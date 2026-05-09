@@ -26,7 +26,12 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   }, [onClose]);
 
   const handleKakao = () => {
-    if (window.Kakao?.isInitialized()) {
+    if (!window.Kakao?.isInitialized()) {
+      console.warn('[Share] Kakao SDK 미초기화 — VITE_KAKAO_JS_KEY 또는 도메인 등록 확인 필요');
+      alert('카카오톡 공유 기능을 불러오지 못했어요.\n카카오 앱이 설치된 모바일에서 다시 시도해주세요.');
+      return;
+    }
+    try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
@@ -43,14 +48,10 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
         ],
       });
       onClose();
-      return;
+    } catch (e) {
+      console.error('[Share] Kakao.Share.sendDefault 실패:', e);
+      alert('카카오톡 공유에 실패했어요. 잠시 후 다시 시도해주세요.');
     }
-    if (navigator.share) {
-      navigator.share({ title: kakaoTitle, url: shareUrl }).catch(() => {});
-      onClose();
-      return;
-    }
-    alert('카카오톡 공유는 모바일에서 이용해주세요.');
   };
 
   const handleCopy = async () => {
