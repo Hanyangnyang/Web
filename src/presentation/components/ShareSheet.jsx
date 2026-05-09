@@ -52,7 +52,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
         content: {
           title: kakaoTitle,
           description: '하냥냥에서 자세한 학식 정보를 확인해보세요.',
-          imageUrl: 'https://www.hanyang.life/hanyang_cafeteria.png',
+          imageUrl: 'https://www.hanyang.life/hanyang_cafeteria.jpg',
           link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
         },
         buttons: [
