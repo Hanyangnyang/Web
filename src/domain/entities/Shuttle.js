@@ -34,7 +34,7 @@ const intToHHMM = (h, m) => `${pad2(h)}:${pad2(m)}`;
 // 출발지 기준으로 표시 정류장까지의 분 오프셋 
 function depOffset(displayStop, route) {
   if (displayStop === '셔틀콕 건너편') {
-    if (route === '중앙역') return 6;
+    if (route === '중앙역') return 13;
     if (route === 'D')    return 10;
     return 15;
   }
@@ -52,12 +52,12 @@ function arrivalInfo(displayStop, route) {
       if (route === 'DY') return { label: '예술인', min: 10, subway: false };
       return { label: '한대앞역', min: 10, subway: true };
     case '한대앞':
-      if (route === '중앙역') return { label: '학교', min: 6,  subway: false };
+      if (route === '중앙역') return { label: '학교', min: 13, subway: false };
       if (route === 'D')    return { label: '학교', min: 10, subway: false };
       return                       { label: '학교', min: 15, subway: false };
     case '예술인':       return { label: '학교',   min: 10, subway: false };
     case '셔틀콕 건너편': return { label: '기숙사', min: 5,  subway: false };
-    case '중앙역':       return { label: '학교',   min: 3,  subway: false };
+    case '중앙역':       return { label: '학교',   min: 10, subway: false };
     default:             return { label: '도착',   min: 15, subway: false };
   }
 }
@@ -71,6 +71,7 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
     d['요일']   === dayType(isHolidayServer)
   );
   if (displayStop === '중앙역') rows = rows.filter(d => d['노선기호'] === '중앙역');
+  if (displayStop === '셔틀콕 건너편') rows = rows.filter(d => d['행선지'] === '셔틀콕/인재원');
 
   const allMapped = rows
     .map(d => {
@@ -108,6 +109,39 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
   }
 
   return filteredPast.concat(upcoming);
+}
+
+// 전체 시간표 계산 (순수 함수)
+export function computeFullSchedule(allData, displayStop, dayTypeStr) {
+  const src = STOP_SOURCE[displayStop];
+  let rows = allData.filter(d =>
+    d['출발지'] === src &&
+    d['기간']   === CURRENT_PERIOD &&
+    d['요일']   === dayTypeStr
+  );
+  if (displayStop === '중앙역') rows = rows.filter(d => d['노선기호'] === '중앙역');
+  if (displayStop === '셔틀콕 건너편') rows = rows.filter(d => d['행선지'] === '셔틀콕/인재원');
+
+  const allMapped = rows
+    .map(d => {
+      const srcMin   = d['시'] * 60 + d['분'];
+      const dOff     = depOffset(displayStop, d['노선기호']);
+      const thisDepM = srcMin + dOff;
+      const { label, min: aOff, subway } = arrivalInfo(displayStop, d['노선기호']);
+      const thisArrM = thisDepM + aOff;
+      return {
+        depMin:   thisDepM,
+        dep:      intToHHMM(Math.floor(thisDepM / 60), thisDepM % 60),
+        arr:      intToHHMM(Math.floor(thisArrM / 60), thisArrM % 60),
+        arrLabel: label,
+        subway,
+        route:    d['노선기호'],
+      };
+    })
+    .sort((a, b) => a.depMin - b.depMin);
+
+  const lastMin = allMapped.length > 0 ? allMapped[allMapped.length - 1].depMin : -1;
+  return allMapped.map(r => ({ ...r, isLast: r.depMin === lastMin }));
 }
 
 // 셔틀 도착 이후 연결 가능한 지하철 편 필터 (순수 함수)

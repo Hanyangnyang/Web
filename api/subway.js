@@ -143,13 +143,11 @@ export default async function handler(req, res) {
   const hour = nowKst.getHours();
   const nowMs = now.getTime();
 
-  // Only query the API between 05:00–24:00
-  if (hour < 5 || hour >= 24) {
-    return res.status(200).json({ arrivals: [], offPeak: true });
-  }
+  const isFull = req.query.full === 'true';
+  const reqDayType = req.query.dayType; // '평일' or '주말'
 
-  // Serve warm cache if still fresh
-  if (subwayCache && nowMs - subwayCacheTime < CACHE_TTL) {
+  // Serve warm cache if still fresh and not a special query
+  if (!isFull && !reqDayType && subwayCache && nowMs - subwayCacheTime < CACHE_TTL) {
     return res.status(200).json(subwayCache);
   }
 
@@ -167,8 +165,12 @@ export default async function handler(req, res) {
     const day = nowKst.getDay();
     
     let dayTag = '1'; // Weekday
-    if (day === 0 || isHoliday) dayTag = '3'; // Sunday/Holiday
-    else if (day === 6) dayTag = '2'; // Saturday
+    if (reqDayType) {
+      dayTag = reqDayType === '주말' ? '3' : '1';
+    } else {
+      if (day === 0 || isHoliday) dayTag = '3'; // Sunday/Holiday
+      else if (day === 6) dayTag = '2'; // Saturday
+    }
 
     const cacheEntry = timetableCache[dayTag];
 
@@ -216,10 +218,10 @@ export default async function handler(req, res) {
     // 3. Filter Future Timetable Entries
     const combined = [];
     const nowHHMM = `${String(hour).padStart(2, '0')}:${String(nowKst.getMinutes()).padStart(2, '0')}`;
-    console.log(`[Subway API] DayTag: ${dayTag}, Time: ${nowHHMM}`);
+    console.log(`[Subway API] DayTag: ${dayTag}, Time: ${nowHHMM}, Full: ${isFull}`);
     
     timetableCache[dayTag].data.forEach(tt => {
-      if (tt.arrTime >= nowHHMM) {
+      if (isFull || tt.arrTime >= nowHHMM) {
         combined.push(tt);
       }
     });
@@ -230,9 +232,14 @@ export default async function handler(req, res) {
     const suinCount = combined.filter(c => c.subwayId === '1075').length;
     console.log(`[Subway API] Final Response -> Line 4: ${line4Count}, Suin: ${suinCount}`);
 
-    subwayCache = { arrivals: combined, isHoliday };
-    subwayCacheTime = nowMs;
-    return res.status(200).json(subwayCache);
+    const result = { arrivals: combined, isHoliday };
+    
+    if (!isFull && !reqDayType) {
+      subwayCache = result;
+      subwayCacheTime = nowMs;
+    }
+    
+    return res.status(200).json(result);
   } catch (err) {
     console.error('[Subway API] Fatal Error:', err);
     if (subwayCache) return res.status(200).json({ ...subwayCache, stale: true });

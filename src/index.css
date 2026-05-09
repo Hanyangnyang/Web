@@ -2111,6 +2111,17 @@ p.subtitle {
   margin-bottom: 1.5rem;
 }
 
+.stt-sticky-top {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 100;
+  padding-bottom: 12px;
+  margin-bottom: 1.5rem;
+  /* 스크롤 시 아래쪽 내용과 살짝 구분만 되도록 매우 미세한 그림자 추가 */
+  box-shadow: 0 8px 12px -12px rgba(0, 0, 0, 0.15);
+}
+
 .stt-sec-label {
   display: flex;
   align-items: center;
@@ -2583,6 +2594,11 @@ p.subtitle {
   color: var(--color-warning-dark);
   font-size: 9px;
   letter-spacing: -0.2px;
+}
+
+.stt-route-label.ja {
+  background: rgba(253, 224, 71, 0.2);
+  color: #854d0e;
 }
 
 .stt-tooltip {

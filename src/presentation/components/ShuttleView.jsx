@@ -32,7 +32,7 @@ const IcBus = () => (
 
 const STOP_ICON = { '기숙사': IcBed, '셔틀콕': IcSchool, '한대앞': IcSubway, '셔틀콕 건너편': IcSchool, '예술인': IcBus, '중앙역': IcSubway };
 
-const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '순환' };
+const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
 
 // ── 지하철 노선 뱃지 ──────────────────────────────────────────────────────────
 function LineBadge({ opt, size = 32 }) {
@@ -110,7 +110,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     ? (subwayOffPeak ? '운행 시간 외' : '연결 열차 없음') : null;
 
   const rLabel = ROUTE_LABEL[row.route] || row.route;
-  const routeClass = row.route === 'DY' ? 'dy' : (row.route === 'C' || row.route === '중앙역' ? 'c' : 'd');
+  const routeClass = row.route === 'DY' ? 'dy' : (row.route === '중앙역' ? 'ja' : (row.route === 'C' ? 'c' : 'd'));
 
   return (
     <div className={`stt-trow${isNext ? ' next' : ''}${isPast ? ' past' : ''}`}>
@@ -167,6 +167,8 @@ export function ShuttleView() {
     needsSubway,
     loadErr, isLoading, isSubwayLoading,
     visibleCount, loadMore,
+    isFullMode, setIsFullMode,
+    fullDayType, setFullDayType,
   } = useShuttle();
 
   const [showTooltip, setShowTooltip] = useState(true);
@@ -186,7 +188,7 @@ export function ShuttleView() {
   return (
     <div className="stt-container">
       {/* 출발지 선택 */}
-      <div className="stt-section">
+      <div className="stt-section stt-sticky-top">
         <p className="stt-sec-label">출발지</p>
         <div className="stt-stops-grid">
           {STOPS.map((s, idx) => {
@@ -210,37 +212,112 @@ export function ShuttleView() {
 
       {/* 시간표 */}
       <div className="stt-section">
-        <div className="stt-section-header">
-          <div className="stt-sec-label">
-            시간표
-            {isWeekend ? (
-              <span className="stt-holiday-badge">주말</span>
-            ) : isHolidayServer ? (
-              <span className="stt-holiday-badge">공휴일</span>
-            ) : null}
+        <div className="stt-section-header" style={{ alignItems: 'center' }}>
+          <div>
+            <div className="stt-sec-label" style={{ marginBottom: 2 }}>
+              시간표
+              {!isFullMode && (isWeekend ? (
+                <span className="stt-holiday-badge">주말</span>
+              ) : isHolidayServer ? (
+                <span className="stt-holiday-badge">공휴일</span>
+              ) : null)}
+            </div>
           </div>
-          {needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
+
+          {isFullMode && (
+            <div style={{
+              display: 'flex',
+              background: 'var(--color-surface-variant)',
+              borderRadius: 8,
+              padding: 2,
+              border: '1px solid rgba(0,0,0,0.05)',
+              marginLeft: 16,
+              marginRight: 8
+            }}>
+              <button
+                onClick={() => setFullDayType('평일')}
+                style={{
+                  padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12,
+                  background: fullDayType === '평일' ? 'white' : 'transparent',
+                  color: fullDayType === '평일' ? 'var(--color-primary)' : 'var(--color-text-hint)',
+                  boxShadow: fullDayType === '평일' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                평일
+              </button>
+              <button
+                onClick={() => setFullDayType('주말')}
+                style={{
+                  padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12,
+                  background: fullDayType === '주말' ? 'white' : 'transparent',
+                  color: fullDayType === '주말' ? 'var(--color-primary)' : 'var(--color-text-hint)',
+                  boxShadow: fullDayType === '주말' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                주말/공휴일
+              </button>
+            </div>
+          )}
+
+          <div style={{ marginLeft: 'auto' }}>
+            {needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
+          </div>
         </div>
 
-        <div className="stt-col-header">
+        <div className="stt-col-header" style={{ position: 'relative' }}>
           <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 90 }} className="stt-col-label">출발 시간</div>
           {!hideSubwayCol && (
             <div style={{ flex: 1, paddingLeft: 4 }} className="stt-col-label">
               {needsSubway ? '연결 지하철' : '도착'}
             </div>
           )}
+
+          <div style={{
+            position: 'absolute', right: 0, top: -2,
+            display: 'flex', alignItems: 'center', gap: 6
+          }}>
+            <div
+              onClick={() => setIsFullMode(!isFullMode)}
+              style={{
+                width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer',
+                background: isFullMode ? 'var(--color-primary)' : '#e0e0e0',
+                position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)'
+              }}
+            >
+              <div style={{
+                width: 17, height: 17, borderRadius: '50%', background: 'white',
+                boxShadow: '0 2px 3px rgba(0,0,0,0.15)',
+                position: 'absolute', top: 2,
+                left: isFullMode ? 19 : 2,
+                transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }} />
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                color: isFullMode ? 'var(--color-primary)' : 'var(--color-text-hint)',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              전체 시간표
+            </span>
+          </div>
         </div>
 
         <div className="stt-tcard">
           {schedule.length > 0 ? (
-            schedule.slice(0, visibleCount).map((row, i) => (
+            (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
               <TimetableRow
                 key={i}
                 row={row}
                 lineId={lineId}
-                isNext={i === nextIdx && nextIdx !== -1}
-                isLast={i === schedule.length - 1}
-                isPast={row.depMin < now}
+                isNext={!isFullMode && i === nextIdx && nextIdx !== -1}
+                isLast={row.isLast || i === schedule.length - 1}
+                isPast={!isFullMode && row.depMin < now}
                 subwayArrivals={subwayArrivals}
                 subwayOffPeak={subwayOffPeak}
                 isSubwayLoading={isSubwayLoading}
@@ -252,7 +329,7 @@ export function ShuttleView() {
           )}
         </div>
 
-        {schedule.length > visibleCount && (
+        {!isFullMode && schedule.length > visibleCount && (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
             <button className="qr-refresh-btn" onClick={loadMore} style={{ width: 'auto', padding: '8px 24px' }}>
               <ChevronDown size={16} />

@@ -9,8 +9,8 @@ export const createShuttleRepository = ({ shuttleDataSource }) => {
       return cachedSchedule;
     },
 
-    getSubwayArrivals: async () => {
-      const data = await shuttleDataSource.fetchSubwayArrivals();
+    getSubwayArrivals: async (full = false, dayType = null) => {
+      const data = await shuttleDataSource.fetchSubwayArrivals(full, dayType);
       return { arrivals: data.arrivals ?? [], offPeak: !!data.offPeak, isHoliday: data.isHoliday ?? false };
     },
   };
