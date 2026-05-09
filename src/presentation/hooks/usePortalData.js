@@ -40,7 +40,7 @@ export function usePortalData() {
 async function getLibraryData() {
   try {
     const res = await fetch('/api/library');
-    if (!res.ok) throw new Error('Proxy not available');
+    if (!res.ok) throw new Error('API call failed');
     const json = await res.json();
     
     if (json.success) {
@@ -75,16 +75,9 @@ async function getLibraryData() {
 
       return { list, updatedAt: Date.now() };
     }
+    return null;
   } catch (e) {
-    return {
-      list: [
-        { id: 61, name: "제1열람실 (2F)", total: 321, occupied: 25, ratio: 0.07, status: '쾌적', color: '#2563eb', emoji: '🔵' },
-        { id: 63, name: "제2열람실 (4F)", total: 216, occupied: 47, ratio: 0.21, status: '쾌적', color: '#2563eb', emoji: '🔵' },
-        { id: 132, name: "노상일 HOLMZ (4F)", total: 82, occupied: 18, ratio: 0.21, status: '쾌적', color: '#2563eb', emoji: '🔵' },
-        { id: 131, name: "집중열람실 (4F)", total: 12, occupied: 5, ratio: 0.41, status: '보통', color: '#22c55e', emoji: '🟢' }
-      ],
-      updatedAt: Date.now()
-    };
+    console.warn('Library API fetch failed:', e);
+    return null; // 가짜 데이터 대신 null 반환
   }
-  return null;
 }
