@@ -1364,11 +1364,17 @@ p.subtitle {
   color: var(--color-text-hint);
 }
 
-.menu-hours--card {
+.menu-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 0.6rem;
   padding-top: 0.6rem;
-  padding-left: 0.2rem;
   border-top: 1px solid #e2e8f0;
+}
+
+.menu-hours--card {
+  padding-left: 0.2rem;
 }
 
 .menu-card--jeyuk {
@@ -1439,6 +1445,145 @@ p.subtitle {
   background: var(--hyu-blue-light);
   padding: 2px 8px;
   border-radius: var(--radius-card);
+}
+
+/* 메뉴 카드 공유 버튼 */
+.menu-card-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--color-text-hint);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.menu-card-share-btn:hover {
+  background: #f1f5f9;
+  color: var(--color-text-sub);
+}
+
+.menu-card-share-btn:active {
+  background: #e2e8f0;
+  transform: scale(0.92);
+}
+
+/* Share Bottom Sheet */
+.share-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.share-sheet {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  padding: 0 var(--space-page) calc(var(--space-page) + env(safe-area-inset-bottom, 0px));
+  animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.share-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: var(--radius-full);
+  margin: var(--space-element) auto var(--space-element);
+}
+
+.share-sheet-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-sub);
+  text-align: center;
+  margin: 0 0 var(--space-page);
+}
+
+.share-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-section);
+  padding-bottom: var(--space-sm);
+}
+
+.share-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-sm);
+  border-radius: var(--radius-card);
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+
+.share-action-btn:hover {
+  background: var(--color-surface);
+}
+
+.share-action-btn span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.share-action-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-action-icon--kakao {
+  background: #FEE500;
+}
+
+.share-action-icon--link {
+  background: #f1f5f9;
+}
+
+/* 링크 복사 토스트 */
+.copy-toast {
+  position: fixed;
+  bottom: calc(var(--space-page) + 64px + 52px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.88);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  z-index: 2000;
+  animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards;
+  pointer-events: none;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
 .accordion-content {

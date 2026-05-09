@@ -1,8 +1,10 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 식단 목록 표시
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Clock, Bell } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ChevronLeft, ChevronRight, Clock, Bell, Share2 } from 'lucide-react';
 import { getKSTDate } from '../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
+import { ShareSheet } from './ShareSheet.jsx';
 
 function MenuItemLine({ html }) {
   const scrollWrapRef = useRef(null);
@@ -76,7 +78,12 @@ const getMenuIcon = (type) => {
 };
 
 export function CafeteriaView({ date, changeDate, cafes, loading }) {
-  const [selectedCafeId, setSelectedCafeId] = useState(() => localStorage.getItem('lastSelectedCafeId') || 're12');
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTypeRef = useRef(urlParams.get('type'));
+
+  const [selectedCafeId, setSelectedCafeId] = useState(
+    () => urlParams.get('cafe') || localStorage.getItem('lastSelectedCafeId') || 're12'
+  );
   
   const handleCafeSelect = (id) => {
     setSelectedCafeId(id);
@@ -84,12 +91,49 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
   };
   const [expandedGroups, setExpandedGroups] = useState({});
   const [showAlarm, setShowAlarm] = useState(false);
+  const [shareTarget, setShareTarget] = useState(null);
+  const [copiedToast, setCopiedToast] = useState(false);
   const listRef = useRef(null);
 
   const selectedCafe = cafes.find(c => c.id === selectedCafeId) || { menus: [] };
 
+  // 날짜 이동 후 선택된 식당에 메뉴가 없으면 메뉴 있는 식당으로 자동 전환
+  useEffect(() => {
+    if (!cafes.length) return;
+    const current = cafes.find(c => c.id === selectedCafeId);
+    if (!current?.menus?.length) {
+      const fallback = cafes.find(c => c.menus?.length > 0);
+      if (fallback) setSelectedCafeId(fallback.id);
+    }
+  }, [cafes]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // URL 파라미터 한 번 읽은 후 히스토리 정리
+  useEffect(() => {
+    if (window.location.search) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   useEffect(() => {
     if (!selectedCafe.menus?.length) return;
+
+    // URL ?type= 파라미터가 있으면 해당 끼니만 펼침
+    const urlType = urlTypeRef.current;
+    if (urlType) {
+      const initial = {};
+      selectedCafe.menus.forEach(m => {
+        if (initial[m.type] === undefined) initial[m.type] = m.type === urlType;
+      });
+      setExpandedGroups(initial);
+      urlTypeRef.current = null;
+
+      setTimeout(() => {
+        const targetEl = listRef.current?.querySelector(`[data-type="${CSS.escape(urlType)}"]`);
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+      return;
+    }
+
     const nowKst = getKSTDate();
     const isToday = nowKst.toISOString().split('T')[0] === date.toISOString().split('T')[0];
     const h = nowKst.getUTCHours();
@@ -136,13 +180,35 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     return acc;
   }, {});
 
+  const handleCopied = () => {
+    setCopiedToast(true);
+    setTimeout(() => setCopiedToast(false), 2000);
+  };
+
   return (
     <div className="cafe-container">
-      <button className="alarm-fab" onClick={() => setShowAlarm(true)}>
-        <Bell size={18} />
-        키워드 알림 받기
-      </button>
-      {showAlarm && <AlarmSettings onClose={() => setShowAlarm(false)} />}
+      {createPortal(
+        <>
+          <button className="alarm-fab" onClick={() => setShowAlarm(true)}>
+            <Bell size={18} />
+            키워드 알림 받기
+          </button>
+          {showAlarm && <AlarmSettings onClose={() => setShowAlarm(false)} />}
+        </>,
+        document.body
+      )}
+      {shareTarget && (
+        <ShareSheet
+          cafeName={selectedCafe.name}
+          dateText={formatDate(date)}
+          mealType={shareTarget.type}
+          menuText={shareTarget.menu.menu}
+          shareUrl={shareTarget.shareUrl}
+          onClose={() => setShareTarget(null)}
+          onCopied={handleCopied}
+        />
+      )}
+      {copiedToast && <div className="copy-toast">링크 복사됨!</div>}
       <div className="cafe-sticky-header">
         <div className="date-controller">
           <button className="date-btn" onClick={() => changeDate(-1)} disabled={loading}>
@@ -213,6 +279,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                               {menus.map((m, i) => {
                                 const hasJeyuk = m.menu.includes('제육');
                                 const cardClass = `menu-card${hasJeyuk ? ' menu-card--jeyuk' : ''}`;
+                                const shareUrl = `${window.location.origin}?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
                                 return (
                                   <div key={i} className={cardClass}>
                                     {m.price && <div className="menu-price">{m.price}</div>}
@@ -221,12 +288,21 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                         <MenuItemLine key={idx} html={line} />
                                       ))}
                                     </div>
-                                    {hoursText && (
-                                      <div className="menu-hours menu-hours--card">
-                                        <Clock size={12} />
-                                        <span>{hoursText}</span>
-                                      </div>
-                                    )}
+                                    <div className="menu-card-footer">
+                                      {hoursText ? (
+                                        <div className="menu-hours">
+                                          <Clock size={12} />
+                                          <span>{hoursText}</span>
+                                        </div>
+                                      ) : <span />}
+                                      <button
+                                        className="menu-card-share-btn"
+                                        onClick={() => setShareTarget({ type, menu: m, shareUrl })}
+                                        aria-label="메뉴 공유"
+                                      >
+                                        <Share2 size={14} />
+                                      </button>
+                                    </div>
                                   </div>
                                 );
                               })}

@@ -3,8 +3,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { getMenuUseCase } from '../../di.js';
 import { getKSTDate } from '../../utils/time.js';
 
+function getInitialDate() {
+  const dateParam = new URLSearchParams(window.location.search).get('date');
+  if (dateParam) {
+    const d = new Date(dateParam + 'T00:00:00Z');
+    if (!isNaN(d)) return d;
+  }
+  return getKSTDate();
+}
+
 export function useMenu() {
-  const [menuDate, setMenuDate]     = useState(getKSTDate);
+  const [menuDate, setMenuDate]     = useState(getInitialDate);
   const [cafes, setCafes]           = useState([]);
   const [menuLoading, setMenuLoading] = useState(false);
 
