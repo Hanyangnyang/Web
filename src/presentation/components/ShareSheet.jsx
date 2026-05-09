@@ -26,11 +26,25 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   }, [onClose]);
 
   const handleKakao = () => {
-    if (!window.Kakao?.isInitialized()) {
-      console.warn('[Share] Kakao SDK 미초기화 — VITE_KAKAO_JS_KEY 또는 도메인 등록 확인 필요');
-      alert('카카오톡 공유 기능을 불러오지 못했어요.\n카카오 앱이 설치된 모바일에서 다시 시도해주세요.');
+    if (!window.Kakao) {
+      console.error('[Share] window.Kakao 없음 (SDK_NOT_LOADED)');
+      alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]\n\nindex.html의 script 태그가 올바른지 확인해주세요.');
       return;
     }
+
+    if (!window.Kakao.isInitialized()) {
+      const status = window.__kakaoStatus ?? 'UNKNOWN';
+      console.error(`[Share] Kakao 미초기화 (${status})`);
+      if (status === 'NO_KEY') {
+        alert('앱 키가 설정되어 있지 않아요.\n[오류 코드: NO_APP_KEY]\n\nVercel 환경변수 VITE_KAKAO_JS_KEY를 확인하고 재배포해주세요.');
+      } else if (status === 'INIT_ERROR') {
+        alert('SDK 초기화 중 오류가 발생했어요.\n[오류 코드: INIT_ERROR]\n\n카카오 개발자 콘솔에서 앱 키와 도메인 등록을 확인해주세요.');
+      } else {
+        alert('SDK가 아직 초기화되지 않았어요.\n[오류 코드: NOT_INITIALIZED]\n\n카카오 개발자 콘솔에서 도메인 등록 여부를 확인해주세요.');
+      }
+      return;
+    }
+
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -42,15 +56,17 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
         },
         buttons: [
           {
-            title: '하냥냥으로 이동해서 학식 메뉴보기',
+            title: '하냥냥에서 학식 메뉴 보기',
             link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
           },
         ],
       });
       onClose();
     } catch (e) {
-      console.error('[Share] Kakao.Share.sendDefault 실패:', e);
-      alert('카카오톡 공유에 실패했어요. 잠시 후 다시 시도해주세요.');
+      const code = e?.code ?? e?.status ?? 'UNKNOWN';
+      const msg = e?.message ?? String(e);
+      console.error(`[Share] Kakao.Share.sendDefault 실패 (${code}):`, e);
+      alert(`카카오톡 공유에 실패했어요.\n[오류 코드: ${code}]\n${msg}`);
     }
   };
 
