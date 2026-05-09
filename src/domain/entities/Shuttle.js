@@ -110,6 +110,38 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
   return filteredPast.concat(upcoming);
 }
 
+// 전체 시간표 계산 (순수 함수)
+export function computeFullSchedule(allData, displayStop, dayTypeStr) {
+  const src = STOP_SOURCE[displayStop];
+  let rows = allData.filter(d =>
+    d['출발지'] === src &&
+    d['기간']   === CURRENT_PERIOD &&
+    d['요일']   === dayTypeStr
+  );
+  if (displayStop === '중앙역') rows = rows.filter(d => d['노선기호'] === '중앙역');
+
+  const allMapped = rows
+    .map(d => {
+      const srcMin   = d['시'] * 60 + d['분'];
+      const dOff     = depOffset(displayStop, d['노선기호']);
+      const thisDepM = srcMin + dOff;
+      const { label, min: aOff, subway } = arrivalInfo(displayStop, d['노선기호']);
+      const thisArrM = thisDepM + aOff;
+      return {
+        depMin:   thisDepM,
+        dep:      intToHHMM(Math.floor(thisDepM / 60), thisDepM % 60),
+        arr:      intToHHMM(Math.floor(thisArrM / 60), thisArrM % 60),
+        arrLabel: label,
+        subway,
+        route:    d['노선기호'],
+      };
+    })
+    .sort((a, b) => a.depMin - b.depMin);
+
+  const lastMin = allMapped.length > 0 ? allMapped[allMapped.length - 1].depMin : -1;
+  return allMapped.map(r => ({ ...r, isLast: r.depMin === lastMin }));
+}
+
 // 셔틀 도착 이후 연결 가능한 지하철 편 필터 (순수 함수)
 export function connectingTrains(subwayArrivals, shuttleArrTime, lineId) {
   if (!subwayArrivals?.length) return [];
