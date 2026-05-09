@@ -34,7 +34,7 @@ const intToHHMM = (h, m) => `${pad2(h)}:${pad2(m)}`;
 // 출발지 기준으로 표시 정류장까지의 분 오프셋 
 function depOffset(displayStop, route) {
   if (displayStop === '셔틀콕 건너편') {
-    if (route === '중앙역') return 6;
+    if (route === '중앙역') return 13;
     if (route === 'D')    return 10;
     return 15;
   }
@@ -52,12 +52,12 @@ function arrivalInfo(displayStop, route) {
       if (route === 'DY') return { label: '예술인', min: 10, subway: false };
       return { label: '한대앞역', min: 10, subway: true };
     case '한대앞':
-      if (route === '중앙역') return { label: '학교', min: 6,  subway: false };
+      if (route === '중앙역') return { label: '학교', min: 13, subway: false };
       if (route === 'D')    return { label: '학교', min: 10, subway: false };
       return                       { label: '학교', min: 15, subway: false };
     case '예술인':       return { label: '학교',   min: 10, subway: false };
     case '셔틀콕 건너편': return { label: '기숙사', min: 5,  subway: false };
-    case '중앙역':       return { label: '학교',   min: 3,  subway: false };
+    case '중앙역':       return { label: '학교',   min: 10, subway: false };
     default:             return { label: '도착',   min: 15, subway: false };
   }
 }
