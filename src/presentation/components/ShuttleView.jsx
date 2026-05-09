@@ -188,7 +188,7 @@ export function ShuttleView() {
   return (
     <div className="stt-container">
       {/* 출발지 선택 */}
-      <div className="stt-section">
+      <div className="stt-section stt-sticky-top">
         <p className="stt-sec-label">출발지</p>
         <div className="stt-stops-grid">
           {STOPS.map((s, idx) => {
