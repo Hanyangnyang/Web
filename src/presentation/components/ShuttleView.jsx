@@ -227,7 +227,7 @@ export function ShuttleView() {
         </div>
 
         <div className="stt-col-header">
-          <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 16 }} className="stt-col-label">출발 시간</div>
+          <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 90 }} className="stt-col-label">출발 시간</div>
           {!hideSubwayCol && (
             <div style={{ flex: 1, paddingLeft: 4 }} className="stt-col-label">
               {needsSubway ? '연결 지하철' : '도착'}
