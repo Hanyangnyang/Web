@@ -97,6 +97,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
 
   const selectedCafe = cafes.find(c => c.id === selectedCafeId) || { menus: [] };
 
+  // 식당 자동 선택 및 메뉴 유무 확인
   useEffect(() => {
     if (!cafes.length) return;
     const current = cafes.find(c => c.id === selectedCafeId);
@@ -106,9 +107,24 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     }
   }, [cafes]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 딥링크 처리: 날짜 동기화
+  useEffect(() => {
+    const urlDate = urlParams.get('date');
+    if (urlDate) {
+      const parsed = new Date(urlDate);
+      if (!isNaN(parsed) && urlDate !== date.toISOString().split('T')[0]) {
+        changeDate(parsed);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 딥링크 처리: 파라미터 제거 (모든 연동 준비 후)
   useEffect(() => {
     if (window.location.search) {
-      window.history.replaceState({}, '', window.location.pathname);
+      const t = setTimeout(() => {
+        window.history.replaceState({}, '', window.location.pathname);
+      }, 1000); // 넉넉히 1초 후 제거
+      return () => clearTimeout(t);
     }
   }, []);
 
