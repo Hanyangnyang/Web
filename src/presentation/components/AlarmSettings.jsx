@@ -11,19 +11,24 @@ const TIME_LIST = Array.from({ length: 24 }, (_, h) => ({
 }));
 
 const AMPM_LIST = ['오전', '오후'];
+const DAY_LIST = ['전날', '당일'];
 
-function TimePicker({ value, onChange }) {
+function TimePicker({ value, onChange, day, onDayChange }) {
   const timeIdx = Math.max(0, Math.min(parseInt(value.split(':')[0]), 23));
   const currentAmpm = timeIdx < 12 ? '오전' : '오후';
+  const dayIdx = DAY_LIST.indexOf(day) === -1 ? 1 : DAY_LIST.indexOf(day);
 
   const hourRef = useRef(null);
   const ampmRef = useRef(null);
+  const dayRef = useRef(null);
   const hourTimerRef = useRef(null);
+  const dayTimerRef = useRef(null);
 
   useLayoutEffect(() => {
     if (hourRef.current) hourRef.current.scrollTop = timeIdx * ITEM_H;
     if (ampmRef.current) ampmRef.current.scrollTop = (timeIdx < 12 ? 0 : 1) * ITEM_H;
-  }, [timeIdx]);
+    if (dayRef.current) dayRef.current.scrollTop = dayIdx * ITEM_H;
+  }, [timeIdx, dayIdx]);
 
   const handleHourScroll = () => {
     clearTimeout(hourTimerRef.current);
@@ -43,6 +48,25 @@ function TimePicker({ value, onChange }) {
     if (!el) return;
     const current = Math.round(el.scrollTop / ITEM_H);
     const next = e.deltaY > 0 ? Math.min(current + 1, 23) : Math.max(current - 1, 0);
+    el.scrollTop = next * ITEM_H;
+  };
+
+  const handleDayScroll = () => {
+    clearTimeout(dayTimerRef.current);
+    dayTimerRef.current = setTimeout(() => {
+      const el = dayRef.current;
+      if (!el) return;
+      const idx = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1));
+      if (DAY_LIST[idx] !== day) onDayChange(DAY_LIST[idx]);
+    }, 200);
+  };
+
+  const handleDayWheel = (e) => {
+    e.preventDefault();
+    const el = dayRef.current;
+    if (!el) return;
+    const current = Math.round(el.scrollTop / ITEM_H);
+    const next = e.deltaY > 0 ? Math.min(current + 1, 1) : Math.max(current - 1, 0);
     el.scrollTop = next * ITEM_H;
   };
 
@@ -82,6 +106,27 @@ function TimePicker({ value, onChange }) {
         pointerEvents: 'none',
       }} />
 
+      {/* 전날/당일 */}
+      <div
+        ref={dayRef}
+        onScroll={handleDayScroll}
+        onWheel={handleDayWheel}
+        className="alarm-picker-scroll"
+        style={{
+          height: ITEM_H * VISIBLE,
+          overflowY: 'auto',
+          scrollSnapType: 'y mandatory',
+          width: 64,
+        }}
+      >
+        <div style={{ height: ITEM_H }} />
+        {DAY_LIST.map((opt, idx) => (
+          <div key={opt} style={itemStyle(idx === dayIdx)}>{opt}</div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      {/* 오전/오후 */}
       <div
         ref={ampmRef}
         className="alarm-picker-scroll"
@@ -89,7 +134,7 @@ function TimePicker({ value, onChange }) {
           height: ITEM_H * VISIBLE,
           overflowY: 'auto',
           scrollSnapType: 'y mandatory',
-          width: 72,
+          width: 64,
           pointerEvents: 'none',
         }}
       >
@@ -100,6 +145,7 @@ function TimePicker({ value, onChange }) {
         <div style={{ height: ITEM_H }} />
       </div>
 
+      {/* 시간 */}
       <div
         ref={hourRef}
         onScroll={handleHourScroll}
@@ -139,21 +185,23 @@ function TimePicker({ value, onChange }) {
 const loadSettings = () => {
   try {
     const saved = localStorage.getItem('alarm_settings');
-    if (!saved) return { jeyukAlert: false, keywords: [], notifyTime: '08:00' };
+    if (!saved) return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
     const parsed = JSON.parse(saved);
     if (parsed.notifyTime) {
       const h = parseInt(parsed.notifyTime.split(':')[0]);
       if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
     }
-    return { jeyukAlert: false, keywords: [], notifyTime: '08:00', ...parsed };
+    if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
+    return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일', ...parsed };
   } catch {
-    return { jeyukAlert: false, keywords: [], notifyTime: '08:00' };
+    return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
   }
 };
 
 const settingsEqual = (a, b) =>
   a.jeyukAlert === b.jeyukAlert &&
   a.notifyTime === b.notifyTime &&
+  a.notifyDay === b.notifyDay &&
   JSON.stringify(a.keywords) === JSON.stringify(b.keywords);
 
 export function AlarmSettings({ onClose }) {
@@ -185,7 +233,7 @@ export function AlarmSettings({ onClose }) {
       if (settings.jeyukAlert && settings.keywords.length > 0) {
         const h = parseInt(settings.notifyTime.split(':')[0]);
         const t = TIME_LIST[Math.max(0, Math.min(h, 23))];
-        onClose(`${t.ampm} ${t.hourStr}시에 알림을 보내드릴게요!`);
+        onClose('설정한 시간에 맞춰\n알림을 보내드릴게요');
         return;
       }
     }
@@ -252,6 +300,8 @@ export function AlarmSettings({ onClose }) {
             <TimePicker
               value={settings.notifyTime}
               onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
+              day={settings.notifyDay}
+              onDayChange={(d) => setSettings(p => ({ ...p, notifyDay: d }))}
             />
           </div>
         </div>

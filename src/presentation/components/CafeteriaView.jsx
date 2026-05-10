@@ -194,7 +194,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
             setShowAlarm(false);
             if (msg) {
               setAlarmPopup(msg);
-              setTimeout(() => setAlarmPopup(''), 3000);
+              setTimeout(() => setAlarmPopup(''), 1500);
             }
           }} />}
         </>,
@@ -221,7 +221,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
         <div style={{ position: 'fixed', inset: 0, zIndex: 1500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', pointerEvents: 'none' }}>
           <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 240, margin: '0 24px' }}>
             <div style={{ fontSize: 22, marginBottom: 8 }}>🔔</div>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.6 }}>{alarmPopup}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{alarmPopup}</p>
           </div>
         </div>
       )}
