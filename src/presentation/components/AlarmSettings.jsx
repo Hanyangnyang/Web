@@ -143,8 +143,45 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     overflowY: 'auto',
     scrollSnapType: 'y mandatory',
     width,
-    touchAction: 'pan-y', // 터치 스크롤 허용
+    touchAction: 'pan-y',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    cursor: 'grab',
   });
+
+  // --- 드래그로 휠 돌리기 (마우스용) ---
+  const handleDragScroll = (ref, liveSetter) => {
+    let isDown = false;
+    let startY;
+    let scrollTop;
+
+    const onDown = (e) => {
+      isDown = true;
+      ref.current.style.cursor = 'grabbing';
+      startY = e.pageY - ref.current.offsetTop;
+      scrollTop = ref.current.scrollTop;
+    };
+
+    const onLeave = () => {
+      isDown = false;
+      ref.current.style.cursor = 'grab';
+    };
+
+    const onUp = () => {
+      isDown = false;
+      ref.current.style.cursor = 'grab';
+    };
+
+    const onMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const y = e.pageY - ref.current.offsetTop;
+      const walk = (y - startY) * 1.5;
+      ref.current.scrollTop = scrollTop - walk;
+    };
+
+    return { onMouseDown: onDown, onMouseLeave: onLeave, onMouseUp: onUp, onMouseMove: onMove };
+  };
 
   return (
     <div style={{
@@ -176,6 +213,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         ref={dayRef}
         onScroll={handleDayScroll}
         onWheel={handleDayWheel}
+        {...handleDragScroll(dayRef, setLiveDay)}
         className="alarm-picker-scroll"
         style={colStyle(64)}
       >
@@ -191,6 +229,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         ref={ampmRef}
         onScroll={handleAmpmScroll}
         onWheel={handleAmpmWheel}
+        {...handleDragScroll(ampmRef, setLiveAmpm)}
         className="alarm-picker-scroll"
         style={colStyle(56)}
       >
@@ -206,6 +245,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         ref={hourRef}
         onScroll={handleHourScroll}
         onWheel={handleHourWheel}
+        {...handleDragScroll(hourRef, setLiveHour)}
         className="alarm-picker-scroll"
         style={colStyle(44)}
       >
@@ -303,27 +343,39 @@ export function AlarmSettings({ onClose }) {
     return () => el.removeEventListener('touchmove', prevent);
   }, []);
 
-  // 드래그 제어 핸들러
+  // 드래그 제어 핸들러 (전체 시트용)
   const handleTouchStart = (e) => {
-    startY.current = e.touches[0].clientY;
+    // 내부 스크롤 중이면 드래그 무시
+    if (sheetRef.current && sheetRef.current.scrollTop > 0) return;
+    startY.current = e.touches ? e.touches[0].clientY : e.clientY;
     setIsDragging(true);
   };
 
   const handleTouchMove = (e) => {
     if (!isDragging) return;
-    const currentY = e.touches[0].clientY;
+    
+    const currentY = e.touches ? e.touches[0].clientY : e.clientY;
     const deltaY = currentY - startY.current;
+
+    // 아래로 내릴 때만 시트 이동
     if (deltaY > 0) {
+      // 이벤트 전파 방지 (스크롤 발생 차단)
+      if (e.cancelable) e.preventDefault();
       setDragY(deltaY);
+    } else {
+      // 위로 올리려 할 때는 드래그 중단 (내부 스크롤 허용)
+      setDragY(0);
+      setIsDragging(false);
     }
   };
 
   const handleTouchEnd = () => {
+    if (!isDragging) return;
     setIsDragging(false);
-    if (dragY > 100) {
-      handleClose(); // 100px 이상 내리면 닫기
+    if (dragY > 120) {
+      handleClose();
     } else {
-      setDragY(0); // 다시 제자리로
+      setDragY(0);
     }
   };
 
@@ -424,22 +476,23 @@ export function AlarmSettings({ onClose }) {
     >
       <div
         ref={sheetRef}
-        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-4 max-h-[90vh] overflow-y-auto mb-6 relative"
+        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-4 max-h-[90vh] overflow-y-auto mb-6 relative select-none"
         style={{ 
           transform: `translateY(${dragY}px)`,
-          transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+          transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           animation: closing ? 'sheetDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           willChange: 'transform'
         }}
         onClick={e => e.stopPropagation()}
+        onMouseDown={handleTouchStart}
+        onMouseMove={handleTouchMove}
+        onMouseUp={handleTouchEnd}
+        onMouseLeave={handleTouchEnd}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        {/* 드래그 핸들 영역 (터치 인식 범위 확장) */}
-        <div 
-          className="py-3 cursor-grab active:cursor-grabbing"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
+        <div className="py-3">
           <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto" />
         </div>
 
