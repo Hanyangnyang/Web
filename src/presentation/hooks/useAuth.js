@@ -1,17 +1,21 @@
 // 훅(ViewModel): 인증 상태 관리 - 로그인·로그아웃·자동 재로그인
 import { useState, useEffect, useCallback } from 'react';
 import { loginUseCase, reloginUseCase, authRepository } from '../../di.js';
+import { useBoot } from '../context/BootContext';
 
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const { markReady } = useBoot();
+
   useEffect(() => {
     authRepository.getStoredSession().then(session => {
       if (session) setUser(session);
       setLoading(false);
+      markReady('auth');
     });
-  }, []);
+  }, [markReady]);
 
   const login = useCallback(async ({ loginId, password }) => {
     const newUser = await loginUseCase.execute({ loginId, password });

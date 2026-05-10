@@ -10,17 +10,27 @@ import { ShuttleView }   from './presentation/components/ShuttleView.jsx';
 import { MiscView }      from './presentation/components/MiscView.jsx';
 import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
+import { BootProvider, useBoot } from './presentation/context/BootContext';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'misc'];
 
 export default function App() {
+  return (
+    <BootProvider>
+      <MainLayout />
+    </BootProvider>
+  );
+}
+
+function MainLayout() {
   const [activeTab, setActiveTab] = useState(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
     return localStorage.getItem('lastActiveTab') || 'cafe';
   });
   const [slideDir, setSlideDir] = useState('right');
-  const [splashDone, setSplashDone] = useState(false);
+  const { isAppReady, splashDone, completeSplash } = useBoot();
+  
   const { user, loading, login, relogin, logout, updateUser } = useAuth();
   const { menuDate, cafes, menuLoading, changeDate } = useMenu();
 
@@ -41,7 +51,10 @@ export default function App() {
   return (
     <>
       {!splashDone && (
-        <SplashScreen ready={!loading && !menuLoading} onDone={() => setSplashDone(true)} />
+        <SplashScreen 
+          ready={isAppReady} 
+          onDone={completeSplash} 
+        />
       )}
       <div className="mx-auto w-full max-w-app min-h-screen px-5 py-6 flex flex-col">
         <div key={activeTab} className={`tab-slide-${slideDir}`}>
