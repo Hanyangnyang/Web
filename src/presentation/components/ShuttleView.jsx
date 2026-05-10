@@ -4,39 +4,6 @@ import { Loader2, ChevronDown } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 
-// ── 아이콘
-const IcBed = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 7v11M3 13h18M21 7v11M18 7H6a2 2 0 00-2 2v4h16V9a2 2 0 00-2-2z" />
-  </svg>
-);
-const IcBusStop = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 17h2M3 17h2M4 7V5a1 1 0 011-1h14a1 1 0 011 1v2M18 7H6v10h12V7zM8 11h2M14 11h2M7 17l-1 3M17 17l1 3" />
-  </svg>
-);
-const IcTrain = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-    <rect x="4" y="3" width="16" height="15" rx="2" />
-    <path d="M4 11h16M12 3v15M8 15h8M7 21l2-3M17 21l-2-3" />
-  </svg>
-);
-const IcPalette = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2a10 10 0 1010 10 10 10 0 00-1-4.5 1 1 0 011-1.5H22a2 2 0 00-2-2h-3a1 1 0 01-1-1V2z" />
-    <circle cx="7.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="10.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="13.5" cy="10.5" r=".5" fill="currentColor" />
-  </svg>
-);
-
-const STOP_ICON = { 
-  '기숙사': IcBed, 
-  '셔틀콕': IcBusStop, 
-  '한대앞': IcTrain, 
-  '셔틀콕 건너편': IcBusStop, 
-  '예술인': IcPalette, 
-  '중앙역': IcTrain 
-};
-
 const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
 
 // ── 지하철 노선 뱃지
@@ -244,31 +211,28 @@ export function ShuttleView() {
           출발지
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {STOPS.map((s, idx) => {
-            const Icon = STOP_ICON[s];
-            return (
-              <div
-                key={s}
-                className={`py-[11px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full font-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
-                  stop === s
-                    ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                    : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                }`}
-                onClick={() => setStop(s)}
-                style={{ position: 'relative' }}
-              >
-                {initialStop === s && showTooltip && (
-                  <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
-                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
-                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    잠깐! 이 출발지가 맞나요?
-                  </div>
-                )}
-                <Icon /> {s}
-              </div>
-            );
-          })}
+          {STOPS.map((s, idx) => (
+            <div
+              key={s}
+              className={`py-[11px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full font-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
+                stop === s
+                  ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                  : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+              }`}
+              onClick={() => setStop(s)}
+              style={{ position: 'relative' }}
+            >
+              {initialStop === s && showTooltip && (
+                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
+                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  잠깐! 이 출발지가 맞나요?
+                </div>
+              )}
+              {s}
+            </div>
+          ))}
         </div>
       </div>
 
