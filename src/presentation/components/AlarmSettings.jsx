@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
 import { requestNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
@@ -6,70 +6,124 @@ import { supabase } from '../../lib/supabase';
 const ITEM_H = 36;
 const VISIBLE = 3;
 
-const TIME_LIST = Array.from({ length: 24 }, (_, h) => ({
-  h24: h,
-  hourStr: h === 0 ? '0' : h < 12 ? String(h) : h === 12 ? '12' : String(h - 12),
-  ampm: h < 12 ? '오전' : '오후',
-}));
-
+const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i); // 0~11
 const AMPM_LIST = ['오전', '오후'];
 const DAY_LIST = ['전날', '당일'];
 
+// h24 → 표시용 분리
+const parseH24 = (h24) => ({
+  displayHour: h24 % 12,        // 0~11
+  ampmIdx:     h24 < 12 ? 0 : 1, // 0=오전, 1=오후
+});
+
+// 표시값 → h24
+const toH24 = (displayHour, ampmIdx) => ampmIdx === 0 ? displayHour : displayHour + 12;
+
+
 function TimePicker({ value, onChange, day, onDayChange }) {
-  const timeIdx = Math.max(0, Math.min(parseInt(value.split(':')[0]), 23));
-  const currentAmpm = timeIdx < 12 ? '오전' : '오후';
-  const dayIdx = DAY_LIST.indexOf(day) === -1 ? 1 : DAY_LIST.indexOf(day);
+  const h24     = Math.max(0, Math.min(parseInt(value.split(':')[0]) || 0, 23));
+  const initDay = Math.max(0, DAY_LIST.indexOf(day));
+  const { displayHour: initHour, ampmIdx: initAmpm } = parseH24(h24);
+
+  // 즉시 색상 피드백용 live state (스크롤하면 바로 반영)
+  const [liveHour, setLiveHour] = useState(initHour);
+  const [liveAmpm, setLiveAmpm] = useState(initAmpm);
+  const [liveDay,  setLiveDay]  = useState(initDay);
 
   const hourRef = useRef(null);
   const ampmRef = useRef(null);
-  const dayRef = useRef(null);
-  const hourTimerRef = useRef(null);
-  const dayTimerRef = useRef(null);
+  const dayRef  = useRef(null);
+  const hourTimer = useRef(null);
+  const ampmTimer = useRef(null);
+  const dayTimer  = useRef(null);
 
+  // 최초 마운트 시 스크롤 위치 초기화
   useLayoutEffect(() => {
-    if (hourRef.current) hourRef.current.scrollTop = timeIdx * ITEM_H;
-    if (ampmRef.current) ampmRef.current.scrollTop = (timeIdx < 12 ? 0 : 1) * ITEM_H;
-    if (dayRef.current) dayRef.current.scrollTop = dayIdx * ITEM_H;
-  }, [timeIdx, dayIdx]);
+    if (hourRef.current) hourRef.current.scrollTop = initHour * ITEM_H;
+    if (ampmRef.current) ampmRef.current.scrollTop = initAmpm * ITEM_H;
+    if (dayRef.current)  dayRef.current.scrollTop  = initDay  * ITEM_H;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleHourScroll = () => {
-    clearTimeout(hourTimerRef.current);
-    hourTimerRef.current = setTimeout(() => {
-      const el = hourRef.current;
-      if (!el) return;
-      const idx = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 23));
-      if (ampmRef.current) ampmRef.current.scrollTop = (idx < 12 ? 0 : 1) * ITEM_H;
-      const newH24 = TIME_LIST[idx].h24;
-      if (newH24 !== timeIdx) onChange(`${String(newH24).padStart(2, '0')}:00`);
-    }, 200);
+  // 외부에서 value가 바뀔 때 live state 동기화
+  useEffect(() => {
+    const { displayHour, ampmIdx } = parseH24(h24);
+    setLiveHour(displayHour);
+    setLiveAmpm(ampmIdx);
+  }, [h24]);
+
+  useEffect(() => {
+    setLiveDay(initDay);
+  }, [initDay]);
+
+  // DOM 현재 위치를 읽어 onChange/onDayChange 호출
+  const commitTime = () => {
+    const hourEl = hourRef.current;
+    const ampmEl = ampmRef.current;
+    if (!hourEl || !ampmEl) return;
+    const curHour = Math.max(0, Math.min(Math.round(hourEl.scrollTop / ITEM_H), 11));
+    const curAmpm = Math.max(0, Math.min(Math.round(ampmEl.scrollTop / ITEM_H), 1));
+    const newH24  = toH24(curHour, curAmpm);
+    if (newH24 !== h24) onChange(`${String(newH24).padStart(2, '0')}:00`);
   };
 
+  const commitDay = () => {
+    const el = dayRef.current;
+    if (!el) return;
+    const idx = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1));
+    if (DAY_LIST[idx] !== day) onDayChange(DAY_LIST[idx]);
+  };
+
+  // --- 스크롤 핸들러 (즉시 live 색상 + 디바운스 commit) ---
+  const handleHourScroll = () => {
+    const el = hourRef.current;
+    if (!el) return;
+    setLiveHour(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 11)));
+    clearTimeout(hourTimer.current);
+    hourTimer.current = setTimeout(commitTime, 150);
+  };
+
+  const handleAmpmScroll = () => {
+    const el = ampmRef.current;
+    if (!el) return;
+    setLiveAmpm(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1)));
+    clearTimeout(ampmTimer.current);
+    ampmTimer.current = setTimeout(commitTime, 150);
+  };
+
+  const handleDayScroll = () => {
+    const el = dayRef.current;
+    if (!el) return;
+    setLiveDay(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1)));
+    clearTimeout(dayTimer.current);
+    dayTimer.current = setTimeout(commitDay, 150);
+  };
+
+  // --- 마우스 휠 핸들러 ---
   const handleHourWheel = (e) => {
     e.preventDefault();
     const el = hourRef.current;
     if (!el) return;
-    const current = Math.round(el.scrollTop / ITEM_H);
-    const next = e.deltaY > 0 ? Math.min(current + 1, 23) : Math.max(current - 1, 0);
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 11));
     el.scrollTop = next * ITEM_H;
+    setLiveHour(next);
   };
 
-  const handleDayScroll = () => {
-    clearTimeout(dayTimerRef.current);
-    dayTimerRef.current = setTimeout(() => {
-      const el = dayRef.current;
-      if (!el) return;
-      const idx = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1));
-      if (DAY_LIST[idx] !== day) onDayChange(DAY_LIST[idx]);
-    }, 200);
+  const handleAmpmWheel = (e) => {
+    e.preventDefault();
+    const el = ampmRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
+    el.scrollTop = next * ITEM_H;
+    setLiveAmpm(next);
   };
 
   const handleDayWheel = (e) => {
     e.preventDefault();
     const el = dayRef.current;
     if (!el) return;
-    const current = Math.round(el.scrollTop / ITEM_H);
-    const next = e.deltaY > 0 ? Math.min(current + 1, 1) : Math.max(current - 1, 0);
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
     el.scrollTop = next * ITEM_H;
+    setLiveDay(next);
   };
 
   const itemStyle = (active) => ({
@@ -79,9 +133,16 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: 14,
-    fontWeight: active ? 500 : 400,
-    color: active ? '#4b5563' : '#d1d5db',
+    fontWeight: active ? 700 : 400,
+    color: active ? '#1e293b' : '#d1d5db',
     userSelect: 'none',
+  });
+
+  const colStyle = (width) => ({
+    height: ITEM_H * VISIBLE,
+    overflowY: 'auto',
+    scrollSnapType: 'y mandatory',
+    width,
   });
 
   return (
@@ -96,6 +157,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       width: 'fit-content',
       margin: '0 auto',
     }}>
+      {/* 선택 하이라이트 바 */}
       <div style={{
         position: 'absolute',
         top: '50%',
@@ -114,55 +176,41 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         onScroll={handleDayScroll}
         onWheel={handleDayWheel}
         className="alarm-picker-scroll"
-        style={{
-          height: ITEM_H * VISIBLE,
-          overflowY: 'auto',
-          scrollSnapType: 'y mandatory',
-          width: 64,
-        }}
+        style={colStyle(64)}
       >
         <div style={{ height: ITEM_H }} />
         {DAY_LIST.map((opt, idx) => (
-          <div key={opt} style={itemStyle(idx === dayIdx)}>{opt}</div>
+          <div key={opt} style={itemStyle(idx === liveDay)}>{opt}</div>
         ))}
         <div style={{ height: ITEM_H }} />
       </div>
 
-      {/* 오전/오후 */}
+      {/* 오전/오후 — 이제 직접 스크롤 가능 */}
       <div
         ref={ampmRef}
+        onScroll={handleAmpmScroll}
+        onWheel={handleAmpmWheel}
         className="alarm-picker-scroll"
-        style={{
-          height: ITEM_H * VISIBLE,
-          overflowY: 'auto',
-          scrollSnapType: 'y mandatory',
-          width: 64,
-          pointerEvents: 'none',
-        }}
+        style={colStyle(56)}
       >
         <div style={{ height: ITEM_H }} />
-        {AMPM_LIST.map((opt) => (
-          <div key={opt} style={itemStyle(opt === currentAmpm)}>{opt}</div>
+        {AMPM_LIST.map((opt, idx) => (
+          <div key={opt} style={itemStyle(idx === liveAmpm)}>{opt}</div>
         ))}
         <div style={{ height: ITEM_H }} />
       </div>
 
-      {/* 시간 */}
+      {/* 시간 0~11 */}
       <div
         ref={hourRef}
         onScroll={handleHourScroll}
         onWheel={handleHourWheel}
         className="alarm-picker-scroll"
-        style={{
-          height: ITEM_H * VISIBLE,
-          overflowY: 'auto',
-          scrollSnapType: 'y mandatory',
-          width: 52,
-        }}
+        style={colStyle(44)}
       >
         <div style={{ height: ITEM_H }} />
-        {TIME_LIST.map((t, idx) => (
-          <div key={t.h24} style={itemStyle(idx === timeIdx)}>{t.hourStr}</div>
+        {HOUR_LIST.map((h, idx) => (
+          <div key={h} style={itemStyle(idx === liveHour)}>{h}</div>
         ))}
         <div style={{ height: ITEM_H }} />
       </div>
@@ -171,7 +219,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         display: 'flex',
         alignItems: 'center',
         paddingLeft: 2,
-        paddingRight: 18,
+        paddingRight: 16,
         fontSize: 13,
         fontWeight: 500,
         color: '#4b5563',
@@ -213,13 +261,41 @@ export function AlarmSettings({ onClose }) {
     keywords: [...savedRef.current.keywords],
   }));
   const [keywordInput, setKeywordInput] = useState('');
+  const [closing, setClosing] = useState(false);
+  const backdropRef = useRef(null);
 
   const isDirty = !settingsEqual(settings, savedRef.current);
+
+  // iOS 배경 스크롤 잠금
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
+  // 백드롭 터치무브 방지 (iOS에서 배경 스크롤 방지)
+  useEffect(() => {
+    const el = backdropRef.current;
+    if (!el) return;
+    const prevent = (e) => e.preventDefault();
+    el.addEventListener('touchmove', prevent, { passive: false });
+    return () => el.removeEventListener('touchmove', prevent);
+  }, []);
 
   const toggle = async () => {
     const turningOn = !settings.jeyukAlert;
     setSettings(p => ({ ...p, jeyukAlert: turningOn }));
-
     if (turningOn) {
       const token = await requestNotificationPermission();
       if (!token) {
@@ -240,69 +316,78 @@ export function AlarmSettings({ onClose }) {
   const removeKeyword = (kw) =>
     setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }));
 
+  // 닫힘 애니메이션 후 실제 onClose 호출
+  const triggerClose = (msg) => {
+    setClosing(true);
+    setTimeout(() => onClose(msg), 260);
+  };
+
   const handleClose = () => {
+    let successMsg;
     if (isDirty) {
       localStorage.setItem('alarm_settings', JSON.stringify(settings));
 
-      if (settings.jeyukAlert) {
-        if (settings.keywords.length > 0) {
-          const h = parseInt(settings.notifyTime.split(':')[0]);
-          const t = TIME_LIST[Math.max(0, Math.min(h, 23))];
-          onClose(`${t.ampm} ${t.hourStr}시에 알림을 보내드릴게요!`);
+      if (settings.jeyukAlert && settings.keywords.length > 0) {
+        successMsg = '설정한 시간에 맞춰\n알림을 보내드릴게요!';
 
-          // Background sync
-          (async () => {
-            try {
-              const token = await requestNotificationPermission();
-              if (token) {
-                let deviceId = localStorage.getItem('device_id');
-                if (!deviceId) {
-                  deviceId = crypto.randomUUID();
-                  localStorage.setItem('device_id', deviceId);
-                }
-
-                await supabase.from('devices').upsert({ id: deviceId, fcm_token: token, platform: 'web', last_active_at: new Date().toISOString() }, { onConflict: 'id' });
-
-                const { data: existingSub } = await supabase
-                  .from('subscriptions')
-                  .select('id')
-                  .eq('device_id', deviceId)
-                  .eq('topic', 'CAFETERIA_KEYWORD')
-                  .maybeSingle();
-
-                if (existingSub) {
-                  await supabase
-                    .from('subscriptions')
-                    .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime }, is_active: true, updated_at: new Date().toISOString() })
-                    .eq('id', existingSub.id);
-                } else {
-                  await supabase
-                    .from('subscriptions')
-                    .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime } });
-                }
+        (async () => {
+          try {
+            const token = await requestNotificationPermission();
+            if (token) {
+              let deviceId = localStorage.getItem('device_id');
+              if (!deviceId) {
+                deviceId = crypto.randomUUID();
+                localStorage.setItem('device_id', deviceId);
               }
-            } catch (err) {
-              console.error('Failed to sync alarm settings', err);
+              await supabase.from('devices').upsert(
+                { id: deviceId, fcm_token: token, platform: 'web', last_active_at: new Date().toISOString() },
+                { onConflict: 'id' }
+              );
+              const { data: existingSub } = await supabase
+                .from('subscriptions')
+                .select('id')
+                .eq('device_id', deviceId)
+                .eq('topic', 'CAFETERIA_KEYWORD')
+                .maybeSingle();
+              if (existingSub) {
+                await supabase
+                  .from('subscriptions')
+                  .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime }, is_active: true, updated_at: new Date().toISOString() })
+                  .eq('id', existingSub.id);
+              } else {
+                await supabase
+                  .from('subscriptions')
+                  .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime } });
+              }
             }
-          })();
-
-          return;
-        }
-      } else {
-        // Background sync: turn off
-        let deviceId = localStorage.getItem('device_id');
+          } catch (err) {
+            console.error('Failed to sync alarm settings', err);
+          }
+        })();
+      } else if (!settings.jeyukAlert) {
+        const deviceId = localStorage.getItem('device_id');
         if (deviceId) {
-          supabase.from('subscriptions').update({ is_active: false, updated_at: new Date().toISOString() }).eq('device_id', deviceId).eq('topic', 'CAFETERIA_KEYWORD').then();
+          supabase.from('subscriptions')
+            .update({ is_active: false, updated_at: new Date().toISOString() })
+            .eq('device_id', deviceId)
+            .eq('topic', 'CAFETERIA_KEYWORD')
+            .then();
         }
       }
     }
-    onClose();
+    triggerClose(successMsg);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/45 z-[1100] flex items-end justify-center [animation:fadeIn_0.2s_ease]" onClick={handleClose}>
+    <div
+      ref={backdropRef}
+      className="fixed inset-0 bg-black/45 z-[1100] flex items-end justify-center"
+      style={{ animation: closing ? 'fadeOut 0.26s ease forwards' : 'fadeIn 0.2s ease' }}
+      onClick={handleClose}
+    >
       <div
-        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-4 max-h-[90vh] overflow-y-auto [animation:sheetUp_0.3s_cubic-bezier(0.16,1,0.3,1)] mb-6"
+        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-4 max-h-[90vh] overflow-y-auto mb-6"
+        style={{ animation: closing ? 'sheetDown 0.26s cubic-bezier(0.4,0,1,1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16,1,0.3,1)' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto mt-3" />

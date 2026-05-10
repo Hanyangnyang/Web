@@ -101,6 +101,16 @@ body {
   to   { transform: translateY(0); }
 }
 
+@keyframes sheetDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(120%); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
@@ -211,7 +221,7 @@ body {
 .alarm-toggle input:checked + .alarm-toggle-slider::before { transform: translateX(16px); }
 
 /* ═══ 픽커 스크롤바 숨기기 ═══ */
-.alarm-picker-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.alarm-picker-scroll { scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .alarm-picker-scroll::-webkit-scrollbar { display: none; }
 
 /* ═══ 마키 애니메이션 ═══ */
