@@ -1,5 +1,7 @@
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { X, Plus } from 'lucide-react';
+import { requestNotificationPermission } from '../../lib/firebase';
+import { supabase } from '../../lib/supabase';
 
 const ITEM_H = 36;
 const VISIBLE = 3;
@@ -166,7 +168,18 @@ export function AlarmSettings({ onClose }) {
 
   const isDirty = !settingsEqual(settings, savedRef.current);
 
-  const toggle = () => setSettings(p => ({ ...p, jeyukAlert: !p.jeyukAlert }));
+  const toggle = async () => {
+    const turningOn = !settings.jeyukAlert;
+    setSettings(p => ({ ...p, jeyukAlert: turningOn }));
+
+    if (turningOn) {
+      const token = await requestNotificationPermission();
+      if (!token) {
+        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        setSettings(p => ({ ...p, jeyukAlert: false }));
+      }
+    }
+  };
 
   const addKeyword = () => {
     const trimmed = keywordInput.trim();
@@ -182,11 +195,57 @@ export function AlarmSettings({ onClose }) {
   const handleClose = () => {
     if (isDirty) {
       localStorage.setItem('alarm_settings', JSON.stringify(settings));
-      if (settings.jeyukAlert && settings.keywords.length > 0) {
-        const h = parseInt(settings.notifyTime.split(':')[0]);
-        const t = TIME_LIST[Math.max(0, Math.min(h, 23))];
-        onClose(`${t.ampm} ${t.hourStr}시에 알림을 보내드릴게요!`);
-        return;
+      
+      if (settings.jeyukAlert) {
+        if (settings.keywords.length > 0) {
+          const h = parseInt(settings.notifyTime.split(':')[0]);
+          const t = TIME_LIST[Math.max(0, Math.min(h, 23))];
+          onClose(`${t.ampm} ${t.hourStr}시에 알림을 보내드릴게요!`);
+
+          // Background sync
+          (async () => {
+            try {
+              const token = await requestNotificationPermission();
+              if (token) {
+                let deviceId = localStorage.getItem('device_id');
+                if (!deviceId) {
+                  deviceId = crypto.randomUUID();
+                  localStorage.setItem('device_id', deviceId);
+                }
+
+                await supabase.from('devices').upsert({ id: deviceId, fcm_token: token, platform: 'web', last_active_at: new Date().toISOString() }, { onConflict: 'id' });
+
+                const { data: existingSub } = await supabase
+                  .from('subscriptions')
+                  .select('id')
+                  .eq('device_id', deviceId)
+                  .eq('topic', 'CAFETERIA_KEYWORD')
+                  .maybeSingle();
+
+                if (existingSub) {
+                  await supabase
+                    .from('subscriptions')
+                    .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime }, is_active: true, updated_at: new Date().toISOString() })
+                    .eq('id', existingSub.id);
+                } else {
+                  await supabase
+                    .from('subscriptions')
+                    .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime } });
+                }
+              }
+            } catch (err) {
+              console.error('Failed to sync alarm settings', err);
+            }
+          })();
+          
+          return;
+        }
+      } else {
+        // Background sync: turn off
+        let deviceId = localStorage.getItem('device_id');
+        if (deviceId) {
+          supabase.from('subscriptions').update({ is_active: false, updated_at: new Date().toISOString() }).eq('device_id', deviceId).eq('topic', 'CAFETERIA_KEYWORD').then();
+        }
       }
     }
     onClose();
