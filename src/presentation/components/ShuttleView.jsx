@@ -237,11 +237,6 @@ export function ShuttleView() {
       <div className="mb-6 sticky top-0 bg-surface z-[100] pb-3 shadow-[0_8px_12px_-12px_rgba(0,0,0,0.15)]">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
-          {(isHolidayServer || isWeekend) && (
-            <span className="inline-flex items-center ml-2.5 px-2.5 py-0.5 bg-error text-white rounded-full text-[0.95rem] font-extrabold leading-[1.1] opacity-85">
-              {isHolidayServer ? '공휴일' : '주말'}
-            </span>
-          )}
         </div>
         <div className="grid grid-cols-3 gap-2">
           {STOPS.map((s, idx) => {
