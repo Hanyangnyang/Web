@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 const KakaoIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,8 +16,8 @@ function stripHtml(html) {
 
 export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }) {
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
-  const titleLine = `${dateLabel}의 '${cafeName}' ${mealType}${mealEmoji} 공유하기`;
-  const kakaoTitle = `${dateLabel}의 '${cafeName}' ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
+  const titleLine = `${dateLabel} '${cafeName}' ${mealType}${mealEmoji} 공유하기`;
+  const kakaoTitle = `${dateLabel} '${cafeName}' ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
   const cleanMenu = stripHtml(menuText);
 
   useEffect(() => {
@@ -27,6 +27,12 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   }, [onClose]);
 
   const handleKakao = () => {
+    console.log('[Share] shareUrl:', shareUrl);
+    console.log('[Share] shareUrl origin:', new URL(shareUrl).origin);
+    console.log('[Share] kakaoTitle:', kakaoTitle);
+    console.log('[Share] Kakao initialized:', window.Kakao?.isInitialized());
+    console.log('[Share] __kakaoStatus:', window.__kakaoStatus);
+
     if (!window.Kakao) {
       console.error('[Share] window.Kakao 없음 (SDK_NOT_LOADED)');
       alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]\n\nindex.html의 script 태그가 올바른지 확인해주세요.');
@@ -53,14 +59,16 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
           title: kakaoTitle,
           description: '하냥냥에서 자세한 학식 정보를 확인해보세요.',
           imageUrl: 'https://www.hanyang.life/hanyang_cafeteria.jpg',
+          imageWidth: 800,
+          imageHeight: 500,
           link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
         },
-        buttons: [
-          {
-            title: '하냥냥에서 학식 메뉴 보기',
-            link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-          },
-        ],
+        // buttons: [
+        //   {
+        //     title: '하냥냥에서 학식 메뉴 보기',
+        //     link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+        //   },
+        // ],
       });
       onClose();
     } catch (e) {
@@ -71,19 +79,32 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
     }
   };
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-    } catch {
-      const el = document.createElement('textarea');
-      el.value = shareUrl;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: kakaoTitle, url: shareUrl });
+        onClose();
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          await navigator.clipboard.writeText(shareUrl).catch(() => {});
+          onClose();
+          onCopied?.();
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        const el = document.createElement('textarea');
+        el.value = shareUrl;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      }
+      onClose();
+      onCopied?.();
     }
-    onClose();
-    onCopied?.();
   };
 
   return (
@@ -98,11 +119,11 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
             </div>
             <span>카카오톡</span>
           </button>
-          <button className="share-action-btn" onClick={handleCopy}>
+          <button className="share-action-btn" onClick={handleShare}>
             <div className="share-action-icon share-action-icon--link">
-              <Link2 size={20} color="#475569" />
+              <Share2 size={20} color="#475569" />
             </div>
-            <span>링크 복사</span>
+            <span>공유하기</span>
           </button>
         </div>
       </div>
