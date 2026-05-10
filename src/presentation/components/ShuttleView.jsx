@@ -214,7 +214,7 @@ export function ShuttleView() {
           {STOPS.map((s, idx) => (
             <div
               key={s}
-              className={`py-[11px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full font-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
+              className={`py-[8px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full font-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
                 stop === s
                   ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                   : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
