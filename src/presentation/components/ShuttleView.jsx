@@ -6,31 +6,35 @@ import { useShuttle } from '../hooks/useShuttle.js';
 
 // ── 아이콘
 const IcBed = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 20V10h20v10M2 10V8a2 2 0 012-2h5a2 2 0 012 2v2M13 10V8a2 2 0 012-2h5a2 2 0 012 2v2" />
+  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 4v16M2 8h18a2 2 0 012 2v10M2 17h20M6 8v0" />
   </svg>
 );
-const IcSchool = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 21h18M3 10l9-7 9 7M5 21V10M19 21V10M9 21V15h6v6" />
+const IcBusStop = () => (
+  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 2h4M12 2v20M7 7h10v5H7zM16 22H8" />
   </svg>
 );
-const IcSubway = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <rect x="4" y="3" width="16" height="13" rx="3" />
-    <path d="M4 10h16" />
-    <circle cx="9" cy="16" r="2" /><circle cx="15" cy="16" r="2" />
+const IcTrain = () => (
+  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="3" width="16" height="15" rx="2" />
+    <path d="M4 11h16M8 15h0M16 15h0M7 21l2-3M17 21l-2-3" />
   </svg>
 );
-const IcBus = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="5" width="20" height="13" rx="2" />
-    <path d="M2 11h20" />
-    <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
+const IcBrush = () => (
+  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 11l-1.5-1.5M6 13l-2 2v2h2l2-2M21 3.5a3.5 3.5 0 00-5 0l-9 9 7 7 9-9a3.5 3.5 0 000-5z" />
   </svg>
 );
 
-const STOP_ICON = { '기숙사': IcBed, '셔틀콕': IcSchool, '한대앞': IcSubway, '셔틀콕 건너편': IcSchool, '예술인': IcBus, '중앙역': IcSubway };
+const STOP_ICON = { 
+  '기숙사': IcBed, 
+  '셔틀콕': IcBusStop, 
+  '한대앞': IcTrain, 
+  '셔틀콕 건너편': IcBusStop, 
+  '예술인': IcBrush, 
+  '중앙역': IcTrain 
+};
 
 const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
 
