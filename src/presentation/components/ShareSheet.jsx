@@ -16,8 +16,8 @@ function stripHtml(html) {
 
 export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }) {
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
-  const titleLine = `${dateLabel} '${cafeName}' ${mealType}${mealEmoji} 공유하기`;
-  const kakaoTitle = `${dateLabel} '${cafeName}' ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
+  const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
+  const kakaoTitle = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
   const cleanMenu = stripHtml(menuText);
 
   useEffect(() => {

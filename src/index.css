@@ -797,14 +797,15 @@ p.subtitle {
 }
 
 .alarm-sheet {
-  width: 100%;
-  max-width: 440px;
+  width: calc(100% - 64px);
+  max-width: 300px;
   background: white;
-  border-radius: var(--radius-card) var(--radius-card) 0 0;
-  padding: 0 var(--space-page) var(--space-section);
+  border-radius: var(--radius-card);
+  padding: 0 20px 16px;
   max-height: 90vh;
   overflow-y: auto;
   animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 24px;
 }
 
 @keyframes sheetUp {
@@ -829,15 +830,16 @@ p.subtitle {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-page) 0 var(--space-element);
+  padding: 14px 0 10px;
   border-bottom: 1px solid #f1f5f9;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .alarm-sheet-title {
   font-size: var(--font-size-h2);
   font-weight: 800;
   color: var(--color-text-main);
+  line-height: 1;
 }
 
 .alarm-close-btn {
@@ -856,7 +858,7 @@ p.subtitle {
 }
 
 .alarm-section {
-  padding: var(--space-element) 0;
+  padding: 8px 0;
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -868,7 +870,7 @@ p.subtitle {
   font-size: var(--font-size-body2);
   font-weight: 800;
   color: var(--color-text-main);
-  margin-bottom: var(--space-element);
+  margin-bottom: 6px;
 }
 
 .alarm-section-desc {
@@ -890,8 +892,8 @@ p.subtitle {
   position: relative;
   display: flex;
   align-items: center;
-  width: 44px;
-  height: 24px;
+  width: 36px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -913,8 +915,8 @@ p.subtitle {
 .alarm-toggle-slider::before {
   content: '';
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   left: 3px;
   top: 3px;
   background: white;
@@ -924,11 +926,11 @@ p.subtitle {
 }
 
 .alarm-toggle input:checked+.alarm-toggle-slider {
-  background: var(--color-primary);
+  background: #3b82f6;
 }
 
 .alarm-toggle input:checked+.alarm-toggle-slider::before {
-  transform: translateX(20px);
+  transform: translateX(16px);
 }
 
 .alarm-keyword-row {
@@ -951,14 +953,14 @@ p.subtitle {
 }
 
 .alarm-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-glow);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .alarm-add-btn {
   width: 40px;
   height: 40px;
-  background: var(--color-primary);
+  background: #3b82f6;
   color: white;
   border: none;
   border-radius: var(--radius-card);
@@ -984,8 +986,8 @@ p.subtitle {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: var(--color-primary-glow);
-  color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-h1);
   padding: 4px var(--space-element);
@@ -995,7 +997,7 @@ p.subtitle {
 .alarm-keyword-tag button {
   background: none;
   border: none;
-  color: var(--color-primary);
+  color: #3b82f6;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1032,18 +1034,26 @@ p.subtitle {
   box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
+.alarm-picker-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.alarm-picker-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .alarm-confirm-btn {
   width: 100%;
-  margin-top: var(--space-page);
-  padding: var(--space-element);
-  background: linear-gradient(135deg, var(--color-primary), #1e5fa0);
+  margin-top: 10px;
+  padding: 8px 0;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
-  font-size: var(--font-size-body1);
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 700;
   border: none;
   border-radius: var(--radius-card);
   cursor: pointer;
-  box-shadow: 0 4px 14px 0 var(--color-primary-glow);
+  box-shadow: 0 3px 10px 0 rgba(59, 130, 246, 0.35);
   transition: opacity 0.2s, transform 0.15s;
 }
 
@@ -1077,8 +1087,8 @@ p.subtitle {
 }
 
 .alarm-exit-dialog {
-  width: 100%;
-  max-width: 400px;
+  width: calc(100% - 48px);
+  max-width: 300px;
   background: white;
   border-radius: var(--radius-card);
   padding: var(--space-section);
@@ -1122,9 +1132,9 @@ p.subtitle {
 }
 
 .alarm-exit-btn--save {
-  background: linear-gradient(135deg, var(--color-primary), #1e5fa0);
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
-  box-shadow: 0 4px 14px 0 var(--color-primary-glow);
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.35);
 }
 
 .alarm-exit-btn--discard {

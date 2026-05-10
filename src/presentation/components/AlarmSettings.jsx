@@ -1,39 +1,160 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { X, Plus } from 'lucide-react';
 
-const TIME_OPTIONS = (() => {
-  const opts = [];
-  for (let h = 6; h < 24; h++) opts.push(`${String(h).padStart(2,'0')}:00`, `${String(h).padStart(2,'0')}:30`);
-  opts.push('24:00');
-  return opts;
-})();
+const ITEM_H = 36;
+const VISIBLE = 3;
 
-const formatTime = (t) => {
-  const [h, m] = t.split(':');
-  const hour = parseInt(h);
-  if (hour === 0 || hour === 24) return `자정 12:${m}`;
-  if (hour < 12) return `오전 ${hour}:${m}`;
-  if (hour === 12) return `오후 12:${m}`;
-  return `오후 ${hour - 12}:${m}`;
-};
+const TIME_LIST = Array.from({ length: 24 }, (_, h) => ({
+  h24: h,
+  hourStr: h === 0 ? '0' : h < 12 ? String(h) : h === 12 ? '12' : String(h - 12),
+  ampm: h < 12 ? '오전' : '오후',
+}));
+
+const AMPM_LIST = ['오전', '오후'];
+
+function TimePicker({ value, onChange }) {
+  const timeIdx = Math.max(0, Math.min(parseInt(value.split(':')[0]), 23));
+  const currentAmpm = timeIdx < 12 ? '오전' : '오후';
+
+  const hourRef = useRef(null);
+  const ampmRef = useRef(null);
+  const hourTimerRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (hourRef.current) hourRef.current.scrollTop = timeIdx * ITEM_H;
+    if (ampmRef.current) ampmRef.current.scrollTop = (timeIdx < 12 ? 0 : 1) * ITEM_H;
+  }, [timeIdx]);
+
+  const handleHourScroll = () => {
+    clearTimeout(hourTimerRef.current);
+    hourTimerRef.current = setTimeout(() => {
+      const el = hourRef.current;
+      if (!el) return;
+      const idx = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 23));
+      if (ampmRef.current) ampmRef.current.scrollTop = (idx < 12 ? 0 : 1) * ITEM_H;
+      const newH24 = TIME_LIST[idx].h24;
+      if (newH24 !== timeIdx) onChange(`${String(newH24).padStart(2, '0')}:00`);
+    }, 200);
+  };
+
+  const handleHourWheel = (e) => {
+    e.preventDefault();
+    const el = hourRef.current;
+    if (!el) return;
+    const current = Math.round(el.scrollTop / ITEM_H);
+    const next = e.deltaY > 0 ? Math.min(current + 1, 23) : Math.max(current - 1, 0);
+    el.scrollTop = next * ITEM_H;
+  };
+
+  const itemStyle = (active) => ({
+    height: ITEM_H,
+    scrollSnapAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 14,
+    fontWeight: active ? 500 : 400,
+    color: active ? '#4b5563' : '#d1d5db',
+    userSelect: 'none',
+  });
+
+  return (
+    <div style={{
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'stretch',
+      height: ITEM_H * VISIBLE,
+      background: 'white',
+      borderRadius: 10,
+      overflow: 'hidden',
+      width: 'fit-content',
+      margin: '0 auto',
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: 0,
+        right: 0,
+        height: ITEM_H,
+        transform: 'translateY(-50%)',
+        background: 'rgba(0,0,0,0.06)',
+        borderRadius: 8,
+        pointerEvents: 'none',
+      }} />
+
+      {/* AM/PM — auto-driven only */}
+      <div
+        ref={ampmRef}
+        className="alarm-picker-scroll"
+        style={{
+          height: ITEM_H * VISIBLE,
+          overflowY: 'auto',
+          scrollSnapType: 'y mandatory',
+          width: 72,
+          pointerEvents: 'none',
+        }}
+      >
+        <div style={{ height: ITEM_H }} />
+        {AMPM_LIST.map((opt) => (
+          <div key={opt} style={itemStyle(opt === currentAmpm)}>{opt}</div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      {/* Hour — user-scrollable */}
+      <div
+        ref={hourRef}
+        onScroll={handleHourScroll}
+        onWheel={handleHourWheel}
+        className="alarm-picker-scroll"
+        style={{
+          height: ITEM_H * VISIBLE,
+          overflowY: 'auto',
+          scrollSnapType: 'y mandatory',
+          width: 52,
+        }}
+      >
+        <div style={{ height: ITEM_H }} />
+        {TIME_LIST.map((t, idx) => (
+          <div key={t.h24} style={itemStyle(idx === timeIdx)}>{t.hourStr}</div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        paddingLeft: 2,
+        paddingRight: 18,
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#4b5563',
+        flexShrink: 0,
+        position: 'relative',
+      }}>
+        시
+      </div>
+    </div>
+  );
+}
 
 const loadSettings = () => {
   try {
     const saved = localStorage.getItem('alarm_settings');
-    return saved ? JSON.parse(saved) : {
-      jeyukAlert: false,
-      cheonaAlert: false,
-      keywords: [],
-      notifyTime: '08:00',
-    };
+    if (!saved) return { jeyukAlert: false, keywords: [], notifyTime: '08:00' };
+    const parsed = JSON.parse(saved);
+    if (parsed.notifyTime) {
+      const h = parseInt(parsed.notifyTime.split(':')[0]);
+      if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
+    }
+    return { jeyukAlert: false, keywords: [], notifyTime: '08:00', ...parsed };
   } catch {
-    return { jeyukAlert: false, cheonaAlert: false, keywords: [], notifyTime: '08:00' };
+    return { jeyukAlert: false, keywords: [], notifyTime: '08:00' };
   }
 };
 
 const settingsEqual = (a, b) =>
   a.jeyukAlert === b.jeyukAlert &&
-  a.cheonaAlert === b.cheonaAlert &&
   a.notifyTime === b.notifyTime &&
   JSON.stringify(a.keywords) === JSON.stringify(b.keywords);
 
@@ -44,11 +165,10 @@ export function AlarmSettings({ onClose }) {
     keywords: [...savedRef.current.keywords],
   }));
   const [keywordInput, setKeywordInput] = useState('');
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const isDirty = !settingsEqual(settings, savedRef.current);
 
-  const toggle = (key) => setSettings(p => ({ ...p, [key]: !p[key] }));
+  const toggle = () => setSettings(p => ({ ...p, jeyukAlert: !p.jeyukAlert }));
 
   const addKeyword = () => {
     const trimmed = keywordInput.trim();
@@ -61,17 +181,17 @@ export function AlarmSettings({ onClose }) {
   const removeKeyword = (kw) =>
     setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }));
 
-  const handleConfirm = () => {
-    localStorage.setItem('alarm_settings', JSON.stringify(settings));
-    onClose();
-  };
-
   const handleClose = () => {
     if (isDirty) {
-      setShowExitConfirm(true);
-    } else {
-      onClose();
+      localStorage.setItem('alarm_settings', JSON.stringify(settings));
+      if (settings.jeyukAlert && settings.keywords.length > 0) {
+        const h = parseInt(settings.notifyTime.split(':')[0]);
+        const t = TIME_LIST[Math.max(0, Math.min(h, 23))];
+        onClose(`${t.ampm} ${t.hourStr}시에 알림을 보내드릴게요!`);
+        return;
+      }
     }
+    onClose();
   };
 
   return (
@@ -81,96 +201,52 @@ export function AlarmSettings({ onClose }) {
 
         <div className="alarm-sheet-header">
           <span className="alarm-sheet-title">학식 알림설정</span>
-          <button className="alarm-close-btn" onClick={handleClose}>
-            <X size={20} />
-          </button>
+          <label className="alarm-toggle" style={{ marginLeft: 'auto', alignSelf: 'center' }}>
+            <input type="checkbox" checked={settings.jeyukAlert} onChange={toggle} />
+            <span className="alarm-toggle-slider" />
+          </label>
         </div>
 
-        {/* 학식 알림 */}
-        <div className="alarm-section">
-          <div className="alarm-row">
-            <span>학식 관련 알림 받기</span>
-            <label className="alarm-toggle">
-              <input type="checkbox" checked={settings.jeyukAlert} onChange={() => toggle('jeyukAlert')} />
-              <span className="alarm-toggle-slider" />
-            </label>
+        <div style={{
+          opacity: settings.jeyukAlert ? 1 : 0.35,
+          pointerEvents: settings.jeyukAlert ? 'auto' : 'none',
+          transition: 'opacity 0.2s',
+        }}>
+          <div className="alarm-section">
+            <div className="alarm-section-title">키워드</div>
+            <div className="alarm-keyword-row">
+              <input
+                className="alarm-input"
+                value={keywordInput}
+                onChange={e => setKeywordInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addKeyword()}
+                placeholder="키워드 입력"
+              />
+              <button className="alarm-add-btn" onClick={addKeyword}>
+                <Plus size={18} />
+              </button>
+            </div>
+            {settings.keywords.length > 0 && (
+              <div className="alarm-keyword-tags">
+                {settings.keywords.map(kw => (
+                  <span key={kw} className="alarm-keyword-tag">
+                    {kw}
+                    <button onClick={() => removeKeyword(kw)}><X size={11} /></button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* 키워드 알림 */}
-        <div className={`alarm-section${!settings.jeyukAlert ? ' alarm-section--disabled' : ''}`}>
-          <div className="alarm-section-title">키워드 알림</div>
-          <div className="alarm-section-desc">입력된 키워드가 포함된 알림을 보내드려요!</div>
-          <div className="alarm-keyword-row">
-            <input
-              className="alarm-input"
-              value={keywordInput}
-              onChange={e => setKeywordInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && addKeyword()}
-              placeholder="키워드 입력"
-              disabled={!settings.jeyukAlert}
+          <div className="alarm-section" style={{ borderBottom: 'none' }}>
+            <div className="alarm-section-title">언제 알림을 보낼까요?</div>
+            <TimePicker
+              value={settings.notifyTime}
+              onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
             />
-            <button className="alarm-add-btn" onClick={addKeyword} disabled={!settings.jeyukAlert}>
-              <Plus size={18} />
-            </button>
           </div>
-          {settings.keywords.length > 0 && (
-            <div className="alarm-keyword-tags">
-              {settings.keywords.map(kw => (
-                <span key={kw} className="alarm-keyword-tag">
-                  {kw}
-                  <button onClick={() => removeKeyword(kw)}><X size={11} /></button>
-                </span>
-              ))}
-            </div>
-          )}
         </div>
-
-        {/* 알림수신시간 */}
-        <div className={`alarm-section${!settings.jeyukAlert ? ' alarm-section--disabled' : ''}`}>
-          <div className="alarm-section-title">알림 수신 시간</div>
-          <div className="alarm-section-desc">정해진 시간마다 알림을 보내드려요!</div>
-          <select
-            className="alarm-time-select"
-            value={settings.notifyTime}
-            onChange={e => setSettings(p => ({ ...p, notifyTime: e.target.value }))}
-            disabled={!settings.jeyukAlert}
-          >
-            {TIME_OPTIONS.map(t => (
-              <option key={t} value={t}>{formatTime(t)}</option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          className="alarm-confirm-btn"
-          onClick={handleConfirm}
-          disabled={!isDirty}
-        >
-          저장
-        </button>
       </div>
-
-      {/* 나가기 확인 다이얼로그 */}
-      {showExitConfirm && (
-        <div className="alarm-exit-overlay" onClick={e => e.stopPropagation()}>
-          <div className="alarm-exit-dialog">
-            <p className="alarm-exit-title">저장하지 않은 변경사항이 있어요</p>
-            <p className="alarm-exit-desc">변경사항을 어떻게 할까요?</p>
-            <div className="alarm-exit-actions">
-              <button className="alarm-exit-btn alarm-exit-btn--cancel" onClick={() => setShowExitConfirm(false)}>
-                계속 편집
-              </button>
-              <button className="alarm-exit-btn alarm-exit-btn--discard" onClick={onClose}>
-                저장 안 함
-              </button>
-              <button className="alarm-exit-btn alarm-exit-btn--save" onClick={handleConfirm}>
-                저장하고 나가기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

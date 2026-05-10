@@ -93,6 +93,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
   const [showAlarm, setShowAlarm] = useState(false);
   const [shareTarget, setShareTarget] = useState(null);
   const [copiedToast, setCopiedToast] = useState(false);
+  const [alarmPopup, setAlarmPopup] = useState('');
   const listRef = useRef(null);
 
   const selectedCafe = cafes.find(c => c.id === selectedCafeId) || { menus: [] };
@@ -193,7 +194,13 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
             <Bell size={18} />
             키워드 알림 받기
           </button>
-          {showAlarm && <AlarmSettings onClose={() => setShowAlarm(false)} />}
+          {showAlarm && <AlarmSettings onClose={(msg) => {
+            setShowAlarm(false);
+            if (msg) {
+              setAlarmPopup(msg);
+              setTimeout(() => setAlarmPopup(''), 3000);
+            }
+          }} />}
         </>,
         document.body
       )}
@@ -210,6 +217,14 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
         />
       )}
       {copiedToast && <div className="copy-toast">링크 복사됨!</div>}
+      {alarmPopup && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', pointerEvents: 'none' }}>
+          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 240, margin: '0 24px' }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>🔔</div>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.6 }}>{alarmPopup}</p>
+          </div>
+        </div>
+      )}
       <div className="cafe-sticky-header">
         <div className="date-controller">
           <button className="date-btn" onClick={() => changeDate(-1)} disabled={loading}>
@@ -282,7 +297,12 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                 const isCheonwon = type.includes('천원') || m.menu.includes('천원의아침밥');
                                 const cardClass = `menu-card${hasJeyuk ? ' menu-card--jeyuk' : ''}`;
                                 const shareUrl = `${window.location.origin}/?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
-                                const dateLabel = `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
+                                const nowKst = getKSTDate();
+                                const targetStr = date.toISOString().split('T')[0];
+                                const dateLabel = targetStr === nowKst.toISOString().split('T')[0] ? '오늘'
+                                  : targetStr === new Date(nowKst.getTime() + 86400000).toISOString().split('T')[0] ? '내일'
+                                  : targetStr === new Date(nowKst.getTime() - 86400000).toISOString().split('T')[0] ? '어제'
+                                  : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
                                 const menuLines = m.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
                                 return (
                                   <div key={i} className={cardClass}>
