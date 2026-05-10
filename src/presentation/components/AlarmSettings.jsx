@@ -3,145 +3,231 @@ import { X, Plus } from 'lucide-react';
 import { requestNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 
-const ITEM_H = 38; // 휠 아이템 높이 약간 증가로 터치 영역 확보
+const ITEM_H = 36;
 const VISIBLE = 3;
 
-const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i);
+const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i); // 0~11
 const AMPM_LIST = ['오전', '오후'];
 const DAY_LIST = ['전날', '당일'];
 
+// h24 → 표시용 분리
 const parseH24 = (h24) => ({
-  displayHour: h24 % 12,
-  ampmIdx: h24 < 12 ? 0 : 1,
+  displayHour: h24 % 12,        // 0~11
+  ampmIdx:     h24 < 12 ? 0 : 1, // 0=오전, 1=오후
 });
 
+// 표시값 → h24
 const toH24 = (displayHour, ampmIdx) => ampmIdx === 0 ? displayHour : displayHour + 12;
 
-/**
- * 터치 최적화된 스르륵 움직이는 타임 피커 컬럼
- */
-function PickerColumn({ list, valueIdx, onChange, width }) {
-  const scrollRef = useRef(null);
-  const isInternalScroll = useRef(false);
-  const [activeIdx, setActiveIdx] = useState(valueIdx);
-
-  // 초기 위치 및 외부 값 변경 시 동기화
-  useLayoutEffect(() => {
-    if (!scrollRef.current || isInternalScroll.current) return;
-    scrollRef.current.scrollTop = valueIdx * ITEM_H;
-    setActiveIdx(valueIdx);
-  }, [valueIdx]);
-
-  const handleScroll = (e) => {
-    const el = e.currentTarget;
-    const top = el.scrollTop;
-    const idx = Math.max(0, Math.min(Math.round(top / ITEM_H), list.length - 1));
-    
-    if (idx !== activeIdx) {
-      setActiveIdx(idx);
-    }
-
-    // 스크롤이 멈췄을 때 최종 값 확정 (Debounce)
-    isInternalScroll.current = true;
-    clearTimeout(el.scrollTimer);
-    el.scrollTimer = setTimeout(() => {
-      onChange(idx);
-      isInternalScroll.current = false;
-    }, 100);
-  };
-
-  return (
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      className="alarm-picker-scroll"
-      style={{
-        height: ITEM_H * VISIBLE,
-        overflowY: 'auto',
-        scrollSnapType: 'y mandatory',
-        width,
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
-      <div style={{ height: ITEM_H }} />
-      {list.map((item, idx) => (
-        <div
-          key={idx}
-          style={{
-            height: ITEM_H,
-            scrollSnapAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 15,
-            fontWeight: idx === activeIdx ? 800 : 400,
-            color: idx === activeIdx ? '#1e293b' : '#cbd5e1',
-            transition: 'all 0.15s ease',
-            userSelect: 'none',
-          }}
-        >
-          {item}
-        </div>
-      ))}
-      <div style={{ height: ITEM_H }} />
-    </div>
-  );
-}
 
 function TimePicker({ value, onChange, day, onDayChange }) {
-  const h24 = parseInt(value.split(':')[0]) || 0;
-  const { displayHour, ampmIdx } = parseH24(h24);
-  const dayIdx = DAY_LIST.indexOf(day);
+  const h24     = Math.max(0, Math.min(parseInt(value.split(':')[0]) || 0, 23));
+  const initDay = Math.max(0, DAY_LIST.indexOf(day));
+  const { displayHour: initHour, ampmIdx: initAmpm } = parseH24(h24);
+
+  // 즉시 색상 피드백용 live state (스크롤하면 바로 반영)
+  const [liveHour, setLiveHour] = useState(initHour);
+  const [liveAmpm, setLiveAmpm] = useState(initAmpm);
+  const [liveDay,  setLiveDay]  = useState(initDay);
+
+  const hourRef = useRef(null);
+  const ampmRef = useRef(null);
+  const dayRef  = useRef(null);
+  const hourTimer = useRef(null);
+  const ampmTimer = useRef(null);
+  const dayTimer  = useRef(null);
+
+  // 최초 마운트 시 스크롤 위치 초기화
+  useLayoutEffect(() => {
+    if (hourRef.current) hourRef.current.scrollTop = initHour * ITEM_H;
+    if (ampmRef.current) ampmRef.current.scrollTop = initAmpm * ITEM_H;
+    if (dayRef.current)  dayRef.current.scrollTop  = initDay  * ITEM_H;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 외부에서 value가 바뀔 때 live state 동기화
+  useEffect(() => {
+    const { displayHour, ampmIdx } = parseH24(h24);
+    setLiveHour(displayHour);
+    setLiveAmpm(ampmIdx);
+  }, [h24]);
+
+  useEffect(() => {
+    setLiveDay(initDay);
+  }, [initDay]);
+
+  // DOM 현재 위치를 읽어 onChange/onDayChange 호출
+  const commitTime = () => {
+    const hourEl = hourRef.current;
+    const ampmEl = ampmRef.current;
+    if (!hourEl || !ampmEl) return;
+    const curHour = Math.max(0, Math.min(Math.round(hourEl.scrollTop / ITEM_H), 11));
+    const curAmpm = Math.max(0, Math.min(Math.round(ampmEl.scrollTop / ITEM_H), 1));
+    const newH24  = toH24(curHour, curAmpm);
+    if (newH24 !== h24) onChange(`${String(newH24).padStart(2, '0')}:00`);
+  };
+
+  const commitDay = () => {
+    const el = dayRef.current;
+    if (!el) return;
+    const idx = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1));
+    if (DAY_LIST[idx] !== day) onDayChange(DAY_LIST[idx]);
+  };
+
+  // --- 스크롤 핸들러 (즉시 live 색상 + 디바운스 commit) ---
+  const handleHourScroll = () => {
+    const el = hourRef.current;
+    if (!el) return;
+    setLiveHour(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 11)));
+    clearTimeout(hourTimer.current);
+    hourTimer.current = setTimeout(commitTime, 150);
+  };
+
+  const handleAmpmScroll = () => {
+    const el = ampmRef.current;
+    if (!el) return;
+    setLiveAmpm(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1)));
+    clearTimeout(ampmTimer.current);
+    ampmTimer.current = setTimeout(commitTime, 150);
+  };
+
+  const handleDayScroll = () => {
+    const el = dayRef.current;
+    if (!el) return;
+    setLiveDay(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1)));
+    clearTimeout(dayTimer.current);
+    dayTimer.current = setTimeout(commitDay, 150);
+  };
+
+  // --- 마우스 휠 핸들러 ---
+  const handleHourWheel = (e) => {
+    e.preventDefault();
+    const el = hourRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 11));
+    el.scrollTop = next * ITEM_H;
+    setLiveHour(next);
+  };
+
+  const handleAmpmWheel = (e) => {
+    e.preventDefault();
+    const el = ampmRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
+    el.scrollTop = next * ITEM_H;
+    setLiveAmpm(next);
+  };
+
+  const handleDayWheel = (e) => {
+    e.preventDefault();
+    const el = dayRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
+    el.scrollTop = next * ITEM_H;
+    setLiveDay(next);
+  };
+
+  const itemStyle = (active) => ({
+    height: ITEM_H,
+    scrollSnapAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 14,
+    fontWeight: active ? 700 : 400,
+    color: active ? '#1e293b' : '#d1d5db',
+    userSelect: 'none',
+  });
+
+  const colStyle = (width) => ({
+    height: ITEM_H * VISIBLE,
+    overflowY: 'auto',
+    scrollSnapType: 'y mandatory',
+    width,
+    touchAction: 'pan-y', // 터치 스크롤 허용
+  });
 
   return (
     <div style={{
       position: 'relative',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'stretch',
       height: ITEM_H * VISIBLE,
-      background: '#f8fafc',
-      borderRadius: 14,
-      padding: '0 8px',
-      margin: '8px auto 0',
+      background: 'white',
+      borderRadius: 10,
+      overflow: 'hidden',
       width: 'fit-content',
+      margin: '0 auto',
     }}>
-      {/* 중앙 하이라이트 바 */}
+      {/* 선택 하이라이트 바 */}
       <div style={{
         position: 'absolute',
         top: '50%',
-        left: 8,
-        right: 8,
-        height: ITEM_H - 4,
+        left: 0,
+        right: 0,
+        height: ITEM_H,
         transform: 'translateY(-50%)',
-        background: 'white',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+        background: 'rgba(0,0,0,0.06)',
         borderRadius: 8,
         pointerEvents: 'none',
-        zIndex: 0
       }} />
 
-      <div style={{ display: 'flex', position: 'relative', zIndex: 1 }}>
-        <PickerColumn 
-          list={DAY_LIST} 
-          valueIdx={dayIdx} 
-          onChange={(idx) => onDayChange(DAY_LIST[idx])} 
-          width={60} 
-        />
-        <PickerColumn 
-          list={AMPM_LIST} 
-          valueIdx={ampmIdx} 
-          onChange={(idx) => onChange(`${String(toH24(displayHour, idx)).padStart(2, '0')}:00`)} 
-          width={56} 
-        />
-        <PickerColumn 
-          list={HOUR_LIST} 
-          valueIdx={displayHour} 
-          onChange={(idx) => onChange(`${String(toH24(idx, ampmIdx)).padStart(2, '0')}:00`)} 
-          width={44} 
-        />
-        <div style={{ paddingRight: 12, fontSize: 13, fontWeight: 700, color: '#64748b' }}>시</div>
+      {/* 전날/당일 */}
+      <div
+        ref={dayRef}
+        onScroll={handleDayScroll}
+        onWheel={handleDayWheel}
+        className="alarm-picker-scroll"
+        style={colStyle(64)}
+      >
+        <div style={{ height: ITEM_H }} />
+        {DAY_LIST.map((opt, idx) => (
+          <div key={opt} style={itemStyle(idx === liveDay)}>{opt}</div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      {/* 오전/오후 — 이제 직접 스크롤 가능 */}
+      <div
+        ref={ampmRef}
+        onScroll={handleAmpmScroll}
+        onWheel={handleAmpmWheel}
+        className="alarm-picker-scroll"
+        style={colStyle(56)}
+      >
+        <div style={{ height: ITEM_H }} />
+        {AMPM_LIST.map((opt, idx) => (
+          <div key={opt} style={itemStyle(idx === liveAmpm)}>{opt}</div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      {/* 시간 0~11 */}
+      <div
+        ref={hourRef}
+        onScroll={handleHourScroll}
+        onWheel={handleHourWheel}
+        className="alarm-picker-scroll"
+        style={colStyle(44)}
+      >
+        <div style={{ height: ITEM_H }} />
+        {HOUR_LIST.map((h, idx) => (
+          <div key={h} style={itemStyle(idx === liveHour)}>{h}</div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        paddingLeft: 2,
+        paddingRight: 16,
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#4b5563',
+        flexShrink: 0,
+        position: 'relative',
+      }}>
+        시
       </div>
     </div>
   );
@@ -152,6 +238,11 @@ const loadSettings = () => {
     const saved = localStorage.getItem('alarm_settings');
     if (!saved) return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
     const parsed = JSON.parse(saved);
+    if (parsed.notifyTime) {
+      const h = parseInt(parsed.notifyTime.split(':')[0]);
+      if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
+    }
+    if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
     return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일', ...parsed };
   } catch {
     return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
@@ -171,199 +262,244 @@ export function AlarmSettings({ onClose }) {
     keywords: [...savedRef.current.keywords],
   }));
   const [keywordInput, setKeywordInput] = useState('');
-  
-  // 애니메이션 및 드래그 상태
   const [closing, setClosing] = useState(false);
-  const [dragY, setDragY] = useState(0);
+  const [dragY, setDragY] = useState(0); // 드래그 거리
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
+  const backdropRef = useRef(null);
   const sheetRef = useRef(null);
 
   const isDirty = !settingsEqual(settings, savedRef.current);
 
-  // iOS 배경 스크롤 잠금 및 복구
+  // iOS 배경 스크롤 잠금
   useEffect(() => {
     const scrollY = window.scrollY;
-    document.body.style.cssText = `
-      position: fixed;
-      top: -${scrollY}px;
-      left: 0;
-      right: 0;
-      width: 100%;
-      overflow: hidden;
-    `;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.cssText = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
       window.scrollTo(0, scrollY);
     };
   }, []);
 
-  const triggerClose = (msg) => {
-    if (closing) return;
-    setClosing(true);
-    setTimeout(() => onClose(msg), 300);
+  // 백드롭 터치무브 방지 (iOS에서 배경 스크롤 방지)
+  useEffect(() => {
+    const el = backdropRef.current;
+    if (!el) return;
+    const prevent = (e) => {
+      // 시트 내부의 스크롤 요소가 아닐 때만 차단
+      if (!e.target.closest('.alarm-picker-scroll')) {
+        e.preventDefault();
+      }
+    };
+    el.addEventListener('touchmove', prevent, { passive: false });
+    return () => el.removeEventListener('touchmove', prevent);
+  }, []);
+
+  // 드래그 제어 핸들러
+  const handleTouchStart = (e) => {
+    startY.current = e.touches[0].clientY;
+    setIsDragging(true);
   };
 
-  const handleSaveAndClose = async () => {
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY.current;
+    if (deltaY > 0) {
+      setDragY(deltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (dragY > 100) {
+      handleClose(); // 100px 이상 내리면 닫기
+    } else {
+      setDragY(0); // 다시 제자리로
+    }
+  };
+
+  const toggle = async () => {
+    const turningOn = !settings.jeyukAlert;
+    setSettings(p => ({ ...p, jeyukAlert: turningOn }));
+    if (turningOn) {
+      const token = await requestNotificationPermission();
+      if (!token) {
+        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        setSettings(p => ({ ...p, jeyukAlert: false }));
+      }
+    }
+  };
+
+  const addKeyword = () => {
+    const trimmed = keywordInput.trim();
+    if (trimmed && !settings.keywords.includes(trimmed)) {
+      setSettings(p => ({ ...p, keywords: [...p.keywords, trimmed] }));
+    }
+    setKeywordInput('');
+  };
+
+  const removeKeyword = (kw) =>
+    setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }));
+
+  // 닫힘 애니메이션 후 실제 onClose 호출
+  const triggerClose = (msg) => {
+    setClosing(true);
+    // 애니메이션 속도와 맞춤 (260ms)
+    setTimeout(() => {
+      onClose(msg);
+    }, 250);
+  };
+
+  const handleClose = () => {
     let successMsg;
     if (isDirty) {
       localStorage.setItem('alarm_settings', JSON.stringify(settings));
+
       if (settings.jeyukAlert && settings.keywords.length > 0) {
         successMsg = '설정한 시간에 맞춰\n알림을 보내드릴게요!';
-        // 서버 동기화 로직 (비동기 유지)
-        syncSettings(settings);
+
+        (async () => {
+          try {
+            const token = await requestNotificationPermission();
+            if (token) {
+              let deviceId = localStorage.getItem('device_id');
+              if (!deviceId) {
+                deviceId = crypto.randomUUID();
+                localStorage.setItem('device_id', deviceId);
+              }
+              await supabase.from('devices').upsert(
+                { id: deviceId, fcm_token: token, platform: 'web', last_active_at: new Date().toISOString() },
+                { onConflict: 'id' }
+              );
+              const { data: existingSub } = await supabase
+                .from('subscriptions')
+                .select('id')
+                .eq('device_id', deviceId)
+                .eq('topic', 'CAFETERIA_KEYWORD')
+                .maybeSingle();
+              if (existingSub) {
+                await supabase
+                  .from('subscriptions')
+                  .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime }, is_active: true, updated_at: new Date().toISOString() })
+                  .eq('id', existingSub.id);
+              } else {
+                await supabase
+                  .from('subscriptions')
+                  .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime } });
+              }
+            }
+          } catch (err) {
+            console.error('Failed to sync alarm settings', err);
+          }
+        })();
       } else if (!settings.jeyukAlert) {
-        disableAlarm();
+        const deviceId = localStorage.getItem('device_id');
+        if (deviceId) {
+          supabase.from('subscriptions')
+            .update({ is_active: false, updated_at: new Date().toISOString() })
+            .eq('device_id', deviceId)
+            .eq('topic', 'CAFETERIA_KEYWORD')
+            .then();
+        }
       }
     }
     triggerClose(successMsg);
   };
 
-  const syncSettings = async (s) => {
-    try {
-      const token = await requestNotificationPermission();
-      if (!token) return;
-      let deviceId = localStorage.getItem('device_id') || crypto.randomUUID();
-      localStorage.setItem('device_id', deviceId);
-      
-      await supabase.from('devices').upsert({ id: deviceId, fcm_token: token, platform: 'web', last_active_at: new Date().toISOString() });
-      
-      const { data: existingSub } = await supabase.from('subscriptions').select('id').eq('device_id', deviceId).eq('topic', 'CAFETERIA_KEYWORD').maybeSingle();
-      if (existingSub) {
-        await supabase.from('subscriptions').update({ params: { keywords: s.keywords, notifyTime: s.notifyTime }, is_active: true, updated_at: new Date().toISOString() }).eq('id', existingSub.id);
-      } else {
-        await supabase.from('subscriptions').insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: s.keywords, notifyTime: s.notifyTime } });
-      }
-    } catch (err) { console.error(err); }
-  };
-
-  const disableAlarm = () => {
-    const deviceId = localStorage.getItem('device_id');
-    if (deviceId) {
-      supabase.from('subscriptions').update({ is_active: false, updated_at: new Date().toISOString() }).eq('device_id', deviceId).eq('topic', 'CAFETERIA_KEYWORD').then();
-    }
-  };
-
-  // --- 드래그 핸들러 ---
-  const onTouchStart = (e) => {
-    if (sheetRef.current?.scrollTop > 0) return; // 내부 스크롤 중일 땐 드래그 금지
-    startY.current = e.touches[0].clientY;
-    setIsDragging(true);
-  };
-
-  const onTouchMove = (e) => {
-    if (!isDragging) return;
-    const currentY = e.touches[0].clientY;
-    const diff = currentY - startY.current;
-    if (diff > 0) {
-      setDragY(diff);
-      // 배경 불투명도 조절 효과를 위해 인라인 스타일로 전달 가능
-    }
-  };
-
-  const onTouchEnd = () => {
-    setIsDragging(false);
-    if (dragY > 100) {
-      triggerClose();
-    } else {
-      setDragY(0);
-    }
-  };
-
-  const modalStyle = {
-    transform: `translateY(${closing ? '100%' : `${dragY}px`})`,
-    transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-  };
-
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-[1100] flex items-end justify-center transition-opacity duration-300"
-      style={{ opacity: closing ? 0 : 1 }}
-      onClick={() => triggerClose()}
+      ref={backdropRef}
+      className="fixed inset-0 bg-black/45 z-[1100] flex items-end justify-center"
+      style={{ animation: closing ? 'fadeOut 0.26s ease forwards' : 'fadeIn 0.2s ease' }}
+      onClick={handleClose}
     >
       <div
         ref={sheetRef}
-        className="w-[calc(100%-48px)] max-w-[320px] bg-white rounded-t-[24px] rounded-b-[24px] px-5 pb-6 mb-8 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] touch-none"
-        style={modalStyle}
+        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-4 max-h-[90vh] overflow-y-auto mb-6 relative"
+        style={{ 
+          transform: `translateY(${dragY}px)`,
+          transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+          animation: closing ? 'sheetDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          willChange: 'transform'
+        }}
         onClick={e => e.stopPropagation()}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
       >
-        {/* 드래그 핸들 */}
-        <div className="pt-3 pb-4 flex justify-center cursor-grab active:cursor-grabbing">
-          <div className="w-10 h-1.5 bg-slate-200 rounded-full" />
+        {/* 드래그 핸들 영역 (터치 인식 범위 확장) */}
+        <div 
+          className="py-3 cursor-grab active:cursor-grabbing"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto" />
         </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[20px] font-black text-slate-800">학식 알림설정</span>
-          <label className="alarm-toggle">
-            <input type="checkbox" checked={settings.jeyukAlert} onChange={() => setSettings(p => ({ ...p, jeyukAlert: !p.jeyukAlert }))} />
+        <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-0.5">
+          <span className="text-[18px] font-extrabold text-text-main leading-none">학식 알림설정</span>
+          <label className="alarm-toggle" style={{ marginLeft: 'auto', alignSelf: 'center' }}>
+            <input type="checkbox" checked={settings.jeyukAlert} onChange={toggle} />
             <span className="alarm-toggle-slider" />
           </label>
         </div>
 
         <div style={{
-          opacity: settings.jeyukAlert ? 1 : 0.4,
+          opacity: settings.jeyukAlert ? 1 : 0.35,
           pointerEvents: settings.jeyukAlert ? 'auto' : 'none',
-          transition: 'all 0.3s ease',
+          transition: 'opacity 0.2s',
         }}>
-          <div className="space-y-4">
-            <div>
-              <div className="text-[14px] font-bold text-slate-500 mb-2 px-1">키워드 설정</div>
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 h-11 bg-slate-50 border-none rounded-xl px-4 text-[15px] font-medium text-slate-800 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
-                  value={keywordInput}
-                  onChange={e => setKeywordInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && (keywordInput.trim() && setSettings(p => ({ ...p, keywords: [...new Set([...p.keywords, keywordInput.trim()])] })), setKeywordInput(''))}
-                  placeholder="예: 돈까스, 제육"
-                />
-                <button
-                  className="w-11 h-11 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
-                  onClick={() => {
-                    if (keywordInput.trim()) {
-                      setSettings(p => ({ ...p, keywords: [...new Set([...p.keywords, keywordInput.trim()])] }));
-                      setKeywordInput('');
-                    }
-                  }}
-                >
-                  <Plus size={20} strokeWidth={3} />
-                </button>
-              </div>
-              
-              {settings.keywords.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  {settings.keywords.map(kw => (
-                    <span key={kw} className="group flex items-center gap-1.5 bg-blue-50 text-blue-600 text-[13px] font-bold pl-3 pr-2 py-1.5 rounded-lg border border-blue-100/50">
-                      {kw}
-                      <button className="p-0.5 hover:bg-blue-100 rounded-md transition-colors" onClick={() => setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }))}>
-                        <X size={14} strokeWidth={2.5} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="text-[14px] font-bold text-slate-500 mb-1 px-1">알림 발송 시간</div>
-              <TimePicker
-                value={settings.notifyTime}
-                onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
-                day={settings.notifyDay}
-                onDayChange={(d) => setSettings(p => ({ ...p, notifyDay: d }))}
+          <div className="py-2 border-b border-[#f1f5f9]">
+            <div className="text-[14px] font-extrabold text-text-main mb-1.5">키워드</div>
+            <div className="flex gap-2 mb-2">
+              <input
+                className="flex-1 h-10 border-[1.5px] border-[#e2e8f0] rounded-card px-3 text-[14px] text-text-main bg-surface outline-none transition-colors duration-200 focus:border-[#3b82f6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
+                value={keywordInput}
+                onChange={e => setKeywordInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addKeyword()}
+                placeholder="키워드 입력"
               />
+              <button
+                className="w-10 h-10 bg-[#3b82f6] text-white border-none rounded-card flex items-center justify-center cursor-pointer flex-shrink-0 transition-opacity duration-150 hover:opacity-[0.88]"
+                onClick={addKeyword}
+              >
+                <Plus size={18} />
+              </button>
             </div>
+            {settings.keywords.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {settings.keywords.map(kw => (
+                  <span key={kw} className="flex items-center gap-1 bg-[rgba(59,130,246,0.1)] text-[#3b82f6] text-[12px] font-bold px-3 py-1 rounded-full">
+                    {kw}
+                    <button
+                      className="bg-none border-none text-[#3b82f6] cursor-pointer flex items-center p-0 opacity-70 transition-opacity duration-150 hover:opacity-100"
+                      onClick={() => removeKeyword(kw)}
+                    >
+                      <X size={11} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="py-2">
+            <div className="text-[14px] font-extrabold text-text-main mb-1.5">언제 알림을 보낼까요?</div>
+            <TimePicker
+              value={settings.notifyTime}
+              onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
+              day={settings.notifyDay}
+              onDayChange={(d) => setSettings(p => ({ ...p, notifyDay: d }))}
+            />
           </div>
         </div>
-
-        <button
-          className="w-full h-13 mt-6 bg-slate-900 text-white rounded-2xl font-bold text-[16px] shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all"
-          onClick={handleSaveAndClose}
-        >
-          {isDirty ? '설정 저장하기' : '닫기'}
-        </button>
       </div>
     </div>
   );
