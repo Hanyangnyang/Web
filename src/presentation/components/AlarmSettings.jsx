@@ -184,17 +184,25 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   };
 
   return (
-    <div style={{
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'stretch',
-      height: ITEM_H * VISIBLE,
-      background: 'white',
-      borderRadius: 10,
-      overflow: 'hidden',
-      width: 'fit-content',
-      margin: '0 auto',
-    }}>
+    <div 
+      onMouseDown={e => e.stopPropagation()}
+      onMouseMove={e => e.stopPropagation()}
+      onMouseUp={e => e.stopPropagation()}
+      onTouchStart={e => e.stopPropagation()}
+      onTouchMove={e => e.stopPropagation()}
+      onTouchEnd={e => e.stopPropagation()}
+      style={{
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'stretch',
+        height: ITEM_H * VISIBLE,
+        background: 'white',
+        borderRadius: 10,
+        overflow: 'hidden',
+        width: 'fit-content',
+        margin: '0 auto',
+      }}
+    >
       {/* 선택 하이라이트 바 */}
       <div style={{
         position: 'absolute',
