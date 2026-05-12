@@ -446,12 +446,12 @@ export function AlarmSettings({ onClose }) {
               if (existingSub) {
                 await supabase
                   .from('subscriptions')
-                  .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime }, is_active: true, updated_at: new Date().toISOString() })
+                  .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime, notifyDay: settings.notifyDay }, is_active: true, updated_at: new Date().toISOString() })
                   .eq('id', existingSub.id);
               } else {
                 await supabase
                   .from('subscriptions')
-                  .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime } });
+                  .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime, notifyDay: settings.notifyDay } });
               }
             }
           } catch (err) {
@@ -481,7 +481,7 @@ export function AlarmSettings({ onClose }) {
     >
       <div
         ref={sheetRef}
-        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-4 max-h-[90vh] overflow-y-auto mb-6 relative select-none"
+        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-6 max-h-[90vh] overflow-y-auto mb-0 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
         style={{ 
           transform: `translateY(${dragY}px)`,
           transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',

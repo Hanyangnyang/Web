@@ -189,15 +189,20 @@ export function ShuttleView() {
     fullDayType, setFullDayType,
   } = useShuttle();
 
-  const [showTooltip, setShowTooltip] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [initialStop] = useState(stop);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
 
   useEffect(() => {
-    const t = setTimeout(() => setShowTooltip(false), 2000);
-    return () => clearTimeout(t);
+    // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
+    const showTimer = setTimeout(() => setShowTooltip(true), 2000);
+    const hideTimer = setTimeout(() => setShowTooltip(false), 10000);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+    };
   }, []);
 
   if (loadErr) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>;
@@ -206,7 +211,7 @@ export function ShuttleView() {
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 선택 */}
-      <div className="mb-6 sticky top-0 bg-[#F8F9FA]/40 backdrop-blur-xl z-[100] -mx-[50vw] px-[50vw] pb-3">
+      <div className="mb-6 sticky top-0 bg-[#F8F9FA]/40 backdrop-blur-xl z-[100] -mx-5 px-5 pt-8 pb-3">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
         </div>

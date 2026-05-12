@@ -56,7 +56,7 @@ function MainLayout() {
           onDone={completeSplash} 
         />
       )}
-      <div className="mx-auto w-full max-w-app min-h-screen px-5 py-6 flex flex-col">
+      <div className="mx-auto w-full max-w-app min-h-screen px-5 py-6 flex flex-col overflow-x-hidden">
         <div key={activeTab} className={`tab-slide-${slideDir}`}>
           {activeTab === 'qr' ? (
             user ? (
