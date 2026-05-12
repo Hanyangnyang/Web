@@ -11,27 +11,32 @@ const BusIcon = () => (
 );
 
 export function BottomNav({ activeTab, setActiveTab }) {
+  const itemClass = (tab) =>
+    `flex flex-col items-center gap-1 cursor-pointer transition-colors duration-300 flex-1 py-2 [-webkit-tap-highlight-color:transparent] ${
+      activeTab === tab ? 'text-hyu-blue-light' : 'text-text-hint'
+    }`;
+
   return (
-    <div className="bottom-nav">
-      <div className={`nav-item ${activeTab === 'cafe'    ? 'active' : ''}`} onClick={() => setActiveTab('cafe')}>
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-16 bg-[rgba(15,23,42,0.8)] backdrop-blur-[20px] border border-white/10 rounded-full flex justify-around items-center z-[1000] shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+      <div className={itemClass('cafe')} onClick={() => setActiveTab('cafe')}>
         <Utensils size={24} />
-        <span className="nav-item-text">학식</span>
+        <span className="text-[0.7rem] font-semibold">학식</span>
       </div>
-      <div className={`nav-item ${activeTab === 'shuttle' ? 'active' : ''}`} onClick={() => setActiveTab('shuttle')}>
+      <div className={itemClass('shuttle')} onClick={() => setActiveTab('shuttle')}>
         <BusIcon />
-        <span className="nav-item-text">셔틀·지하철</span>
+        <span className="text-[0.7rem] font-semibold">셔틀·지하철</span>
       </div>
-      <div className={`nav-item ${activeTab === 'qr'      ? 'active' : ''}`} onClick={() => setActiveTab('qr')}>
+      <div className={itemClass('qr')} onClick={() => setActiveTab('qr')}>
         <BookOpen size={24} />
-        <span className="nav-item-text">도서관</span>
+        <span className="text-[0.7rem] font-semibold">도서관</span>
       </div>
-      <div className={`nav-item ${activeTab === 'portal'  ? 'active' : ''}`} onClick={() => setActiveTab('portal')}>
+      <div className={itemClass('portal')} onClick={() => setActiveTab('portal')}>
         <Megaphone size={24} />
-        <span className="nav-item-text">소식</span>
+        <span className="text-[0.7rem] font-semibold">소식</span>
       </div>
-      <div className={`nav-item ${activeTab === 'misc'    ? 'active' : ''}`} onClick={() => setActiveTab('misc')}>
+      <div className={itemClass('misc')} onClick={() => setActiveTab('misc')}>
         <LayoutGrid size={24} />
-        <span className="nav-item-text">기타</span>
+        <span className="text-[0.7rem] font-semibold">기타</span>
       </div>
     </div>
   );

@@ -21,7 +21,6 @@ function MenuItemLine({ html }) {
     if (!wrap || !span) return;
     const dist = span.scrollWidth - wrap.clientWidth;
     if (dist > 2) {
-      // 텍스트 너비 + 1em 간격(≈16px) 기준
       setMarquee({ duration: Math.max(4, (span.scrollWidth + 16) / 30) });
     } else {
       setMarquee(null);
@@ -29,19 +28,19 @@ function MenuItemLine({ html }) {
   }, [html]);
 
   return (
-    <div className="menu-item-line">
-      {bullet && <span className="menu-item-bullet">{bullet}</span>}
-      <div ref={scrollWrapRef} className="menu-item-scroll-wrap">
+    <div className="flex items-baseline whitespace-nowrap leading-[1.8]">
+      {bullet && <span className="flex-shrink-0 mr-[0.4rem]">{bullet}</span>}
+      <div ref={scrollWrapRef} className="overflow-hidden flex-1 min-w-0">
         <span
           ref={spanRef}
-          className="menu-item-text"
+          className="inline-block"
           style={marquee ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' } : undefined}
           dangerouslySetInnerHTML={{ __html: content }}
         />
         {marquee && (
           <span className="menu-item-marquee-track" style={{ animationDuration: `${marquee.duration}s` }}>
-            <span className="menu-item-text menu-item-gap" dangerouslySetInnerHTML={{ __html: content }} />
-            <span className="menu-item-text menu-item-gap" aria-hidden="true" dangerouslySetInnerHTML={{ __html: content }} />
+            <span className="inline-block menu-item-gap" dangerouslySetInnerHTML={{ __html: content }} />
+            <span className="inline-block menu-item-gap" aria-hidden="true" dangerouslySetInnerHTML={{ __html: content }} />
           </span>
         )}
       </div>
@@ -84,7 +83,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
   const [selectedCafeId, setSelectedCafeId] = useState(
     () => urlParams.get('cafe') || localStorage.getItem('lastSelectedCafeId') || 're12'
   );
-  
+
   const handleCafeSelect = (id) => {
     setSelectedCafeId(id);
     localStorage.setItem('lastSelectedCafeId', id);
@@ -93,11 +92,12 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
   const [showAlarm, setShowAlarm] = useState(false);
   const [shareTarget, setShareTarget] = useState(null);
   const [copiedToast, setCopiedToast] = useState(false);
+  const [alarmPopup, setAlarmPopup] = useState('');
   const listRef = useRef(null);
 
   const selectedCafe = cafes.find(c => c.id === selectedCafeId) || { menus: [] };
 
-  // 날짜 이동 후 선택된 식당에 메뉴가 없으면 메뉴 있는 식당으로 자동 전환
+  // 식당 자동 선택 및 메뉴 유무 확인
   useEffect(() => {
     if (!cafes.length) return;
     const current = cafes.find(c => c.id === selectedCafeId);
@@ -107,30 +107,64 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     }
   }, [cafes]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // URL 파라미터 한 번 읽은 후 히스토리 정리
+  // 딥링크 처리: 날짜 동기화
+  useEffect(() => {
+    const urlDate = urlParams.get('date');
+    if (urlDate) {
+      const parsed = new Date(urlDate);
+      if (!isNaN(parsed) && urlDate !== date.toISOString().split('T')[0]) {
+        changeDate(parsed);
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 딥링크 처리: 파라미터 제거 (모든 연동 준비 후)
   useEffect(() => {
     if (window.location.search) {
-      window.history.replaceState({}, '', window.location.pathname);
+      const t = setTimeout(() => {
+        window.history.replaceState({}, '', window.location.pathname);
+      }, 1000); // 넉넉히 1초 후 제거
+      return () => clearTimeout(t);
     }
   }, []);
 
   useEffect(() => {
     if (!selectedCafe.menus?.length) return;
 
-    // URL ?type= 파라미터가 있으면 해당 끼니만 펼침
     const urlType = urlTypeRef.current;
     if (urlType) {
       const initial = {};
+      let foundExact = false;
+      
       selectedCafe.menus.forEach(m => {
-        if (initial[m.type] === undefined) initial[m.type] = m.type === urlType;
+        // 정확히 일치하거나, 포함되어 있는 경우 (예: "중식" vs "중식 (학식)")
+        const match = m.type === urlType || m.type.includes(urlType) || urlType.includes(m.type);
+        if (initial[m.type] === undefined) {
+          initial[m.type] = match;
+          if (match) foundExact = true;
+        }
       });
+      
       setExpandedGroups(initial);
       urlTypeRef.current = null;
 
-      setTimeout(() => {
-        const targetEl = listRef.current?.querySelector(`[data-type="${CSS.escape(urlType)}"]`);
-        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 150);
+      if (foundExact) {
+        setTimeout(() => {
+          // 정확히 일치하는 data-type을 찾거나, 포함하는 요소를 찾음
+          const targetEl = listRef.current?.querySelector(`[data-type="${CSS.escape(urlType)}"]`) || 
+                          listRef.current?.querySelector(`[data-type*="${urlType}"]`);
+          if (targetEl) {
+            const headerOffset = 120; // 고정 헤더 높이 고려
+            const elementPosition = targetEl.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 300);
+      }
       return;
     }
 
@@ -160,14 +194,11 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     });
     setExpandedGroups(initial);
 
-    // 중식/석식 시간에 식당 선택 시 해당 섹션으로 자동 스크롤 (조식 제외)
     if (isToday && (targetType === '중식' || targetType === '석식')) {
       setTimeout(() => {
         const targetEl = listRef.current?.querySelector(`[data-type*="${targetType}"]`);
-        if (targetEl) {
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 150); // 렌더링 및 애니메이션 대기
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
     }
   }, [selectedCafeId, cafes, date]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -186,14 +217,23 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
   };
 
   return (
-    <div className="cafe-container">
+    <div className="pb-20 relative">
       {createPortal(
         <>
-          <button className="alarm-fab" onClick={() => setShowAlarm(true)}>
+          <button
+            className="fixed bottom-[calc(20px+64px+12px)] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
+            onClick={() => setShowAlarm(true)}
+          >
             <Bell size={18} />
             키워드 알림 받기
           </button>
-          {showAlarm && <AlarmSettings onClose={() => setShowAlarm(false)} />}
+          {showAlarm && <AlarmSettings onClose={(msg) => {
+            setShowAlarm(false);
+            if (msg) {
+              setAlarmPopup(msg);
+              setTimeout(() => setAlarmPopup(''), 1500);
+            }
+          }} />}
         </>,
         document.body
       )}
@@ -209,39 +249,74 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
           onCopied={handleCopied}
         />
       )}
-      {copiedToast && <div className="copy-toast">링크 복사됨!</div>}
-      <div className="cafe-sticky-header">
-        <div className="date-controller">
-          <button className="date-btn" onClick={() => changeDate(-1)} disabled={loading}>
+      {copiedToast && (
+        <div className="copy-toast fixed bottom-[calc(20px+64px+52px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.88)] text-white text-[0.78rem] font-semibold px-4 py-2 rounded-full whitespace-nowrap z-[2000] pointer-events-none">
+          링크 복사됨!
+        </div>
+      )}
+      {alarmPopup && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', pointerEvents: 'none' }}>
+          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 240, margin: '0 24px' }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>🔔</div>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{alarmPopup}</p>
+          </div>
+        </div>
+      )}
+
+      {/* 고정 헤더 */}
+      <div className="sticky top-[-1.25rem] z-[100] bg-surface pt-5 pb-[0.4rem] mt-[-1.25rem] mb-[0.35rem] shadow-[0_4px_6px_-1px_rgba(248,249,250,1),0_10px_15px_-3px_rgba(0,0,0,0.02)]">
+        <div className="flex justify-between items-center mb-3 bg-white px-5 py-3 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+          <button
+            className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
+            onClick={() => changeDate(-1)}
+            disabled={loading}
+          >
             <ChevronLeft style={{ opacity: loading ? 0.3 : 1 }} />
           </button>
-          <div className="date-text" style={{ opacity: loading ? 0.5 : 1 }}>{formatDate(date)}</div>
-          <button className="date-btn" onClick={() => changeDate(1)} disabled={loading}>
+          <div className="text-[1.1rem] font-bold text-text-main font-['Outfit',sans-serif]" style={{ opacity: loading ? 0.5 : 1 }}>
+            {formatDate(date)}
+          </div>
+          <button
+            className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
+            onClick={() => changeDate(1)}
+            disabled={loading}
+          >
             <ChevronRight style={{ opacity: loading ? 0.3 : 1 }} />
           </button>
         </div>
 
         <div
-          className="cafe-selector"
+          className="flex gap-1.5 pt-2.5"
           style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
         >
           {cafes.map(cafe => (
             <div
               key={cafe.id}
-              className={`cafe-chip ${selectedCafeId === cafe.id ? 'active' : ''} ${!cafe.available ? 'disabled' : ''}`}
+              className={`flex-1 min-w-0 py-2 px-[0.15rem] border rounded-card text-[clamp(0.65rem,3.3vw,0.85rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
+                selectedCafeId === cafe.id
+                  ? 'bg-primary text-white border-hyu-blue-light'
+                  : !cafe.available
+                    ? 'bg-white border-[#e2e8f0] text-text-sub opacity-30'
+                    : 'bg-white border-[#e2e8f0] text-text-sub hover:border-hyu-blue-light hover:text-primary'
+              }`}
               onClick={() => handleCafeSelect(cafe.id)}
             >
               {cafe.name}
-              {cafe.hasJeyuk && <span className="jeyuk-badge">🔥 제육</span>}
+              {cafe.hasJeyuk && (
+                <span className="absolute top-[-8px] right-[-5px] bg-error text-white text-[0.65rem] px-1.5 py-0.5 rounded font-extrabold shadow-[0_2px_8px_rgba(239,68,68,0.4)]">
+                  🔥 제육
+                </span>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="menu-list" ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
+      {/* 메뉴 목록 */}
+      <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
         {loading && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
-            <div className="loader-spinner" style={{ width: '40px', height: '40px' }} />
+            <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
             <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>식단 정보를 가져오는 중...</span>
           </div>
         )}
@@ -252,59 +327,66 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
               Object.entries(groupedMenus).map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
                 return (
-                  <div key={type} className="accordion-group" data-type={type}>
+                  <div key={type} className="mb-[0.6rem]" data-type={type}>
                     {(() => {
                       const mealKey = ['조식', '중식', '석식'].find(k => type.includes(k));
                       const hoursText = mealKey ? selectedCafe.hours?.[mealKey] : null;
                       return (
                         <>
                           <div
-                            className={`accordion-header ${isExpanded ? 'expanded' : ''}`}
+                            className="flex justify-between items-center px-5 py-4 bg-white rounded-card border border-[#e2e8f0] cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-200 mb-[0.4rem] hover:bg-surface hover:border-[#cbd5e1]"
                             onClick={() => toggleGroup(type)}
                           >
-                            <div className="accordion-title-area">
-                              <span className="menu-icon">{getMenuIcon(type)}</span>
-                              <span className="accordion-title">{type}</span>
-                              <span className="accordion-count">{menus.length}개 메뉴</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xl">{getMenuIcon(type)}</span>
+                              <span className="font-extrabold text-[1.05rem] text-text-main">{type}</span>
+                              <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
+                                {menus.length}개 메뉴
+                              </span>
                             </div>
-                            <div className="accordion-chevron">
-                              <ChevronRight
-                                style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
-                                size={20}
-                                color="#94a3b8"
-                              />
-                            </div>
+                            <ChevronRight
+                              style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+                              size={20}
+                              color="#94a3b8"
+                            />
                           </div>
                           <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
                             <div className="accordion-inner">
                               {menus.map((m, i) => {
                                 const hasJeyuk = m.menu.includes('제육');
                                 const isCheonwon = type.includes('천원') || m.menu.includes('천원의아침밥');
-                                const cardClass = `menu-card${hasJeyuk ? ' menu-card--jeyuk' : ''}`;
-                                const shareUrl = `${window.location.origin}?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
-                                const dateLabel = `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
+                                const shareUrl = `${window.location.origin}/?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
+                                const nowKst = getKSTDate();
+                                const targetStr = date.toISOString().split('T')[0];
+                                const dateLabel = targetStr === nowKst.toISOString().split('T')[0] ? '오늘'
+                                  : targetStr === new Date(nowKst.getTime() + 86400000).toISOString().split('T')[0] ? '내일'
+                                  : targetStr === new Date(nowKst.getTime() - 86400000).toISOString().split('T')[0] ? '어제'
+                                  : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
                                 const menuLines = m.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
                                 return (
-                                  <div key={i} className={cardClass}>
+                                  <div
+                                    key={i}
+                                    className={`menu-card bg-white rounded-card p-6 border text-left transition-transform duration-200 relative active:scale-[0.98] ${hasJeyuk ? 'border-[rgba(239,68,68,0.2)]' : 'border-[#e2e8f0]'} shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]`}
+                                  >
                                     {m.price && (
-                                      <div className={`menu-price${isCheonwon ? ' menu-price--cheonwon' : ''}`}>
-                                        {isCheonwon ? `💕 ${m.price} 💕` : m.price}
+                                      <div className="absolute top-5 right-5 text-primary font-bold text-[0.9rem] bg-[rgba(14,74,132,0.06)] px-2.5 py-1 rounded z-[1]">
+                                        {isCheonwon ? `${m.price}💕` : m.price}
                                       </div>
                                     )}
-                                    <div className="menu-items">
+                                    <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]">
                                       {menuLines.map((line, idx) => (
                                         <MenuItemLine key={idx} html={line} />
                                       ))}
                                     </div>
-                                    <div className="menu-card-footer">
+                                    <div className="flex justify-between items-center mt-[0.6rem] pt-[0.6rem] pl-[0.2rem] border-t border-[#e2e8f0]">
                                       {hoursText ? (
-                                        <div className="menu-hours">
+                                        <div className="flex items-center gap-1 text-xs text-text-hint">
                                           <Clock size={12} />
                                           <span>{hoursText}</span>
                                         </div>
                                       ) : <span />}
                                       <button
-                                        className="menu-card-share-btn"
+                                        className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
                                         onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
                                         aria-label="메뉴 공유"
                                       >
@@ -323,10 +405,10 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                 );
               })
             ) : (
-              <div className="no-menu">해당 식당은 오늘 등록된 메뉴가 없습니다.</div>
+              <div className="text-center py-12 px-4 text-text-sub">해당 식당은 오늘 등록된 메뉴가 없습니다.</div>
             )
           ) : !loading && (
-            <div className="no-menu">정보를 불러올 수 없습니다.</div>
+            <div className="text-center py-12 px-4 text-text-sub">정보를 불러올 수 없습니다.</div>
           )}
         </div>
       </div>

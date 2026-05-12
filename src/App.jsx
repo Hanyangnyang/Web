@@ -11,17 +11,27 @@ import { PortalView }    from './presentation/components/PortalView.jsx';
 import { MiscView }      from './presentation/components/MiscView.jsx';
 import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
+import { BootProvider, useBoot } from './presentation/context/BootContext';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 
 export default function App() {
+  return (
+    <BootProvider>
+      <MainLayout />
+    </BootProvider>
+  );
+}
+
+function MainLayout() {
   const [activeTab, setActiveTab] = useState(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
     return localStorage.getItem('lastActiveTab') || 'cafe';
   });
   const [slideDir, setSlideDir] = useState('right');
-  const [splashDone, setSplashDone] = useState(false);
+  const { isAppReady, splashDone, completeSplash } = useBoot();
+  
   const { user, loading, login, relogin, logout, updateUser } = useAuth();
   const { menuDate, cafes, menuLoading, changeDate } = useMenu();
 
@@ -42,38 +52,43 @@ export default function App() {
   return (
     <>
       {!splashDone && (
-        <SplashScreen ready={!loading && !menuLoading} onDone={() => setSplashDone(true)} />
+        <SplashScreen 
+          ready={isAppReady} 
+          onDone={completeSplash} 
+        />
       )}
-    <div className="app-container">
-      <div key={activeTab} className={`main-content tab-slide-${slideDir}`}>
-        {activeTab === 'qr' ? (
-          user ? (
-            <QRView
-              user={user}
-              reloginFn={reloginFn}
-              onNameDiscovered={handleNameDiscovered}
-              onLogout={logout}
+      <div className="mx-auto w-full max-w-app min-h-screen px-5 py-6 flex flex-col overflow-x-hidden">
+        <div key={activeTab} className={`tab-slide-${slideDir}`}>
+          {activeTab === 'qr' ? (
+            user ? (
+              <QRView
+                user={user}
+                reloginFn={reloginFn}
+                onNameDiscovered={handleNameDiscovered}
+                onLogout={logout}
+              />
+            ) : (
+              <LoginForm onSuccess={login} />
+            )
+          ) : activeTab === 'cafe' ? (
+            <CafeteriaView
+              date={menuDate}
+              changeDate={changeDate}
+              cafes={cafes}
+              loading={menuLoading}
             />
+          ) : activeTab === 'shuttle' ? (
+            <ShuttleView />
           ) : (
-            <LoginForm onSuccess={login} />
-          )
-        ) : activeTab === 'cafe' ? (
-          <CafeteriaView
-            date={menuDate}
-            changeDate={changeDate}
-            cafes={cafes}
-            loading={menuLoading}
-          />
-        ) : activeTab === 'shuttle' ? (
-          <ShuttleView />
-        ) : activeTab === 'portal' ? (
-          <PortalView />
-        ) : (
-          <MiscView />
-        )}
+            activeTab === 'portal' ? (
+              <PortalView />
+            ) : (
+              <MiscView />
+            )
+          )}
+        </div>
+        <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
-      <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
-    </div>
     </>
   );
 }

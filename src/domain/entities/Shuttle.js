@@ -71,6 +71,7 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
     d['요일']   === dayType(isHolidayServer)
   );
   if (displayStop === '중앙역') rows = rows.filter(d => d['노선기호'] === '중앙역');
+  if (displayStop === '셔틀콕 건너편') rows = rows.filter(d => d['행선지'] === '셔틀콕/인재원');
 
   const allMapped = rows
     .map(d => {
@@ -119,6 +120,7 @@ export function computeFullSchedule(allData, displayStop, dayTypeStr) {
     d['요일']   === dayTypeStr
   );
   if (displayStop === '중앙역') rows = rows.filter(d => d['노선기호'] === '중앙역');
+  if (displayStop === '셔틀콕 건너편') rows = rows.filter(d => d['행선지'] === '셔틀콕/인재원');
 
   const allMapped = rows
     .map(d => {

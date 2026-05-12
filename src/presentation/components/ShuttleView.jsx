@@ -4,50 +4,22 @@ import { Loader2, ChevronDown } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 
-// ── 아이콘 ────────────────────────────────────────────────────────────────────
-const IcBed = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 20V10h20v10M2 10V8a2 2 0 012-2h5a2 2 0 012 2v2M13 10V8a2 2 0 012-2h5a2 2 0 012 2v2" />
-  </svg>
-);
-const IcSchool = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 21h18M3 10l9-7 9 7M5 21V10M19 21V10M9 21V15h6v6" />
-  </svg>
-);
-const IcSubway = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <rect x="4" y="3" width="16" height="13" rx="3" />
-    <path d="M4 10h16" />
-    <circle cx="9" cy="16" r="2" /><circle cx="15" cy="16" r="2" />
-  </svg>
-);
-const IcBus = () => (
-  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="5" width="20" height="13" rx="2" />
-    <path d="M2 11h20" />
-    <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
-  </svg>
-);
-
-const STOP_ICON = { '기숙사': IcBed, '셔틀콕': IcSchool, '한대앞': IcSubway, '셔틀콕 건너편': IcSchool, '예술인': IcBus, '중앙역': IcSubway };
-
 const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
 
-// ── 지하철 노선 뱃지 ──────────────────────────────────────────────────────────
+// ── 지하철 노선 뱃지
 function LineBadge({ opt, size = 32 }) {
   const is4 = opt.line === '4호선';
   return (
-    <div className="stt-lb" style={{ width: size, height: size, background: opt.color }}>
+    <div className="rounded-full flex items-center justify-center flex-shrink-0" style={{ width: size, height: size, background: opt.color }}>
       {is4
-        ? <span className="stt-lb-4" style={{ fontSize: size * 0.5 }}>4</span>
-        : <span className="stt-lb-sb" style={{ fontSize: size * 0.22 }}>수인<br />분당</span>
+        ? <span className="font-['Inter',-apple-system,sans-serif] font-black text-white" style={{ fontSize: size * 0.5 }}>4</span>
+        : <span className="font-black text-white text-center leading-[1.1]" style={{ fontSize: size * 0.22 }}>수인<br />분당</span>
       }
     </div>
   );
 }
 
-// ── 지하철 노선 드롭다운 ──────────────────────────────────────────────────────
+// ── 지하철 노선 드롭다운
 function SubwayDropdown({ selected, onChange }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -63,34 +35,43 @@ function SubwayDropdown({ selected, onChange }) {
   const sb = SUBWAY_OPTS.filter(o => o.line === '수인분당선');
 
   return (
-    <div className="stt-dd-wrap" ref={ref}>
-      <div className={`stt-dd-trigger${open ? ' open' : ''}`} onClick={() => setOpen(p => !p)}>
+    <div className="relative select-none" ref={ref}>
+      <div
+        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        onClick={() => setOpen(p => !p)}
+      >
         <LineBadge opt={opt} size={28} />
-        <div className="stt-dd-trigger-text">
-          <span className="stt-dd-trigger-line">{opt.line} · {opt.dir}</span>
-          <span className="stt-dd-trigger-dest">{opt.dest}</span>
+        <div className="flex flex-col gap-px">
+          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em]">{opt.line} · {opt.dir}</span>
+          <span className="text-[13px] font-extrabold text-text-main">{opt.dest}</span>
         </div>
-        <svg className={`stt-dd-arrow${open ? ' open' : ''}`} width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+        <svg
+          className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`}
+          width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"
+        >
           <path d="M6 9l6 6 6-6" />
         </svg>
       </div>
 
       {open && (
-        <div className="stt-dd-panel">
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[232px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.14)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
           {[{ label: '4호선', items: line4 }, { label: '수인분당선', items: sb }].map(({ label, items }) => (
             <div key={label}>
-              <div className="stt-dd-group-label">
+              <div className="flex items-center gap-[7px] px-3.5 pt-[9px] pb-1.5 text-[10px] font-bold text-text-hint tracking-[0.05em] border-t border-surface first:border-t-0">
                 <LineBadge opt={items[0]} size={18} /><span>{label}</span>
               </div>
               {items.map(o => (
-                <div key={o.id} className={`stt-dd-opt${selected === o.id ? ' sel' : ''}`}
-                  onClick={() => { onChange(o.id); setOpen(false); }}>
-                  <div className="stt-dd-opt-info">
-                    <p className="stt-dd-opt-main">{o.dest}</p>
-                    <p className="stt-dd-opt-sub">{o.dir} · 한대앞역 출발</p>
+                <div
+                  key={o.id}
+                  className={`flex items-center gap-2.5 px-3.5 py-2.5 cursor-pointer transition-colors duration-100 hover:bg-surface ${selected === o.id ? 'bg-[rgba(14,74,132,0.04)]' : ''}`}
+                  onClick={() => { onChange(o.id); setOpen(false); }}
+                >
+                  <div className="flex-1">
+                    <p className="text-[13px] font-bold text-text-main m-0">{o.dest}</p>
+                    <p className="text-[11px] text-text-hint mt-0.5 mb-0">{o.dir} · 한대앞역 출발</p>
                   </div>
-                  <div className={`stt-dd-radio${selected === o.id ? ' sel' : ''}`}>
-                    {selected === o.id && <div className="stt-dd-dot" />}
+                  <div className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-150 ${selected === o.id ? 'border-primary' : 'border-[#e2e8f0]'}`}>
+                    {selected === o.id && <div className="w-2 h-2 rounded-full bg-primary" />}
                   </div>
                 </div>
               ))}
@@ -102,7 +83,15 @@ function SubwayDropdown({ selected, onChange }) {
   );
 }
 
-// ── 시간표 행 ─────────────────────────────────────────────────────────────────
+// ── 노선 라벨 색상
+const ROUTE_STYLE = {
+  d:  'bg-[rgba(14,74,132,0.08)] text-primary',
+  c:  'bg-[rgba(39,174,96,0.08)] text-success',
+  dy: 'bg-[rgba(243,156,18,0.08)] text-warning-dark text-[9px] tracking-[-0.2px]',
+  ja: 'bg-[rgba(253,224,71,0.2)] text-[#854d0e]',
+};
+
+// ── 시간표 행
 function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol }) {
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
   const trains = row.subway ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
@@ -110,20 +99,46 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     ? (subwayOffPeak ? '운행 시간 외' : '연결 열차 없음') : null;
 
   const rLabel = ROUTE_LABEL[row.route] || row.route;
-  const routeClass = row.route === 'DY' ? 'dy' : (row.route === '중앙역' ? 'ja' : (row.route === 'C' ? 'c' : 'd'));
+  const routeKey = row.route === 'DY' ? 'dy' : (row.route === '중앙역' ? 'ja' : (row.route === 'C' ? 'c' : 'd'));
+
+  const tagBase = "absolute top-0 left-0 text-[10px] font-black text-white z-[10]";
 
   return (
-    <div className={`stt-trow${isNext ? ' next' : ''}${isPast ? ' past' : ''}`}>
-      {isPast && <div className="stt-past-tag">이전 셔틀{isLast && <span className="stt-mak-badge">막</span>}</div>}
-      {isNext && <div className="stt-next-tag">다음 셔틀{isLast && <span className="stt-mak-badge">막</span>}</div>}
-      {isLast && !isNext && !isPast && <div className="stt-last-tag">마지막 셔틀</div>}
+    <div className={`flex items-stretch border-b border-[#f1f5f9] relative ${
+      isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20]' :
+      isPast ? 'opacity-55 bg-[#f8fafc]' :
+      'bg-[#fafbfc]'
+    }`}>
+      {isPast && (
+        <div className={`${tagBase} bg-[#e2e8f0] text-[#64748b] px-2.5 h-5 flex items-center rounded-br`}>
+          이전 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
+        </div>
+      )}
+      {isNext && (
+        <div className={`${tagBase} bg-primary px-2.5 h-5 flex items-center rounded-br`}>
+          다음 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
+        </div>
+      )}
+      {isLast && !isNext && !isPast && (
+        <div className={`${tagBase} bg-[#fb7185] py-0.5 px-2.5 rounded-br`}>마지막 셔틀</div>
+      )}
 
-      <div className="stt-shuttle-col" style={{ paddingTop: (isNext || isLast || isPast) ? 26 : 16, flex: hideSubwayCol ? 1 : '0 0 52%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span className={`stt-route-label ${routeClass}`}>{rLabel}</span>
+      <div
+        className="flex items-center py-4 pl-4"
+        style={{
+          paddingTop: (isNext || isLast || isPast) ? 26 : 16,
+          flex: hideSubwayCol ? 1 : '0 0 52%',
+        }}
+      >
+        <div className="flex items-center gap-3.5">
+          <span className={`inline-flex justify-center items-center w-[58px] min-h-[34px] text-[10px] font-extrabold py-1 rounded flex-shrink-0 transition-all duration-200 whitespace-pre-line leading-[1.1] text-center ${ROUTE_STYLE[routeKey]}`}>
+            {rLabel}
+          </span>
           <div>
-            <span className="stt-time-big">{row.dep}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 2 }}>
+            <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast ? 'text-text-hint' : 'text-text-main'}`}>
+              {row.dep}
+            </span>
+            <div className="flex items-center gap-[3px] mt-0.5">
               <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="var(--color-text-hint)" strokeWidth={2.5} strokeLinecap="round" style={{ flexShrink: 0 }}>
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -136,27 +151,30 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
       </div>
 
       {!hideSubwayCol && (
-        <div className="stt-subway-col" style={{ paddingTop: (isNext || isLast || isPast) ? 26 : 14 }}>
+        <div
+          className="flex-1 flex flex-col gap-0.5 justify-center pr-3.5 pl-1"
+          style={{ paddingTop: (isNext || isLast || isPast) ? 26 : 14, paddingBottom: 14 }}
+        >
           {row.subway ? (
             isSubwayLoading ? (
-              <div className="stt-subway-loader-wrap">
-                <Loader2 className="stt-subway-loader" size={16} />
+              <div className="flex items-center justify-start pl-0.5 h-6">
+                <Loader2 className="text-[#cbd5e1] animate-[spin_1s_linear_infinite]" size={16} />
               </div>
             ) : trains.length > 0 ? trains.map((tr, i) => (
-              <div key={i} className="stt-subway-row">
+              <div key={i} className="grid grid-cols-[22px_1fr_auto] items-center gap-1.5">
                 <LineBadge opt={opt} size={20} />
-                <span className="stt-subway-dest">{tr.dest}행</span>
-                <span className="stt-subway-time">{tr.arrTime}</span>
+                <span className="text-[13px] font-bold text-text-main">{tr.dest}행</span>
+                <span className="font-['Inter',-apple-system,sans-serif] text-[13px] font-bold text-text-sub">{tr.arrTime}</span>
               </div>
-            )) : <span className="stt-no-train">{noTrainReason}</span>
-          ) : <span className="stt-no-train">—</span>}
+            )) : <span className="text-xs text-[#cbd5e1] font-medium">{noTrainReason}</span>
+          ) : <span className="text-xs text-[#cbd5e1] font-medium">—</span>}
         </div>
       )}
     </div>
   );
 }
 
-// ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
+// ── 메인 컴포넌트
 export function ShuttleView() {
   const {
     stop, setStop,
@@ -171,93 +189,79 @@ export function ShuttleView() {
     fullDayType, setFullDayType,
   } = useShuttle();
 
-  const [showTooltip, setShowTooltip] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [initialStop] = useState(stop);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
 
   useEffect(() => {
-    const t = setTimeout(() => setShowTooltip(false), 2000);
-    return () => clearTimeout(t);
+    // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
+    const showTimer = setTimeout(() => setShowTooltip(true), 2000);
+    const hideTimer = setTimeout(() => setShowTooltip(false), 10000);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+    };
   }, []);
 
-  if (loadErr) return <div className="stt-container"><div className="stt-empty"><p>{loadErr}</p></div></div>;
-  if (isLoading) return <div className="stt-container"><div className="stt-empty"><p>불러오는 중…</p></div></div>;
+  if (loadErr) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>;
+  if (isLoading) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>;
 
   return (
-    <div className="stt-container">
+    <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 선택 */}
-      <div className="stt-section stt-sticky-top">
-        <p className="stt-sec-label">출발지</p>
-        <div className="stt-stops-grid">
-          {STOPS.map((s, idx) => {
-            const Icon = STOP_ICON[s];
-            return (
-              <div key={s} className={`stt-stop-chip${stop === s ? ' active' : ''}`} onClick={() => setStop(s)} style={{ position: 'relative' }}>
-                {initialStop === s && showTooltip && (
-                  <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'}`}>
-                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
-                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    잠깐! 이 출발지가 맞나요?
-                  </div>
-                )}
-                <Icon /> {s}
-              </div>
-            );
-          })}
+      <div className="mb-6 sticky top-0 bg-[#F8F9FA]/40 backdrop-blur-xl z-[100] -mx-5 px-5 pt-8 pb-3">
+        <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
+          출발지
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {STOPS.map((s, idx) => (
+            <div
+              key={s}
+              className={`py-[8px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full font-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
+                stop === s
+                  ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                  : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+              }`}
+              onClick={() => setStop(s)}
+              style={{ position: 'relative' }}
+            >
+              {initialStop === s && showTooltip && (
+                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
+                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  잠깐! 이 출발지가 맞나요?
+                </div>
+              )}
+              {s}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* 시간표 */}
-      <div className="stt-section">
-        <div className="stt-section-header" style={{ alignItems: 'center' }}>
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-2">
           <div>
-            <div className="stt-sec-label" style={{ marginBottom: 2 }}>
-              시간표
-              {!isFullMode && (isWeekend ? (
-                <span className="stt-holiday-badge">주말</span>
-              ) : isHolidayServer ? (
-                <span className="stt-holiday-badge">공휴일</span>
-              ) : null)}
-            </div>
+            <div className="flex items-center text-2xl font-extrabold text-text-main mb-0.5">시간표</div>
           </div>
 
-          {isFullMode && (
-            <div style={{
-              display: 'flex',
-              background: 'var(--color-surface-variant)',
-              borderRadius: 8,
-              padding: 2,
-              border: '1px solid rgba(0,0,0,0.05)',
-              marginLeft: 16,
-              marginRight: 8
-            }}>
+          {!isFullMode ? (
+            <span style={{ marginLeft: 16, padding: '4px 12px', borderRadius: 6, background: 'white', color: 'var(--color-primary)', fontWeight: 700, fontSize: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              {isHolidayServer ? '공휴일' : isWeekend ? '주말' : '평일'}
+            </span>
+          ) : (
+            <div style={{ display: 'flex', background: 'var(--color-surface-variant)', borderRadius: 8, padding: 2, border: '1px solid rgba(0,0,0,0.05)', marginLeft: 16, marginRight: 8 }}>
               <button
                 onClick={() => setFullDayType('평일')}
-                style={{
-                  padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12,
-                  background: fullDayType === '평일' ? 'white' : 'transparent',
-                  color: fullDayType === '평일' ? 'var(--color-primary)' : 'var(--color-text-hint)',
-                  boxShadow: fullDayType === '평일' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                평일
-              </button>
+                style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12, background: fullDayType === '평일' ? 'white' : 'transparent', color: fullDayType === '평일' ? 'var(--color-primary)' : 'var(--color-text-hint)', boxShadow: fullDayType === '평일' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s ease' }}
+              >평일</button>
               <button
                 onClick={() => setFullDayType('주말')}
-                style={{
-                  padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12,
-                  background: fullDayType === '주말' ? 'white' : 'transparent',
-                  color: fullDayType === '주말' ? 'var(--color-primary)' : 'var(--color-text-hint)',
-                  boxShadow: fullDayType === '주말' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                주말/공휴일
-              </button>
+                style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12, background: fullDayType === '주말' ? 'white' : 'transparent', color: fullDayType === '주말' ? 'var(--color-primary)' : 'var(--color-text-hint)', boxShadow: fullDayType === '주말' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s ease' }}
+              >주말/공휴일</button>
             </div>
           )}
 
@@ -266,49 +270,28 @@ export function ShuttleView() {
           </div>
         </div>
 
-        <div className="stt-col-header" style={{ position: 'relative' }}>
-          <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 90 }} className="stt-col-label">출발 시간</div>
+        <div className="flex py-0 pb-1.5 border-b border-[#f1f5f9] relative">
+          <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 90 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">출발 시간</div>
           {!hideSubwayCol && (
-            <div style={{ flex: 1, paddingLeft: 4 }} className="stt-col-label">
+            <div style={{ flex: 1, paddingLeft: 4 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">
               {needsSubway ? '연결 지하철' : '도착'}
             </div>
           )}
 
-          <div style={{
-            position: 'absolute', right: 0, top: -2,
-            display: 'flex', alignItems: 'center', gap: 6
-          }}>
+          <div style={{ position: 'absolute', right: 0, top: -2, display: 'flex', alignItems: 'center', gap: 6 }}>
             <div
               onClick={() => setIsFullMode(!isFullMode)}
-              style={{
-                width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer',
-                background: isFullMode ? 'var(--color-primary)' : '#e0e0e0',
-                position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)'
-              }}
+              style={{ width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer', background: isFullMode ? 'var(--color-primary)' : '#e0e0e0', position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)' }}
             >
-              <div style={{
-                width: 17, height: 17, borderRadius: '50%', background: 'white',
-                boxShadow: '0 2px 3px rgba(0,0,0,0.15)',
-                position: 'absolute', top: 2,
-                left: isFullMode ? 19 : 2,
-                transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-              }} />
+              <div style={{ width: 17, height: 17, borderRadius: '50%', background: 'white', boxShadow: '0 2px 3px rgba(0,0,0,0.15)', position: 'absolute', top: 2, left: isFullMode ? 19 : 2, transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} />
             </div>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 800,
-                color: isFullMode ? 'var(--color-primary)' : 'var(--color-text-hint)',
-                whiteSpace: 'nowrap'
-              }}
-            >
+            <span style={{ fontSize: 10, fontWeight: 800, color: isFullMode ? 'var(--color-primary)' : 'var(--color-text-hint)', whiteSpace: 'nowrap' }}>
               전체 시간표
             </span>
           </div>
         </div>
 
-        <div className="stt-tcard">
+        <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
           {schedule.length > 0 ? (
             (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
               <TimetableRow
@@ -325,13 +308,18 @@ export function ShuttleView() {
               />
             ))
           ) : (
-            <div className="stt-empty large"><p>오늘 남은 셔틀이 없습니다</p></div>
+            <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
+              <p>오늘 남은 셔틀이 없습니다</p>
+            </div>
           )}
         </div>
 
         {!isFullMode && schedule.length > visibleCount && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-            <button className="qr-refresh-btn" onClick={loadMore} style={{ width: 'auto', padding: '8px 24px' }}>
+          <div className="flex justify-center py-4">
+            <button
+              className="bg-transparent border border-[#cbd5e1] text-text-sub rounded-full px-6 py-2 text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-surface"
+              onClick={loadMore}
+            >
               <ChevronDown size={16} />
               더 불러오기
             </button>
