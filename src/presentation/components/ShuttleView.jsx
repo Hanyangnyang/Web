@@ -188,13 +188,19 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // 공통 박스 스타일
+  const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
+
   if (!isFullMode) {
     const dType = isHolidayServer ? '공휴일' : (isWeekend ? '주말' : '평일');
     const period = appConfig.current_period;
     return (
-      <div className="flex flex-col items-end gap-0.5 select-none pr-1">
-        <span className="text-[17px] font-black text-primary leading-tight">{dType}</span>
-        <span className="text-[11px] font-bold text-text-hint">({period})</span>
+      <div className={`${boxBase} border-[#f1f5f9] bg-[#f8fafc]/50`}>
+        <div className="flex flex-col">
+          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em] uppercase">{period}</span>
+          <span className="text-[14px] font-black text-text-main/70 leading-tight">{dType}</span>
+        </div>
+        <div className="w-1.5 h-1.5 rounded-full bg-text-hint/20 ml-1" />
       </div>
     );
   }
@@ -202,7 +208,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   return (
     <div className="relative select-none" ref={ref}>
       <div
-        className={`flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`${boxBase} cursor-pointer ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <div className="flex flex-col">
@@ -213,22 +219,22 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[240px] bg-white/90 backdrop-blur-md border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[240px] bg-white/95 backdrop-blur-md border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
           <div className="flex h-[180px] relative">
-            {/* 중앙 선택 가이드선 */}
-            <div className="absolute top-1/2 left-0 w-full h-10 -translate-y-1/2 bg-primary/5 pointer-events-none border-y border-primary/10" />
+            {/* 중앙 선택 가이드선 (알림 설정 스타일) */}
+            <div className="absolute top-1/2 left-2 right-2 h-10 -translate-y-1/2 bg-surface rounded-lg pointer-events-none border border-[#f1f5f9]" />
             
             {/* 상하단 페이드 효과 */}
-            <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none z-10" />
-            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+            <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-b from-white via-white/40 to-transparent pointer-events-none z-10" />
+            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white via-white/40 to-transparent pointer-events-none z-10" />
 
             {/* 기간 컬럼 */}
             <div className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory py-[70px] relative z-0">
               {periods.map(p => (
                 <div
                   key={p}
-                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullPeriod === p ? 'text-primary font-black text-[15px]' : 'text-text-hint font-bold text-[13px] opacity-30'}`}
-                  onClick={() => setFullPeriod(p)}
+                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullPeriod === p ? 'text-primary font-bold text-[15px]' : 'text-[#cbd5e1] font-medium text-[13px]'}`}
+                  onClick={() => { setFullPeriod(p); }}
                 >
                   {p}
                 </div>
@@ -242,21 +248,13 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
               {dayTypes.map(d => (
                 <div
                   key={d}
-                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullDayType === d ? 'text-primary font-black text-[15px]' : 'text-text-hint font-bold text-[13px] opacity-30'}`}
-                  onClick={() => setFullDayType(d)}
+                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullDayType === d ? 'text-primary font-bold text-[15px]' : 'text-[#cbd5e1] font-medium text-[13px]'}`}
+                  onClick={() => { setFullDayType(d); }}
                 >
                   {d === '평일' ? '평일' : '주말/공휴일'}
                 </div>
               ))}
             </div>
-          </div>
-          <div className="p-2 border-t border-[#f1f5f9] bg-surface/50">
-            <button 
-              className="w-full py-2.5 bg-primary text-white text-[13px] font-bold rounded-lg shadow-[0_4px_12px_rgba(14,74,132,0.25)] active:scale-[0.97] transition-all"
-              onClick={() => setOpen(false)}
-            >
-              선택 완료
-            </button>
           </div>
         </div>
       )}
@@ -318,7 +316,6 @@ export function ShuttleView() {
 
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
-      {/* 출발지 선택 */}
       {/* 출발지 선택 (고정 상단) */}
       <div className="sticky top-[-1.5rem] bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-6 pb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
@@ -371,7 +368,7 @@ export function ShuttleView() {
               isHolidayServer={isHolidayServer}
               isWeekend={isWeekend}
             />
-            {isFullMode && needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
+            {needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
           </div>
         </div>
 
