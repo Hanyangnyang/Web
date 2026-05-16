@@ -20,7 +20,9 @@ export function BootProvider({ children }) {
     current_period: '학기중',
     custom_holidays: [],
     force_weekend: false,
-    period_schedule: []
+    period_schedule: [],
+    no_operation_days: [],
+    force_no_operation: false
   });
 
   const [splashDone, setSplashDone] = useState(() => {
@@ -76,7 +78,9 @@ export function BootProvider({ children }) {
             current_period_override: data.current_period_override,
             period_schedule: data.period_schedule || [],
             custom_holidays: data.custom_holidays || [],
-            force_weekend: data.force_weekend || false
+            force_weekend: data.force_weekend || false,
+            no_operation_days: data.no_operation_days || [],
+            force_no_operation: data.force_no_operation || false
           };
           setAppConfig(configData);
           localStorage.setItem('app_config_cache', JSON.stringify(configData));

@@ -224,12 +224,13 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
 
   if (!isFullMode) {
-    const dType = isHolidayServer ? '공휴일' : (isWeekend ? '주말' : '평일');
+    const isWk = isHolidayServer || isWeekend;
+    const dType = isWk ? '주말·공휴일' : '평일';
     const period = appConfig.current_period;
     const displayPeriod = period?.replace('중', ' 중');
     return (
-      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[125px]`}>
-        <div className="flex flex-col">
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[125px] justify-center items-center`}>
+        <div className="flex flex-col items-center">
           <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
           <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
         </div>
@@ -245,7 +246,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
         className={`${boxBase} cursor-pointer w-[125px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col flex-1 min-w-0 items-center">
           <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
           <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
         </div>

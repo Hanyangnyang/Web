@@ -66,8 +66,17 @@ function arrivalInfo(displayStop, route) {
   }
 }
 
+// 현재 날짜 문자열 (YYYY-MM-DD)
+const getYYYYMMDD = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+};
+
 // 현재 시각 근처의 셔틀 계산 (순수 함수)
 export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServer, lookbackMinutes = 0, appConfig = {}) {
+  const noOpDays = appConfig.no_operation_days || [];
+  if (appConfig.force_no_operation || noOpDays.includes(getYYYYMMDD())) return [];
+
   const period = appConfig.current_period || '학기중';
   const customHolidays = appConfig.custom_holidays || [];
   const forceWeekend = appConfig.force_weekend || false;
