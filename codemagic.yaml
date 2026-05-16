@@ -1,0 +1,39 @@
+workflows:
+  ios-release:
+    name: 하냥냥 iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.hanyangnyang.app
+      node: 20.x
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build web
+        script: npm run build
+      - name: Add iOS platform (if not exists)
+        script: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+      - name: Sync Capacitor
+        script: npx cap sync ios
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      email:
+        recipients:
+          - yaeunjess@gmail.com
+        notify:
+          success: true
+          failure: true
