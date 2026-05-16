@@ -1,161 +1,134 @@
-import React from 'react';
-import { Bell, Info, ExternalLink, Sparkles, CloudRain, Thermometer, Users, Loader2, Wind, Sun } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Sparkles, CloudRain, Wind, Sun, Loader2, Info, Users, Heart } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 
+const FALLBACK_MESSAGES = [
+  { title: "오늘의 한 마디", text: "무언가 새로 시작하기 딱 좋은 날입니다! 자신감을 가지세요.", icon: Sparkles, color: "linear-gradient(135deg, #0E4A84 0%, #1a74c7 100%)" },
+  { title: "오늘의 행운", text: "생각지도 못했던 곳에서 기분 좋은 소식이 들려올 수 있는 하루입니다.", icon: Sparkles, color: "linear-gradient(135deg, #059669 0%, #10b981 100%)" },
+  { title: "오늘의 다짐", text: "가끔은 여유를 가지고 하늘을 올려다보는 것도 좋습니다. 숨을 크게 쉬어보세요.", icon: Info, color: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)" },
+  { title: "오늘의 운세", text: "작은 친절이 큰 기쁨으로 돌아오는 날입니다. 따뜻한 하루 보내세요.", icon: Heart, color: "linear-gradient(135deg, #be123c 0%, #e11d48 100%)" },
+  { title: "오늘의 조언", text: "모든 일에는 타이밍이 있습니다. 서두르지 말고 차분히 나아가세요.", icon: Info, color: "linear-gradient(135deg, #4338ca 0%, #6366f1 100%)" },
+  { title: "오늘의 한 마디", text: "당신의 묵묵한 노력이 곧 빛을 발할 거예요. 오늘도 힘차게 화이팅!", icon: Users, color: "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)" },
+];
+
 export function PortalView() {
-  const { weather, library, loading, error } = usePortalData();
+  const { weather, library, loading } = usePortalData();
+
+  const fallback = useMemo(() => {
+    const today = new Date();
+    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    return FALLBACK_MESSAGES[seed % FALLBACK_MESSAGES.length];
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-hyu-blue opacity-50" size={32} />
+      </div>
+    );
+  }
 
   return (
-    <div className="stt-container" style={{ animation: 'slideUp 0.4s ease-out' }}>
+    <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
+      <div className="mb-6">
+        <h2 className="text-2xl font-extrabold text-text-main">소식</h2>
+      </div>
       
-      {/* 1. 오늘의 날씨 섹션 */}
-      <div className="stt-section">
-        <p className="stt-sec-label">오늘의 날씨</p>
-        <div className="glass-panel" style={{ 
-          padding: '20px', 
-          borderRadius: '20px', 
-          background: 'linear-gradient(135deg, #0E4A84 0%, #1a74c7 100%)',
-          color: 'white',
-          position: 'relative',
-          overflow: 'hidden'
+      {/* 1. 오늘의 날씨 & 소식 섹션 */}
+      <section className="mb-10">
+        <h3 className="text-xl font-bold text-text-main mb-4">
+          {weather ? '오늘의 날씨' : fallback.title}
+        </h3>
+        
+        <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
+          background: weather ? 'linear-gradient(135deg, #0E4A84 0%, #1a74c7 100%)' : fallback.color
         }}>
-          {loading ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80px' }}>
-              <Loader2 className="animate-spin" size={24} opacity={0.7} />
-            </div>
-          ) : weather ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                  <span style={{ fontSize: '36px', fontWeight: 800 }}>{weather.temp}°</span>
-                  <span style={{ fontSize: '16px', fontWeight: 600, opacity: 0.9 }}>{weather.description}</span>
-                </div>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.8, fontWeight: 500 }}>안산시 상록구 사동</p>
-                
-                {/* 상시 노출되는 날씨 멘트 배너 */}
-                <div style={{ 
-                  marginTop: '12px', 
-                  background: 'rgba(255,255,255,0.2)', 
-                  padding: '8px 14px', 
-                  borderRadius: '12px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  backdropFilter: 'blur(4px)',
-                  lineHeight: 1.4,
-                  maxWidth: '100%'
-                }}>
-                  {weather.hasPrecipitation ? <CloudRain size={14} /> : <Sparkles size={14} />}
-                  <span>{weather.message}</span>
+          {weather ? (
+            <>
+              <div className="relative z-10 flex justify-between items-center">
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
+                    <span className="text-xl font-bold opacity-90">{weather.description}</span>
+                  </div>
+                  <p className="mt-2 text-sm font-semibold opacity-70 flex items-center gap-1">
+                    안산시 상록구 사동
+                  </p>
+                  
+                  <div className="mt-5 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl inline-flex items-center gap-2.5 text-sm font-bold leading-relaxed max-w-[90%] border border-white/10">
+                    {weather.hasPrecipitation ? <CloudRain size={16} strokeWidth={2.5} /> : <Sparkles size={16} strokeWidth={2.5} />}
+                    <span className="break-keep">{weather.message}</span>
+                  </div>
                 </div>
               </div>
-              <div style={{ opacity: 0.2, position: 'absolute', right: '-10px', top: '-10px' }}>
-                <CloudRain size={120} />
+              <div className="absolute right-[-15px] top-[-15px] opacity-15 pointer-events-none transform rotate-12">
+                <CloudRain size={160} />
               </div>
-            </div>
+            </>
           ) : (
-            <p style={{ textAlign: 'center', opacity: 0.7 }}>날씨 정보를 불러올 수 없습니다.</p>
+            <div className="relative z-10 flex flex-col gap-4">
+              <div className="flex items-center gap-2 bg-white/20 w-fit px-3 py-1 rounded-full border border-white/10">
+                <fallback.icon size={16} strokeWidth={3} />
+                <span className="text-xs font-black uppercase tracking-widest">Hanyangnyang Pick</span>
+              </div>
+              <p className="m-0 text-2xl font-black leading-tight break-keep drop-shadow-sm">
+                "{fallback.text}"
+              </p>
+            </div>
           )}
 
-          {/* 대기질 및 자외선 지수 정보 (미세먼지, 초미세먼지, 자외선) */}
           {weather && weather.airQuality && (
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)', 
-              gap: '10px', 
-              marginTop: '12px' 
-            }}>
+            <div className="grid grid-cols-3 gap-3 mt-8 relative z-10">
               {[
                 { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
                 { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
                 { label: '자외선', data: weather.airQuality.uv, icon: Sun }
               ].map((item, idx) => (
-                <div key={idx} className="glass-panel" style={{ 
-                  padding: '12px 8px', 
-                  borderRadius: '16px', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center',
-                  gap: '4px',
-                  background: 'white',
-                  border: '1px solid rgba(0,0,0,0.03)'
-                }}>
-                  <span style={{ fontSize: '10px', color: 'var(--color-text-hint)', fontWeight: 700 }}>{item.label}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <item.icon size={12} color={item.data.color} />
-                    <span style={{ fontSize: '13px', fontWeight: 800, color: item.data.color }}>{item.data.label}</span>
+                <div key={idx} className="bg-white/95 backdrop-blur-sm rounded-2xl py-3.5 px-2 flex flex-col items-center gap-1.5 shadow-md">
+                  <span className="text-[10px] text-text-sub font-black uppercase tracking-widest opacity-80">{item.label}</span>
+                  <div className="flex items-center gap-1.5">
+                    <item.icon size={14} color={item.data.color} strokeWidth={3} />
+                    <span className="text-[14px] font-black" style={{ color: item.data.color }}>{item.data.label}</span>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* 2. 도서관 혼잡도 섹션 */}
-      <div className="stt-section">
-        <p className="stt-sec-label">도서관 혼잡도</p>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
-          gap: '12px' 
-        }}>
-          {loading ? (
-            <div className="glass-panel" style={{ gridColumn: 'span 2', padding: '40px', textAlign: 'center' }}>
-              <Loader2 className="animate-spin" size={24} style={{ margin: '0 auto', color: 'var(--color-primary)' }} />
-            </div>
-          ) : library?.list ? (
+      <section className="mb-6">
+        <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {library?.list ? (
             library.list.map((room) => (
-              <div key={room.id} className="glass-panel" style={{ 
-                padding: '14px', 
-                borderRadius: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                background: 'white',
-                border: '1px solid rgba(0,0,0,0.03)'
-              }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontWeight: 800, fontSize: '13px', color: 'var(--color-text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-black text-[0.95rem] text-text-main truncate leading-tight">
                     {room.name.replace(' (2F)', '').replace(' (4F)', '')}
                   </span>
-                  <div style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '4px',
-                    padding: '2px 8px',
-                    borderRadius: '6px',
-                    background: `${room.color}10`,
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-black w-fit shadow-sm" style={{ 
+                    backgroundColor: `${room.color}15`,
                     color: room.color,
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    width: 'fit-content'
+                    border: `1px solid ${room.color}20`
                   }}>
                     {room.emoji} {room.status}
                   </div>
                 </div>
                 
-                <div style={{ marginTop: '2px' }}>
-                  <div style={{ 
-                    width: '100%', height: '5px', 
-                    background: '#f1f5f9', 
-                    borderRadius: '3px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{ 
+                <div className="mt-auto">
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                    <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ 
                       width: `${room.ratio * 100}%`, 
-                      height: '100%', 
-                      background: room.color,
-                      transition: 'width 0.5s ease-out'
+                      backgroundColor: room.color
                     }} />
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-                    <span style={{ fontSize: '10px', color: 'var(--color-text-hint)', fontWeight: 600 }}>
-                      {room.occupied}/{room.total}석
+                  <div className="flex justify-between items-center mt-2.5">
+                    <span className="text-[11px] text-text-sub font-bold">
+                      {room.occupied} / {room.total}
                     </span>
-                    <span style={{ fontSize: '10px', color: 'var(--color-text-hint)', fontWeight: 600 }}>
+                    <span className="text-[12px] text-text-main font-black">
                       {Math.round(room.ratio * 100)}%
                     </span>
                   </div>
@@ -163,12 +136,13 @@ export function PortalView() {
               </div>
             ))
           ) : (
-            <p style={{ gridColumn: 'span 2', textAlign: 'center', opacity: 0.7 }}>혼잡도 정보를 불러올 수 없습니다.</p>
+            <div className="col-span-2 bg-white rounded-card border border-[#e2e8f0] py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
+              <Info size={20} className="text-text-hint" />
+              <p className="text-center text-text-sub text-sm font-semibold">혼잡도 정보를 불러올 수 없습니다</p>
+            </div>
           )}
         </div>
-      </div>
-
+      </section>
     </div>
   );
 }
-

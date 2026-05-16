@@ -15,7 +15,6 @@ export default async function handler(req, res) {
     const response = await fetch('https://lib.hanyang.ac.kr/pyxis-api/2/seat-rooms?smufMethodCode=PC&roomTypeId=7&branchGroupId=2', {
       method: 'GET',
       headers: {
-        'Pyxis-Auth-Token': '4ainps13fni3sa6n5n4ccr6kf5cq6g62',
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
         'Referer': 'https://information.hanyang.ac.kr/',

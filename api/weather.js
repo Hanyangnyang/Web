@@ -1,109 +1,102 @@
-// Vercel Serverless Function: Weather & Air Quality API Proxy (OpenWeather Version)
+// Vercel Serverless Function: Weather & Air Quality API Proxy (Open-Meteo Version)
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  const API_KEY = process.env.OPENWEATHER_KEY || 'b222f9ea1d9c0ed0d1dffc7c483a94e3';
-  const LAT = 37.297;
+  const LAT = 37.297; // 한양대 에리카 좌표
   const LNG = 126.834;
 
   try {
-    // 1. 현재 날씨 호출
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LNG}&appid=${API_KEY}&units=metric&lang=kr`;
+    // 1. 날씨 및 강수 예보 호출 (Open-Meteo)
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=temperature_2m,weather_code&hourly=weather_code&timezone=Asia%2FSeoul&forecast_days=2`;
     
-    // 2. 대기질 데이터 호출
-    const airUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${LAT}&lon=${LNG}&appid=${API_KEY}`;
+    // 2. 대기질 및 자외선 호출 (Open-Meteo Air Quality)
+    const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LNG}&current=pm10,pm2_5,uv_index&timezone=Asia%2FSeoul`;
 
-    // 3. 5일/3시간 예보 호출 (강수 시간 파악용)
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LNG}&appid=${API_KEY}&units=metric`;
-
-    const [weatherRes, airRes, forecastRes] = await Promise.all([
+    const [weatherRes, airRes] = await Promise.all([
       fetch(weatherUrl),
-      fetch(airUrl),
-      fetch(forecastUrl)
+      fetch(airUrl)
     ]);
 
     const weatherData = await weatherRes.json();
     const airData = await airRes.json();
-    const forecastData = await forecastRes.json();
 
-    if (weatherData.cod !== 200) throw new Error(weatherData.message);
+    const currentTemp = Math.round(weatherData.current.temperature_2m);
+    const weatherCode = weatherData.current.weather_code;
+    const pm10 = Math.round(airData.current.pm10);
+    const pm25 = Math.round(airData.current.pm2_5);
+    const uvIndex = Math.round(airData.current.uv_index);
 
-    const currentTemp = Math.round(weatherData.main.temp);
-    const weatherId = weatherData.weather[0].id;
-    const description = weatherData.weather[0].description;
-
-    // 대기질 (OpenWeather AQI는 1~5단계이지만, 미세먼지 수치 직접 사용)
-    const pm10 = Math.round(airData.list[0].components.pm10);
-    const pm25 = Math.round(airData.list[0].components.pm2_5);
-
-    // 강수 예보 확인 (오늘 24시간 내)
+    // 향후 12시간 내 비/눈 예보 확인
+    const currentHour = new Date().getHours();
+    const upcomingWeatherCodes = weatherData.hourly.weather_code.slice(currentHour, currentHour + 12);
+    
     let precipType = null;
     let precipTime = null;
     
-    // 3시간 단위 예보에서 비/눈 확인
-    for (const item of forecastData.list.slice(0, 8)) {
-      const date = new Date(item.dt * 1000);
-      const hour = date.getHours();
-      
-      if (item.weather[0].main === 'Rain' || item.weather[0].main === 'Drizzle') {
-        precipType = 'rain'; precipTime = hour; break;
-      } else if (item.weather[0].main === 'Snow') {
-        precipType = 'snow'; precipTime = hour; break;
+    for (let i = 0; i < upcomingWeatherCodes.length; i++) {
+      const code = upcomingWeatherCodes[i];
+      if ([71, 73, 75, 77, 85, 86].includes(code)) {
+        precipType = 'snow'; precipTime = currentHour + i; break;
+      } else if ([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code)) {
+        precipType = 'rain'; precipTime = currentHour + i; break;
       }
     }
 
-    // 자외선 지수 (OpenWeather One Call이 아니면 직접 제공 안되는 경우 많음)
-    // 대체제로 Open-Meteo에서 자외선만 가져오거나, 맑은 정도에 따라 임의 계산 가능
-    // 여기서는 안정성을 위해 Open-Meteo의 자외선 지수만 살짝 섞어 쓰거나 맑음 여부로 판단
-    const uvRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=uv_index&timezone=Asia%2FSeoul&forecast_days=1`);
-    const uvData = await uvRes.json();
-    const uvIndex = uvData.current.uv_index;
+    if (precipTime >= 24) precipTime -= 24; // 24시 넘어가면 새벽으로 표기
 
     const processedData = {
       temp: currentTemp,
-      description: mapWeatherIdToDesc(weatherId, description),
-      message: generateWeatherMessage(weatherId, currentTemp, precipType, precipTime),
+      description: getKoreanWeatherDesc(weatherCode),
+      message: generateWeatherMessage(weatherCode, currentTemp, precipType, precipTime),
       hasPrecipitation: !!precipType,
       airQuality: {
-        pm10: { value: pm10, ...getPm10Status(pm10) },
-        pm25: { value: pm25, ...getPm25Status(pm25) },
-        uv: { value: uvIndex, ...getUvStatus(uvIndex) }
+        pm10: { value: pm10, ...getKoreanPm10Status(pm10) },
+        pm25: { value: pm25, ...getKoreanPm25Status(pm25) },
+        uv: { value: uvIndex, ...getKoreanUvStatus(uvIndex) }
       },
       updatedAt: Date.now()
     };
 
     return res.status(200).json(processedData);
   } catch (error) {
-    console.error('OpenWeather fetch error:', error);
+    console.error('Open-Meteo fetch error:', error);
     return res.status(500).json({ error: 'Weather fetch failed' });
   }
 }
 
-function mapWeatherIdToDesc(id, defaultDesc) {
-  if (id === 800) return '맑음';
-  if (id === 801) return '구름 조금';
-  if (id >= 802 && id <= 804) return '흐림';
-  if (id >= 200 && id <= 531) return '비';
-  if (id >= 600 && id <= 622) return '눈';
-  return defaultDesc;
+// 💡 WMO 코드를 완벽한 한국어로 매핑 (네이버 날씨와 유사한 표준 명칭)
+function getKoreanWeatherDesc(code) {
+  if (code === 0) return '맑음';
+  if (code === 1 || code === 2) return '구름 조금';
+  if (code === 3) return '흐림';
+  if ([45, 48].includes(code)) return '안개';
+  if ([51, 53, 55, 56, 57].includes(code)) return '이슬비';
+  if ([61, 63, 65, 66, 67].includes(code)) return '비';
+  if ([71, 73, 75, 77].includes(code)) return '눈';
+  if ([80, 81, 82].includes(code)) return '소나기';
+  if ([85, 86].includes(code)) return '눈보라';
+  if ([95, 96, 99].includes(code)) return '천둥번개';
+  return '알 수 없음';
 }
 
-function getPm10Status(val) {
+// 💡 한국 환경부(에어코리아) 미세먼지 기준 적용
+function getKoreanPm10Status(val) {
   if (val <= 30) return { label: '좋음', color: '#3b82f6' };
   if (val <= 80) return { label: '보통', color: '#22c55e' };
   if (val <= 150) return { label: '나쁨', color: '#f59e0b' };
   return { label: '매우나쁨', color: '#ef4444' };
 }
 
-function getPm25Status(val) {
+// 💡 한국 환경부(에어코리아) 초미세먼지 기준 적용
+function getKoreanPm25Status(val) {
   if (val <= 15) return { label: '좋음', color: '#3b82f6' };
   if (val <= 35) return { label: '보통', color: '#22c55e' };
   if (val <= 75) return { label: '나쁨', color: '#f59e0b' };
   return { label: '매우나쁨', color: '#ef4444' };
 }
 
-function getUvStatus(val) {
+function getKoreanUvStatus(val) {
   if (val <= 2) return { label: '낮음', color: '#3b82f6' };
   if (val <= 5) return { label: '보통', color: '#22c55e' };
   if (val <= 7) return { label: '높음', color: '#f59e0b' };
@@ -111,16 +104,16 @@ function getUvStatus(val) {
   return { label: '위험', color: '#991b1b' };
 }
 
-function generateWeatherMessage(id, temp, precipType, precipTime) {
+// 멘트도 날씨 코드 기반으로 자연스럽게 수정
+function generateWeatherMessage(code, temp, precipType, precipTime) {
   const rand = Math.floor(Math.random() * 3);
-  if (precipType === 'snow') return [`오늘 ${precipTime}시경에 눈 소식이 있습니다. 미끄러운 길 조심하세요.`, `${precipTime}시쯤부터 눈이 내릴 것으로 예상됩니다. 안전에 유의하세요.`, `오후 ${precipTime}시경 눈 예보가 있습니다. 이동 시 주의하시기 바랍니다.`][rand];
-  if (precipType === 'rain') return [`오늘 ${precipTime}시경부터 비 소식이 있습니다. 우산을 미리 챙기세요.`, `${precipTime}시쯤 비가 시작될 것으로 보입니다. 외출 시 참고하세요.`, `오늘 오후 ${precipTime}시경에 비가 예보되어 있습니다.`][rand];
-  if (temp <= 0) return ["날씨가 매우 춥습니다. 옷을 든든하게 챙겨 입으세요.", "기온이 낮아 체감 온도가 많이 떨어졌습니다. 따뜻하게 입으세요.", "추운 날씨입니다. 감기 조심하시고 보온에 신경 쓰세요."][rand];
-  if (temp >= 28) return ["현재 기온이 매우 높습니다. 무더위에 지치지 않게 조심하세요.", "폭염이 예상되는 날씨입니다. 야외 활동 시 수분 섭취를 자주 하세요.", "날씨가 많이 덥습니다. 통풍이 잘 되는 옷을 입고 건강에 유의하세요."][rand];
   
-  if (id > 800) { // Cloudy
-    return ["현재 하늘에 구름이 많고 조금 흐린 상태입니다.", "구름이 해를 가려 조금 어두운 날씨가 이어지겠습니다.", "오늘은 전반적으로 흐린 날씨가 예상됩니다."][rand];
-  }
+  if (precipType === 'snow') return [`오늘 ${precipTime}시경에 눈 소식이 있습니다.`, `${precipTime}시쯤부터 눈이 내릴 것으로 예상됩니다.`, `오후 ${precipTime}시경 눈 예보가 있습니다.`][rand];
+  if (precipType === 'rain') return [`오늘 ${precipTime}시경부터 비 소식이 있습니다. 우산을 챙기세요!`, `${precipTime}시쯤 비가 시작될 것으로 보입니다.`, `오늘 ${precipTime}시경에 비가 예보되어 있습니다.`][rand];
+  if (temp <= 0) return ["날씨가 꽤 춥습니다. 옷을 든든하게 입으세요.", "바람이 차갑습니다. 따뜻하게 입고 외출하세요.", "추운 날씨입니다. 감기 조심하세요!"][rand];
+  if (temp >= 28) return ["날씨가 덥습니다. 무더위에 지치지 않게 조심하세요.", "폭염이 예상됩니다. 수분을 자주 섭취하세요.", "햇빛이 강합니다. 시원하게 입고 외출하세요!"][rand];
   
-  return ["오늘은 맑은 하늘이 계속되겠습니다. 즐거운 하루 보내세요!", "구름 없이 화창한 날씨입니다. 야외 활동하기 좋겠네요.", "현재 날씨가 매우 맑습니다. 기분 좋게 하루 시작하세요!"][rand];
+  if (code === 3) return ["하늘에 구름이 많고 흐린 날씨입니다.", "구름이 해를 가려 어둑한 날씨가 이어집니다.", "오늘은 전반적으로 구름 많은 날씨가 예상됩니다."][rand];
+  
+  return ["오늘은 맑고 화창한 날씨입니다! 기분 좋게 출발하세요.", "구름 없이 맑은 날씨입니다. 산책하기 좋겠네요.", "현재 쾌청한 날씨를 보이고 있습니다."][rand];
 }

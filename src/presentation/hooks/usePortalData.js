@@ -78,6 +78,6 @@ async function getLibraryData() {
     return null;
   } catch (e) {
     console.warn('Library API fetch failed:', e);
-    return null; // 가짜 데이터 대신 null 반환
+    return null;
   }
 }
