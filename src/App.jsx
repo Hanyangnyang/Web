@@ -13,6 +13,7 @@ import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { usePostHog } from 'posthog-js/react';
+import { isNativeApp, getPlatform } from './lib/platform.js';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 
@@ -25,6 +26,9 @@ export default function App() {
 }
 
 function MainLayout() {
+  const isApp = isNativeApp();
+  const platform = getPlatform(); // 'ios' | 'android' | 'web'
+
   const [activeTab, setActiveTab] = useState(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
@@ -67,7 +71,13 @@ function MainLayout() {
           onDone={completeSplash} 
         />
       )}
-      <div className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden">
+      <div
+        className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden"
+        style={isApp ? {
+          paddingTop: platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        } : {}}
+      >
         <div key={activeTab} className={`flex-1 overflow-y-auto overflow-x-hidden px-5 py-6 tab-slide-${slideDir}`}>
           {activeTab === 'qr' ? (
             user ? (
