@@ -190,20 +190,36 @@ export function ShuttleView() {
   } = useShuttle();
 
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
   const [initialStop] = useState(stop);
+  const hasInteractedRef = useRef(false);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
 
   useEffect(() => {
     // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
-    const showTimer = setTimeout(() => setShowTooltip(true), 2000);
-    const hideTimer = setTimeout(() => setShowTooltip(false), 10000);
+    const showTimer = setTimeout(() => {
+      if (!hasInteractedRef.current) setShowTooltip(true);
+    }, 2000);
+    const hideTimer = setTimeout(() => {
+      setIsTooltipFadingOut(true);
+      setTimeout(() => setShowTooltip(false), 400);
+    }, 10000);
     return () => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
   }, []);
+
+  const handleStopClick = (s) => {
+    setStop(s);
+    if (showTooltip) {
+      setIsTooltipFadingOut(true);
+      setTimeout(() => setShowTooltip(false), 400);
+    }
+    hasInteractedRef.current = true;
+  };
 
   if (loadErr) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>;
   if (isLoading) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>;
@@ -211,7 +227,8 @@ export function ShuttleView() {
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 선택 */}
-      <div className="mb-6 sticky top-0 bg-[#F8F9FA]/40 backdrop-blur-xl z-[100] -mx-5 px-5 pt-8 pb-3">
+      {/* 출발지 선택 (고정 상단) */}
+      <div className="sticky top-[-1.5rem] bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-6 pb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
         </div>
@@ -224,11 +241,11 @@ export function ShuttleView() {
                   ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                   : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
               }`}
-              onClick={() => setStop(s)}
+              onClick={() => handleStopClick(s)}
               style={{ position: 'relative' }}
             >
               {initialStop === s && showTooltip && (
-                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
+                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0 translate-y-2' : ''} ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
                     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>

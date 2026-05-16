@@ -56,8 +56,8 @@ function MainLayout() {
           onDone={completeSplash} 
         />
       )}
-      <div className="mx-auto w-full max-w-app min-h-screen px-5 py-6 flex flex-col overflow-x-hidden">
-        <div key={activeTab} className={`tab-slide-${slideDir}`}>
+      <div className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden">
+        <div key={activeTab} className={`flex-1 overflow-y-auto overflow-x-hidden px-5 py-6 tab-slide-${slideDir}`}>
           {activeTab === 'qr' ? (
             user ? (
               <QRView
