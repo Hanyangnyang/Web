@@ -65,7 +65,7 @@ export function PortalView() {
       <section className="mb-10">
         <h3 className="text-xl font-bold text-text-main mb-4">
           {loading ? '오늘의 날씨' : weather ? '오늘의 날씨' : fallback.title}
-        </h2>
+        </h3>
 
         {loading ? (
           <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
@@ -136,7 +136,7 @@ export function PortalView() {
 
       {/* 2. 도서관 혼잡도 섹션 */}
       <section className="mb-6">
-        <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h2>
+        <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h3>
         <div className="grid grid-cols-2 gap-4">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
