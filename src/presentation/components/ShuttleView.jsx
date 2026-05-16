@@ -177,10 +177,27 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
 // ── 셔틀 기간/요일 선택기 (Wheel Picker 스타일)
 function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isHolidayServer, isWeekend }) {
   const [open, setOpen] = useState(false);
+  const [localPeriod, setLocalPeriod] = useState(fullPeriod);
+  const [localDayType, setLocalDayType] = useState(fullDayType);
+
   const ref = useRef(null);
+  const periodScrollRef = useRef(null);
+  const dayTypeScrollRef = useRef(null);
   
   const periods = ['학기중', '계절학기', '방학중'];
   const dayTypes = ['평일', '주말/공휴일'];
+
+  // 오픈 시 부모 상태로 로컬 상태 초기화
+  useEffect(() => {
+    if (open) {
+      setLocalPeriod(fullPeriod);
+      setLocalDayType(fullDayType);
+    } else {
+      // 닫힐 때 부모 상태에 반영 (Commit)
+      setFullPeriod(localPeriod);
+      setFullDayType(localDayType);
+    }
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -188,72 +205,142 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // 오픈 시 스크롤 위치 초기화
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        if (periodScrollRef.current) {
+          periodScrollRef.current.scrollTop = periods.indexOf(localPeriod) * 36;
+        }
+        if (dayTypeScrollRef.current) {
+          dayTypeScrollRef.current.scrollTop = dayTypes.indexOf(localDayType) * 36;
+        }
+      }, 10);
+      return () => clearTimeout(timer);
+    }
+  }, [open]); // localPeriod/DayType 변화에 따라 스크롤이 튀지 않도록 open시에만 실행
+
   // 공통 박스 스타일
   const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
 
   if (!isFullMode) {
     const dType = isHolidayServer ? '공휴일' : (isWeekend ? '주말' : '평일');
     const period = appConfig.current_period;
+    const displayPeriod = period?.replace('중', ' 중');
     return (
-      <div className={`${boxBase} border-[#f1f5f9] bg-[#f8fafc]/50`}>
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[125px]`}>
         <div className="flex flex-col">
-          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em] uppercase">{period}</span>
-          <span className="text-[14px] font-black text-text-main/70 leading-tight">{dType}</span>
+          <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
+          <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
         </div>
-        <div className="w-1.5 h-1.5 rounded-full bg-text-hint/20 ml-1" />
       </div>
     );
   }
 
+  const displayFullPeriod = fullPeriod?.replace('중', ' 중');
+
   return (
     <div className="relative select-none" ref={ref}>
       <div
-        className={`${boxBase} cursor-pointer ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`${boxBase} cursor-pointer w-[125px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
-        <div className="flex flex-col">
-          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em] uppercase">{fullPeriod}</span>
-          <span className="text-[14px] font-black text-text-main leading-tight">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
+          <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
         </div>
-        <ChevronDown size={16} className={`text-text-hint transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[240px] bg-white/95 backdrop-blur-md border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
-          <div className="flex h-[180px] relative">
-            {/* 중앙 선택 가이드선 (알림 설정 스타일) */}
-            <div className="absolute top-1/2 left-2 right-2 h-10 -translate-y-1/2 bg-surface rounded-lg pointer-events-none border border-[#f1f5f9]" />
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[240px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+          <div className="flex relative" style={{ height: 36 * 3, background: 'white' }}>
+            {/* 선택 하이라이트 바 (알림 설정과 동일) */}
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: 6,
+              right: 6,
+              height: 36,
+              transform: 'translateY(-50%)',
+              background: 'rgba(0,0,0,0.06)',
+              borderRadius: 8,
+              pointerEvents: 'none',
+              zIndex: 10
+            }} />
             
-            {/* 상하단 페이드 효과 */}
-            <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-b from-white via-white/40 to-transparent pointer-events-none z-10" />
-            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white via-white/40 to-transparent pointer-events-none z-10" />
-
             {/* 기간 컬럼 */}
-            <div className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory py-[70px] relative z-0">
+            <div 
+              ref={periodScrollRef}
+              className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              onScroll={(e) => {
+                const idx = Math.round(e.target.scrollTop / 36);
+                if (periods[idx] && periods[idx] !== localPeriod) setLocalPeriod(periods[idx]);
+              }}
+            >
+              <div style={{ height: 36 }} />
               {periods.map(p => (
                 <div
                   key={p}
-                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullPeriod === p ? 'text-primary font-bold text-[15px]' : 'text-[#cbd5e1] font-medium text-[13px]'}`}
-                  onClick={() => { setFullPeriod(p); }}
+                  style={{
+                    height: 36,
+                    scrollSnapAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 14,
+                    fontWeight: localPeriod === p ? 700 : 400,
+                    color: localPeriod === p ? '#1e293b' : '#d1d5db',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setLocalPeriod(p);
+                    if (periodScrollRef.current) periodScrollRef.current.scrollTop = periods.indexOf(p) * 36;
+                  }}
                 >
-                  {p}
+                  {p.replace('중', ' 중')}
                 </div>
               ))}
+              <div style={{ height: 36 }} />
             </div>
 
             <div className="w-px h-full bg-[#f1f5f9] relative z-20" />
 
             {/* 요일 컬럼 */}
-            <div className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory py-[70px] relative z-0">
+            <div 
+              ref={dayTypeScrollRef}
+              className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              onScroll={(e) => {
+                const idx = Math.round(e.target.scrollTop / 36);
+                if (dayTypes[idx] && dayTypes[idx] !== localDayType) setLocalDayType(dayTypes[idx]);
+              }}
+            >
+              <div style={{ height: 36 }} />
               {dayTypes.map(d => (
                 <div
                   key={d}
-                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullDayType === d ? 'text-primary font-bold text-[15px]' : 'text-[#cbd5e1] font-medium text-[13px]'}`}
-                  onClick={() => { setFullDayType(d); }}
+                  style={{
+                    height: 36,
+                    scrollSnapAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 14,
+                    fontWeight: localDayType === d ? 700 : 400,
+                    color: localDayType === d ? '#1e293b' : '#d1d5db',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setLocalDayType(d);
+                    if (dayTypeScrollRef.current) dayTypeScrollRef.current.scrollTop = dayTypes.indexOf(d) * 36;
+                  }}
                 >
                   {d === '평일' ? '평일' : '주말/공휴일'}
                 </div>
               ))}
+              <div style={{ height: 36 }} />
             </div>
           </div>
         </div>
@@ -352,9 +439,6 @@ export function ShuttleView() {
         <div className="flex justify-between items-end mb-4">
           <div className="flex flex-col">
             <div className="flex items-center text-2xl font-extrabold text-text-main">시간표</div>
-            {!isFullMode && (
-              <div className="w-12 h-1 bg-primary rounded-full mt-1.5 opacity-20" />
-            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -411,7 +495,7 @@ export function ShuttleView() {
             ))
           ) : (
             <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
-              <p>오늘 남은 셔틀이 없습니다</p>
+              <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
             </div>
           )}
         </div>

@@ -125,10 +125,12 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
 export function computeFullSchedule(allData, displayStop, dayTypeStr, appConfig = {}, overridePeriod = null) {
   const period = overridePeriod || appConfig.current_period || '학기중';
   const src = STOP_SOURCE[displayStop];
+  const normalizedDayType = dayTypeStr === '주말/공휴일' ? '주말' : dayTypeStr;
+
   let rows = allData.filter(d =>
     d['출발지'] === src &&
     d['기간']   === period &&
-    d['요일']   === dayTypeStr
+    d['요일']   === normalizedDayType
   );
   if (displayStop === '중앙역') rows = rows.filter(d => d['노선기호'] === '중앙역');
   if (displayStop === '셔틀콕 건너편') rows = rows.filter(d => d['행선지'] === '셔틀콕/인재원');
