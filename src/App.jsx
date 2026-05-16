@@ -73,7 +73,7 @@ function MainLayout() {
       <div
         className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden"
         style={isApp ? {
-          paddingTop: platform === 'ios' ? 'env(safe-area-inset-top)' : '0px',
+          paddingTop: platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)',
           paddingBottom: 'env(safe-area-inset-bottom)',
         } : {}}
       >

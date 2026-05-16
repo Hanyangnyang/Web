@@ -3,7 +3,8 @@
   "appName": "하냥냥",
   "webDir": "dist",
   "server": {
-    "androidScheme": "https"
+    "url": "https://www.hanyang.life",
+    "cleartext": false
   },
   "plugins": {
     "SplashScreen": {

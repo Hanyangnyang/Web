@@ -35,15 +35,15 @@ function SubwayDropdown({ selected, onChange }) {
   const sb = SUBWAY_OPTS.filter(o => o.line === '수인분당선');
 
   return (
-    <div className="relative select-none" ref={ref}>
+    <div className="relative select-none w-full min-w-0" ref={ref}>
       <div
-        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] w-full min-w-0 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <LineBadge opt={opt} size={28} />
-        <div className="flex flex-col gap-px">
-          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em]">{opt.line} · {opt.dir}</span>
-          <span className="text-[13px] font-extrabold text-text-main">{opt.dest}</span>
+        <div className="flex flex-col gap-px min-w-0 overflow-hidden">
+          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em] truncate">{opt.line} · {opt.dir}</span>
+          <span className="text-[13px] font-extrabold text-text-main truncate">{opt.dest}</span>
         </div>
         <svg
           className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`}
@@ -228,7 +228,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
     const period = appConfig.current_period;
     const displayPeriod = period?.replace('중', ' 중');
     return (
-      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[125px]`}>
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-full`}>
         <div className="flex flex-col">
           <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
           <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
@@ -242,7 +242,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   return (
     <div className="relative select-none" ref={ref}>
       <div
-        className={`${boxBase} cursor-pointer w-[125px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`${boxBase} cursor-pointer w-full ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <div className="flex flex-col flex-1 min-w-0">
@@ -421,7 +421,7 @@ export function ShuttleView() {
               style={{ position: 'relative' }}
             >
               {initialStop === s && showTooltip && (
-                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0 translate-y-2' : ''} ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
+                <div className={`stt-tooltip bottom absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0 translate-y-2' : ''} [animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto`}>
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
                     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
@@ -436,23 +436,27 @@ export function ShuttleView() {
 
       {/* 시간표 */}
       <div className="mb-6">
-        <div className="flex justify-between items-end mb-4">
-          <div className="flex flex-col">
-            <div className="flex items-center text-2xl font-extrabold text-text-main">시간표</div>
-          </div>
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-shrink-0 flex items-center text-2xl font-extrabold text-text-main">시간표</div>
 
-          <div className="flex items-center gap-3">
-            <ShuttleSelector 
-              isFullMode={isFullMode}
-              fullPeriod={fullPeriod}
-              setFullPeriod={setFullPeriod}
-              fullDayType={fullDayType}
-              setFullDayType={setFullDayType}
-              appConfig={appConfig}
-              isHolidayServer={isHolidayServer}
-              isWeekend={isWeekend}
-            />
-            {needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
+          <div className="ml-auto flex items-center gap-2 min-w-0" style={{ maxWidth: 'calc(100% - 80px)' }}>
+            <div className="flex-1 min-w-0">
+              <ShuttleSelector
+                isFullMode={isFullMode}
+                fullPeriod={fullPeriod}
+                setFullPeriod={setFullPeriod}
+                fullDayType={fullDayType}
+                setFullDayType={setFullDayType}
+                appConfig={appConfig}
+                isHolidayServer={isHolidayServer}
+                isWeekend={isWeekend}
+              />
+            </div>
+            {needsSubway && (
+              <div className="flex-1 min-w-0">
+                <SubwayDropdown selected={lineId} onChange={setLineId} />
+              </div>
+            )}
           </div>
         </div>
 
