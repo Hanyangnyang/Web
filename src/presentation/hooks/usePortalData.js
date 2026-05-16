@@ -1,14 +1,37 @@
 import { useState, useEffect } from 'react';
 
+// 메모리 캐시: 앱 실행 중 탭 전환 시 즉시 데이터 제공
+let memoryCache = null;
+const CACHE_KEY = 'hyu_portal_cache';
+
 export function usePortalData() {
-  const [weather, setWeather] = useState(null);
-  const [library, setLibrary] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [weather, setWeather] = useState(() => memoryCache?.weather || null);
+  const [library, setLibrary] = useState(() => memoryCache?.library || null);
+  const [loading, setLoading] = useState(!memoryCache);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // 1. 초기화: 메모리 캐시가 없으면 로컬 스토리지 확인
+    if (!memoryCache) {
+      const saved = localStorage.getItem(CACHE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          // 1시간 이내 데이터면 유효한 것으로 간주하여 즉시 표시
+          if (Date.now() - parsed.timestamp < 3600000) {
+            setWeather(parsed.weather);
+            setLibrary(parsed.library);
+            setLoading(false);
+          }
+        } catch (e) {}
+      }
+    }
+
     async function fetchData() {
-      setLoading(true);
+      // 캐시 데이터가 있으면 로딩을 보여주지 않고 백그라운드 업데이트
+      if (!weather && !library) {
+        setLoading(true);
+      }
       setError(null);
       
       try {
@@ -17,15 +40,28 @@ export function usePortalData() {
 
         const [weatherData, libData] = await Promise.all([weatherPromise, libraryPromise]);
         
-        setWeather(weatherData);
-        setLibrary(libData);
+        if (weatherData || libData) {
+          const newData = {
+            weather: weatherData || weather,
+            library: libData || library,
+            timestamp: Date.now()
+          };
+          
+          memoryCache = newData;
+          localStorage.setItem(CACHE_KEY, JSON.stringify(newData));
+          
+          setWeather(newData.weather);
+          setLibrary(newData.library);
+        }
         
-        if (!weatherData && !libData) {
+        if (!weatherData && !libData && !weather && !library) {
           setError('데이터를 불러오는 중 오류가 발생했습니다.');
         }
       } catch (err) {
         console.error('Portal data fetch error:', err);
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        if (!weather && !library) {
+          setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        }
       } finally {
         setLoading(false);
       }
