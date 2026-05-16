@@ -456,7 +456,7 @@ export function ShuttleView() {
           <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
 
           <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
-            <div className="flex-1 min-w-0 max-w-[140px]">
+            <div className="shrink basis-[125px] min-w-0">
               <ShuttleSelector
                 isFullMode={isFullMode}
                 fullPeriod={fullPeriod}
@@ -469,7 +469,7 @@ export function ShuttleView() {
               />
             </div>
             {needsSubway && (
-              <div className="flex-1 min-w-0 max-w-[140px]">
+              <div className="shrink basis-[125px] min-w-0">
                 <SubwayDropdown selected={lineId} onChange={setLineId} />
               </div>
             )}
