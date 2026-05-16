@@ -1,4 +1,5 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
+// Triggering redeploy
 import React, { useState, useCallback, useRef } from 'react';
 import './index.css';
 import { useAuth } from './presentation/hooks/useAuth.js';
