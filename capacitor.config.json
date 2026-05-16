@@ -1,0 +1,13 @@
+{
+  "appId": "life.hanyang.app",
+  "appName": "하냥냥",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
