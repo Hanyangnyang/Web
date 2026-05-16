@@ -37,7 +37,7 @@ function SubwayDropdown({ selected, onChange }) {
   return (
     <div className="relative select-none w-full min-w-0" ref={ref}>
       <div
-        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] w-full min-w-0 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] w-full min-w-0 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <LineBadge opt={opt} size={28} />
@@ -232,10 +232,10 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
     const period = appConfig.current_period;
     const displayPeriod = period?.replace('중', ' 중');
     return (
-      <div className={`${boxBase} border-primary/20 bg-primary/5 w-full px-2 gap-1.5 justify-center items-center`}>
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-full px-2 gap-1.5 justify-center items-center h-[44px]`}>
         <div className="flex flex-col items-center">
-          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
-          <span className="text-[clamp(12px,3.1vw,15px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
+          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
+          <span className="text-[clamp(12px,3vw,13px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
         </div>
       </div>
     );
@@ -246,12 +246,12 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   return (
     <div className="relative select-none w-full" ref={ref}>
       <div
-        className={`${boxBase} cursor-pointer w-full px-2 gap-1.5 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`${boxBase} cursor-pointer w-full px-2 gap-1.5 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <div className="flex flex-col flex-1 min-w-0 items-center">
-          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
-          <span className="text-[clamp(12px,3.1vw,15px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
+          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
+          <span className="text-[clamp(12px,3vw,13px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
         </div>
         <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
       </div>
@@ -409,7 +409,7 @@ export function ShuttleView() {
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 선택 (고정 상단) */}
-      <div className="sticky top-[-1.5rem] bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-6 pb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+      <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
         </div>
@@ -417,7 +417,7 @@ export function ShuttleView() {
           {STOPS.map((s, idx) => (
             <div
               key={s}
-              className={`py-[8px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full font-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
+              className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
                 stop === s
                   ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                   : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
@@ -425,14 +425,25 @@ export function ShuttleView() {
               onClick={() => handleStopClick(s)}
               style={{ position: 'relative' }}
             >
-              {initialStop === s && showTooltip && (
-                <div className={`stt-tooltip bottom absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0 translate-y-2' : ''} [animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto`}>
+              {initialStop === s && showTooltip && (() => {
+                const isTop = idx < 3;
+                const arrowClass = isTop ? 'top' : 'bottom';
+                const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
+                const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
+                const fadeY = isTooltipFadingOut ? (isTop ? ' translateY(-0.5rem)' : ' translateY(0.5rem)') : '';
+                const origin = isTop ? 'bottom center' : 'top center';
+                return (
+                <div
+                  className={`stt-tooltip ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
+                  style={{ transform: `translateX(-50%) scale(0.85)${fadeY}`, transformOrigin: origin, animation: `${anim} 0.4s cubic-bezier(0.175,0.885,0.32,1.275)` }}
+                >
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
                     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
                   잠깐! 이 출발지가 맞나요?
                 </div>
-              )}
+                );
+              })()}
               {s}
             </div>
           ))}
@@ -445,7 +456,7 @@ export function ShuttleView() {
           <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
 
           <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
-            <div className="flex-1 min-w-0 max-w-[140px]">
+            <div className="shrink basis-[125px] min-w-0">
               <ShuttleSelector
                 isFullMode={isFullMode}
                 fullPeriod={fullPeriod}
@@ -458,7 +469,7 @@ export function ShuttleView() {
               />
             </div>
             {needsSubway && (
-              <div className="flex-1 min-w-0 max-w-[140px]">
+              <div className="shrink basis-[125px] min-w-0">
                 <SubwayDropdown selected={lineId} onChange={setLineId} />
               </div>
             )}
