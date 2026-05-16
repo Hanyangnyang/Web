@@ -42,8 +42,8 @@ function SubwayDropdown({ selected, onChange }) {
       >
         <LineBadge opt={opt} size={28} />
         <div className="flex flex-col gap-px flex-1 min-w-0">
-          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] whitespace-nowrap overflow-hidden text-ellipsis">{opt.line} · {opt.dir}</span>
-          <span className="text-[clamp(12px,3vw,13px)] font-extrabold text-text-main whitespace-nowrap overflow-hidden text-ellipsis">{opt.dest}</span>
+          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] whitespace-nowrap overflow-hidden text-ellipsis">{opt.line} · {opt.dir}</span>
+          <span className="text-[clamp(12px,3.1vw,15px)] font-extrabold text-text-main whitespace-nowrap overflow-hidden text-ellipsis">{opt.dest}</span>
         </div>
         <svg
           className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`}
@@ -425,22 +425,17 @@ export function ShuttleView() {
               onClick={() => handleStopClick(s)}
               style={{ position: 'relative' }}
             >
-              {initialStop === s && showTooltip && (() => {
-                const col = idx % 3;
-                const alignClass = col === 0 ? 'align-start' : col === 2 ? 'align-end' : '';
-                const tx = col === 0 ? '-25%' : col === 2 ? '-75%' : '-50%';
-                return (
+              {initialStop === s && showTooltip && (
                 <div
-                  className={`stt-tooltip bottom ${alignClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} [animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto`}
-                  style={{ transform: `translateX(${tx})${isTooltipFadingOut ? ' translateY(0.5rem)' : ''}` }}
+                  className={`stt-tooltip bottom absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} [animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto`}
+                  style={{ transform: `translateX(-50%) scale(0.7)${isTooltipFadingOut ? ' translateY(0.5rem)' : ''}`, transformOrigin: 'top center' }}
                 >
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
                     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
                   잠깐! 이 출발지가 맞나요?
                 </div>
-                );
-              })()}
+              )}
               {s}
             </div>
           ))}
