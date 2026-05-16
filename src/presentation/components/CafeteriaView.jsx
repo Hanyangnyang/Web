@@ -367,11 +367,11 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                 return (
                                   <div
                                     key={i}
-                                    className={`menu-card bg-white rounded-card p-6 border text-left transition-transform duration-200 relative active:scale-[0.98] ${hasJeyuk ? 'border-[rgba(239,68,68,0.2)]' : 'border-[#e2e8f0]'} shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]`}
+                                    className="menu-card bg-white rounded-card p-6 border border-[#e2e8f0] text-left transition-transform duration-200 relative active:scale-[0.98] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]"
                                   >
                                     {m.price && (
                                       <div className="absolute top-5 right-5 text-primary font-bold text-[0.9rem] bg-[rgba(14,74,132,0.06)] px-2.5 py-1 rounded z-[1]">
-                                        {isCheonwon ? `${m.price}💕` : m.price}
+                                        {isCheonwon ? `${m.price}💕` : hasJeyuk ? `${m.price}🔥` : m.price}
                                       </div>
                                     )}
                                     <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]">
