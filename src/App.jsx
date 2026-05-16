@@ -79,7 +79,7 @@ function MainLayout() {
           paddingBottom: 'env(safe-area-inset-bottom)',
         } : {}}
       >
-        <div key={activeTab} className={`flex-1 overflow-y-auto overflow-x-hidden px-5 py-6 tab-slide-${slideDir}`}>
+        <div key={activeTab} className={`flex-1 overflow-y-auto overflow-x-hidden px-5 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : 'py-6'}`}>
           {activeTab === 'qr' ? (
             user ? (
               <QRView

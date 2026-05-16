@@ -56,18 +56,6 @@ export function MiscView() {
           </div>
         </div>
 
-        <div className={cardClass} onClick={() => window.location.href = 'https://hanjari.site'}>
-          <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <PianoIcon size={28} color="#0EA5E9" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[0.95rem] font-extrabold text-text-main">
-              동아리 <ArrowUpRight size={14} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle', opacity: 0.8 }} />
-            </span>
-            <span className="text-[0.8rem] text-text-sub">동아리 조회는 '한자리'</span>
-          </div>
-        </div>
-
         <div className={cardClass} onClick={() => window.open('https://www.hanyang.ac.kr/-93', '_blank', 'noopener,noreferrer')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <CalendarDays size={28} color="var(--hyu-blue)" />
@@ -77,6 +65,18 @@ export function MiscView() {
               학사 일정 <ArrowUpRight size={14} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle', opacity: 0.8 }} />
             </span>
             <span className="text-[0.8rem] text-text-sub">에리카 학사 캘린더</span>
+          </div>
+        </div>
+
+        <div className={cardClass} onClick={() => window.location.href = 'https://hanjari.site'}>
+          <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
+            <PianoIcon size={28} color="#0EA5E9" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[0.95rem] font-extrabold text-text-main">
+              동아리 <ArrowUpRight size={14} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle', opacity: 0.8 }} />
+            </span>
+            <span className="text-[0.8rem] text-text-sub">동아리 조회는 '한자리'</span>
           </div>
         </div>
       </div>
