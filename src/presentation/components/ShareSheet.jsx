@@ -96,9 +96,9 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/45 z-[1200] flex items-end justify-center pb-8 [animation:fadeIn_0.2s_ease]" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/45 z-[1200] flex items-end justify-center [animation:fadeIn_0.2s_ease]" onClick={onClose}>
       <div
-        className="w-auto min-w-[260px] bg-white rounded-card px-8 pb-6 [animation:sheetUp_0.3s_cubic-bezier(0.16,1,0.3,1)]"
+        className="w-full max-w-app bg-white rounded-t-card px-5 pb-[calc(20px+env(safe-area-inset-bottom,0px))] [animation:sheetUp_0.3s_cubic-bezier(0.16,1,0.3,1)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto my-3" />
