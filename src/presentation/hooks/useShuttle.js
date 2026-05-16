@@ -2,8 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { computeSchedule, computeFullSchedule, curMin, dayType } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayArrivalsUseCase } from '../../di.js';
+import { useBoot } from '../context/BootContext.jsx';
 
 export function useShuttle() {
+  const { appConfig } = useBoot();
   const [stop,   setStopState]  = useState(() => localStorage.getItem('shuttle_stop')   || '기숙사');
   const [lineId, setLineIdState] = useState(() => localStorage.getItem('shuttle_lineId') || 'line4-bulam');
   const [allData,         setAllData]         = useState(null);
@@ -16,6 +18,13 @@ export function useShuttle() {
   const [loadErr,         setLoadErr]         = useState(null);
   const [isFullMode,      setIsFullMode]      = useState(false);
   const [fullDayType,     setFullDayType]     = useState('평일');
+  const [fullPeriod,      setFullPeriod]      = useState(appConfig.current_period);
+
+  useEffect(() => {
+    if (appConfig.current_period) {
+      setFullPeriod(appConfig.current_period);
+    }
+  }, [appConfig.current_period]);
 
   const setStop = (s) => { 
     setStopState(s); 
@@ -75,10 +84,10 @@ export function useShuttle() {
 
   if (allData) {
     if (isFullMode) {
-      schedule = computeFullSchedule(allData, stop, fullDayType);
+      schedule = computeFullSchedule(allData, stop, fullDayType, appConfig, fullPeriod);
       nextIdx = -1; // 전체 모드에서는 다음 셔틀 하이라이트 안 함
     } else {
-      schedule = computeSchedule(allData, stop, now, isHolidayServer, lookback);
+      schedule = computeSchedule(allData, stop, now, isHolidayServer, lookback, appConfig);
       nextIdx = schedule.findIndex(r => r.depMin >= now);
     }
   }
@@ -102,5 +111,8 @@ export function useShuttle() {
     setIsFullMode,
     fullDayType,
     setFullDayType,
+    fullPeriod,
+    setFullPeriod,
+    appConfig,
   };
 }

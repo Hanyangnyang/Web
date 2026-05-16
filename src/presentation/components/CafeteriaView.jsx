@@ -264,7 +264,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
       )}
 
       {/* 고정 헤더 */}
-      <div className="sticky top-[-1.25rem] z-[100] bg-surface pt-5 pb-[0.4rem] mt-[-1.25rem] mb-[0.35rem] shadow-[0_4px_6px_-1px_rgba(248,249,250,1),0_10px_15px_-3px_rgba(0,0,0,0.02)]">
+      {/* 고정 헤더: 날짜 및 식당 선택 */}
+      <div className="sticky top-[-1.5rem] z-[100] bg-surface/90 backdrop-blur-xl pt-6 pb-4 -mx-5 px-5 mb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex justify-between items-center mb-3 bg-white px-5 py-3 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
           <button
             className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"

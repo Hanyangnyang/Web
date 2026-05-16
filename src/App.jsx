@@ -1,5 +1,5 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import './index.css';
 import { useAuth } from './presentation/hooks/useAuth.js';
 import { useMenu } from './presentation/hooks/useMenu.js';
@@ -12,6 +12,7 @@ import { MiscView }      from './presentation/components/MiscView.jsx';
 import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
+import { usePostHog } from 'posthog-js/react';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 
@@ -31,7 +32,9 @@ function MainLayout() {
   });
   const [slideDir, setSlideDir] = useState('right');
   const { isAppReady, splashDone, completeSplash } = useBoot();
-  
+  const posthog = usePostHog();
+  const tabStartTime = useRef(Date.now());
+
   const { user, loading, login, relogin, logout, updateUser } = useAuth();
   const { menuDate, cafes, menuLoading, changeDate } = useMenu();
 
@@ -42,12 +45,19 @@ function MainLayout() {
   }, [updateUser]);
 
   const handleTabChange = useCallback((tab) => {
+    if (tab === activeTab) return;
+
+    const duration = Math.round((Date.now() - tabStartTime.current) / 1000);
+    posthog?.capture('tab_time_spent', { tab: activeTab, duration_seconds: duration });
+    posthog?.capture('tab_clicked', { tab, previous_tab: activeTab });
+    tabStartTime.current = Date.now();
+
     const newIdx = TAB_ORDER.indexOf(tab);
     const curIdx = TAB_ORDER.indexOf(activeTab);
     setSlideDir(newIdx >= curIdx ? 'right' : 'left');
     setActiveTab(tab);
     localStorage.setItem('lastActiveTab', tab);
-  }, [activeTab]);
+  }, [activeTab, posthog]);
 
   return (
     <>
@@ -57,8 +67,8 @@ function MainLayout() {
           onDone={completeSplash} 
         />
       )}
-      <div className="mx-auto w-full max-w-app min-h-screen px-5 py-6 flex flex-col overflow-x-hidden">
-        <div key={activeTab} className={`tab-slide-${slideDir}`}>
+      <div className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden">
+        <div key={activeTab} className={`flex-1 overflow-y-auto overflow-x-hidden px-5 py-6 tab-slide-${slideDir}`}>
           {activeTab === 'qr' ? (
             user ? (
               <QRView

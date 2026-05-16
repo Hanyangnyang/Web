@@ -218,7 +218,7 @@ export default async function handler(req, res) {
     // 3. Filter Future Timetable Entries
     const combined = [];
     const nowHHMM = `${String(hour).padStart(2, '0')}:${String(nowKst.getMinutes()).padStart(2, '0')}`;
-    console.log(`[Subway API] DayTag: ${dayTag}, Time: ${nowHHMM}, Full: ${isFull}`);
+    // console.log(`[Subway API] DayTag: ${dayTag}, Time: ${nowHHMM}, Full: ${isFull}`);
     
     timetableCache[dayTag].data.forEach(tt => {
       if (isFull || tt.arrTime >= nowHHMM) {
@@ -230,7 +230,7 @@ export default async function handler(req, res) {
 
     const line4Count = combined.filter(c => c.subwayId === '1004').length;
     const suinCount = combined.filter(c => c.subwayId === '1075').length;
-    console.log(`[Subway API] Final Response -> Line 4: ${line4Count}, Suin: ${suinCount}`);
+    // console.log(`[Subway API] Final Response -> Line 4: ${line4Count}, Suin: ${suinCount}`);
 
     const result = { arrivals: combined, isHoliday };
     

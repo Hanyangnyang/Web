@@ -37,13 +37,13 @@ function SubwayDropdown({ selected, onChange }) {
   return (
     <div className="relative select-none" ref={ref}>
       <div
-        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] min-w-[130px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <LineBadge opt={opt} size={28} />
-        <div className="flex flex-col gap-px">
-          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em]">{opt.line} · {opt.dir}</span>
-          <span className="text-[13px] font-extrabold text-text-main">{opt.dest}</span>
+        <div className="flex flex-col gap-px flex-1 min-w-0">
+          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] whitespace-nowrap overflow-hidden text-ellipsis">{opt.line} · {opt.dir}</span>
+          <span className="text-[clamp(12px,3vw,13px)] font-extrabold text-text-main whitespace-nowrap overflow-hidden text-ellipsis">{opt.dest}</span>
         </div>
         <svg
           className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`}
@@ -174,6 +174,186 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
   );
 }
 
+// ── 셔틀 기간/요일 선택기 (Wheel Picker 스타일)
+function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isHolidayServer, isWeekend }) {
+  const [open, setOpen] = useState(false);
+  const [localPeriod, setLocalPeriod] = useState(fullPeriod);
+  const [localDayType, setLocalDayType] = useState(fullDayType);
+
+  const ref = useRef(null);
+  const periodScrollRef = useRef(null);
+  const dayTypeScrollRef = useRef(null);
+  
+  const periods = ['학기중', '계절학기', '방학중'];
+  const dayTypes = ['평일', '주말/공휴일'];
+
+  // 오픈 시 부모 상태로 로컬 상태 초기화
+  useEffect(() => {
+    if (open) {
+      setLocalPeriod(fullPeriod);
+      setLocalDayType(fullDayType);
+    } else {
+      // 닫힐 때 부모 상태에 반영 (Commit)
+      setFullPeriod(localPeriod);
+      setFullDayType(localDayType);
+    }
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // 오픈 시 스크롤 위치 초기화
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        const pIdx = periods.indexOf(fullPeriod);
+        const dIdx = dayTypes.findIndex(d => d === fullDayType || (fullDayType === '주말' && d === '주말/공휴일'));
+
+        if (periodScrollRef.current && pIdx !== -1) {
+          periodScrollRef.current.scrollTop = pIdx * 36;
+        }
+        if (dayTypeScrollRef.current && dIdx !== -1) {
+          dayTypeScrollRef.current.scrollTop = dIdx * 36;
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [open, fullPeriod, fullDayType]);
+
+  // 공통 박스 스타일
+  const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
+
+  if (!isFullMode) {
+    const isWk = isHolidayServer || isWeekend;
+    const dType = isWk ? '주말·공휴일' : '평일';
+    const period = appConfig.current_period;
+    const displayPeriod = period?.replace('중', ' 중');
+    return (
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[115px] px-2 gap-1.5 justify-center items-center`}>
+        <div className="flex flex-col items-center">
+          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
+          <span className="text-[clamp(12px,3.1vw,15px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
+        </div>
+      </div>
+    );
+  }
+
+  const displayFullPeriod = fullPeriod?.replace('중', ' 중');
+
+  return (
+    <div className="relative select-none" ref={ref}>
+      <div
+        className={`${boxBase} cursor-pointer w-[115px] px-2 gap-1.5 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        onClick={() => setOpen(p => !p)}
+      >
+        <div className="flex flex-col flex-1 min-w-0 items-center">
+          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
+          <span className="text-[clamp(12px,3.1vw,15px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
+        </div>
+        <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
+      </div>
+
+      {open && (
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[190px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+          <div className="flex relative" style={{ height: 36 * 3, background: 'white' }}>
+            {/* 선택 하이라이트 바 (알림 설정과 동일) */}
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: 6,
+              right: 6,
+              height: 36,
+              transform: 'translateY(-50%)',
+              background: 'rgba(0,0,0,0.06)',
+              borderRadius: 8,
+              pointerEvents: 'none',
+              zIndex: 10
+            }} />
+            
+            {/* 기간 컬럼 */}
+            <div 
+              ref={periodScrollRef}
+              className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              onScroll={(e) => {
+                const idx = Math.round(e.target.scrollTop / 36);
+                if (periods[idx] && periods[idx] !== localPeriod) setLocalPeriod(periods[idx]);
+              }}
+            >
+              <div style={{ height: 36 }} />
+              {periods.map(p => (
+                <div
+                  key={p}
+                  style={{
+                    height: 36,
+                    scrollSnapAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 14,
+                    fontWeight: localPeriod === p ? 700 : 400,
+                    color: localPeriod === p ? '#1e293b' : '#d1d5db',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setLocalPeriod(p);
+                    if (periodScrollRef.current) periodScrollRef.current.scrollTop = periods.indexOf(p) * 36;
+                  }}
+                >
+                  {p.replace('중', ' 중')}
+                </div>
+              ))}
+              <div style={{ height: 36 }} />
+            </div>
+
+            {/* 요일 컬럼 */}
+            <div 
+              ref={dayTypeScrollRef}
+              className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              onScroll={(e) => {
+                const idx = Math.round(e.target.scrollTop / 36);
+                if (dayTypes[idx] && dayTypes[idx] !== localDayType) setLocalDayType(dayTypes[idx]);
+              }}
+            >
+              <div style={{ height: 36 }} />
+              {dayTypes.map(d => {
+                const isSelected = d === localDayType || (localDayType === '주말' && d === '주말/공휴일');
+                return (
+                  <div
+                    key={d}
+                    style={{
+                      height: 36,
+                      scrollSnapAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 14,
+                      fontWeight: isSelected ? 700 : 400,
+                      color: isSelected ? '#1e293b' : '#d1d5db',
+                      transition: 'all 0.2s',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                      setLocalDayType(d);
+                      if (dayTypeScrollRef.current) dayTypeScrollRef.current.scrollTop = dayTypes.indexOf(d) * 36;
+                    }}
+                  >
+                    {d}
+                  </div>
+                );
+              })}
+              <div style={{ height: 36 }} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── 메인 컴포넌트
 export function ShuttleView() {
   const {
@@ -187,31 +367,49 @@ export function ShuttleView() {
     visibleCount, loadMore,
     isFullMode, setIsFullMode,
     fullDayType, setFullDayType,
+    fullPeriod, setFullPeriod,
+    appConfig,
   } = useShuttle();
 
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
   const [initialStop] = useState(stop);
+  const hasInteractedRef = useRef(false);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
 
   useEffect(() => {
     // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
-    const showTimer = setTimeout(() => setShowTooltip(true), 2000);
-    const hideTimer = setTimeout(() => setShowTooltip(false), 10000);
+    const showTimer = setTimeout(() => {
+      if (!hasInteractedRef.current) setShowTooltip(true);
+    }, 2000);
+    const hideTimer = setTimeout(() => {
+      setIsTooltipFadingOut(true);
+      setTimeout(() => setShowTooltip(false), 400);
+    }, 10000);
     return () => {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
   }, []);
 
+  const handleStopClick = (s) => {
+    setStop(s);
+    if (showTooltip) {
+      setIsTooltipFadingOut(true);
+      setTimeout(() => setShowTooltip(false), 400);
+    }
+    hasInteractedRef.current = true;
+  };
+
   if (loadErr) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>;
   if (isLoading) return <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>;
 
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
-      {/* 출발지 선택 */}
-      <div className="mb-6 sticky top-0 bg-[#F8F9FA]/40 backdrop-blur-xl z-[100] -mx-5 px-5 pt-8 pb-3">
+      {/* 출발지 선택 (고정 상단) */}
+      <div className="sticky top-[-1.5rem] bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-6 pb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
         </div>
@@ -224,11 +422,11 @@ export function ShuttleView() {
                   ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                   : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
               }`}
-              onClick={() => setStop(s)}
+              onClick={() => handleStopClick(s)}
               style={{ position: 'relative' }}
             >
               {initialStop === s && showTooltip && (
-                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
+                <div className={`stt-tooltip ${idx >= 3 ? 'bottom' : 'top'} absolute left-1/2 -translate-x-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0 translate-y-2' : ''} ${idx >= 3 ? '[animation:tooltipPopDown_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] top-[calc(100%+12px)] bottom-auto' : '[animation:tooltipPop_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)] bottom-[calc(100%+12px)]'}`}>
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
                     <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
@@ -243,29 +441,22 @@ export function ShuttleView() {
 
       {/* 시간표 */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <div>
-            <div className="flex items-center text-2xl font-extrabold text-text-main mb-0.5">시간표</div>
+        <div className="flex justify-between items-end mb-4">
+          <div className="flex flex-col">
+            <div className="flex items-center text-2xl font-extrabold text-text-main">시간표</div>
           </div>
 
-          {!isFullMode ? (
-            <span style={{ marginLeft: 16, padding: '4px 12px', borderRadius: 6, background: 'white', color: 'var(--color-primary)', fontWeight: 700, fontSize: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
-              {isHolidayServer ? '공휴일' : isWeekend ? '주말' : '평일'}
-            </span>
-          ) : (
-            <div style={{ display: 'flex', background: 'var(--color-surface-variant)', borderRadius: 8, padding: 2, border: '1px solid rgba(0,0,0,0.05)', marginLeft: 16, marginRight: 8 }}>
-              <button
-                onClick={() => setFullDayType('평일')}
-                style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12, background: fullDayType === '평일' ? 'white' : 'transparent', color: fullDayType === '평일' ? 'var(--color-primary)' : 'var(--color-text-hint)', boxShadow: fullDayType === '평일' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s ease' }}
-              >평일</button>
-              <button
-                onClick={() => setFullDayType('주말')}
-                style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12, background: fullDayType === '주말' ? 'white' : 'transparent', color: fullDayType === '주말' ? 'var(--color-primary)' : 'var(--color-text-hint)', boxShadow: fullDayType === '주말' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s ease' }}
-              >주말/공휴일</button>
-            </div>
-          )}
-
-          <div style={{ marginLeft: 'auto' }}>
+          <div className="flex items-center gap-3">
+            <ShuttleSelector 
+              isFullMode={isFullMode}
+              fullPeriod={fullPeriod}
+              setFullPeriod={setFullPeriod}
+              fullDayType={fullDayType}
+              setFullDayType={setFullDayType}
+              appConfig={appConfig}
+              isHolidayServer={isHolidayServer}
+              isWeekend={isWeekend}
+            />
             {needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
           </div>
         </div>
@@ -309,7 +500,7 @@ export function ShuttleView() {
             ))
           ) : (
             <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
-              <p>오늘 남은 셔틀이 없습니다</p>
+              <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
             </div>
           )}
         </div>

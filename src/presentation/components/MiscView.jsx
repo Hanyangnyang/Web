@@ -1,6 +1,6 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
 import React, { useState } from 'react';
-import { Dumbbell, LayoutGrid, ArrowUpRight } from 'lucide-react';
+import { Dumbbell, CalendarDays, ArrowUpRight } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
 
@@ -68,13 +68,15 @@ export function MiscView() {
           </div>
         </div>
 
-        <div className="bg-surface border border-[#e2e8f0] rounded-card px-4 py-6 flex flex-col items-center text-center gap-3 opacity-60 cursor-not-allowed shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div className={cardClass} onClick={() => window.open('https://www.hanyang.ac.kr/-93', '_blank', 'noopener,noreferrer')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <LayoutGrid size={28} style={{ opacity: 0.2 }} />
+            <CalendarDays size={28} color="var(--hyu-blue)" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[0.95rem] font-extrabold text-text-main">커밍순</span>
-            <span className="text-[0.8rem] text-text-sub">준비 중입니다</span>
+            <span className="text-[0.95rem] font-extrabold text-text-main">
+              학사 일정 <ArrowUpRight size={14} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle', opacity: 0.8 }} />
+            </span>
+            <span className="text-[0.8rem] text-text-sub">에리카 학사 캘린더</span>
           </div>
         </div>
       </div>
