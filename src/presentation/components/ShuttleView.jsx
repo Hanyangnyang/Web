@@ -37,13 +37,13 @@ function SubwayDropdown({ selected, onChange }) {
   return (
     <div className="relative select-none" ref={ref}>
       <div
-        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] min-w-[130px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <LineBadge opt={opt} size={28} />
-        <div className="flex flex-col gap-px">
-          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em]">{opt.line} · {opt.dir}</span>
-          <span className="text-[13px] font-extrabold text-text-main">{opt.dest}</span>
+        <div className="flex flex-col gap-px flex-1 min-w-0">
+          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] whitespace-nowrap overflow-hidden text-ellipsis">{opt.line} · {opt.dir}</span>
+          <span className="text-[clamp(12px,3vw,13px)] font-extrabold text-text-main whitespace-nowrap overflow-hidden text-ellipsis">{opt.dest}</span>
         </div>
         <svg
           className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`}
@@ -209,16 +209,19 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => {
-        if (periodScrollRef.current) {
-          periodScrollRef.current.scrollTop = periods.indexOf(localPeriod) * 36;
+        const pIdx = periods.indexOf(fullPeriod);
+        const dIdx = dayTypes.findIndex(d => d === fullDayType || (fullDayType === '주말' && d === '주말/공휴일'));
+
+        if (periodScrollRef.current && pIdx !== -1) {
+          periodScrollRef.current.scrollTop = pIdx * 36;
         }
-        if (dayTypeScrollRef.current) {
-          dayTypeScrollRef.current.scrollTop = dayTypes.indexOf(localDayType) * 36;
+        if (dayTypeScrollRef.current && dIdx !== -1) {
+          dayTypeScrollRef.current.scrollTop = dIdx * 36;
         }
-      }, 10);
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [open]); // localPeriod/DayType 변화에 따라 스크롤이 튀지 않도록 open시에만 실행
+  }, [open, fullPeriod, fullDayType]);
 
   // 공통 박스 스타일
   const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
@@ -229,10 +232,10 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
     const period = appConfig.current_period;
     const displayPeriod = period?.replace('중', ' 중');
     return (
-      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[125px] justify-center items-center`}>
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-[115px] px-2 gap-1.5 justify-center items-center`}>
         <div className="flex flex-col items-center">
-          <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
-          <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
+          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">{displayPeriod}</span>
+          <span className="text-[clamp(12px,3.1vw,15px)] font-black text-text-main leading-tight whitespace-nowrap">{dType}</span>
         </div>
       </div>
     );
@@ -243,18 +246,18 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   return (
     <div className="relative select-none" ref={ref}>
       <div
-        className={`${boxBase} cursor-pointer w-[125px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`${boxBase} cursor-pointer w-[115px] px-2 gap-1.5 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
       >
         <div className="flex flex-col flex-1 min-w-0 items-center">
-          <span className="text-[clamp(9px,2.2vw,11px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
-          <span className="text-[clamp(13px,3.2vw,16px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
+          <span className="text-[clamp(9px,2.1vw,10px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap overflow-hidden text-ellipsis">{displayFullPeriod}</span>
+          <span className="text-[clamp(12px,3.1vw,15px)] font-black text-text-main leading-tight whitespace-nowrap">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
         </div>
         <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[240px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[190px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
           <div className="flex relative" style={{ height: 36 * 3, background: 'white' }}>
             {/* 선택 하이라이트 바 (알림 설정과 동일) */}
             <div style={{
@@ -306,8 +309,6 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
               <div style={{ height: 36 }} />
             </div>
 
-            <div className="w-px h-full bg-[#f1f5f9] relative z-20" />
-
             {/* 요일 컬럼 */}
             <div 
               ref={dayTypeScrollRef}
@@ -318,29 +319,32 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
               }}
             >
               <div style={{ height: 36 }} />
-              {dayTypes.map(d => (
-                <div
-                  key={d}
-                  style={{
-                    height: 36,
-                    scrollSnapAlign: 'center',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 14,
-                    fontWeight: localDayType === d ? 700 : 400,
-                    color: localDayType === d ? '#1e293b' : '#d1d5db',
-                    transition: 'all 0.2s',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => {
-                    setLocalDayType(d);
-                    if (dayTypeScrollRef.current) dayTypeScrollRef.current.scrollTop = dayTypes.indexOf(d) * 36;
-                  }}
-                >
-                  {d === '평일' ? '평일' : '주말/공휴일'}
-                </div>
-              ))}
+              {dayTypes.map(d => {
+                const isSelected = d === localDayType || (localDayType === '주말' && d === '주말/공휴일');
+                return (
+                  <div
+                    key={d}
+                    style={{
+                      height: 36,
+                      scrollSnapAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 14,
+                      fontWeight: isSelected ? 700 : 400,
+                      color: isSelected ? '#1e293b' : '#d1d5db',
+                      transition: 'all 0.2s',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                      setLocalDayType(d);
+                      if (dayTypeScrollRef.current) dayTypeScrollRef.current.scrollTop = dayTypes.indexOf(d) * 36;
+                    }}
+                  >
+                    {d}
+                  </div>
+                );
+              })}
               <div style={{ height: 36 }} />
             </div>
           </div>
