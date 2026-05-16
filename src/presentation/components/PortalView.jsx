@@ -33,7 +33,7 @@ export function PortalView() {
     <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
       {/* 1. 오늘의 날씨 & 소식 섹션 */}
       <section className="mb-10">
-        <h2 className="text-2xl font-extrabold text-text-main mb-4">
+        <h3 className="text-xl font-bold text-text-main mb-4">
           {loading ? '오늘의 날씨' : weather ? '오늘의 날씨' : fallback.title}
         </h2>
 
@@ -106,7 +106,7 @@ export function PortalView() {
 
       {/* 2. 도서관 혼잡도 섹션 */}
       <section className="mb-6">
-        <h2 className="text-2xl font-extrabold text-text-main mb-4">도서관 혼잡도</h2>
+        <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h2>
         <div className="grid grid-cols-2 gap-4">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
