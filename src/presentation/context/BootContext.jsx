@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
+import { supabase } from '../../lib/supabase.js';
+
 const BootContext = createContext(null);
 
 /**
@@ -11,6 +13,13 @@ export function BootProvider({ children }) {
   const [readyMap, setReadyMap] = useState({
     auth: false,
     menu: false,
+    config: false,
+  });
+
+  const [appConfig, setAppConfig] = useState({
+    current_period: '학기중',
+    custom_holidays: [],
+    force_weekend: false
   });
 
   const [splashDone, setSplashDone] = useState(() => {
@@ -23,6 +32,38 @@ export function BootProvider({ children }) {
       return { ...prev, [key]: true };
     });
   }, []);
+
+  // Remote Config (app_config) 로딩 및 캐싱 로직
+  React.useEffect(() => {
+    async function fetchConfig() {
+      const cached = localStorage.getItem('app_config_cache');
+      if (cached) {
+        try { setAppConfig(JSON.parse(cached)); } catch(e){}
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('app_config')
+          .select('*')
+          .limit(1)
+          .single();
+        
+        if (data && !error) {
+          setAppConfig({
+            current_period: data.current_period || '학기중',
+            custom_holidays: data.custom_holidays || [],
+            force_weekend: data.force_weekend || false
+          });
+          localStorage.setItem('app_config_cache', JSON.stringify(data));
+        }
+      } catch (e) {
+        console.error('[Boot] Failed to fetch app config:', e);
+      } finally {
+        markReady('config');
+      }
+    }
+    fetchConfig();
+  }, [markReady]);
 
   // 모든 서비스가 준비되었는지 확인
   const isAppReady = useMemo(() => {
@@ -38,8 +79,9 @@ export function BootProvider({ children }) {
     isAppReady,
     splashDone,
     markReady,
-    completeSplash
-  }), [isAppReady, splashDone, markReady, completeSplash]);
+    completeSplash,
+    appConfig
+  }), [isAppReady, splashDone, markReady, completeSplash, appConfig]);
 
   return (
     <BootContext.Provider value={value}>
