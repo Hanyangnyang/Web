@@ -19,7 +19,8 @@ export function BootProvider({ children }) {
   const [appConfig, setAppConfig] = useState({
     current_period: '학기중',
     custom_holidays: [],
-    force_weekend: false
+    force_weekend: false,
+    period_schedule: []
   });
 
   const [splashDone, setSplashDone] = useState(() => {
@@ -33,12 +34,32 @@ export function BootProvider({ children }) {
     });
   }, []);
 
+  // 오늘 날짜 기준 현재 기간 산출 함수
+  const calculatePeriod = (schedule, override) => {
+    if (override) return override;
+    if (!schedule || schedule.length === 0) return '학기중';
+
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    
+    // 시작일 기준 내림차순 정렬 (최신순)
+    const sorted = [...schedule].sort((a, b) => b.start.localeCompare(a.start));
+    
+    // 오늘 날짜보다 시작일이 이전이거나 같은 첫 번째 항목 찾기
+    const found = sorted.find(item => item.start <= todayStr);
+    return found ? found.name : '학기중';
+  };
+
   // Remote Config (app_config) 로딩 및 캐싱 로직
   React.useEffect(() => {
     async function fetchConfig() {
       const cached = localStorage.getItem('app_config_cache');
       if (cached) {
-        try { setAppConfig(JSON.parse(cached)); } catch(e){}
+        try {
+          const parsed = JSON.parse(cached);
+          const period = calculatePeriod(parsed.period_schedule, parsed.current_period_override);
+          setAppConfig({ ...parsed, current_period: period });
+        } catch(e){}
       }
 
       try {
@@ -49,12 +70,16 @@ export function BootProvider({ children }) {
           .single();
         
         if (data && !error) {
-          setAppConfig({
-            current_period: data.current_period || '학기중',
+          const period = calculatePeriod(data.period_schedule, data.current_period_override);
+          const configData = {
+            current_period: period,
+            current_period_override: data.current_period_override,
+            period_schedule: data.period_schedule || [],
             custom_holidays: data.custom_holidays || [],
             force_weekend: data.force_weekend || false
-          });
-          localStorage.setItem('app_config_cache', JSON.stringify(data));
+          };
+          setAppConfig(configData);
+          localStorage.setItem('app_config_cache', JSON.stringify(configData));
         }
       } catch (e) {
         console.error('[Boot] Failed to fetch app config:', e);
