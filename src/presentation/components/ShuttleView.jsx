@@ -244,7 +244,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   const displayFullPeriod = fullPeriod?.replace('중', ' 중');
 
   return (
-    <div className="relative select-none" ref={ref}>
+    <div className="relative select-none w-full" ref={ref}>
       <div
         className={`${boxBase} cursor-pointer w-full px-2 gap-1.5 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
         onClick={() => setOpen(p => !p)}
@@ -442,10 +442,10 @@ export function ShuttleView() {
       {/* 시간표 */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex-shrink-0 flex items-center text-2xl font-extrabold text-text-main">시간표</div>
+          <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
 
-          <div className="ml-auto flex items-center gap-2 min-w-0" style={{ maxWidth: 'calc(100% - 80px)' }}>
-            <div className="flex-1 min-w-0">
+          <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
+            <div className="flex-1 min-w-0 max-w-[140px]">
               <ShuttleSelector
                 isFullMode={isFullMode}
                 fullPeriod={fullPeriod}
@@ -458,7 +458,7 @@ export function ShuttleView() {
               />
             </div>
             {needsSubway && (
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 max-w-[140px]">
                 <SubwayDropdown selected={lineId} onChange={setLineId} />
               </div>
             )}
