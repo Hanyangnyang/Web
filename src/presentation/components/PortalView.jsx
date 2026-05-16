@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
-import { Sparkles, CloudRain, Wind, Sun, Info, Users, Heart } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Sparkles, CloudRain, Wind, Sun, Info, Users, Heart, Bell } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
+import { UmbrellaAlarmSettings } from './UmbrellaAlarmSettings.jsx';
 
 const FALLBACK_MESSAGES = [
   { title: "오늘의 한 마디", text: "무언가 새로 시작하기 딱 좋은 날입니다! 자신감을 가지세요.", icon: Sparkles, color: "linear-gradient(135deg, #0E4A84 0%, #1a74c7 100%)" },
@@ -13,6 +15,8 @@ const FALLBACK_MESSAGES = [
 
 export function PortalView() {
   const { weather, library, loading } = usePortalData();
+  const [showUmbrellaAlarm, setShowUmbrellaAlarm] = useState(false);
+  const [alarmPopup, setAlarmPopup] = useState('');
 
   const fallback = useMemo(() => {
     const today = new Date();
@@ -30,7 +34,33 @@ export function PortalView() {
   }, [weather]);
 
   return (
-    <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
+    <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
+      {createPortal(
+        <>
+          <button
+            className="fixed bottom-[calc(20px+64px+12px)] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
+            onClick={() => setShowUmbrellaAlarm(true)}
+          >
+            <Bell size={18} />
+            우산 알림 받기
+          </button>
+          {showUmbrellaAlarm && (
+            <UmbrellaAlarmSettings onClose={(msg) => {
+              setShowUmbrellaAlarm(false);
+              if (msg) {
+                setAlarmPopup(msg);
+                setTimeout(() => setAlarmPopup(''), 1500);
+              }
+            }} />
+          )}
+          {alarmPopup && (
+            <div className="fixed bottom-[calc(20px+64px+60px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[1000] whitespace-pre-line text-center copy-toast">
+              {alarmPopup}
+            </div>
+          )}
+        </>,
+        document.body
+      )}
       {/* 1. 오늘의 날씨 & 소식 섹션 */}
       <section className="mb-10">
         <h3 className="text-xl font-bold text-text-main mb-4">
