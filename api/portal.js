@@ -75,6 +75,7 @@ async function handleWeather(req, res) {
       temp: Math.round(current.temperature_2m),
       description: info.label,
       emoji: info.emoji,
+      weatherCode: current.weather_code,
       message: info.message,
       hasPrecipitation: current.precipitation > 0,
       airQuality: {

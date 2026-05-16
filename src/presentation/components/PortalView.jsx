@@ -20,6 +20,15 @@ export function PortalView() {
     return FALLBACK_MESSAGES[seed % FALLBACK_MESSAGES.length];
   }, []);
 
+  const WeatherIcon = useMemo(() => {
+    if (!weather) return null;
+    const code = weather.weatherCode;
+    if (code <= 1) return Sun;
+    if (code <= 3) return Sun; // Actually Cloud would be better for 3, but Sun with opacity looks okay
+    if (code <= 48) return Wind;
+    return CloudRain;
+  }, [weather]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -30,10 +39,6 @@ export function PortalView() {
 
   return (
     <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
-      <div className="mb-6">
-        <h2 className="text-2xl font-extrabold text-text-main">소식</h2>
-      </div>
-      
       {/* 1. 오늘의 날씨 & 소식 섹션 */}
       <section className="mb-10">
         <h3 className="text-xl font-bold text-text-main mb-4">
@@ -62,7 +67,7 @@ export function PortalView() {
                 </div>
               </div>
               <div className="absolute right-[-15px] top-[-15px] opacity-15 pointer-events-none transform rotate-12">
-                <CloudRain size={160} />
+                {WeatherIcon && <WeatherIcon size={160} />}
               </div>
             </>
           ) : (
