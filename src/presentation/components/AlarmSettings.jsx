@@ -416,6 +416,36 @@ export function AlarmSettings({ onClose }) {
     }, 250);
   };
 
+  // 서버 설정과 동기화 (RPC 호출)
+  useEffect(() => {
+    async function syncWithServer() {
+      const deviceId = localStorage.getItem('device_id');
+      if (!deviceId) return;
+      
+      try {
+        const { data, error } = await supabase.rpc('get_alarm_subscription', {
+          p_device_id: deviceId,
+          p_topic: 'CAFETERIA_KEYWORD'
+        });
+        
+        if (data && !error) {
+          const newSettings = {
+            jeyukAlert: data.is_active,
+            keywords: data.params?.keywords || [],
+            notifyTime: data.params?.notifyTime || '08:00',
+            notifyDay: data.params?.notifyDay || '당일'
+          };
+          setSettings(newSettings);
+          savedRef.current = newSettings;
+          localStorage.setItem('alarm_settings', JSON.stringify(newSettings));
+        }
+      } catch (err) {
+        console.error('Failed to sync settings from server', err);
+      }
+    }
+    syncWithServer();
+  }, []);
+
   const handleClose = () => {
     let successMsg;
     if (isDirty) {
@@ -433,26 +463,20 @@ export function AlarmSettings({ onClose }) {
                 deviceId = crypto.randomUUID();
                 localStorage.setItem('device_id', deviceId);
               }
-              await supabase.from('devices').upsert(
-                { id: deviceId, fcm_token: token, platform: 'web', last_active_at: new Date().toISOString() },
-                { onConflict: 'id' }
-              );
-              const { data: existingSub } = await supabase
-                .from('subscriptions')
-                .select('id')
-                .eq('device_id', deviceId)
-                .eq('topic', 'CAFETERIA_KEYWORD')
-                .maybeSingle();
-              if (existingSub) {
-                await supabase
-                  .from('subscriptions')
-                  .update({ params: { keywords: settings.keywords, notifyTime: settings.notifyTime, notifyDay: settings.notifyDay }, is_active: true, updated_at: new Date().toISOString() })
-                  .eq('id', existingSub.id);
-              } else {
-                await supabase
-                  .from('subscriptions')
-                  .insert({ device_id: deviceId, topic: 'CAFETERIA_KEYWORD', params: { keywords: settings.keywords, notifyTime: settings.notifyTime, notifyDay: settings.notifyDay } });
-              }
+              
+              const params = { 
+                keywords: settings.keywords, 
+                notifyTime: settings.notifyTime, 
+                notifyDay: settings.notifyDay 
+              };
+
+              await supabase.rpc('upsert_alarm_subscription', {
+                p_device_id: deviceId,
+                p_fcm_token: token,
+                p_topic: 'CAFETERIA_KEYWORD',
+                p_params: params,
+                p_is_active: true
+              });
             }
           } catch (err) {
             console.error('Failed to sync alarm settings', err);
@@ -461,11 +485,13 @@ export function AlarmSettings({ onClose }) {
       } else if (!settings.jeyukAlert) {
         const deviceId = localStorage.getItem('device_id');
         if (deviceId) {
-          supabase.from('subscriptions')
-            .update({ is_active: false, updated_at: new Date().toISOString() })
-            .eq('device_id', deviceId)
-            .eq('topic', 'CAFETERIA_KEYWORD')
-            .then();
+          supabase.rpc('upsert_alarm_subscription', {
+            p_device_id: deviceId,
+            p_fcm_token: null,
+            p_topic: 'CAFETERIA_KEYWORD',
+            p_params: null,
+            p_is_active: false
+          }).then();
         }
       }
     }
