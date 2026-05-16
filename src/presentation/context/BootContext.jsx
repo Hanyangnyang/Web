@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
+import { supabase } from '../../lib/supabase.js';
+
 const BootContext = createContext(null);
 
 /**
@@ -11,6 +13,14 @@ export function BootProvider({ children }) {
   const [readyMap, setReadyMap] = useState({
     auth: false,
     menu: false,
+    config: false,
+  });
+
+  const [appConfig, setAppConfig] = useState({
+    current_period: '학기중',
+    custom_holidays: [],
+    force_weekend: false,
+    period_schedule: []
   });
 
   const [splashDone, setSplashDone] = useState(() => {
@@ -23,6 +33,62 @@ export function BootProvider({ children }) {
       return { ...prev, [key]: true };
     });
   }, []);
+
+  // 오늘 날짜 기준 현재 기간 산출 함수
+  const calculatePeriod = (schedule, override) => {
+    if (override) return override;
+    if (!schedule || schedule.length === 0) return '학기중';
+
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    
+    // 시작일 기준 내림차순 정렬 (최신순)
+    const sorted = [...schedule].sort((a, b) => b.start.localeCompare(a.start));
+    
+    // 오늘 날짜보다 시작일이 이전이거나 같은 첫 번째 항목 찾기
+    const found = sorted.find(item => item.start <= todayStr);
+    return found ? found.name : '학기중';
+  };
+
+  // Remote Config (app_config) 로딩 및 캐싱 로직
+  React.useEffect(() => {
+    async function fetchConfig() {
+      const cached = localStorage.getItem('app_config_cache');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          const period = calculatePeriod(parsed.period_schedule, parsed.current_period_override);
+          setAppConfig({ ...parsed, current_period: period });
+        } catch(e){}
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('app_config')
+          .select('*')
+          .limit(1)
+          .single();
+        
+        if (data && !error) {
+          const period = calculatePeriod(data.period_schedule, data.current_period_override);
+          const configData = {
+            current_period: period,
+            current_period_override: data.current_period_override,
+            period_schedule: data.period_schedule || [],
+            custom_holidays: data.custom_holidays || [],
+            force_weekend: data.force_weekend || false
+          };
+          setAppConfig(configData);
+          localStorage.setItem('app_config_cache', JSON.stringify(configData));
+        }
+      } catch (e) {
+        console.error('[Boot] Failed to fetch app config:', e);
+      } finally {
+        markReady('config');
+      }
+    }
+    fetchConfig();
+  }, [markReady]);
 
   // 모든 서비스가 준비되었는지 확인
   const isAppReady = useMemo(() => {
@@ -38,8 +104,9 @@ export function BootProvider({ children }) {
     isAppReady,
     splashDone,
     markReady,
-    completeSplash
-  }), [isAppReady, splashDone, markReady, completeSplash]);
+    completeSplash,
+    appConfig
+  }), [isAppReady, splashDone, markReady, completeSplash, appConfig]);
 
   return (
     <BootContext.Provider value={value}>
