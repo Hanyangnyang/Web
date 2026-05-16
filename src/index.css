@@ -277,6 +277,8 @@ body {
 }
 .stt-tooltip.top::after    { top: 100%; border-top-color: rgba(33, 37, 41, 0.9); }
 .stt-tooltip.bottom::after { bottom: 100%; border-bottom-color: rgba(33, 37, 41, 0.9); }
+.stt-tooltip.align-start::after { left: 25%; }
+.stt-tooltip.align-end::after   { left: 75%; }
 
 /* ═══ QR 플레이스홀더 (repeating-conic-gradient) ═══ */
 .qr-placeholder {
