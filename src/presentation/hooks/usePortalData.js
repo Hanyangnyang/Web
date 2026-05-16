@@ -12,7 +12,7 @@ export function usePortalData() {
       setError(null);
       
       try {
-        const weatherPromise = fetch('/api/weather').then(res => res.ok ? res.json() : null);
+        const weatherPromise = fetch('/api/portal?type=weather').then(res => res.ok ? res.json() : null);
         const libraryPromise = getLibraryData();
 
         const [weatherData, libData] = await Promise.all([weatherPromise, libraryPromise]);
@@ -39,7 +39,7 @@ export function usePortalData() {
 
 async function getLibraryData() {
   try {
-    const res = await fetch('/api/library');
+    const res = await fetch('/api/portal?type=library');
     if (!res.ok) throw new Error('API call failed');
     const json = await res.json();
     
