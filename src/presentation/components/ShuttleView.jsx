@@ -174,6 +174,96 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
   );
 }
 
+// ── 셔틀 기간/요일 선택기 (Wheel Picker 스타일)
+function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isHolidayServer, isWeekend }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  
+  const periods = ['학기중', '계절학기', '방학중'];
+  const dayTypes = ['평일', '주말/공휴일'];
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  if (!isFullMode) {
+    const dType = isHolidayServer ? '공휴일' : (isWeekend ? '주말' : '평일');
+    const period = appConfig.current_period;
+    return (
+      <div className="flex flex-col items-end gap-0.5 select-none pr-1">
+        <span className="text-[17px] font-black text-primary leading-tight">{dType}</span>
+        <span className="text-[11px] font-bold text-text-hint">({period})</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative select-none" ref={ref}>
+      <div
+        className={`flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        onClick={() => setOpen(p => !p)}
+      >
+        <div className="flex flex-col">
+          <span className="text-[9px] font-bold text-text-hint tracking-[0.04em] uppercase">{fullPeriod}</span>
+          <span className="text-[14px] font-black text-text-main leading-tight">{fullDayType === '평일' ? '평일' : '주말·공휴일'}</span>
+        </div>
+        <ChevronDown size={16} className={`text-text-hint transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </div>
+
+      {open && (
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[240px] bg-white/90 backdrop-blur-md border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+          <div className="flex h-[180px] relative">
+            {/* 중앙 선택 가이드선 */}
+            <div className="absolute top-1/2 left-0 w-full h-10 -translate-y-1/2 bg-primary/5 pointer-events-none border-y border-primary/10" />
+            
+            {/* 상하단 페이드 효과 */}
+            <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none z-10" />
+            <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+
+            {/* 기간 컬럼 */}
+            <div className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory py-[70px] relative z-0">
+              {periods.map(p => (
+                <div
+                  key={p}
+                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullPeriod === p ? 'text-primary font-black text-[15px]' : 'text-text-hint font-bold text-[13px] opacity-30'}`}
+                  onClick={() => setFullPeriod(p)}
+                >
+                  {p}
+                </div>
+              ))}
+            </div>
+
+            <div className="w-px h-full bg-[#f1f5f9] relative z-20" />
+
+            {/* 요일 컬럼 */}
+            <div className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory py-[70px] relative z-0">
+              {dayTypes.map(d => (
+                <div
+                  key={d}
+                  className={`h-10 flex items-center justify-center snap-center transition-all duration-200 cursor-pointer ${fullDayType === d ? 'text-primary font-black text-[15px]' : 'text-text-hint font-bold text-[13px] opacity-30'}`}
+                  onClick={() => setFullDayType(d)}
+                >
+                  {d === '평일' ? '평일' : '주말/공휴일'}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="p-2 border-t border-[#f1f5f9] bg-surface/50">
+            <button 
+              className="w-full py-2.5 bg-primary text-white text-[13px] font-bold rounded-lg shadow-[0_4px_12px_rgba(14,74,132,0.25)] active:scale-[0.97] transition-all"
+              onClick={() => setOpen(false)}
+            >
+              선택 완료
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── 메인 컴포넌트
 export function ShuttleView() {
   const {
@@ -187,6 +277,8 @@ export function ShuttleView() {
     visibleCount, loadMore,
     isFullMode, setIsFullMode,
     fullDayType, setFullDayType,
+    fullPeriod, setFullPeriod,
+    appConfig,
   } = useShuttle();
 
   const [showTooltip, setShowTooltip] = useState(false);
@@ -260,30 +352,26 @@ export function ShuttleView() {
 
       {/* 시간표 */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <div>
-            <div className="flex items-center text-2xl font-extrabold text-text-main mb-0.5">시간표</div>
+        <div className="flex justify-between items-end mb-4">
+          <div className="flex flex-col">
+            <div className="flex items-center text-2xl font-extrabold text-text-main">시간표</div>
+            {!isFullMode && (
+              <div className="w-12 h-1 bg-primary rounded-full mt-1.5 opacity-20" />
+            )}
           </div>
 
-          {!isFullMode ? (
-            <span style={{ marginLeft: 16, padding: '4px 12px', borderRadius: 6, background: 'white', color: 'var(--color-primary)', fontWeight: 700, fontSize: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
-              {isHolidayServer ? '공휴일' : isWeekend ? '주말' : '평일'}
-            </span>
-          ) : (
-            <div style={{ display: 'flex', background: 'var(--color-surface-variant)', borderRadius: 8, padding: 2, border: '1px solid rgba(0,0,0,0.05)', marginLeft: 16, marginRight: 8 }}>
-              <button
-                onClick={() => setFullDayType('평일')}
-                style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12, background: fullDayType === '평일' ? 'white' : 'transparent', color: fullDayType === '평일' ? 'var(--color-primary)' : 'var(--color-text-hint)', boxShadow: fullDayType === '평일' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s ease' }}
-              >평일</button>
-              <button
-                onClick={() => setFullDayType('주말')}
-                style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontWeight: 700, fontSize: 12, background: fullDayType === '주말' ? 'white' : 'transparent', color: fullDayType === '주말' ? 'var(--color-primary)' : 'var(--color-text-hint)', boxShadow: fullDayType === '주말' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s ease' }}
-              >주말/공휴일</button>
-            </div>
-          )}
-
-          <div style={{ marginLeft: 'auto' }}>
-            {needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
+          <div className="flex items-center gap-3">
+            <ShuttleSelector 
+              isFullMode={isFullMode}
+              fullPeriod={fullPeriod}
+              setFullPeriod={setFullPeriod}
+              fullDayType={fullDayType}
+              setFullDayType={setFullDayType}
+              appConfig={appConfig}
+              isHolidayServer={isHolidayServer}
+              isWeekend={isWeekend}
+            />
+            {isFullMode && needsSubway && <SubwayDropdown selected={lineId} onChange={setLineId} />}
           </div>
         </div>
 

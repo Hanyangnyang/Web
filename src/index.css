@@ -300,3 +300,18 @@ body {
 
 /* ═══ 링크 복사 토스트 (JS로 동적 생성) ═══ */
 .copy-toast { animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards; }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes sttDropIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -18,6 +18,13 @@ export function useShuttle() {
   const [loadErr,         setLoadErr]         = useState(null);
   const [isFullMode,      setIsFullMode]      = useState(false);
   const [fullDayType,     setFullDayType]     = useState('평일');
+  const [fullPeriod,      setFullPeriod]      = useState(appConfig.current_period);
+
+  useEffect(() => {
+    if (appConfig.current_period) {
+      setFullPeriod(appConfig.current_period);
+    }
+  }, [appConfig.current_period]);
 
   const setStop = (s) => { 
     setStopState(s); 
@@ -77,7 +84,7 @@ export function useShuttle() {
 
   if (allData) {
     if (isFullMode) {
-      schedule = computeFullSchedule(allData, stop, fullDayType, appConfig);
+      schedule = computeFullSchedule(allData, stop, fullDayType, appConfig, fullPeriod);
       nextIdx = -1; // 전체 모드에서는 다음 셔틀 하이라이트 안 함
     } else {
       schedule = computeSchedule(allData, stop, now, isHolidayServer, lookback, appConfig);
@@ -104,5 +111,8 @@ export function useShuttle() {
     setIsFullMode,
     fullDayType,
     setFullDayType,
+    fullPeriod,
+    setFullPeriod,
+    appConfig,
   };
 }

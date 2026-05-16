@@ -122,8 +122,8 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
 }
 
 // 전체 시간표 계산 (순수 함수)
-export function computeFullSchedule(allData, displayStop, dayTypeStr, appConfig = {}) {
-  const period = appConfig.current_period || '학기중';
+export function computeFullSchedule(allData, displayStop, dayTypeStr, appConfig = {}, overridePeriod = null) {
+  const period = overridePeriod || appConfig.current_period || '학기중';
   const src = STOP_SOURCE[displayStop];
   let rows = allData.filter(d =>
     d['출발지'] === src &&
