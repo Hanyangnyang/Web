@@ -110,20 +110,16 @@ export default async function handler(req, res) {
 
           messages.push({
             token: token,
-            notification: {
+            data: {
               title: isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!',
               body: `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`,
-            },
-            webpush: {
-              fcmOptions: {
-                link: deepLink
-              }
+              link: deepLink
             }
           });
 
           // update body if it's today
           if (!isTomorrow) {
-            messages[messages.length - 1].notification.body = `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
+            messages[messages.length - 1].data.body = `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
           }
 
           sentTokens.add(token);
