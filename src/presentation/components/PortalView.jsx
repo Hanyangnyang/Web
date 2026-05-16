@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Sparkles, CloudRain, Wind, Sun, Loader2, Info, Users, Heart } from 'lucide-react';
+import { Sparkles, CloudRain, Wind, Sun, Info, Users, Heart } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 
 const FALLBACK_MESSAGES = [
@@ -29,23 +29,24 @@ export function PortalView() {
     return CloudRain;
   }, [weather]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-hyu-blue opacity-50" size={32} />
-      </div>
-    );
-  }
-
   return (
     <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
       {/* 1. 오늘의 날씨 & 소식 섹션 */}
       <section className="mb-10">
-        <h3 className="text-xl font-bold text-text-main mb-4">
-          {weather ? '오늘의 날씨' : fallback.title}
-        </h3>
-        
-        <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
+        <h2 className="text-2xl font-extrabold text-text-main mb-4">
+          {loading ? '오늘의 날씨' : weather ? '오늘의 날씨' : fallback.title}
+        </h2>
+
+        {loading ? (
+          <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
+            <div className="flex flex-col gap-3">
+              <div className="h-12 w-36 bg-slate-200 rounded-xl" />
+              <div className="h-4 w-28 bg-slate-200 rounded-full" />
+            </div>
+            <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
+          </div>
+        ) : (
+        <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
           background: weather ? 'linear-gradient(135deg, #0E4A84 0%, #1a74c7 100%)' : fallback.color
         }}>
           {weather ? (
@@ -100,13 +101,24 @@ export function PortalView() {
             </div>
           )}
         </div>
+        )}
       </section>
 
       {/* 2. 도서관 혼잡도 섹션 */}
       <section className="mb-6">
-        <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h3>
+        <h2 className="text-2xl font-extrabold text-text-main mb-4">도서관 혼잡도</h2>
         <div className="grid grid-cols-2 gap-4">
-          {library?.list ? (
+          {loading ? (
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-5 h-[140px] animate-pulse flex flex-col justify-between">
+                <div className="flex flex-col gap-2">
+                  <div className="h-4 w-3/4 bg-slate-100 rounded-full" />
+                  <div className="h-6 w-1/2 bg-slate-100 rounded-lg" />
+                </div>
+                <div className="h-2 w-full bg-slate-100 rounded-full" />
+              </div>
+            ))
+          ) : library?.list ? (
             library.list.map((room) => (
               <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
                 <div className="flex flex-col gap-1.5">
