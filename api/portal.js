@@ -19,8 +19,8 @@ async function handleWeather(req, res) {
     const lon = 126.834;
 
     const [weatherRes, airRes] = await Promise.all([
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code&timezone=Asia%2FSeoul`),
-      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,uv_index&timezone=Asia%2FSeoul`)
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code&timezone=Asia%2FSeoul&models=icon_seamless`),
+      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,uv_index&timezone=Asia%2FSeoul&models=icon_seamless`)
     ]);
 
     const weatherData = await weatherRes.json();
