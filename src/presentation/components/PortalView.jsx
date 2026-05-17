@@ -20,6 +20,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
   });
   const [waiting, setWaiting] = useState(false); // delay 구간 (커서 깜빡임)
   const started = useRef(hasAnimatedThisSession);
+  const prevTextRef = useRef(text);
 
   useEffect(() => {
     // 1. 이미 이번 세션에 애니메이션이 완료되었다면 즉시 전문 노출 및 생략
@@ -36,6 +37,13 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
       setWaiting(false);
       return;
     }
+
+    // 3. 만약 텍스트가 변경되었다면 시작 플래그를 리셋하여 새 텍스트를 타이핑할 수 있게 처리 (무한 깜빡임 방지)
+    if (prevTextRef.current !== text) {
+      started.current = false;
+      prevTextRef.current = text;
+    }
+
     if (!text || started.current) return;
 
     started.current = true;
@@ -182,7 +190,7 @@ export function PortalView({ isVisible = true }) {
                   </p>
                   
                   <div className="mt-5 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-[90%] border border-white/10">
-                    <Sparkles size={15} className="mr-2 mt-[5px] flex-shrink-0 text-white/70" />
+                    <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
                     <span className="break-all flex-1">
                       <TypewriterText text={weather.message} isVisible={isVisible} />
                     </span>
