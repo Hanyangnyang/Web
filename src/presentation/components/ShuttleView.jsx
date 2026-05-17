@@ -355,7 +355,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
 }
 
 // ── 메인 컴포넌트
-export function ShuttleView() {
+export function ShuttleView({ isActive }) {
   const {
     stop, setStop,
     lineId, setLineId,
@@ -369,7 +369,7 @@ export function ShuttleView() {
     fullDayType, setFullDayType,
     fullPeriod, setFullPeriod,
     appConfig,
-  } = useShuttle();
+  } = useShuttle(isActive);
 
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);

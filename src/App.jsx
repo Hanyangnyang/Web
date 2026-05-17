@@ -98,7 +98,7 @@ function MainLayout() {
             <CafeteriaView date={menuDate} changeDate={changeDate} cafes={cafes} loading={menuLoading} />
           </div>
           <div style={{ display: activeTab === 'shuttle' ? 'block' : 'none' }}>
-            <ShuttleView />
+            <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
           <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
             <PortalView isVisible={activeTab === 'portal'} />
