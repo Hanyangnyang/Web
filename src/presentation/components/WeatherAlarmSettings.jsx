@@ -518,7 +518,7 @@ export function WeatherAlarmSettings({ onClose }) {
           {/* 2단계: 이럴 때 알림을 보내주세요 */}
           <div className="mb-5">
             <div className="text-[14px] font-extrabold text-text-main mb-2.5">이럴 때 알림을 보내주세요</div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               <button
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.daily
@@ -527,16 +527,31 @@ export function WeatherAlarmSettings({ onClose }) {
                 }`}
                 onClick={() => handleConditionToggle('daily')}
               >
-                항상 보내주세요
+                항상
               </button>
               
               <button
                 disabled={settings.conditions.daily}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                style={{
+                  opacity: settings.conditions.daily ? 0 : 1,
+                  transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
+                  maxWidth: settings.conditions.daily ? '0px' : '150px',
+                  margin: settings.conditions.daily ? '0px' : '',
+                  paddingLeft: settings.conditions.daily ? '0px' : '14px',
+                  paddingRight: settings.conditions.daily ? '0px' : '14px',
+                  paddingTop: settings.conditions.daily ? '0px' : '6px',
+                  paddingBottom: settings.conditions.daily ? '0px' : '6px',
+                  borderWidth: settings.conditions.daily ? '0px' : '1px',
+                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                className={`rounded-full text-xs font-bold border ${
                   settings.conditions.rainSnow
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
                     : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
+                }`}
                 onClick={() => handleConditionToggle('rainSnow')}
               >
                 비/눈이 올 때
@@ -544,11 +559,26 @@ export function WeatherAlarmSettings({ onClose }) {
 
               <button
                 disabled={settings.conditions.daily}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                style={{
+                  opacity: settings.conditions.daily ? 0 : 1,
+                  transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
+                  maxWidth: settings.conditions.daily ? '0px' : '150px',
+                  margin: settings.conditions.daily ? '0px' : '',
+                  paddingLeft: settings.conditions.daily ? '0px' : '14px',
+                  paddingRight: settings.conditions.daily ? '0px' : '14px',
+                  paddingTop: settings.conditions.daily ? '0px' : '6px',
+                  paddingBottom: settings.conditions.daily ? '0px' : '6px',
+                  borderWidth: settings.conditions.daily ? '0px' : '1px',
+                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                className={`rounded-full text-xs font-bold border ${
                   settings.conditions.dust
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
                     : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
+                }`}
                 onClick={() => handleConditionToggle('dust')}
               >
                 미세먼지가 나쁠 때
@@ -556,15 +586,35 @@ export function WeatherAlarmSettings({ onClose }) {
 
               <button
                 disabled={settings.conditions.daily}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                style={{
+                  opacity: settings.conditions.daily ? 0 : 1,
+                  transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
+                  maxWidth: settings.conditions.daily ? '0px' : '150px',
+                  margin: settings.conditions.daily ? '0px' : '',
+                  paddingLeft: settings.conditions.daily ? '0px' : '14px',
+                  paddingRight: settings.conditions.daily ? '0px' : '14px',
+                  paddingTop: settings.conditions.daily ? '0px' : '6px',
+                  paddingBottom: settings.conditions.daily ? '0px' : '6px',
+                  borderWidth: settings.conditions.daily ? '0px' : '1px',
+                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                className={`rounded-full text-xs font-bold border ${
                   settings.conditions.uv
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
                     : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
+                }`}
                 onClick={() => handleConditionToggle('uv')}
               >
                 자외선이 강할 때
               </button>
+            </div>
+            
+            {/* 항상 또는 타 칩이 노출될 때 문장을 자연스럽게 완성하는 접미 문구 */}
+            <div className="text-[13px] font-bold text-text-sub mt-2.5 pl-1.5 flex items-center gap-1 transition-opacity duration-200">
+              보내주세요
             </div>
           </div>
 
