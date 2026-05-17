@@ -662,7 +662,7 @@ export function WeatherAlarmSettings({ onClose }) {
 
             {/* 시간 선택 */}
             <div className="py-1">
-              <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 알림을 보낼까요?</div>
+              <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 보낼까요?</div>
               <TimePicker
                 value={settings.notifyTime}
                 onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
