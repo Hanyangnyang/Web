@@ -93,12 +93,22 @@ function triggerBackoffRetry() {
 export function usePortalData() {
   // 초기값: 1순위 메모리 캐시 → 2순위 localStorage 캐시 → null
   const [data, setData] = useState(() => {
-    if (memoryCache) return memoryCache;
+    const checkStale = (parsed) => {
+      if (!parsed?.weather?.hourlyForecast) return true;
+      const forecast = parsed.weather.hourlyForecast;
+      if (forecast.length === 0) return true;
+      const firstEpoch = forecast[0].epoch;
+      const lastEpoch = forecast[forecast.length - 1].epoch;
+      const nowEpoch = Date.now();
+      return nowEpoch < firstEpoch || nowEpoch > lastEpoch;
+    };
+
+    if (memoryCache && !checkStale(memoryCache)) return memoryCache;
     try {
       const saved = localStorage.getItem(CACHE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Date.now() - parsed.timestamp < CACHE_TTL) {
+        if (Date.now() - parsed.timestamp < CACHE_TTL && !checkStale(parsed)) {
           memoryCache = parsed; // 메모리에도 올려둠
           return parsed;
         }
@@ -121,7 +131,21 @@ export function usePortalData() {
     // 유효 캐시가 없거나, 캐시 내부 데이터 중 일부가 누락된 불완전 캐시인 경우 강제 즉시 갱신!
     const isPartialCache = memoryCache && (!memoryCache.weather || !memoryCache.library);
 
-    if (!memoryCache || isPartialCache || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
+    // 캐시된 날씨 예보 범위가 현재 시각을 포함하는지 정밀 검사 (시간 정합성 보장)
+    let isStaleTimeline = false;
+    if (memoryCache?.weather?.hourlyForecast) {
+      const forecast = memoryCache.weather.hourlyForecast;
+      if (forecast.length > 0) {
+        const firstEpoch = forecast[0].epoch;
+        const lastEpoch = forecast[forecast.length - 1].epoch;
+        const nowEpoch = Date.now();
+        if (nowEpoch < firstEpoch || nowEpoch > lastEpoch) {
+          isStaleTimeline = true;
+        }
+      }
+    }
+
+    if (!memoryCache || isPartialCache || isStaleTimeline || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
       setLoading(true);
       prefetchPortalData();
     }
