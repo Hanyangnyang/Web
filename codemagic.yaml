@@ -6,7 +6,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: development
-        bundle_identifier: com.hanyangnyang.ap
+        bundle_identifier: com.hanyangnyang.app
       node: latest
     scripts:
       - name: Install dependencies
