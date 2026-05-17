@@ -22,7 +22,7 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
   return R * c; // km 단위
 };
 
-export function useShuttle() {
+export function useShuttle(isActive = false) {
   const { appConfig } = useBoot();
   const [stop,   setStopState]  = useState(() => localStorage.getItem('shuttle_stop') || '한대앞');
   const [lineId, setLineIdState] = useState(() => localStorage.getItem('shuttle_lineId') || 'line4-bulam');
@@ -44,8 +44,10 @@ export function useShuttle() {
     }
   }, [appConfig.current_period]);
 
-  // 지오로케이션으로 현재 위치 판단하여 셔틀 정류장 자동 선택
+  // 지오로케이션으로 현재 위치 판단하여 셔틀 정류장 자동 선택 (셔틀 탭 활성화 시에만 지연 로드)
   useEffect(() => {
+    if (!isActive) return;
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -81,7 +83,7 @@ export function useShuttle() {
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
-  }, []);
+  }, [isActive]);
 
   const setStop = (s) => { 
     setStopState(s); 
