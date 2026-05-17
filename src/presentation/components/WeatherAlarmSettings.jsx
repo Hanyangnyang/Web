@@ -527,7 +527,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 }`}
                 onClick={() => handleConditionToggle('daily')}
               >
-                매일
+                항상 보내주세요
               </button>
               
               <button
@@ -539,7 +539,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
                 onClick={() => handleConditionToggle('rainSnow')}
               >
-                비/눈
+                비/눈이 올 때
               </button>
 
               <button
@@ -551,7 +551,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
                 onClick={() => handleConditionToggle('dust')}
               >
-                미세먼지
+                미세먼지가 나쁠 때
               </button>
 
               <button
@@ -563,7 +563,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
                 onClick={() => handleConditionToggle('uv')}
               >
-                자외선
+                자외선이 강할 때
               </button>
             </div>
           </div>
