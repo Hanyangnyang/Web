@@ -6,7 +6,7 @@ let memoryCache = null;
 let isFetching = false;   // 중복 fetch 방지 플래그
 let listeners = [];       // 데이터 갱신 시 구독 컴포넌트에 알림
 
-const CACHE_KEY = 'hyu_portal_cache';
+const CACHE_KEY = 'hyu_portal_cache_v3';
 const CACHE_TTL = 10800000; // 3시간 (서버 s-maxage 와 동일)
 
 function notifyListeners(data) {
