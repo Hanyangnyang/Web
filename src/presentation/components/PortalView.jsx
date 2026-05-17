@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart, Bell } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
+import { UmbrellaAlarmSettings } from './UmbrellaAlarmSettings.jsx';
 
 const FALLBACK_MESSAGES = [
   { title: "오늘의 한 마디", text: "무언가 새로 시작하기 딱 좋은 날입니다! 자신감을 가지세요.", icon: Sparkles, color: "linear-gradient(135deg, #0E4A84 0%, #1a74c7 100%)" },
@@ -93,6 +95,8 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 
 export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData();
+  const [showUmbrellaAlarm, setShowUmbrellaAlarm] = useState(false);
+  const [alarmPopup, setAlarmPopup] = useState('');
   const scrollContainerRef = useRef(null);
   
   // 현재 시각 계산 (가상 날씨 모킹 상태가 아니면 실제 시간 반환)
@@ -178,25 +182,51 @@ export function PortalView({ isVisible = true }) {
     return '⛈️';
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-hyu-blue opacity-50" size={32} />
-      </div>
-    );
-  }
-
   return (
-    <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
+    <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
+      {createPortal(
+        <>
+          <button
+            className="fixed bottom-[calc(20px+64px+12px)] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
+            onClick={() => setShowUmbrellaAlarm(true)}
+          >
+            <Bell size={18} />
+            우산 알림 받기
+          </button>
+          {showUmbrellaAlarm && (
+            <UmbrellaAlarmSettings onClose={(msg) => {
+              setShowUmbrellaAlarm(false);
+              if (msg) {
+                setAlarmPopup(msg);
+                setTimeout(() => setAlarmPopup(''), 1500);
+              }
+            }} />
+          )}
+          {alarmPopup && (
+            <div className="fixed bottom-[calc(20px+64px+60px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[1000] whitespace-pre-line text-center copy-toast">
+              {alarmPopup}
+            </div>
+          )}
+        </>,
+        document.body
+      )}
       {/* 1. 오늘의 날씨 & 소식 섹션 */}
       <section className="mb-10">
         <h3 className="text-xl font-bold text-text-main mb-4">
-          {weather ? '오늘의 날씨' : fallback.title}
+          {loading ? '오늘의 날씨' : weather ? '오늘의 날씨' : fallback.title}
         </h3>
-        
-        <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
-          background: weatherTheme.bg
-        }}>
+        {loading ? (
+          <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
+            <div className="flex flex-col gap-3">
+              <div className="h-12 w-36 bg-slate-200 rounded-xl" />
+              <div className="h-4 w-28 bg-slate-200 rounded-full" />
+            </div>
+            <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
+          </div>
+        ) : (
+          <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
+            background: weatherTheme.bg
+          }}>
           {weather ? (
             <>
               <div className="relative z-10 w-full">
@@ -254,7 +284,7 @@ export function PortalView({ isVisible = true }) {
             </div>
           )}
         </div>
-
+      )}
         {/* 시간별 예보 스트립 (0시부터 23시까지 전체 소급 스크롤 지원) */}
         {weather?.hourlyForecast?.length > 0 && (
           <div 
@@ -296,7 +326,17 @@ export function PortalView({ isVisible = true }) {
       <section className="mb-6">
         <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h3>
         <div className="grid grid-cols-2 gap-4">
-          {library?.list ? (
+          {loading ? (
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-5 h-[140px] animate-pulse flex flex-col justify-between">
+                <div className="flex flex-col gap-2">
+                  <div className="h-4 w-3/4 bg-slate-100 rounded-full" />
+                  <div className="h-6 w-1/2 bg-slate-100 rounded-lg" />
+                </div>
+                <div className="h-2 w-full bg-slate-100 rounded-full" />
+              </div>
+            ))
+          ) : library?.list ? (
             library.list.map((room) => (
               <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
                 <div className="flex items-center gap-2 min-w-0">
