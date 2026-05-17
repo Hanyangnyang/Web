@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+
 import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart, Bell } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 import { UmbrellaAlarmSettings } from './UmbrellaAlarmSettings.jsx';
@@ -184,31 +184,26 @@ export function PortalView({ isVisible = true }) {
 
   return (
     <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
-      {createPortal(
-        <>
-          <button
-            className="fixed bottom-[calc(20px+64px+12px)] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
-            onClick={() => setShowUmbrellaAlarm(true)}
-          >
-            <Bell size={18} />
-            우산 알림 받기
-          </button>
-          {showUmbrellaAlarm && (
-            <UmbrellaAlarmSettings onClose={(msg) => {
-              setShowUmbrellaAlarm(false);
-              if (msg) {
-                setAlarmPopup(msg);
-                setTimeout(() => setAlarmPopup(''), 1500);
-              }
-            }} />
-          )}
-          {alarmPopup && (
-            <div className="fixed bottom-[calc(20px+64px+60px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[1000] whitespace-pre-line text-center copy-toast">
-              {alarmPopup}
-            </div>
-          )}
-        </>,
-        document.body
+      <button
+        className="fixed bottom-[calc(20px+64px+12px)] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
+        onClick={() => setShowUmbrellaAlarm(true)}
+      >
+        <Bell size={18} />
+        우산 알림 받기
+      </button>
+      {showUmbrellaAlarm && (
+        <UmbrellaAlarmSettings onClose={(msg) => {
+          setShowUmbrellaAlarm(false);
+          if (msg) {
+            setAlarmPopup(msg);
+            setTimeout(() => setAlarmPopup(''), 1500);
+          }
+        }} />
+      )}
+      {alarmPopup && (
+        <div className="fixed bottom-[calc(20px+64px+60px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[1000] whitespace-pre-line text-center copy-toast">
+          {alarmPopup}
+        </div>
       )}
       {/* 1. 오늘의 날씨 & 소식 섹션 */}
       <section className="mb-10">
@@ -289,7 +284,7 @@ export function PortalView({ isVisible = true }) {
         {weather?.hourlyForecast?.length > 0 && (
           <div 
             ref={scrollContainerRef}
-            className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto"
+            className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
           >
             <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
               {weather.hourlyForecast.map((h, idx) => {
