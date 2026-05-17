@@ -211,7 +211,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
 
   const handleNativeShare = async (title, url) => {
     if (navigator.share) {
-      try { await navigator.share({ title, url }); } catch {}
+      try { await navigator.share({ url }); } catch {}
     } else {
       try {
         await navigator.clipboard.writeText(url);
@@ -350,7 +350,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                             <div className="accordion-inner">
                               {menus.map((m, i) => {
                                 const isCheonwon = type.includes('천원') || m.menu.includes('천원의아침밥');
-                                const shareUrl = `${window.location.origin}/?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
+                                const shareUrl = `${window.location.origin}/api/share?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
                                 const nowKst = getKSTDate();
                                 const targetStr = date.toISOString().split('T')[0];
                                 const dateLabel = targetStr === nowKst.toISOString().split('T')[0] ? '오늘'
