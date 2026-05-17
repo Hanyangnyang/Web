@@ -5,21 +5,19 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       ios_signing:
-        distribution_type: app_store
+        distribution_type: development
         bundle_identifier: com.hanyangnyang.app
-      node: 20.x
+      node: latest
     scripts:
       - name: Install dependencies
         script: npm ci
       - name: Build web
         script: npm run build
-      - name: Add iOS platform (if not exists)
-        script: |
-          if [ ! -d "ios" ]; then
-            npx cap add ios
-          fi
       - name: Sync Capacitor
         script: npx cap sync ios
+      - name: Pod install
+        script: |
+          cd ios/App && pod install
       - name: Set up code signing
         script: xcode-project use-profiles
       - name: Build IPA

@@ -1,6 +1,6 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
 // Triggering redeploy
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import './index.css';
 import { useAuth } from './presentation/hooks/useAuth.js';
 import { useMenu } from './presentation/hooks/useMenu.js';
@@ -13,6 +13,7 @@ import { MiscView }      from './presentation/components/MiscView.jsx';
 import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
+import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 
@@ -42,6 +43,11 @@ function MainLayout() {
 
   const { user, loading, login, relogin, logout, updateUser } = useAuth();
   const { menuDate, cafes, menuLoading, changeDate } = useMenu();
+
+  // 앱 시작 시 소식 탭 데이터를 백그라운드에서 미리 로드
+  useEffect(() => {
+    prefetchPortalData();
+  }, []);
 
   const reloginFn = useCallback(() => relogin(), [relogin]);
 
@@ -79,34 +85,27 @@ function MainLayout() {
           paddingBottom: 'env(safe-area-inset-bottom)',
         } : {}}
       >
-        <div key={activeTab} className={`flex-1 overflow-y-auto overflow-x-hidden px-5 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : 'py-6'}`}>
-          {activeTab === 'qr' ? (
-            user ? (
-              <QRView
-                user={user}
-                reloginFn={reloginFn}
-                onNameDiscovered={handleNameDiscovered}
-                onLogout={logout}
-              />
+        {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
+        <div className={`flex-1 overflow-y-auto overflow-x-hidden px-5 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : 'py-6'}`}>
+          <div style={{ display: activeTab === 'qr' ? 'block' : 'none' }}>
+            {user ? (
+              <QRView user={user} reloginFn={reloginFn} onNameDiscovered={handleNameDiscovered} onLogout={logout} />
             ) : (
               <LoginForm onSuccess={login} />
-            )
-          ) : activeTab === 'cafe' ? (
-            <CafeteriaView
-              date={menuDate}
-              changeDate={changeDate}
-              cafes={cafes}
-              loading={menuLoading}
-            />
-          ) : activeTab === 'shuttle' ? (
+            )}
+          </div>
+          <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
+            <CafeteriaView date={menuDate} changeDate={changeDate} cafes={cafes} loading={menuLoading} />
+          </div>
+          <div style={{ display: activeTab === 'shuttle' ? 'block' : 'none' }}>
             <ShuttleView />
-          ) : (
-            activeTab === 'portal' ? (
-              <PortalView />
-            ) : (
-              <MiscView />
-            )
-          )}
+          </div>
+          <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
+            <PortalView isVisible={activeTab === 'portal'} />
+          </div>
+          <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
+            <MiscView />
+          </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
