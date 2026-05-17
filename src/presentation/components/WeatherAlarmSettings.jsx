@@ -2,6 +2,19 @@ import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 're
 import { requestNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 
+// 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
+const josa = (word, type) => {
+  if (!word) return '';
+  const lastChar = word.charCodeAt(word.length - 1);
+  if (lastChar < 0xAC00 || lastChar > 0xD7A3) return word;
+  const hasBatchim = (lastChar - 0xAC00) % 28 !== 0;
+  
+  if (type === '이/가') return hasBatchim ? `${word}이` : `${word}가`;
+  if (type === '을/를') return hasBatchim ? `${word}을` : `${word}를`;
+  if (type === '와/과') return hasBatchim ? `${word}과` : `${word}와`;
+  return word;
+};
+
 const ITEM_H = 36;
 const VISIBLE = 3;
 
@@ -431,7 +444,31 @@ export function WeatherAlarmSettings({ onClose }) {
       localStorage.setItem('weather_alarm_settings', JSON.stringify(settings));
 
       if (settings.weatherAlert) {
-        successMsg = '설정한 조건과 시간에 맞춰\n알림을 보내드릴게요!';
+        // 동적 완성형 팝업 완료 메시지 조립
+        if (settings.conditions.daily) {
+          successMsg = '매일 설정하신 시간에 맞춰\n정갈한 날씨 브리핑을 보내드릴게요.';
+        } else {
+          const activeKeywords = [];
+          if (settings.conditions.rainSnow) activeKeywords.push('비/눈 소식');
+          if (settings.conditions.dust) activeKeywords.push('탁한 공기');
+          if (settings.conditions.uv) activeKeywords.push('강한 자외선 소식');
+
+          if (activeKeywords.length > 0) {
+            let joined = '';
+            if (activeKeywords.length === 3) {
+              joined = `${activeKeywords[0]}, ${activeKeywords[1]}, 그리고 ${activeKeywords[2]}`;
+            } else if (activeKeywords.length === 2) {
+              // 한글 '비/눈 소식'은 받침이 없으므로 '과' 조사로 유기적 매치
+              joined = `${activeKeywords[0]}과 ${activeKeywords[1]}`;
+            } else {
+              joined = activeKeywords[0];
+            }
+            const josaJoined = josa(joined, '이/가');
+            successMsg = `설정하신 시간에 캠퍼스에\n${josaJoined} 있을 때 알림을 보내드릴게요.`;
+          } else {
+            successMsg = '설정하신 시간에 맞춰\n날씨 알림을 보내드릴게요.';
+          }
+        }
 
         (async () => {
           try {
