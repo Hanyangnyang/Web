@@ -8,6 +8,7 @@ const VISIBLE = 3;
 const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i);
 const AMPM_LIST = ['오전', '오후'];
 const DAY_LIST = ['전날', '당일'];
+const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
 const parseH24 = (h24) => ({
   displayHour: h24 % 12,
@@ -89,33 +90,6 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     dayTimer.current = setTimeout(commitDay, 150);
   };
 
-  const handleHourWheel = (e) => {
-    e.preventDefault();
-    const el = hourRef.current;
-    if (!el) return;
-    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 11));
-    el.scrollTop = next * ITEM_H;
-    setLiveHour(next);
-  };
-
-  const handleAmpmWheel = (e) => {
-    e.preventDefault();
-    const el = ampmRef.current;
-    if (!el) return;
-    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
-    el.scrollTop = next * ITEM_H;
-    setLiveAmpm(next);
-  };
-
-  const handleDayWheel = (e) => {
-    e.preventDefault();
-    const el = dayRef.current;
-    if (!el) return;
-    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
-    el.scrollTop = next * ITEM_H;
-    setLiveDay(next);
-  };
-
   const itemStyle = (active) => ({
     height: ITEM_H,
     scrollSnapAlign: 'center',
@@ -139,7 +113,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     cursor: 'grab',
   });
 
-  const handleDragScroll = (ref, liveSetter) => {
+  const handleDragScroll = (ref) => {
     let isDown = false;
     let startY;
     let scrollTop;
@@ -207,7 +181,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={dayRef}
         onScroll={handleDayScroll}
-        {...handleDragScroll(dayRef, setLiveDay)}
+        {...handleDragScroll(dayRef)}
         className="alarm-picker-scroll"
         style={colStyle(64)}
       >
@@ -221,7 +195,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={ampmRef}
         onScroll={handleAmpmScroll}
-        {...handleDragScroll(ampmRef, setLiveAmpm)}
+        {...handleDragScroll(ampmRef)}
         className="alarm-picker-scroll"
         style={colStyle(56)}
       >
@@ -235,7 +209,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={hourRef}
         onScroll={handleHourScroll}
-        {...handleDragScroll(hourRef, setLiveHour)}
+        {...handleDragScroll(hourRef)}
         className="alarm-picker-scroll"
         style={colStyle(44)}
       >
@@ -265,26 +239,48 @@ function TimePicker({ value, onChange, day, onDayChange }) {
 
 const loadSettings = () => {
   try {
-    const saved = localStorage.getItem('umbrella_alarm_settings');
-    if (!saved) return { umbrellaAlert: false, notifyTime: '08:00', notifyDay: '당일' };
+    const saved = localStorage.getItem('weather_alarm_settings');
+    const defaultVal = {
+      weatherAlert: false,
+      conditions: { daily: false, rainSnow: false, dust: false, uv: false },
+      selectedDays: ['월', '화', '수', '목', '금', '토', '일'],
+      notifyTime: '08:00',
+      notifyDay: '당일'
+    };
+    if (!saved) return defaultVal;
     const parsed = JSON.parse(saved);
+    
+    // 시간 검증
     if (parsed.notifyTime) {
       const h = parseInt(parsed.notifyTime.split(':')[0]);
       if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
     }
     if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
-    return { umbrellaAlert: false, notifyTime: '08:00', notifyDay: '당일', ...parsed };
+    
+    // 조건 칩 기본 값 구조 유지 검증
+    parsed.conditions = { ...defaultVal.conditions, ...parsed.conditions };
+    if (!Array.isArray(parsed.selectedDays)) parsed.selectedDays = defaultVal.selectedDays;
+    
+    return { ...defaultVal, ...parsed };
   } catch {
-    return { umbrellaAlert: false, notifyTime: '08:00', notifyDay: '당일' };
+    return {
+      weatherAlert: false,
+      conditions: { daily: false, rainSnow: false, dust: false, uv: false },
+      selectedDays: ['월', '화', '수', '목', '금', '토', '일'],
+      notifyTime: '08:00',
+      notifyDay: '당일'
+    };
   }
 };
 
 const settingsEqual = (a, b) =>
-  a.umbrellaAlert === b.umbrellaAlert &&
+  a.weatherAlert === b.weatherAlert &&
   a.notifyTime === b.notifyTime &&
-  a.notifyDay === b.notifyDay;
+  a.notifyDay === b.notifyDay &&
+  JSON.stringify(a.conditions) === JSON.stringify(b.conditions) &&
+  JSON.stringify(a.selectedDays) === JSON.stringify(b.selectedDays);
 
-export function UmbrellaAlarmSettings({ onClose }) {
+export function WeatherAlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
   const [settings, setSettings] = useState(() => ({ ...savedRef.current }));
   const [closing, setClosing] = useState(false);
@@ -295,6 +291,12 @@ export function UmbrellaAlarmSettings({ onClose }) {
   const sheetRef = useRef(null);
 
   const isDirty = !settingsEqual(settings, savedRef.current);
+
+  // 3단계 영역(날짜 및 시간 선택) 활성화 조건: 2단계 조건이 하나라도 켜져 있는가
+  const isStep3Active = settings.conditions.daily ||
+                        settings.conditions.rainSnow ||
+                        settings.conditions.dust ||
+                        settings.conditions.uv;
 
   useEffect(() => {
     const scrollY = window.scrollY;
@@ -330,20 +332,22 @@ export function UmbrellaAlarmSettings({ onClose }) {
       try {
         const { data, error } = await supabase.rpc('get_alarm_subscription', {
           p_device_id: deviceId,
-          p_topic: 'UMBRELLA_ALERT'
+          p_topic: 'WEATHER_ALERT'
         });
         if (data && !error) {
           const newSettings = {
-            umbrellaAlert: data.is_active,
+            weatherAlert: data.is_active,
+            conditions: data.params?.conditions || { daily: false, rainSnow: false, dust: false, uv: false },
+            selectedDays: data.params?.selectedDays || ['월', '화', '수', '목', '금', '토', '일'],
             notifyTime: data.params?.notifyTime || '08:00',
             notifyDay: data.params?.notifyDay || '당일',
           };
           setSettings(newSettings);
           savedRef.current = newSettings;
-          localStorage.setItem('umbrella_alarm_settings', JSON.stringify(newSettings));
+          localStorage.setItem('weather_alarm_settings', JSON.stringify(newSettings));
         }
       } catch (err) {
-        console.error('Failed to sync umbrella alarm settings', err);
+        console.error('Failed to sync weather alarm settings', err);
       }
     }
     syncWithServer();
@@ -379,13 +383,13 @@ export function UmbrellaAlarmSettings({ onClose }) {
   };
 
   const toggle = async () => {
-    const turningOn = !settings.umbrellaAlert;
-    setSettings(p => ({ ...p, umbrellaAlert: turningOn }));
+    const turningOn = !settings.weatherAlert;
+    setSettings(p => ({ ...p, weatherAlert: turningOn }));
     if (turningOn) {
       const token = await requestNotificationPermission();
       if (!token) {
         alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
-        setSettings(p => ({ ...p, umbrellaAlert: false }));
+        setSettings(p => ({ ...p, weatherAlert: false }));
       }
     }
   };
@@ -398,10 +402,10 @@ export function UmbrellaAlarmSettings({ onClose }) {
   const handleClose = () => {
     let successMsg;
     if (isDirty) {
-      localStorage.setItem('umbrella_alarm_settings', JSON.stringify(settings));
+      localStorage.setItem('weather_alarm_settings', JSON.stringify(settings));
 
-      if (settings.umbrellaAlert) {
-        successMsg = '설정한 시간에 맞춰\n알림을 보내드릴게요!';
+      if (settings.weatherAlert) {
+        successMsg = '설정한 조건과 시간에 맞춰\n알림을 보내드릴게요!';
 
         (async () => {
           try {
@@ -415,13 +419,18 @@ export function UmbrellaAlarmSettings({ onClose }) {
               await supabase.rpc('upsert_alarm_subscription', {
                 p_device_id: deviceId,
                 p_fcm_token: token,
-                p_topic: 'UMBRELLA_ALERT',
-                p_params: { notifyTime: settings.notifyTime, notifyDay: settings.notifyDay },
+                p_topic: 'WEATHER_ALERT',
+                p_params: {
+                  conditions: settings.conditions,
+                  selectedDays: settings.selectedDays,
+                  notifyTime: settings.notifyTime,
+                  notifyDay: settings.notifyDay
+                },
                 p_is_active: true,
               });
             }
           } catch (err) {
-            console.error('Failed to sync umbrella alarm settings', err);
+            console.error('Failed to sync weather alarm settings', err);
           }
         })();
       } else {
@@ -430,7 +439,7 @@ export function UmbrellaAlarmSettings({ onClose }) {
           supabase.rpc('upsert_alarm_subscription', {
             p_device_id: deviceId,
             p_fcm_token: null,
-            p_topic: 'UMBRELLA_ALERT',
+            p_topic: 'WEATHER_ALERT',
             p_params: null,
             p_is_active: false,
           }).then();
@@ -438,6 +447,52 @@ export function UmbrellaAlarmSettings({ onClose }) {
       }
     }
     triggerClose(successMsg);
+  };
+
+  // 조건 칩 클릭 제약 처리
+  const handleConditionToggle = (key) => {
+    setSettings(prev => {
+      const nextConditions = { ...prev.conditions };
+      if (key === 'daily') {
+        const nextVal = !nextConditions.daily;
+        // '매일' 선택 시 다른 칩들은 모두 꺼지고 비활성화
+        return {
+          ...prev,
+          conditions: {
+            daily: nextVal,
+            rainSnow: false,
+            dust: false,
+            uv: false
+          }
+        };
+      } else {
+        // 비/눈, 미세먼지, 자외선은 중복 선택 가능
+        nextConditions[key] = !nextConditions[key];
+        return {
+          ...prev,
+          conditions: nextConditions
+        };
+      }
+    });
+  };
+
+  // 요일 토글 처리
+  const handleDayToggle = (day) => {
+    setSettings(prev => {
+      let nextDays = [...prev.selectedDays];
+      if (nextDays.includes(day)) {
+        // 최소 1개는 요일이 선택되어 있어야 하거나, 0개까지 선택 가능
+        nextDays = nextDays.filter(d => d !== day);
+      } else {
+        nextDays.push(day);
+      }
+      // 순서 보장을 위해 정렬
+      const sortedDays = WEEKDAYS.filter(d => nextDays.includes(d));
+      return {
+        ...prev,
+        selectedDays: sortedDays
+      };
+    });
   };
 
   return (
@@ -449,7 +504,7 @@ export function UmbrellaAlarmSettings({ onClose }) {
     >
       <div
         ref={sheetRef}
-        className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-6 max-h-[90vh] overflow-y-auto mb-0 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
+        className="w-[calc(100%-48px)] max-w-[340px] bg-white rounded-card px-5 pb-6 max-h-[90vh] overflow-y-auto mb-6 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)] no-scrollbar"
         style={{
           transform: `translateY(${dragY}px)`,
           transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
@@ -469,28 +524,120 @@ export function UmbrellaAlarmSettings({ onClose }) {
           <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto" />
         </div>
 
-        <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-0.5">
-          <span className="text-[18px] font-extrabold text-text-main leading-none">우산 알림설정</span>
+        {/* 1단계: 타이틀 및 온오프 스위치 */}
+        <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-4">
+          <span className="text-[18px] font-extrabold text-text-main leading-none">날씨 알림설정</span>
           <label className="alarm-toggle" style={{ marginLeft: 'auto', alignSelf: 'center' }}>
-            <input type="checkbox" checked={settings.umbrellaAlert} onChange={toggle} />
+            <input type="checkbox" checked={settings.weatherAlert} onChange={toggle} />
             <span className="alarm-toggle-slider" />
           </label>
         </div>
 
         <div style={{
-          opacity: settings.umbrellaAlert ? 1 : 0.35,
-          pointerEvents: settings.umbrellaAlert ? 'auto' : 'none',
+          opacity: settings.weatherAlert ? 1 : 0.35,
+          pointerEvents: settings.weatherAlert ? 'auto' : 'none',
           transition: 'opacity 0.2s',
         }}>
-          <div className="py-2">
-            <div className="text-[14px] font-extrabold text-text-main mb-1.5">언제 알림을 보낼까요?</div>
-            <TimePicker
-              value={settings.notifyTime}
-              onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
-              day={settings.notifyDay}
-              onDayChange={(d) => setSettings(p => ({ ...p, notifyDay: d }))}
-            />
+          
+          {/* 2단계: 이럴 때 알림을 보내주세요 */}
+          <div className="mb-5">
+            <div className="text-[14px] font-extrabold text-text-main mb-2.5">이럴 때 알림을 보내주세요</div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                  settings.conditions.daily
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                }`}
+                onClick={() => handleConditionToggle('daily')}
+              >
+                매일
+              </button>
+              
+              <button
+                disabled={settings.conditions.daily}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                  settings.conditions.rainSnow
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
+                onClick={() => handleConditionToggle('rainSnow')}
+              >
+                비/눈
+              </button>
+
+              <button
+                disabled={settings.conditions.daily}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                  settings.conditions.dust
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
+                onClick={() => handleConditionToggle('dust')}
+              >
+                미세먼지
+              </button>
+
+              <button
+                disabled={settings.conditions.daily}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                  settings.conditions.uv
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                } ${settings.conditions.daily ? 'opacity-35 cursor-not-allowed' : ''}`}
+                onClick={() => handleConditionToggle('uv')}
+              >
+                자외선
+              </button>
+            </div>
           </div>
+
+          {/* 3단계: 날짜 및 시간 설정 (조건 선택 시 활성화) */}
+          <div style={{
+            opacity: isStep3Active ? 1 : 0.35,
+            pointerEvents: isStep3Active ? 'auto' : 'none',
+            transition: 'opacity 0.2s',
+          }}>
+            
+            {/* 요일 선택 */}
+            <div className="mb-5 pt-1">
+              <div className="text-[14px] font-extrabold text-text-main mb-2">알림 요일을 선택해 주세요</div>
+              <div className="flex justify-between gap-1">
+                {WEEKDAYS.map((day) => {
+                  const isSel = settings.selectedDays.includes(day);
+                  const isSun = day === '일';
+                  const isSat = day === '토';
+                  return (
+                    <button
+                      key={day}
+                      className={`w-8 h-8 rounded-full text-xs font-bold transition-all duration-150 flex items-center justify-center border ${
+                        isSel
+                          ? 'bg-primary text-white border-primary'
+                          : `bg-white border-[#e2e8f0] ${
+                              isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-text-sub'
+                            } hover:bg-slate-50`
+                      }`}
+                      onClick={() => handleDayToggle(day)}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 시간 선택 */}
+            <div className="py-1">
+              <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 알림을 보낼까요?</div>
+              <TimePicker
+                value={settings.notifyTime}
+                onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
+                day={settings.notifyDay}
+                onDayChange={(d) => setSettings(p => ({ ...p, notifyDay: d }))}
+              />
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
