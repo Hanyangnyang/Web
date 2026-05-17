@@ -184,7 +184,7 @@ export function PortalView({ isVisible = true }) {
         {/* 1. 오늘의 날씨 & 소식 섹션 */}
         {(loading || weather) && (
           <section className="mb-10">
-            <h2 className="text-2xl font-extrabold text-text-main mb-4">오늘의 날씨</h2>
+            <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
                 <div className="flex flex-col gap-3">
@@ -282,7 +282,7 @@ export function PortalView({ isVisible = true }) {
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
-        <h2 className="text-2xl font-extrabold text-text-main mb-4">열람실 혼잡도</h2>
+        <h3 className="text-xl font-bold text-text-main mb-4">열람실 혼잡도</h3>
         <div className="grid grid-cols-2 gap-4">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
