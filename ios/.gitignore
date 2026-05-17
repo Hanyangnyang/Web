@@ -1,0 +1,11 @@
+App/Pods/
+App/App/public/
+App/build/
+App/*.xcworkspace
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate

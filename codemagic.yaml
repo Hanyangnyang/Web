@@ -13,12 +13,6 @@ workflows:
         script: npm ci
       - name: Build web
         script: npm run build
-      - name: Recreate Capacitor iOS Platform
-        script: |
-          # 💡 1. 깃허브에서 딸려온 알맹이 없는 ios 폴더를 가차없이 지워버립니다.
-          rm -rf ios
-          # 💡 2. 완전 백지 상태에서 ios 플랫폼을 새로 추가하여 Podfile을 강제로 새로 만듭니다.
-          npx cap add ios
       - name: Sync Capacitor
         script: npx cap sync ios
       - name: Set up code signing
