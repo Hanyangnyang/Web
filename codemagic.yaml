@@ -13,15 +13,17 @@ workflows:
         script: npm ci
       - name: Build web
         script: npm run build
-      - name: Initialize or Sync Capacitor iOS
+      - name: Recreate Capacitor iOS Platform
         script: |
-          if [ ! -d "ios" ]; then
-            npx cap add ios
-          else
-            npx cap sync ios
-          fi
+          # 💡 1. 깃허브에서 딸려온 알맹이 없는 ios 폴더를 가차없이 지워버립니다.
+          rm -rf ios
+          # 💡 2. 완전 백지 상태에서 ios 플랫폼을 새로 추가하여 Podfile을 강제로 새로 만듭니다.
+          npx cap add ios
+      - name: Sync Capacitor
+        script: npx cap sync ios
       - name: Generate Workspace (Pod Install)
         script: |
+          # 💡 3. 이제 완벽하게 생성된 Podfile 위치로 이동해 팟을 설치합니다.
           cd ios/App
           pod install --repo-update
       - name: Set up code signing
