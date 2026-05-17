@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
 
 const KakaoIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -12,15 +11,10 @@ const KakaoIcon = () => (
 );
 
 
-export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, menuCardEl, onClose, onCopied }) {
+export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }) {
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
-  const mealLabel = mealType.includes('조식') || mealType.includes('천원') ? '아침'
-    : mealType.includes('석식') ? '저녁'
-    : '점심';
-  const titleLine = `${dateLabel} ${cafeName} ${mealLabel}${mealEmoji} 공유하기`;
-  const kakaoTitle = `${dateLabel} ${cafeName} ${mealLabel} 메뉴는 뭘까요?`;
-
-  const [isCapturing, setIsCapturing] = useState(false);
+  const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
+  const kakaoTitle = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -28,7 +22,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const handleKakao = async () => {
+  const handleKakao = () => {
     if (!window.Kakao) {
       alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]');
       return;
@@ -41,48 +35,17 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
       return;
     }
 
-    setIsCapturing(true);
-    let imageUrl = null;
-    let imageWidth = null;
-    let imageHeight = null;
-
-    if (menuCardEl) {
-      try {
-        // pr-[6.5rem]은 가격 뱃지 겹침 방지용이므로 캡처 시 임시 제거
-        const origPaddingRight = menuCardEl.style.paddingRight;
-        menuCardEl.style.paddingRight = '0.25rem';
-
-        const canvas = await html2canvas(menuCardEl, {
-          scale: 2,
-          backgroundColor: '#ffffff',
-          useCORS: true,
-          logging: false,
-        });
-
-        menuCardEl.style.paddingRight = origPaddingRight;
-
-        imageWidth = canvas.width;
-        imageHeight = canvas.height;
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        const file = new File([blob], 'menu.png', { type: 'image/png' });
-        const res = await window.Kakao.Share.uploadImage({ file: [file] });
-        imageUrl = res?.infos?.original?.url ?? null;
-      } catch (err) {
-        console.warn('[Share] 메뉴 카드 캡처/업로드 실패:', err);
-      }
-    }
-
-    setIsCapturing(false);
-
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
           title: kakaoTitle,
-          ...(imageUrl ? { imageUrl, imageWidth, imageHeight } : {}),
+          imageUrl: 'https://www.hanyang.life/hanyang_cafeteria.jpg',
+          imageWidth: 800,
+          imageHeight: 480,
           link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
         },
-        buttons: [{ title: '더 많은 학식 정보 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+        buttons: [{ title: '학식 메뉴 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
       });
       onClose();
     } catch (e) {
@@ -130,16 +93,13 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
         <p className="text-base font-bold text-text-main text-center mb-5">{titleLine}</p>
         <div className="flex justify-center gap-6 pb-2">
           <button
-            className="flex flex-col items-center gap-2 bg-none border-none cursor-pointer p-2 rounded-card transition-colors duration-150 font-[inherit] hover:bg-surface disabled:opacity-50"
+            className="flex flex-col items-center gap-2 bg-none border-none cursor-pointer p-2 rounded-card transition-colors duration-150 font-[inherit] hover:bg-surface"
             onClick={handleKakao}
-            disabled={isCapturing}
           >
             <div className="w-[52px] h-[52px] rounded-card flex items-center justify-center bg-[#FEE500]">
-              {isCapturing
-                ? <div className="w-5 h-5 border-2 border-[#3A1D1D]/30 border-t-[#3A1D1D] rounded-full animate-spin" />
-                : <KakaoIcon />}
+              <KakaoIcon />
             </div>
-            <span className="text-xs font-semibold text-text-main">{isCapturing ? '준비 중...' : '카카오톡'}</span>
+            <span className="text-xs font-semibold text-text-main">카카오톡</span>
           </button>
           <button
             className="flex flex-col items-center gap-2 bg-none border-none cursor-pointer p-2 rounded-card transition-colors duration-150 font-[inherit] hover:bg-surface"
