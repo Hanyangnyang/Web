@@ -21,11 +21,6 @@ workflows:
           npx cap add ios
       - name: Sync Capacitor
         script: npx cap sync ios
-      - name: Generate Workspace (Pod Install)
-        script: |
-          # 💡 3. 이제 완벽하게 생성된 Podfile 위치로 이동해 팟을 설치합니다.
-          cd ios/App
-          pod install --repo-update
       - name: Set up code signing
         script: xcode-project use-profiles
       - name: Build IPA
