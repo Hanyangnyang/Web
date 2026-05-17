@@ -55,7 +55,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   };
 
   const handleShare = async () => {
-    const shareText = `하냥냥-학식 정보\n\n${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?\n\n${shareUrl}`;
+    const shareText = `하냥냥 - 학식 정보\n${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?\n${shareUrl}`;
     if (navigator.share) {
       try {
         await navigator.share({
