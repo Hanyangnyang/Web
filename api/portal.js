@@ -136,7 +136,6 @@ async function handleWeather(req, res) {
     const uvInfo = getAQILabel(air.uv_index, 'uv');
 
     // 현재 KST 시각 기준 시간대 라벨 정의 (Gemini 프롬프트 시간대 인지 강화)
-    const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
     const hour = nowKST.getHours();
     let timeOfDayLabel = '하루';
     let timeContext = '현재 기상 정보를 요약해줘.';
