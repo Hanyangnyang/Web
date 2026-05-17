@@ -89,12 +89,35 @@ async function handleWeather(req, res) {
     const pm25Info = getAQILabel(air.pm2_5, 'pm25');
     const uvInfo = getAQILabel(air.uv_index, 'uv');
 
+    // 현재 KST 시각 기준 시간대 라벨 정의 (Gemini 프롬프트 시간대 인지 강화)
+    const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+    const hour = nowKST.getHours();
+    let timeOfDayLabel = '하루';
+    let timeContext = '현재 기상 정보를 요약해줘.';
+
+    if (hour >= 5 && hour < 12) {
+      timeOfDayLabel = '아침/등교 시간대';
+      timeContext = '상쾌한 아침 등교길 인사와 함께 오늘 하루 전반적인 날씨 대비 요령을 조언해줘.';
+    } else if (hour >= 12 && hour < 17) {
+      timeOfDayLabel = '낮/활동 시간대';
+      timeContext = '활기찬 낮 일과 중 조언과 함께 자외선, 미세먼지 등 실외 활동 대비 요령을 조언해줘.';
+    } else if (hour >= 17 && hour < 21) {
+      timeOfDayLabel = '저녁/하교 시간대';
+      timeContext = '수고한 하루를 마무리하는 따뜻한 인사와 함께 퇴근/하굣길 날씨(쌀쌀함 등)나 밤사이 유의사항을 조언해줘.';
+    } else {
+      timeOfDayLabel = '밤/새벽 시간대';
+      timeContext = '편안한 밤을 보내기 위한 인사와 함께 내일 등교길이나 출근길 날씨를 가볍게 대비할 수 있도록 조언해줘.';
+    }
+
     let aiMessage = info.message; // 기본 폴백
     const geminiKey = process.env.GEMINI_API_KEY;
 
     if (geminiKey && geminiKey !== '여기에_API_키_입력') {
       try {
-        const prompt = `너는 날씨 앱의 AI 어시스턴트야. 아래 날씨 데이터를 바탕으로 한국 대학생에게 친근하고 자연스러운 한국어로 오늘 날씨 코멘트를 한 문장으로 작성해줘.
+        const prompt = `너는 날씨 앱의 AI 어시스턴트야. 아래 날씨 데이터와 [현재 시간대] 정보를 바탕으로 한국 대학생에게 친근하고 자연스러운 한국어로 오늘 날씨 코멘트를 한 문장으로 작성해줘.
+
+현재 시간대: ${timeOfDayLabel} (${hour}시)
+맥락 가이드: ${timeContext}
 
 현재 기온: ${Math.round(current.temperature_2m)}°C (오늘 최고 ${maxTemp}°C / 최저 ${minTemp}°C)
 날씨 상태: ${info.label}
