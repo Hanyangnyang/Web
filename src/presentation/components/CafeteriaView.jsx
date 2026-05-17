@@ -245,6 +245,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
           menuText={shareTarget.menu.menu}
           dateLabel={shareTarget.dateLabel}
           shareUrl={shareTarget.shareUrl}
+          menuCardEl={shareTarget.cardEl}
           onClose={() => setShareTarget(null)}
           onCopied={handleCopied}
         />
@@ -374,7 +375,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                         {isCheonwon ? `${m.price}💕` : hasJeyuk ? `${m.price}🔥` : m.price}
                                       </div>
                                     )}
-                                    <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]">
+                                    <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]" data-menu-content>
                                       {menuLines.map((line, idx) => (
                                         <MenuItemLine key={idx} html={line} />
                                       ))}
@@ -388,7 +389,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                       ) : <span />}
                                       <button
                                         className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
-                                        onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
+                                        onClick={(e) => setShareTarget({ type, menu: m, shareUrl, dateLabel, cardEl: e.currentTarget.closest('.menu-card')?.querySelector('[data-menu-content]') })}
                                         aria-label="메뉴 공유"
                                       >
                                         <Share2 size={14} />
