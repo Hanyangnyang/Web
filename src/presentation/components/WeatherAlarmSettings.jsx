@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
 import { requestNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 
@@ -292,6 +292,24 @@ export function WeatherAlarmSettings({ onClose }) {
                         settings.conditions.rainSnow ||
                         settings.conditions.dust ||
                         settings.conditions.uv;
+
+  // 동적 안내 설명 문구 계산
+  const guideText = useMemo(() => {
+    if (settings.conditions.daily) {
+      return '매일 알림으로 날씨를 알려드릴게요.';
+    }
+    
+    const activeConditions = [];
+    if (settings.conditions.rainSnow) activeConditions.push('비/눈이 오는 날');
+    if (settings.conditions.dust) activeConditions.push('미세먼지가 나쁜 날');
+    if (settings.conditions.uv) activeConditions.push('자외선 지수가 높은 날');
+    
+    if (activeConditions.length > 0) {
+      return `${activeConditions.join(', ')} 알림을 보내드릴게요`;
+    }
+    
+    return '';
+  }, [settings.conditions]);
 
   useEffect(() => {
     const scrollY = window.scrollY;
@@ -611,6 +629,14 @@ export function WeatherAlarmSettings({ onClose }) {
                 자외선
               </button>
             </div>
+            {guideText && (
+              <div 
+                className="mt-3.5 px-3 py-2.5 bg-slate-50/80 border border-slate-100/50 rounded-xl text-[11px] font-bold text-slate-500 leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]"
+                style={{ whiteSpace: 'pre-line' }}
+              >
+                {guideText}
+              </div>
+            )}
           </div>
 
           {/* 3단계: 날짜 및 시간 설정 (조건 선택 시 활성화) */}
