@@ -11,14 +11,26 @@ const FALLBACK_MESSAGES = [
   { title: "오늘의 한 마디", text: "당신의 묵묵한 노력이 곧 빛을 발할 거예요. 오늘도 힘차게 화이팅!", icon: Users, color: "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)" },
 ];
 
-// 타이핑 애니메이션: isVisible이 true가 될 때마다 항상 재생
+// 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
+let hasAnimatedThisSession = false;
+
 function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
-  const [displayed, setDisplayed] = useState('');
+  const [displayed, setDisplayed] = useState(() => {
+    return hasAnimatedThisSession ? text : '';
+  });
   const [waiting, setWaiting] = useState(false); // delay 구간 (커서 깜빡임)
-  const started = useRef(false);
+  const started = useRef(hasAnimatedThisSession);
 
   useEffect(() => {
-    // 탭이 숨겨지면 플래그 리셋 → 다음 진입 시 다시 애니메이션
+    // 1. 이미 이번 세션에 애니메이션이 완료되었다면 즉시 전문 노출 및 생략
+    if (hasAnimatedThisSession) {
+      setDisplayed(text);
+      setWaiting(false);
+      started.current = true;
+      return;
+    }
+
+    // 2. 탭이 숨겨지면 플래그 리셋 → 다음 진입 시 다시 애니메이션
     if (!isVisible) {
       started.current = false;
       setWaiting(false);
@@ -38,7 +50,10 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
       typingTimer = setInterval(() => {
         i++;
         setDisplayed(text.slice(0, i));
-        if (i >= text.length) clearInterval(typingTimer);
+        if (i >= text.length) {
+          clearInterval(typingTimer);
+          hasAnimatedThisSession = true; // 타이핑이 완벽히 한 번 끝나면 세션 플래그 true 설정
+        }
       }, speed);
     };
 
