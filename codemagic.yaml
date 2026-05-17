@@ -18,12 +18,14 @@ workflows:
           if [ ! -d "ios" ]; then
             npx cap add ios
           fi
-      - name: Capacitor Copy & Update
+      - name: Sync Capacitor
         script: |
           npx cap copy ios
-          npx cap update ios
-      - name: Sync Capacitor
-        script: npx cap sync ios
+          npx cap sync ios
+      - name: Generate Workspace
+        script: |
+          cd ios/App
+          pod install --repo-update
       - name: Set up code signing
         script: xcode-project use-profiles
       - name: Build IPA
