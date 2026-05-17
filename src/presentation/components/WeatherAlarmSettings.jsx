@@ -293,10 +293,14 @@ export function WeatherAlarmSettings({ onClose }) {
                         settings.conditions.dust ||
                         settings.conditions.uv;
 
-  // 동적 안내 설명 문구 계산
-  const guideText = useMemo(() => {
+  // 동적 안내 설명 문구 계산 (React Element 형태 반환)
+  const guideElement = useMemo(() => {
     if (settings.conditions.daily) {
-      return '매일 알림으로 날씨를 알려드릴게요.';
+      return (
+        <span>
+          <span className="text-[#6366f1] font-extrabold">매일</span> 알림으로 날씨를 알려드릴게요.
+        </span>
+      );
     }
     
     const activeConditions = [];
@@ -305,10 +309,20 @@ export function WeatherAlarmSettings({ onClose }) {
     if (settings.conditions.uv) activeConditions.push('자외선 지수가 높은 날');
     
     if (activeConditions.length > 0) {
-      return `${activeConditions.join(', ')} 알림을 보내드릴게요`;
+      return (
+        <span>
+          {activeConditions.map((cond, idx) => (
+            <span key={cond}>
+              {idx > 0 && <span className="text-text-sub">, </span>}
+              <span className="text-[#6366f1] font-extrabold">{cond}</span>
+            </span>
+          ))}
+          <span className="text-text-sub">에 알림을 보내드릴게요</span>
+        </span>
+      );
     }
     
-    return '';
+    return null;
   }, [settings.conditions]);
 
   useEffect(() => {
@@ -629,9 +643,9 @@ export function WeatherAlarmSettings({ onClose }) {
                 자외선
               </button>
             </div>
-            {guideText && (
-              <div className="mt-3 px-1 text-[12px] font-bold text-text-sub leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]">
-                {guideText}
+            {guideElement && (
+              <div className="mt-3 px-1 text-[12px] font-medium text-text-sub leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]">
+                {guideElement}
               </div>
             )}
           </div>
