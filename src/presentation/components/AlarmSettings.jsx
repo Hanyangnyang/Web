@@ -36,6 +36,10 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   const hourTimer = useRef(null);
   const ampmTimer = useRef(null);
   const dayTimer  = useRef(null);
+  
+  const hourWheelCooldown = useRef(false);
+  const ampmWheelCooldown = useRef(false);
+  const dayWheelCooldown = useRef(false);
 
   // 최초 마운트 시 스크롤 위치 초기화
   useLayoutEffect(() => {
@@ -98,32 +102,90 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     dayTimer.current = setTimeout(commitDay, 150);
   };
 
-  // --- 마우스 휠 핸들러 ---
+  // --- 마우스 휠 핸들러 (500ms 쿨다운 쓰로틀링 + 미세 입력 필터링 적용으로 완벽한 쫀득 스냅 조작 구현) ---
   const handleHourWheel = (e) => {
     e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (hourWheelCooldown.current) return;
+    hourWheelCooldown.current = true;
+    setTimeout(() => { hourWheelCooldown.current = false; }, 500);
+
     const el = hourRef.current;
-    if (!el) return;
-    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 11));
-    el.scrollTop = next * ITEM_H;
-    setLiveHour(next);
+    const ampmEl = ampmRef.current;
+    if (!el || !ampmEl) return;
+
+    const cur = Math.round(el.scrollTop / ITEM_H);
+    const dir = e.deltaY > 0 ? 1 : -1;
+    let next = cur + dir;
+    
+    const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
+
+    if (next > 11) {
+      if (curAmpm === 0) {
+        // 오전 11시 -> 오후 12시(0시)로 순환 가능! (정오 경계 스위칭)
+        next = 0;
+        el.scrollTop = 0;
+        setLiveHour(0);
+        
+        ampmEl.scrollTop = 1 * ITEM_H;
+        setLiveAmpm(1);
+        
+        const newH24 = toH24(0, 1);
+        onChange(`${String(newH24).padStart(2, '0')}:00`);
+      } else {
+        // 오후 11시 -> 오전 00시로 순환하지 못하도록 차단!
+      }
+    } else if (next < 0) {
+      if (curAmpm === 1) {
+        // 오후 12시(0시) -> 오전 11시로 순환 가능! (정오 경계 스위칭)
+        next = 11;
+        el.scrollTop = 11 * ITEM_H;
+        setLiveHour(11);
+        
+        ampmEl.scrollTop = 0;
+        setLiveAmpm(0);
+        
+        const newH24 = toH24(11, 0);
+        onChange(`${String(newH24).padStart(2, '0')}:00`);
+      } else {
+        // 오전 00시(0시) -> 오후 11시로 순환하지 못하도록 차단!
+      }
+    } else {
+      // 일반적인 휠 이동
+      el.scrollTop = next * ITEM_H;
+      setLiveHour(next);
+      commitTime();
+    }
   };
 
   const handleAmpmWheel = (e) => {
     e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (ampmWheelCooldown.current) return;
+    ampmWheelCooldown.current = true;
+    setTimeout(() => { ampmWheelCooldown.current = false; }, 500);
+
     const el = ampmRef.current;
     if (!el) return;
     const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
     el.scrollTop = next * ITEM_H;
     setLiveAmpm(next);
+    commitTime();
   };
 
   const handleDayWheel = (e) => {
     e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (dayWheelCooldown.current) return;
+    dayWheelCooldown.current = true;
+    setTimeout(() => { dayWheelCooldown.current = false; }, 500);
+
     const el = dayRef.current;
     if (!el) return;
     const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
     el.scrollTop = next * ITEM_H;
     setLiveDay(next);
+    commitDay();
   };
 
   const itemStyle = (active) => ({
@@ -220,6 +282,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={dayRef}
         onScroll={handleDayScroll}
+        onWheel={handleDayWheel}
         {...handleDragScroll(dayRef, setLiveDay)}
         className="alarm-picker-scroll"
         style={colStyle(64)}
@@ -235,6 +298,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={ampmRef}
         onScroll={handleAmpmScroll}
+        onWheel={handleAmpmWheel}
         {...handleDragScroll(ampmRef, setLiveAmpm)}
         className="alarm-picker-scroll"
         style={colStyle(56)}
@@ -250,14 +314,20 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={hourRef}
         onScroll={handleHourScroll}
+        onWheel={handleHourWheel}
         {...handleDragScroll(hourRef, setLiveHour)}
         className="alarm-picker-scroll"
         style={colStyle(44)}
       >
         <div style={{ height: ITEM_H }} />
-        {HOUR_LIST.map((h, idx) => (
-          <div key={h} style={itemStyle(idx === liveHour)}>{h}</div>
-        ))}
+        {HOUR_LIST.map((h, idx) => {
+          const displayVal = h === 0 ? (liveAmpm === 0 ? "00" : 12) : h;
+          return (
+            <div key={h} style={itemStyle(idx === liveHour)}>
+              {displayVal}
+            </div>
+          );
+        })}
         <div style={{ height: ITEM_H }} />
       </div>
 
@@ -471,7 +541,7 @@ export function AlarmSettings({ onClose }) {
       localStorage.setItem('alarm_settings', JSON.stringify(settings));
 
       if (settings.jeyukAlert && settings.keywords.length > 0) {
-        successMsg = '설정한 시간에 맞춰\n알림을 보내드릴게요!';
+        successMsg = '설정한 시간에 맞춰\n식단 알림을 보내드릴게요';
 
         (async () => {
           try {
@@ -597,21 +667,38 @@ export function AlarmSettings({ onClose }) {
             )}
           </div>
 
-          <div className="py-2">
-            <div className="text-[14px] font-extrabold text-text-main mb-1.5">언제 알림을 보낼까요?</div>
-            <TimePicker
-              value={settings.notifyTime}
-              onChange={async (t) => {
-                const ok = await ensureJeyukAlertOn();
-                if (ok) setSettings(p => ({ ...p, notifyTime: t }));
-              }}
-              day={settings.notifyDay}
-              onDayChange={async (d) => {
-                const ok = await ensureJeyukAlertOn();
-                if (ok) setSettings(p => ({ ...p, notifyDay: d }));
-              }}
-            />
-          </div>
+          {/* 3단계: 시간 설정 (키워드가 1개 이상일 때 활성화 - 부드럽게 Slide Up & Fade In) */}
+          {(() => {
+            const isTimePickerActive = settings.keywords.length > 0;
+            return (
+              <div style={{
+                opacity: isTimePickerActive ? 1 : 0,
+                transform: isTimePickerActive ? 'translateY(0)' : 'translateY(24px)',
+                maxHeight: isTimePickerActive ? '200px' : '0px',
+                marginTop: isTimePickerActive ? '20px' : '0px',
+                paddingTop: isTimePickerActive ? '4px' : '0px',
+                pointerEvents: isTimePickerActive ? 'auto' : 'none',
+                overflow: 'hidden',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}>
+                <div className="py-1">
+                  <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 보낼까요?</div>
+                  <TimePicker
+                    value={settings.notifyTime}
+                    onChange={async (t) => {
+                      const ok = await ensureJeyukAlertOn();
+                      if (ok) setSettings(p => ({ ...p, notifyTime: t }));
+                    }}
+                    day={settings.notifyDay}
+                    onDayChange={async (d) => {
+                      const ok = await ensureJeyukAlertOn();
+                      if (ok) setSettings(p => ({ ...p, notifyDay: d }));
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>

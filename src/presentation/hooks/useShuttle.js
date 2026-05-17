@@ -4,9 +4,27 @@ import { computeSchedule, computeFullSchedule, curMin, dayType } from '../../dom
 import { getShuttleDataUseCase, getSubwayArrivalsUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 
+const STATION_COORDS = {
+  '기숙사': { lat: 37.293338, lon: 126.836230 },
+  '셔틀콕': { lat: 37.298737, lon: 126.837870 },
+  '한대앞': { lat: 37.309650, lon: 126.852108 },
+};
+
+const getDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // 지구 반지름 (km)
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // km 단위
+};
+
 export function useShuttle() {
   const { appConfig } = useBoot();
-  const [stop,   setStopState]  = useState(() => localStorage.getItem('shuttle_stop')   || '기숙사');
+  const [stop,   setStopState]  = useState(() => localStorage.getItem('shuttle_stop') || '한대앞');
   const [lineId, setLineIdState] = useState(() => localStorage.getItem('shuttle_lineId') || 'line4-bulam');
   const [allData,         setAllData]         = useState(null);
   const [subwayArrivals,  setSubwayArrivals]  = useState([]);
@@ -25,6 +43,45 @@ export function useShuttle() {
       setFullPeriod(appConfig.current_period);
     }
   }, [appConfig.current_period]);
+
+  // 지오로케이션으로 현재 위치 판단하여 셔틀 정류장 자동 선택
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          let closestStop = '한대앞';
+          let minDistance = Infinity;
+          const stopsToCheck = ['기숙사', '셔틀콕', '한대앞'];
+          const distances = {};
+
+          stopsToCheck.forEach(sName => {
+            const coord = STATION_COORDS[sName];
+            const dist = getDistance(latitude, longitude, coord.lat, coord.lon);
+            distances[sName] = dist;
+            if (dist < minDistance) {
+              minDistance = dist;
+              closestStop = sName;
+            }
+          });
+
+          const allOver1km = stopsToCheck.every(sName => distances[sName] >= 1.0);
+
+          if (allOver1km) {
+            setStopState('한대앞');
+          } else {
+            setStopState(closestStop);
+          }
+        },
+        (error) => {
+          // 위치 권한이 꺼져 있거나 오류가 난 경우에는 localStorage의 이전 저장값을 그대로 유지하기 위해 덮어쓰지 않습니다.
+          console.warn('Geolocation failed or permission denied. Retaining localStorage stop.', error);
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+  }, []);
 
   const setStop = (s) => { 
     setStopState(s); 

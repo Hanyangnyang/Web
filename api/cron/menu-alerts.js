@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
     const currentHourStr = nowKST.getHours().toString().padStart(2, '0'); // e.g. "08"
 
-    // 2. Fetch active subscriptions with related device tokens
+    // 2. Fetch active subscriptions with related device tokens (Menu & Weather)
     const { data: subscriptions, error: subError } = await supabase
       .from('subscriptions')
       .select('*, devices(fcm_token)')
@@ -55,99 +55,173 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'No subscriptions for this hour' });
     }
 
-    // 3. Prepare notifications
-    const messages = [];
-    const sentTokens = new Set(); // 중복 발송 방지용
-
-    // Group subscriptions by target date
-    const todaySubs = matchingSubscriptions.filter(sub => (sub.params?.notifyDay || '당일') === '당일');
-    const tomorrowSubs = matchingSubscriptions.filter(sub => sub.params?.notifyDay === '전날');
-
     const host = req.headers.host || 'hanyang.life';
     const protocol = host.includes('localhost') ? 'http' : 'https';
 
-    // Helper to process a group of subscriptions with a specific menu
-    const processGroup = (subs, menuData) => {
-      subs.forEach(sub => {
-        const keywords = sub.params?.keywords || [];
-        const token = sub.devices?.fcm_token;
+    const messages = [];
+    const sentTokens = new Set(); // 중복 발송 방지용
 
-        if (!keywords.length || !token || sentTokens.has(token)) return;
+    // --- A. 식단 알림(CAFETERIA_KEYWORD) 분할 및 처리 ---
+    const menuSubs = matchingSubscriptions.filter(sub => sub.topic === 'CAFETERIA_KEYWORD');
+    if (menuSubs.length > 0) {
+      const todaySubs = menuSubs.filter(sub => (sub.params?.notifyDay || '당일') === '당일');
+      const tomorrowSubs = menuSubs.filter(sub => sub.params?.notifyDay === '전날');
 
-        let foundKeywords = [];
-        const matchedCafes = [];
-        let targetCafeId = '';
-        let targetMealType = '';
+      const processGroup = (subs, menuData) => {
+        subs.forEach(sub => {
+          const keywords = sub.params?.keywords || [];
+          const token = sub.devices?.fcm_token;
 
-        for (const cafe of menuData.data) {
-          if (!cafe.available) continue;
-          let cafeMatched = false;
-          for (const menuItem of cafe.menus) {
-            if (keywords.some(kw => menuItem.menu.includes(kw))) {
-              const matchedInThisItem = keywords.filter(kw => menuItem.menu.includes(kw));
-              matchedInThisItem.forEach(kw => {
-                if (!foundKeywords.includes(kw)) foundKeywords.push(kw);
-              });
+          if (!keywords.length || !token || sentTokens.has(token)) return;
 
-              if (!targetCafeId) {
-                targetCafeId = cafe.id;
-                targetMealType = menuItem.type;
+          let foundKeywords = [];
+          const matchedCafes = [];
+          let targetCafeId = '';
+          let targetMealType = '';
+
+          for (const cafe of menuData.data) {
+            if (!cafe.available) continue;
+            let cafeMatched = false;
+            for (const menuItem of cafe.menus) {
+              if (keywords.some(kw => menuItem.menu.includes(kw))) {
+                const matchedInThisItem = keywords.filter(kw => menuItem.menu.includes(kw));
+                matchedInThisItem.forEach(kw => {
+                  if (!foundKeywords.includes(kw)) foundKeywords.push(kw);
+                });
+
+                if (!targetCafeId) {
+                  targetCafeId = cafe.id;
+                  targetMealType = menuItem.type;
+                }
+                cafeMatched = true;
               }
-              cafeMatched = true;
             }
-          }
-          if (cafeMatched) matchedCafes.push(cafe.name);
-        }
-
-        if (foundKeywords.length > 0) {
-          const dateParam = menuData.date.replace(/\//g, '-');
-          const deepLink = `https://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}&type=${encodeURIComponent(targetMealType)}`;
-          const cafeInfo = matchedCafes.length > 1
-            ? `${matchedCafes[0]} 등 ${matchedCafes.length}곳`
-            : matchedCafes[0];
-
-          const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
-
-          messages.push({
-            token: token,
-            data: {
-              title: isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!',
-              body: `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`,
-              link: deepLink
-            }
-          });
-
-          // update body if it's today
-          if (!isTomorrow) {
-            messages[messages.length - 1].data.body = `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
+            if (cafeMatched) matchedCafes.push(cafe.name);
           }
 
-          sentTokens.add(token);
-        }
-      });
-    };
+          if (foundKeywords.length > 0) {
+            const dateParam = menuData.date.replace(/\//g, '-');
+            const deepLink = `${protocol}://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}&type=${encodeURIComponent(targetMealType)}`;
+            const cafeInfo = matchedCafes.length > 1
+              ? `${matchedCafes[0]} 등 ${matchedCafes.length}곳`
+              : matchedCafes[0];
 
-    // Process Today's Subscriptions
-    if (todaySubs.length > 0) {
-      const menuRes = await fetch(`${protocol}://${host}/api/menu`);
-      const menuData = await menuRes.json();
-      if (menuData.success) processGroup(todaySubs, menuData);
+            const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
+
+            const bodyText = isTomorrow 
+              ? `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`
+              : `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
+
+            messages.push({
+              token: token,
+              data: {
+                title: isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!',
+                body: bodyText,
+                link: deepLink
+              }
+            });
+            sentTokens.add(token);
+          }
+        });
+      };
+
+      // Process Today's Subscriptions
+      if (todaySubs.length > 0) {
+        const menuRes = await fetch(`${protocol}://${host}/api/menu`);
+        const menuData = await menuRes.json();
+        if (menuData.success) processGroup(todaySubs, menuData);
+      }
+
+      // Process Tomorrow's Subscriptions
+      if (tomorrowSubs.length > 0) {
+        const tomorrow = new Date(nowKST.getTime() + 24 * 60 * 60 * 1000);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${tomorrowStr}`);
+        const menuData = await menuRes.json();
+        if (menuData.success) processGroup(tomorrowSubs, menuData);
+      }
     }
 
-    // Process Tomorrow's Subscriptions
-    if (tomorrowSubs.length > 0) {
-      const tomorrow = new Date(nowKST.getTime() + 24 * 60 * 60 * 1000);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0];
-      const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${tomorrowStr}`);
-      const menuData = await menuRes.json();
-      if (menuData.success) processGroup(tomorrowSubs, menuData);
-    }
+    // --- B. 날씨 알림(WEATHER_ALERT) 처리 ---
+    const weatherSubs = matchingSubscriptions.filter(sub => sub.topic === 'WEATHER_ALERT');
+    if (weatherSubs.length > 0) {
+      // 1. 날씨 데이터를 한 번 기상 API 프록시에서 긁어오기
+      const weatherRes = await fetch(`${protocol}://${host}/api/portal?type=weather`);
+      if (weatherRes.ok) {
+        const weatherData = await weatherRes.json();
+        
+        // 날씨 파라미터 판단 가드 설정
+        const hasRainOrSnow = weatherData.hasPrecipitation || (weatherData.hourlyForecast || []).some(h => {
+          // 낮 시간대(8시 ~ 18시) 강수 확률 30% 이상이거나 비/눈 상태코드 검출
+          return h.hour >= 8 && h.hour <= 18 && (h.precipProb >= 30 || h.weatherCode >= 51);
+        });
 
-    if (messages.length === 0) {
-      return res.status(200).json({ success: true, message: 'No matching keywords found' });
+        const isDustBad = weatherData.airQuality?.pm10?.label === '나쁨' || 
+                          weatherData.airQuality?.pm10?.label === '매우나쁨' ||
+                          weatherData.airQuality?.pm25?.label === '나쁨' || 
+                          weatherData.airQuality?.pm25?.label === '매우나쁨';
+
+        const isUvHigh = weatherData.airQuality?.uv?.label === '높음' || 
+                         weatherData.airQuality?.uv?.label === '매우높음';
+
+        weatherSubs.forEach(sub => {
+          const token = sub.devices?.fcm_token;
+          if (!token || sentTokens.has(token)) return;
+
+          const cond = sub.params || {};
+          let shouldNotify = false;
+          let title = '🌦️ 오늘 한양대 캠퍼스 날씨';
+          let body = '';
+
+          // 1순위: 기상 악화 경보 (비/눈, 미세먼지, 자외선)
+          if (cond.rainSnow && hasRainOrSnow) {
+            shouldNotify = true;
+            title = '☔ 캠퍼스에 비/눈 소식이 있어요!';
+            body = '오늘 한양대 캠퍼스에 비나 눈 예보가 있습니다. 외출 시 꼭 우산을 챙기세요!';
+          } else if (cond.dust && isDustBad) {
+            shouldNotify = true;
+            title = '😷 미세먼지가 나쁜 날입니다!';
+            body = `오늘 캠퍼스 미세먼지가 ${weatherData.airQuality?.pm10?.label || '나쁨'} 단계입니다. 마스크를 잊지 마세요!`;
+          } else if (cond.uv && isUvHigh) {
+            shouldNotify = true;
+            title = '☀️ 자외선 지수가 높은 날입니다!';
+            body = '오늘 캠퍼스 자외선 강도가 높습니다. 외출 시 자외선 차단제와 선글라스를 챙기세요!';
+          } else if (cond.daily) {
+            // 2순위: 매일 브리핑 신청자
+            shouldNotify = true;
+            title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
+            
+            // 최고/최저 기온 추출
+            const temps = (weatherData.hourlyForecast || []).map(h => h.temp);
+            const maxTemp = temps.length > 0 ? Math.max(...temps) : weatherData.temp;
+            const minTemp = temps.length > 0 ? Math.min(...temps) : weatherData.temp;
+
+            // Gemini 코멘트가 제공되었다면 붙이고, 없으면 기본 날씨 묘사 사용
+            const comment = weatherData.message || `${weatherData.description} 상태입니다.`;
+            body = `오늘 한양대 최고 ${maxTemp}°C / 최저 ${minTemp}°C 이며, ${comment}`;
+          }
+
+          if (shouldNotify && body) {
+            const deepLink = `${protocol}://${host}/?tab=weather`;
+            messages.push({
+              token: token,
+              data: {
+                title: title,
+                body: body,
+                link: deepLink
+              }
+            });
+            sentTokens.add(token);
+          }
+        });
+      }
     }
 
     // 4. Send Firebase Push Notifications in batches (max 500 per batch)
+    if (messages.length === 0) {
+      return res.status(200).json({ success: true, message: 'No notifications triggered' });
+    }
+
     const BATCH_SIZE = 500;
     let successCount = 0;
     let failureCount = 0;

@@ -44,6 +44,10 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   const hourTimer = useRef(null);
   const ampmTimer = useRef(null);
   const dayTimer  = useRef(null);
+  
+  const hourWheelCooldown = useRef(false);
+  const ampmWheelCooldown = useRef(false);
+  const dayWheelCooldown = useRef(false);
 
   useLayoutEffect(() => {
     if (hourRef.current) hourRef.current.scrollTop = initHour * ITEM_H;
@@ -100,6 +104,92 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     setLiveDay(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 1)));
     clearTimeout(dayTimer.current);
     dayTimer.current = setTimeout(commitDay, 150);
+  };
+
+  // --- 마우스 휠 핸들러 (500ms 쿨다운 쓰로틀링 + 미세 입력 필터링 적용으로 완벽한 쫀득 스냅 조작 구현) ---
+  const handleHourWheel = (e) => {
+    e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (hourWheelCooldown.current) return;
+    hourWheelCooldown.current = true;
+    setTimeout(() => { hourWheelCooldown.current = false; }, 500);
+
+    const el = hourRef.current;
+    const ampmEl = ampmRef.current;
+    if (!el || !ampmEl) return;
+
+    const cur = Math.round(el.scrollTop / ITEM_H);
+    const dir = e.deltaY > 0 ? 1 : -1;
+    let next = cur + dir;
+    
+    const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
+
+    if (next > 11) {
+      if (curAmpm === 0) {
+        // 오전 11시 -> 오후 12시(0시)로 순환 가능! (정오 경계 스위칭)
+        next = 0;
+        el.scrollTop = 0;
+        setLiveHour(0);
+        
+        ampmEl.scrollTop = 1 * ITEM_H;
+        setLiveAmpm(1);
+        
+        const newH24 = toH24(0, 1);
+        onChange(`${String(newH24).padStart(2, '0')}:00`);
+      } else {
+        // 오후 11시 -> 오전 00시로 순환하지 못하도록 차단!
+      }
+    } else if (next < 0) {
+      if (curAmpm === 1) {
+        // 오후 12시(0시) -> 오전 11시로 순환 가능! (정오 경계 스위칭)
+        next = 11;
+        el.scrollTop = 11 * ITEM_H;
+        setLiveHour(11);
+        
+        ampmEl.scrollTop = 0;
+        setLiveAmpm(0);
+        
+        const newH24 = toH24(11, 0);
+        onChange(`${String(newH24).padStart(2, '0')}:00`);
+      } else {
+        // 오전 00시(0시) -> 오후 11시로 순환하지 못하도록 차단!
+      }
+    } else {
+      // 일반적인 휠 이동
+      el.scrollTop = next * ITEM_H;
+      setLiveHour(next);
+      commitTime();
+    }
+  };
+
+  const handleAmpmWheel = (e) => {
+    e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (ampmWheelCooldown.current) return;
+    ampmWheelCooldown.current = true;
+    setTimeout(() => { ampmWheelCooldown.current = false; }, 500);
+
+    const el = ampmRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
+    el.scrollTop = next * ITEM_H;
+    setLiveAmpm(next);
+    commitTime();
+  };
+
+  const handleDayWheel = (e) => {
+    e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (dayWheelCooldown.current) return;
+    dayWheelCooldown.current = true;
+    setTimeout(() => { dayWheelCooldown.current = false; }, 500);
+
+    const el = dayRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 1));
+    el.scrollTop = next * ITEM_H;
+    setLiveDay(next);
+    commitDay();
   };
 
   const itemStyle = (active) => ({
@@ -193,6 +283,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={dayRef}
         onScroll={handleDayScroll}
+        onWheel={handleDayWheel}
         {...handleDragScroll(dayRef)}
         className="alarm-picker-scroll"
         style={colStyle(64)}
@@ -207,6 +298,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={ampmRef}
         onScroll={handleAmpmScroll}
+        onWheel={handleAmpmWheel}
         {...handleDragScroll(ampmRef)}
         className="alarm-picker-scroll"
         style={colStyle(56)}
@@ -221,14 +313,20 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       <div
         ref={hourRef}
         onScroll={handleHourScroll}
+        onWheel={handleHourWheel}
         {...handleDragScroll(hourRef)}
         className="alarm-picker-scroll"
         style={colStyle(44)}
       >
         <div style={{ height: ITEM_H }} />
-        {HOUR_LIST.map((h, idx) => (
-          <div key={h} style={itemStyle(idx === liveHour)}>{h}</div>
-        ))}
+        {HOUR_LIST.map((h, idx) => {
+          const displayVal = h === 0 ? (liveAmpm === 0 ? "00" : 12) : h;
+          return (
+            <div key={h} style={itemStyle(idx === liveHour)}>
+              {displayVal}
+            </div>
+          );
+        })}
         <div style={{ height: ITEM_H }} />
       </div>
 
@@ -458,7 +556,7 @@ export function WeatherAlarmSettings({ onClose }) {
       if (settings.weatherAlert) {
         // 동적 완성형 팝업 완료 메시지 조립
         if (settings.conditions.daily) {
-          successMsg = '매일 설정하신 시간에 맞춰\n정갈한 날씨 브리핑을 보내드릴게요.';
+          successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
         } else {
           const activeKeywords = [];
           if (settings.conditions.rainSnow) activeKeywords.push('비/눈 소식');
@@ -476,9 +574,9 @@ export function WeatherAlarmSettings({ onClose }) {
               joined = activeKeywords[0];
             }
             const josaJoined = josa(joined, '이/가');
-            successMsg = `설정하신 시간에 캠퍼스에\n${josaJoined} 있을 때 알림을 보내드릴게요.`;
+            successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           } else {
-            successMsg = '설정하신 시간에 맞춰\n날씨 알림을 보내드릴게요.';
+            successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           }
         }
 

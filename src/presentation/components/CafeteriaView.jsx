@@ -250,11 +250,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
         </div>
       )}
       {alarmPopup && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', pointerEvents: 'none' }}>
-          <div style={{ background: 'white', borderRadius: 16, padding: '20px 24px', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 240, margin: '0 24px' }}>
-            <div style={{ fontSize: 22, marginBottom: 8 }}>🔔</div>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{alarmPopup}</p>
-          </div>
+        <div className="fixed bottom-[calc(20px+64px+60px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[1000] whitespace-pre-line text-center copy-toast">
+          {alarmPopup}
         </div>
       )}
 
