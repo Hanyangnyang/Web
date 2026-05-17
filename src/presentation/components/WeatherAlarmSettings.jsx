@@ -8,7 +8,6 @@ const VISIBLE = 3;
 const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i);
 const AMPM_LIST = ['오전', '오후'];
 const DAY_LIST = ['전날', '당일'];
-const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
 const parseH24 = (h24) => ({
   displayHour: h24 % 12,
@@ -243,7 +242,6 @@ const loadSettings = () => {
     const defaultVal = {
       weatherAlert: false,
       conditions: { daily: false, rainSnow: false, dust: false, uv: false },
-      selectedDays: ['월', '화', '수', '목', '금', '토', '일'],
       notifyTime: '08:00',
       notifyDay: '당일'
     };
@@ -259,14 +257,12 @@ const loadSettings = () => {
     
     // 조건 칩 기본 값 구조 유지 검증
     parsed.conditions = { ...defaultVal.conditions, ...parsed.conditions };
-    if (!Array.isArray(parsed.selectedDays)) parsed.selectedDays = defaultVal.selectedDays;
     
     return { ...defaultVal, ...parsed };
   } catch {
     return {
       weatherAlert: false,
       conditions: { daily: false, rainSnow: false, dust: false, uv: false },
-      selectedDays: ['월', '화', '수', '목', '금', '토', '일'],
       notifyTime: '08:00',
       notifyDay: '당일'
     };
@@ -277,8 +273,7 @@ const settingsEqual = (a, b) =>
   a.weatherAlert === b.weatherAlert &&
   a.notifyTime === b.notifyTime &&
   a.notifyDay === b.notifyDay &&
-  JSON.stringify(a.conditions) === JSON.stringify(b.conditions) &&
-  JSON.stringify(a.selectedDays) === JSON.stringify(b.selectedDays);
+  JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
 
 export function WeatherAlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
@@ -338,7 +333,6 @@ export function WeatherAlarmSettings({ onClose }) {
           const newSettings = {
             weatherAlert: data.is_active,
             conditions: data.params?.conditions || { daily: false, rainSnow: false, dust: false, uv: false },
-            selectedDays: data.params?.selectedDays || ['월', '화', '수', '목', '금', '토', '일'],
             notifyTime: data.params?.notifyTime || '08:00',
             notifyDay: data.params?.notifyDay || '당일',
           };
@@ -422,7 +416,6 @@ export function WeatherAlarmSettings({ onClose }) {
                 p_topic: 'WEATHER_ALERT',
                 p_params: {
                   conditions: settings.conditions,
-                  selectedDays: settings.selectedDays,
                   notifyTime: settings.notifyTime,
                   notifyDay: settings.notifyDay
                 },
@@ -476,24 +469,7 @@ export function WeatherAlarmSettings({ onClose }) {
     });
   };
 
-  // 요일 토글 처리
-  const handleDayToggle = (day) => {
-    setSettings(prev => {
-      let nextDays = [...prev.selectedDays];
-      if (nextDays.includes(day)) {
-        // 최소 1개는 요일이 선택되어 있어야 하거나, 0개까지 선택 가능
-        nextDays = nextDays.filter(d => d !== day);
-      } else {
-        nextDays.push(day);
-      }
-      // 순서 보장을 위해 정렬
-      const sortedDays = WEEKDAYS.filter(d => nextDays.includes(d));
-      return {
-        ...prev,
-        selectedDays: sortedDays
-      };
-    });
-  };
+
 
   return (
     <div
@@ -599,32 +575,7 @@ export function WeatherAlarmSettings({ onClose }) {
             transition: 'opacity 0.2s',
           }}>
             
-            {/* 요일 선택 */}
-            <div className="mb-5 pt-1">
-              <div className="text-[14px] font-extrabold text-text-main mb-2">알림 요일을 선택해 주세요</div>
-              <div className="flex justify-between gap-1">
-                {WEEKDAYS.map((day) => {
-                  const isSel = settings.selectedDays.includes(day);
-                  const isSun = day === '일';
-                  const isSat = day === '토';
-                  return (
-                    <button
-                      key={day}
-                      className={`w-8 h-8 rounded-full text-xs font-bold transition-all duration-150 flex items-center justify-center border ${
-                        isSel
-                          ? 'bg-primary text-white border-primary'
-                          : `bg-white border-[#e2e8f0] ${
-                              isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-text-sub'
-                            } hover:bg-slate-50`
-                      }`}
-                      onClick={() => handleDayToggle(day)}
-                    >
-                      {day}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+
 
             {/* 시간 선택 */}
             <div className="py-1">
