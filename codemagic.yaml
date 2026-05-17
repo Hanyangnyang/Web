@@ -6,7 +6,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: development
-        bundle_identifier: com.hanyangnyang.app
+        bundle_identifier: com.hanyangnyang.ap
       node: latest
     scripts:
       - name: Install dependencies
@@ -18,6 +18,10 @@ workflows:
           if [ ! -d "ios" ]; then
             npx cap add ios
           fi
+      - name: Capacitor Copy & Update
+        script: |
+          npx cap copy ios
+          npx cap update ios
       - name: Sync Capacitor
         script: npx cap sync ios
       - name: Set up code signing
