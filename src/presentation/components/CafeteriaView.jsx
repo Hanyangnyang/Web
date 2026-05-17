@@ -4,6 +4,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Clock, Bell, Share2 } from 'lucide-react';
 import { getKSTDate } from '../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
+import { ShareSheet } from './ShareSheet.jsx';
 
 function MenuItemLine({ html }) {
   const scrollWrapRef = useRef(null);
@@ -89,6 +90,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
   };
   const [expandedGroups, setExpandedGroups] = useState({});
   const [showAlarm, setShowAlarm] = useState(false);
+  const [shareTarget, setShareTarget] = useState(null);
   const [copiedToast, setCopiedToast] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
   const listRef = useRef(null);
@@ -209,23 +211,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     return acc;
   }, {});
 
-  const handleNativeShare = async (text) => {
-    if (navigator.share) {
-      try { await navigator.share({ text }); } catch {}
-    } else {
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        const el = document.createElement('textarea');
-        el.value = text;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-      }
-      setCopiedToast(true);
-      setTimeout(() => setCopiedToast(false), 2000);
-    }
+  const handleCopied = () => {
+    setCopiedToast(true);
+    setTimeout(() => setCopiedToast(false), 2000);
   };
 
   return (
@@ -244,6 +232,18 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
           setTimeout(() => setAlarmPopup(''), 1500);
         }
       }} />}
+      {shareTarget && (
+        <ShareSheet
+          cafeName={selectedCafe.name}
+          dateText={formatDate(date)}
+          mealType={shareTarget.type}
+          menuText={shareTarget.menu.menu}
+          dateLabel={shareTarget.dateLabel}
+          shareUrl={shareTarget.shareUrl}
+          onClose={() => setShareTarget(null)}
+          onCopied={handleCopied}
+        />
+      )}
       {copiedToast && (
         <div className="copy-toast fixed bottom-[calc(20px+64px+52px)] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.88)] text-white text-[0.78rem] font-semibold px-4 py-2 rounded-full whitespace-nowrap z-[2000] pointer-events-none">
           링크 복사됨!
@@ -379,12 +379,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                       ) : <span />}
                                       <button
                                         className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
-                                        onClick={() => {
-                                          const mealLabel = type.includes('조식') || type.includes('천원') ? '아침' : type.includes('석식') ? '저녁' : '점심';
-                                          const menuLines = m.menu.split('\n').map(l => l.replace(/<[^>]+>/g, '').trim()).filter(Boolean);
-                                          const shareText = `${dateLabel} ${selectedCafe.name} ${mealLabel}\n\n${menuLines.join('\n')}\n\n${shareUrl}`;
-                                          handleNativeShare(shareText);
-                                        }}
+                                        onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
                                         aria-label="메뉴 공유"
                                       >
                                         <Share2 size={14} />
