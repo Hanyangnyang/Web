@@ -93,6 +93,26 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 
 export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData();
+  const scrollContainerRef = useRef(null);
+  
+  // 현재 시각 계산 (가상 날씨 모킹 상태가 아니면 실제 시간 반환)
+  const nowHour = useMemo(() => new Date().getHours(), [weather]);
+
+  // 날씨 탭에 진입하거나 날씨 데이터가 로드될 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
+  useEffect(() => {
+    if (isVisible && scrollContainerRef.current && weather?.hourlyForecast) {
+      const timer = setTimeout(() => {
+        const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
+        if (activeEl) {
+          scrollContainerRef.current.scrollTo({
+            left: activeEl.offsetLeft - 16,
+            behavior: 'smooth'
+          });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [weather, isVisible]);
 
   const fallback = useMemo(() => {
     const today = new Date();
@@ -235,26 +255,38 @@ export function PortalView({ isVisible = true }) {
           )}
         </div>
 
-        {/* 시간별 예보 스트립 */}
+        {/* 시간별 예보 스트립 (0시부터 23시까지 전체 소급 스크롤 지원) */}
         {weather?.hourlyForecast?.length > 0 && (
-          <div className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto">
+          <div 
+            ref={scrollContainerRef}
+            className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto"
+          >
             <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
-              {weather.hourlyForecast.map((h, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center gap-1.5 px-3.5"
-                  style={{ minWidth: '52px' }}
-                >
-                  <span className="text-[11px] font-bold text-text-sub">
-                    {idx === 0 ? '지금' : `${h.hour}시`}
-                  </span>
-                  <span className="text-[22px] leading-none">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
-                  <span className="text-[13px] font-black text-text-main">{h.temp}°</span>
-                  {h.precipProb > 20 && (
-                    <span className="text-[10px] font-bold text-blue-500">{h.precipProb}%</span>
-                  )}
-                </div>
-              ))}
+              {weather.hourlyForecast.map((h, idx) => {
+                const isCurrent = h.hour === nowHour;
+                const isPast = h.hour < nowHour;
+                return (
+                  <div
+                    key={idx}
+                    data-current={isCurrent}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 ${
+                      isCurrent 
+                        ? 'bg-blue-50/80 border border-blue-100/60 shadow-[0_1px_3px_rgba(37,99,235,0.06)]' 
+                        : 'border border-transparent'
+                    } ${isPast ? 'opacity-55' : 'opacity-100'}`}
+                    style={{ minWidth: '54px' }}
+                  >
+                    <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600 font-extrabold' : 'text-text-sub'}`}>
+                      {isCurrent ? '지금' : `${h.hour}시`}
+                    </span>
+                    <span className="text-[22px] leading-none my-0.5">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
+                    <span className={`text-[13px] font-black ${isCurrent ? 'text-blue-700' : 'text-text-main'}`}>{h.temp}°</span>
+                    {h.precipProb > 20 && (
+                      <span className={`text-[10px] font-bold ${isCurrent ? 'text-blue-600' : 'text-blue-400'}`}>{h.precipProb}%</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

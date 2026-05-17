@@ -70,15 +70,14 @@ async function handleWeather(req, res) {
       }
     };
 
-    // 오늘의 시간별 예보 (현재 시각 기준 이후 데이터)
+    // 오늘의 시간별 예보 (0시부터 23시까지 전체 제공)
     const hourly = weatherData.hourly;
-    const nowHour = new Date().getHours();
     const hourlyForecast = hourly.time.map((time, i) => ({
       hour: new Date(time).getHours(),
       temp: Math.round(hourly.temperature_2m[i]),
       weatherCode: hourly.weather_code[i],
       precipProb: hourly.precipitation_probability[i]
-    })).filter(h => h.hour >= nowHour);
+    }));
 
     // 오늘 전체 기온 범위 계산
     const allTemps = hourly.temperature_2m;
