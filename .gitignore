@@ -33,3 +33,11 @@ api/cache
 *.p12
 *.mobileprovision
 
+# Android signing keys
+*.jks
+*.keystore
+
+# Android Firebase config (contains API keys)
+google-services.json
+android/app/google-services.json
+
