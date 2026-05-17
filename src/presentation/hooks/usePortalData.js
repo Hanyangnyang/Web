@@ -99,6 +99,8 @@ export function usePortalData() {
       if (forecast.length === 0) return true;
       const firstEpoch = forecast[0].epoch;
       const lastEpoch = forecast[forecast.length - 1].epoch;
+      // epoch 필드가 없는 구형 캐시 → 무조건 stale 처리
+      if (!firstEpoch || !lastEpoch) return true;
       const nowEpoch = Date.now();
       return nowEpoch < firstEpoch || nowEpoch > lastEpoch;
     };
@@ -138,9 +140,14 @@ export function usePortalData() {
       if (forecast.length > 0) {
         const firstEpoch = forecast[0].epoch;
         const lastEpoch = forecast[forecast.length - 1].epoch;
-        const nowEpoch = Date.now();
-        if (nowEpoch < firstEpoch || nowEpoch > lastEpoch) {
+        // epoch 필드가 없는 구형 캐시 → stale 처리
+        if (!firstEpoch || !lastEpoch) {
           isStaleTimeline = true;
+        } else {
+          const nowEpoch = Date.now();
+          if (nowEpoch < firstEpoch || nowEpoch > lastEpoch) {
+            isStaleTimeline = true;
+          }
         }
       }
     }
