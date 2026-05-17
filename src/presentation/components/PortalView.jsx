@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 
 import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart, Bell } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
-import { UmbrellaAlarmSettings } from './UmbrellaAlarmSettings.jsx';
+import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 
 
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
@@ -75,7 +75,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 
 export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData();
-  const [showUmbrellaAlarm, setShowUmbrellaAlarm] = useState(false);
+  const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
   const scrollContainerRef = useRef(null);
   
@@ -160,14 +160,14 @@ export function PortalView({ isVisible = true }) {
     <>
       <button
         className="fixed bottom-[calc(20px+64px+12px)] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
-        onClick={() => setShowUmbrellaAlarm(true)}
+        onClick={() => setShowWeatherAlarm(true)}
       >
         <Bell size={18} />
-        우산 알림 받기
+        날씨 알림 받기
       </button>
-      {showUmbrellaAlarm && (
-        <UmbrellaAlarmSettings onClose={(msg) => {
-          setShowUmbrellaAlarm(false);
+      {showWeatherAlarm && (
+        <WeatherAlarmSettings onClose={(msg) => {
+          setShowWeatherAlarm(false);
           if (msg) {
             setAlarmPopup(msg);
             setTimeout(() => setAlarmPopup(''), 1500);
