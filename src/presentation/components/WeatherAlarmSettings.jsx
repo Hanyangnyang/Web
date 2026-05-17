@@ -298,7 +298,7 @@ export function WeatherAlarmSettings({ onClose }) {
     if (settings.conditions.daily) {
       return (
         <span>
-          <span className="text-[#6366f1] font-extrabold">매일</span> 알림으로 날씨를 알려드릴게요.
+          <span className="font-extrabold">매일</span> 알림으로 날씨를 알려드릴게요.
         </span>
       );
     }
@@ -313,11 +313,11 @@ export function WeatherAlarmSettings({ onClose }) {
         <span>
           {activeConditions.map((cond, idx) => (
             <span key={cond}>
-              {idx > 0 && <span className="text-text-sub">, </span>}
-              <span className="text-[#6366f1] font-extrabold">{cond}</span>
+              {idx > 0 && <span>, </span>}
+              <span className="font-extrabold">{cond}</span>
             </span>
           ))}
-          <span className="text-text-sub">에 알림을 보내드릴게요</span>
+          <span>에 알림을 보내드릴게요</span>
         </span>
       );
     }
