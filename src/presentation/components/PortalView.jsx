@@ -21,34 +21,22 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
     return hasAnimatedThisSession ? text : '';
   });
   const [waiting, setWaiting] = useState(false); // delay 구간 (커서 깜빡임)
-  const started = useRef(hasAnimatedThisSession);
-  const prevTextRef = useRef(text);
 
   useEffect(() => {
     // 1. 이미 이번 세션에 애니메이션이 완료되었다면 즉시 전문 노출 및 생략
     if (hasAnimatedThisSession) {
       setDisplayed(text);
       setWaiting(false);
-      started.current = true;
       return;
     }
 
-    // 2. 탭이 숨겨지면 플래그 리셋 → 다음 진입 시 다시 애니메이션
-    if (!isVisible) {
-      started.current = false;
+    // 2. 탭이 숨겨지거나 텍스트가 아직 없는 경우 플래그 리셋 및 대기
+    if (!isVisible || !text) {
       setWaiting(false);
       return;
     }
 
-    // 3. 만약 텍스트가 변경되었다면 시작 플래그를 리셋하여 새 텍스트를 타이핑할 수 있게 처리 (무한 깜빡임 방지)
-    if (prevTextRef.current !== text) {
-      started.current = false;
-      prevTextRef.current = text;
-    }
-
-    if (!text || started.current) return;
-
-    started.current = true;
+    // 3. 타이핑 진행 시작
     setDisplayed('');
     setWaiting(true); // 커서 깜빡임 시작
 
@@ -236,7 +224,7 @@ export function PortalView({ isVisible = true }) {
                     안산시 상록구 사동
                   </p>
                   
-                  <div className="mt-5 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-[90%] border border-white/10">
+                  <div className="mt-5 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
                     <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
                     <span className="break-all flex-1">
                       <TypewriterText text={weather.message} isVisible={isVisible} />
@@ -319,9 +307,9 @@ export function PortalView({ isVisible = true }) {
         )}
       </section>
 
-      {/* 2. 도서관 혼잡도 섹션 */}
+      {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
-        <h3 className="text-xl font-bold text-text-main mb-4">도서관 혼잡도</h3>
+        <h3 className="text-xl font-bold text-text-main mb-4">열람실 혼잡도</h3>
         <div className="grid grid-cols-2 gap-4">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
@@ -334,40 +322,42 @@ export function PortalView({ isVisible = true }) {
               </div>
             ))
           ) : library?.list ? (
-            library.list.map((room) => (
-              <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-black text-[0.95rem] text-text-main truncate leading-tight min-w-0 flex-1">
-                    {room.name.replace(' (2F)', '').replace(' (4F)', '')}
-                  </span>
-                  <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-black flex-shrink-0 shadow-sm" style={{ 
-                    backgroundColor: `${room.color}15`,
-                    color: room.color,
-                    border: `1px solid ${room.color}20`
-                  }}>
-                    {room.emoji} {room.status}
-
+            library.list.map((room) => {
+              const emptySeats = Math.max(0, room.total - room.occupied);
+              return (
+                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-black text-[0.95rem] text-text-main truncate leading-tight min-w-0 flex-1">
+                      {room.name.replace(' (2F)', '').replace(' (4F)', '')}
+                    </span>
+                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-black flex-shrink-0 shadow-sm" style={{ 
+                      backgroundColor: `${room.color}15`,
+                      color: room.color,
+                      border: `1px solid ${room.color}20`
+                    }}>
+                      {room.emoji} {room.status}
+                    </div>
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ 
+                        width: `${room.ratio * 100}%`, 
+                        backgroundColor: room.color
+                      }} />
+                    </div>
+                    <div className="flex justify-between items-center mt-2.5">
+                      <span className="text-[11px] text-text-sub font-bold">
+                        {room.occupied} / {room.total}
+                      </span>
+                      <span className="text-[12px] text-text-main font-black">
+                        {emptySeats}석 남음
+                      </span>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="mt-auto">
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                    <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ 
-                      width: `${room.ratio * 100}%`, 
-                      backgroundColor: room.color
-                    }} />
-                  </div>
-                  <div className="flex justify-between items-center mt-2.5">
-                    <span className="text-[11px] text-text-sub font-bold">
-                      {room.occupied} / {room.total}
-                    </span>
-                    <span className="text-[12px] text-text-main font-black">
-                      {Math.round(room.ratio * 100)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="col-span-2 bg-white rounded-card border border-[#e2e8f0] py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
               <Info size={20} className="text-text-hint" />
