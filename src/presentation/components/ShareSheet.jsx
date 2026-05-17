@@ -55,24 +55,27 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   };
 
   const handleShare = async () => {
-    const baseUrl = window.location.origin;
     if (navigator.share) {
       try {
-        await navigator.share({ title: kakaoTitle, url: baseUrl });
+        await navigator.share({
+          title: '하냥냥 - 학식 정보',
+          text: `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`,
+          url: shareUrl,
+        });
         onClose();
       } catch (e) {
         if (e.name !== 'AbortError') {
-          await navigator.clipboard.writeText(baseUrl).catch(() => {});
+          await navigator.clipboard.writeText(shareUrl).catch(() => {});
           onClose();
           onCopied?.();
         }
       }
     } else {
       try {
-        await navigator.clipboard.writeText(baseUrl);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const el = document.createElement('textarea');
-        el.value = baseUrl;
+        el.value = shareUrl;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
