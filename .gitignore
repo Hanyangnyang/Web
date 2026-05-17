@@ -25,3 +25,16 @@ dist-ssr
 .env
 api/cache
 
+# iOS signing credentials (NEVER commit these)
+*.key
+*.cer
+*.pem
+*.certSigningRequest
+*.p12
+*.mobileprovision
+
+# Android signing keys and Firebase config
+*.jks
+*.keystore
+google-services.json
+android/app/google-services.json
