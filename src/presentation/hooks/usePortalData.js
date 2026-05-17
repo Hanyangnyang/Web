@@ -40,20 +40,28 @@ export async function prefetchPortalData() {
       getLibraryData()
     ]);
 
-    if (weatherData || libData) {
+    if (weatherData && libData) {
       const newData = {
-        weather: weatherData || memoryCache?.weather || null,
-        library: libData     || memoryCache?.library || null,
+        weather: weatherData,
+        library: libData,
         timestamp: Date.now()
       };
       memoryCache = newData;
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch (_) {}
       notifyListeners(newData);
-      
-      // 성공 시 재시도 카운트 초기화
       retryCount = 0;
+    } else if (weatherData || libData) {
+      // 부분 성공 시: 기존 캐시와 병합하여 최선의 폴백 노출, 타임스탬프 갱신을 연기하여 백그라운드 재시도 유도
+      const newData = {
+        weather: weatherData || memoryCache?.weather || null,
+        library: libData     || memoryCache?.library || null,
+        timestamp: memoryCache?.timestamp || (Date.now() - CACHE_TTL + 30000) // 30초 후 즉시 갱신되도록 세팅
+      };
+      memoryCache = newData;
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch (_) {}
+      notifyListeners(newData);
+      triggerBackoffRetry();
     } else {
-      // 둘 다 실패 시 지수 백오프 작동
       triggerBackoffRetry();
     }
   } catch (e) {
