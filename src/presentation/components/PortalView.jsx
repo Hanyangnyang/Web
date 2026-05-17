@@ -79,12 +79,62 @@ export function PortalView({ isVisible = true }) {
   const [alarmPopup, setAlarmPopup] = useState('');
   const scrollContainerRef = useRef(null);
   
-  // 현재 시각 계산 (가상 날씨 모킹 상태가 아니면 실제 시간 반환)
-  const nowHour = useMemo(() => new Date().getHours(), [weather]);
+  // 1. 클라이언트(브라우저) 실제 현재 시간을 KST 기준으로 정확히 구하여 12시간 전/후 필터링
+  const renderedHourlyForecast = useMemo(() => {
+    if (!weather?.hourlyForecast) return [];
+
+    const nowEpoch = Date.now();
+    const twelveHoursAgo = nowEpoch - (12 * 60 * 60 * 1000);
+    const twelveHoursLater = nowEpoch + (12 * 60 * 60 * 1000);
+
+    const localDate = new Date();
+    const kstYear = localDate.getFullYear();
+    const kstMonth = String(localDate.getMonth() + 1).padStart(2, '0');
+    const kstDate = String(localDate.getDate()).padStart(2, '0');
+    const kstHour = String(localDate.getHours()).padStart(2, '0');
+    const currentKstString = `${kstYear}-${kstMonth}-${kstDate}T${kstHour}:00`;
+
+    const mapped = weather.hourlyForecast.map(item => {
+      const isCurrent = item.time === currentKstString;
+      const isPast = item.epoch < nowEpoch - (30 * 60 * 1000);
+
+      return {
+        ...item,
+        isCurrent,
+        isPast
+      };
+    });
+
+    const filtered = mapped.filter(item => {
+      return item.epoch >= twelveHoursAgo && item.epoch <= twelveHoursLater;
+    });
+
+    // Fallback: "지금" 노드가 반드시 1개 존재하도록 보정
+    const hasCurrent = filtered.some(item => item.isCurrent);
+    if (!hasCurrent && filtered.length > 0) {
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      filtered.forEach((item, idx) => {
+        const diff = Math.abs(item.epoch - nowEpoch);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+      filtered[closestIdx].isCurrent = true;
+      filtered[closestIdx].isPast = false;
+
+      for (let i = 0; i < closestIdx; i++) {
+        filtered[i].isPast = true;
+      }
+    }
+
+    return filtered;
+  }, [weather]);
 
   // 날씨 탭에 진입하거나 날씨 데이터가 로드될 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
-    if (isVisible && scrollContainerRef.current && weather?.hourlyForecast) {
+    if (isVisible && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
       const timer = setTimeout(() => {
         const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
         if (activeEl) {
@@ -96,7 +146,7 @@ export function PortalView({ isVisible = true }) {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [weather, isVisible]);
+  }, [renderedHourlyForecast, isVisible]);
 
   // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
   const weatherTheme = useMemo(() => {
@@ -242,14 +292,14 @@ export function PortalView({ isVisible = true }) {
               </div>
             ) : null}
 
-            {/* 시간별 예보 스트립 (0시부터 23시까지 전체 소급 스크롤 지원) */}
-            {weather?.hourlyForecast?.length > 0 && (
+            {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
+            {renderedHourlyForecast.length > 0 && (
               <div 
                 ref={scrollContainerRef}
                 className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
               >
                 <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
-                  {weather.hourlyForecast.map((h, idx) => {
+                  {renderedHourlyForecast.map((h, idx) => {
                     const isCurrent = h.isCurrent;
                     const isPast = h.isPast;
                     return (
