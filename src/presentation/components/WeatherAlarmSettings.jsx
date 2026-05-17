@@ -651,15 +651,17 @@ export function WeatherAlarmSettings({ onClose }) {
             )}
           </div>
 
-          {/* 3단계: 날짜 및 시간 설정 (조건 선택 시 활성화) */}
+          {/* 3단계: 날짜 및 시간 설정 (조건 선택 시 활성화 - 부드럽게 Slide Up & Fade In) */}
           <div style={{
-            opacity: isStep3Active ? 1 : 0.35,
+            opacity: isStep3Active ? 1 : 0,
+            transform: isStep3Active ? 'translateY(0)' : 'translateY(24px)',
+            maxHeight: isStep3Active ? '200px' : '0px',
+            marginTop: isStep3Active ? '20px' : '0px',
+            paddingTop: isStep3Active ? '4px' : '0px',
             pointerEvents: isStep3Active ? 'auto' : 'none',
-            transition: 'opacity 0.2s',
+            overflow: 'hidden',
+            transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           }}>
-            
-
-
             {/* 시간 선택 */}
             <div className="py-1">
               <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 보낼까요?</div>
