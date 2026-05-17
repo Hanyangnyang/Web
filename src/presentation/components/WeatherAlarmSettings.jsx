@@ -552,6 +552,7 @@ export function WeatherAlarmSettings({ onClose }) {
             <div className="text-[14px] font-extrabold text-text-main mb-2.5">이럴 때 알림을 보내주세요</div>
             <div className="flex flex-wrap gap-2 items-center">
               <button
+                disabled={!settings.weatherAlert}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.daily
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
@@ -563,7 +564,7 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
               
               <button
-                disabled={settings.conditions.daily}
+                disabled={!settings.weatherAlert || settings.conditions.daily}
                 style={{
                   opacity: settings.conditions.daily ? 0 : 1,
                   transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
@@ -574,7 +575,7 @@ export function WeatherAlarmSettings({ onClose }) {
                   paddingTop: settings.conditions.daily ? '0px' : '6px',
                   paddingBottom: settings.conditions.daily ? '0px' : '6px',
                   borderWidth: settings.conditions.daily ? '0px' : '1px',
-                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  pointerEvents: (!settings.weatherAlert || settings.conditions.daily) ? 'none' : 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -590,7 +591,7 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
 
               <button
-                disabled={settings.conditions.daily}
+                disabled={!settings.weatherAlert || settings.conditions.daily}
                 style={{
                   opacity: settings.conditions.daily ? 0 : 1,
                   transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
@@ -601,7 +602,7 @@ export function WeatherAlarmSettings({ onClose }) {
                   paddingTop: settings.conditions.daily ? '0px' : '6px',
                   paddingBottom: settings.conditions.daily ? '0px' : '6px',
                   borderWidth: settings.conditions.daily ? '0px' : '1px',
-                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  pointerEvents: (!settings.weatherAlert || settings.conditions.daily) ? 'none' : 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -617,7 +618,7 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
 
               <button
-                disabled={settings.conditions.daily}
+                disabled={!settings.weatherAlert || settings.conditions.daily}
                 style={{
                   opacity: settings.conditions.daily ? 0 : 1,
                   transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
@@ -628,7 +629,7 @@ export function WeatherAlarmSettings({ onClose }) {
                   paddingTop: settings.conditions.daily ? '0px' : '6px',
                   paddingBottom: settings.conditions.daily ? '0px' : '6px',
                   borderWidth: settings.conditions.daily ? '0px' : '1px',
-                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  pointerEvents: (!settings.weatherAlert || settings.conditions.daily) ? 'none' : 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
