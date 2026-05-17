@@ -56,11 +56,25 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
 
   const handleShare = async () => {
     const shareText = `하냥냥 - 학식 정보\n${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?\n${shareUrl}`;
+
+    const nativeShare = window.Capacitor?.Plugins?.Share;
+    if (nativeShare) {
+      try {
+        await nativeShare.share({ text: shareText, dialogTitle: '공유하기' });
+        onClose();
+      } catch (e) {
+        if (e?.message !== 'Share canceled') {
+          await navigator.clipboard.writeText(shareText).catch(() => {});
+          onClose();
+          onCopied?.();
+        }
+      }
+      return;
+    }
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          text: shareText,
-        });
+        await navigator.share({ text: shareText });
         onClose();
       } catch (e) {
         if (e.name !== 'AbortError') {
