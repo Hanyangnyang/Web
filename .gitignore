@@ -25,3 +25,11 @@ dist-ssr
 .env
 api/cache
 
+# iOS certificates & keys
+*.key
+*.cer
+*.pem
+*.certSigningRequest
+*.p12
+*.mobileprovision
+
