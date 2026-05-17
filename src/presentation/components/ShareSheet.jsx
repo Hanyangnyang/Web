@@ -35,6 +35,14 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
       return;
     }
 
+    const execParams = (() => { try { return new URL(shareUrl).search.slice(1); } catch { return ''; } })();
+    const link = {
+      mobileWebUrl: shareUrl,
+      webUrl: shareUrl,
+      androidExecutionParams: execParams,
+      iosExecutionParams: execParams,
+    };
+
     try {
       window.Kakao.Share.sendDefault({
         objectType: 'feed',
@@ -43,9 +51,9 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
           imageUrl: 'https://www.hanyang.life/hanyang_cafeteria.jpg',
           imageWidth: 800,
           imageHeight: 480,
-          link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+          link,
         },
-        buttons: [{ title: '학식 메뉴 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+        buttons: [{ title: '학식 메뉴 확인하기', link }],
       });
       onClose();
     } catch (e) {
