@@ -554,7 +554,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 }`}
                 onClick={() => handleConditionToggle('rainSnow')}
               >
-                비/눈이 올 때
+                비/눈
               </button>
 
               <button
@@ -581,7 +581,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 }`}
                 onClick={() => handleConditionToggle('dust')}
               >
-                미세먼지가 나쁠 때
+                미세먼지
               </button>
 
               <button
@@ -608,13 +608,8 @@ export function WeatherAlarmSettings({ onClose }) {
                 }`}
                 onClick={() => handleConditionToggle('uv')}
               >
-                자외선이 강할 때
+                자외선
               </button>
-            </div>
-            
-            {/* 항상 또는 타 칩이 노출될 때 문장을 자연스럽게 완성하는 접미 문구 */}
-            <div className="text-[13px] font-bold text-text-sub mt-2.5 pl-1.5 flex items-center gap-1 transition-opacity duration-200">
-              보내주세요
             </div>
           </div>
 
