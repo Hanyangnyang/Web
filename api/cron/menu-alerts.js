@@ -59,7 +59,8 @@ export default async function handler(req, res) {
     const protocol = host.includes('localhost') ? 'http' : 'https';
 
     const messages = [];
-    const sentTokens = new Set(); // 중복 발송 방지용
+    const menuSentTokens = new Set();    // 식단 중복 발송 방지용
+    const weatherSentTokens = new Set(); // 날씨 중복 발송 방지용
 
     // --- A. 식단 알림(CAFETERIA_KEYWORD) 분할 및 처리 ---
     const menuSubs = matchingSubscriptions.filter(sub => sub.topic === 'CAFETERIA_KEYWORD');
@@ -72,7 +73,7 @@ export default async function handler(req, res) {
           const keywords = sub.params?.keywords || [];
           const token = sub.devices?.fcm_token;
 
-          if (!keywords.length || !token || sentTokens.has(token)) return;
+          if (!keywords.length || !token || menuSentTokens.has(token)) return;
 
           let foundKeywords = [];
           const matchedCafes = [];
@@ -120,7 +121,7 @@ export default async function handler(req, res) {
                 link: deepLink
               }
             });
-            sentTokens.add(token);
+            menuSentTokens.add(token);
           }
         });
       };
@@ -166,7 +167,7 @@ export default async function handler(req, res) {
 
         weatherSubs.forEach(sub => {
           const token = sub.devices?.fcm_token;
-          if (!token || sentTokens.has(token)) return;
+          if (!token || weatherSentTokens.has(token)) return;
 
           const cond = sub.params || {};
           let shouldNotify = false;
@@ -211,7 +212,7 @@ export default async function handler(req, res) {
                 link: deepLink
               }
             });
-            sentTokens.add(token);
+            weatherSentTokens.add(token);
           }
         });
       }
