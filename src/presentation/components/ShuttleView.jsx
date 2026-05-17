@@ -355,7 +355,7 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
 }
 
 // ── 메인 컴포넌트
-export function ShuttleView() {
+export function ShuttleView({ isActive }) {
   const {
     stop, setStop,
     lineId, setLineId,
@@ -369,11 +369,11 @@ export function ShuttleView() {
     fullDayType, setFullDayType,
     fullPeriod, setFullPeriod,
     appConfig,
-  } = useShuttle();
+  } = useShuttle(isActive);
 
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
-  const [initialStop] = useState(stop);
+  const [tooltipStop, setTooltipStop] = useState(stop);
   const hasInteractedRef = useRef(false);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
@@ -382,7 +382,10 @@ export function ShuttleView() {
   useEffect(() => {
     // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
     const showTimer = setTimeout(() => {
-      if (!hasInteractedRef.current) setShowTooltip(true);
+      if (!hasInteractedRef.current) {
+        setTooltipStop(stop); // 2초 뒤 툴팁 생성되는 찰나에 결정된 최신 자동선택 정류장으로 조립!
+        setShowTooltip(true);
+      }
     }, 2000);
     const hideTimer = setTimeout(() => {
       setIsTooltipFadingOut(true);
@@ -392,7 +395,7 @@ export function ShuttleView() {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
-  }, []);
+  }, [stop]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
 
   const handleStopClick = (s) => {
     setStop(s);
@@ -425,7 +428,7 @@ export function ShuttleView() {
               onClick={() => handleStopClick(s)}
               style={{ position: 'relative' }}
             >
-              {initialStop === s && showTooltip && (() => {
+              {tooltipStop === s && showTooltip && (() => {
                 const isTop = idx < 3;
                 const arrowClass = isTop ? 'top' : 'bottom';
                 const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';

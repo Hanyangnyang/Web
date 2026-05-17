@@ -79,12 +79,63 @@ export function PortalView({ isVisible = true }) {
   const [alarmPopup, setAlarmPopup] = useState('');
   const scrollContainerRef = useRef(null);
   
-  // 현재 시각 계산 (가상 날씨 모킹 상태가 아니면 실제 시간 반환)
-  const nowHour = useMemo(() => new Date().getHours(), [weather]);
+  // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
+  // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
+  //           item.epoch + 브라우저 로컬 시각으로 모든 계산을 수행합니다.
+  const renderedHourlyForecast = useMemo(() => {
+    if (!weather?.hourlyForecast) return [];
+
+    const nowEpoch = Date.now();
+    const twelveHoursAgo = nowEpoch - (12 * 60 * 60 * 1000);
+    const twelveHoursLater = nowEpoch + (12 * 60 * 60 * 1000);
+
+    // epoch 기준 ±30분 이내이면 "지금" 노드로 판정 (문자열 비교 없음)
+    const mapped = weather.hourlyForecast.map(item => {
+      const epoch = item.epoch;
+      if (!epoch) return null; // epoch 없는 구형 캐시 데이터 제거
+
+      // 브라우저 로컬 시각(KST)으로 hour 직접 계산 (서버의 UTC hour 사용 안 함)
+      const localHour = new Date(epoch).getHours();
+
+      const isCurrent = Math.abs(epoch - nowEpoch) < 30 * 60 * 1000;
+      const isPast = epoch < nowEpoch - (30 * 60 * 1000);
+
+      return {
+        ...item,
+        hour: localHour, // 브라우저 KST 기준 시각으로 덮어쓰기
+        isCurrent,
+        isPast
+      };
+    }).filter(Boolean);
+
+    const filtered = mapped.filter(item => {
+      return item.epoch >= twelveHoursAgo && item.epoch <= twelveHoursLater;
+    });
+
+    // Fallback: ±30분 내 exact match가 없을 경우 epoch 기준 가장 가까운 노드를 "지금"으로 보정
+    const hasCurrent = filtered.some(item => item.isCurrent);
+    if (!hasCurrent && filtered.length > 0) {
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      filtered.forEach((item, idx) => {
+        const diff = Math.abs(item.epoch - nowEpoch);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+      filtered[closestIdx] = { ...filtered[closestIdx], isCurrent: true, isPast: false };
+      for (let i = 0; i < closestIdx; i++) {
+        filtered[i] = { ...filtered[i], isPast: true };
+      }
+    }
+
+    return filtered;
+  }, [weather]);
 
   // 날씨 탭에 진입하거나 날씨 데이터가 로드될 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
-    if (isVisible && scrollContainerRef.current && weather?.hourlyForecast) {
+    if (isVisible && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
       const timer = setTimeout(() => {
         const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
         if (activeEl) {
@@ -96,7 +147,7 @@ export function PortalView({ isVisible = true }) {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [weather, isVisible]);
+  }, [renderedHourlyForecast, isVisible]);
 
   // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
   const weatherTheme = useMemo(() => {
@@ -242,16 +293,16 @@ export function PortalView({ isVisible = true }) {
               </div>
             ) : null}
 
-            {/* 시간별 예보 스트립 (0시부터 23시까지 전체 소급 스크롤 지원) */}
-            {weather?.hourlyForecast?.length > 0 && (
+            {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
+            {renderedHourlyForecast.length > 0 && (
               <div 
                 ref={scrollContainerRef}
                 className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
               >
                 <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
-                  {weather.hourlyForecast.map((h, idx) => {
-                    const isCurrent = h.hour === nowHour;
-                    const isPast = h.hour < nowHour;
+                  {renderedHourlyForecast.map((h, idx) => {
+                    const isCurrent = h.isCurrent;
+                    const isPast = h.isPast;
                     return (
                       <div
                         key={idx}

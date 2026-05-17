@@ -40,20 +40,28 @@ export async function prefetchPortalData() {
       getLibraryData()
     ]);
 
-    if (weatherData || libData) {
+    if (weatherData && libData) {
       const newData = {
-        weather: weatherData || memoryCache?.weather || null,
-        library: libData     || memoryCache?.library || null,
+        weather: weatherData,
+        library: libData,
         timestamp: Date.now()
       };
       memoryCache = newData;
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch (_) {}
       notifyListeners(newData);
-      
-      // 성공 시 재시도 카운트 초기화
       retryCount = 0;
+    } else if (weatherData || libData) {
+      // 부분 성공 시: 기존 캐시와 병합하여 최선의 폴백 노출, 타임스탬프 갱신을 연기하여 백그라운드 재시도 유도
+      const newData = {
+        weather: weatherData || memoryCache?.weather || null,
+        library: libData     || memoryCache?.library || null,
+        timestamp: memoryCache?.timestamp || (Date.now() - CACHE_TTL + 30000) // 30초 후 즉시 갱신되도록 세팅
+      };
+      memoryCache = newData;
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch (_) {}
+      notifyListeners(newData);
+      triggerBackoffRetry();
     } else {
-      // 둘 다 실패 시 지수 백오프 작동
       triggerBackoffRetry();
     }
   } catch (e) {
@@ -85,12 +93,24 @@ function triggerBackoffRetry() {
 export function usePortalData() {
   // 초기값: 1순위 메모리 캐시 → 2순위 localStorage 캐시 → null
   const [data, setData] = useState(() => {
-    if (memoryCache) return memoryCache;
+    const checkStale = (parsed) => {
+      if (!parsed?.weather?.hourlyForecast) return true;
+      const forecast = parsed.weather.hourlyForecast;
+      if (forecast.length === 0) return true;
+      const firstEpoch = forecast[0].epoch;
+      const lastEpoch = forecast[forecast.length - 1].epoch;
+      // epoch 필드가 없는 구형 캐시 → 무조건 stale 처리
+      if (!firstEpoch || !lastEpoch) return true;
+      const nowEpoch = Date.now();
+      return nowEpoch < firstEpoch || nowEpoch > lastEpoch;
+    };
+
+    if (memoryCache && !checkStale(memoryCache)) return memoryCache;
     try {
       const saved = localStorage.getItem(CACHE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Date.now() - parsed.timestamp < CACHE_TTL) {
+        if (Date.now() - parsed.timestamp < CACHE_TTL && !checkStale(parsed)) {
           memoryCache = parsed; // 메모리에도 올려둠
           return parsed;
         }
@@ -110,8 +130,29 @@ export function usePortalData() {
     };
     listeners.push(handler);
 
-    // 유효 캐시가 없을 때만 fetch 시작 (App.jsx prefetch 가 먼저 했으면 skip)
-    if (!memoryCache || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
+    // 유효 캐시가 없거나, 캐시 내부 데이터 중 일부가 누락된 불완전 캐시인 경우 강제 즉시 갱신!
+    const isPartialCache = memoryCache && (!memoryCache.weather || !memoryCache.library);
+
+    // 캐시된 날씨 예보 범위가 현재 시각을 포함하는지 정밀 검사 (시간 정합성 보장)
+    let isStaleTimeline = false;
+    if (memoryCache?.weather?.hourlyForecast) {
+      const forecast = memoryCache.weather.hourlyForecast;
+      if (forecast.length > 0) {
+        const firstEpoch = forecast[0].epoch;
+        const lastEpoch = forecast[forecast.length - 1].epoch;
+        // epoch 필드가 없는 구형 캐시 → stale 처리
+        if (!firstEpoch || !lastEpoch) {
+          isStaleTimeline = true;
+        } else {
+          const nowEpoch = Date.now();
+          if (nowEpoch < firstEpoch || nowEpoch > lastEpoch) {
+            isStaleTimeline = true;
+          }
+        }
+      }
+    }
+
+    if (!memoryCache || isPartialCache || isStaleTimeline || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
       setLoading(true);
       prefetchPortalData();
     }
