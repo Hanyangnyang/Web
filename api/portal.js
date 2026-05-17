@@ -70,24 +70,34 @@ async function handleWeather(req, res) {
       }
     };
 
-    // 현재 KST 시각 기준 이전 12시간 ~ 이후 12시간 예보 범위 필터링
+    // 1. 현재의 진짜 KST 기준 날짜/시간 정보를 구합니다.
     const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
-    const currentEpoch = nowKST.getTime();
+    const kstYear = nowKST.getUTCFullYear();
+    const kstMonth = String(nowKST.getUTCMonth() + 1).padStart(2, '0');
+    const kstDate = String(nowKST.getUTCDate()).padStart(2, '0');
+    const kstHour = String(nowKST.getUTCHours()).padStart(2, '0');
+
+    // 현재 KST 정각 날씨 노드의 문자열 포맷: "2026-05-17T18:00"
+    const currentKstString = `${kstYear}-${kstMonth}-${kstDate}T${kstHour}:00`;
+
+    // 12시간 전/후 필터링을 위해 절대 Epoch 밀리초(+09:00 지정) 계산
+    const currentEpoch = new Date(`${currentKstString}+09:00`).getTime();
     const twelveHoursAgo = currentEpoch - (12 * 60 * 60 * 1000);
     const twelveHoursLater = currentEpoch + (12 * 60 * 60 * 1000);
 
     const hourly = weatherData.hourly;
     const allHourly = hourly.time.map((time, i) => {
-      const itemDate = new Date(time);
-      const itemEpoch = itemDate.getTime();
+      // KST(+09:00) 기준 절대 타임스탬프로 안전 파싱
+      const itemEpoch = new Date(`${time}+09:00`).getTime();
+      const itemDate = new Date(`${time}+09:00`);
 
-      // 현재 시각 정각과 매칭되는지 판단 (30분 오차 범위)
-      const isCurrent = Math.abs(itemEpoch - currentEpoch) < 30 * 60 * 1000;
-      const isPast = itemEpoch < (currentEpoch - 30 * 60 * 1000);
+      // 문자열이 완벽히 일치하면 진짜 '지금' 노드입니다!
+      const isCurrent = time === currentKstString;
+      const isPast = itemEpoch < currentEpoch;
 
       return {
         epoch: itemEpoch,
-        hour: itemDate.getHours(),
+        hour: itemDate.getHours(), // KST getHours가 완벽하게 확보됨
         temp: Math.round(hourly.temperature_2m[i]),
         weatherCode: hourly.weather_code[i],
         precipProb: hourly.precipitation_probability[i],
