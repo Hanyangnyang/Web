@@ -7,7 +7,7 @@ workflows:
       ios_signing:
         distribution_type: development
         bundle_identifier: com.hanyangnyang.app
-      node: 20.x
+      node: latest
     scripts:
       - name: Install dependencies
         script: npm ci
