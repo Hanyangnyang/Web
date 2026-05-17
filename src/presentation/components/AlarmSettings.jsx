@@ -384,6 +384,18 @@ export function AlarmSettings({ onClose }) {
     }
   };
 
+  const ensureJeyukAlertOn = async () => {
+    if (!settings.jeyukAlert) {
+      const token = await requestNotificationPermission();
+      if (!token) {
+        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        return false;
+      }
+      setSettings(prev => ({ ...prev, jeyukAlert: true }));
+    }
+    return true;
+  };
+
   const toggle = async () => {
     const turningOn = !settings.jeyukAlert;
     setSettings(p => ({ ...p, jeyukAlert: turningOn }));
@@ -396,10 +408,17 @@ export function AlarmSettings({ onClose }) {
     }
   };
 
-  const addKeyword = () => {
+  const addKeyword = async () => {
     const trimmed = keywordInput.trim();
-    if (trimmed && !settings.keywords.includes(trimmed)) {
-      setSettings(p => ({ ...p, keywords: [...p.keywords, trimmed] }));
+    if (trimmed) {
+      const ok = await ensureJeyukAlertOn();
+      if (!ok) return;
+      setSettings(p => {
+        if (!p.keywords.includes(trimmed)) {
+          return { ...p, keywords: [...p.keywords, trimmed] };
+        }
+        return p;
+      });
     }
     setKeywordInput('');
   };
@@ -537,7 +556,6 @@ export function AlarmSettings({ onClose }) {
 
         <div style={{
           opacity: settings.jeyukAlert ? 1 : 0.35,
-          pointerEvents: settings.jeyukAlert ? 'auto' : 'none',
           transition: 'opacity 0.2s',
         }}>
           <div className="py-2 border-b border-[#f1f5f9]">
@@ -546,7 +564,12 @@ export function AlarmSettings({ onClose }) {
               <input
                 className="flex-1 h-10 border-[1.5px] border-[#e2e8f0] rounded-card px-3 text-[14px] text-text-main bg-surface outline-none transition-colors duration-200 focus:border-[#3b82f6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
                 value={keywordInput}
-                onChange={e => setKeywordInput(e.target.value)}
+                onChange={async (e) => {
+                  setKeywordInput(e.target.value);
+                  if (e.target.value.trim().length > 0) {
+                    await ensureJeyukAlertOn();
+                  }
+                }}
                 onKeyDown={e => e.key === 'Enter' && addKeyword()}
                 placeholder="키워드 입력"
               />
@@ -578,9 +601,15 @@ export function AlarmSettings({ onClose }) {
             <div className="text-[14px] font-extrabold text-text-main mb-1.5">언제 알림을 보낼까요?</div>
             <TimePicker
               value={settings.notifyTime}
-              onChange={(t) => setSettings(p => ({ ...p, notifyTime: t }))}
+              onChange={async (t) => {
+                const ok = await ensureJeyukAlertOn();
+                if (ok) setSettings(p => ({ ...p, notifyTime: t }));
+              }}
               day={settings.notifyDay}
-              onDayChange={(d) => setSettings(p => ({ ...p, notifyDay: d }))}
+              onDayChange={async (d) => {
+                const ok = await ensureJeyukAlertOn();
+                if (ok) setSettings(p => ({ ...p, notifyDay: d }));
+              }}
             />
           </div>
         </div>
