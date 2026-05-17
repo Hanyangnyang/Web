@@ -118,8 +118,10 @@ export function usePortalData() {
     };
     listeners.push(handler);
 
-    // 유효 캐시가 없을 때만 fetch 시작 (App.jsx prefetch 가 먼저 했으면 skip)
-    if (!memoryCache || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
+    // 유효 캐시가 없거나, 캐시 내부 데이터 중 일부가 누락된 불완전 캐시인 경우 강제 즉시 갱신!
+    const isPartialCache = memoryCache && (!memoryCache.weather || !memoryCache.library);
+
+    if (!memoryCache || isPartialCache || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
       setLoading(true);
       prefetchPortalData();
     }

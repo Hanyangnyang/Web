@@ -19,7 +19,7 @@ async function handleWeather(req, res) {
     const lon = 126.834;
 
     const [weatherRes, airRes] = await Promise.all([
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code&hourly=temperature_2m,weather_code,precipitation_probability&timezone=Asia%2FSeoul&models=icon_seamless&forecast_days=1`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code&hourly=temperature_2m,weather_code,precipitation_probability&timezone=Asia%2FSeoul&models=icon_seamless&forecast_days=2`),
       fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,uv_index&timezone=Asia%2FSeoul`)
     ]);
 
@@ -70,19 +70,65 @@ async function handleWeather(req, res) {
       }
     };
 
-    // 오늘의 시간별 예보 (0시부터 23시까지 전체 제공)
-    const hourly = weatherData.hourly;
-    const hourlyForecast = hourly.time.map((time, i) => ({
-      hour: new Date(time).getHours(),
-      temp: Math.round(hourly.temperature_2m[i]),
-      weatherCode: hourly.weather_code[i],
-      precipProb: hourly.precipitation_probability[i]
-    }));
+    // 현재 KST 시각 기준 이전 12시간 ~ 이후 12시간 예보 범위 필터링
+    const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+    const currentEpoch = nowKST.getTime();
+    const twelveHoursAgo = currentEpoch - (12 * 60 * 60 * 1000);
+    const twelveHoursLater = currentEpoch + (12 * 60 * 60 * 1000);
 
-    // 오늘 전체 기온 범위 계산
-    const allTemps = hourly.temperature_2m;
-    const maxTemp = Math.round(Math.max(...allTemps));
-    const minTemp = Math.round(Math.min(...allTemps));
+    const hourly = weatherData.hourly;
+    const allHourly = hourly.time.map((time, i) => {
+      const itemDate = new Date(time);
+      const itemEpoch = itemDate.getTime();
+
+      // 현재 시각 정각과 매칭되는지 판단 (30분 오차 범위)
+      const isCurrent = Math.abs(itemEpoch - currentEpoch) < 30 * 60 * 1000;
+      const isPast = itemEpoch < (currentEpoch - 30 * 60 * 1000);
+
+      return {
+        epoch: itemEpoch,
+        hour: itemDate.getHours(),
+        temp: Math.round(hourly.temperature_2m[i]),
+        weatherCode: hourly.weather_code[i],
+        precipProb: hourly.precipitation_probability[i],
+        isCurrent,
+        isPast
+      };
+    });
+
+    const hourlyForecast = allHourly.filter(item => {
+      return item.epoch >= twelveHoursAgo && item.epoch <= twelveHoursLater;
+    });
+
+    // Fallback: 만약 경계 조건 오차로 isCurrent가 없으면 가장 가까운 노드를 강제 지정
+    const hasCurrent = hourlyForecast.some(item => item.isCurrent);
+    if (!hasCurrent && hourlyForecast.length > 0) {
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      hourlyForecast.forEach((item, idx) => {
+        const diff = Math.abs(item.epoch - currentEpoch);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+      hourlyForecast[closestIdx].isCurrent = true;
+      hourlyForecast[closestIdx].isPast = false;
+
+      for (let i = 0; i < closestIdx; i++) {
+        hourlyForecast[i].isPast = true;
+      }
+    }
+
+    // 오늘 하루 전체 기온 범위 계산 (오늘 날짜와 매칭되는 24개 노드 기준)
+    const todayStr = nowKST.toISOString().split('T')[0];
+    const todayTemps = hourly.time
+      .map((time, i) => ({ time, temp: hourly.temperature_2m[i] }))
+      .filter(item => item.time.startsWith(todayStr))
+      .map(item => item.temp);
+
+    const maxTemp = todayTemps.length > 0 ? Math.round(Math.max(...todayTemps)) : Math.round(Math.max(...hourly.temperature_2m));
+    const minTemp = todayTemps.length > 0 ? Math.round(Math.min(...todayTemps)) : Math.round(Math.min(...hourly.temperature_2m));
 
     // Gemini AI로 날씨 코멘트 생성 (실패 시 정적 메시지 폴백)
     const pm10Info = getAQILabel(air.pm10, 'pm10');

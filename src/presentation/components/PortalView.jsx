@@ -250,8 +250,8 @@ export function PortalView({ isVisible = true }) {
               >
                 <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
                   {weather.hourlyForecast.map((h, idx) => {
-                    const isCurrent = h.hour === nowHour;
-                    const isPast = h.hour < nowHour;
+                    const isCurrent = h.isCurrent;
+                    const isPast = h.isPast;
                     return (
                       <div
                         key={idx}
