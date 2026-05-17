@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.hanyangnyang.app",
+    "sha256_cert_fingerprints": [
+      "8C:DA:C0:E5:4A:F3:24:AE:C4:AA:37:01:76:8E:CE:DA:D4:EE:0A:CB:09:29:45:45:A8:B4:BA:A6:F8:16:E8:BF",
+      "EE:3E:02:48:87:22:72:2E:00:82:DD:B5:BC:A0:26:6E:C2:BB:7C:63:3A:2A:88:DC:A3:6D:8D:F4:FA:39:BF:7B"
+    ]
+  }
+}]
