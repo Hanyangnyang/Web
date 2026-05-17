@@ -630,10 +630,7 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
             </div>
             {guideText && (
-              <div 
-                className="mt-3.5 px-3 py-2.5 bg-slate-50/80 border border-slate-100/50 rounded-xl text-[11px] font-bold text-slate-500 leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]"
-                style={{ whiteSpace: 'pre-line' }}
-              >
+              <div className="mt-3 px-1 text-[12px] font-bold text-text-sub leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]">
                 {guideText}
               </div>
             )}
