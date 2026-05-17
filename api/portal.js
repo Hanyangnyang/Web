@@ -19,7 +19,7 @@ async function handleWeather(req, res) {
     const lon = 126.834;
 
     const [weatherRes, airRes] = await Promise.all([
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code&timezone=Asia%2FSeoul&models=icon_seamless`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code&hourly=temperature_2m,weather_code,precipitation_probability&timezone=Asia%2FSeoul&models=icon_seamless&forecast_days=1`),
       fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,uv_index&timezone=Asia%2FSeoul`)
     ]);
 
@@ -50,7 +50,7 @@ async function handleWeather(req, res) {
     };
 
     const info = weatherCodeMap[current.weather_code] || { label: '정보 없음', emoji: '🌡️', message: '현재 날씨 정보를 불러오고 있습니다.' };
-    
+
     const getAQILabel = (val, type) => {
       if (type === 'pm10') {
         if (val <= 30) return { label: '좋음', color: '#2563eb' };
@@ -70,18 +70,85 @@ async function handleWeather(req, res) {
       }
     };
 
-    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');
+    // 오늘의 시간별 예보 (현재 시각 기준 이후 데이터)
+    const hourly = weatherData.hourly;
+    const nowHour = new Date().getHours();
+    const hourlyForecast = hourly.time.map((time, i) => ({
+      hour: new Date(time).getHours(),
+      temp: Math.round(hourly.temperature_2m[i]),
+      weatherCode: hourly.weather_code[i],
+      precipProb: hourly.precipitation_probability[i]
+    })).filter(h => h.hour >= nowHour);
+
+    // 오늘 전체 기온 범위 계산
+    const allTemps = hourly.temperature_2m;
+    const maxTemp = Math.round(Math.max(...allTemps));
+    const minTemp = Math.round(Math.min(...allTemps));
+
+    // Gemini AI로 날씨 코멘트 생성 (실패 시 정적 메시지 폴백)
+    const pm10Info = getAQILabel(air.pm10, 'pm10');
+    const pm25Info = getAQILabel(air.pm2_5, 'pm25');
+    const uvInfo = getAQILabel(air.uv_index, 'uv');
+
+    let aiMessage = info.message; // 기본 폴백
+    const geminiKey = process.env.GEMINI_API_KEY;
+
+    if (geminiKey && geminiKey !== '여기에_API_키_입력') {
+      try {
+        const prompt = `너는 날씨 앱의 AI 어시스턴트야. 아래 날씨 데이터를 바탕으로 한국 대학생에게 친근하고 자연스러운 한국어로 오늘 날씨 코멘트를 한 문장으로 작성해줘.
+
+현재 기온: ${Math.round(current.temperature_2m)}°C (오늘 최고 ${maxTemp}°C / 최저 ${minTemp}°C)
+날씨 상태: ${info.label}
+미세먼지: ${pm10Info.label} / 초미세먼지: ${pm25Info.label} / 자외선: ${uvInfo.label}
+강수 여부: ${current.precipitation > 0 ? '비 또는 눈 내리는 중' : '없음'}
+
+규칙:
+- 40자 이내로 간결하게
+- 실용적인 조언(외투, 우산, 자외선차단제 등)을 자연스럽게 포함
+- 이모지 사용 금지
+- 반말 금지, 친근한 존댓말 사용
+- 문장 부호로만 끝낼 것 (마침표 또는 느낌표)
+- 오직 코멘트 문장만 출력, 다른 말 하지 말 것`;
+
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { maxOutputTokens: 80, temperature: 0.8 }
+            })
+          }
+        );
+
+        if (geminiRes.ok) {
+          const geminiData = await geminiRes.json();
+          const generated = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (generated && generated.length > 0) {
+            aiMessage = generated;
+          }
+        }
+      } catch (e) {
+        console.warn('Gemini API 호출 실패, 정적 메시지 사용:', e.message);
+      }
+    }
+
+    // 3시간 서버 캐시 (LLM 호출 빈도 제한)
+    res.setHeader('Cache-Control', 's-maxage=10800, stale-while-revalidate');
     return res.status(200).json({
       temp: Math.round(current.temperature_2m),
       description: info.label,
       emoji: info.emoji,
       weatherCode: current.weather_code,
-      message: info.message,
+      message: aiMessage,
+      isAiMessage: aiMessage !== info.message,
       hasPrecipitation: current.precipitation > 0,
+      hourlyForecast,
       airQuality: {
-        pm10: getAQILabel(air.pm10, 'pm10'),
-        pm25: getAQILabel(air.pm2_5, 'pm25'),
-        uv: getAQILabel(air.uv_index, 'uv')
+        pm10: pm10Info,
+        pm25: pm25Info,
+        uv: uvInfo
       }
     });
   } catch (error) {
