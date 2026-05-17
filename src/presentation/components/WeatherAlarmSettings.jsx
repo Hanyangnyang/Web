@@ -560,7 +560,7 @@ export function WeatherAlarmSettings({ onClose }) {
                 }`}
                 onClick={() => handleConditionToggle('daily')}
               >
-                항상
+                매일
               </button>
               
               <button
