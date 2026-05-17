@@ -209,15 +209,15 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     return acc;
   }, {});
 
-  const handleNativeShare = async (title, url) => {
+  const handleNativeShare = async (text) => {
     if (navigator.share) {
-      try { await navigator.share({ title, url }); } catch {}
+      try { await navigator.share({ text }); } catch {}
     } else {
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(text);
       } catch {
         const el = document.createElement('textarea');
-        el.value = url;
+        el.value = text;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
@@ -384,7 +384,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
                                         className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
                                         onClick={() => {
                                           const mealLabel = type.includes('조식') || type.includes('천원') ? '아침' : type.includes('석식') ? '저녁' : '점심';
-                                          handleNativeShare(`${dateLabel} ${selectedCafe.name} ${mealLabel} 메뉴`, shareUrl);
+                                          const menuLines = m.menu.split('\n').map(l => l.replace(/<[^>]+>/g, '').trim()).filter(Boolean);
+                                          const shareText = `${dateLabel} ${selectedCafe.name} ${mealLabel}\n\n${menuLines.join('\n')}\n\n${shareUrl}`;
+                                          handleNativeShare(shareText);
                                         }}
                                         aria-label="메뉴 공유"
                                       >
