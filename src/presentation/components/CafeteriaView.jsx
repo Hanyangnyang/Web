@@ -151,7 +151,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
       if (foundExact) {
         setTimeout(() => {
           // 정확히 일치하는 data-type을 찾거나, 포함하는 요소를 찾음
-          const targetEl = listRef.current?.querySelector(`[data-type="${CSS.escape(urlType)}"]`) || 
+          const targetEl = listRef.current?.querySelector(`[data-type="${CSS.escape(urlType)}"]`) ||
                           listRef.current?.querySelector(`[data-type*="${urlType}"]`);
           if (targetEl) {
             const headerOffset = 120; // 고정 헤더 높이 고려

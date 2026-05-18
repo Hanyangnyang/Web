@@ -14,7 +14,13 @@ const KakaoIcon = () => (
 export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }) {
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
   const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
-  const kakaoTitle = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
+
+  const boldMatch = menuText?.match(/<b[^>]*>(.*?)<\/b>/i);
+  const featuredItem = boldMatch ? boldMatch[1] : null;
+  const kakaoTitle = featuredItem
+    ? `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 '${featuredItem}'입니다!`
+    : `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
+
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -53,7 +59,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
           imageHeight: 480,
           link,
         },
-        buttons: [{ title: '학식 메뉴 확인하기', link }],
+        buttons: [{ title: '더 자세히 보기', link }],
       });
       onClose();
     } catch (e) {
@@ -63,7 +69,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   };
 
   const handleShare = async () => {
-    const shareText = `하냥냥 - 학식 정보\n${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?\n${shareUrl}`;
+    const shareText = `하냥냥 - 학식 정보\n${kakaoTitle}\n더 자세히 보기${shareUrl}`;
 
     const nativeShare = window.Capacitor?.Plugins?.Share;
     if (nativeShare) {

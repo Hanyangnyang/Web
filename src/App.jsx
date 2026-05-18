@@ -36,6 +36,10 @@ function MainLayout() {
     if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
     return localStorage.getItem('lastActiveTab') || 'cafe';
   });
+  const [isCafeteriaLink] = useState(() => {
+    const p = new URLSearchParams(window.location.search);
+    return p.has('date') || p.has('cafe') || p.has('type');
+  });
   const [slideDir, setSlideDir] = useState('right');
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const posthog = usePostHog();
@@ -73,9 +77,10 @@ function MainLayout() {
   return (
     <>
       {!splashDone && (
-        <SplashScreen 
-          ready={isAppReady} 
-          onDone={completeSplash} 
+        <SplashScreen
+          ready={isAppReady}
+          onDone={completeSplash}
+          variant={isCafeteriaLink ? 'menu' : 'default'}
         />
       )}
       <div
