@@ -69,7 +69,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   };
 
   const handleShare = async () => {
-    const shareText = `하냥냥 - 학식 정보\n${kakaoTitle}\n더 자세히 보기${shareUrl}`;
+    const shareText = `하냥냥 - 학식 정보\n${kakaoTitle}\n\n더 자세히 보기\n${shareUrl}`;
 
     const nativeShare = window.Capacitor?.Plugins?.Share;
     if (nativeShare) {
