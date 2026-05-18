@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export function SplashScreen({ ready, onDone }) {
+export function SplashScreen({ ready, onDone, variant = 'default' }) {
   const [fading, setFading] = useState(false);
   const [minDone, setMinDone] = useState(false);
 
@@ -12,6 +12,29 @@ export function SplashScreen({ ready, onDone }) {
   useEffect(() => {
     if (ready && minDone) setFading(true);
   }, [ready, minDone]);
+
+  if (variant === 'menu') {
+    return (
+      <div
+        className={`fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-opacity duration-[450ms] ${fading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        onTransitionEnd={() => fading && onDone()}
+      >
+        <div className="flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <p className="text-[1.15rem] font-bold text-text-main tracking-[-0.02em]">
+              학식 메뉴를 불러오고 있어요
+            </p>
+            <p className="text-[0.82rem] text-text-hint">잠시만 기다려 주세요</p>
+          </div>
+          <div className="flex gap-1.5 items-center">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
