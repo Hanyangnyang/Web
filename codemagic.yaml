@@ -7,7 +7,7 @@ workflows:
       groups:
         - AppStore
       ios_signing:
-        distribution_type: app-store
+        distribution_type: app_store
         bundle_identifier: com.hanyangnyang.app
       node: latest
     scripts:
@@ -32,7 +32,9 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
       email:
         recipients:
