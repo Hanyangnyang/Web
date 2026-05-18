@@ -3,11 +3,9 @@ workflows:
     name: 하냥냥 iOS Build
     max_build_duration: 60
     instance_type: mac_mini_m2
-    integrations:
-      app_store_connect: AppStore
     environment:
       ios_signing:
-        distribution_type: app_store
+        distribution_type: development
         bundle_identifier: com.hanyangnyang.app
       node: latest
     scripts:
@@ -31,9 +29,6 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
       email:
         recipients:
           - yaeunjess@gmail.com
