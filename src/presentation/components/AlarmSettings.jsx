@@ -13,7 +13,7 @@ const DAY_LIST = ['전날', '당일'];
 // h24 → 표시용 분리
 const parseH24 = (h24) => ({
   displayHour: h24 % 12,        // 0~11
-  ampmIdx:     h24 < 12 ? 0 : 1, // 0=오전, 1=오후
+  ampmIdx: h24 < 12 ? 0 : 1, // 0=오전, 1=오후
 });
 
 // 표시값 → h24
@@ -21,22 +21,22 @@ const toH24 = (displayHour, ampmIdx) => ampmIdx === 0 ? displayHour : displayHou
 
 
 function TimePicker({ value, onChange, day, onDayChange }) {
-  const h24     = Math.max(0, Math.min(parseInt(value.split(':')[0]) || 0, 23));
+  const h24 = Math.max(0, Math.min(parseInt(value.split(':')[0]) || 0, 23));
   const initDay = Math.max(0, DAY_LIST.indexOf(day));
   const { displayHour: initHour, ampmIdx: initAmpm } = parseH24(h24);
 
   // 즉시 색상 피드백용 live state (스크롤하면 바로 반영)
   const [liveHour, setLiveHour] = useState(initHour);
   const [liveAmpm, setLiveAmpm] = useState(initAmpm);
-  const [liveDay,  setLiveDay]  = useState(initDay);
+  const [liveDay, setLiveDay] = useState(initDay);
 
   const hourRef = useRef(null);
   const ampmRef = useRef(null);
-  const dayRef  = useRef(null);
+  const dayRef = useRef(null);
   const hourTimer = useRef(null);
   const ampmTimer = useRef(null);
-  const dayTimer  = useRef(null);
-  
+  const dayTimer = useRef(null);
+
   const hourWheelCooldown = useRef(false);
   const ampmWheelCooldown = useRef(false);
   const dayWheelCooldown = useRef(false);
@@ -45,7 +45,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   useLayoutEffect(() => {
     if (hourRef.current) hourRef.current.scrollTop = initHour * ITEM_H;
     if (ampmRef.current) ampmRef.current.scrollTop = initAmpm * ITEM_H;
-    if (dayRef.current)  dayRef.current.scrollTop  = initDay  * ITEM_H;
+    if (dayRef.current) dayRef.current.scrollTop = initDay * ITEM_H;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 외부에서 value가 바뀔 때 live state 동기화
@@ -66,7 +66,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     if (!hourEl || !ampmEl) return;
     const curHour = Math.max(0, Math.min(Math.round(hourEl.scrollTop / ITEM_H), 11));
     const curAmpm = Math.max(0, Math.min(Math.round(ampmEl.scrollTop / ITEM_H), 1));
-    const newH24  = toH24(curHour, curAmpm);
+    const newH24 = toH24(curHour, curAmpm);
     if (newH24 !== h24) onChange(`${String(newH24).padStart(2, '0')}:00`);
   };
 
@@ -117,7 +117,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     const cur = Math.round(el.scrollTop / ITEM_H);
     const dir = e.deltaY > 0 ? 1 : -1;
     let next = cur + dir;
-    
+
     const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
 
     if (next > 11) {
@@ -126,10 +126,10 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         next = 0;
         el.scrollTop = 0;
         setLiveHour(0);
-        
+
         ampmEl.scrollTop = 1 * ITEM_H;
         setLiveAmpm(1);
-        
+
         const newH24 = toH24(0, 1);
         onChange(`${String(newH24).padStart(2, '0')}:00`);
       } else {
@@ -141,10 +141,10 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         next = 11;
         el.scrollTop = 11 * ITEM_H;
         setLiveHour(11);
-        
+
         ampmEl.scrollTop = 0;
         setLiveAmpm(0);
-        
+
         const newH24 = toH24(11, 0);
         onChange(`${String(newH24).padStart(2, '0')}:00`);
       } else {
@@ -246,7 +246,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   };
 
   return (
-    <div 
+    <div
       onMouseDown={e => e.stopPropagation()}
       onMouseMove={e => e.stopPropagation()}
       onMouseUp={e => e.stopPropagation()}
@@ -351,21 +351,23 @@ function TimePicker({ value, onChange, day, onDayChange }) {
 const loadSettings = () => {
   try {
     const saved = localStorage.getItem('alarm_settings');
-    if (!saved) return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
+    if (!saved) return { jeyukAlert: false, mode: null, selectedCafe: null, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
     const parsed = JSON.parse(saved);
     if (parsed.notifyTime) {
       const h = parseInt(parsed.notifyTime.split(':')[0]);
       if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
     }
     if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
-    return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일', ...parsed };
+    return { jeyukAlert: false, mode: null, selectedCafe: null, keywords: [], notifyTime: '08:00', notifyDay: '당일', ...parsed };
   } catch {
-    return { jeyukAlert: false, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
+    return { jeyukAlert: false, mode: null, selectedCafe: null, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
   }
 };
 
 const settingsEqual = (a, b) =>
   a.jeyukAlert === b.jeyukAlert &&
+  a.mode === b.mode &&
+  a.selectedCafe === b.selectedCafe &&
   a.notifyTime === b.notifyTime &&
   a.notifyDay === b.notifyDay &&
   JSON.stringify(a.keywords) === JSON.stringify(b.keywords);
@@ -428,7 +430,7 @@ export function AlarmSettings({ onClose }) {
 
   const handleTouchMove = (e) => {
     if (!isDragging) return;
-    
+
     const currentY = e.touches ? e.touches[0].clientY : e.clientY;
     const deltaY = currentY - startY.current;
 
@@ -510,16 +512,18 @@ export function AlarmSettings({ onClose }) {
     async function syncWithServer() {
       const deviceId = localStorage.getItem('device_id');
       if (!deviceId) return;
-      
+
       try {
         const { data, error } = await supabase.rpc('get_alarm_subscription', {
           p_device_id: deviceId,
           p_topic: 'CAFETERIA_KEYWORD'
         });
-        
+
         if (data && !error) {
           const newSettings = {
             jeyukAlert: data.is_active,
+            mode: data.params?.mode || null,
+            selectedCafe: data.params?.selectedCafe || null,
             keywords: data.params?.keywords || [],
             notifyTime: data.params?.notifyTime || '08:00',
             notifyDay: data.params?.notifyDay || '당일'
@@ -540,7 +544,9 @@ export function AlarmSettings({ onClose }) {
     if (isDirty) {
       localStorage.setItem('alarm_settings', JSON.stringify(settings));
 
-      if (settings.jeyukAlert && settings.keywords.length > 0) {
+      const isSubscribed = settings.jeyukAlert && (settings.mode === 'cafe' || settings.keywords.length > 0);
+
+      if (isSubscribed) {
         successMsg = '설정한 시간에 맞춰\n식단 알림을 보내드릴게요';
 
         (async () => {
@@ -552,11 +558,13 @@ export function AlarmSettings({ onClose }) {
                 deviceId = crypto.randomUUID();
                 localStorage.setItem('device_id', deviceId);
               }
-              
-              const params = { 
-                keywords: settings.keywords, 
-                notifyTime: settings.notifyTime, 
-                notifyDay: settings.notifyDay 
+
+              const params = {
+                mode: settings.mode,
+                selectedCafe: settings.selectedCafe,
+                keywords: settings.keywords,
+                notifyTime: settings.notifyTime,
+                notifyDay: settings.notifyDay
               };
 
               await supabase.rpc('upsert_alarm_subscription', {
@@ -597,7 +605,7 @@ export function AlarmSettings({ onClose }) {
       <div
         ref={sheetRef}
         className="w-[calc(100%-64px)] max-w-[300px] bg-white rounded-card px-5 pb-6 max-h-[90vh] overflow-y-auto mb-0 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
-        style={{ 
+        style={{
           transform: `translateY(${dragY}px)`,
           transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           animation: closing ? 'sheetDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -628,8 +636,91 @@ export function AlarmSettings({ onClose }) {
           opacity: settings.jeyukAlert ? 1 : 0.35,
           transition: 'opacity 0.2s',
         }}>
-          <div className="py-2 border-b border-[#f1f5f9]">
-            <div className="text-[14px] font-extrabold text-text-main mb-1.5">키워드</div>
+          {/* 1단계: 알림 방식 선택 */}
+          <div className="py-2.5 border-b border-[#f1f5f9]">
+            <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림 방식 선택</div>
+            <div className="flex flex-wrap gap-2 items-center">
+              <button
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${settings.mode === 'cafe'
+                  ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                  : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                  }`}
+                onClick={async () => {
+                  const ok = await ensureJeyukAlertOn();
+                  if (ok) setSettings(p => ({ ...p, mode: p.mode === 'cafe' ? null : 'cafe' }));
+                }}
+              >
+                식당별
+              </button>
+              <button
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${settings.mode === 'keyword'
+                  ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                  : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                  }`}
+                onClick={async () => {
+                  const ok = await ensureJeyukAlertOn();
+                  if (ok) setSettings(p => ({ ...p, mode: p.mode === 'keyword' ? null : 'keyword' }));
+                }}
+              >
+                키워드
+              </button>
+            </div>
+            <div className="text-[11px] text-[#64748b] leading-relaxed px-0.5 mt-2">
+              {settings.mode === 'cafe'
+                ? '선택한 식당의 알림을 받습니다.'
+                : settings.mode === 'keyword'
+                  ? '키워드가 메뉴에 포함되어 있을 때만 알림을 받습니다.'
+                  : '알림을 받아볼 방식을 선택해주세요.'
+              }
+            </div>
+          </div>
+
+          {/* 2단계: 식당 모드 상세 설정 */}
+          <div style={{
+            opacity: settings.mode === 'cafe' ? 1 : 0,
+            transform: settings.mode === 'cafe' ? 'translateY(0)' : 'translateY(16px)',
+            maxHeight: settings.mode === 'cafe' ? '200px' : '0px',
+            overflow: 'hidden',
+            transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: settings.mode === 'cafe' ? 'auto' : 'none',
+            marginTop: settings.mode === 'cafe' ? '8px' : '0px',
+          }} className={settings.mode === 'cafe' ? "py-2.5 border-b border-[#f1f5f9]" : ""}>
+            <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림을 받아볼 식당 선택</div>
+            <div className="flex flex-wrap gap-2 items-center">
+              {[
+                { id: 're12', name: '학생식당' },
+                { id: 're15', name: '창업보육센터' },
+                { id: 're11', name: '교직원식당' },
+                { id: 're13', name: '기숙사식당' }
+              ].map(cafe => (
+                <button
+                  key={cafe.id}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${settings.selectedCafe === cafe.id
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary/50'
+                    }`}
+                  onClick={async () => {
+                    const ok = await ensureJeyukAlertOn();
+                    if (ok) setSettings(p => ({ ...p, selectedCafe: p.selectedCafe === cafe.id ? null : cafe.id }));
+                  }}
+                >
+                  {cafe.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 2단계: 키워드 모드 상세 설정 */}
+          <div style={{
+            opacity: settings.mode === 'keyword' ? 1 : 0,
+            transform: settings.mode === 'keyword' ? 'translateY(0)' : 'translateY(16px)',
+            maxHeight: settings.mode === 'keyword' ? '300px' : '0px',
+            overflow: 'hidden',
+            transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: settings.mode === 'keyword' ? 'auto' : 'none',
+            marginTop: settings.mode === 'keyword' ? '8px' : '0px',
+          }} className={settings.mode === 'keyword' ? "py-2.5 border-b border-[#f1f5f9]" : ""}>
+            <div className="text-[14px] font-extrabold text-text-main mb-1.5">알림 키워드 등록</div>
             <div className="flex gap-2 mb-2">
               <input
                 className="flex-1 h-10 border-[1.5px] border-[#e2e8f0] rounded-card px-3 text-[14px] text-text-main bg-surface outline-none transition-colors duration-200 focus:border-[#3b82f6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
@@ -641,7 +732,7 @@ export function AlarmSettings({ onClose }) {
                   }
                 }}
                 onKeyDown={e => e.key === 'Enter' && addKeyword()}
-                placeholder="키워드 입력"
+                placeholder="예: 제육, 돈까스"
               />
               <button
                 className="w-10 h-10 bg-[#3b82f6] text-white border-none rounded-card flex items-center justify-center cursor-pointer flex-shrink-0 transition-opacity duration-150 hover:opacity-[0.88]"
@@ -651,7 +742,7 @@ export function AlarmSettings({ onClose }) {
               </button>
             </div>
             {settings.keywords.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 max-h-[88px] overflow-y-auto pr-1 no-scrollbar">
                 {settings.keywords.map(kw => (
                   <span key={kw} className="flex items-center gap-1 bg-[rgba(59,130,246,0.1)] text-[#3b82f6] text-[12px] font-bold px-3 py-1 rounded-full">
                     {kw}
@@ -667,15 +758,15 @@ export function AlarmSettings({ onClose }) {
             )}
           </div>
 
-          {/* 3단계: 시간 설정 (키워드가 1개 이상일 때 활성화 - 부드럽게 Slide Up & Fade In) */}
+          {/* 3단계: 시간 설정 (조건 충족 시 활성화 - 부드럽게 Slide Up & Fade In) */}
           {(() => {
-            const isTimePickerActive = settings.keywords.length > 0;
+            const isTimePickerActive = (settings.mode === 'cafe' && settings.selectedCafe !== null) || (settings.mode === 'keyword' && settings.keywords.length > 0);
             return (
               <div style={{
                 opacity: isTimePickerActive ? 1 : 0,
                 transform: isTimePickerActive ? 'translateY(0)' : 'translateY(24px)',
                 maxHeight: isTimePickerActive ? '200px' : '0px',
-                marginTop: isTimePickerActive ? '20px' : '0px',
+                marginTop: isTimePickerActive ? '16px' : '0px',
                 paddingTop: isTimePickerActive ? '4px' : '0px',
                 pointerEvents: isTimePickerActive ? 'auto' : 'none',
                 overflow: 'hidden',
