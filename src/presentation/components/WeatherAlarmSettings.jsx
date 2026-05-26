@@ -685,7 +685,7 @@ export function WeatherAlarmSettings({ onClose }) {
     >
       <div
         ref={sheetRef}
-        className="w-[calc(100%-48px)] max-w-[340px] bg-white rounded-card px-5 pb-6 max-h-[90vh] overflow-y-auto mb-6 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)] no-scrollbar"
+        className="w-[calc(100%-48px)] max-w-[340px] bg-white rounded-card rounded-b-none px-5 pb-6 max-h-[90vh] overflow-y-auto mb-0 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)] no-scrollbar"
         style={{
           transform: `translateY(${dragY}px)`,
           transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
