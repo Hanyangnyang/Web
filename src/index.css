@@ -4,6 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── 모바일 앱 패키징(Capacitor)용 네이티브 터치 UX 최적화 ─── */
+* {
+  -webkit-user-select: none;          /* iOS Safari 텍스트 선택 해제 */
+  user-select: none;                  /* 일반 텍스트 선택 해제 */
+  -webkit-tap-highlight-color: transparent; /* 터치 시 파란색 아웃라인 제거 */
+  -webkit-touch-callout: none;        /* iOS 롱클릭 공유 팝업 해제 */
+}
+
+/* 입력창 및 편집 영역은 정상적인 텍스트 입력을 위해 선택 가능하도록 예외 처리 */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+}
+
 /* ─── CSS 변수 (style={} 인라인에서 계속 참조됨) ─── */
 :root {
   --color-primary: #0E4A84;
