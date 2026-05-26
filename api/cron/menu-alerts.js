@@ -226,14 +226,9 @@ export default async function handler(req, res) {
             shouldNotify = true;
             title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
             
-            // 최고/최저 기온 추출
-            const temps = (weatherData.hourlyForecast || []).map(h => h.temp);
-            const maxTemp = temps.length > 0 ? Math.max(...temps) : weatherData.temp;
-            const minTemp = temps.length > 0 ? Math.min(...temps) : weatherData.temp;
-
             // Gemini 코멘트가 제공되었다면 붙이고, 없으면 기본 날씨 묘사 사용
             const comment = weatherData.message || `${weatherData.description} 상태입니다.`;
-            body = `오늘 한양대 최고 ${maxTemp}°C / 최저 ${minTemp}°C 이며, ${comment}`;
+            body = comment;
           }
 
           if (shouldNotify && body) {
