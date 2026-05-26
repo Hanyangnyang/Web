@@ -223,7 +223,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
         onClick={() => setShowAlarm(true)}
       >
         <Bell size={18} />
-        키워드 알림 받기
+        학식 알림 받기
       </button>
       {showAlarm && <AlarmSettings onClose={(msg) => {
         setShowAlarm(false);
