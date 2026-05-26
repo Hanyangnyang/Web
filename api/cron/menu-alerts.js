@@ -70,58 +70,85 @@ export default async function handler(req, res) {
 
       const processGroup = (subs, menuData) => {
         subs.forEach(sub => {
-          const keywords = sub.params?.keywords || [];
           const token = sub.devices?.fcm_token;
+          if (!token || menuSentTokens.has(token)) return;
 
-          if (!keywords.length || !token || menuSentTokens.has(token)) return;
+          const mode = sub.params?.mode || 'keyword';
 
-          let foundKeywords = [];
-          const matchedCafes = [];
-          let targetCafeId = '';
-          let targetMealType = '';
+          if (mode === 'cafe') {
+            const targetCafeId = sub.params?.selectedCafe || 're12';
+            const cafeObj = menuData.data.find(c => c.id === targetCafeId);
+            if (cafeObj && cafeObj.available) {
+              const dateParam = menuData.date.replace(/\//g, '-');
+              const deepLink = `${protocol}://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}`;
+              
+              const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
+              const dayText = isTomorrow ? '내일' : '오늘';
+              const bodyText = `${dayText} ${cafeObj.name}의 메뉴는 뭘까요?`;
 
-          for (const cafe of menuData.data) {
-            if (!cafe.available) continue;
-            let cafeMatched = false;
-            for (const menuItem of cafe.menus) {
-              if (keywords.some(kw => menuItem.menu.includes(kw))) {
-                const matchedInThisItem = keywords.filter(kw => menuItem.menu.includes(kw));
-                matchedInThisItem.forEach(kw => {
-                  if (!foundKeywords.includes(kw)) foundKeywords.push(kw);
-                });
-
-                if (!targetCafeId) {
-                  targetCafeId = cafe.id;
-                  targetMealType = menuItem.type;
+              messages.push({
+                token: token,
+                data: {
+                  title: isTomorrow ? '📅 내일의 학식 메뉴를 확인하세요!' : '🍔 오늘의 학식 메뉴가 나왔어요!',
+                  body: bodyText,
+                  link: deepLink
                 }
-                cafeMatched = true;
-              }
+              });
+              menuSentTokens.add(token);
             }
-            if (cafeMatched) matchedCafes.push(cafe.name);
-          }
+          } else {
+            // 키워드 모드
+            const keywords = sub.params?.keywords || [];
+            if (!keywords.length) return;
 
-          if (foundKeywords.length > 0) {
-            const dateParam = menuData.date.replace(/\//g, '-');
-            const deepLink = `${protocol}://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}&type=${encodeURIComponent(targetMealType)}`;
-            const cafeInfo = matchedCafes.length > 1
-              ? `${matchedCafes[0]} 등 ${matchedCafes.length}곳`
-              : matchedCafes[0];
+            let foundKeywords = [];
+            const matchedCafes = [];
+            let targetCafeId = '';
+            let targetMealType = '';
 
-            const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
+            for (const cafe of menuData.data) {
+              if (!cafe.available) continue;
+              let cafeMatched = false;
+              for (const menuItem of cafe.menus) {
+                if (keywords.some(kw => menuItem.menu.includes(kw))) {
+                  const matchedInThisItem = keywords.filter(kw => menuItem.menu.includes(kw));
+                  matchedInThisItem.forEach(kw => {
+                    if (!foundKeywords.includes(kw)) foundKeywords.push(kw);
+                  });
 
-            const bodyText = isTomorrow 
-              ? `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`
-              : `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
-
-            messages.push({
-              token: token,
-              data: {
-                title: isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!',
-                body: bodyText,
-                link: deepLink
+                  if (!targetCafeId) {
+                    targetCafeId = cafe.id;
+                    targetMealType = menuItem.type;
+                  }
+                  cafeMatched = true;
+                }
               }
-            });
-            menuSentTokens.add(token);
+              if (cafeMatched) matchedCafes.push(cafe.name);
+            }
+
+            if (foundKeywords.length > 0) {
+              const dateParam = menuData.date.replace(/\//g, '-');
+              const deepLink = `${protocol}://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}&type=${encodeURIComponent(targetMealType)}`;
+              const cafeInfo = matchedCafes.length > 1
+                ? `${matchedCafes[0]} 등 ${matchedCafes.length}곳`
+                : matchedCafes[0];
+
+              const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
+
+              const bodyText = isTomorrow 
+                ? `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`
+                : `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
+
+              messages.push({
+                token: token,
+                data: {
+                  title: isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!',
+                  body: bodyText,
+                  link: deepLink
+                }
+              });
+              menuSentTokens.add(token);
+            }
           }
         });
       };
