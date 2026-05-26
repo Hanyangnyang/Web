@@ -146,10 +146,17 @@ export default async function handler(req, res) {
     // --- B. 날씨 알림(WEATHER_ALERT) 처리 ---
     const weatherSubs = matchingSubscriptions.filter(sub => sub.topic === 'WEATHER_ALERT');
     if (weatherSubs.length > 0) {
-      // 1. 날씨 데이터를 한 번 기상 API 프록시에서 긁어오기
-      const weatherRes = await fetch(`${protocol}://${host}/api/portal?type=weather`);
+      // 1. 날씨 데이터와 지하철 공휴일 판단용 데이터 병렬로 긁어오기
+      const [weatherRes, subwayRes] = await Promise.all([
+        fetch(`${protocol}://${host}/api/portal?type=weather`),
+        fetch(`${protocol}://${host}/api/subway`).then(r => r.ok ? r.json() : null).catch(() => null)
+      ]);
+
       if (weatherRes.ok) {
         const weatherData = await weatherRes.json();
+        const isHoliday = subwayRes?.isHoliday || false;
+        const currentDay = nowKST.getDay();
+        const isWeekday = currentDay >= 1 && currentDay <= 5 && !isHoliday;
         
         // 날씨 파라미터 판단 가드 설정
         const hasRainOrSnow = weatherData.hasPrecipitation || (weatherData.hourlyForecast || []).some(h => {
@@ -187,8 +194,8 @@ export default async function handler(req, res) {
             shouldNotify = true;
             title = '☀️ 자외선 지수가 높은 날입니다!';
             body = '오늘 캠퍼스 자외선 강도가 높습니다. 외출 시 자외선 차단제와 선글라스를 챙기세요!';
-          } else if (cond.daily) {
-            // 2순위: 매일 브리핑 신청자
+          } else if (cond.daily || (cond.weekday && isWeekday)) {
+            // 2순위: 매일/평일 브리핑 신청자
             shouldNotify = true;
             title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
             
