@@ -21,7 +21,8 @@ workflows:
         script: |
           cd ios/App && pod install
       - name: Set up code signing
-        script: xcode-project use-profiles
+        # 💡 [변경 포인트 1] 수동 대신 Codemagic 자동 서명 엔진을 사용하도록 옵션 추가
+        script: xcode-project use-profiles --auth automatic
       - name: Build IPA
         script: |
           xcode-project build-ipa \
@@ -35,7 +36,9 @@ workflows:
         auth: integration
         submit_to_testflight: true
         beta_groups:
-          - 알파 테스트
+          # 💡 [변경 포인트 2] 한글 그룹명은 API 연동 시 씹힐 수 있으므로 영문 변경 권장
+          # (App Store Connect -> TestFlight 페이지 좌측의 그룹 이름도 똑같이 'alpha-test'로 바꿔주세요!)
+          - alpha-test
       email:
         recipients:
           - yaeunjess@gmail.com
