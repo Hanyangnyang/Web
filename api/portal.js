@@ -164,7 +164,7 @@ async function handleWeather(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: 80, temperature: 0.8 }
+              generationConfig: { maxOutputTokens: 1024, temperature: 0.8 }
             })
           }
         );
