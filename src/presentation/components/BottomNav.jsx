@@ -17,7 +17,7 @@ export function BottomNav({ activeTab, setActiveTab }) {
     }`;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-16 bg-[rgba(15,23,42,0.8)] backdrop-blur-[20px] border border-white/10 rounded-full flex justify-around items-center z-[1000] shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+    <div className="fixed bottom-[calc(24px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-16 bg-[rgba(15,23,42,0.8)] backdrop-blur-[20px] border border-white/10 rounded-full flex justify-around items-center z-[1000] shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
       <div className={itemClass('cafe')} onClick={() => setActiveTab('cafe')}>
         <Utensils size={24} />
         <span className="text-[0.7rem] font-semibold">학식</span>
