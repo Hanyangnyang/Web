@@ -352,7 +352,7 @@ const loadSettings = () => {
     const saved = localStorage.getItem('weather_alarm_settings');
     const defaultVal = {
       weatherAlert: false,
-      conditions: { daily: false, rainSnow: false, dust: false, uv: false },
+      conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
       notifyTime: '08:00',
       notifyDay: '당일'
     };
@@ -373,7 +373,7 @@ const loadSettings = () => {
   } catch {
     return {
       weatherAlert: false,
-      conditions: { daily: false, rainSnow: false, dust: false, uv: false },
+      conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
       notifyTime: '08:00',
       notifyDay: '당일'
     };
@@ -400,6 +400,7 @@ export function WeatherAlarmSettings({ onClose }) {
 
   // 3단계 영역(날짜 및 시간 선택) 활성화 조건: 2단계 조건이 하나라도 켜져 있는가
   const isStep3Active = settings.conditions.daily ||
+                        settings.conditions.weekday ||
                         settings.conditions.rainSnow ||
                         settings.conditions.dust ||
                         settings.conditions.uv;
@@ -410,6 +411,14 @@ export function WeatherAlarmSettings({ onClose }) {
       return (
         <span>
           <span className="font-extrabold">매일</span> 알림으로 날씨를 알려드릴게요.
+        </span>
+      );
+    }
+
+    if (settings.conditions.weekday) {
+      return (
+        <span>
+          <span className="font-extrabold">평일</span> 알림으로 날씨를 알려드릴게요.
         </span>
       );
     }
@@ -555,7 +564,7 @@ export function WeatherAlarmSettings({ onClose }) {
 
       if (settings.weatherAlert) {
         // 동적 완성형 팝업 완료 메시지 조립
-        if (settings.conditions.daily) {
+        if (settings.conditions.daily || settings.conditions.weekday) {
           successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
         } else {
           const activeKeywords = [];
@@ -635,6 +644,20 @@ export function WeatherAlarmSettings({ onClose }) {
           ...prev,
           conditions: {
             daily: nextVal,
+            weekday: false,
+            rainSnow: false,
+            dust: false,
+            uv: false
+          }
+        };
+      } else if (key === 'weekday') {
+        const nextVal = !nextConditions.weekday;
+        // '평일' 선택 시 다른 칩들은 모두 꺼지고 비활성화
+        return {
+          ...prev,
+          conditions: {
+            daily: false,
+            weekday: nextVal,
             rainSnow: false,
             dust: false,
             uv: false
@@ -710,20 +733,31 @@ export function WeatherAlarmSettings({ onClose }) {
               >
                 매일
               </button>
+
+              <button
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                  settings.conditions.weekday
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                }`}
+                onClick={() => handleConditionToggle('weekday')}
+              >
+                평일
+              </button>
               
               <button
-                disabled={settings.conditions.daily}
+                disabled={settings.conditions.daily || settings.conditions.weekday}
                 style={{
-                  opacity: settings.conditions.daily ? 0 : 1,
-                  transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
-                  maxWidth: settings.conditions.daily ? '0px' : '150px',
-                  margin: settings.conditions.daily ? '0px' : '',
-                  paddingLeft: settings.conditions.daily ? '0px' : '14px',
-                  paddingRight: settings.conditions.daily ? '0px' : '14px',
-                  paddingTop: settings.conditions.daily ? '0px' : '6px',
-                  paddingBottom: settings.conditions.daily ? '0px' : '6px',
-                  borderWidth: settings.conditions.daily ? '0px' : '1px',
-                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  opacity: (settings.conditions.daily || settings.conditions.weekday) ? 0 : 1,
+                  transform: (settings.conditions.daily || settings.conditions.weekday) ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
+                  maxWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '150px',
+                  margin: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '',
+                  paddingLeft: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
+                  paddingRight: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
+                  paddingTop: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
+                  paddingBottom: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
+                  borderWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '1px',
+                  pointerEvents: (settings.conditions.daily || settings.conditions.weekday) ? 'none' : 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -739,18 +773,18 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
 
               <button
-                disabled={settings.conditions.daily}
+                disabled={settings.conditions.daily || settings.conditions.weekday}
                 style={{
-                  opacity: settings.conditions.daily ? 0 : 1,
-                  transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
-                  maxWidth: settings.conditions.daily ? '0px' : '150px',
-                  margin: settings.conditions.daily ? '0px' : '',
-                  paddingLeft: settings.conditions.daily ? '0px' : '14px',
-                  paddingRight: settings.conditions.daily ? '0px' : '14px',
-                  paddingTop: settings.conditions.daily ? '0px' : '6px',
-                  paddingBottom: settings.conditions.daily ? '0px' : '6px',
-                  borderWidth: settings.conditions.daily ? '0px' : '1px',
-                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  opacity: (settings.conditions.daily || settings.conditions.weekday) ? 0 : 1,
+                  transform: (settings.conditions.daily || settings.conditions.weekday) ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
+                  maxWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '150px',
+                  margin: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '',
+                  paddingLeft: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
+                  paddingRight: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
+                  paddingTop: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
+                  paddingBottom: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
+                  borderWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '1px',
+                  pointerEvents: (settings.conditions.daily || settings.conditions.weekday) ? 'none' : 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -766,18 +800,18 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
 
               <button
-                disabled={settings.conditions.daily}
+                disabled={settings.conditions.daily || settings.conditions.weekday}
                 style={{
-                  opacity: settings.conditions.daily ? 0 : 1,
-                  transform: settings.conditions.daily ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
-                  maxWidth: settings.conditions.daily ? '0px' : '150px',
-                  margin: settings.conditions.daily ? '0px' : '',
-                  paddingLeft: settings.conditions.daily ? '0px' : '14px',
-                  paddingRight: settings.conditions.daily ? '0px' : '14px',
-                  paddingTop: settings.conditions.daily ? '0px' : '6px',
-                  paddingBottom: settings.conditions.daily ? '0px' : '6px',
-                  borderWidth: settings.conditions.daily ? '0px' : '1px',
-                  pointerEvents: settings.conditions.daily ? 'none' : 'auto',
+                  opacity: (settings.conditions.daily || settings.conditions.weekday) ? 0 : 1,
+                  transform: (settings.conditions.daily || settings.conditions.weekday) ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
+                  maxWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '150px',
+                  margin: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '',
+                  paddingLeft: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
+                  paddingRight: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
+                  paddingTop: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
+                  paddingBottom: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
+                  borderWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '1px',
+                  pointerEvents: (settings.conditions.daily || settings.conditions.weekday) ? 'none' : 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',

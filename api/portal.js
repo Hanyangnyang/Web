@@ -142,7 +142,7 @@ async function handleWeather(req, res) {
 - 오직 코멘트 문장만 출력, 다른 말 하지 말 것`;
 
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -165,8 +165,8 @@ async function handleWeather(req, res) {
       }
     }
 
-    // 3시간 서버 캐시 (LLM 호출 빈도 제한)
-    res.setHeader('Cache-Control', 's-maxage=10800, stale-while-revalidate');
+    // 1시간 서버 캐시 (LLM 호출 빈도 제한)
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
     return res.status(200).json({
       temp: Math.round(current.temperature_2m),
       description: info.label,
