@@ -84,12 +84,28 @@ export default async function handler(req, res) {
               
               const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
               const dayText = isTomorrow ? '내일' : '오늘';
-              const bodyText = `${dayText} ${cafeObj.name}의 메뉴는 뭘까요?`;
+
+              // 중식 메뉴 추출
+              const lunchMenus = (cafeObj.menus || []).filter(m => m.type.includes('중식'));
+              let bodyText = '';
+              if (lunchMenus.length > 0) {
+                // 첫번째 메뉴의 첫째 줄(대표 메뉴)
+                const mainDish = lunchMenus[0].menu.split('\n')[0].trim().replace(/^[\*\-\s]+/, ''); // 마크다운 기호 제거
+                if (lunchMenus.length > 1) {
+                  bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish} 외 ${lunchMenus.length - 1}개의 메뉴가 있어요`;
+                } else {
+                  bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish}가 나와요`;
+                }
+              } else {
+                bodyText = `${dayText} ${cafeObj.name}의 맛있고 영양 가득한 식단을 확인해보세요!`;
+              }
+
+              const titleText = isTomorrow ? `내일의 학식 메뉴가 나왔어요!` : `오늘의 학식 메뉴가 나왔어요!`;
 
               messages.push({
                 token: token,
                 data: {
-                  title: isTomorrow ? '📅 내일의 학식 메뉴를 확인하세요!' : '🍔 오늘의 학식 메뉴가 나왔어요!',
+                  title: titleText,
                   body: bodyText,
                   link: deepLink
                 }
