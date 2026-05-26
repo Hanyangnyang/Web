@@ -30,8 +30,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Get current hour in KST
-    const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+    // 1. Get current hour in KST (Safe against different server/local timezones)
+    const nowKST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
     const currentHourStr = nowKST.getHours().toString().padStart(2, '0'); // e.g. "08"
 
     // 2. Fetch active subscriptions with related device tokens (Menu & Weather)
