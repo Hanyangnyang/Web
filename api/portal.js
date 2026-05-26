@@ -23,6 +23,15 @@ async function handleWeather(req, res) {
       fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,uv_index&timezone=Asia%2FSeoul`)
     ]);
 
+    if (!weatherRes.ok) {
+      const text = await weatherRes.text();
+      throw new Error(`Weather API failed (${weatherRes.status}): ${text.substring(0, 300)}`);
+    }
+    if (!airRes.ok) {
+      const text = await airRes.text();
+      throw new Error(`Air Quality API failed (${airRes.status}): ${text.substring(0, 300)}`);
+    }
+
     const weatherData = await weatherRes.json();
     const airData = await airRes.json();
 
