@@ -127,6 +127,12 @@ async function handleWeather(req, res) {
       timeContext = '편안한 밤을 보내기 위한 인사와 함께 내일 등교길이나 출근길 날씨를 가볍게 대비할 수 있도록 조언해줘.';
     }
 
+    // 오늘 중 현재 시간 이후 비/눈 예보가 있는지 판단
+    const hasRainOrSnowLater = hourlyForecast.some(h => {
+      const hDate = new Date(`${h.time}+09:00`);
+      return hDate.getDate() === nowKST.getDate() && h.hour > hour && (h.precipProb >= 30 || h.weatherCode >= 51);
+    });
+
     let aiMessage = info.message; // 기본 폴백
     const geminiKey = process.env.GEMINI_API_KEY;
 
@@ -140,7 +146,8 @@ async function handleWeather(req, res) {
 현재 기온: ${Math.round(current.temperature_2m)}°C (오늘 최고 ${maxTemp}°C / 최저 ${minTemp}°C)
 날씨 상태: ${info.label}
 미세먼지: ${pm10Info.label} / 초미세먼지: ${pm25Info.label} / 자외선: ${uvInfo.label}
-강수 여부: ${current.precipitation > 0 ? '비 또는 눈 내리는 중' : '없음'}
+현재 강수 여부: ${current.precipitation > 0 ? '비 또는 눈 내리는 중' : '없음'}
+오늘 중 비/눈 예보 여부: ${hasRainOrSnowLater ? '있음 (우산을 꼭 챙기도록 친근하게 조언해줘)' : '없음'}
 
 규칙:
 - 40자 이내로 간결하게
