@@ -169,7 +169,7 @@ export default async function handler(req, res) {
           const token = sub.devices?.fcm_token;
           if (!token || weatherSentTokens.has(token)) return;
 
-          const cond = sub.params || {};
+          const cond = sub.params?.conditions || {};
           let shouldNotify = false;
           let title = '🌦️ 오늘 한양대 캠퍼스 날씨';
           let body = '';

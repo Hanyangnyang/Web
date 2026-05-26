@@ -70,67 +70,21 @@ async function handleWeather(req, res) {
       }
     };
 
-    // 1. 현재의 진짜 KST 기준 날짜/시간 정보를 구합니다.
-    const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
-    const kstYear = nowKST.getUTCFullYear();
-    const kstMonth = String(nowKST.getUTCMonth() + 1).padStart(2, '0');
-    const kstDate = String(nowKST.getUTCDate()).padStart(2, '0');
-    const kstHour = String(nowKST.getUTCHours()).padStart(2, '0');
-
-    // 현재 KST 정각 날씨 노드의 문자열 포맷: "2026-05-17T18:00"
-    const currentKstString = `${kstYear}-${kstMonth}-${kstDate}T${kstHour}:00`;
-
-    // 12시간 전/후 필터링을 위해 절대 Epoch 밀리초(+09:00 지정) 계산
-    const currentEpoch = new Date(`${currentKstString}+09:00`).getTime();
-    const twelveHoursAgo = currentEpoch - (12 * 60 * 60 * 1000);
-    const twelveHoursLater = currentEpoch + (12 * 60 * 60 * 1000);
-
     const hourly = weatherData.hourly;
-    const allHourly = hourly.time.map((time, i) => {
-      // KST(+09:00) 기준 절대 타임스탬프로 안전 파싱
-      const itemEpoch = new Date(`${time}+09:00`).getTime();
+    const hourlyForecast = hourly.time.map((time, i) => {
       const itemDate = new Date(`${time}+09:00`);
-
-      // 문자열이 완벽히 일치하면 진짜 '지금' 노드입니다!
-      const isCurrent = time === currentKstString;
-      const isPast = itemEpoch < currentEpoch;
-
       return {
-        epoch: itemEpoch,
-        hour: itemDate.getHours(), // KST getHours가 완벽하게 확보됨
+        time, // "2026-05-17T18:00"
+        epoch: itemDate.getTime(),
+        hour: itemDate.getHours(),
         temp: Math.round(hourly.temperature_2m[i]),
         weatherCode: hourly.weather_code[i],
-        precipProb: hourly.precipitation_probability[i],
-        isCurrent,
-        isPast
+        precipProb: hourly.precipitation_probability[i]
       };
     });
 
-    const hourlyForecast = allHourly.filter(item => {
-      return item.epoch >= twelveHoursAgo && item.epoch <= twelveHoursLater;
-    });
-
-    // Fallback: 만약 경계 조건 오차로 isCurrent가 없으면 가장 가까운 노드를 강제 지정
-    const hasCurrent = hourlyForecast.some(item => item.isCurrent);
-    if (!hasCurrent && hourlyForecast.length > 0) {
-      let closestIdx = 0;
-      let minDiff = Infinity;
-      hourlyForecast.forEach((item, idx) => {
-        const diff = Math.abs(item.epoch - currentEpoch);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestIdx = idx;
-        }
-      });
-      hourlyForecast[closestIdx].isCurrent = true;
-      hourlyForecast[closestIdx].isPast = false;
-
-      for (let i = 0; i < closestIdx; i++) {
-        hourlyForecast[i].isPast = true;
-      }
-    }
-
     // 오늘 하루 전체 기온 범위 계산 (오늘 날짜와 매칭되는 24개 노드 기준)
+    const nowKST = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
     const todayStr = nowKST.toISOString().split('T')[0];
     const todayTemps = hourly.time
       .map((time, i) => ({ time, temp: hourly.temperature_2m[i] }))
