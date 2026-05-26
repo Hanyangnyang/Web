@@ -5,7 +5,7 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       ios_signing:
-        distribution_type: development
+        distribution_type: app_store
         bundle_identifier: com.hanyangnyang.app
       node: latest
     scripts:
@@ -29,6 +29,11 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - 알파 테스트
       email:
         recipients:
           - yaeunjess@gmail.com
