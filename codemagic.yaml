@@ -22,7 +22,7 @@ workflows:
           cd ios/App && pod install
       - name: Set up code signing
         # Codemagic이 원격으로 애플 서버에서 인증서와 배포 프로파일을 자동으로 발급/갱신합니다.
-        script: xcode-project use-profiles --auth automatic
+        script: xcode-project use-profiles
       - name: Build IPA
         script: |
           xcode-project build-ipa \
