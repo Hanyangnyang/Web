@@ -108,6 +108,23 @@ export default async function handler(req, res) {
                   title: titleText,
                   body: bodyText,
                   link: deepLink
+                },
+                apns: {
+                  payload: {
+                    aps: {
+                      alert: {
+                        title: titleText,
+                        body: bodyText
+                      },
+                      sound: 'default'
+                    }
+                  }
+                },
+                android: {
+                  notification: {
+                    title: titleText,
+                    body: bodyText
+                  }
                 }
               });
               menuSentTokens.add(token);
@@ -155,12 +172,30 @@ export default async function handler(req, res) {
                 ? `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`
                 : `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
 
+              const titleText = isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!';
               messages.push({
                 token: token,
                 data: {
-                  title: isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!',
+                  title: titleText,
                   body: bodyText,
                   link: deepLink
+                },
+                apns: {
+                  payload: {
+                    aps: {
+                      alert: {
+                        title: titleText,
+                        body: bodyText
+                      },
+                      sound: 'default'
+                    }
+                  }
+                },
+                android: {
+                  notification: {
+                    title: titleText,
+                    body: bodyText
+                  }
                 }
               });
               menuSentTokens.add(token);
@@ -255,6 +290,23 @@ export default async function handler(req, res) {
                 title: title,
                 body: body,
                 link: deepLink
+              },
+              apns: {
+                payload: {
+                  aps: {
+                    alert: {
+                      title: title,
+                      body: body
+                    },
+                    sound: 'default'
+                  }
+                }
+              },
+              android: {
+                notification: {
+                  title: title,
+                  body: body
+                }
               }
             });
             weatherSentTokens.add(token);

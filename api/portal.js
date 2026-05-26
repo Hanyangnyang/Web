@@ -151,7 +151,6 @@ async function handleWeather(req, res) {
 
 규칙:
 - 한 문장으로 매우 짧고 간결하게 작성할 것 (대략 30자 이내)
-- 답변 텍스트 내에 절대 자가적인 글자 수 세기나 글자 인덱스 번호(예: (1), (2), (3) 등)를 포함하지 말 것
 - 실용적인 조언(외투, 우산, 자외선차단제 등)을 자연스럽게 포함
 - 이모지 사용 금지
 - 반말 금지, 친근한 존댓말 사용
@@ -159,7 +158,7 @@ async function handleWeather(req, res) {
 - 오직 코멘트 문장만 출력, 다른 말 하지 말 것`;
 
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
