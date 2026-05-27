@@ -29,6 +29,8 @@ export const initMessaging = async () => {
   return null;
 };
 
+let cachedNativeToken = null;
+
 export const requestNotificationPermission = async () => {
   try {
     if (Capacitor.isNativePlatform()) {
@@ -39,21 +41,40 @@ export const requestNotificationPermission = async () => {
       }
       
       if (permStatus.receive === 'granted') {
-        await PushNotifications.register();
-        
+        if (cachedNativeToken) return cachedNativeToken;
+
         return new Promise((resolve) => {
+          let isResolved = false;
+
           const regListener = PushNotifications.addListener('registration', (token) => {
+            if (isResolved) return;
+            isResolved = true;
+            cachedNativeToken = token.value;
             regListener.remove();
             resolve(token.value);
           });
+
           const errListener = PushNotifications.addListener('registrationError', (err) => {
+            if (isResolved) return;
+            isResolved = true;
             console.error('Push registration error: ', err);
             errListener.remove();
             resolve(null);
           });
+
+          PushNotifications.register().catch(e => {
+            console.error('Push register call failed:', e);
+          });
+          
           // Timeout if registration takes too long
           setTimeout(() => {
-            resolve(null);
+            if (!isResolved) {
+              isResolved = true;
+              regListener.remove();
+              errListener.remove();
+              console.warn('Push registration timed out');
+              resolve(null);
+            }
           }, 5000);
         });
       } else {
