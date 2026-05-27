@@ -11,5 +11,8 @@
 			"launchShowDuration": 0
 		}
 	},
-	"packageClassList": []
+	"packageClassList": [
+		"PushNotificationsPlugin",
+		"SharePlugin"
+	]
 }
