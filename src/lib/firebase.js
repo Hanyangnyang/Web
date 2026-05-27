@@ -105,3 +105,24 @@ export const requestNotificationPermission = async () => {
   }
 };
 
+export const checkNotificationPermission = async () => {
+  try {
+    if (Capacitor.isNativePlatform()) {
+      let permStatus = await PushNotifications.checkPermissions();
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
+      return permStatus.receive === 'granted';
+    }
+
+    const permission = Notification.permission;
+    if (permission === 'default') {
+      const result = await Notification.requestPermission();
+      return result === 'granted';
+    }
+    return permission === 'granted';
+  } catch (err) {
+    console.error('Error checking notification permission:', err);
+    return false;
+  }
+};

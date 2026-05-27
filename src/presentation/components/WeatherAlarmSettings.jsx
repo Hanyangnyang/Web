@@ -1,5 +1,5 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
-import { requestNotificationPermission } from '../../lib/firebase';
+import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 
 // 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
@@ -530,8 +530,8 @@ export function WeatherAlarmSettings({ onClose }) {
 
   const ensureWeatherAlertOn = async () => {
     if (!settings.weatherAlert) {
-      const token = await requestNotificationPermission();
-      if (!token) {
+      const hasPerm = await checkNotificationPermission();
+      if (!hasPerm) {
         alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
         return false;
       }
@@ -544,8 +544,8 @@ export function WeatherAlarmSettings({ onClose }) {
     const turningOn = !settings.weatherAlert;
     setSettings(p => ({ ...p, weatherAlert: turningOn }));
     if (turningOn) {
-      const token = await requestNotificationPermission();
-      if (!token) {
+      const hasPerm = await checkNotificationPermission();
+      if (!hasPerm) {
         alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
         setSettings(p => ({ ...p, weatherAlert: false }));
       }
