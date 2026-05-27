@@ -336,8 +336,24 @@ export function PortalView({ isVisible = true }) {
       <div className="mb-6">
         <img
           src="/monster_banner_home.png"
-          className="w-full h-auto rounded-xl"
+          className="w-full h-auto rounded-xl cursor-pointer"
           alt="Monster Energy"
+          onClick={() => {
+            // TODO: 출시 후 실제 스토어 링크로 교체
+            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=TODO';
+            const APP_STORE_URL = 'https://apps.apple.com/app/TODO';
+
+            const ua = navigator.userAgent;
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            const isAndroid = /Android/i.test(ua);
+
+            if (isIOS) {
+              window.open(APP_STORE_URL, '_blank');
+            } else {
+              // Android 또는 데스크톱 → Play Store
+              window.open(PLAY_STORE_URL, '_blank');
+            }
+          }}
         />
       </div>
 
