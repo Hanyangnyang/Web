@@ -26,10 +26,12 @@ export function BottomNav({ activeTab, setActiveTab }) {
         <BusIcon />
         <span className="text-[0.7rem] font-semibold">셔틀·지하철</span>
       </div>
+      {/* 도서관 탭 임시 비활성화 (보안 이슈 및 회원가입 개편 전까지)
       <div className={itemClass('qr')} onClick={() => setActiveTab('qr')}>
         <BookOpen size={24} />
         <span className="text-[0.7rem] font-semibold">도서관</span>
       </div>
+      */}
       <div className={itemClass('portal')} onClick={() => setActiveTab('portal')}>
         <Megaphone size={24} />
         <span className="text-[0.7rem] font-semibold">소식</span>
