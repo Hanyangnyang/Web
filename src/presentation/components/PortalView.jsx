@@ -8,6 +8,7 @@ import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
+
 function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
   const [displayed, setDisplayed] = useState(() => {
     return hasAnimatedThisSession ? text : '';
@@ -234,7 +235,7 @@ export function PortalView({ isVisible = true }) {
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
         {/* 1. 오늘의 날씨 & 소식 섹션 */}
         {(loading || weather) && (
-          <section className="mb-10">
+          <section className="mb-2">
             <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
@@ -330,6 +331,15 @@ export function PortalView({ isVisible = true }) {
             )}
           </section>
         )}
+
+      {/* Monster Energy 배너 */}
+      <div className="mb-6">
+        <img
+          src="/monster_banner_home.png"
+          className="w-full h-auto rounded-xl"
+          alt="Monster Energy"
+        />
+      </div>
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
