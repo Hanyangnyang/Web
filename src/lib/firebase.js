@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, isSupported } from 'firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { FCM } from '@capacitor-community/fcm';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -43,40 +44,15 @@ export const requestNotificationPermission = async () => {
       if (permStatus.receive === 'granted') {
         if (cachedNativeToken) return cachedNativeToken;
 
-        return new Promise((resolve) => {
-          let isResolved = false;
-
-          const regListener = PushNotifications.addListener('registration', (token) => {
-            if (isResolved) return;
-            isResolved = true;
-            cachedNativeToken = token.value;
-            regListener.remove();
-            resolve(token.value);
-          });
-
-          const errListener = PushNotifications.addListener('registrationError', (err) => {
-            if (isResolved) return;
-            isResolved = true;
-            console.error('Push registration error: ', err);
-            errListener.remove();
-            resolve(null);
-          });
-
-          PushNotifications.register().catch(e => {
-            console.error('Push register call failed:', e);
-          });
-          
-          // Timeout if registration takes too long
-          setTimeout(() => {
-            if (!isResolved) {
-              isResolved = true;
-              regListener.remove();
-              errListener.remove();
-              console.warn('Push registration timed out');
-              resolve(null);
-            }
-          }, 5000);
-        });
+        try {
+          await PushNotifications.register();
+          const { token } = await FCM.getToken();
+          cachedNativeToken = token;
+          return token;
+        } catch (e) {
+          console.error('FCM Push register failed:', e);
+          return null;
+        }
       } else {
         console.warn('Native notification permission denied');
         return null;

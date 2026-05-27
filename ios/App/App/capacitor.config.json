@@ -12,6 +12,7 @@
 		}
 	},
 	"packageClassList": [
+		"FCMPlugin",
 		"PushNotificationsPlugin",
 		"SharePlugin"
 	]
