@@ -11,5 +11,9 @@
 			"launchShowDuration": 0
 		}
 	},
-	"packageClassList": []
+	"packageClassList": [
+		"FCMPlugin",
+		"PushNotificationsPlugin",
+		"SharePlugin"
+	]
 }

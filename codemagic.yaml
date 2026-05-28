@@ -31,15 +31,31 @@ workflows:
           </plist>
           EOF
           
-          # 2. Add CODE_SIGN_ENTITLEMENTS to project using Ruby
+          # 2. Add CODE_SIGN_ENTITLEMENTS and GoogleService-Info.plist to project using Ruby
           ruby -e "
           require 'xcodeproj'
           project = Xcodeproj::Project.open('ios/App/App.xcodeproj')
+          
+          # Add Entitlements
           project.targets.each do |target|
             target.build_configurations.each do |config|
               config.build_settings['CODE_SIGN_ENTITLEMENTS'] = 'App/App.entitlements'
             end
           end
+          
+          # Add GoogleService-Info.plist to Resource Build Phase
+          target = project.targets.find { |t| t.name == 'App' } || project.targets.first
+          group = project.main_group.find_subpath('App', true)
+          file_name = 'GoogleService-Info.plist'
+          
+          unless group.files.any? { |f| f.path == file_name }
+            file_ref = group.new_file(file_name)
+            target.add_resources([file_ref])
+            puts 'GoogleService-Info.plist linked successfully.'
+          else
+            puts 'GoogleService-Info.plist is already linked.'
+          end
+          
           project.save
           "
       - name: Pod install
@@ -50,6 +66,19 @@ workflows:
         script: xcode-project use-profiles
       - name: Build IPA
         script: |
+          # TestFlight의 최신 빌드 번호를 동적으로 가져와서 1씩 차례대로 증가시킵니다.
+          # (가져오는 데 실패할 경우를 대비해 기존 BUILD_NUMBER를 폴백으로 사용)
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number 2>/dev/null || echo "")
+          if ! [[ "$LATEST_BUILD" =~ ^[0-9]+$ ]]; then
+            LATEST_BUILD=$BUILD_NUMBER
+          fi
+          BUILD_NO=$(($LATEST_BUILD + 1))
+          
+          # agvtool을 사용하여 Xcode 프로젝트의 빌드 번호를 업데이트합니다.
+          cd ios/App
+          agvtool new-version -all $BUILD_NO
+          cd ../..
+          
           xcode-project build-ipa \
             --workspace ios/App/App.xcworkspace \
             --scheme App

@@ -34,7 +34,9 @@ function MainLayout() {
   const [activeTab, setActiveTab] = useState(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
-    return localStorage.getItem('lastActiveTab') || 'cafe';
+    let lastTab = localStorage.getItem('lastActiveTab') || 'cafe';
+    if (lastTab === 'qr') lastTab = 'cafe'; // 도서관 탭 임시 비활성화
+    return lastTab;
   });
   const [isCafeteriaLink] = useState(() => {
     const p = new URLSearchParams(window.location.search);

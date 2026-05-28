@@ -90,7 +90,11 @@ export default async function handler(req, res) {
               let bodyText = '';
               if (lunchMenus.length > 0) {
                 // 첫번째 메뉴의 첫째 줄(대표 메뉴)
-                const mainDish = lunchMenus[0].menu.split('\n')[0].trim().replace(/^[\*\-\s]+/, ''); // 마크다운 기호 제거
+                const mainDish = lunchMenus[0].menu
+                  .split('\n')[0]
+                  .trim()
+                  .replace(/^[\*\-\s•]+/, '') // 마크다운/불렛 기호 제거
+                  .replace(/<\/?[^>]+(>|$)/g, ''); // HTML 태그 제거
                 if (lunchMenus.length > 1) {
                   bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish} 외 ${lunchMenus.length - 1}개의 메뉴가 있어요`;
                 } else {
