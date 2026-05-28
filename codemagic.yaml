@@ -19,6 +19,9 @@ workflows:
         script: npx cap sync ios
       - name: Set up push capabilities
         script: |
+          # 0. Decode GoogleService-Info.plist from base64 environment variable
+          echo "$GOOGLE_SERVICE_INFO_BASE64" | base64 --decode > ios/App/App/GoogleService-Info.plist
+          
           # 1. Create entitlements file
           cat <<EOF > ios/App/App/App.entitlements
           <?xml version="1.0" encoding="UTF-8"?>
