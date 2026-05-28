@@ -2,6 +2,7 @@ import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
+import { getPlatform } from '../../lib/platform';
 
 const ITEM_H = 36;
 const VISIBLE = 3;
@@ -572,7 +573,8 @@ export function AlarmSettings({ onClose }) {
                 p_fcm_token: token,
                 p_topic: 'CAFETERIA_KEYWORD',
                 p_params: params,
-                p_is_active: true
+                p_is_active: true,
+                p_platform: getPlatform()
               });
             }
           } catch (err) {
@@ -587,7 +589,8 @@ export function AlarmSettings({ onClose }) {
             p_fcm_token: null,
             p_topic: 'CAFETERIA_KEYWORD',
             p_params: null,
-            p_is_active: false
+            p_is_active: false,
+            p_platform: getPlatform()
           }).then();
         }
       }
