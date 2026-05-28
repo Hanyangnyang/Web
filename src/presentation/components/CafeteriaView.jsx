@@ -76,7 +76,7 @@ const getMenuIcon = (type) => {
   return '🍚';
 };
 
-export function CafeteriaView({ date, changeDate, cafes, loading }) {
+export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, onCafeDeepLinkHandled }) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
 
@@ -89,6 +89,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
     localStorage.setItem('lastSelectedCafeId', id);
   };
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
   const [showAlarm, setShowAlarm] = useState(false);
   const [shareTarget, setShareTarget] = useState(null);
   const [copiedToast, setCopiedToast] = useState(false);
@@ -127,6 +128,25 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
       return () => clearTimeout(t);
     }
   }, []);
+
+  // 네이티브 알림 탭 딥링크: App에서 전달된 파라미터 처리
+  useEffect(() => {
+    if (!cafeDeepLink) return;
+    const { date: dateStr, cafe: cafeId, type: mealType } = cafeDeepLink;
+    if (dateStr) {
+      const parsed = new Date(dateStr);
+      if (!isNaN(parsed)) changeDate(parsed);
+    }
+    if (cafeId) {
+      setSelectedCafeId(cafeId);
+      localStorage.setItem('lastSelectedCafeId', cafeId);
+    }
+    if (mealType) {
+      urlTypeRef.current = mealType;
+    }
+    setDeepLinkTrigger(t => t + 1);
+    onCafeDeepLinkHandled?.();
+  }, [cafeDeepLink]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!selectedCafe.menus?.length) return;
@@ -200,7 +220,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading }) {
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
     }
-  }, [selectedCafeId, cafes, date]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCafeId, cafes, date, deepLinkTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleGroup = (type) =>
     setExpandedGroups(prev => ({ ...prev, [type]: !prev[type] }));
