@@ -80,6 +80,17 @@ export function MiscView() {
           </div>
         </div>
       </div>
+
+      <div className="mt-8 text-center">
+        <a
+          href="https://app.notion.com/p/361325c5461f80aa8463ee5ae404d4ba?source=copy_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[0.78rem] text-text-hint underline underline-offset-2"
+        >
+          개인정보처리방침
+        </a>
+      </div>
     </div>
   );
 }
