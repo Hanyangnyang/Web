@@ -7,5 +7,11 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/menu-alerts",
+      "schedule": "0 * * * *"
+    }
   ]
 }
