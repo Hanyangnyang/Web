@@ -6,6 +6,8 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
+      groups:
+        - Appstore
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.hanyangnyang.app
@@ -19,6 +21,9 @@ workflows:
         script: npx cap sync ios
       - name: Set up push capabilities
         script: |
+          # 0. Decode GoogleService-Info.plist from base64 environment variable
+          echo "$GOOGLE_SERVICE_INFO_BASE64" | base64 -D > ios/App/App/GoogleService-Info.plist
+          
           # 1. Create entitlements file
           cat <<EOF > ios/App/App/App.entitlements
           <?xml version="1.0" encoding="UTF-8"?>
@@ -73,6 +78,11 @@ workflows:
             LATEST_BUILD=$BUILD_NUMBER
           fi
           BUILD_NO=$(($LATEST_BUILD + 1))
+          
+          # 만료된 빌드 50번으로 인한 중복 에러를 방지하기 위해 최소 빌드 번호 51 강제 보정
+          if [ "$BUILD_NO" -le 50 ]; then
+            BUILD_NO=51
+          fi
           
           # agvtool을 사용하여 Xcode 프로젝트의 빌드 번호를 업데이트합니다.
           cd ios/App
