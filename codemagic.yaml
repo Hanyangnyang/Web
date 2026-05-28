@@ -7,7 +7,7 @@ workflows:
       app_store_connect: Codemagic
     environment:
       groups:
-        - credentials
+        - Appstore
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.hanyangnyang.app
