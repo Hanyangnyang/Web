@@ -51,5 +51,9 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>셔틀버스 정류장까지의 거리를 계산하기 위해 위치 정보가 필요합니다.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>셔틀버스 정류장까지의 거리를 계산하기 위해 위치 정보가 필요합니다.</string>
 </dict>
 </plist>
