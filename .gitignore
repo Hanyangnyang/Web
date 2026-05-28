@@ -38,3 +38,6 @@ api/cache
 *.keystore
 google-services.json
 android/app/google-services.json
+
+# iOS Firebase config
+ios/App/App/GoogleService-Info.plist
