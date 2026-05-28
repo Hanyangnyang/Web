@@ -45,7 +45,11 @@ export const requestNotificationPermission = async () => {
         if (cachedNativeToken) return cachedNativeToken;
 
         try {
-          await PushNotifications.register();
+          await new Promise((resolve, reject) => {
+            PushNotifications.addListener('registration', () => resolve());
+            PushNotifications.addListener('registrationError', (err) => reject(new Error(err.error)));
+            PushNotifications.register();
+          });
           const { token } = await FCM.getToken();
           cachedNativeToken = token;
           return token;
