@@ -44,6 +44,8 @@ function MainLayout() {
     const p = new URLSearchParams(window.location.search);
     return p.has('date') || p.has('cafe') || p.has('type');
   });
+  // 네이티브 앱에서 getLaunchUrl() 결과를 확인하기 전까지 스플래시 렌더링 지연
+  const [launchUrlChecked, setLaunchUrlChecked] = useState(() => !isNativeApp());
   const [cafeDeepLink, setCafeDeepLink] = useState(null);
   const [slideDir, setSlideDir] = useState('right');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
@@ -114,15 +116,19 @@ function MainLayout() {
 
     // 콜드 스타트: 앱이 닫힌 상태에서 딥링크로 실행된 경우
     CapApp.getLaunchUrl().then(({ url }) => {
-      if (!url) return;
-      const params = parseCafeParams(url);
-      if (!params) return;
-      coldStartHandled = true;
-      setIsCafeteriaLink(true);
-      setActiveTab('cafe');
-      localStorage.setItem('lastActiveTab', 'cafe');
-      setCafeDeepLink(params);
-    }).catch(() => {});
+      if (url) {
+        const params = parseCafeParams(url);
+        if (params) {
+          coldStartHandled = true;
+          setIsCafeteriaLink(true);
+          setActiveTab('cafe');
+          localStorage.setItem('lastActiveTab', 'cafe');
+          setCafeDeepLink(params);
+        }
+      }
+    }).catch(() => {}).finally(() => {
+      setLaunchUrlChecked(true);
+    });
 
     // 웜 스타트: 앱이 백그라운드에 있는 상태에서 딥링크로 포그라운드 진입
     CapApp.addListener('appUrlOpen', (data) => {
@@ -163,7 +169,7 @@ function MainLayout() {
 
   return (
     <>
-      {!splashDone && (
+      {!splashDone && launchUrlChecked && (
         <SplashScreen
           ready={isAppReady}
           onDone={completeSplash}
