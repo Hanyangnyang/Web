@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["V5VT97523D.com.hanyangnyang.app"],
+        "components": [
+          { "/": "/*" }
+        ]
+      }
+    ]
+  }
+}
