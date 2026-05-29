@@ -123,8 +123,8 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
   let filteredPast = pastCandidates.filter(r => r.depMin >= nowMinutes - lookbackMinutes);
   if (filteredPast.length === 0 && pastCandidates.length > 0) {
     filteredPast = [pastCandidates[pastCandidates.length - 1]];
-  } else if (filteredPast.length > 2) {
-    filteredPast = filteredPast.slice(-2);
+  } else if (filteredPast.length > 1) {
+    filteredPast = filteredPast.slice(-1);
   }
 
   return filteredPast.concat(upcoming);
