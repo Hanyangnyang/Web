@@ -24,6 +24,18 @@ public class MainActivity extends BridgeActivity {
         String ua = getBridge().getWebView().getSettings().getUserAgentString();
         getBridge().getWebView().getSettings().setUserAgentString(ua + " HanyangAndroidApp");
         pendingDeepLinkParams = extractDeepLinkParams(getIntent());
+        // FCM 알림 탭으로 콜드 스타트된 경우: Capacitor 이벤트가 리스너 등록 전에 드랍되므로
+        // Intent extra의 link 필드를 직접 읽어 Kakao 딥링크와 동일한 경로로 주입
+        if (pendingDeepLinkParams == null) {
+            String fcmLink = getIntent().getStringExtra("link");
+            if (fcmLink != null && !fcmLink.isEmpty()) {
+                try {
+                    android.net.Uri fcmUri = android.net.Uri.parse(fcmLink);
+                    String query = fcmUri.getEncodedQuery();
+                    if (query != null && !query.isEmpty()) pendingDeepLinkParams = query;
+                } catch (Exception ignored) {}
+            }
+        }
         // Android 13+ Predictive Back: Capacitor의 기본 동작이 무력화되므로 직접 처리
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
