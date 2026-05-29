@@ -377,7 +377,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       >
         <div style={{ height: ITEM_H }} />
         {HOUR_LIST.map((h, idx) => {
-          const displayVal = h === 0 ? 12 : h;
+          const displayVal = h;
           return (
             <div key={h} style={itemStyle(idx === liveHour)}>
               {displayVal}
