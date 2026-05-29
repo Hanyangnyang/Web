@@ -127,7 +127,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
         className="flex items-center py-4 pl-4"
         style={{
           paddingTop: (isNext || isLast || isPast) ? 26 : 16,
-          flex: hideSubwayCol ? 1 : '0 0 52%',
+          flex: hideSubwayCol ? 1 : '0 0 40%',
         }}
       >
         <div className="flex items-center gap-3.5">
@@ -480,7 +480,7 @@ export function ShuttleView({ isActive }) {
         </div>
 
         <div className="flex py-0 pb-1.5 border-b border-[#f1f5f9] relative">
-          <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 90 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">출발 시간</div>
+          <div style={{ flex: hideSubwayCol ? 1 : '0 0 40%', paddingLeft: 90 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">출발 시간</div>
           {!hideSubwayCol && (
             <div style={{ flex: 1, paddingLeft: 4 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">
               {needsSubway ? '연결 지하철' : '도착'}
