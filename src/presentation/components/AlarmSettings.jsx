@@ -100,8 +100,37 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   // --- 스크롤 핸들러 (즉시 live 색상 + 디바운스 commit) ---
   const handleHourScroll = () => {
     const el = hourRef.current;
-    if (!el) return;
-    setLiveHour(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 11)));
+    const ampmEl = ampmRef.current;
+    if (!el || !ampmEl) return;
+    
+    const curScroll = el.scrollTop;
+    const maxScroll = 11 * ITEM_H;
+    const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
+    
+    // 오버스크롤(튕김) 감지 시 오전/오후 자동 전환
+    if (curScroll > maxScroll + 10) {
+      if (curAmpm === 0) { // 오전 11시 -> 더 아래로 -> 오후 12시(0)
+        el.scrollTop = 0;
+        setLiveHour(0);
+        ampmEl.scrollTop = 1 * ITEM_H;
+        setLiveAmpm(1);
+        clearTimeout(hourTimer.current);
+        hourTimer.current = setTimeout(commitTime, 150);
+        return;
+      }
+    } else if (curScroll < -10) {
+      if (curAmpm === 1) { // 오후 12시(0) -> 더 위로 -> 오전 11시
+        el.scrollTop = 11 * ITEM_H;
+        setLiveHour(11);
+        ampmEl.scrollTop = 0;
+        setLiveAmpm(0);
+        clearTimeout(hourTimer.current);
+        hourTimer.current = setTimeout(commitTime, 150);
+        return;
+      }
+    }
+
+    setLiveHour(Math.max(0, Math.min(Math.round(curScroll / ITEM_H), 11)));
     clearTimeout(hourTimer.current);
     hourTimer.current = setTimeout(commitTime, 150);
   };
@@ -350,7 +379,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       >
         <div style={{ height: ITEM_H }} />
         {HOUR_LIST.map((h, idx) => {
-          const displayVal = h === 0 ? (liveAmpm === 0 ? "00" : 12) : h;
+          const displayVal = h === 0 ? 12 : h;
           return (
             <div key={h} style={itemStyle(idx === liveHour)}>
               {displayVal}
@@ -608,7 +637,7 @@ export function AlarmSettings({ onClose }) {
       const isSubscribed = settings.jeyukAlert && (settings.mode === 'cafe' || settings.keywords.length > 0);
 
       if (isSubscribed) {
-        successMsg = '설정한 시간에 맞춰\n식단 알림을 보내드릴게요';
+        successMsg = '🔔 설정한 시간에 맞춰\n식단 알림을 보내드릴게요';
 
         (async () => {
           try {

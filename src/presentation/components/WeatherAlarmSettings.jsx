@@ -104,8 +104,37 @@ function TimePicker({ value, onChange, day, onDayChange }) {
 
   const handleHourScroll = () => {
     const el = hourRef.current;
-    if (!el) return;
-    setLiveHour(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 11)));
+    const ampmEl = ampmRef.current;
+    if (!el || !ampmEl) return;
+    
+    const curScroll = el.scrollTop;
+    const maxScroll = 11 * ITEM_H;
+    const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
+    
+    // 오버스크롤(튕김) 감지 시 오전/오후 자동 전환
+    if (curScroll > maxScroll + 10) {
+      if (curAmpm === 0) { // 오전 11시 -> 더 아래로 -> 오후 12시(0)
+        el.scrollTop = 0;
+        setLiveHour(0);
+        ampmEl.scrollTop = 1 * ITEM_H;
+        setLiveAmpm(1);
+        clearTimeout(hourTimer.current);
+        hourTimer.current = setTimeout(commitTime, 150);
+        return;
+      }
+    } else if (curScroll < -10) {
+      if (curAmpm === 1) { // 오후 12시(0) -> 더 위로 -> 오전 11시
+        el.scrollTop = 11 * ITEM_H;
+        setLiveHour(11);
+        ampmEl.scrollTop = 0;
+        setLiveAmpm(0);
+        clearTimeout(hourTimer.current);
+        hourTimer.current = setTimeout(commitTime, 150);
+        return;
+      }
+    }
+
+    setLiveHour(Math.max(0, Math.min(Math.round(curScroll / ITEM_H), 11)));
     clearTimeout(hourTimer.current);
     hourTimer.current = setTimeout(commitTime, 150);
   };
@@ -348,7 +377,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
       >
         <div style={{ height: ITEM_H }} />
         {HOUR_LIST.map((h, idx) => {
-          const displayVal = h === 0 ? (liveAmpm === 0 ? "00" : 12) : h;
+          const displayVal = h === 0 ? 12 : h;
           return (
             <div key={h} style={itemStyle(idx === liveHour)}>
               {displayVal}
@@ -625,7 +654,7 @@ export function WeatherAlarmSettings({ onClose }) {
       if (settings.weatherAlert) {
         // 동적 완성형 팝업 완료 메시지 조립
         if (settings.conditions.daily || settings.conditions.weekday) {
-          successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
+          successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
         } else {
           const activeKeywords = [];
           if (settings.conditions.rainSnow) activeKeywords.push('비/눈 소식');
@@ -643,9 +672,9 @@ export function WeatherAlarmSettings({ onClose }) {
               joined = activeKeywords[0];
             }
             const josaJoined = josa(joined, '이/가');
-            successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
+            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           } else {
-            successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
+            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           }
         }
 
