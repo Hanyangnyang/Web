@@ -31,6 +31,7 @@ function getKSTDateDetails() {
   
   return {
     hourStr: partMap.hour,
+    minuteStr: partMap.minute,
     todayDateStr,
     tomorrowDateStr,
     tomorrowISODateStr,
@@ -100,14 +101,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Filter subscriptions for current hour
+    // Filter subscriptions for current hour and minute
     const matchingSubscriptions = subscriptions.filter(sub => {
       const time = sub.params?.notifyTime || '08:00';
-      return time.startsWith(kst.hourStr + ':');
+      const [sh, sm] = time.split(':');
+      return sh === kst.hourStr && sm === kst.minuteStr;
     });
 
     if (matchingSubscriptions.length === 0) {
-      return new Response(JSON.stringify({ success: true, message: 'No subscriptions for this hour' }), {
+      return new Response(JSON.stringify({ success: true, message: 'No subscriptions for this hour and minute' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
