@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Dumbbell, CalendarDays, ArrowUpRight } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
-import { pushBackHandler, popBackHandler } from '../../lib/backHandler.js';
+import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
 
 const InstagramIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
