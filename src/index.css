@@ -332,6 +332,11 @@ body {
 /* ═══ 링크 복사 토스트 (JS로 동적 생성) ═══ */
 .copy-toast { animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards; }
 
+/* ═══ 모달/시트 열릴 때 배경 스크롤 잠금 (레이아웃 점프 없이) ═══ */
+.scroll-locked {
+  overflow: hidden;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;

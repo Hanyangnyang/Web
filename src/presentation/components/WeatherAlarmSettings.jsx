@@ -538,20 +538,13 @@ export function WeatherAlarmSettings({ onClose }) {
     return null;
   }, [settings.conditions]);
 
+  // iOS 배경 스크롤 잠금 (position:fixed 대신 클래스 토글로 레이아웃 점프 방지)
   useEffect(() => {
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('scroll-locked');
+    document.body.classList.add('scroll-locked');
     return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, scrollY);
+      document.documentElement.classList.remove('scroll-locked');
+      document.body.classList.remove('scroll-locked');
     };
   }, []);
 
