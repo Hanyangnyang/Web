@@ -115,12 +115,11 @@ public class MainActivity extends BridgeActivity {
 
         String scheme = data.getScheme();
 
-        // Kakao 커스텀 스킴: kakao{key}://kakaolink?androidexecutionparams=...
-        // SDK가 생성하는 URL의 키는 소문자이므로 양쪽 모두 시도
+        // Kakao 커스텀 스킴: SDK가 androidExecutionParams를 URL에 직접 풀어서 넣음
+        // 예: kakao{key}://kakaolink?date=2026-06-01&cafe=re13&type=조식
         if (KAKAO_SCHEME.equals(scheme)) {
-            String execParams = data.getQueryParameter("androidExecutionParams");
-            if (execParams == null) execParams = data.getQueryParameter("androidexecutionparams");
-            if (execParams != null && !execParams.isEmpty()) return execParams;
+            String query = data.getEncodedQuery();
+            if (query != null && !query.isEmpty()) return query;
         }
 
         // HTTPS App Links: https://www.hanyang.life/?date=...&cafe=...&type=...
