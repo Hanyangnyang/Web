@@ -99,6 +99,15 @@ Deno.serve(async (req) => {
   // 커스텀 크론 비밀키 검증 (보안 강화)
   const authHeader = req.headers.get('Authorization');
   const cronSecret = Deno.env.get('CRON_SECRET');
+
+  console.log('--- CRON AUTH DEBUG ---');
+  console.log('1. 수신된 Auth 헤더 존재 여부:', authHeader ? '존재함 (Present)' : '누락됨 (Missing)');
+  console.log('2. Deno Secrets 변수 존재 여부:', cronSecret ? '존재함 (Present)' : '누락됨 (Missing)');
+  if (authHeader && cronSecret) {
+    console.log('3. 수신 헤더 길이:', authHeader.length, ' / Secrets 변수 길이 (Bearer 포함):', `Bearer ${cronSecret}`.length);
+    console.log('4. 두 값의 일치 여부:', authHeader === `Bearer ${cronSecret}` ? '일치함 (Match)' : '불일치함 (Mismatch)');
+  }
+
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
