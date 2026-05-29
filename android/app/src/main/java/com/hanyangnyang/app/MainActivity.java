@@ -12,17 +12,18 @@ import androidx.activity.OnBackPressedCallback;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebViewClient;
 
+import org.json.JSONObject;
+
 public class MainActivity extends BridgeActivity {
     private static final String KAKAO_SCHEME = "kakao79b4e1cf4eb03ea19f0eda552d6e219d";
-    private static final String BASE_URL = "https://www.hanyang.life/";
-    private String pendingDeepLink = null;
+    private String pendingDeepLinkParams = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String ua = getBridge().getWebView().getSettings().getUserAgentString();
         getBridge().getWebView().getSettings().setUserAgentString(ua + " HanyangAndroidApp");
-        pendingDeepLink = extractDeepLink(getIntent());
+        pendingDeepLinkParams = extractDeepLinkParams(getIntent());
         // Android 13+ Predictive Back: Capacitor의 기본 동작이 무력화되므로 직접 처리
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -63,10 +64,10 @@ public class MainActivity extends BridgeActivity {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
-                    if (pendingDeepLink != null) {
-                        String deepLink = pendingDeepLink;
-                        pendingDeepLink = null;
-                        view.loadUrl(deepLink);
+                    if (pendingDeepLinkParams != null) {
+                        String params = pendingDeepLinkParams;
+                        pendingDeepLinkParams = null;
+                        injectDeepLink(view, params);
                     }
                 }
             }
@@ -76,18 +77,31 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        String deepLink = extractDeepLink(intent);
-        if (deepLink != null) {
-            getBridge().getWebView().loadUrl(deepLink);
+        String params = extractDeepLinkParams(intent);
+        if (params != null) {
+            injectDeepLink(getBridge().getWebView(), params);
         }
     }
 
-    private String extractDeepLink(Intent intent) {
+    // loadUrl 대신 JS 함수 호출로 파라미터만 전달 → 페이지 재로드 없음
+    // window.__pendingDeepLinkParams: React 마운트 전 도착 시 useEffect에서 읽음
+    // hanyang-deeplink 이벤트: 앱이 이미 실행 중일 때 즉시 수신
+    private void injectDeepLink(WebView view, String params) {
+        try {
+            String quoted = JSONObject.quote(params);
+            String js = "var p=" + quoted + ";" +
+                        "window.__pendingDeepLinkParams=p;" +
+                        "document.dispatchEvent(new CustomEvent('hanyang-deeplink',{detail:p}));";
+            view.evaluateJavascript(js, null);
+        } catch (Exception ignored) {}
+    }
+
+    private String extractDeepLinkParams(Intent intent) {
         if (intent == null) return null;
         Uri data = intent.getData();
         if (data == null || !KAKAO_SCHEME.equals(data.getScheme())) return null;
         String execParams = data.getQueryParameter("androidExecutionParams");
         if (execParams == null || execParams.isEmpty()) return null;
-        return BASE_URL + "?" + execParams;
+        return execParams;
     }
 }

@@ -59,6 +59,41 @@ function MainLayout() {
     prefetchPortalData();
   }, []);
 
+  // 탭 라우팅 공통 함수 - Kakao 딥링크 / 푸시 알림 양쪽에서 재사용
+  const routeFromParams = useCallback((paramString) => {
+    const params = new URLSearchParams(paramString);
+    const tab = params.get('tab');
+    if (tab === 'weather') {
+      setActiveTab('portal');
+      localStorage.setItem('lastActiveTab', 'portal');
+      return;
+    }
+    if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
+      setActiveTab('cafe');
+      localStorage.setItem('lastActiveTab', 'cafe');
+      setCafeDeepLink({
+        date: params.get('date'),
+        cafe: params.get('cafe'),
+        type: params.get('type'),
+      });
+    }
+  }, []);
+
+  // Android Kakao 딥링크 처리 (MainActivity.java가 evaluateJavascript로 주입)
+  // window.__pendingDeepLinkParams: 초기 실행 시 React 마운트 전에 도착한 파라미터
+  // hanyang-deeplink 이벤트: 앱이 이미 실행 중일 때 onNewIntent로 수신
+  useEffect(() => {
+    if (!isApp) return;
+    const pending = window.__pendingDeepLinkParams;
+    if (pending) {
+      window.__pendingDeepLinkParams = null;
+      routeFromParams(pending);
+    }
+    const handler = (e) => routeFromParams(e.detail);
+    document.addEventListener('hanyang-deeplink', handler);
+    return () => document.removeEventListener('hanyang-deeplink', handler);
+  }, [isApp, routeFromParams]);
+
   // 네이티브 푸시 알림 탭 → 딥링크 처리
   useEffect(() => {
     if (!isApp) return;
@@ -68,30 +103,13 @@ function MainLayout() {
       if (!link) return;
       try {
         const url = new URL(link);
-        const params = url.searchParams;
-        const tab = params.get('tab');
-        if (tab === 'weather') {
-          // 날씨 알림 → 소식 탭
-          setActiveTab('portal');
-          localStorage.setItem('lastActiveTab', 'portal');
-          return;
-        }
-        // 학식 알림 → 학식 탭 + 파라미터 전달
-        if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
-          setActiveTab('cafe');
-          localStorage.setItem('lastActiveTab', 'cafe');
-          setCafeDeepLink({
-            date: params.get('date'),
-            cafe: params.get('cafe'),
-            type: params.get('type'),
-          });
-        }
+        routeFromParams(url.searchParams.toString());
       } catch (e) {
         console.error('Failed to parse notification deep link', e);
       }
     }).then(h => { handle = h; });
     return () => { handle?.remove(); };
-  }, [isApp]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isApp, routeFromParams]);
 
   const reloginFn = useCallback(() => relogin(), [relogin]);
 
