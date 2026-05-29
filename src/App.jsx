@@ -16,6 +16,7 @@ import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 
@@ -42,6 +43,7 @@ function MainLayout() {
     const p = new URLSearchParams(window.location.search);
     return p.has('date') || p.has('cafe') || p.has('type');
   });
+  const [cafeDeepLink, setCafeDeepLink] = useState(null);
   const [slideDir, setSlideDir] = useState('right');
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const posthog = usePostHog();
@@ -54,6 +56,40 @@ function MainLayout() {
   useEffect(() => {
     prefetchPortalData();
   }, []);
+
+  // 네이티브 푸시 알림 탭 → 딥링크 처리
+  useEffect(() => {
+    if (!isApp) return;
+    let handle;
+    PushNotifications.addListener('pushNotificationActionPerformed', (event) => {
+      const link = event?.notification?.data?.link;
+      if (!link) return;
+      try {
+        const url = new URL(link);
+        const params = url.searchParams;
+        const tab = params.get('tab');
+        if (tab === 'weather') {
+          // 날씨 알림 → 소식 탭
+          setActiveTab('portal');
+          localStorage.setItem('lastActiveTab', 'portal');
+          return;
+        }
+        // 학식 알림 → 학식 탭 + 파라미터 전달
+        if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
+          setActiveTab('cafe');
+          localStorage.setItem('lastActiveTab', 'cafe');
+          setCafeDeepLink({
+            date: params.get('date'),
+            cafe: params.get('cafe'),
+            type: params.get('type'),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to parse notification deep link', e);
+      }
+    }).then(h => { handle = h; });
+    return () => { handle?.remove(); };
+  }, [isApp]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const reloginFn = useCallback(() => relogin(), [relogin]);
 
@@ -102,7 +138,14 @@ function MainLayout() {
             )}
           </div>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
-            <CafeteriaView date={menuDate} changeDate={changeDate} cafes={cafes} loading={menuLoading} />
+            <CafeteriaView
+              date={menuDate}
+              changeDate={changeDate}
+              cafes={cafes}
+              loading={menuLoading}
+              cafeDeepLink={cafeDeepLink}
+              onCafeDeepLinkHandled={() => setCafeDeepLink(null)}
+            />
           </div>
           <div style={{ display: activeTab === 'shuttle' ? 'block' : 'none' }}>
             <ShuttleView isActive={activeTab === 'shuttle'} />

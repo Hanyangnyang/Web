@@ -16,15 +16,17 @@ CREATE OR REPLACE FUNCTION upsert_alarm_subscription(
   p_fcm_token text,
   p_topic text,
   p_params jsonb,
-  p_is_active boolean
+  p_is_active boolean,
+  p_platform text DEFAULT 'web'
 ) RETURNS void AS $$
 BEGIN
   -- 1) FCM 토큰이 전달된 경우 Devices 테이블 갱신
   IF p_fcm_token IS NOT NULL THEN
     INSERT INTO public.devices (id, fcm_token, platform, last_active_at)
-    VALUES (p_device_id, p_fcm_token, 'web', now())
+    VALUES (p_device_id, p_fcm_token, COALESCE(p_platform, 'web'), now())
     ON CONFLICT (id) DO UPDATE
     SET fcm_token = EXCLUDED.fcm_token,
+        platform = COALESCE(EXCLUDED.platform, devices.platform),
         last_active_at = now();
   END IF;
 

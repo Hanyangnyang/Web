@@ -47,7 +47,7 @@ export function SplashScreen({ ready, onDone, variant = 'default' }) {
           className="w-[200px] h-[200px] object-contain [animation:splash-pop_0.5s_cubic-bezier(0.16,1,0.3,1)_both]"
           alt="하냥냥"
         />
-        <p className="text-[1.4rem] font-extrabold text-primary tracking-[0.04em] [animation:splash-pop_0.5s_0.12s_cubic-bezier(0.16,1,0.3,1)_both]">
+        <p className="text-[1.4rem] text-primary tracking-[0.04em] [animation:splash-pop_0.5s_0.12s_cubic-bezier(0.16,1,0.3,1)_both]" style={{ fontFamily: "'HakgyoansimDunggeunmiso', sans-serif" }}>
           하냥냥
         </p>
         <p className="text-[0.8rem] font-medium text-text-hint [animation:splash-pop_0.5s_0.22s_cubic-bezier(0.16,1,0.3,1)_both]">

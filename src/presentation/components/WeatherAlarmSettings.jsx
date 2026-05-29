@@ -1,6 +1,7 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
+import { getPlatform } from '../../lib/platform';
 
 // 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
 const josa = (word, type) => {
@@ -608,6 +609,7 @@ export function WeatherAlarmSettings({ onClose }) {
                   notifyDay: settings.notifyDay
                 },
                 p_is_active: true,
+                p_platform: getPlatform(),
               });
             }
           } catch (err) {
@@ -623,6 +625,7 @@ export function WeatherAlarmSettings({ onClose }) {
             p_topic: 'WEATHER_ALERT',
             p_params: null,
             p_is_active: false,
+            p_platform: getPlatform(),
           }).then();
         }
       }
