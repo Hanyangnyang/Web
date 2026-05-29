@@ -1,40 +1,45 @@
-import { createClient } from '@supabase/supabase-js';
-import admin from 'firebase-admin';
+import { createClient } from 'npm:@supabase/supabase-js@2';
+import admin from 'npm:firebase-admin@11.8.0';
 
-// Initialize Supabase Admin Client
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-// Initialize Firebase Admin (only once)
-if (!admin.apps.length) {
-  try {
-    // If FIREBASE_PRIVATE_KEY contains literal \n, replace them with actual newlines
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-        clientEmail: process.env.CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase admin initialization error', error);
+Deno.serve(async (req) => {
+  // CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*' } });
   }
-}
 
-export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+
+  // Initialize Firebase (only once)
+  if (!admin.apps.length) {
+    try {
+      const privateKey = Deno.env.get('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n');
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: Deno.env.get('VITE_FIREBASE_PROJECT_ID') || Deno.env.get('FIREBASE_PROJECT_ID'),
+          clientEmail: Deno.env.get('CLIENT_EMAIL'),
+          privateKey: privateKey,
+        }),
+      });
+    } catch (error) {
+      console.error('Firebase admin initialization error', error);
+    }
   }
 
   try {
-    // 1. Get current hour in KST (Safe against different server/local timezones)
-    const nowKST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
-    const currentHourStr = nowKST.getHours().toString().padStart(2, '0'); // e.g. "08"
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 2. Fetch active subscriptions with related device tokens (Menu & Weather)
+    // 1. Get current hour in KST
+    const nowKST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    const currentHourStr = nowKST.getHours().toString().padStart(2, '0');
+
+    // 2. Fetch active subscriptions
     const { data: subscriptions, error: subError } = await supabase
       .from('subscriptions')
       .select('*, devices(fcm_token)')
@@ -42,7 +47,10 @@ export default async function handler(req, res) {
 
     if (subError) throw subError;
     if (!subscriptions || subscriptions.length === 0) {
-      return res.status(200).json({ success: true, message: 'No active subscriptions' });
+      return new Response(JSON.stringify({ success: true, message: 'No active subscriptions' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
     }
 
     // Filter subscriptions for current hour
@@ -52,15 +60,19 @@ export default async function handler(req, res) {
     });
 
     if (matchingSubscriptions.length === 0) {
-      return res.status(200).json({ success: true, message: 'No subscriptions for this hour' });
+      return new Response(JSON.stringify({ success: true, message: 'No subscriptions for this hour' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
     }
 
-    const host = req.headers.host || 'hanyang.life';
-    const protocol = host.includes('localhost') ? 'http' : 'https';
+    // In Supabase Edge Functions, host is locked to production domain
+    const host = 'hanyang.life';
+    const protocol = 'https';
 
     const messages = [];
-    const menuSentTokens = new Set();    // 식단 중복 발송 방지용
-    const weatherSentTokens = new Set(); // 날씨 중복 발송 방지용
+    const menuSentTokens = new Set();
+    const weatherSentTokens = new Set();
 
     // --- A. 식단 알림(CAFETERIA_KEYWORD) 분할 및 처리 ---
     const menuSubs = matchingSubscriptions.filter(sub => sub.topic === 'CAFETERIA_KEYWORD');
@@ -85,16 +97,14 @@ export default async function handler(req, res) {
               const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
               const dayText = isTomorrow ? '내일' : '오늘';
 
-              // 중식 메뉴 추출
               const lunchMenus = (cafeObj.menus || []).filter(m => m.type.includes('중식'));
               let bodyText = '';
               if (lunchMenus.length > 0) {
-                // 첫번째 메뉴의 첫째 줄(대표 메뉴)
                 const mainDish = lunchMenus[0].menu
                   .split('\n')[0]
                   .trim()
-                  .replace(/^[\*\-\s•]+/, '') // 마크다운/불렛 기호 제거
-                  .replace(/<\/?[^>]+(>|$)/g, ''); // HTML 태그 제거
+                  .replace(/^[\*\-\s•]+/, '')
+                  .replace(/<\/?[^>]+(>|$)/g, '');
                 if (lunchMenus.length > 1) {
                   bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish} 외 ${lunchMenus.length - 1}개의 메뉴가 있어요`;
                 } else {
@@ -108,26 +118,31 @@ export default async function handler(req, res) {
 
               messages.push({
                 token: token,
+                notification: {
+                  title: titleText,
+                  body: bodyText
+                },
                 data: {
                   title: titleText,
                   body: bodyText,
                   link: deepLink
                 },
                 apns: {
+                  headers: {
+                    'apns-push-type': 'alert',
+                    'apns-priority': '10'
+                  },
                   payload: {
                     aps: {
-                      alert: {
-                        title: titleText,
-                        body: bodyText
-                      },
-                      sound: 'default'
+                      sound: 'default',
+                      badge: 1
                     }
                   }
                 },
                 android: {
+                  priority: 'high',
                   notification: {
-                    title: titleText,
-                    body: bodyText
+                    sound: 'default'
                   }
                 }
               });
@@ -179,26 +194,31 @@ export default async function handler(req, res) {
               const titleText = isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!';
               messages.push({
                 token: token,
+                notification: {
+                  title: titleText,
+                  body: bodyText
+                },
                 data: {
                   title: titleText,
                   body: bodyText,
                   link: deepLink
                 },
                 apns: {
+                  headers: {
+                    'apns-push-type': 'alert',
+                    'apns-priority': '10'
+                  },
                   payload: {
                     aps: {
-                      alert: {
-                        title: titleText,
-                        body: bodyText
-                      },
-                      sound: 'default'
+                      sound: 'default',
+                      badge: 1
                     }
                   }
                 },
                 android: {
+                  priority: 'high',
                   notification: {
-                    title: titleText,
-                    body: bodyText
+                    sound: 'default'
                   }
                 }
               });
@@ -210,25 +230,32 @@ export default async function handler(req, res) {
 
       // Process Today's Subscriptions
       if (todaySubs.length > 0) {
-        const menuRes = await fetch(`${protocol}://${host}/api/menu`);
-        const menuData = await menuRes.json();
-        if (menuData.success) processGroup(todaySubs, menuData);
+        try {
+          const menuRes = await fetch(`${protocol}://${host}/api/menu`);
+          const menuData = await menuRes.json();
+          if (menuData.success) processGroup(todaySubs, menuData);
+        } catch (e) {
+          console.error("Today's menu fetch failed:", e);
+        }
       }
 
       // Process Tomorrow's Subscriptions
       if (tomorrowSubs.length > 0) {
-        const tomorrow = new Date(nowKST.getTime() + 24 * 60 * 60 * 1000);
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
-        const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${tomorrowStr}`);
-        const menuData = await menuRes.json();
-        if (menuData.success) processGroup(tomorrowSubs, menuData);
+        try {
+          const tomorrow = new Date(nowKST.getTime() + 24 * 60 * 60 * 1000);
+          const tomorrowStr = tomorrow.toISOString().split('T')[0];
+          const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${tomorrowStr}`);
+          const menuData = await menuRes.json();
+          if (menuData.success) processGroup(tomorrowSubs, menuData);
+        } catch (e) {
+          console.error("Tomorrow's menu fetch failed:", e);
+        }
       }
     }
 
     // --- B. 날씨 알림(WEATHER_ALERT) 처리 ---
     const weatherSubs = matchingSubscriptions.filter(sub => sub.topic === 'WEATHER_ALERT');
     if (weatherSubs.length > 0) {
-      // 1. 날씨 데이터와 지하철 공휴일 판단용 데이터 병렬로 긁어오기
       const [weatherRes, subwayRes] = await Promise.all([
         fetch(`${protocol}://${host}/api/portal?type=weather`),
         fetch(`${protocol}://${host}/api/subway`).then(r => r.ok ? r.json() : null).catch(() => null)
@@ -240,9 +267,7 @@ export default async function handler(req, res) {
         const currentDay = nowKST.getDay();
         const isWeekday = currentDay >= 1 && currentDay <= 5 && !isHoliday;
         
-        // 날씨 파라미터 판단 가드 설정
         const hasRainOrSnow = weatherData.hasPrecipitation || (weatherData.hourlyForecast || []).some(h => {
-          // 낮 시간대(8시 ~ 18시) 강수 확률 30% 이상이거나 비/눈 상태코드 검출
           return h.hour >= 8 && h.hour <= 18 && (h.precipProb >= 30 || h.weatherCode >= 51);
         });
 
@@ -263,7 +288,6 @@ export default async function handler(req, res) {
           let title = '🌦️ 오늘 한양대 캠퍼스 날씨';
           let body = '';
 
-          // 1순위: 기상 악화 경보 (비/눈, 미세먼지, 자외선)
           if (cond.rainSnow && hasRainOrSnow) {
             shouldNotify = true;
             title = '☔ 캠퍼스에 비/눈 소식이 있어요!';
@@ -277,11 +301,8 @@ export default async function handler(req, res) {
             title = '☀️ 자외선 지수가 높은 날입니다!';
             body = '오늘 캠퍼스 자외선 강도가 높습니다. 외출 시 자외선 차단제와 선글라스를 챙기세요!';
           } else if (cond.daily || (cond.weekday && isWeekday)) {
-            // 2순위: 매일/평일 브리핑 신청자
             shouldNotify = true;
             title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
-            
-            // Gemini 코멘트가 제공되었다면 붙이고, 없으면 기본 날씨 묘사 사용
             const comment = weatherData.message || `${weatherData.description} 상태입니다.`;
             body = comment;
           }
@@ -290,26 +311,31 @@ export default async function handler(req, res) {
             const deepLink = `${protocol}://${host}/?tab=weather`;
             messages.push({
               token: token,
+              notification: {
+                title: title,
+                body: body
+              },
               data: {
                 title: title,
                 body: body,
                 link: deepLink
               },
               apns: {
+                headers: {
+                  'apns-push-type': 'alert',
+                  'apns-priority': '10'
+                },
                 payload: {
                   aps: {
-                    alert: {
-                      title: title,
-                      body: body
-                    },
-                    sound: 'default'
+                    sound: 'default',
+                    badge: 1
                   }
                 }
               },
               android: {
+                priority: 'high',
                 notification: {
-                  title: title,
-                  body: body
+                  sound: 'default'
                 }
               }
             });
@@ -321,7 +347,10 @@ export default async function handler(req, res) {
 
     // 4. Send Firebase Push Notifications in batches (max 500 per batch)
     if (messages.length === 0) {
-      return res.status(200).json({ success: true, message: 'No notifications triggered' });
+      return new Response(JSON.stringify({ success: true, message: 'No notifications triggered' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
     }
 
     const BATCH_SIZE = 500;
@@ -335,13 +364,22 @@ export default async function handler(req, res) {
       failureCount += response.failureCount;
     }
 
-    return res.status(200).json({
-      success: true,
-      message: `Notifications sent. Success: ${successCount}, Failures: ${failureCount}`
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: `Notifications sent. Success: ${successCount}, Failures: ${failureCount}`
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      }
+    );
 
   } catch (error) {
     console.error('Cron job error:', error);
-    return res.status(500).json({ success: false, message: error.message });
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
   }
-}
+});
