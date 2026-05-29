@@ -1,6 +1,43 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import admin from 'npm:firebase-admin@11.8.0';
 
+// 한국 표준시(KST) 상세 날짜/시간 정보를 신뢰할 수 있게 반환하는 헬퍼 함수
+function getKSTDateDetails() {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  
+  const parts = formatter.formatToParts(new Date());
+  const partMap = Object.fromEntries(parts.map(p => [p.type, p.value]));
+  
+  // 오늘 날짜 형식: YYYY/MM/DD
+  const todayDateStr = `${partMap.year}/${partMap.month}/${partMap.day}`;
+  
+  // 내일 날짜 계산
+  const kstDate = new Date(`${partMap.year}-${partMap.month}-${partMap.day}T${partMap.hour}:${partMap.minute}:${partMap.second}+09:00`);
+  const tomorrow = new Date(kstDate.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowParts = formatter.formatToParts(tomorrow);
+  const tomorrowPartMap = Object.fromEntries(tomorrowParts.map(p => [p.type, p.value]));
+  
+  const tomorrowDateStr = `${tomorrowPartMap.year}/${tomorrowPartMap.month}/${tomorrowPartMap.day}`;
+  const tomorrowISODateStr = `${tomorrowPartMap.year}-${tomorrowPartMap.month}-${tomorrowPartMap.day}`;
+  
+  return {
+    hourStr: partMap.hour,
+    todayDateStr,
+    tomorrowDateStr,
+    tomorrowISODateStr,
+    dayOfWeek: kstDate.getDay() // 0 = 일요일, 1 = 월요일, ..., 6 = 토요일
+  };
+}
+
 Deno.serve(async (req) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
@@ -35,9 +72,8 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Get current hour in KST
-    const nowKST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
-    const currentHourStr = nowKST.getHours().toString().padStart(2, '0');
+    // 1. Get KST Time details
+    const kst = getKSTDateDetails();
 
     // 2. Fetch active subscriptions
     const { data: subscriptions, error: subError } = await supabase
@@ -56,7 +92,7 @@ Deno.serve(async (req) => {
     // Filter subscriptions for current hour
     const matchingSubscriptions = subscriptions.filter(sub => {
       const time = sub.params?.notifyTime || '08:00';
-      return time.startsWith(currentHourStr + ':');
+      return time.startsWith(kst.hourStr + ':');
     });
 
     if (matchingSubscriptions.length === 0) {
@@ -81,6 +117,8 @@ Deno.serve(async (req) => {
       const tomorrowSubs = menuSubs.filter(sub => sub.params?.notifyDay === '전날');
 
       const processGroup = (subs, menuData) => {
+        if (!menuData || !menuData.data || !Array.isArray(menuData.data)) return;
+        
         subs.forEach(sub => {
           const token = sub.devices?.fcm_token;
           if (!token || menuSentTokens.has(token)) return;
@@ -89,18 +127,19 @@ Deno.serve(async (req) => {
 
           if (mode === 'cafe') {
             const targetCafeId = sub.params?.selectedCafe || 're12';
-            const cafeObj = menuData.data.find(c => c.id === targetCafeId);
+            const cafeObj = menuData.data.find(c => c && c.id === targetCafeId);
             if (cafeObj && cafeObj.available) {
-              const dateParam = menuData.date.replace(/\//g, '-');
+              const dateParam = (menuData.date || '').replace(/\//g, '-');
               const deepLink = `${protocol}://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}`;
               
-              const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
+              const isTomorrow = menuData.date !== kst.todayDateStr;
               const dayText = isTomorrow ? '내일' : '오늘';
 
-              const lunchMenus = (cafeObj.menus || []).filter(m => m.type.includes('중식'));
+              const lunchMenus = (cafeObj.menus || []).filter(m => m && m.type && typeof m.type === 'string' && m.type.includes('중식'));
               let bodyText = '';
               if (lunchMenus.length > 0) {
-                const mainDish = lunchMenus[0].menu
+                const rawMenuText = lunchMenus[0].menu || '';
+                const mainDish = rawMenuText
                   .split('\n')[0]
                   .trim()
                   .replace(/^[\*\-\s•]+/, '')
@@ -159,9 +198,10 @@ Deno.serve(async (req) => {
             let targetMealType = '';
 
             for (const cafe of menuData.data) {
-              if (!cafe.available) continue;
+              if (!cafe || !cafe.available) continue;
               let cafeMatched = false;
-              for (const menuItem of cafe.menus) {
+              for (const menuItem of (cafe.menus || [])) {
+                if (!menuItem || !menuItem.menu || typeof menuItem.menu !== 'string') continue;
                 if (keywords.some(kw => menuItem.menu.includes(kw))) {
                   const matchedInThisItem = keywords.filter(kw => menuItem.menu.includes(kw));
                   matchedInThisItem.forEach(kw => {
@@ -170,7 +210,7 @@ Deno.serve(async (req) => {
 
                   if (!targetCafeId) {
                     targetCafeId = cafe.id;
-                    targetMealType = menuItem.type;
+                    targetMealType = menuItem.type || '';
                   }
                   cafeMatched = true;
                 }
@@ -179,13 +219,13 @@ Deno.serve(async (req) => {
             }
 
             if (foundKeywords.length > 0) {
-              const dateParam = menuData.date.replace(/\//g, '-');
+              const dateParam = (menuData.date || '').replace(/\//g, '-');
               const deepLink = `${protocol}://${host}/?tab=cafe&date=${dateParam}&cafe=${targetCafeId}&type=${encodeURIComponent(targetMealType)}`;
               const cafeInfo = matchedCafes.length > 1
                 ? `${matchedCafes[0]} 등 ${matchedCafes.length}곳`
                 : matchedCafes[0];
 
-              const isTomorrow = menuData.date !== nowKST.toISOString().split('T')[0].replace(/-/g, '/');
+              const isTomorrow = menuData.date !== kst.todayDateStr;
 
               const bodyText = isTomorrow 
                 ? `내일 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 미리 확인해볼까요?`
@@ -242,9 +282,7 @@ Deno.serve(async (req) => {
       // Process Tomorrow's Subscriptions
       if (tomorrowSubs.length > 0) {
         try {
-          const tomorrow = new Date(nowKST.getTime() + 24 * 60 * 60 * 1000);
-          const tomorrowStr = tomorrow.toISOString().split('T')[0];
-          const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${tomorrowStr}`);
+          const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${kst.tomorrowISODateStr}`);
           const menuData = await menuRes.json();
           if (menuData.success) processGroup(tomorrowSubs, menuData);
         } catch (e) {
@@ -264,7 +302,7 @@ Deno.serve(async (req) => {
       if (weatherRes.ok) {
         const weatherData = await weatherRes.json();
         const isHoliday = subwayRes?.isHoliday || false;
-        const currentDay = nowKST.getDay();
+        const currentDay = kst.dayOfWeek;
         const isWeekday = currentDay >= 1 && currentDay <= 5 && !isHoliday;
         
         const hasRainOrSnow = weatherData.hasPrecipitation || (weatherData.hourlyForecast || []).some(h => {
@@ -345,7 +383,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 4. Send Firebase Push Notifications in batches (max 500 per batch)
+    // 4. Send Firebase Push Notifications in batches (max 500 per batch in parallel)
     if (messages.length === 0) {
       return new Response(JSON.stringify({ success: true, message: 'No notifications triggered' }), {
         status: 200,
@@ -357,12 +395,17 @@ Deno.serve(async (req) => {
     let successCount = 0;
     let failureCount = 0;
 
+    const batchPromises = [];
     for (let i = 0; i < messages.length; i += BATCH_SIZE) {
       const batch = messages.slice(i, i + BATCH_SIZE);
-      const response = await admin.messaging().sendEach(batch);
+      batchPromises.push(admin.messaging().sendEach(batch));
+    }
+
+    const responses = await Promise.all(batchPromises);
+    responses.forEach(response => {
       successCount += response.successCount;
       failureCount += response.failureCount;
-    }
+    });
 
     return new Response(
       JSON.stringify({
