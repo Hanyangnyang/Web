@@ -1,5 +1,5 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dumbbell, CalendarDays, ArrowUpRight } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
@@ -24,8 +24,12 @@ const PianoIcon = ({ size = 24, color = 'currentColor' }) => (
 
 const cardClass = "bg-white border border-[#e2e8f0] rounded-card px-4 py-6 flex flex-col items-center text-center gap-3 cursor-pointer transition-all duration-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:border-hyu-blue-light hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] active:scale-[0.98]";
 
-export function MiscView() {
+export function MiscView({ resetSignal }) {
   const [subView, setSubView] = useState('list');
+
+  useEffect(() => {
+    setSubView('list');
+  }, [resetSignal]);
 
   if (subView === 'gym')   return <GymTimetable onBack={() => setSubView('list')} />;
   if (subView === 'insta') return <InstagramListView onBack={() => setSubView('list')} />;
