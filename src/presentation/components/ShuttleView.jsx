@@ -138,12 +138,14 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
   return (
     <div 
       ref={elementRef}
-      className={`flex items-stretch border-b border-[#f1f5f9] relative transition-all duration-300 active:bg-slate-100 cursor-pointer select-none ${fullModeActiveStyle} ${
-        !isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20]' :
-        !isFullMode && isPast ? 'opacity-55 bg-[#f8fafc]' :
-        'bg-[#fafbfc]'
+      className={`flex items-stretch border-b border-[#f1f5f9] relative transition-all duration-300 select-none ${fullModeActiveStyle} ${
+        !isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20] cursor-pointer active:bg-slate-100' :
+        !isFullMode && isPast ? 'opacity-55 bg-[#f8fafc] cursor-pointer active:bg-slate-100' :
+        isFullMode ? 'bg-[#fafbfc]' : 'bg-[#fafbfc] cursor-pointer active:bg-slate-100'
       }`}
-      onClick={() => setShowRowRelative(p => !p)}
+      onClick={() => {
+        if (!isFullMode) setShowRowRelative(p => !p);
+      }}
     >
       {isPast && !isFullMode && (
         <div className={`${tagBase} bg-[#e2e8f0] text-[#64748b] px-2.5 h-5 flex items-center rounded-br`}>
@@ -176,7 +178,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
             {rLabel}
           </span>
           <div className="perspective-container flex-1" style={{ height: 50 }}>
-            <div className={`flip-card-inner ${showRowRelative ? 'flipped' : ''}`}>
+            <div className={`flip-card-inner ${(!isFullMode && showRowRelative) ? 'flipped' : ''}`}>
               {/* Front side (Absolute time) */}
               <div className="flip-card-front flex flex-col justify-center">
                 <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast && !isFullMode ? 'text-text-hint' : 'text-text-main'}`}>
