@@ -1,5 +1,6 @@
 // 훅(ViewModel): 셔틀 시간표 로딩·정류장 선택·지하철 연동 상태 관리
 import { useState, useEffect, useCallback } from 'react';
+import { Geolocation } from '@capacitor/geolocation';
 import { computeSchedule, computeFullSchedule, curMin, dayType } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayArrivalsUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
@@ -48,41 +49,37 @@ export function useShuttle(isActive = false) {
   useEffect(() => {
     if (!isActive) return;
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          
-          let closestStop = '한대앞';
-          let minDistance = Infinity;
-          const stopsToCheck = ['기숙사', '셔틀콕', '한대앞'];
-          const distances = {};
+    Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 })
+      .then((position) => {
+        const { latitude, longitude } = position.coords;
+        
+        let closestStop = '한대앞';
+        let minDistance = Infinity;
+        const stopsToCheck = ['기숙사', '셔틀콕', '한대앞'];
+        const distances = {};
 
-          stopsToCheck.forEach(sName => {
-            const coord = STATION_COORDS[sName];
-            const dist = getDistance(latitude, longitude, coord.lat, coord.lon);
-            distances[sName] = dist;
-            if (dist < minDistance) {
-              minDistance = dist;
-              closestStop = sName;
-            }
-          });
-
-          const allOver1km = stopsToCheck.every(sName => distances[sName] >= 1.0);
-
-          if (allOver1km) {
-            setStopState('한대앞');
-          } else {
-            setStopState(closestStop);
+        stopsToCheck.forEach(sName => {
+          const coord = STATION_COORDS[sName];
+          const dist = getDistance(latitude, longitude, coord.lat, coord.lon);
+          distances[sName] = dist;
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestStop = sName;
           }
-        },
-        (error) => {
-          // 위치 권한이 꺼져 있거나 오류가 난 경우에는 localStorage의 이전 저장값을 그대로 유지하기 위해 덮어쓰지 않습니다.
-          console.warn('Geolocation failed or permission denied. Retaining localStorage stop.', error);
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
-    }
+        });
+
+        const allOver1km = stopsToCheck.every(sName => distances[sName] >= 1.0);
+
+        if (allOver1km) {
+          setStopState('한대앞');
+        } else {
+          setStopState(closestStop);
+        }
+      })
+      .catch((error) => {
+        // 위치 권한이 꺼져 있거나 오류가 난 경우에는 localStorage의 이전 저장값을 그대로 유지하기 위해 덮어쓰지 않습니다.
+        console.warn('Geolocation failed or permission denied. Retaining localStorage stop.', error);
+      });
   }, [isActive]);
 
   const setStop = (s) => { 
