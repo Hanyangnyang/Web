@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 import { supabase } from '../../lib/supabase.js';
+import { isCapacitorApp } from '../../lib/platform.js';
 
 const BootContext = createContext(null);
 
@@ -26,6 +27,9 @@ export function BootProvider({ children }) {
   });
 
   const [splashDone, setSplashDone] = useState(() => {
+    // 앱(Capacitor)에서는 네이티브 스플래시로 대체하므로 웹 스플래시 skip
+    // Capacitor 앱은 반드시 localhost에서 서빙되므로 타이밍 이슈 없이 판단 가능
+    if (isCapacitorApp()) return true;
     return sessionStorage.getItem('splashShown') === 'true';
   });
 

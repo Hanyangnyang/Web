@@ -18,6 +18,8 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String ua = getBridge().getWebView().getSettings().getUserAgentString();
+        getBridge().getWebView().getSettings().setUserAgentString(ua + " HanyangAndroidApp");
         pendingDeepLink = extractDeepLink(getIntent());
         getBridge().getWebView().setWebViewClient(
             new BridgeWebViewClient(getBridge()) {
