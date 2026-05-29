@@ -76,7 +76,7 @@ const getMenuIcon = (type) => {
   return '🍚';
 };
 
-export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, onCafeDeepLinkHandled }) {
+export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, cafeDeepLink, onCafeDeepLinkHandled }) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
 
@@ -153,9 +153,13 @@ export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, 
 
     const urlType = urlTypeRef.current;
     if (urlType) {
+      // cafes가 현재 date와 일치하는 날짜 데이터인지 확인 (stale 캐시/응답 방지)
+      const expectedDateStr = date.toISOString().split('T')[0];
+      if (cafesDate !== expectedDateStr) return;
+
       const initial = {};
       let foundExact = false;
-      
+
       selectedCafe.menus.forEach(m => {
         // 정확히 일치하거나, 포함되어 있는 경우 (예: "중식" vs "중식 (학식)")
         const match = m.type === urlType || m.type.includes(urlType) || urlType.includes(m.type);
@@ -164,7 +168,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, 
           if (match) foundExact = true;
         }
       });
-      
+
       setExpandedGroups(initial);
       urlTypeRef.current = null;
 
@@ -174,14 +178,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, 
           const targetEl = listRef.current?.querySelector(`[data-type="${CSS.escape(urlType)}"]`) ||
                           listRef.current?.querySelector(`[data-type*="${urlType}"]`);
           if (targetEl) {
-            const headerOffset = 120; // 고정 헤더 높이 고려
-            const elementPosition = targetEl.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth'
-            });
+            // scrollIntoView로 실제 스크롤 컨테이너(overflow-y-auto div)를 스크롤
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }, 300);
       }
@@ -220,7 +218,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, 
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
     }
-  }, [selectedCafeId, cafes, date, deepLinkTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCafeId, cafes, cafesDate, date, deepLinkTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleGroup = (type) =>
     setExpandedGroups(prev => ({ ...prev, [type]: !prev[type] }));
@@ -340,7 +338,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, cafeDeepLink, 
               Object.entries(groupedMenus).map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
                 return (
-                  <div key={type} className="mb-[0.6rem]" data-type={type}>
+                  <div key={type} className="mb-[0.6rem]" data-type={type} style={{ scrollMarginTop: '140px' }}>
                     {(() => {
                       const mealKey = ['조식', '중식', '석식'].find(k => type.includes(k));
                       const hoursText = mealKey ? selectedCafe.hours?.[mealKey] : null;

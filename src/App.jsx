@@ -52,7 +52,7 @@ function MainLayout() {
   const tabStartTime = useRef(Date.now());
 
   const { user, loading, login, relogin, logout, updateUser } = useAuth();
-  const { menuDate, cafes, menuLoading, changeDate } = useMenu();
+  const { menuDate, cafes, cafesDate, menuLoading, changeDate } = useMenu();
 
   // 앱 시작 시 소식 탭 데이터를 백그라운드에서 미리 로드
   useEffect(() => {
@@ -165,6 +165,7 @@ function MainLayout() {
               date={menuDate}
               changeDate={changeDate}
               cafes={cafes}
+              cafesDate={cafesDate}
               loading={menuLoading}
               cafeDeepLink={cafeDeepLink}
               onCafeDeepLinkHandled={() => setCafeDeepLink(null)}

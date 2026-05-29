@@ -38,12 +38,16 @@ function performMenuCacheGC() {
 export function useMenu() {
   const [menuDate, setMenuDate]     = useState(getInitialDate);
   const [cafes, setCafes]           = useState([]);
+  const [cafesDate, setCafesDate]   = useState(null); // cafes가 어느 날짜 데이터인지 추적
   const [menuLoading, setMenuLoading] = useState(true);
   const { markReady } = useBoot();
   const initialFetched = useRef(false);
+  const fetchCounterRef = useRef(0); // 가장 최근 페치만 반영하도록 경쟁 조건 방지
 
   const fetchMenus = useCallback(async (targetDate) => {
+    const myCounter = ++fetchCounterRef.current;
     const dateStr = targetDate.toISOString().split('T')[0].replace(/-/g, '/');
+    const cafesDateStr = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD
     const cacheKey = `menu_${dateStr}`;
     let hasCache = false;
 
@@ -51,8 +55,11 @@ export function useMenu() {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
-        setCafes(parsed);
-        setMenuLoading(false);
+        if (myCounter === fetchCounterRef.current) {
+          setCafes(parsed);
+          setCafesDate(cafesDateStr);
+          setMenuLoading(false);
+        }
         hasCache = true;
         if (!initialFetched.current) {
           initialFetched.current = true;
@@ -63,13 +70,12 @@ export function useMenu() {
       console.error('Failed to parse cached menu:', e);
     }
 
-    if (!hasCache) {
+    if (!hasCache && myCounter === fetchCounterRef.current) {
       setMenuLoading(true);
     }
 
     try {
       const result = await getMenuUseCase.execute(dateStr);
-      setCafes(result);
       try {
         localStorage.setItem(cacheKey, JSON.stringify(result));
       } catch (e) {
@@ -79,10 +85,16 @@ export function useMenu() {
         initialFetched.current = true;
         markReady('menu');
       }
+      if (myCounter === fetchCounterRef.current) {
+        setCafes(result);
+        setCafesDate(cafesDateStr);
+      }
     } catch (e) {
       console.error('식단 조회 실패:', e);
     } finally {
-      setMenuLoading(false);
+      if (myCounter === fetchCounterRef.current) {
+        setMenuLoading(false);
+      }
     }
   }, [markReady]);
 
@@ -147,5 +159,5 @@ export function useMenu() {
     }
   }, []);
 
-  return { menuDate, cafes, menuLoading, changeDate };
+  return { menuDate, cafes, cafesDate, menuLoading, changeDate };
 }
