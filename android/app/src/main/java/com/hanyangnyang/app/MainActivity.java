@@ -111,9 +111,27 @@ public class MainActivity extends BridgeActivity {
     private String extractDeepLinkParams(Intent intent) {
         if (intent == null) return null;
         Uri data = intent.getData();
-        if (data == null || !KAKAO_SCHEME.equals(data.getScheme())) return null;
-        String execParams = data.getQueryParameter("androidExecutionParams");
-        if (execParams == null || execParams.isEmpty()) return null;
-        return execParams;
+        if (data == null) return null;
+
+        String scheme = data.getScheme();
+
+        // Kakao 커스텀 스킴: kakao{key}://kakaolink?androidexecutionparams=...
+        // SDK가 생성하는 URL의 키는 소문자이므로 양쪽 모두 시도
+        if (KAKAO_SCHEME.equals(scheme)) {
+            String execParams = data.getQueryParameter("androidExecutionParams");
+            if (execParams == null) execParams = data.getQueryParameter("androidexecutionparams");
+            if (execParams != null && !execParams.isEmpty()) return execParams;
+        }
+
+        // HTTPS App Links: https://www.hanyang.life/?date=...&cafe=...&type=...
+        if ("https".equals(scheme)) {
+            String host = data.getHost();
+            if ("www.hanyang.life".equals(host) || "hanyang.life".equals(host)) {
+                String query = data.getEncodedQuery();
+                if (query != null && !query.isEmpty()) return query;
+            }
+        }
+
+        return null;
     }
 }
