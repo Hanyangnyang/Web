@@ -92,7 +92,7 @@ const ROUTE_STYLE = {
 };
 
 // ── 시간표 행
-function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull }) {
+function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull, shouldScroll }) {
   const [showRowRelative, setShowRowRelative] = useState(false);
   const elementRef = useRef(null);
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
@@ -120,15 +120,78 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     return diff > 0 ? `${diff}분 뒤 도착` : `${Math.abs(diff)}분 전 도착`;
   };
 
-  // 전체 시간표 전환 시 해당 위치로 부드러운 스크롤 + 시각효과
+  // 전체 시간표 전환 시 해당 위치로 부드러운 스크롤 (속도 1.5배 개선) + 시각효과
   useEffect(() => {
-    if (isFullMode && isActiveInFull && elementRef.current) {
+    if (isFullMode && isActiveInFull && shouldScroll && elementRef.current) {
       const timer = setTimeout(() => {
-        elementRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+        const element = elementRef.current;
+        
+        // 1. 스크롤 가능한 가장 가까운 부모 요소를 찾습니다.
+        const getScrollParent = (node) => {
+          if (node == null) return null;
+          if (node.scrollHeight > node.clientHeight) {
+            const style = window.getComputedStyle(node);
+            if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+              return node;
+            }
+          }
+          return getScrollParent(node.parentNode) || document.documentElement || document.body;
+        };
+
+        const scrollParent = getScrollParent(element);
+        if (!scrollParent) return;
+
+        // 2. 부모 컨테이너 기준 타겟 스크롤 위치를 계산합니다.
+        let targetY;
+        let startY;
+        if (scrollParent === document.documentElement || scrollParent === document.body) {
+          targetY = element.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (element.clientHeight / 2);
+          startY = window.scrollY;
+        } else {
+          const parentRect = scrollParent.getBoundingClientRect();
+          const elementRect = element.getBoundingClientRect();
+          targetY = scrollParent.scrollTop + (elementRect.top - parentRect.top) - (parentRect.height / 2) + (element.clientHeight / 2);
+          startY = scrollParent.scrollTop;
+        }
+
+        const distance = targetY - startY;
+        const duration = 280; // 280ms 동안 빠르게 스크롤 (일반 smooth scroll 대비 약 1.5~2배 신속하게 이동)
+        let startTime = null;
+
+        const animateScroll = (timestamp) => {
+          if (!startTime) startTime = timestamp;
+          const progress = timestamp - startTime;
+          const run = easeInOutQuad(progress, startY, distance, duration);
+          
+          if (scrollParent === document.documentElement || scrollParent === document.body) {
+            window.scrollTo(0, run);
+          } else {
+            scrollParent.scrollTop = run;
+          }
+
+          if (progress < duration) {
+            requestAnimationFrame(animateScroll);
+          } else {
+            if (scrollParent === document.documentElement || scrollParent === document.body) {
+              window.scrollTo(0, targetY);
+            } else {
+              scrollParent.scrollTop = targetY;
+            }
+          }
+        };
+
+        const easeInOutQuad = (t, b, c, d) => {
+          t /= d / 2;
+          if (t < 1) return c / 2 * t * t + b;
+          t--;
+          return -c / 2 * (t * (t - 2) - 1) + b;
+        };
+
+        requestAnimationFrame(animateScroll);
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isFullMode, isActiveInFull]);
+  }, [isFullMode, isActiveInFull, shouldScroll]);
 
   // 전체 시간표 모드에서 현재 조회 시간대 노출 스타일 정의
   const fullModeActiveStyle = isFullMode && isActiveInFull 
@@ -442,10 +505,45 @@ export function ShuttleView({ isActive }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
   const [tooltipStop, setTooltipStop] = useState(stop);
+  const [justToggledFullMode, setJustToggledFullMode] = useState(false);
   const hasInteractedRef = useRef(false);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
+
+  // 스크롤 동기화 만료 처리 효과
+  useEffect(() => {
+    if (justToggledFullMode) {
+      const timer = setTimeout(() => setJustToggledFullMode(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [justToggledFullMode]);
+
+  // 출발지 칩(stop) 이나 학기/요일 필터 변경 시 전체 시간표 스크롤을 맨 위(첫차)로 초기화
+  const containerRef = useRef(null);
+  useEffect(() => {
+    if (isFullMode && containerRef.current) {
+      const getScrollParent = (node) => {
+        if (node == null) return null;
+        if (node.scrollHeight > node.clientHeight) {
+          const style = window.getComputedStyle(node);
+          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+            return node;
+          }
+        }
+        return getScrollParent(node.parentNode) || document.documentElement || document.body;
+      };
+
+      const scrollParent = getScrollParent(containerRef.current);
+      if (scrollParent) {
+        if (scrollParent === document.documentElement || scrollParent === document.body) {
+          window.scrollTo(0, 0);
+        } else {
+          scrollParent.scrollTop = 0;
+        }
+      }
+    }
+  }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
 
   useEffect(() => {
     // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
@@ -557,7 +655,12 @@ export function ShuttleView({ isActive }) {
 
           <div style={{ position: 'absolute', right: 0, top: -2, display: 'flex', alignItems: 'center', gap: 6 }}>
             <div
-              onClick={() => setIsFullMode(!isFullMode)}
+              onClick={() => {
+                if (!isFullMode) {
+                  setJustToggledFullMode(true);
+                }
+                setIsFullMode(!isFullMode);
+              }}
               style={{ width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer', background: isFullMode ? 'var(--color-primary)' : '#e0e0e0', position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)' }}
             >
               <div style={{ width: 17, height: 17, borderRadius: '50%', background: 'white', boxShadow: '0 2px 3px rgba(0,0,0,0.15)', position: 'absolute', top: 2, left: isFullMode ? 19 : 2, transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} />
@@ -568,7 +671,7 @@ export function ShuttleView({ isActive }) {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
+        <div ref={containerRef} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
           {schedule.length > 0 ? (() => {
             const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
             return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
@@ -586,6 +689,7 @@ export function ShuttleView({ isActive }) {
                 now={now}
                 isFullMode={isFullMode}
                 isActiveInFull={isFullMode && i === fullActiveIdx}
+                shouldScroll={justToggledFullMode}
               />
             ));
           })() : (
