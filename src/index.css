@@ -4,7 +4,7 @@
   font-family: 'HakgyoansimDunggeunmiso';
   src: url('/fonts/HakgyoansimDunggeunmiso-B.otf') format('opentype');
   font-weight: bold;
-  font-display: swap;
+  font-display: block;
 }
 
 @tailwind base;
