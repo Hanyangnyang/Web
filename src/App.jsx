@@ -17,8 +17,6 @@ import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
-import { App as CapacitorApp } from '@capacitor/app';
-import { invokeBackHandler } from './lib/backHandler.js';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 
@@ -59,18 +57,6 @@ function MainLayout() {
   useEffect(() => {
     prefetchPortalData();
   }, []);
-
-  // Android 하드웨어 뒤로가기 처리
-  useEffect(() => {
-    if (platform !== 'android') return;
-    let handle;
-    CapacitorApp.addListener('backButton', () => {
-      if (!invokeBackHandler()) {
-        CapacitorApp.exitApp();
-      }
-    }).then(h => { handle = h; });
-    return () => { handle?.remove(); };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 네이티브 푸시 알림 탭 → 딥링크 처리
   useEffect(() => {
