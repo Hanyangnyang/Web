@@ -1,7 +1,7 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
 import { Loader2, ChevronDown } from 'lucide-react';
-import { STOPS, SUBWAY_OPTS, connectingTrains } from '../../domain/entities/Shuttle.js';
+import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 
 const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
@@ -92,7 +92,8 @@ const ROUTE_STYLE = {
 };
 
 // ── 시간표 행
-function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol }) {
+function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now }) {
+  const [showRowRelative, setShowRowRelative] = useState(false);
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
   const trains = row.subway ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
   const noTrainReason = row.subway && trains.length === 0
@@ -103,12 +104,30 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
 
   const tagBase = "absolute top-0 left-0 text-[10px] font-black text-white z-[10]";
 
+  // 상대 시간 계산 포맷터
+  const getShuttleRelativeTime = () => {
+    const diff = row.depMin - now;
+    if (diff === 0) return '곧 출발';
+    if (diff > 0) return `${diff}분 후`;
+    return `${Math.abs(diff)}분 전`;
+  };
+
+  const getShuttleArrivalRelativeTime = () => {
+    const arrMin = toMin(row.arr);
+    const diff = arrMin - now;
+    if (diff === 0) return '곧 도착';
+    return diff > 0 ? `${diff}분 뒤 도착` : `${Math.abs(diff)}분 전 도착`;
+  };
+
   return (
-    <div className={`flex items-stretch border-b border-[#f1f5f9] relative ${
-      isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20]' :
-      isPast ? 'opacity-55 bg-[#f8fafc]' :
-      'bg-[#fafbfc]'
-    }`}>
+    <div 
+      className={`flex items-stretch border-b border-[#f1f5f9] relative transition-colors duration-150 active:bg-slate-100 cursor-pointer select-none ${
+        isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20]' :
+        isPast ? 'opacity-55 bg-[#f8fafc]' :
+        'bg-[#fafbfc]'
+      }`}
+      onClick={() => setShowRowRelative(p => !p)}
+    >
       {isPast && (
         <div className={`${tagBase} bg-[#e2e8f0] text-[#64748b] px-2.5 h-5 flex items-center rounded-br`}>
           이전 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
@@ -127,24 +146,44 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
         className="flex items-center py-4 pl-4"
         style={{
           paddingTop: (isNext || isLast || isPast) ? 26 : 16,
-          flex: hideSubwayCol ? 1 : '0 0 40%',
+          flex: hideSubwayCol ? 1 : '0 0 52%',
         }}
       >
-        <div className="flex items-center gap-3.5">
+        <div className="flex items-center gap-3.5 w-full">
           <span className={`inline-flex justify-center items-center w-[58px] min-h-[34px] text-[10px] font-extrabold py-1 rounded flex-shrink-0 transition-all duration-200 whitespace-pre-line leading-[1.1] text-center ${ROUTE_STYLE[routeKey]}`}>
             {rLabel}
           </span>
-          <div>
-            <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast ? 'text-text-hint' : 'text-text-main'}`}>
-              {row.dep}
-            </span>
-            <div className="flex items-center gap-[3px] mt-0.5">
-              <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="var(--color-text-hint)" strokeWidth={2.5} strokeLinecap="round" style={{ flexShrink: 0 }}>
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-              <span style={{ fontSize: 12, color: 'var(--color-text-hint)', fontWeight: 600 }}>
-                {row.arrLabel} {row.arr}
-              </span>
+          <div className="perspective-container flex-1" style={{ height: 50 }}>
+            <div className={`flip-card-inner ${showRowRelative ? 'flipped' : ''}`}>
+              {/* Front side (Absolute time) */}
+              <div className="flip-card-front flex flex-col justify-center">
+                <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast ? 'text-text-hint' : 'text-text-main'}`}>
+                  {row.dep}
+                </span>
+                <div className="flex items-center gap-[3px] mt-0.5">
+                  <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="var(--color-text-hint)" strokeWidth={2.5} strokeLinecap="round" style={{ flexShrink: 0 }}>
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                  <span style={{ fontSize: 12, color: 'var(--color-text-hint)', fontWeight: 600 }} className="whitespace-nowrap">
+                    {row.arrLabel} {row.arr}
+                  </span>
+                </div>
+              </div>
+
+              {/* Back side (Relative time) */}
+              <div className="flip-card-back flex flex-col justify-center">
+                <span className={`font-['Inter',-apple-system,sans-serif] text-[22px] font-black leading-none tracking-[-1px] ${isPast ? 'text-text-hint' : 'text-text-main'}`}>
+                  {getShuttleRelativeTime()}
+                </span>
+                <div className="flex items-center gap-[3px] mt-0.5">
+                  <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="var(--color-text-hint)" strokeWidth={2.5} strokeLinecap="round" style={{ flexShrink: 0 }}>
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                  <span style={{ fontSize: 12, color: 'var(--color-text-hint)', fontWeight: 600 }} className="whitespace-nowrap">
+                    {row.arrLabel} {getShuttleArrivalRelativeTime()}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -161,10 +200,15 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
                 <Loader2 className="text-[#cbd5e1] animate-[spin_1s_linear_infinite]" size={16} />
               </div>
             ) : trains.length > 0 ? trains.map((tr, i) => (
-              <div key={i} className="grid grid-cols-[22px_1fr_auto] items-center gap-1.5">
-                <LineBadge opt={opt} size={20} />
-                <span className="text-[13px] font-bold text-text-main">{tr.dest}행</span>
-                <span className="font-['Inter',-apple-system,sans-serif] text-[13px] font-bold text-text-sub">{tr.arrTime}</span>
+              <div key={i} className="grid grid-cols-[1fr_auto_48px] items-center gap-x-2">
+                <div /> {/* 1fr Spacer to push subway line info to the right */}
+                <div className="flex items-center gap-1.5">
+                  <LineBadge opt={opt} size={20} />
+                  <span className="text-[13px] font-bold text-text-main whitespace-nowrap">{tr.dest}행</span>
+                </div>
+                <span className="font-['Inter',-apple-system,sans-serif] text-[13px] font-bold text-text-sub text-right whitespace-nowrap">
+                  {tr.arrTime}
+                </span>
               </div>
             )) : <span className="text-xs text-[#cbd5e1] font-medium">{noTrainReason}</span>
           ) : <span className="text-xs text-[#cbd5e1] font-medium">—</span>}
@@ -480,10 +524,10 @@ export function ShuttleView({ isActive }) {
         </div>
 
         <div className="flex py-0 pb-1.5 border-b border-[#f1f5f9] relative">
-          <div style={{ flex: hideSubwayCol ? 1 : '0 0 40%', paddingLeft: 90 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">출발 시간</div>
+          <div style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 90 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">출발 시간</div>
           {!hideSubwayCol && (
             <div style={{ flex: 1, paddingLeft: 4 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em]">
-              {needsSubway ? '연결 지하철' : '도착'}
+              {needsSubway ? '' : '도착'}
             </div>
           )}
 
@@ -514,6 +558,7 @@ export function ShuttleView({ isActive }) {
                 subwayOffPeak={subwayOffPeak}
                 isSubwayLoading={isSubwayLoading}
                 hideSubwayCol={hideSubwayCol}
+                now={now}
               />
             ))
           ) : (
