@@ -17,6 +17,7 @@ import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { App as CapApp } from '@capacitor/app';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 
@@ -39,7 +40,7 @@ function MainLayout() {
     if (lastTab === 'qr') lastTab = 'cafe'; // 도서관 탭 임시 비활성화
     return lastTab;
   });
-  const [isCafeteriaLink] = useState(() => {
+  const [isCafeteriaLink, setIsCafeteriaLink] = useState(() => {
     const p = new URLSearchParams(window.location.search);
     return p.has('date') || p.has('cafe') || p.has('type');
   });
@@ -89,6 +90,46 @@ function MainLayout() {
         console.error('Failed to parse notification deep link', e);
       }
     }).then(h => { handle = h; });
+    return () => { handle?.remove(); };
+  }, [isApp]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 카카오 딥링크 URL에서 학식 파라미터 파싱
+  const parseCafeParams = (urlString) => {
+    try {
+      const search = urlString.includes('?') ? urlString.slice(urlString.indexOf('?')) : '';
+      const p = new URLSearchParams(search);
+      if (p.has('date') || p.has('cafe') || p.has('type')) {
+        return { date: p.get('date'), cafe: p.get('cafe'), type: p.get('type') };
+      }
+    } catch {}
+    return null;
+  };
+
+  // 카카오 딥링크로 앱 진입 시 학식 탭으로 이동
+  useEffect(() => {
+    if (!isApp) return;
+    let handle;
+
+    // 콜드 스타트: 앱이 닫힌 상태에서 딥링크로 실행된 경우
+    CapApp.getLaunchUrl().then(({ url }) => {
+      if (!url) return;
+      const params = parseCafeParams(url);
+      if (!params) return;
+      setIsCafeteriaLink(true);
+      setActiveTab('cafe');
+      localStorage.setItem('lastActiveTab', 'cafe');
+      setCafeDeepLink(params);
+    }).catch(() => {});
+
+    // 웜 스타트: 앱이 백그라운드에 있는 상태에서 딥링크로 포그라운드 진입
+    CapApp.addListener('appUrlOpen', (data) => {
+      const params = parseCafeParams(data.url);
+      if (!params) return;
+      setActiveTab('cafe');
+      localStorage.setItem('lastActiveTab', 'cafe');
+      setCafeDeepLink(params);
+    }).then(h => { handle = h; });
+
     return () => { handle?.remove(); };
   }, [isApp]); // eslint-disable-line react-hooks/exhaustive-deps
 
