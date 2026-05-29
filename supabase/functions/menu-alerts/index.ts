@@ -353,6 +353,21 @@ Deno.serve(async (req) => {
           const isUvHigh = weatherData.airQuality?.uv?.label === '높음' || 
                            weatherData.airQuality?.uv?.label === '매우높음';
 
+          // 날씨 코드에 맞춰 브리핑 타이틀 이모지 동적 결정 (기본 '☀️' / 비오는 느낌의 '🌦️' 오해 방지)
+          let briefingEmoji = '☀️';
+          const weatherCode = weatherData.weatherCode;
+          if (weatherCode !== undefined && weatherCode !== null) {
+            if (weatherCode <= 0) briefingEmoji = '☀️';
+            else if (weatherCode <= 1) briefingEmoji = '🌤️';
+            else if (weatherCode <= 2) briefingEmoji = '⛅';
+            else if (weatherCode <= 3) briefingEmoji = '☁️';
+            else if (weatherCode <= 48) briefingEmoji = '🌫️';
+            else if (weatherCode <= 67) briefingEmoji = '🌧️';
+            else if (weatherCode <= 77) briefingEmoji = '❄️';
+            else if (weatherCode <= 82) briefingEmoji = '🌦️';
+            else briefingEmoji = '⛈️';
+          }
+
           weatherSubs.forEach(sub => {
             const token = sub.devices?.fcm_token;
             const platform = sub.devices?.platform || 'web';
@@ -360,7 +375,7 @@ Deno.serve(async (req) => {
 
             const cond = sub.params?.conditions || {};
             let shouldNotify = false;
-            let title = '🌦️ 오늘 한양대 캠퍼스 날씨';
+            let title = `${briefingEmoji} 오늘 한양대 캠퍼스 날씨`;
             let body = '';
 
             if (cond.rainSnow && hasRainOrSnow) {
@@ -377,7 +392,7 @@ Deno.serve(async (req) => {
               body = '오늘 캠퍼스 자외선 강도가 높습니다. 외출 시 자외선 차단제와 선글라스를 챙기세요!';
             } else if (cond.daily || (cond.weekday && isWeekday)) {
               shouldNotify = true;
-              title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
+              title = `${briefingEmoji} 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
               const comment = weatherData.message || `${weatherData.description} 상태입니다.`;
               body = comment;
             }
