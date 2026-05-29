@@ -51,6 +51,17 @@ Deno.serve(async (req) => {
     });
   }
 
+  // 커스텀 크론 비밀키 검증 (보안 강화)
+  const authHeader = req.headers.get('Authorization');
+  const cronSecret = Deno.env.get('CRON_SECRET');
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+
+
   // Initialize Firebase (only once)
   if (!admin.apps.length) {
     try {
