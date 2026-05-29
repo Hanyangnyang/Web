@@ -135,16 +135,12 @@ export function useMenu() {
     return () => clearTimeout(timer);
   }, []);
 
-  const changeDate = useCallback((offsetOrDate) => {
-    if (offsetOrDate instanceof Date) {
-      setMenuDate(new Date(offsetOrDate));
-    } else {
-      setMenuDate(prev => {
-        const d = new Date(prev);
-        d.setDate(d.getDate() + offsetOrDate);
-        return d;
-      });
-    }
+  const changeDate = useCallback((offset) => {
+    setMenuDate(prev => {
+      const d = new Date(prev);
+      d.setDate(d.getDate() + offset);
+      return d;
+    });
   }, []);
 
   return { menuDate, cafes, menuLoading, changeDate };
