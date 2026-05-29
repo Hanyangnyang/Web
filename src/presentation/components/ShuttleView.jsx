@@ -92,8 +92,9 @@ const ROUTE_STYLE = {
 };
 
 // ── 시간표 행
-function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now }) {
+function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull }) {
   const [showRowRelative, setShowRowRelative] = useState(false);
+  const elementRef = useRef(null);
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
   const trains = row.subway ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
   const noTrainReason = row.subway && trains.length === 0
@@ -119,33 +120,54 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     return diff > 0 ? `${diff}분 뒤 도착` : `${Math.abs(diff)}분 전 도착`;
   };
 
+  // 전체 시간표 전환 시 해당 위치로 부드러운 스크롤 + 시각효과
+  useEffect(() => {
+    if (isFullMode && isActiveInFull && elementRef.current) {
+      const timer = setTimeout(() => {
+        elementRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isFullMode, isActiveInFull]);
+
+  // 전체 시간표 모드에서 현재 조회 시간대 노출 스타일 정의
+  const fullModeActiveStyle = isFullMode && isActiveInFull 
+    ? 'bg-[rgba(14,74,132,0.05)] border-y-2 border-primary/20 shadow-[0_0_15px_rgba(14,74,132,0.08)] z-10 [animation:pulseHighlight_2s_infinite]' 
+    : '';
+
   return (
     <div 
-      className={`flex items-stretch border-b border-[#f1f5f9] relative transition-colors duration-150 active:bg-slate-100 cursor-pointer select-none ${
-        isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20]' :
-        isPast ? 'opacity-55 bg-[#f8fafc]' :
+      ref={elementRef}
+      className={`flex items-stretch border-b border-[#f1f5f9] relative transition-all duration-300 active:bg-slate-100 cursor-pointer select-none ${fullModeActiveStyle} ${
+        !isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20]' :
+        !isFullMode && isPast ? 'opacity-55 bg-[#f8fafc]' :
         'bg-[#fafbfc]'
       }`}
       onClick={() => setShowRowRelative(p => !p)}
     >
-      {isPast && (
+      {isPast && !isFullMode && (
         <div className={`${tagBase} bg-[#e2e8f0] text-[#64748b] px-2.5 h-5 flex items-center rounded-br`}>
           이전 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
         </div>
       )}
-      {isNext && (
+      {isNext && !isFullMode && (
         <div className={`${tagBase} bg-primary px-2.5 h-5 flex items-center rounded-br`}>
           다음 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
         </div>
       )}
-      {isLast && !isNext && !isPast && (
+      {isFullMode && isActiveInFull && (
+        <div className={`${tagBase} bg-primary/95 px-2.5 h-5 flex items-center rounded-br shadow-sm`}>
+          현재 시간대 위치
+        </div>
+      )}
+      {isLast && !isNext && !isPast && !isFullMode && (
         <div className={`${tagBase} bg-[#fb7185] py-0.5 px-2.5 rounded-br`}>마지막 셔틀</div>
       )}
 
       <div
         className="flex items-center py-4 pl-4"
         style={{
-          paddingTop: (isNext || isLast || isPast) ? 26 : 16,
+          paddingTop: (isNext || isLast || isPast || (isFullMode && isActiveInFull)) ? 26 : 16,
           flex: hideSubwayCol ? 1 : '0 0 52%',
         }}
       >
@@ -157,7 +179,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
             <div className={`flip-card-inner ${showRowRelative ? 'flipped' : ''}`}>
               {/* Front side (Absolute time) */}
               <div className="flip-card-front flex flex-col justify-center">
-                <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast ? 'text-text-hint' : 'text-text-main'}`}>
+                <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast && !isFullMode ? 'text-text-hint' : 'text-text-main'}`}>
                   {row.dep}
                 </span>
                 <div className="flex items-center gap-[3px] mt-0.5">
@@ -172,7 +194,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
 
               {/* Back side (Relative time) */}
               <div className="flip-card-back flex flex-col justify-center">
-                <span className={`font-['Inter',-apple-system,sans-serif] text-[22px] font-black leading-none tracking-[-1px] ${isPast ? 'text-text-hint' : 'text-text-main'}`}>
+                <span className={`font-['Inter',-apple-system,sans-serif] text-[22px] font-black leading-none tracking-[-1px] ${isPast && !isFullMode ? 'text-text-hint' : 'text-text-main'}`}>
                   {getShuttleRelativeTime()}
                 </span>
                 <div className="flex items-center gap-[3px] mt-0.5">
@@ -192,7 +214,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
       {!hideSubwayCol && (
         <div
           className="flex-1 flex flex-col gap-0.5 justify-center pr-3.5 pl-1"
-          style={{ paddingTop: (isNext || isLast || isPast) ? 26 : 14, paddingBottom: 14 }}
+          style={{ paddingTop: (isNext || isLast || isPast || (isFullMode && isActiveInFull)) ? 26 : 14, paddingBottom: 14 }}
         >
           {row.subway ? (
             isSubwayLoading ? (
@@ -545,8 +567,9 @@ export function ShuttleView({ isActive }) {
         </div>
 
         <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-          {schedule.length > 0 ? (
-            (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
+          {schedule.length > 0 ? (() => {
+            const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
+            return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
               <TimetableRow
                 key={i}
                 row={row}
@@ -559,9 +582,11 @@ export function ShuttleView({ isActive }) {
                 isSubwayLoading={isSubwayLoading}
                 hideSubwayCol={hideSubwayCol}
                 now={now}
+                isFullMode={isFullMode}
+                isActiveInFull={isFullMode && i === fullActiveIdx}
               />
-            ))
-          ) : (
+            ));
+          })() : (
             <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
               <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
             </div>
