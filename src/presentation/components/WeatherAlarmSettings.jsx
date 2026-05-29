@@ -494,6 +494,10 @@ export function WeatherAlarmSettings({ onClose }) {
                         settings.conditions.dust ||
                         settings.conditions.uv;
 
+  // 매일/평일(Group A)과 상세 기상 조건(Group B)의 배타적 스타일 적용을 위한 판별 변수
+  const isGroupAActive = settings.conditions.daily || settings.conditions.weekday;
+  const isGroupBActive = settings.conditions.rainSnow || settings.conditions.dust || settings.conditions.uv;
+
   // 동적 안내 설명 문구 계산 (React Element 형태 반환)
   const guideElement = useMemo(() => {
     if (settings.conditions.daily) {
@@ -730,7 +734,7 @@ export function WeatherAlarmSettings({ onClose }) {
       const nextConditions = { ...prev.conditions };
       if (key === 'daily') {
         const nextVal = !nextConditions.daily;
-        // '매일' 선택 시 다른 칩들은 모두 꺼지고 비활성화
+        // '매일' 선택 시 다른 모든 조건은 해제
         return {
           ...prev,
           conditions: {
@@ -743,7 +747,7 @@ export function WeatherAlarmSettings({ onClose }) {
         };
       } else if (key === 'weekday') {
         const nextVal = !nextConditions.weekday;
-        // '평일' 선택 시 다른 칩들은 모두 꺼지고 비활성화
+        // '평일' 선택 시 다른 모든 조건은 해제
         return {
           ...prev,
           conditions: {
@@ -756,7 +760,13 @@ export function WeatherAlarmSettings({ onClose }) {
         };
       } else {
         // 비/눈, 미세먼지, 자외선은 중복 선택 가능
-        nextConditions[key] = !nextConditions[key];
+        const nextVal = !nextConditions[key];
+        if (nextVal) {
+          // 비/눈, 미세먼지, 자외선 중 하나가 선택되면 매일/평일은 자동 해제 (배타적 선택)
+          nextConditions.daily = false;
+          nextConditions.weekday = false;
+        }
+        nextConditions[key] = nextVal;
         return {
           ...prev,
           conditions: nextConditions
@@ -818,7 +828,9 @@ export function WeatherAlarmSettings({ onClose }) {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.daily
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                    : isGroupBActive
+                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
+                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
                 }`}
                 onClick={() => handleConditionToggle('daily')}
               >
@@ -829,7 +841,9 @@ export function WeatherAlarmSettings({ onClose }) {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.weekday
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                    : isGroupBActive
+                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
+                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
                 }`}
                 onClick={() => handleConditionToggle('weekday')}
               >
@@ -837,26 +851,12 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
               
               <button
-                disabled={settings.conditions.daily || settings.conditions.weekday}
-                style={{
-                  opacity: (settings.conditions.daily || settings.conditions.weekday) ? 0 : 1,
-                  transform: (settings.conditions.daily || settings.conditions.weekday) ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
-                  maxWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '150px',
-                  margin: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '',
-                  paddingLeft: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
-                  paddingRight: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
-                  paddingTop: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
-                  paddingBottom: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
-                  borderWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '1px',
-                  pointerEvents: (settings.conditions.daily || settings.conditions.weekday) ? 'none' : 'auto',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-                className={`rounded-full text-xs font-bold border ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.rainSnow
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                    : isGroupAActive
+                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
+                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
                 }`}
                 onClick={() => handleConditionToggle('rainSnow')}
               >
@@ -864,26 +864,12 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
 
               <button
-                disabled={settings.conditions.daily || settings.conditions.weekday}
-                style={{
-                  opacity: (settings.conditions.daily || settings.conditions.weekday) ? 0 : 1,
-                  transform: (settings.conditions.daily || settings.conditions.weekday) ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
-                  maxWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '150px',
-                  margin: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '',
-                  paddingLeft: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
-                  paddingRight: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
-                  paddingTop: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
-                  paddingBottom: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
-                  borderWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '1px',
-                  pointerEvents: (settings.conditions.daily || settings.conditions.weekday) ? 'none' : 'auto',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-                className={`rounded-full text-xs font-bold border ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.dust
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                    : isGroupAActive
+                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
+                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
                 }`}
                 onClick={() => handleConditionToggle('dust')}
               >
@@ -891,26 +877,12 @@ export function WeatherAlarmSettings({ onClose }) {
               </button>
 
               <button
-                disabled={settings.conditions.daily || settings.conditions.weekday}
-                style={{
-                  opacity: (settings.conditions.daily || settings.conditions.weekday) ? 0 : 1,
-                  transform: (settings.conditions.daily || settings.conditions.weekday) ? 'scale(0.7) translateY(-4px)' : 'scale(1) translateY(0)',
-                  maxWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '150px',
-                  margin: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '',
-                  paddingLeft: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
-                  paddingRight: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '14px',
-                  paddingTop: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
-                  paddingBottom: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '6px',
-                  borderWidth: (settings.conditions.daily || settings.conditions.weekday) ? '0px' : '1px',
-                  pointerEvents: (settings.conditions.daily || settings.conditions.weekday) ? 'none' : 'auto',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-                className={`rounded-full text-xs font-bold border ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
                   settings.conditions.uv
                     ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                    : isGroupAActive
+                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
+                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
                 }`}
                 onClick={() => handleConditionToggle('uv')}
               >
