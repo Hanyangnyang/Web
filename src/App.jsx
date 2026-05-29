@@ -109,12 +109,15 @@ function MainLayout() {
   useEffect(() => {
     if (!isApp) return;
     let handle;
+    // 콜드 스타트에서 getLaunchUrl과 appUrlOpen이 모두 발동하는 경우 중복 방지
+    let coldStartHandled = false;
 
     // 콜드 스타트: 앱이 닫힌 상태에서 딥링크로 실행된 경우
     CapApp.getLaunchUrl().then(({ url }) => {
       if (!url) return;
       const params = parseCafeParams(url);
       if (!params) return;
+      coldStartHandled = true;
       setIsCafeteriaLink(true);
       setActiveTab('cafe');
       localStorage.setItem('lastActiveTab', 'cafe');
@@ -123,6 +126,7 @@ function MainLayout() {
 
     // 웜 스타트: 앱이 백그라운드에 있는 상태에서 딥링크로 포그라운드 진입
     CapApp.addListener('appUrlOpen', (data) => {
+      if (coldStartHandled) { coldStartHandled = false; return; }
       const params = parseCafeParams(data.url);
       if (!params) return;
       setActiveTab('cafe');
