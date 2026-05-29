@@ -51,24 +51,6 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>kakao79b4e1cf4eb03ea19f0eda552d6e219d</string>
-			</array>
-		</dict>
-	</array>
-	<key>NSLocalizedDescription</key>
-	<string>카카오 링크를 통해 앱을 열 수 있습니다.</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>kakaokompassauth</string>
-		<string>storykompassauth</string>
-		<string>kakaolink</string>
-		<string>kakaotalk</string>
-	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>셔틀버스 정류장까지의 거리를 계산하기 위해 위치 정보가 필요합니다.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
