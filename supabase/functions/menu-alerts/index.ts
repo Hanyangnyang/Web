@@ -39,6 +39,24 @@ function getKSTDateDetails() {
   };
 }
 
+// 한국어 조사 처리 헬퍼 함수 (받침 유무 판별)
+function getJosa(word: string, josaOptions: [string, string]) {
+  if (!word) return josaOptions[0];
+  const lastChar = word.charCodeAt(word.length - 1);
+  // 한글(가~힣) 범위인지 확인
+  if (lastChar >= 0xAC00 && lastChar <= 0xD7A3) {
+    const hasJongseong = (lastChar - 0xAC00) % 28 > 0;
+    return hasJongseong ? josaOptions[0] : josaOptions[1]; // [받침있을때, 받침없을때]
+  }
+  // 숫자로 끝나는 경우 (예: 1, 3, 6, 7, 8, 0 은 받침 소리가 남)
+  if (/[013678]$/.test(word)) return josaOptions[0];
+  if (/[2459]$/.test(word)) return josaOptions[1];
+  
+  // 영어 알파벳 등 기타 문자는 보통 괄호 처리하거나 '가'로 통일하지만, 
+  // 식단 메뉴는 거의 한글이므로 기본적으로 받침 없다고 가정
+  return josaOptions[1]; 
+}
+
 // 플랫폼에 대응하여 최적화된 FCM 메시지 페이로드를 조립하는 헬퍼 함수
 function buildFCMMessage(token: string, platform: string, title: string, body: string, link: string) {
   const isWeb = platform === 'web';
@@ -95,25 +113,29 @@ Deno.serve(async (req) => {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
-
-  // 커스텀 크론 비밀키 검증 (보안 강화)
+  // 보안 검증: 오직 service_role 권한만 함수를 실행할 수 있도록 검사합니다.
+  // 게이트웨이가 JWT 유효성(서명)은 이미 검증했으므로, 우리는 페이로드의 'role'만 확인하면 됩니다.
   const authHeader = req.headers.get('Authorization');
-  const cronSecret = Deno.env.get('CRON_SECRET');
-
-  console.log('--- CRON AUTH DEBUG ---');
-  console.log('1. 수신된 Auth 헤더 존재 여부:', authHeader ? '존재함 (Present)' : '누락됨 (Missing)');
-  console.log('2. Deno Secrets 변수 존재 여부:', cronSecret ? '존재함 (Present)' : '누락됨 (Missing)');
-  if (authHeader && cronSecret) {
-    console.log('3. 수신 헤더 길이:', authHeader.length, ' / Secrets 변수 길이 (Bearer 포함):', `Bearer ${cronSecret}`.length);
-    console.log('4. 두 값의 일치 여부:', authHeader === `Bearer ${cronSecret}` ? '일치함 (Match)' : '불일치함 (Mismatch)');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return new Response(JSON.stringify({ error: 'Missing or invalid Authorization header' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   }
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+  try {
+    const token = authHeader.split(' ')[1];
+    const payloadBase64Url = token.split('.')[1];
+    // Base64Url 형식을 Base64로 변환
+    const payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const decodedPayload = JSON.parse(atob(payloadBase64));
+
+    if (decodedPayload.role !== 'service_role') {
+      console.warn('Unauthorized role attempted access:', decodedPayload.role);
+      return new Response(JSON.stringify({ error: 'Forbidden: Requires service_role' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+    }
+  } catch (error) {
+    console.error('JWT payload parsing error:', error);
+    return new Response(JSON.stringify({ error: 'Invalid token payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
+
 
   // Initialize Firebase (only once)
   if (!admin.apps.length) {
@@ -210,10 +232,12 @@ Deno.serve(async (req) => {
                   .trim()
                   .replace(/^[\*\-\s•]+/, '')
                   .replace(/<\/?[^>]+(>|$)/g, '');
+                  
+                const josa = getJosa(mainDish, ['이', '가']);
                 if (lunchMenus.length > 1) {
                   bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish} 외 ${lunchMenus.length - 1}개의 메뉴가 있어요`;
                 } else {
-                  bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish}가 나와요`;
+                  bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish}${josa} 나와요`;
                 }
               } else {
                 bodyText = `${dayText} ${cafeObj.name}의 맛있고 영양 가득한 식단을 확인해보세요!`;
