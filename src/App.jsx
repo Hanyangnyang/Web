@@ -45,6 +45,7 @@ function MainLayout() {
   });
   const [cafeDeepLink, setCafeDeepLink] = useState(null);
   const [slideDir, setSlideDir] = useState('right');
+  const [miscResetSignal, setMiscResetSignal] = useState(0);
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const posthog = usePostHog();
   const tabStartTime = useRef(Date.now());
@@ -98,7 +99,10 @@ function MainLayout() {
   }, [updateUser]);
 
   const handleTabChange = useCallback((tab) => {
-    if (tab === activeTab) return;
+    if (tab === activeTab) {
+      if (tab === 'misc') setMiscResetSignal(s => s + 1);
+      return;
+    }
 
     const duration = Math.round((Date.now() - tabStartTime.current) / 1000);
     posthog?.capture('tab_time_spent', { tab: activeTab, duration_seconds: duration });
@@ -154,7 +158,7 @@ function MainLayout() {
             <PortalView isVisible={activeTab === 'portal'} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
-            <MiscView />
+            <MiscView resetSignal={miscResetSignal} />
           </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
