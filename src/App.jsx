@@ -17,6 +17,7 @@ import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
+import './lib/androidBackHandler.js';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'qr', 'portal', 'misc'];
 

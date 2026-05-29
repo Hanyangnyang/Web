@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebViewClient;
 
@@ -21,6 +23,21 @@ public class MainActivity extends BridgeActivity {
         String ua = getBridge().getWebView().getSettings().getUserAgentString();
         getBridge().getWebView().getSettings().setUserAgentString(ua + " HanyangAndroidApp");
         pendingDeepLink = extractDeepLink(getIntent());
+        // Android 13+ Predictive Back: Capacitor의 기본 동작이 무력화되므로 직접 처리
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                getBridge().getWebView().evaluateJavascript(
+                    "(function(){ return window.__androidBackPress ? window.__androidBackPress() : false; })()",
+                    value -> {
+                        if (!"true".equals(value)) {
+                            finish();
+                        }
+                    }
+                );
+            }
+        });
+
         getBridge().getWebView().setWebViewClient(
             new BridgeWebViewClient(getBridge()) {
                 @Override
