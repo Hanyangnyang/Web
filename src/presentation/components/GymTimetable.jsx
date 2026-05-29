@@ -85,7 +85,7 @@ export function GymTimetable({ onBack }) {
   };
 
   return (
-    <div className="bg-surface min-h-screen font-['Pretendard',-apple-system,sans-serif]">
+    <div className="pb-20 font-['Pretendard',-apple-system,sans-serif] [animation:slideUp_0.4s_ease-out]">
       <header className="flex items-center gap-4 mb-6">
         <button
           className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
