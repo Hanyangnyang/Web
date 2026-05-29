@@ -31,11 +31,74 @@ function getKSTDateDetails() {
   
   return {
     hourStr: partMap.hour,
+    minuteStr: partMap.minute,
     todayDateStr,
     tomorrowDateStr,
     tomorrowISODateStr,
     dayOfWeek: kstDate.getDay() // 0 = 일요일, 1 = 월요일, ..., 6 = 토요일
   };
+}
+
+// 한국어 조사 처리 헬퍼 함수 (받침 유무 판별)
+function getJosa(word: string, josaOptions: [string, string]) {
+  if (!word) return josaOptions[0];
+  const lastChar = word.charCodeAt(word.length - 1);
+  // 한글(가~힣) 범위인지 확인
+  if (lastChar >= 0xAC00 && lastChar <= 0xD7A3) {
+    const hasJongseong = (lastChar - 0xAC00) % 28 > 0;
+    return hasJongseong ? josaOptions[0] : josaOptions[1]; // [받침있을때, 받침없을때]
+  }
+  // 숫자로 끝나는 경우 (예: 1, 3, 6, 7, 8, 0 은 받침 소리가 남)
+  if (/[013678]$/.test(word)) return josaOptions[0];
+  if (/[2459]$/.test(word)) return josaOptions[1];
+  
+  // 영어 알파벳 등 기타 문자는 보통 괄호 처리하거나 '가'로 통일하지만, 
+  // 식단 메뉴는 거의 한글이므로 기본적으로 받침 없다고 가정
+  return josaOptions[1]; 
+}
+
+// 플랫폼에 대응하여 최적화된 FCM 메시지 페이로드를 조립하는 헬퍼 함수
+function buildFCMMessage(token: string, platform: string, title: string, body: string, link: string) {
+  const isWeb = platform === 'web';
+  
+  const message: any = {
+    token: token,
+    data: {
+      title: title,
+      body: body,
+      link: link
+    }
+  };
+
+  // Web (PWA) 플랫폼의 경우, 서비스워커(firebase-messaging-sw.js)의 onBackgroundMessage와
+  // 브라우저 백그라운드 자동 노출 기능의 충돌로 인한 이중 알림(중복) 노출을 방지하기 위해 
+  // 'notification' 속성을 제외한 'data-only' 메시지로 발송합니다.
+  if (!isWeb) {
+    message.notification = {
+      title: title,
+      body: body
+    };
+    message.apns = {
+      headers: {
+        'apns-push-type': 'alert',
+        'apns-priority': '10'
+      },
+      payload: {
+        aps: {
+          sound: 'default',
+          badge: 1
+        }
+      }
+    };
+    message.android = {
+      priority: 'high',
+      notification: {
+        sound: 'default'
+      }
+    };
+  }
+
+  return message;
 }
 
 Deno.serve(async (req) => {
@@ -50,15 +113,27 @@ Deno.serve(async (req) => {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
-
-  // 커스텀 크론 비밀키 검증 (보안 강화)
+  // 보안 검증: 오직 service_role 권한만 함수를 실행할 수 있도록 검사합니다.
+  // 게이트웨이가 JWT 유효성(서명)은 이미 검증했으므로, 우리는 페이로드의 'role'만 확인하면 됩니다.
   const authHeader = req.headers.get('Authorization');
-  const cronSecret = Deno.env.get('CRON_SECRET');
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return new Response(JSON.stringify({ error: 'Missing or invalid Authorization header' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  try {
+    const token = authHeader.split(' ')[1];
+    const payloadBase64Url = token.split('.')[1];
+    // Base64Url 형식을 Base64로 변환
+    const payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const decodedPayload = JSON.parse(atob(payloadBase64));
+
+    if (decodedPayload.role !== 'service_role') {
+      console.warn('Unauthorized role attempted access:', decodedPayload.role);
+      return new Response(JSON.stringify({ error: 'Forbidden: Requires service_role' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+    }
+  } catch (error) {
+    console.error('JWT payload parsing error:', error);
+    return new Response(JSON.stringify({ error: 'Invalid token payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
 
@@ -86,10 +161,10 @@ Deno.serve(async (req) => {
     // 1. Get KST Time details
     const kst = getKSTDateDetails();
 
-    // 2. Fetch active subscriptions
+    // 2. Fetch active subscriptions (devices의 fcm_token과 platform을 함께 조인)
     const { data: subscriptions, error: subError } = await supabase
       .from('subscriptions')
-      .select('*, devices(fcm_token)')
+      .select('*, devices(fcm_token, platform)')
       .eq('is_active', true);
 
     if (subError) throw subError;
@@ -100,14 +175,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Filter subscriptions for current hour
+    // Filter subscriptions for current hour and minute
     const matchingSubscriptions = subscriptions.filter(sub => {
       const time = sub.params?.notifyTime || '08:00';
-      return time.startsWith(kst.hourStr + ':');
+      const [sh, sm] = time.split(':');
+      return sh === kst.hourStr && sm === kst.minuteStr;
     });
 
     if (matchingSubscriptions.length === 0) {
-      return new Response(JSON.stringify({ success: true, message: 'No subscriptions for this hour' }), {
+      return new Response(JSON.stringify({ success: true, message: 'No subscriptions for this hour and minute' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
@@ -132,6 +208,7 @@ Deno.serve(async (req) => {
         
         subs.forEach(sub => {
           const token = sub.devices?.fcm_token;
+          const platform = sub.devices?.platform || 'web';
           if (!token || menuSentTokens.has(token)) return;
 
           const mode = sub.params?.mode || 'keyword';
@@ -155,10 +232,12 @@ Deno.serve(async (req) => {
                   .trim()
                   .replace(/^[\*\-\s•]+/, '')
                   .replace(/<\/?[^>]+(>|$)/g, '');
+                  
+                const josa = getJosa(mainDish, ['이', '가']);
                 if (lunchMenus.length > 1) {
                   bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish} 외 ${lunchMenus.length - 1}개의 메뉴가 있어요`;
                 } else {
-                  bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish}가 나와요`;
+                  bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish}${josa} 나와요`;
                 }
               } else {
                 bodyText = `${dayText} ${cafeObj.name}의 맛있고 영양 가득한 식단을 확인해보세요!`;
@@ -166,36 +245,8 @@ Deno.serve(async (req) => {
 
               const titleText = isTomorrow ? `내일의 학식 메뉴가 나왔어요!` : `오늘의 학식 메뉴가 나왔어요!`;
 
-              messages.push({
-                token: token,
-                notification: {
-                  title: titleText,
-                  body: bodyText
-                },
-                data: {
-                  title: titleText,
-                  body: bodyText,
-                  link: deepLink
-                },
-                apns: {
-                  headers: {
-                    'apns-push-type': 'alert',
-                    'apns-priority': '10'
-                  },
-                  payload: {
-                    aps: {
-                      sound: 'default',
-                      badge: 1
-                    }
-                  }
-                },
-                android: {
-                  priority: 'high',
-                  notification: {
-                    sound: 'default'
-                  }
-                }
-              });
+              const fcmMsg = buildFCMMessage(token, platform, titleText, bodyText, deepLink);
+              messages.push(fcmMsg);
               menuSentTokens.add(token);
             }
           } else {
@@ -243,36 +294,9 @@ Deno.serve(async (req) => {
                 : `오늘 ${cafeInfo}에 [${foundKeywords.join(', ')}] 메뉴가 있어요! 얼른 확인해볼까요?`;
 
               const titleText = isTomorrow ? '📅 내일의 메뉴를 확인하세요!' : '🍔 기다리던 메뉴가 나왔어요!';
-              messages.push({
-                token: token,
-                notification: {
-                  title: titleText,
-                  body: bodyText
-                },
-                data: {
-                  title: titleText,
-                  body: bodyText,
-                  link: deepLink
-                },
-                apns: {
-                  headers: {
-                    'apns-push-type': 'alert',
-                    'apns-priority': '10'
-                  },
-                  payload: {
-                    aps: {
-                      sound: 'default',
-                      badge: 1
-                    }
-                  }
-                },
-                android: {
-                  priority: 'high',
-                  notification: {
-                    sound: 'default'
-                  }
-                }
-              });
+              
+              const fcmMsg = buildFCMMessage(token, platform, titleText, bodyText, deepLink);
+              messages.push(fcmMsg);
               menuSentTokens.add(token);
             }
           }
@@ -311,86 +335,61 @@ Deno.serve(async (req) => {
       ]);
 
       if (weatherRes.ok) {
-        const weatherData = await weatherRes.json();
-        const isHoliday = subwayRes?.isHoliday || false;
-        const currentDay = kst.dayOfWeek;
-        const isWeekday = currentDay >= 1 && currentDay <= 5 && !isHoliday;
-        
-        const hasRainOrSnow = weatherData.hasPrecipitation || (weatherData.hourlyForecast || []).some(h => {
-          return h.hour >= 8 && h.hour <= 18 && (h.precipProb >= 30 || h.weatherCode >= 51);
-        });
+        const weatherData = await weatherRes.ok ? await weatherRes.json() : null;
+        if (weatherData) {
+          const isHoliday = subwayRes?.isHoliday || false;
+          const currentDay = kst.dayOfWeek;
+          const isWeekday = currentDay >= 1 && currentDay <= 5 && !isHoliday;
+          
+          const hasRainOrSnow = weatherData.hasPrecipitation || (weatherData.hourlyForecast || []).some(h => {
+            return h.hour >= 8 && h.hour <= 18 && (h.precipProb >= 30 || h.weatherCode >= 51);
+          });
 
-        const isDustBad = weatherData.airQuality?.pm10?.label === '나쁨' || 
-                          weatherData.airQuality?.pm10?.label === '매우나쁨' ||
-                          weatherData.airQuality?.pm25?.label === '나쁨' || 
-                          weatherData.airQuality?.pm25?.label === '매우나쁨';
+          const isDustBad = weatherData.airQuality?.pm10?.label === '나쁨' || 
+                            weatherData.airQuality?.pm10?.label === '매우나쁨' ||
+                            weatherData.airQuality?.pm25?.label === '나쁨' || 
+                            weatherData.airQuality?.pm25?.label === '매우나쁨';
 
-        const isUvHigh = weatherData.airQuality?.uv?.label === '높음' || 
-                         weatherData.airQuality?.uv?.label === '매우높음';
+          const isUvHigh = weatherData.airQuality?.uv?.label === '높음' || 
+                           weatherData.airQuality?.uv?.label === '매우높음';
 
-        weatherSubs.forEach(sub => {
-          const token = sub.devices?.fcm_token;
-          if (!token || weatherSentTokens.has(token)) return;
+          weatherSubs.forEach(sub => {
+            const token = sub.devices?.fcm_token;
+            const platform = sub.devices?.platform || 'web';
+            if (!token || weatherSentTokens.has(token)) return;
 
-          const cond = sub.params?.conditions || {};
-          let shouldNotify = false;
-          let title = '🌦️ 오늘 한양대 캠퍼스 날씨';
-          let body = '';
+            const cond = sub.params?.conditions || {};
+            let shouldNotify = false;
+            let title = '🌦️ 오늘 한양대 캠퍼스 날씨';
+            let body = '';
 
-          if (cond.rainSnow && hasRainOrSnow) {
-            shouldNotify = true;
-            title = '☔ 캠퍼스에 비/눈 소식이 있어요!';
-            body = '오늘 한양대 캠퍼스에 비나 눈 예보가 있습니다. 외출 시 꼭 우산을 챙기세요!';
-          } else if (cond.dust && isDustBad) {
-            shouldNotify = true;
-            title = '😷 미세먼지가 나쁜 날입니다!';
-            body = `오늘 캠퍼스 미세먼지가 ${weatherData.airQuality?.pm10?.label || '나쁨'} 단계입니다. 마스크를 잊지 마세요!`;
-          } else if (cond.uv && isUvHigh) {
-            shouldNotify = true;
-            title = '☀️ 자외선 지수가 높은 날입니다!';
-            body = '오늘 캠퍼스 자외선 강도가 높습니다. 외출 시 자외선 차단제와 선글라스를 챙기세요!';
-          } else if (cond.daily || (cond.weekday && isWeekday)) {
-            shouldNotify = true;
-            title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
-            const comment = weatherData.message || `${weatherData.description} 상태입니다.`;
-            body = comment;
-          }
+            if (cond.rainSnow && hasRainOrSnow) {
+              shouldNotify = true;
+              title = '☔ 캠퍼스에 비/눈 소식이 있어요!';
+              body = '오늘 한양대 캠퍼스에 비나 눈 예보가 있습니다. 외출 시 꼭 우산을 챙기세요!';
+            } else if (cond.dust && isDustBad) {
+              shouldNotify = true;
+              title = '😷 미세먼지가 나쁜 날입니다!';
+              body = `오늘 캠퍼스 미세먼지가 ${weatherData.airQuality?.pm10?.label || '나쁨'} 단계입니다. 마스크를 잊지 마세요!`;
+            } else if (cond.uv && isUvHigh) {
+              shouldNotify = true;
+              title = '☀️ 자외선 지수가 높은 날입니다!';
+              body = '오늘 캠퍼스 자외선 강도가 높습니다. 외출 시 자외선 차단제와 선글라스를 챙기세요!';
+            } else if (cond.daily || (cond.weekday && isWeekday)) {
+              shouldNotify = true;
+              title = `🌦️ 오늘의 캠퍼스 날씨 브리핑 (${weatherData.temp}°C)`;
+              const comment = weatherData.message || `${weatherData.description} 상태입니다.`;
+              body = comment;
+            }
 
-          if (shouldNotify && body) {
-            const deepLink = `${protocol}://${host}/?tab=weather`;
-            messages.push({
-              token: token,
-              notification: {
-                title: title,
-                body: body
-              },
-              data: {
-                title: title,
-                body: body,
-                link: deepLink
-              },
-              apns: {
-                headers: {
-                  'apns-push-type': 'alert',
-                  'apns-priority': '10'
-                },
-                payload: {
-                  aps: {
-                    sound: 'default',
-                    badge: 1
-                  }
-                }
-              },
-              android: {
-                priority: 'high',
-                notification: {
-                  sound: 'default'
-                }
-              }
-            });
-            weatherSentTokens.add(token);
-          }
-        });
+            if (shouldNotify && body) {
+              const deepLink = `${protocol}://${host}/?tab=weather`;
+              const fcmMsg = buildFCMMessage(token, platform, title, body, deepLink);
+              messages.push(fcmMsg);
+              weatherSentTokens.add(token);
+            }
+          });
+        }
       }
     }
 

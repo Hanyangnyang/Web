@@ -20,6 +20,7 @@ const ITEM_H = 36;
 const VISIBLE = 3;
 
 const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i);
+const MINUTE_LIST = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
 const AMPM_LIST = ['오전', '오후'];
 const DAY_LIST = ['전날', '당일'];
 
@@ -31,36 +32,50 @@ const parseH24 = (h24) => ({
 const toH24 = (displayHour, ampmIdx) => ampmIdx === 0 ? displayHour : displayHour + 12;
 
 function TimePicker({ value, onChange, day, onDayChange }) {
-  const h24     = Math.max(0, Math.min(parseInt(value.split(':')[0]) || 0, 23));
+  const [hStr, mStr] = value.split(':');
+  const h24     = Math.max(0, Math.min(parseInt(hStr) || 0, 23));
+  const initMin = String(Math.max(0, Math.min(parseInt(mStr) || 0, 55))).padStart(2, '0');
+  const initMinIdx = Math.max(0, MINUTE_LIST.indexOf(initMin));
   const initDay = Math.max(0, DAY_LIST.indexOf(day));
   const { displayHour: initHour, ampmIdx: initAmpm } = parseH24(h24);
 
   const [liveHour, setLiveHour] = useState(initHour);
   const [liveAmpm, setLiveAmpm] = useState(initAmpm);
+  const [liveMin,  setLiveMin]  = useState(initMinIdx);
   const [liveDay,  setLiveDay]  = useState(initDay);
 
   const hourRef = useRef(null);
   const ampmRef = useRef(null);
+  const minRef  = useRef(null);
   const dayRef  = useRef(null);
+  
   const hourTimer = useRef(null);
   const ampmTimer = useRef(null);
+  const minTimer  = useRef(null);
   const dayTimer  = useRef(null);
   
   const hourWheelCooldown = useRef(false);
   const ampmWheelCooldown = useRef(false);
+  const minWheelCooldown  = useRef(false);
   const dayWheelCooldown = useRef(false);
 
   useLayoutEffect(() => {
     if (hourRef.current) hourRef.current.scrollTop = initHour * ITEM_H;
     if (ampmRef.current) ampmRef.current.scrollTop = initAmpm * ITEM_H;
+    if (minRef.current)  minRef.current.scrollTop  = initMinIdx * ITEM_H;
     if (dayRef.current)  dayRef.current.scrollTop  = initDay  * ITEM_H;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    const [hStr, mStr] = value.split(':');
+    const h24 = Math.max(0, Math.min(parseInt(hStr) || 0, 23));
+    const m = Math.max(0, Math.min(parseInt(mStr) || 0, 55));
     const { displayHour, ampmIdx } = parseH24(h24);
+    const minIdx = Math.max(0, MINUTE_LIST.indexOf(String(m).padStart(2, '0')));
     setLiveHour(displayHour);
     setLiveAmpm(ampmIdx);
-  }, [h24]);
+    setLiveMin(minIdx);
+  }, [value]);
 
   useEffect(() => {
     setLiveDay(initDay);
@@ -69,11 +84,15 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   const commitTime = () => {
     const hourEl = hourRef.current;
     const ampmEl = ampmRef.current;
-    if (!hourEl || !ampmEl) return;
+    const minEl  = minRef.current;
+    if (!hourEl || !ampmEl || !minEl) return;
     const curHour = Math.max(0, Math.min(Math.round(hourEl.scrollTop / ITEM_H), 11));
     const curAmpm = Math.max(0, Math.min(Math.round(ampmEl.scrollTop / ITEM_H), 1));
+    const curMinIdx = Math.max(0, Math.min(Math.round(minEl.scrollTop / ITEM_H), 11));
     const newH24  = toH24(curHour, curAmpm);
-    if (newH24 !== h24) onChange(`${String(newH24).padStart(2, '0')}:00`);
+    const newMinStr = MINUTE_LIST[curMinIdx] || '00';
+    const newTime = `${String(newH24).padStart(2, '0')}:${newMinStr}`;
+    if (newTime !== value) onChange(newTime);
   };
 
   const commitDay = () => {
@@ -85,8 +104,37 @@ function TimePicker({ value, onChange, day, onDayChange }) {
 
   const handleHourScroll = () => {
     const el = hourRef.current;
-    if (!el) return;
-    setLiveHour(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 11)));
+    const ampmEl = ampmRef.current;
+    if (!el || !ampmEl) return;
+    
+    const curScroll = el.scrollTop;
+    const maxScroll = 11 * ITEM_H;
+    const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
+    
+    // 오버스크롤(튕김) 감지 시 오전/오후 자동 전환
+    if (curScroll > maxScroll + 10) {
+      if (curAmpm === 0) { // 오전 11시 -> 더 아래로 -> 오후 12시(0)
+        el.scrollTop = 0;
+        setLiveHour(0);
+        ampmEl.scrollTop = 1 * ITEM_H;
+        setLiveAmpm(1);
+        clearTimeout(hourTimer.current);
+        hourTimer.current = setTimeout(commitTime, 150);
+        return;
+      }
+    } else if (curScroll < -10) {
+      if (curAmpm === 1) { // 오후 12시(0) -> 더 위로 -> 오전 11시
+        el.scrollTop = 11 * ITEM_H;
+        setLiveHour(11);
+        ampmEl.scrollTop = 0;
+        setLiveAmpm(0);
+        clearTimeout(hourTimer.current);
+        hourTimer.current = setTimeout(commitTime, 150);
+        return;
+      }
+    }
+
+    setLiveHour(Math.max(0, Math.min(Math.round(curScroll / ITEM_H), 11)));
     clearTimeout(hourTimer.current);
     hourTimer.current = setTimeout(commitTime, 150);
   };
@@ -99,6 +147,14 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     ampmTimer.current = setTimeout(commitTime, 150);
   };
 
+  const handleMinScroll = () => {
+    const el = minRef.current;
+    if (!el) return;
+    setLiveMin(Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H), 11)));
+    clearTimeout(minTimer.current);
+    minTimer.current = setTimeout(commitTime, 150);
+  };
+
   const handleDayScroll = () => {
     const el = dayRef.current;
     if (!el) return;
@@ -107,10 +163,9 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     dayTimer.current = setTimeout(commitDay, 150);
   };
 
-  // --- 마우스 휠 핸들러 (500ms 쿨다운 쓰로틀링 + 미세 입력 필터링 적용으로 완벽한 쫀득 스냅 조작 구현) ---
   const handleHourWheel = (e) => {
     e.preventDefault();
-    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (Math.abs(e.deltaY) < 10) return;
     if (hourWheelCooldown.current) return;
     hourWheelCooldown.current = true;
     setTimeout(() => { hourWheelCooldown.current = false; }, 500);
@@ -122,41 +177,27 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     const cur = Math.round(el.scrollTop / ITEM_H);
     const dir = e.deltaY > 0 ? 1 : -1;
     let next = cur + dir;
-    
     const curAmpm = Math.round(ampmEl.scrollTop / ITEM_H);
 
     if (next > 11) {
       if (curAmpm === 0) {
-        // 오전 11시 -> 오후 12시(0시)로 순환 가능! (정오 경계 스위칭)
         next = 0;
         el.scrollTop = 0;
         setLiveHour(0);
-        
         ampmEl.scrollTop = 1 * ITEM_H;
         setLiveAmpm(1);
-        
-        const newH24 = toH24(0, 1);
-        onChange(`${String(newH24).padStart(2, '0')}:00`);
-      } else {
-        // 오후 11시 -> 오전 00시로 순환하지 못하도록 차단!
+        commitTime();
       }
     } else if (next < 0) {
       if (curAmpm === 1) {
-        // 오후 12시(0시) -> 오전 11시로 순환 가능! (정오 경계 스위칭)
         next = 11;
         el.scrollTop = 11 * ITEM_H;
         setLiveHour(11);
-        
         ampmEl.scrollTop = 0;
         setLiveAmpm(0);
-        
-        const newH24 = toH24(11, 0);
-        onChange(`${String(newH24).padStart(2, '0')}:00`);
-      } else {
-        // 오전 00시(0시) -> 오후 11시로 순환하지 못하도록 차단!
+        commitTime();
       }
     } else {
-      // 일반적인 휠 이동
       el.scrollTop = next * ITEM_H;
       setLiveHour(next);
       commitTime();
@@ -165,7 +206,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
 
   const handleAmpmWheel = (e) => {
     e.preventDefault();
-    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (Math.abs(e.deltaY) < 10) return;
     if (ampmWheelCooldown.current) return;
     ampmWheelCooldown.current = true;
     setTimeout(() => { ampmWheelCooldown.current = false; }, 500);
@@ -178,9 +219,24 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     commitTime();
   };
 
+  const handleMinWheel = (e) => {
+    e.preventDefault();
+    if (Math.abs(e.deltaY) < 10) return;
+    if (minWheelCooldown.current) return;
+    minWheelCooldown.current = true;
+    setTimeout(() => { minWheelCooldown.current = false; }, 500);
+
+    const el = minRef.current;
+    if (!el) return;
+    const next = Math.max(0, Math.min(Math.round(el.scrollTop / ITEM_H) + (e.deltaY > 0 ? 1 : -1), 11));
+    el.scrollTop = next * ITEM_H;
+    setLiveMin(next);
+    commitTime();
+  };
+
   const handleDayWheel = (e) => {
     e.preventDefault();
-    if (Math.abs(e.deltaY) < 10) return; // 미세 진동 입력 무시
+    if (Math.abs(e.deltaY) < 10) return;
     if (dayWheelCooldown.current) return;
     dayWheelCooldown.current = true;
     setTimeout(() => { dayWheelCooldown.current = false; }, 500);
@@ -216,7 +272,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     cursor: 'grab',
   });
 
-  const handleDragScroll = (ref) => {
+  const handleDragScroll = (ref, liveSetter) => {
     let isDown = false;
     let startY;
     let scrollTop;
@@ -285,9 +341,9 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         ref={dayRef}
         onScroll={handleDayScroll}
         onWheel={handleDayWheel}
-        {...handleDragScroll(dayRef)}
+        {...handleDragScroll(dayRef, setLiveDay)}
         className="alarm-picker-scroll"
-        style={colStyle(64)}
+        style={colStyle(56)}
       >
         <div style={{ height: ITEM_H }} />
         {DAY_LIST.map((opt, idx) => (
@@ -300,9 +356,9 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         ref={ampmRef}
         onScroll={handleAmpmScroll}
         onWheel={handleAmpmWheel}
-        {...handleDragScroll(ampmRef)}
+        {...handleDragScroll(ampmRef, setLiveAmpm)}
         className="alarm-picker-scroll"
-        style={colStyle(56)}
+        style={colStyle(48)}
       >
         <div style={{ height: ITEM_H }} />
         {AMPM_LIST.map((opt, idx) => (
@@ -315,13 +371,13 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         ref={hourRef}
         onScroll={handleHourScroll}
         onWheel={handleHourWheel}
-        {...handleDragScroll(hourRef)}
+        {...handleDragScroll(hourRef, setLiveHour)}
         className="alarm-picker-scroll"
-        style={colStyle(44)}
+        style={colStyle(38)}
       >
         <div style={{ height: ITEM_H }} />
         {HOUR_LIST.map((h, idx) => {
-          const displayVal = h === 0 ? (liveAmpm === 0 ? "00" : 12) : h;
+          const displayVal = h;
           return (
             <div key={h} style={itemStyle(idx === liveHour)}>
               {displayVal}
@@ -335,7 +391,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         display: 'flex',
         alignItems: 'center',
         paddingLeft: 2,
-        paddingRight: 16,
+        paddingRight: 6,
         fontSize: 13,
         fontWeight: 500,
         color: '#4b5563',
@@ -343,6 +399,38 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         position: 'relative',
       }}>
         시
+      </div>
+
+      {/* 분 00~55 (5분 단위) */}
+      <div
+        ref={minRef}
+        onScroll={handleMinScroll}
+        onWheel={handleMinWheel}
+        {...handleDragScroll(minRef, setLiveMin)}
+        className="alarm-picker-scroll"
+        style={colStyle(38)}
+      >
+        <div style={{ height: ITEM_H }} />
+        {MINUTE_LIST.map((m, idx) => (
+          <div key={m} style={itemStyle(idx === liveMin)}>
+            {m}
+          </div>
+        ))}
+        <div style={{ height: ITEM_H }} />
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        paddingLeft: 2,
+        paddingRight: 8,
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#4b5563',
+        flexShrink: 0,
+        position: 'relative',
+      }}>
+        분
       </div>
     </div>
   );
@@ -566,7 +654,7 @@ export function WeatherAlarmSettings({ onClose }) {
       if (settings.weatherAlert) {
         // 동적 완성형 팝업 완료 메시지 조립
         if (settings.conditions.daily || settings.conditions.weekday) {
-          successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
+          successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
         } else {
           const activeKeywords = [];
           if (settings.conditions.rainSnow) activeKeywords.push('비/눈 소식');
@@ -584,9 +672,9 @@ export function WeatherAlarmSettings({ onClose }) {
               joined = activeKeywords[0];
             }
             const josaJoined = josa(joined, '이/가');
-            successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
+            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           } else {
-            successMsg = '설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
+            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           }
         }
 
