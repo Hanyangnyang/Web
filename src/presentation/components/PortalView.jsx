@@ -339,9 +339,9 @@ export function PortalView({ isVisible = true }) {
           className="w-full h-auto rounded-xl cursor-pointer"
           alt="Monster Energy"
           onClick={() => {
-            // TODO: 출시 후 실제 스토어 링크로 교체
-            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=TODO';
-            const APP_STORE_URL = 'https://apps.apple.com/app/TODO';
+            const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
+            // TODO: 구글 플레이 스토어 출시 후 실제 링크로 교체
+            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
 
             const ua = navigator.userAgent;
             const isIOS = /iPhone|iPad|iPod/i.test(ua);
