@@ -45,6 +45,7 @@ function MainLayout() {
     return p.has('date') || p.has('cafe') || p.has('type');
   });
   const [cafeDeepLink, setCafeDeepLink] = useState(null);
+  const [showCafeDeepLinkLoader, setShowCafeDeepLinkLoader] = useState(false);
   const [slideDir, setSlideDir] = useState('right');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
   const { isAppReady, splashDone, completeSplash } = useBoot();
@@ -76,6 +77,7 @@ function MainLayout() {
         cafe: params.get('cafe'),
         type: params.get('type'),
       });
+      setShowCafeDeepLinkLoader(true);
     }
   }, []);
 
@@ -142,6 +144,13 @@ function MainLayout() {
           ready={isAppReady}
           onDone={completeSplash}
           variant={isCafeteriaLink ? 'menu' : 'default'}
+        />
+      )}
+      {showCafeDeepLinkLoader && (
+        <SplashScreen
+          variant="menu"
+          ready={!menuLoading}
+          onDone={() => setShowCafeDeepLinkLoader(false)}
         />
       )}
       <div
