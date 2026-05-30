@@ -7,6 +7,7 @@ import { CafeteriaView } from './presentation/components/CafeteriaView.jsx';
 import { ShuttleView }   from './presentation/components/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/PortalView.jsx';
 import { MiscView }      from './presentation/components/MiscView.jsx';
+import { PartnershipView } from './presentation/components/PartnershipView.jsx';
 import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
@@ -16,7 +17,7 @@ import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
 import './lib/androidBackHandler.js';
 
-const TAB_ORDER = ['cafe', 'shuttle', 'portal', 'misc'];
+const TAB_ORDER = ['cafe', 'shuttle', 'portal', 'partner', 'misc'];
 
 export default function App() {
   return (
@@ -197,6 +198,9 @@ function MainLayout() {
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView resetSignal={miscResetSignal} />
+          </div>
+          <div style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
+            <PartnershipView />
           </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
