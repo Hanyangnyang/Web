@@ -332,30 +332,7 @@ export function PortalView({ isVisible = true }) {
           </section>
         )}
 
-      {/* Monster Energy 배너 */}
-      <div className="mb-6 mt-2">
-        <img
-          src="/monster_banner_home.png"
-          className="w-full h-auto rounded-xl cursor-pointer"
-          alt="Monster Energy"
-          onClick={() => {
-            const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
-            // TODO: 구글 플레이 스토어 출시 후 실제 링크로 교체
-            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
-
-            const ua = navigator.userAgent;
-            const isIOS = /iPhone|iPad|iPod/i.test(ua);
-            const isAndroid = /Android/i.test(ua);
-
-            if (isIOS) {
-              window.open(APP_STORE_URL, '_blank');
-            } else {
-              // Android 또는 데스크톱 → Play Store
-              window.open(PLAY_STORE_URL, '_blank');
-            }
-          }}
-        />
-      </div>
+      {/* Monster Energy 배너 (임시 비활성화) */}
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
