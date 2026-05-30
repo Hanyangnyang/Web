@@ -12,7 +12,6 @@ const BootContext = createContext(null);
 export function BootProvider({ children }) {
   // 초기화가 필요한 서비스 목록
   const [readyMap, setReadyMap] = useState({
-    auth: false,
     menu: false,
     config: false,
   });
