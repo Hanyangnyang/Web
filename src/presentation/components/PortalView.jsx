@@ -298,7 +298,7 @@ export function PortalView({ isVisible = true }) {
             {renderedHourlyForecast.length > 0 && (
               <div 
                 ref={scrollContainerRef}
-                className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
+                className="mt-2 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
               >
                 <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
                   {renderedHourlyForecast.map((h, idx) => {
@@ -333,7 +333,7 @@ export function PortalView({ isVisible = true }) {
         )}
 
       {/* Monster Energy 배너 */}
-      <div className="mb-6">
+      <div className="mb-6 mt-2">
         <img
           src="/monster_banner_home.png"
           className="w-full h-auto rounded-xl cursor-pointer"
