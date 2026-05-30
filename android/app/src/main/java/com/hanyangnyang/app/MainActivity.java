@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 
@@ -40,6 +41,17 @@ public class MainActivity extends BridgeActivity {
                 } catch (Exception ignored) {}
             }
         }
+        // React가 첫 렌더링 전에 동기적으로 딥링크 여부를 감지하도록 인터페이스 등록
+        // addJavascriptInterface는 loadUrl(super.onCreate 내부) 이후 즉시 호출해야
+        // 페이지 JS 실행 전에 바인딩이 완료됨
+        if (pendingDeepLinkParams != null) {
+            final String coldStartParams = pendingDeepLinkParams;
+            getBridge().getWebView().addJavascriptInterface(new Object() {
+                @JavascriptInterface
+                public String getParams() { return coldStartParams; }
+            }, "__NativeDeepLink");
+        }
+
         // Android 13+ Predictive Back: Capacitor의 기본 동작이 무력화되므로 직접 처리
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override

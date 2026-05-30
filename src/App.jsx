@@ -33,19 +33,35 @@ function MainLayout() {
   const isApp = isNativeApp();
   const platform = getPlatform(); // 'ios' | 'android' | 'web'
 
+  // Android 콜드 스타트 딥링크: JavascriptInterface로 첫 렌더링 전에 동기 감지
   const [activeTab, setActiveTab] = useState(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
+    try {
+      const native = window.__NativeDeepLink?.getParams?.();
+      if (native) { const np = new URLSearchParams(native); if (np.has('date') || np.has('cafe') || np.has('type')) return 'cafe'; }
+    } catch {}
     let lastTab = localStorage.getItem('lastActiveTab') || 'cafe';
     if (lastTab === 'qr') lastTab = 'cafe'; // 도서관 탭 임시 비활성화
     return lastTab;
   });
   const [isCafeteriaLink] = useState(() => {
     const p = new URLSearchParams(window.location.search);
-    return p.has('date') || p.has('cafe') || p.has('type');
+    if (p.has('date') || p.has('cafe') || p.has('type')) return true;
+    try {
+      const native = window.__NativeDeepLink?.getParams?.();
+      if (native) { const np = new URLSearchParams(native); return np.has('date') || np.has('cafe') || np.has('type'); }
+    } catch {}
+    return false;
   });
   const [cafeDeepLink, setCafeDeepLink] = useState(null);
-  const [showCafeDeepLinkLoader, setShowCafeDeepLinkLoader] = useState(false);
+  const [showCafeDeepLinkLoader, setShowCafeDeepLinkLoader] = useState(() => {
+    try {
+      const native = window.__NativeDeepLink?.getParams?.();
+      if (native) { const np = new URLSearchParams(native); return np.has('date') || np.has('cafe') || np.has('type'); }
+    } catch {}
+    return false;
+  });
   const [slideDir, setSlideDir] = useState('right');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
   const { isAppReady, splashDone, completeSplash } = useBoot();
