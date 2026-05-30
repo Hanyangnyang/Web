@@ -259,7 +259,7 @@ export function PortalView({ isVisible = true }) {
                       안산시 상록구 사동
                     </p>
                     
-                    <div className="mt-5 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
+                    <div className="mt-4 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
                       <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
                       <span className="break-all flex-1">
                         <TypewriterText text={weather.message} isVisible={isVisible} />
@@ -275,7 +275,7 @@ export function PortalView({ isVisible = true }) {
                 </div>
 
                 {weather.airQuality && (
-                  <div className="grid gap-2 mt-8 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
+                  <div className="grid gap-2 mt-4 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
                     {[
                       { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
                       { label: '초미세', data: weather.airQuality.pm25, icon: Wind },

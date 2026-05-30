@@ -578,7 +578,7 @@ export function ShuttleView({ isActive }) {
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 선택 (고정 상단) */}
-      <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+      <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
         </div>

@@ -1,5 +1,5 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 식단 목록 표시
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 
 import { ChevronLeft, ChevronRight, Clock, Bell, Share2 } from 'lucide-react';
 import { getKSTDate } from '../../utils/time.js';
@@ -93,6 +93,19 @@ const getMenuIcon = (type) => {
 export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, cafeDeepLink, onCafeDeepLinkHandled }) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
+  const rootRef = useRef(null);
+
+  const scrollToTop = useCallback(() => {
+    let node = rootRef.current?.parentNode;
+    while (node) {
+      const style = window.getComputedStyle(node);
+      if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+        node.scrollTop = 0;
+        return;
+      }
+      node = node.parentNode;
+    }
+  }, []);
 
   const [selectedCafeId, setSelectedCafeId] = useState(
     () => urlParams.get('cafe') || localStorage.getItem('lastSelectedCafeId') || 're12'
@@ -101,6 +114,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   const handleCafeSelect = (id) => {
     setSelectedCafeId(id);
     localStorage.setItem('lastSelectedCafeId', id);
+    scrollToTop();
   };
   const [expandedGroups, setExpandedGroups] = useState({});
   const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
@@ -249,7 +263,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   };
 
   return (
-    <div className="pb-20 relative">
+    <div ref={rootRef} className="pb-20 relative">
       <button
         className="fixed bottom-[calc(20px+64px+12px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
         onClick={() => setShowAlarm(true)}
@@ -289,7 +303,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
       {/* 고정 헤더 */}
       {/* 고정 헤더: 날짜 및 식당 선택 */}
-      <div className="sticky top-[-1.5rem] z-[100] bg-surface/90 backdrop-blur-xl pt-6 pb-4 -mx-5 px-5 mb-4 border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-5 px-5 mb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex justify-between items-center mb-3 bg-white px-5 py-3 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
           <button
             className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
@@ -319,10 +333,10 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
               key={cafe.id}
               className={`flex-1 min-w-0 py-2 px-[0.15rem] border rounded-card text-[clamp(0.65rem,3.3vw,0.85rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
                 selectedCafeId === cafe.id
-                  ? 'bg-primary text-white border-hyu-blue-light'
+                  ? 'bg-primary text-white border-primary'
                   : !cafe.available
                     ? 'bg-white border-[#e2e8f0] text-text-sub opacity-30'
-                    : 'bg-white border-[#e2e8f0] text-text-sub hover:border-hyu-blue-light hover:text-primary'
+                    : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary hover:text-primary'
               }`}
               onClick={() => handleCafeSelect(cafe.id)}
             >

@@ -1,6 +1,6 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send } from 'lucide-react';
+import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
 import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
@@ -94,21 +94,19 @@ function FeedbackSection({ onBack }) {
 
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
-      <div className="flex items-center gap-3.5 mb-6">
+      <div className="flex items-center gap-4 mb-6">
         <button
+          className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center cursor-pointer text-text-main transition-all duration-200 hover:bg-surface"
           onClick={onBack}
-          className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center bg-white shadow-sm active:scale-90 transition-all"
         >
-          <svg className="w-4 h-4 text-text-main" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+          <ArrowLeft size={20} />
         </button>
-        <span className="font-extrabold text-lg text-text-main">피드백 보내기</span>
+        <h2 className="text-2xl font-extrabold text-text-main mb-0">피드백 보내기</h2>
       </div>
 
       <div className="bg-white border border-[#e2e8f0] rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2 mb-3">
-          <Laugh size={18} className="text-[#0e4a84] font-extrabold" />
+          <Laugh size={18} className="text-hyu-blue-light" />
           <span className="font-extrabold text-[15px] text-text-main">하냥냥에게 피드백 보내기</span>
         </div>
 
@@ -134,7 +132,7 @@ function FeedbackSection({ onBack }) {
             <button
               type="submit"
               disabled={loading || content.trim().length < 5}
-              className="h-8 px-4 bg-primary hover:bg-[#0b3c6b] disabled:bg-slate-100 disabled:text-text-hint text-white font-extrabold text-xs rounded-full flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none active:scale-[0.96] shadow-sm disabled:shadow-none"
+              className="h-8 px-4 bg-hyu-blue-light hover:bg-[#2563eb] disabled:bg-slate-100 disabled:text-text-hint text-white font-extrabold text-xs rounded-full flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none active:scale-[0.96] shadow-sm disabled:shadow-none"
             >
               {loading ? (
                 <Loader2 size={13} className="animate-spin" />
@@ -177,7 +175,7 @@ export function MiscView({ resetSignal }) {
       <div className="grid grid-cols-2 gap-4">
         <div className={cardClass} onClick={() => setSubView('gym')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <Dumbbell size={28} color="var(--hyu-blue)" />
+            <Dumbbell size={28} color="#64748B" />
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">체대 헬스장</span>
@@ -197,7 +195,7 @@ export function MiscView({ resetSignal }) {
 
         <div className={cardClass} onClick={() => window.open('https://www.hanyang.ac.kr/-93', '_blank', 'noopener,noreferrer')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <CalendarDays size={28} color="var(--hyu-blue)" />
+            <CalendarDays size={28} color="#0E4A84" />
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">
@@ -221,7 +219,7 @@ export function MiscView({ resetSignal }) {
 
         <div className={cardClass} onClick={() => setSubView('feedback')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <Laugh size={28} color="#0E4A84" />
+            <Laugh size={28} color="#3b82f6" />
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">피드백 보내기</span>
@@ -229,7 +227,7 @@ export function MiscView({ resetSignal }) {
         </div>
       </div>
 
-      <div className="mt-8 text-center">
+      <div className="mt-2 text-center">
         <a
           href="https://app.notion.com/p/361325c5461f80aa8463ee5ae404d4ba?source=copy_link"
           target="_blank"
