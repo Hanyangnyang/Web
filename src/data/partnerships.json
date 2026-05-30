@@ -1,0 +1,6426 @@
+[
+  {
+    "id": "1",
+    "name": "기찬고기",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥓",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "고기 4인분 이상 주문 시 찌개 / 버섯 / 냉국수 중 택1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "고기 4인분 이상 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 방문 시 냉국수, 버섯, 된장찌개 중 택 1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "4인 이상 방문 시 냉국수, 찌개, 버섯 중 택 1 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "benefit": "4인이상 방문 시, 돈장찌개 or 버섯 or 냉국수 중 택1"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "젤리팩토리",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍖",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "4인 이상 방문 시 콜라 한 병 제공 / 6인 이상 방문 시 콜라 두 병 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "4인 이상 방문 시 콜라 1병 / 6인 이상 방문 시 콜라 2병 차등 적용",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2~5인 방문 시 음료 1개 무료제공 / 6인 이상 방문 시 음료 2개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 기준에 따라 제공",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "테이블 당 음료수 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블 당 적용",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "4인 방문시 콜라 1캔 / 6인 이상 방문 시 콜라 2캔",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 조건 충족 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "핵밥",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍱",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "1인 1메뉴 주문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "1인 1메뉴 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "5천원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfIXAWAVQE"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1인 1메뉴 주문 시 음료 1개씩 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인 1메뉴 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "4인 이상 테이블에 카라아게 5p 제공 or 인당 음료 1캔 제공 (중복 불가, 네이버 리뷰 작성 필요)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 및 네이버 영수증 리뷰 작성 완료 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 4인 이상 방문 시 가라아게 증정 / 2. 리뷰 1개당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 또는 리뷰 작성 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1인 1메뉴 주문 시 인당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인 1메뉴 주문 시 인당 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "양식당",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍝",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 방문 시 음료수 / 바게트 중 택1 제공 / 4인 이상 방문 시 음료 2캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인 이상 방문 시 음료수·바게트 중 택1 / 4인 이상 방문 시 음료 2캔으로 혜택 상향",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "5천원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfIBVNAYTP"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 에이드 or 갈릭바게트 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인 이상 방문 시 빅갈릭바게트 or 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2인 이상 방문 시 갈릭바게트 or 뚱캔 선택",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "benefit": "2인 이상 방문 시, 갈릭바게트 or 음료(동캔) 증정"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "앤의 식탁",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍝",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 주문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인 이상 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "2인 이상 방문 시 음료수 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인당",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인 이상 방문 시 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2인당 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인당 적용",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "benefit": "2인 이상 방문 시, 음료 1캔 증정"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "name": "원조 감자탕 일미집",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍲",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 주문 시 음료 1개 제공 / 감자탕(중) 이상 주문 시 볶음밥 또는 사리 중 택1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인 이상 주문 필수 / 볶음밥·사리 혜택은 감자탕 중 사이즈 이상 주문 시 적용",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 이상 방문 시, 1인 1식사 (백반) 주문 시 펩시제로 355ml 한 캔 제공 / 감자탕 (중) 이상 주문 시 볶음밥 or 사리 중 택 1 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 1식사 주문 혹은 감자탕(중) 이상 주문 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인당 음료 1캔 or 감자탕 주문 시 사리 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인당 적용 혹은 감자탕 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 2인 이상, 1인 1식사 (백반) 주문 시 펩시 제로 355ml 한 캔 제공 or 2. 감자탕 중짜 이상 주문 시 볶음밥 or 사리 중 택 1",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 백반 인원 주문 요건 또는 감자탕 중사이즈 이상 주문 시 (조건 택1)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "name": "토마토 도시락",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍱",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "세트메뉴 주문 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "세트메뉴 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "세트 메뉴 주문 시 500원 할인 (매장 내 식사 한정)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 세트 메뉴 주문 및 매장 내 식사 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "세트 메뉴 주문 시 500원 할인 (매장 내 식사 한정)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 세트 메뉴 주문 및 매장 내 식사 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 테이블 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 테이블 당 음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "91콩삼",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🐷",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "4인 이상 방문 시 우동사리 / 당면사리 중 택1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "4인 이상 방문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "4인 테이블당 우동 또는 당면사리 중 택1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 테이블 당 우동/당면사리 중 택 1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 테이블 당",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "우동, 당면 중 택 1 (단, 4인당 1개)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 기준 테이블 당",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "4인 테이블 당 우동 or 당면사리 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 테이블당 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "일미 닭갈비 파전",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "일미 닭갈비 3인분 이상 주문 시 볶음밥 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "일미 닭갈비 메뉴 3인분 이상 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "인원 수 상관없이 3인분 이상 주문 시 볶음밥 1인분 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인분 이상 주문 시 추가볶음밥 1인분 or 사리 추가 무료 (주문 시 미리 안내 필수)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인분 이상 주문 시 (주문 시 미리 안내 필수)",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "닭갈비 3인분 주문 시 볶음밥 1인분 제공 (테이블에 첨단융합대학 학생들로만 구성 시)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 닭갈비 3인분 주문 및 테이블 전체가 첨단융합대학 학생 구성 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "3인분 이상 주문 시 볶음밥 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인분 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3,4인 테이블 당 볶음밥 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 또는 4인 테이블당 1인분 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "탕화쿵푸 마라탕",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍛",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 주문 시 음료 1개 제공 또는 주류 2,000원 할인 중 택1",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인 이상 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "12,000원 이상 주문 시 꼬치 1개 무료",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 12,000원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인 이상 방문 시 음료 제공 (탄산, 중국음료) or 주류 한 병 2,000원 할인 / 마라탕 12,000원 이상 주문 시 꼬치 1개 서비스 (중복 적용 불가)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 또는 마라탕 주문 금액 조건 충족 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 이상 방문 시 음료 1개 제공 or 주류 1개 2,000원 할인 / 12,000원 이상 결제 시 꼬치 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 또는 결제 금액 조건 달성 시 (중복 적용 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "name": "도야짬뽕",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍜",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 방문 시 만두 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인 이상 방문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "인원 수만큼 군만두 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 인원 기준",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인 이상 방문 시 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "인원수만큼 군만두 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 인원 기준 충족 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "name": "동아리식당",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍚",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "4인 이상 방문 시 된장찌개 / 순두부찌개 중 택1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "4인 이상 방문 필수, 1인 1메뉴 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 된장 or 순두부찌개 제공 (1인 1메뉴 주문 필수)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 및 1인 1메뉴 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3인 이상 방문 시 된장 or 순두부 찌개 제공 (1인분 메뉴)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 점심시간 음료 제공 / 3인 이상 방문 시 (11~14시 제외)",
+        "benefit": "점심시간(11~14시)에 3인 이상 방문 시 캔음료 1개 제공 / 3인 이상 방문 시 손두부 or 된장찌개 제공"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 방문 시 된장 or 순두부찌개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시 (된장찌개 또는 순두부찌개 중 택 1)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "name": "육앤샤",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥘",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "4인 이상 방문 시 육회비빔밥 / 샤브샤브 1인분 중 택1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "4인 이상 방문 필수, 1인 1메뉴 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "오후 6시 이후 4인분 이상 주문 시 테이블당 육회비빔밥 또는 샤브샤브 1인분 제공 (샤브샤브는 4인분 이상 주문 시 선택 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "메뉴 4개 이상 주문 시 육회비빔밥 1개 제공 / 오후 6시 이후 방문 시 소주 3천원",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 메뉴 4개 이상 주문 시 혹은 오후 6시 이후 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "4인분 이상 주문 시 육회비빔밥 제공 or 소주 3,000원 (두 가지 모두 오후 6시 이후 방문 시 적용)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 오후 6시 이후 방문 및 4인분 이상 주문 혹은 소주 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 샤브샤브 4인분 이상 주문 시 샤브샤브 or 육회비빔밥 제공 / 2. 소주 18시 이후 주문 시 병당 3,000원 (직원에게 별도 문의)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 18시 이후 방문 소주 주문 혹은 4인분 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "샤브샤브 4인 이상 주문 시 육회비빔밥 or 샤브샤브 1인분 추가 제공 / 소주 3,000원",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 샤브샤브 4인 이상 주문 시 / 소주는 주문 전에 말씀 필수",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "18시 이후 소주 3,000원 / 샤브 4인분 이상 주문 시 육회비빔밥 or 샤브 1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 18시 이후 주류 주문 시 소주 병당 3,000원 적용 또는 샤브 4인분 이상 주문 시 육회비빔밥 또는 샤브 1인분 제공 (혜택 택1)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "14",
+    "name": "더치킨",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "사계천왕 / 치뽀끼 주문 시 감자튀김 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "사계천왕 또는 치뽀끼 메뉴 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "사계천왕 또는 치뽀끼 주문 시 감자튀김 추가 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "사계천왕 혹은 치뽀끼 주문 시 감자튀김 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 사계천왕 혹은 치뽀끼 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "사계천왕 or 치뽀끼 주문 시 감자튀김 추가",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "사계천왕 or 치뽀끼 주문 시 감자튀김 서비스",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
+        "benefit": "사계천왕/치뽀끼 주문 시, 감자튀김 제공"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "위풍당닭 or 사계천왕 or 치뽀끼 주문 시 감자튀김 서비스 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 지정 메뉴 주문 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "15",
+    "name": "미쳐버린파닭",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "한 테이블 당 1,000원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "테이블 기준 적용 / 떡볶이 혜택은 7만원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "테이블당 1,000원 상당의 서비스 제공 / 테이블당 7만원 이상 주문 시 떡볶이 1인분 제공 (중복 적용 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이블 당 1천원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문시 떡볶이 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 7만원 이상 주문 여부에 따라 추가 서비스 제공",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "테이블 당 1,000원 상당의 서비스 제공 / 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 금액에 따른 차등 서비스 제공",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 테이블 당 천원 상당 서비스 / 2. 테이블 당 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 금액 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 7만원 이상 주문 시 추가 혜택",
+        "benefit": "테이블 당 천원 상품 제공 (할인 X) / 7만원 이상 주문 시 떡볶이(1~2인) 무상 제공"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "테이블 당 1,000원 상당의 서비스 / 테이블 당 7만원 이상 주문 시 떡볶이 1인분",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 1,000원 상당 서비스 제공 또는 테이블당 70,000원 이상 주문 시 떡볶이 1인분 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "16",
+    "name": "더술",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍺",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "4인 미만 방문 시 음료 1병 제공 / 4인 이상 방문 시 서비스 메뉴 제공 / 생일자 생일파티 시 뽑기를 통해 안주 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "4인 미만: 음료 1병 / 4인 이상: 서비스 메뉴(매장 사정에 따라 변동 가능) / 생일파티: 메인 안주 주문 필수 / 더술 1·2호점 인스타 업로드 시 중복 혜택 가능",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "5만원 이상 결제 시 1만원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수 / 5만원 이상 결제 시 적용",
+        "source_url": "https://www.instagram.com/p/DVfHiDGAUT1"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "현금/계좌이체 결제 시 10% 할인 / 2-3명 방문 시 음료수 제공 / 4명 이상 방문 시 더술 서비스 메뉴 제공 (중복 적용 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "생일자 동반 4인 이상 방문 시 서비스 안주 뽑기 기회 제공 (생일 전후 하루씩 적용 가능, 인스타그램 스토리에 더술 태그 후 게시 필수, 서비스 외 일반 안주 1개 이상 주문 필수)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 생일자 동반 4인 이상, 인스타 스토리 태그 업로드, 추가 안주 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2~3인 방문 시 음료 1캔 제공 / 4인 이상 방문 시 서비스 메뉴 제공 / 현금 및 계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원에 따른 서비스 제공 혹은 현금/계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2-3인 방문 시 음료 증정 / 4인 이상 방문 시 사장님 서비스 / 현금 및 계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 조건에 맞춰 적용 혹은 현금/계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
+      },
+      {
+        "college_id": "5",
+        "benefit": "2~3인 방문 시 음료 1캔 제공 / 4인 이상 방문 시 더술 서비스 메뉴 제공 / 현금 흑은 계좌이체 시 10% 할인",
+        "college_name": "디자인대학",
+        "conditions": "학생증 제시, 2~3인 음료 혜택과 4인 이상 메뉴 중복 불가, 현금/계좌이체 할인은 별도 적용 가능",
+        "source_url": "https://www.instagram.com/p/DV8L_ewEZpq",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
+        "conditions": "학생증 제시, 2~3인 음료와 4인 이상 메뉴 중복 불가, 현금/계좌이체 할인은 별도 적용 가능",
+        "benefit": "2~3인 방문 시 음료 증정 / 4인 이상 방문 시 서비스 메뉴 증정 / 계좌이체·현금 결제 시 10% 할인 (1/2번 중복 불가, 방문 사진 인스타 게시 시 중복 가능, 3번은 별도 적용)"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2-3인 테이블당 음료수 1개 or 4인 이상 방문 시 서비스 메뉴 제공 / 현금결제 or 계좌이체 시 10% 할인 (1번이랑 중복 적용 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 (인원별 음료/안주 서비스 혜택과 중복 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "17",
+    "name": "달달포차",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍻",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "현금 / 계좌이체 결제 시 10% 할인 / 2인 이상 방문 시 캔 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "할인 혜택: 현금 또는 계좌이체 결제 필수 / 음료 혜택: 2인 이상 방문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "계좌이체 결제 시 소주/맥주 병당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "계좌이체 시 10% 할인 또는 주류 1병 500원 할인 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 계좌이체 혹은 조건에 맞춰 택 1 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "계좌이체 시 소주 / 맥주 병당 500원 할인 (다른 이벤트와 중복 불가)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 계좌이체 결제 시 (타 이벤트 중복 불가)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "소주, 맥주 병당 500원 할인 / 현금, 계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주류 주문 시 혹은 현금/계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "계좌이체 시 소주/맥주 병당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 계좌이체 결제 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "18",
+    "name": "로드락비어",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍺",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "치킨 메뉴 + 탕 메뉴 동시 주문 시 주류 1병 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "치킨 메뉴와 탕 메뉴 동시 주문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "탕 세트 주문 시 음료 또는 주류 1병 제공 / 20인 이상 단체 방문 시 테이블당 주류 1병 제공 (중복 적용 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 대상 세트 주문 혹은 20인 이상 단체 방문 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "18시 이전 방문 시 음료 2캔 or 생맥주 1잔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 18시 이전 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "benefit": "4인 이상 방문 시 음료 1캔 서비스"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "4인 이상 방문 시 음료 1개 or 생맥주 500cc 제공 / 4만원 이상 주문 시 포테이토 메뉴 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 조건 또는 주문 금액 조건 충족 시 (혜택 중복 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "19",
+    "name": "역전할머니맥주",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍺",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "3인 이상 방문 필수",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이블당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 적용",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3인 이상 방문 시 테이블 당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 방문 시 탄산음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시 탄산음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "20",
+    "name": "만취",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍺",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 주문 시 음료 1개 제공 / 4인 이상 주문 시 샤베트 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인 이상 주문 시 음료 1개 / 4인 이상 주문 시 샤베트 1개로 혜택 상향",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "4인 이상 방문 시 샤베트 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 파인애플 샤베트 무료 제공 또는 주류 병당 500원 할인 또는 계좌/현금 결제 시 5% 할인 또는 시험기간 3인 이상 방문 시 주류 반값 할인 (중복 적용 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 선택 조건별 차등 적용 (중복 불가, 시험기간 특별 할인 포함)",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3인 이상 테이블 (1인 1병) 라면 또는 우동 제공 / 4인 이상 테이블 파인애플 샤베트 1개 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 인원 및 주류 주문 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "9",
+        "college_name": "예체능대학",
+        "benefit": "4인 이상 방문 시 오지 치즈 후라이 혹은 스팸후라이 중 택 1 제공 혹은 10만원 이상 결제 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-19",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시 혹은 10만원 이상 결제 시",
+        "source_url": "https://www.instagram.com/p/DWh49Orj_w6/"
+      },
+      {
+        "college_id": "5",
+        "benefit": "2인 이상 방문 시 음료 1캔 제공 / 4인 이상 방문 시 서벳 제공",
+        "college_name": "디자인대학",
+        "conditions": "학생증 제시, 2인 이상 방문 시 음료 / 4인 이상 방문 시 서벳 제공",
+        "source_url": "https://www.instagram.com/p/DV8L_ewEZpq",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
+        "conditions": "학생증 제시, 2인 방문 시 해장 라면 / 4인 이상 방문 시 서벳 제공",
+        "benefit": "2인 방문 시 해장 라면 증정 / 4인 이상 방문 시 서벳 증정"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "4인 테이블 당 샤베트 1회 제공 / 2인 테이블 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블 인원에 따라 혜택 차등 적용 (4인 테이블: 샤베트 1회, 2인 테이블: 음료 1개 제공)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "21",
+    "name": "에이플러스",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍺",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "찌개 주문 시 라면사리 1개 제공 / 현금·계좌이체 결제 시 미니 쮸쮸바 제공 / 에이쁠 인스타 태그 후 스토리 게시 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "사리: 찌개 메뉴 주문 필수 / 쮸쮸바: 현금 또는 계좌이체 결제 필수 / 500원 할인: 에이쁠 인스타 태그 후 스토리 게시 필수",
+        "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "5만원 이상 결제 시 1만원 할인쿠폰 제공 / 10만원 이상 결제 시 2만원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수 / 5만원 이상: 1만원 쿠폰 / 10만원 이상: 2만원 쿠폰",
+        "source_url": "https://www.instagram.com/p/DVfHaqFAXNc"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "찌개류 주문 시 라면사리 무한리필 / 오후 5-8시 약대 재학생 포함 방문 시 병당 500원 할인(병 수 제한 없음) / 단체 행사 예약 시 인원수대로 아이스크림 제공 / 일요일 휴무일 장소 무료 대관",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수 / 무료 대관: 사전 연락(3일 전) 및 뒷정리 필수 / 아이스크림: 개강·종강 총회 제외",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "찌개류 주문 시 라면사리 무한리필 추가 제공 / 10인 이하 방문 시 인당 쭈쭈바 1개 제공 / 오후 8시 이전 방문 시 소주 1병 무료 제공 (중복 적용 가능, 단 인스타그램 스토리 태그 업로드 필수)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인스타그램 스토리 태그 필요, 중복 적용 가능",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "찌개류 주문 시 라면사리 무한 / 10인 이하 테이블 쭈쭈바 제공 / 스토리 업로드 시 기본안주로 라면 제공 (심야타임 1시~5시 해당)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 대상 찌개 주문 혹은 10인 이하 방문 혹은 스토리 업로드 시 (심야타임 1시~5시 한정)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "9",
+        "college_name": "예체능대학",
+        "benefit": "1. 8시 이전 방문, 소주 1병 무료 제공 / 2. 심야타임 12시부터 제공 / 3. 예체능대학 행사 진행 시 4등 경품으로 에이플 협찬 상품권 제공 (행사 일정 사전 공지) / 4. 찌개 라면사리 무한리필 / 5. 아이스크림 무료 제공 / 6. 생일자 샴페인 제공 및 폴라로이드 촬영 서비스 (4인 이상 1인 2만원 이상 주문 시 카운터 문의) / 7. 인스타그램 스토리에 에이플 태그하면 1~6번 전체 중복 가능 (올리지 않을 시 혜택 1개만 가능 / 그룹 중 예체능대학 학생 한 명이라도 있으면 다 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-19",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 그룹 중 예체능대학 학생 한 명이라도 있으면 적용, 인스타그램 스토리에 에이플 태그 시 전체 혜택 중복 가능 (미태그 시 혜택 1개만 선택 가능)",
+        "source_url": "https://www.instagram.com/p/DWh5A3Qj74h/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "시험 기간 주류 반값 / 10인 이하 테이블 미니아이스크림 1인 1개 / 인스타 태그 후 스토리 업로드 시 음료 or 홈런볼 / 에이플 생일 패키지 증정(폴라로이드사진, 머리띠, 장미꽃) / 기념일(생일, 입대, 전역) 끝까지 달릴 시 샴페인 증정",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 시험 기간 주류 반값 적용 및 개별 조건 충족/SNS 이벤트 참여 시",
+        "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
+      },
+      {
+        "college_id": "5",
+        "benefit": "20시 이전 방문 시 소주 1병 제공 / 찌개류 주문 시 라면사리 무한리필 / 스토리 태그 시 과자 1봉지 제공 / 현금·계좌이체 5% 할인 / 스토리 업로드 후 재업로드 시 미니 아이스크림 제공(10인 이하) / 생일자 1~3일 전 예약 시 생일패키지 / 결제 금액 25,000원당 디대도장쿠폰 1개 (10개=14,000원, 20개=24,000원 상품)",
+        "college_name": "디자인대학",
+        "conditions": "학생증 제시, 20시 이전 방문/찌개 주문/스토리 태그 업로드/현금계좌이체/생일 예약 등 각 조건별로 적용 가능, 다 채운 쿠폰 2장 시 모스카토 과실 샴페인 증정 포함",
+        "source_url": "https://www.instagram.com/p/DV8ME6xkRmu",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "4인 이상 방문 시 에이플러스 인스타 태그 후 스토리 올리면 소주 1병 제공 / 8인 이하 방문 시 주류 병당 500원씩 할인 / 김치찌개(소) 주문 시 라면사리 1개 제공 / 김치찌개(대) 주문 시 라면사리 무한리필 (중복 가능, 에이플러스의 다른 행사와 중복 불가, 오전 2시까지 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 중 한 명 이상 소융대 학생이면 적용 가능, 다른 행사와 중복 불가, 오전 2시까지 한정 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "22",
+    "name": "모모커피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "음료 5잔 이상 구매 시 아메리카노 S사이즈 1잔 또는 아이스크림 토핑 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "음료 5잔 이상 구매 필수 / 아메리카노 S사이즈·디저트는 5잔 카운트에 포함되지 않음",
+        "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "메뉴 5개 이상 동시 주문 시 아메리카노 S 사이즈 1잔 제공 (12:00~14:00 제외, 아메리카노 S사이즈 & 뚱카롱은 기준 메뉴 대상에서 제외)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 메뉴 5개 이상 동시 주문 시, 12:00~14:00 제외, 제외 메뉴 존재",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "음료 5잔 이상 동시 주문 시 아메리카노 S사이즈 1잔 or 아이스크림 제공 (2가지 중 택1)",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 음료 5잔 이상 동시 주문 시",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "음료 5개 이상 구매 시 1. 아메리카노 s 사이즈 1개 증정 or 2. 아이스크림 토핑 증정 (아메리카노 s 사이즈와 마카롱 제외)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 5개 이상 구매 시 (아메리카노 s 사이즈 증정 또는 아메리카노 s 사이즈와 마카롱을 제외한 메뉴에 아이스크림 토핑 증정 중 택 1)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "23",
+    "name": "오얏리 커피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍹",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "전 음료 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": null,
+        "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음료 500원 할인 (인원 무관)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "전 메뉴 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "현금/계좌이체 결제 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "메뉴 당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 메뉴 당 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "24",
+    "name": "어반 플레이스",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "테이크 아웃 시 전 음료 500원 할인 / 매장 이용 시 아메리카노(M/L) 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "테이크 아웃: 전 음료 적용 / 매장 이용: 아메리카노 M·L 사이즈에 한해 적용",
+        "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이크아웃 시 전 음료 500원 할인 / 홀 이용 시 아메리카노 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이크아웃 혹은 홀 아메리카노 이용 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "테이크 아웃 음료 전체 500원 할인 or 홀 내에서 아메리카노 (사이즈 무관) 500원 할인 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이크 아웃 혹은 홀 내에서 아메리카노 이용 시 (중복 가능)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "9",
+        "college_name": "예체능대학",
+        "benefit": "전 메뉴 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-19",
+          "is_active": true
+        },
+        "conditions": "학생증 제시",
+        "source_url": "https://www.instagram.com/p/DWh49Orj_w6/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "테이크 아웃 시 음료 500원 할인 / 매장 취식 시 아메리카노 500원 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 테이크 아웃 또는 매장 아메리카노 이용 시",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      }
+    ]
+  },
+  {
+    "id": "25",
+    "name": "포세이돈 PC카페",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "💻",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "1만원 이상 충전 시 음료수 S사이즈 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "1만원 이상 충전 필수",
+        "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "1만원 이상 충전 시 음료수 S사이즈 1잔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "만원 이상 충전 시 음료 S사이즈 제공 / 2만원 이상 충전 시 음료 L사이즈 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 충전 금액 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      }
+    ]
+  },
+  {
+    "id": "26",
+    "name": "슈퍼스타 코인노래연습장",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🎤",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "3천원 이상 결제 시 물 한 병 제공 / 9곡 결제 시 2곡 추가 서비스 / 30분 충전 시 10분 추가 서비스",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "물: 3천원 이상 결제 필수 / 추가 곡·시간 혜택 두 항목 중복 적용 가능",
+        "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3,000원 이상 결제 시 물 한 병 제공 / 9곡 결제 시 2곡 서비스 또는 30분 결제 시 10분 서비스",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3,000원 이상 결제 시 물 1병 제공 및 9곡 이상 결제 시 2곡 추가 또는 30분 이상 결제 시 10분 추가 제공 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시 (중복 가능)",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3,000원 이상 결제 시 물 1병 서비스\n9곡 결제 시 2곡 서비스\n30분 이상 결제 시 10분 서비스",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
+      },
+      {
+        "college_id": "9",
+        "college_name": "예체능대학",
+        "benefit": "3,000원 이상 결제 시 물 1개 제공 / 9곡 시 2곡 추가 OR 30분 시 10분 추가 / 30분 이상 결제 시 10분 서비스",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-19",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 조건에 해당하는 결제 혹은 서비스 이용 시",
+        "source_url": "https://www.instagram.com/p/DWh49Orj_w6/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3천원 이상 결제 시 물 1개 제공 / 9곡 시 2곡 추가 or 30분 시 10분 추가",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3,000원 이상 결제 시 혹은 곡/시간 요건 충족 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "27",
+    "name": "한양사 인쇄복사제본",
+    "category": "life",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🖨️",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "5천원 이상 현금 결제 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "5천원 이상 현금 결제 필수",
+        "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "5,000원 이상 현금 또는 계좌이체 결제 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 5,000원 이상 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "5,000원 이상 현금 결제 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 5,000원 이상 현금 결제 시",
+        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
+      }
+    ]
+  },
+  {
+    "id": "28",
+    "name": "레드버튼 고잔점",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🎮",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "식음료 전체 금액의 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": null,
+        "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음식&음료 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "식음료 결제 금액 10% 할인 / 첨단융합대 재학생 4인 이상 방문 시 1시간 쿠폰(1인 1매) 증정",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시 쿠폰 적용",
+        "source_url": "https://www.instagram.com/p/DW-e137iV6g/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "식음료 전체 결제금액 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 식음료 전체 결제 금액의 10% 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "29",
+    "name": "이삭토스트",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍞",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "토스트&음료 구매 시 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "토스트와 음료 동시 구매 필수",
+        "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "토스트와 음료 세트 구매 시 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "토스트 & 음료 구매 시 음료 1천원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 토스트와 음료 함께 구매 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "토스트&음료 구매 시 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 토스트와 음료 함께 구매 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "토스트와 음료 세트 주문 시 1,000원 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 토스트와 음료 세트 주문 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "세트 주문 시 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 세트 메뉴 주문 시 세트당 1,000원 할인",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "30",
+    "name": "코운즈",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍣",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "3인 이상 방문 시 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "3인 이상 방문 필수",
+        "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 당 탄산 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인당",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2인 이상 방문 시 테이블 당 음료수 한 캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시 (테이블 당)",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "2인 이상 방문 시 음료 1개 제공",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 테이블당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 테이블당 음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "31",
+    "name": "떼드떼",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍰",
+    "partnerships": [
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "2인 이상 주문 시 500원 할인 / 3인 이상 주문 시 1,000원 할인 또는 아메리카노 사이즈업 / 4인 이상 주문 시 1,500원 할인 또는 아메리카노 2개 사이즈업 또는 원쿠키 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "2인: 500원 할인 / 3인: 1,000원 할인 or 아메리카노 사이즈업 / 4인: 1,500원 할인 or 아메리카노 2개 사이즈업 or 원쿠키 중 택1",
+        "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음료 주문 시 2인: 500원 할인 / 3인: 1,000원 할인 + 아메리카노 사이즈업 / 4인: 1,500원 할인 + 아메리카노 2잔 사이즈업 + 원쿠키 1개 제공 (일행 중 1명만 공대생이어도 가능, 인쇄복사 10장 이벤트와 별개, 쿠폰 중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 (일행 중 1명 필수), 음료 주문 인원에 맞춰 혜택 차등 적용 (쿠폰 중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 음료 주문 시 2인 500원 할인 / 2. 3인 1,000원 할인 or 아메리카노 사이즈업 / 3. 4인 1,500원 할인 or 아메리카노 2잔 사이즈업 or 원쿠키 제공 (경상대 1인만 있어도 일행 전체 혜택 제공, 쿠폰 중복 불가, 복사 10장 상시)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 일행 중 경상대 학생 최소 1인 포함 필수, 쿠폰 중복 적용 불가",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "(여름 한정) 음료+컵빙수 주문 시 500원 할인 / 음료2+빙수(2인) 주문 시 1,500원 할인 // (상시) 2인 음료 주문 시 500원 할인 / 3인 음료 주문 시 1,000원 할인 or 아메리카노 사이즈업 / 4인 이상 음료 주문 시 1,500원 할인 or 아메리카노 2잔 사이즈업 or 원쿠키 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 또는 세트 주문 요건 달성 시 (중복 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "32",
+    "name": "시저커피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "아메리카노 무료 쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfHyHkgUE-"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "전 메뉴 500원 할인 (타 이벤트 중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 (타 이벤트 중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "음료 한 잔당 500원 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "매장 내 음료 주문 시 500원 할인 / 상시 테이크아웃 시 1,000원 할인 / 매장 내 디저트 + 음료 주문 시 1,000원 할인 / 매장 내 음료 주문 후 1,000원 추가 시 아메리카노 리필(테이크아웃 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 방식 및 결제 조건에 따라 상이",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "음료 주문 시 인당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 주문 시 인당 500원 할인",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "33",
+    "name": "에이피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍰",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "1만원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfH4I-ARV3"
+      }
+    ]
+  },
+  {
+    "id": "34",
+    "name": "이스턴문",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "3인 이상 방문 시 7천원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-03-31",
+          "is_active": true
+        },
+        "conditions": "3인 이상 방문 필수 / 쿠폰 만료일 2026.03.31 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfH8MDAVGj"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "12시~17시 인당 음료 500원 할인 / 17시 이후 주류 메뉴 4잔 이상 주문 시 감자칩 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 시간 및 주문량 조건 적용 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "12~17시 인당 500원 할인 / 17시 이후 주류메뉴 4개 이상 주문 시 감자칩 1개 제공 (스토리 태그 후 공유 or 영수증 리뷰 시)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 시간 또는 주류 주문 개수 조건 충족 및 인증(스토리 태그 공유 또는 영수증 리뷰) 완료 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 12~17시 인당 500원 할인 / 2. 17시 이후 주류 메뉴 4개 이상 주문 시 감자칩 1개 제공 / 3. 스토리 태그 후 공유 or 영수증 리뷰 시 서비스 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 이용 시간 및 조건 충족 또는 SNS 스토리 공유/영수증 리뷰 참여 시",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "12:00~17:30 주문 시 음료 메뉴 500원 할인 / 음료 4잔 이상 주문 시 감자칩(소) or 웨지 제공",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 12:00~17:30 시간대 또는 4잔 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "12시~17시 인당 500원 할인 / 17시 이후 주류 메뉴 4개 이상 주문시 감자칩 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 시간대 및 주문 조건 충족 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "35",
+    "name": "페퍼로니 버튼",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍕",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "버터갈릭 프라이 쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfIF9GAeJE"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "피자 1판 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 피자 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "캔 음료 1캔 제공 (학생증 지참, 피자 사이즈 상관X)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 지참, 피자 주문 시 (피자 사이즈 무관)",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "테이블 피자 1판 주문 시 음료 1캔",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 피자 1판 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "5",
+        "benefit": "피자 한 판당 음료 한 캔 제공",
+        "college_name": "디자인대학",
+        "conditions": "학생증 제시",
+        "source_url": "https://www.instagram.com/p/DV8L8c5kd8F",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "사이즈 상관없이 피자 한 판 당 음료 1개 or 플레인프라이 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 피자 1판당 음료 1개 또는 플레인 프라이 제공 (택 1)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "36",
+    "name": "두루정",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍲",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "1만원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfIJj3ASWG"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2인당 음료 한 캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인당 적용",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      }
+    ]
+  },
+  {
+    "id": "37",
+    "name": "홍당무",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍲",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "1만원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfIMzDAVH_"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시 음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "38",
+    "name": "돼지우리",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥓",
+    "partnerships": [
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "1만원 할인쿠폰 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
+        "source_url": "https://www.instagram.com/p/DVfIuBTEXkM"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "현금/계좌이체 결제 시 결제 금액의 5% 할인 / 냉면류 500원 할인 (중복 적용 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1. 현금 or 계좌이체 시 5% 할인 / 2. 냉면 주문 시 500원 할인 / 3. 소주 500원 할인 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 혹은 해당 메뉴 주문 시 (중복 가능)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 현금 결제 시 1.5% 할인 / 2. 냉면 500원 할인 (1, 2 조건 중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 결제 조건 혹은 냉면 주문 시 (중복 가능)",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시",
+        "benefit": "인원 당 만두 제공"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "현금결제, 계좌이체 시 5% 할인 / 냉면 500원 할인 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금/계좌이체 결제 시 또는 냉면 주문 시 (중복 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "39",
+    "name": "교반육회비빔밥",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍺",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "(식사 제휴) 4인 기준 음료 2개 제공 / (포차 제휴) 3만원 이상 주문 시 육회 1접시 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "(식사) 4인 이상 방문 시 음료 2개 제공 / (포차) 3만원 이상 이용 시 육회 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 식사 시 4인 이상 방문 혹은 포차 시 3만원 이상 이용 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "30,000원 이상 주문 시 육회 한 접시 제공 / 4인 이상 테이블 음료수 2개 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주류/안주 메뉴 한정 30,000원 이상 주문 시 혹은 4인 이상 테이블에 한함",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "5",
+        "benefit": "4인 이상 방문 시 음료 2캔 제공 (식사) / 3만원 이상 주문 시 육회 제공 (주류, 안주)",
+        "college_name": "디자인대학",
+        "conditions": "학생증 제시, 4인 이상 방문 시 음료 혜택 / 3만원 이상 주문 시 육회 제공",
+        "source_url": "https://www.instagram.com/p/DV8L8c5kd8F",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
+        "conditions": "학생증 제시, 4인 이상 방문 시 음료 / 3만원 이상 주문 시 육회 제공",
+        "benefit": "4인 이상 식사 시 음료 2캔 제공 / 술 마실 시 3만원 이상 테이블당 육회 한접시 서비스"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "(식사) 4인당 음료 2개 제공 / (포차) 3만원 이상 주문 시 육회 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 식사 이용 혹은 포차 조건 금액 이상 주문 시 (중복 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "40",
+    "name": "어반스터디카페",
+    "category": "life",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "📚",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "기간권·정액권 구매 시 10% 할인 / 기간권의 경우 1개월간 사물함 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      }
+    ]
+  },
+  {
+    "id": "41",
+    "name": "소담골",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🦆",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "42",
+    "name": "계림원 누룽지 통닭",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "테이블 당 3만원 이상 주문 시 주류 or 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블 당 3만원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "세트메뉴 하나 당 주먹밥 or 계란찜 제공 / 통닭메뉴 하나 당 음료 1개 제공 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 타당한 조건의 메뉴 주문 시 (중복 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "43",
+    "name": "신선샤브앤칼국수",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍜",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "사리 (야채/버섯/칼국수/물만두 중 택 1), 볶음밥, 탄산음료 중 1가지 제공 (테이블당, 인원 수 무관, 네이버 리뷰 이벤트와 중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 적용 (네이버 리뷰 이벤트와 중복 가능)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "서비스 (야채, 버섯, 칼국수, 물만두, 볶음밥, 탄산음료) 중 택 1 (네이버 영수증과 중복 가능, 학생증 지참)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 지참, 테이블당 적용 (네이버 영수증 리뷰 이벤트와 중복 가능)",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시",
+        "benefit": "테이블 당 음료 1캔 or 사리중류 제공"
+      }
+    ]
+  },
+  {
+    "id": "44",
+    "name": "인더비엣",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥘",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "4인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 or 튀김(고구마롤, 새우롤, 꽃게롤, 샤오마이 중 택1) 제공 (네이버 리뷰 중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "4인 이상 방문 시 음료 제공 OR 4인 이상 방문 시 튀김류 4가지 중 택 1 (고구마롤, 새우롤, 꽃게롤, 웨딩샤오마이)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      }
+    ]
+  },
+  {
+    "id": "45",
+    "name": "언니네 화덕핏짜",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍕",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3인 이상 방문 시 테이블당 음료수 1개 제공 / 현금·계좌이체 결제 시 메인 메뉴당 1,000원 할인 (중복 적용 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 테이블 당 음료 1캔 제공 or 현금결제/계좌이체 시 메인 메뉴 당 1천원 할인 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시 혹은 현금/계좌이체 결제 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3인 이상 테이블 음료수 하나 제공 / 현금 및 계좌이체 시 메뉴 하나 당 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 테이블 혹은 현금/계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "3인 이상 방문 시 탄산음료 1캔 제공 / 현금 결제 시 메인메뉴 당 천원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 또는 현금 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 3인 이상 주문 시 또는 현금/계좌이체 결제 시",
+        "benefit": "3인 이상 주문 시 탄산음료 1캔 제공 / 현금결제/계좌이체 시 메인메뉴 당 1000원 할인"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 테이블 당 음료 1개 제공 / 현금결제, 계좌이체 시 메뉴 당 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 테이블 이용 시 음료 1개 제공 및 현금/계좌이체 결제 시 메뉴 당 1,000원 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "46",
+    "name": "이서식당",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍖",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "2인 이상 식사 시 음료 1병 무료 제공 / 4인 이상 식사 시 주류 1병 또는 음료 2병 무료 제공 (중복 적용 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 당 음료 1캔 제공 / 4인 당 음료 2캔 또는 주류 1병 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원에 따른 서비스 제공",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인 이상 방문 시 음료수 1캔 제공 / 4인 이상 방문 시 음료수 2캔 or 주류 1병 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2인 방문 시 음료 1캔 제공 / 4인 방문 시 음료 2캔 or 주류 1병 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "2인 이상 방문 시 음료 1캔 증정 / 4인 이상 방문 시 음료 2캔 or 주류 1병 증정",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 방문 인원에 따라 차등 적용",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 이상 방문 시 음료 1개 제공 / 4인 테이블당 음료 2개 or 주류 1병 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 조건 충족 시 (중복 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "47",
+    "name": "묵커피바",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍹",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "총 결제 금액 15,000원 이상 시 결제 금액의 10% 할인 / 주문 제작 홀케이크 가격 2,000원 할인 (모든 제휴 조건은 주문에는 제공하지 않음)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "15,000원 이상 주문 시 10% 할인 (테이크 아웃 시 할인 적용된 최종 가격이 15,000원 이상일 경우 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 최종 결제 금액 15,000원 이상 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "15,000원 이상 결제 시 결제 금액의 10% 할인 / 주문제작 케이크 2,000원 할인 (주말 제외 적용)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 결제 혹은 주문제작 케이크 구매 시 (주말 제외)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 총 결제 금액 15,000원 이상 시 결제금액의 10% 할인 / 2. 주문제작 홀케이크 제작 2,000원 할인 (주말 제외 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 평일 결제 요건 및 금액 조건 달성 시 (주말 제외)",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "주문제작 케이크 2,000원 할인 / 15,000원 이상 구매 시 10% 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 주문제작 케이크 또는 15,000원 이상 구매 시",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "15,000원 이상 주문 시 10% 할인 (중복 가능, 주말 불가) / 주문제작 홀 케이크 2,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 주문 시 10% 할인 (타 혜택과 중복 가능, 주말 사용 불가) / 주문 제작 홀 케이크 주문 시 2,000원 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "48",
+    "name": "UP플레이스",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "테이크아웃 음료 전체 500원 할인 / 홀 내에서 아메리카노 사이즈 상관없이 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "매장 이용 시 아메리카노 500원 할인 / Take Out 시 모든 음료 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 매장 이용 형태에 따라 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "49",
+    "name": "코이노커피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍰",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "학생증을 제시한 인원 수 대상으로 전 메뉴 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "학생증 제시 시 인당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 시 인당 적용",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "방문 인원 수 만큼 500원 할인 (테이크 아웃, 매장 이용 둘 다 가능)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인당 적용 (테이크 아웃 및 매장 이용 가능)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1인 1음료 주문 시 음료 한잔 당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인 1음료 주문 시 음료 1잔당 500원 할인",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "50",
+    "name": "신디도넛",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍩",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "현금 or 계좌 이체로 도넛+음료 만원 이상 구매 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 50,000원 이상 주문 시 7% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료와 도넛 함께 주문 및 금액 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 50,000원 이상 주문 시 7% 할인 (계좌이체 or 현금결제 시 적용)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료와 도넛 금액 조건 충족 및 계좌이체/현금 결제 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 2. 50,000원 이상 주문 시 7% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료와 도넛 합산 금액 조건 달성 시",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "음료+도넛 1만원 이상 구매 시 5% 할인 / 음료+도넛 5만원 이상 구매 시 6% 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 현금결제 or 계좌이체 시 적용, 구매 금액 기준 차등 적용",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "음료+도넛 10,000원 이상 주문 시 5% 할인 / 음료+도넛 50,000원 이상 주문 시 7% 할인 (현금/계좌이체 시 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 한정 및 조건 금액 달성 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "51",
+    "name": "동양솥밥",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "사이드 메뉴 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍚",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 방문 시 사이드(랜덤) 1개 제공 (방학 기간 4인 중 1명만 공대여도 제휴 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시 (방학 기간에는 4인 중 1명만 공과대학 학생이어도 가능)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "4인 이상 방문 시 계절에 맞는 사이드 메뉴 제공 (학생증 지참, 카카오톡 채널 추가)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 지참, 4인 이상 방문 및 카카오톡 채널 추가 완료 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "4인 테이블 당 사이드메뉴 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 테이블 당 적용",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      }
+    ]
+  },
+  {
+    "id": "52",
+    "name": "마라미방",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "할인 또는 음료 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍛",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1만원 이상 현금 결제 시 500원 할인 또는 3인 이상 방문 시 테이블 당 음료 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 1만원 이상 결제 시 혹은 3인 이상 방문 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "3인 이상 방문 시 음료수 1개 제공 / 10,000원 이상 현금 결제 시 500원 할인(중복 적용X) / 2인 이상 주문 시 쿠폰 추가 적립",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 결제 및 인원 조건 충족 시 (할인 혜택 중복 적용 불가)",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "5",
+        "benefit": "3인 이상 방문 시 테이블당 음료 1캔 제공",
+        "college_name": "디자인대학",
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DV8L8c5kd8F",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 3인 이상 방문 또는 10000원 이상 결제 시 (중복 불가)",
+        "benefit": "3인 이상 방문 시 음료 1캔 증정 / 10000원 이상 결제 시 500원 할인"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3-4인 테이블 당 아이스티 1개 제공 / 1만원 이상 현금 결제시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 요건 만족 시 또는 1만원 이상 현금 결제 시 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "53",
+    "name": "김밥큐",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍘",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
+  },
+  {
+    "id": "54",
+    "name": "대학통닭",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료 또는 감자튀김",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 홀 방문 시 음료(소) 1개 제공 / 4만원 이상 주문 시 감자튀김 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 홀 방문 혹은 4만원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
+  },
+  {
+    "id": "55",
+    "name": "대홍훠궈 샤브샤브",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥘",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 이상 무한리필 주문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 무한리필 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 이상 무한 리필 주문 시 원하는 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 무한 리필 주문 시 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "56",
+    "name": "마티아스김밥",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "할인 또는 붕어빵 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍘",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "현금 or 계좌이체 시 500원 할인 / 카드결제 시 붕어빵 1개 제공 (겨울한정)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 혹은 카드결제 시 (겨울한정)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
+  },
+  {
+    "id": "57",
+    "name": "밀숲",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "할인 또는 음료 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍜",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 주문 시 만두 1천원 할인 or 음료 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "3인 이상 방문 시 음료수 한 캔 제공 / 만두 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 3인 이상 방문 또는 만두 주문 시",
+        "benefit": "3인 이상 방문 시 음료 1캔 증정 / 만두 주문 시 1000원 할인"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공 or 만두 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "58",
+    "name": "신전떡볶이",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "튀김 또는 음료 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🌶️",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이블 당 15,000원 이상 주문 시 기본 튀김류 1개 (오뎅, 김말이, 잡채, 만두) or 쿨피스 제공 (택1)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 15,000원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 테이블 당 15000원 이상 주문 시",
+        "benefit": "테이블 당 15000원 주문 시 기본 튀김 4종 중 택1 or 쿨피스 한개"
+      }
+    ]
+  },
+  {
+    "id": "59",
+    "name": "쌈&쌈",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍖",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 방문 시 음료 1개 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "현금/계좌이체 시 10% 할인 / 4인 이상 방문 시 음료수 2개 제공 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금/계좌이체 결제 시 또는 4인 이상 방문 시 (혜택 중복 적용 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "60",
+    "name": "에비수",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍣",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "benefit": "3인 이상 방문 시 음료 1캔 증정"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 테이블 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 테이블 당 음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "61",
+    "name": "소확행피자",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "피자 주문 시 한판 당 음료 500ml 1개 제공 (전화 포장 주문 시)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 전화 포장 주문으로 피자 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
+  },
+  {
+    "id": "62",
+    "name": "순뼈감",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료 또는 사리 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍲",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 이상 방문 시 음료 1개 제공 or 전골류 주문 시 사리 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 혹은 전골류 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
+  },
+  {
+    "id": "63",
+    "name": "버텍스",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "추가메뉴 또는 음료",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍛",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 추가 제외) or 4인 이상 주문 시 음료 1캔 제공 (중복 불가, 포장 시 동일 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 추가 메뉴 선택 혹은 4인 이상 주문 시 (중복 불가, 포장 시에도 적용 가능)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "추가 메뉴 1회 무료 제공 (닭고기, 새우, 야채 볶음밥 제외) / 4인 이상 주문 시 음료수 1캔 제공 (포장 시 동일 적용)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 추가 메뉴 선택 또는 4인 이상 주문 시 (포장 시에도 적용 가능)",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 제외) / 4인 이상 방문 시 음료 1캔 (포장 동일 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 또는 메뉴 추가 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 4인 이상 주문 시 또는 추가 메뉴 주문 시 (닭고기, 새우, 야채복음밥 제외, 포장 시 동일 적용)",
+        "benefit": "추가 메뉴 1회 무료 제공 / 4인 이상 주문 시 음료수 1캔 제공"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 제외)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 추가 메뉴 1회 무료 제공 (단, 닭고기, 새우, 야채, 볶음밥 품목은 제외)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "64",
+    "name": "보배반점",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥡",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 테이블 당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "4인 이상 테이블에 마라 만두 4p 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 테이블에 한함",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      }
+    ]
+  },
+  {
+    "id": "65",
+    "name": "예산 닭갈비감자탕",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥓",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이블 1개 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 제공",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "테이블당 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 적용",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      }
+    ]
+  },
+  {
+    "id": "66",
+    "name": "오늘도 부찌",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "사리 또는 음료 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍛",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 or 당면 or 포두부 사리 중 1개 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
+  },
+  {
+    "id": "67",
+    "name": "오타코",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🌮",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 당 음료수 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인당",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시, 2인당",
+        "benefit": "2인당 2000원 음료 증정"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 테이블당 음료 제공 (2,000원)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 테이블당 2,000원 상당 음료 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "68",
+    "name": "자이카 인도요리",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료 또는 샐러드",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥘",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이블 당 음료 1개 제공 / 5인 이상 방문 시 믹스샐러드 1개 제공 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 적용 혹은 5인 이상 방문 시 (중복 불가)",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 주문 테이블 당 음료수 (라씨/콜라/에이드 중 택1) / 2. 5인 이상 방문 시 샐러드 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 조건 혹은 방문 인원 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "5인 이상 방문 시 샐러드 제공 / 주문 테이블당 라씨 1개 제공 (중복 없이 주문 건당 1회 제공)",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 5인 이상 방문 시 또는 테이블 주문 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      }
+    ]
+  },
+  {
+    "id": "69",
+    "name": "올리바샌드위치",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "탄산음료 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥪",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "8천원 이상 구매 시 탄산 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 8천원 이상 구매 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
+        "conditions": "학생증 제시",
+        "benefit": "테이블 당 구매금액 8000원 단위마다 탄산음료 1자씩 제공"
+      }
+    ]
+  },
+  {
+    "id": "70",
+    "name": "유가네닭갈비",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "단품메뉴 (고기메뉴) 주문 시 음료 1캔 제공 (인원무관)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 단품메뉴(고기메뉴) 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "2인 이상 방문 시 또는 단품(고기)메뉴 주문 시 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 혹은 단품(고기)메뉴 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "단품메뉴(2인 이상, 테이블 당) 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 단품메뉴 2인 이상 주문 시 (테이블 당)",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "고기 단품 메뉴 주문 시 테이블 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 고기 단품 메뉴 주문 시 테이블당 음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "71",
+    "name": "정직유부초밥",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료 또는 메뉴 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍣",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1인분 이상 주문 시 음료 1개 무료 제공 / 6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반 제외, 원하는 맛 1가지)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인분 이상 주문 혹은 6만원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "1인분 구매 시 팩 음료 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인분 구매 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1인 1메뉴 주문 시 음료수 1개 or 디핑소스 1개 / 60,000원 이상 주문 시 우볶이 or 유부초밥 (반반제외, 원하는 맛 1가지 아무거나)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인 1메뉴 주문 시 혹은 60,000원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "1인 1메뉴 주문 시 음료(피크닉) or 디핑소스 제공 / 3만원 이상 주문 시 작은 컵라면 제공 / 6만원 이상 주문 시 우볶이 또는 유부초밥 제공 (반반 제외, 원하는 맛 1가지)",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 주문 금액 기준 차등 적용",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 1인 1메뉴 주문 시 음료 or 디핑소스 제공 / 2. 3만원 이상 주문 시 작은 컵라면 증정 / 3. 6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반제외, 원하는 맛 1가지)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인당 메뉴 주문 조건 혹은 결제 조건금액 이상 달성 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "72",
+    "name": "조박사부대찌개",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍲",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 이상 방문 시 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "9",
+        "college_name": "예체능대학",
+        "benefit": "2인 이상 방문 시 탄산음료 1캔 제공 / 4인 이상 방문 시 탄산음료 2캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-19",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 기준 충족 시",
+        "source_url": "https://www.instagram.com/p/DWh49Orj_w6/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "테이블 당 음료 1캔 증정",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시 음료 1개 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "73",
+    "name": "탐나는 바지락 손칼국수",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "10% 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍜",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "현금/계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "계좌이체 시 10% 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "현금결제, 계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 10% 할인",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "74",
+    "name": "텐버거",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "서비스 메뉴 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍔",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "15,000원 이상 주문 시 치즈스틱 (2개)/어니언링 (3개)/오징어링 (2개) 중 택 1 (11:00~13:30 제휴 불가, 자체 이벤트와 중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 주문 시, 11:00~13:30 시간대 제외, 자체 이벤트와 중복 불가",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "15,000원 이상 주문 시 서비스 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 제공 (11:00 ~ 13:30엔 제휴 적용 불가, 다른 이벤트와 중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 주문 시 (단, 11:00~13:30 시간대 및 타 이벤트 중복 적용 제외)",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "15,000원 이상 주문 시 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 중 택1",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 15,000원 이상 주문 시 (11:00~13:30 제외, 타 이벤트 중복 불가)",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "15,000원 이상 주문 시 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 중 택1 (텐버거의 이벤트와 중복 불가, 11:00 ~ 13:00 제휴 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 주문 시 (단, 11:00 ~ 13:00 및 타 이벤트와 중복 제외)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "75",
+    "name": "참새방앗간",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "사리 또는 음료 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🌶️",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 주문 시 사리 1개 or 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3인 이상 방문 시 음료수 or 사리 1인분 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "3인 이상 방문 시 음료수 제공 or 사리 추가",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "3인 이상 방문 시 사리 or 음료 증정",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인분 이상 주문 시 사리 1종류 추가 가능",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인분 이상 주문 시 사리 1종류 추가 가능",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "76",
+    "name": "큰맘할매순대국",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍲",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "현금 or 계좌이체 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      }
+    ]
+  },
+  {
+    "id": "77",
+    "name": "행컵",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍱",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "현금 or 계좌이체 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "1. 10만원 이상 단체주문 시 개당 1,000원 할인 및 배달 / 2. 10,000원 이상 현금결제나 계좌이체 시 원하는 토핑 or 음료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 단체 주문 시 혹은 현금/계좌이체 10,000원 이상 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "1만원 이상 계좌이체 시 원하는 토핑 혹은 음료 제공 / 10만원 이상 단체 배달 주문 시 컵당 1,000원 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 1만원 이상 계좌이체 또는 10만원 이상 단체 배달 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "10만원 이상 단체 주문 시 개당 1,000원 할인 및 배달 / 만원 이상 현금결제, 계좌이체 시 토핑1 or 음료1개 제공 (매장 이벤트 중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 단체 100,000원 이상 주문 시 개당 1,000원 할인 및 배달 지원 / 10,000원 이상 현금/계좌이체 시 토핑 1개 또는 음료 1개 제공 (매장 이벤트와 중복 적용 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "78",
+    "name": "한양솥밥",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍚",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 이상 방문 시 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      }
+    ]
+  },
+  {
+    "id": "79",
+    "name": "토핑스온패티스",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "감자튀김 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍔",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "2인 이상 방문 시 감자튀김 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "2인 이상 방문 시 감자튀김 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "2인 이상 방문 시 감자튀김 무료 제공",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 이상 방문 시 감자튀김 서비스 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "80",
+    "name": "파익스피크소다",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥤",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 방문 시 이달의 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "4인 테이블당 오늘의 음료 1잔 제공 (타코/햄버거로 1인 1메뉴 주문 시)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 타코 또는 햄버거 메뉴로 1인 1메뉴 주문 및 4인 테이블당 오늘의 음료 1잔 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "81",
+    "name": "삐노누아",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "음료 10% 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍹",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이크 아웃 시 음료 10% 할인, 디저트 5% 할인 (쿠폰 적립 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이크 아웃 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 테이크아웃 시 모든 음료 10% 할인 (쿠폰 적립 불가) / 2. 매장 취식 시 1인 1음료+디저트 주문 시 디저트 300원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이크아웃 결제 시(쿠폰 중복 불가) 또는 매장 취식 메뉴 주문 조건 달성 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "82",
+    "name": "사리(디저트카페)",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "10% 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍰",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "전 메뉴 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      }
+    ]
+  },
+  {
+    "id": "83",
+    "name": "오멜트",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "최대 1,500원 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍳",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1. 음료 매장 취식 시 500원 할인 / 2. 음료 테이크 아웃 시 1,000원 할인 / 3. 디저트+음료 매장 취식 시 1,000원 할인 / 4. 음료+디저트 테이크 아웃 시 1,500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 선택 조건별 할인율 차등 적용",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "1. 음료 구매 시: 매장 취식 500원 할인, 테이크 아웃 1,000원 할인\n2. 음료와 디저트 구매 시: 매장 취식 1,000원 할인, 테이크 아웃 1,500원 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 구매 조건 및 이용 방식(매장/테이크아웃)에 따른 차등 적용",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      }
+    ]
+  },
+  {
+    "id": "84",
+    "name": "오쏘커피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이크아웃 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이크아웃 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "테이크아웃 음료 500원 할인 / 3인 이상 매장 내 취식 시 1,000원 할인 (일요일 제외)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 일요일 및 매장 이용 기준 요건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 테이크 아웃 시 음료 1잔 당 500원 할인 / 2. 매장 이용시 음료 1잔 당 500원 할인 (2번은 일요일 제외)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 1잔 당 적용 (매장 이용 할인은 일요일 제외)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "85",
+    "name": "썬더커피",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "아메리카노 서비스",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음료 4잔 이상 주문 시 아이스 아메리카노 벤티 사이즈 1개 증정 (더치페이 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 4잔 이상 주문 시 (더치페이 가능)",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "음료 4잔 주문 시 venti size 아메리카노 1잔 제공 (더치페이 가능, 테이크 아웃 시 가능)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 4잔 주문 및 테이크 아웃 시 (더치페이 가능)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "음료 4잔 주문 시 아메리카노 1잔 증정",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 4잔 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "음료 4잔 주문 시 아메리카노(벤티) 한 잔 제공 (더치페이 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 4잔 주문 시 아메리카노(벤티) 1잔 서비스 제공 (더치페이 결제 건도 인정)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "86",
+    "name": "아로하",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "최대 10% 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "커피 메뉴 10% 할인 / 그 외 메뉴 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문한 메뉴 유형별 차등 적용",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "커피 메뉴 10% 할인 / 커피 메뉴 외 다른 음료 5% 할인 (중복 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 타 할인 혜택과 중복 적용 불가",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "87",
+    "name": "후식집",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "5% 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍰",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "현금 or 계좌이체 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      }
+    ]
+  },
+  {
+    "id": "88",
+    "name": "코지홀리데이",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "음료 10% 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍰",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 테이크아웃 주문 시 1000원 추가 할인 / 음료 현금(계좌) 결제 시 음료 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 테이크아웃 혹은 음료 현금(계좌) 결제 시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "9",
+        "college_name": "예체능대학",
+        "benefit": "방문 시 음료 500원 할인 / 음료 현금 결제 또는 계좌이체 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-19",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시(10% 할인 적용 시)",
+        "source_url": "https://www.instagram.com/p/DWh49Orj_w6/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "4인 이상 테이크 아웃 주문 시 1,000원 할인 / 음료 현금(계좌)결제 시 10% 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 4인 이상 테이크 아웃 시 또는 현금/계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 4인 이상 테이크 아웃 주문 시 1000원 할인 / 2. 음료/베이커리 (현금/계좌이체)로 결제 시 10% 할인 (1,2 중복 불가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이크 아웃 또는 현금/계좌이체 결제 시 (혜택 1, 2 중복 적용 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "89",
+    "name": "투썸플레이스",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "10% 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "15,000원 이상 주문 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      }
+    ]
+  },
+  {
+    "id": "90",
+    "name": "헤브론",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "최대 1,000원 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍹",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "만원의 행복 세트 1,000원 할인 또는 음료 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 대상 메뉴 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "음료 주문 시 500원 할인 / 만원의 행복 메뉴 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 대상 메뉴 주문 혹은 음료 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      }
+    ]
+  },
+  {
+    "id": "91",
+    "name": "카페미올루",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음료 전 메뉴 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 음료 주문 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      }
+    ]
+  },
+  {
+    "id": "92",
+    "name": "오토르테",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "음료 잔당 300원 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🧁",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 방문 및 단체석 이용 시 음료 1잔당 300원 할인 (최대 3시간 이용 가능, 단체 이용 시 최소 2시간 전 카카오톡 오픈채팅 사전 공지 필수)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시, 최소 2시간 전 카톡 오픈채팅 공지 필요",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      }
+    ]
+  },
+  {
+    "id": "93",
+    "name": "워터킹 커피 로스터스",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "☕",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음료 (병음료 제외) 500원 할인 (점심시간 12:00-14:00 제외, 중복 할인 및 포인트 적립 불가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 점심시간(12:00-14:00) 제외, 병음료 제외, 중복 할인/적립 불가",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "커피 및 음료 전 메뉴 1잔당 500원 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 평일 12~14시 제외, RTD음료·프리커피·특가메뉴 제외(생딸기우유 가능), 포인트 적립·사용 불가, 중복 할인 불가, 1인당 1잔만 가능",
+        "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "평일 12시 ~ 14시 제외 특가메뉴를 제외한 커피 및 음료 전메뉴 1잔 당 500원 할인 (포인트 적립 및 사용 불가 & 중복할인 불가) / 1인당 1잔 까지만 적용 가능",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 평일 12:00 ~ 14:00 시간대 제외, 특가 메뉴 제외, 1인당 1잔 한정 적용 (중복 할인 및 포인트 적립/사용 불가)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "94",
+    "name": "동그라미(써클)",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": "음료수 제공 및 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍻",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "4인 이상 방문 시 음료수 1개 제공 & 현금 또는 계좌이체 결제 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 혹은 현금/계좌 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "5만원 이상 현금 또는 계좌이체 시 5% 할인 / 4인 이상 테이블 음료수 하나 제공 / 메인 메뉴 3개 이상 주문 시 소주 한 병 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금 또는 계좌이체 금액 조건 충족 시 혹은 4인 이상 방문 혹은 메인 메뉴 주문 개수 충족 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      },
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "인원 무관하게 테이블 당 음료 1개 / 계좌이체 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인원 관계없이 적용 혹은 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
+      },
+      {
+        "college_id": "6",
+        "college_name": "글로벌문화통상대학",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        },
+        "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
+        "conditions": "학생증 제시, 4인 이상 방문 및 메인 메뉴 2개 이상 주문 시",
+        "benefit": "4인 이상 방문 시 음료 1캔 제공 / 테이블당 메인 메뉴 2개 이상 주문 시 감자튀김 서비스"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 4인 이상 테이블 음료 1캔 서비스 / 2. 5만원 이상 현금/계좌이체 시 5% 할인 (1,2 중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 테이블 이용 시 또는 5만원 이상 현금/계좌이체 결제 시 (중복 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "95",
+    "name": "락",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": "소주 무제한 4천원",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍷",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "9시 전까지 소주 무제한 4,000원 이용 가능",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 오후 9시 이전 주문 및 매장 이용 고객 대상",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "소주(참이슬, 처음처럼, 진로, 새로) 무제한 1,000원 할인 (일행 전원 소융대 소속 학생일 시)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 일행 전원 소프트웨어융합대학 소속 학생일 시, 지정 소주(참이슬, 처음처럼, 진로, 새로) 병당 무제한 1,000원 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "96",
+    "name": "밤새",
+    "category": "pub",
+    "is_active": true,
+    "summary_benefit": "서비스 메뉴 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍾",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1. 2~4인 방문 시 라면사리/음료수/셀프주먹밥 중 택 1 제공\n2. 5~8인 방문 시 감자튀김/국물계란찜 중 택 1 제공 or 생맥주 1700cc 주문 시 2700cc 사이즈업 (9인 이상 테이블 미적용/제휴 내용 중복 불가/테이블 당 1회 제공)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 2~8인 방문 시 (9인 이상 테이블 미적용, 제휴 내용 중복 불가, 테이블 당 1회 제공)",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      }
+    ]
+  },
+  {
+    "id": "97",
+    "name": "브리쓰 복싱앤 크로스핏",
+    "category": "life",
+    "is_active": true,
+    "summary_benefit": "최대 4만원 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "💪",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3개월 이상 가입 시 2만원 추가 할인 및 사물함/티셔츠 이용권(2만원 상당) 무료 제공 (총 4만원 상당 혜택, 최초 가입자 대상)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 (최초 가입 시 필수), 3개월 이상 가입 시 (최초 가입자 한정)",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "첫 등록 시 (3개월 이상 등록) 2만원 할인 및 사물함&티셔츠 무료 제공",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 첫 등록 시 3개월 이상 등록 필수",
+        "source_url": "https://www.instagram.com/p/DWlUOwokzmZ",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3개월 또는 3개월 이상 가입 시 이벤트가에서 2만원 추가 할인 + 사물함, 티셔츠 이용권 무료제공 -> 총 4만원 상당 할인 (단, 최초 가입자에 한해서 적용, 가입 당시 미리 소프트웨어융합대학 학생임을 인증해야 함.)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 최초 가입자에 한해 3개월 이상 신규 등록 시 적용 (이벤트가 추가 20,000원 할인 + 무료 사물함/티셔츠 이용권 제공으로 총 40,000원 상당 혜택, 가입 전 소융대 학생증 사전 확인 필수)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "98",
+    "name": "샛별 코인노래연습장",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": "생수 1병 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🎤",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3,000원 이상 결제 시 물 1병 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3,000원 이상 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3,000원 이상 결제 시 물 1병 서비스",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3,000원 이상 결제 시",
+        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3천원 이상 결제 시 물 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3,000원 이상 결제 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "99",
+    "name": "스튜디오 나우 필라테스",
+    "category": "life",
+    "is_active": true,
+    "summary_benefit": "등록 5% 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "💪",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "등록 시 5% 할인 (재등록 2회 포함 총 3회 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 최초 등록 및 재등록 2회까지 적용",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      }
+    ]
+  },
+  {
+    "id": "100",
+    "name": "큐 당구장",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": "5% 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🎳",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "만원 이상 이용 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 이용금액 1만원 이상 시",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "요금 1인당 만원 이상 나왔을 시 5% 할인 적용 (모든 시간대에 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인당 이용 요금 10,000원 이상 결제 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "101",
+    "name": "트윈스 당구클럽",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": "10분당 100원 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🎳",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "기본 시간 초과 시 10분당 100원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 기본 시간 초과 시 적용",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      }
+    ]
+  },
+  {
+    "id": "102",
+    "name": "청학칡냉면",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료 또는 만두 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍜",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "1. 25,000원 이상 결제 시 음료 1캔 제공\n2. 4인 이상 방문&만두 주문 시 만두 추가 제공\n3. 5만원 이상 결제 시 만두&사리 or 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 방문 인원 및 결제 금액 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      }
+    ]
+  },
+  {
+    "id": "103",
+    "name": "트라이쁘띠",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍩",
+    "partnerships": [
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "8천원 이상 구매 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 8천원 이상 구매 시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 8000원 이상 구매 시 계좌이체/현금으로 결제할 경우 500원 즉시 할인 / 2. 4잔 이상 구매 시 계좌이체/현금으로 결제할 경우 1000원 즉시 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 계좌이체 또는 현금 결제 시 조건(구매 금액 8,000원 이상 또는 음료 4잔 이상) 충족 시 즉시 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "104",
+    "name": "카페 디캔바스",
+    "category": "cafe",
+    "is_active": true,
+    "summary_benefit": "500원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍹",
+    "partnerships": [
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "아메리카노 주문 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 아메리카노 주문 시",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
+      }
+    ]
+  },
+  {
+    "id": "105",
+    "name": "레이지그라운드",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "1,000원 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "📚",
+    "partnerships": [
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "식사류 + 사이드 (총합 10,000원 이상) 주문 시 1,000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 식사류 및 사이드 합산 10,000원 이상 주문 시",
+        "source_url": "https://www.instagram.com/p/DVvVSgfE0Eo/"
+      },
+      {
+        "college_id": "6",
+        "benefit": "학생증 제시 후 카운터에서 식사류 주문 시 500원 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시 필수, 카운터 주문 시",
+        "source_url": "https://www.instagram.com/p/DWlUOwokzmZ",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1. 식사류 주문 시 500원 할인 / 2. 2인 이상 3시간 이용권 구매 시 20분 추가 이용 가능",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 식사 주문 시 또는 2인 이상 3시간 이용권 구매 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "106",
+    "name": "벗히얼 크로스핏",
+    "category": "life",
+    "is_active": true,
+    "summary_benefit": "가입/등록 비용 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🏋️",
+    "partnerships": [
+      {
+        "college_id": "7",
+        "college_name": "경상대학",
+        "benefit": "친구랑 동시 등록 시 1. 1개월 1만원 할인 / 2. 3개월 2만원 할인 (인당 할인)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 친구와 함께 동시 등록 시 적용 (인당 적용)",
+        "source_url": "https://www.instagram.com/p/DVvVSgfE0Eo/"
+      }
+    ]
+  },
+  {
+    "id": "108",
+    "name": "R샐러드카페",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "5% 즉시 할인",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🥗",
+    "partnerships": [
+      {
+        "college_id": "6",
+        "benefit": "샐러드+음료 주문 시 5% 할인",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "학생증 제시, 샐러드+음료 주문 시 / 포장 시 사전 전화 필수",
+        "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      }
+    ]
+  },
+  {
+    "id": "109",
+    "name": "홈즈앤루팡",
+    "category": "play",
+    "is_active": true,
+    "summary_benefit": "30분 추가 지급",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🔍",
+    "partnerships": [
+      {
+        "college_id": "6",
+        "benefit": "(무인매장) 문자로 학생증 인증 후 시간 30분 추가 지급",
+        "college_name": "글로벌문화통상대학",
+        "conditions": "문자로 학생증 인증 필수 (무인매장)",
+        "source_url": "https://www.instagram.com/p/DWlUOwokzmZ",
+        "period": {
+          "start_date": "2026-03-02",
+          "is_active": true,
+          "end_date": "2026-12-31"
+        }
+      }
+    ]
+  },
+  {
+    "id": "110",
+    "name": "풍차이야기",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "할인 혜택 및 음료 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍱",
+    "partnerships": [
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "현금/계좌이체 시 10% 할인 / 4인 이상 방문 시 음료수 2개 제공 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 현금/계좌이체 결제 시 또는 4인 이상 방문 시 (혜택 중복 적용 가능)",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "111",
+    "name": "오빈라멘",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": "음료수 1개 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍜",
+    "partnerships": [
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "112",
+    "name": "허구헌날",
+    "category": "pub",
+    "is_active": true,
+    "emoji": "🍺",
+    "summary_benefit": "나쵸 서비스 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "partnerships": [
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "1인당 주류 15000원 이상 결제 시 나쵸 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 1인당 주류 15,000원 이상 결제 시",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  },
+  {
+    "id": "113",
+    "name": "북경반점",
+    "category": "food",
+    "is_active": true,
+    "emoji": "🥟",
+    "summary_benefit": "음료 서비스 제공",
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "partnerships": [
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "테이블당 음료 한 캔",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 제공",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      }
+    ]
+  }
+]
