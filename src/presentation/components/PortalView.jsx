@@ -349,12 +349,12 @@ export function PortalView({ isVisible = true }) {
             library.list.map((room) => {
               const emptySeats = Math.max(0, room.total - room.occupied);
               return (
-                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
-                  <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2 min-w-0">
-                    <span className="font-black text-[0.95rem] text-text-main leading-tight sm:truncate sm:flex-1 sm:min-w-0">
+                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-3.5 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
                       {room.name.replace(' (2F)', '').replace(' (4F)', '')}
                     </span>
-                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold self-start sm:flex-shrink-0 sm:self-auto" style={{
+                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0" style={{
                       backgroundColor: `${room.color}15`,
                       color: room.color,
                       border: `1px solid ${room.color}25`
