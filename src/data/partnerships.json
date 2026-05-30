@@ -11,6 +11,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥓",
     "partnerships": [
       {
         "college_id": "1",
@@ -48,8 +49,7 @@
         "conditions": "학생증 제시, 4인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🥓"
+    ]
   },
   {
     "id": "2",
@@ -63,6 +63,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍖",
     "partnerships": [
       {
         "college_id": "1",
@@ -88,8 +89,7 @@
         "conditions": "학생증 제시, 인원 기준에 따라 제공",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍖"
+    ]
   },
   {
     "id": "3",
@@ -103,6 +103,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍱",
     "partnerships": [
       {
         "college_id": "1",
@@ -152,8 +153,7 @@
         "conditions": "학생증 제시, 4인 이상 방문 및 네이버 영수증 리뷰 작성 완료 시 (중복 불가)",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍱"
+    ]
   },
   {
     "id": "4",
@@ -167,6 +167,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍝",
     "partnerships": [
       {
         "college_id": "1",
@@ -216,8 +217,7 @@
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍝"
+    ]
   },
   {
     "id": "5",
@@ -231,6 +231,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍝",
     "partnerships": [
       {
         "college_id": "1",
@@ -280,8 +281,7 @@
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍝"
+    ]
   },
   {
     "id": "6",
@@ -295,6 +295,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍲",
     "partnerships": [
       {
         "college_id": "1",
@@ -332,8 +333,7 @@
         "conditions": "학생증 제시, 2인당 적용 혹은 감자탕 주문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍲"
+    ]
   },
   {
     "id": "7",
@@ -347,6 +347,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍱",
     "partnerships": [
       {
         "college_id": "1",
@@ -372,8 +373,7 @@
         "conditions": "학생증 제시, 세트 메뉴 주문 및 매장 내 식사 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍱"
+    ]
   },
   {
     "id": "8",
@@ -387,6 +387,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🐷",
     "partnerships": [
       {
         "college_id": "1",
@@ -424,8 +425,7 @@
         "conditions": "학생증 제시, 4인 이상 테이블 당",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🐷"
+    ]
   },
   {
     "id": "9",
@@ -439,6 +439,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍗",
     "partnerships": [
       {
         "college_id": "1",
@@ -488,8 +489,7 @@
         "conditions": "학생증 제시, 닭갈비 3인분 주문 및 테이블 전체가 첨단융합대학 학생 구성 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍗"
+    ]
   },
   {
     "id": "10",
@@ -503,6 +503,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍛",
     "partnerships": [
       {
         "college_id": "1",
@@ -540,8 +541,7 @@
         "conditions": "학생증 제시, 방문 인원 또는 마라탕 주문 금액 조건 충족 시 (중복 불가)",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍛"
+    ]
   },
   {
     "id": "11",
@@ -555,6 +555,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍜",
     "partnerships": [
       {
         "college_id": "1",
@@ -592,8 +593,7 @@
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍜"
+    ]
   },
   {
     "id": "12",
@@ -607,6 +607,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍚",
     "partnerships": [
       {
         "college_id": "1",
@@ -644,11 +645,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍚"
+    ]
   },
   {
-    "id": "14",
+    "id": "13",
     "name": "육앤샤",
     "category": "food",
     "is_active": true,
@@ -659,6 +659,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥘",
     "partnerships": [
       {
         "college_id": "1",
@@ -708,11 +709,10 @@
         "conditions": "학생증 제시, 오후 6시 이후 방문 및 4인분 이상 주문 혹은 소주 주문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🥘"
+    ]
   },
   {
-    "id": "15",
+    "id": "14",
     "name": "더치킨",
     "category": "pub",
     "is_active": true,
@@ -723,6 +723,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍗",
     "partnerships": [
       {
         "college_id": "1",
@@ -772,11 +773,10 @@
         "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍗"
+    ]
   },
   {
-    "id": "16",
+    "id": "15",
     "name": "미처버린 파닭",
     "category": "pub",
     "is_active": true,
@@ -787,6 +787,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍗",
     "partnerships": [
       {
         "college_id": "1",
@@ -811,12 +812,35 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "테이블 당 1천원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문시 떡볶이 1인분 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 7만원 이상 주문 여부에 따라 추가 서비스 제공",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "테이블 당 1,000원 상당의 서비스 제공 / 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주문 금액에 따른 차등 서비스 제공",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍗"
+    ]
   },
   {
-    "id": "17",
+    "id": "16",
     "name": "더술",
     "category": "pub",
     "is_active": true,
@@ -827,6 +851,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍺",
     "partnerships": [
       {
         "college_id": "1",
@@ -888,11 +913,10 @@
         "conditions": "학생증 제시, 방문 인원에 따른 서비스 제공 혹은 현금/계좌이체 결제 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍺"
+    ]
   },
   {
-    "id": "18",
+    "id": "17",
     "name": "달달포차",
     "category": "pub",
     "is_active": true,
@@ -903,6 +927,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍻",
     "partnerships": [
       {
         "college_id": "1",
@@ -952,11 +977,10 @@
         "conditions": "학생증 제시, 계좌이체 결제 시 (타 이벤트 중복 불가)",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍻"
+    ]
   },
   {
-    "id": "19",
+    "id": "18",
     "name": "로드락비어",
     "category": "pub",
     "is_active": true,
@@ -967,6 +991,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍺",
     "partnerships": [
       {
         "college_id": "1",
@@ -1004,11 +1029,10 @@
         "conditions": "학생증 제시, 18시 이전 방문 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍺"
+    ]
   },
   {
-    "id": "20",
+    "id": "19",
     "name": "역전할머니맥주",
     "category": "pub",
     "is_active": true,
@@ -1019,6 +1043,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍺",
     "partnerships": [
       {
         "college_id": "1",
@@ -1056,11 +1081,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍺"
+    ]
   },
   {
-    "id": "21",
+    "id": "20",
     "name": "만취",
     "category": "pub",
     "is_active": true,
@@ -1071,6 +1095,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍺",
     "partnerships": [
       {
         "college_id": "1",
@@ -1120,12 +1145,11 @@
         "conditions": "학생증 제시, 테이블당 인원 및 주류 주문 조건 충족 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍺"
+    ]
   },
   {
-    "id": "22",
-    "name": "에이쁠",
+    "id": "21",
+    "name": "에이플러스",
     "category": "pub",
     "is_active": true,
     "summary_benefit": null,
@@ -1135,6 +1159,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍺",
     "partnerships": [
       {
         "college_id": "1",
@@ -1171,12 +1196,35 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수 / 무료 대관: 사전 연락(3일 전) 및 뒷정리 필수 / 아이스크림: 개강·종강 총회 제외",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "찌개류 주문 시 라면사리 무한리필 추가 제공 / 10인 이하 방문 시 인당 쭈쭈바 1개 제공 / 오후 8시 이전 방문 시 소주 1병 무료 제공 (중복 적용 가능, 단 인스타그램 스토리 태그 업로드 필수)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인스타그램 스토리 태그 필요, 중복 적용 가능",
+        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "찌개류 주문 시 라면사리 무한 / 10인 이하 테이블 쭈쭈바 제공 / 스토리 업로드 시 기본안주로 라면 제공 (심야타임 1시~5시 해당)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 대상 찌개 주문 혹은 10인 이하 방문 혹은 스토리 업로드 시 (심야타임 1시~5시 한정)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍺"
+    ]
   },
   {
-    "id": "23",
+    "id": "22",
     "name": "모모커피",
     "category": "cafe",
     "is_active": true,
@@ -1187,6 +1235,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "1",
@@ -1212,11 +1261,10 @@
         "conditions": "학생증 제시, 메뉴 5개 이상 동시 주문 시, 12:00~14:00 제외, 제외 메뉴 존재",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "24",
+    "id": "23",
     "name": "오얏리 커피",
     "category": "cafe",
     "is_active": true,
@@ -1227,6 +1275,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍹",
     "partnerships": [
       {
         "college_id": "1",
@@ -1251,12 +1300,23 @@
         },
         "conditions": "학생증 제시, 음료 주문 시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "전 메뉴 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
       }
-    ],
-    "emoji": "🍹"
+    ]
   },
   {
-    "id": "25",
+    "id": "24",
     "name": "어반 플레이스",
     "category": "cafe",
     "is_active": true,
@@ -1267,6 +1327,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "1",
@@ -1304,12 +1365,11 @@
         "conditions": "학생증 제시, 테이크 아웃 혹은 홀 내에서 아메리카노 이용 시 (중복 가능)",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "26",
-    "name": "포세이돈 PC",
+    "id": "25",
+    "name": "포세이돈 PC카페",
     "category": "play",
     "is_active": true,
     "summary_benefit": null,
@@ -1319,6 +1379,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "💻",
     "partnerships": [
       {
         "college_id": "1",
@@ -1343,13 +1404,24 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "만원 이상 충전 시 음료 S사이즈 제공 / 2만원 이상 충전 시 음료 L사이즈 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 충전 금액 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ],
-    "emoji": "💻"
+    ]
   },
   {
-    "id": "27",
-    "name": "슈퍼스타 코인 노래방",
+    "id": "26",
+    "name": "슈퍼스타 코인노래연습장",
     "category": "play",
     "is_active": true,
     "summary_benefit": null,
@@ -1359,6 +1431,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🎤",
     "partnerships": [
       {
         "college_id": "1",
@@ -1383,13 +1456,36 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3,000원 이상 결제 시 물 1병 제공 및 9곡 이상 결제 시 2곡 추가 또는 30분 이상 결제 시 10분 추가 제공 (중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시 (중복 가능)",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3,000원 이상 결제 시 물 1병 서비스\n9곡 결제 시 2곡 서비스\n30분 이상 결제 시 10분 서비스",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시",
+        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       }
-    ],
-    "emoji": "🎤"
+    ]
   },
   {
-    "id": "28",
-    "name": "한양사",
+    "id": "27",
+    "name": "한양사 인쇄복사제본",
     "category": "life",
     "is_active": true,
     "summary_benefit": null,
@@ -1399,6 +1495,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🖨️",
     "partnerships": [
       {
         "college_id": "1",
@@ -1411,13 +1508,36 @@
         },
         "conditions": "5천원 이상 현금 결제 필수",
         "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "5,000원 이상 현금 또는 계좌이체 결제 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 5,000원 이상 현금 또는 계좌이체 결제 시",
+        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "5,000원 이상 현금 결제 시 10% 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 5,000원 이상 현금 결제 시",
+        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       }
-    ],
-    "emoji": "🖨️"
+    ]
   },
   {
-    "id": "29",
-    "name": "레드버튼 안산고잔점",
+    "id": "28",
+    "name": "레드버튼 고잔점",
     "category": "play",
     "is_active": true,
     "summary_benefit": null,
@@ -1427,6 +1547,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🎮",
     "partnerships": [
       {
         "college_id": "1",
@@ -1439,12 +1560,35 @@
         },
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "음식&음료 10% 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시",
+        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "식음료 결제 금액 10% 할인 / 첨단융합대 재학생 4인 이상 방문 시 1시간 쿠폰(1인 1매) 증정",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 4인 이상 방문 시 쿠폰 적용",
+        "source_url": "https://www.instagram.com/p/DW-e137iV6g/"
       }
-    ],
-    "emoji": "🎮"
+    ]
   },
   {
-    "id": "30",
+    "id": "29",
     "name": "이삭토스트",
     "category": "food",
     "is_active": true,
@@ -1455,6 +1599,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍞",
     "partnerships": [
       {
         "college_id": "1",
@@ -1504,11 +1649,10 @@
         "conditions": "학생증 제시, 토스트와 음료 함께 구매 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍞"
+    ]
   },
   {
-    "id": "31",
+    "id": "30",
     "name": "코운즈",
     "category": "food",
     "is_active": true,
@@ -1519,6 +1663,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍣",
     "partnerships": [
       {
         "college_id": "1",
@@ -1556,11 +1701,10 @@
         "conditions": "학생증 제시, 2인당",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍣"
+    ]
   },
   {
-    "id": "32",
+    "id": "31",
     "name": "떼드떼",
     "category": "cafe",
     "is_active": true,
@@ -1571,6 +1715,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "1",
@@ -1596,11 +1741,10 @@
         "conditions": "학생증 제시 (일행 중 1명 필수), 음료 주문 인원에 맞춰 혜택 차등 적용 (쿠폰 중복 불가)",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "🍰"
+    ]
   },
   {
-    "id": "33",
+    "id": "32",
     "name": "시저커피",
     "category": "cafe",
     "is_active": true,
@@ -1611,6 +1755,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "2",
@@ -1648,11 +1793,10 @@
         "conditions": "학생증 제시, 음료 주문 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "34",
+    "id": "33",
     "name": "에이피",
     "category": "cafe",
     "is_active": true,
@@ -1663,6 +1807,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "2",
@@ -1676,11 +1821,10 @@
         "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
         "source_url": "https://www.instagram.com/p/DVfH4I-ARV3"
       }
-    ],
-    "emoji": "🍰"
+    ]
   },
   {
-    "id": "35",
+    "id": "34",
     "name": "이스턴문",
     "category": "cafe",
     "is_active": true,
@@ -1691,6 +1835,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "2",
@@ -1728,11 +1873,10 @@
         "conditions": "학생증 제시, 방문 시간 또는 주류 주문 개수 조건 충족 및 인증(스토리 태그 공유 또는 영수증 리뷰) 완료 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "36",
+    "id": "35",
     "name": "페퍼로니 버튼",
     "category": "food",
     "is_active": true,
@@ -1743,6 +1887,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍕",
     "partnerships": [
       {
         "college_id": "2",
@@ -1780,11 +1925,10 @@
         "conditions": "학생증 지참, 피자 주문 시 (피자 사이즈 무관)",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍕"
+    ]
   },
   {
-    "id": "37",
+    "id": "36",
     "name": "두루정",
     "category": "food",
     "is_active": true,
@@ -1795,6 +1939,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍲",
     "partnerships": [
       {
         "college_id": "2",
@@ -1808,11 +1953,10 @@
         "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
         "source_url": "https://www.instagram.com/p/DVfIJj3ASWG"
       }
-    ],
-    "emoji": "🍲"
+    ]
   },
   {
-    "id": "38",
+    "id": "37",
     "name": "홍당무",
     "category": "food",
     "is_active": true,
@@ -1823,6 +1967,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍲",
     "partnerships": [
       {
         "college_id": "2",
@@ -1848,11 +1993,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍲"
+    ]
   },
   {
-    "id": "39",
+    "id": "38",
     "name": "돼지우리",
     "category": "food",
     "is_active": true,
@@ -1863,6 +2007,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥓",
     "partnerships": [
       {
         "college_id": "2",
@@ -1900,12 +2045,11 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 혹은 해당 메뉴 주문 시 (중복 가능)",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🥓"
+    ]
   },
   {
-    "id": "40",
-    "name": "교반",
+    "id": "39",
+    "name": "교반육회비빔밥",
     "category": "pub",
     "is_active": true,
     "summary_benefit": null,
@@ -1915,6 +2059,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍺",
     "partnerships": [
       {
         "college_id": "4",
@@ -1927,12 +2072,35 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "(식사) 4인 이상 방문 시 음료 2개 제공 / (포차) 3만원 이상 이용 시 육회 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 식사 시 4인 이상 방문 혹은 포차 시 3만원 이상 이용 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "30,000원 이상 주문 시 육회 한 접시 제공 / 4인 이상 테이블 음료수 2개 제공",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 주류/안주 메뉴 한정 30,000원 이상 주문 시 혹은 4인 이상 테이블에 한함",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍺"
+    ]
   },
   {
-    "id": "41",
+    "id": "40",
     "name": "어반스터디카페",
     "category": "life",
     "is_active": true,
@@ -1943,6 +2111,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "📚",
     "partnerships": [
       {
         "college_id": "4",
@@ -1956,11 +2125,10 @@
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
-    ],
-    "emoji": "📚"
+    ]
   },
   {
-    "id": "42",
+    "id": "41",
     "name": "소담골",
     "category": "food",
     "is_active": true,
@@ -1971,6 +2139,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🦆",
     "partnerships": [
       {
         "college_id": "4",
@@ -1984,12 +2153,51 @@
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
       }
-    ],
-    "emoji": "🦆"
+    ]
+  },
+  {
+    "id": "42",
+    "name": "계림원 누룽지 통닭",
+    "category": "food",
+    "is_active": true,
+    "summary_benefit": null,
+    "location": {
+      "latitude": null,
+      "longitude": null,
+      "address": null,
+      "full_address": null
+    },
+    "emoji": "🍗",
+    "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      }
+    ]
   },
   {
     "id": "43",
-    "name": "계림원",
+    "name": "신선샤브앤칼국수",
     "category": "food",
     "is_active": true,
     "summary_benefit": null,
@@ -1999,6 +2207,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍜",
     "partnerships": [
       {
         "college_id": "4",
@@ -2011,40 +2220,35 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "사리 (야채/버섯/칼국수/물만두 중 택 1), 볶음밥, 탄산음료 중 1가지 제공 (테이블당, 인원 수 무관, 네이버 리뷰 이벤트와 중복 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 테이블당 적용 (네이버 리뷰 이벤트와 중복 가능)",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "서비스 (야채, 버섯, 칼국수, 물만두, 볶음밥, 탄산음료) 중 택 1 (네이버 영수증과 중복 가능, 학생증 지참)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 지참, 테이블당 적용 (네이버 영수증 리뷰 이벤트와 중복 가능)",
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍗"
+    ]
   },
   {
     "id": "44",
-    "name": "신선샤브&칼국수",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "4",
-        "college_name": "약학대학",
-        "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
-        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
-      }
-    ],
-    "emoji": "🍜"
-  },
-  {
-    "id": "45",
     "name": "인더비엣",
     "category": "food",
     "is_active": true,
@@ -2055,6 +2259,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥘",
     "partnerships": [
       {
         "college_id": "4",
@@ -2080,11 +2285,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🥘"
+    ]
   },
   {
-    "id": "46",
+    "id": "45",
     "name": "언니네 화덕핏짜",
     "category": "food",
     "is_active": true,
@@ -2095,6 +2299,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍕",
     "partnerships": [
       {
         "college_id": "4",
@@ -2132,11 +2337,10 @@
         "conditions": "학생증 제시, 3인 이상 테이블 혹은 현금/계좌이체 결제 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍕"
+    ]
   },
   {
-    "id": "47",
+    "id": "46",
     "name": "이서식당",
     "category": "food",
     "is_active": true,
@@ -2147,6 +2351,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍖",
     "partnerships": [
       {
         "college_id": "4",
@@ -2184,12 +2389,11 @@
         "conditions": "학생증 제시, 방문 인원 조건 충족 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍖"
+    ]
   },
   {
-    "id": "48",
-    "name": "몫커피바",
+    "id": "47",
+    "name": "묵커피바",
     "category": "cafe",
     "is_active": true,
     "summary_benefit": null,
@@ -2199,6 +2403,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍹",
     "partnerships": [
       {
         "college_id": "4",
@@ -2211,12 +2416,35 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "15,000원 이상 주문 시 10% 할인 (테이크 아웃 시 할인 적용된 최종 가격이 15,000원 이상일 경우 적용)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 최종 결제 금액 15,000원 이상 시",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "15,000원 이상 결제 시 결제 금액의 10% 할인 / 주문제작 케이크 2,000원 할인 (주말 제외 적용)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 15,000원 이상 결제 혹은 주문제작 케이크 구매 시 (주말 제외)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍹"
+    ]
   },
   {
-    "id": "49",
+    "id": "48",
     "name": "UP플레이스",
     "category": "cafe",
     "is_active": true,
@@ -2227,6 +2455,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "4",
@@ -2240,12 +2469,11 @@
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "50",
-    "name": "코이노-커피",
+    "id": "49",
+    "name": "코이노커피",
     "category": "cafe",
     "is_active": true,
     "summary_benefit": null,
@@ -2255,6 +2483,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "4",
@@ -2267,12 +2496,35 @@
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "3",
+        "college_name": "공과대학",
+        "benefit": "학생증 제시 시 인당 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 시 인당 적용",
+        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "방문 인원 수 만큼 500원 할인 (테이크 아웃, 매장 이용 둘 다 가능)",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 인당 적용 (테이크 아웃 및 매장 이용 가능)",
+        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍰"
+    ]
   },
   {
-    "id": "51",
+    "id": "50",
     "name": "신디도넛",
     "category": "cafe",
     "is_active": true,
@@ -2283,6 +2535,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍩",
     "partnerships": [
       {
         "college_id": "4",
@@ -2320,107 +2573,10 @@
         "conditions": "학생증 제시, 음료와 도넛 금액 조건 충족 및 계좌이체/현금 결제 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍩"
+    ]
   },
   {
-    "id": "52",
-    "name": "오앗리커피",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "4",
-        "college_name": "약학대학",
-        "benefit": "전 메뉴 500원 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
-        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
-      }
-    ],
-    "emoji": "☕"
-  },
-  {
-    "id": "55",
-    "name": "계림원 누룽지 통닭",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "음료수 서비스",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "3인 이상 방문 시 음료 1개 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
-        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
-      }
-    ],
-    "emoji": "🍗"
-  },
-  {
-    "id": "56",
-    "name": "교반육회비빔밥",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "음료 또는 육회 제공",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "(식사) 4인 이상 방문 시 음료 2개 제공 / (포차) 3만원 이상 이용 시 육회 1개 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 식사 시 4인 이상 방문 혹은 포차 시 3만원 이상 이용 시",
-        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "30,000원 이상 주문 시 육회 한 접시 제공 / 4인 이상 테이블 음료수 2개 제공",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 주류/안주 메뉴 한정 30,000원 이상 주문 시 혹은 4인 이상 테이블에 한함",
-        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
-      }
-    ],
-    "emoji": "🍚"
-  },
-  {
-    "id": "57",
+    "id": "51",
     "name": "동양솥밥",
     "category": "food",
     "is_active": true,
@@ -2431,6 +2587,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍚",
     "partnerships": [
       {
         "college_id": "3",
@@ -2456,11 +2613,10 @@
         "conditions": "학생증 지참, 4인 이상 방문 및 카카오톡 채널 추가 완료 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍚"
+    ]
   },
   {
-    "id": "58",
+    "id": "52",
     "name": "마라미방",
     "category": "food",
     "is_active": true,
@@ -2471,6 +2627,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍛",
     "partnerships": [
       {
         "college_id": "3",
@@ -2484,11 +2641,10 @@
         "conditions": "학생증 제시, 현금 1만원 이상 결제 시 혹은 3인 이상 방문 시 (중복 불가)",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍛"
+    ]
   },
   {
-    "id": "59",
+    "id": "53",
     "name": "김밥큐",
     "category": "food",
     "is_active": true,
@@ -2499,6 +2655,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍘",
     "partnerships": [
       {
         "college_id": "3",
@@ -2512,11 +2669,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍘"
+    ]
   },
   {
-    "id": "60",
+    "id": "54",
     "name": "대학통닭",
     "category": "food",
     "is_active": true,
@@ -2527,6 +2683,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍗",
     "partnerships": [
       {
         "college_id": "3",
@@ -2540,11 +2697,10 @@
         "conditions": "학생증 제시, 3인 이상 홀 방문 혹은 4만원 이상 주문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍗"
+    ]
   },
   {
-    "id": "61",
+    "id": "55",
     "name": "대홍훠궈 샤브샤브",
     "category": "food",
     "is_active": true,
@@ -2555,6 +2711,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥘",
     "partnerships": [
       {
         "college_id": "3",
@@ -2568,11 +2725,10 @@
         "conditions": "학생증 제시, 2인 이상 무한리필 주문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🥘"
+    ]
   },
   {
-    "id": "62",
+    "id": "56",
     "name": "마티아스김밥",
     "category": "food",
     "is_active": true,
@@ -2583,6 +2739,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍘",
     "partnerships": [
       {
         "college_id": "3",
@@ -2596,51 +2753,10 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 혹은 카드결제 시 (겨울한정)",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍘"
+    ]
   },
   {
-    "id": "63",
-    "name": "미쳐버린 파닭",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "서비스 메뉴 제공",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "테이블 당 1천원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문시 떡볶이 1인분 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 7만원 이상 주문 여부에 따라 추가 서비스 제공",
-        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "테이블 당 1,000원 상당의 서비스 제공 / 7만원 이상 주문 시 떡볶이 1인분 제공",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 주문 금액에 따른 차등 서비스 제공",
-        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
-      }
-    ],
-    "emoji": "🍗"
-  },
-  {
-    "id": "64",
+    "id": "57",
     "name": "밀숲",
     "category": "food",
     "is_active": true,
@@ -2651,6 +2767,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍜",
     "partnerships": [
       {
         "college_id": "3",
@@ -2664,11 +2781,10 @@
         "conditions": "학생증 제시, 3인 이상 주문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍜"
+    ]
   },
   {
-    "id": "65",
+    "id": "58",
     "name": "신전떡볶이",
     "category": "food",
     "is_active": true,
@@ -2679,6 +2795,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🌶️",
     "partnerships": [
       {
         "college_id": "3",
@@ -2692,11 +2809,10 @@
         "conditions": "학생증 제시, 테이블당 15,000원 이상 주문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🌶️"
+    ]
   },
   {
-    "id": "66",
+    "id": "59",
     "name": "쌈&쌈",
     "category": "food",
     "is_active": true,
@@ -2707,6 +2823,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍖",
     "partnerships": [
       {
         "college_id": "3",
@@ -2720,11 +2837,10 @@
         "conditions": "학생증 제시, 4인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍖"
+    ]
   },
   {
-    "id": "67",
+    "id": "60",
     "name": "에비수",
     "category": "food",
     "is_active": true,
@@ -2735,6 +2851,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍣",
     "partnerships": [
       {
         "college_id": "3",
@@ -2748,11 +2865,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍣"
+    ]
   },
   {
-    "id": "68",
+    "id": "61",
     "name": "소확행피자",
     "category": "food",
     "is_active": true,
@@ -2763,6 +2879,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍕",
     "partnerships": [
       {
         "college_id": "3",
@@ -2776,11 +2893,10 @@
         "conditions": "학생증 제시, 전화 포장 주문으로 피자 주문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍕"
+    ]
   },
   {
-    "id": "69",
+    "id": "62",
     "name": "순뼈감",
     "category": "food",
     "is_active": true,
@@ -2791,6 +2907,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍲",
     "partnerships": [
       {
         "college_id": "3",
@@ -2804,51 +2921,10 @@
         "conditions": "학생증 제시, 2인 이상 방문 혹은 전골류 주문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍲"
+    ]
   },
   {
-    "id": "70",
-    "name": "신선샤브앤칼국수",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "서비스 메뉴 제공",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "사리 (야채/버섯/칼국수/물만두 중 택 1), 볶음밥, 탄산음료 중 1가지 제공 (테이블당, 인원 수 무관, 네이버 리뷰 이벤트와 중복 가능)",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 테이블당 적용 (네이버 리뷰 이벤트와 중복 가능)",
-        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "서비스 (야채, 버섯, 칼국수, 물만두, 볶음밥, 탄산음료) 중 택 1 (네이버 영수증과 중복 가능, 학생증 지참)",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 지참, 테이블당 적용 (네이버 영수증 리뷰 이벤트와 중복 가능)",
-        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
-      }
-    ],
-    "emoji": "🍜"
-  },
-  {
-    "id": "71",
+    "id": "63",
     "name": "버텍스",
     "category": "food",
     "is_active": true,
@@ -2859,6 +2935,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍛",
     "partnerships": [
       {
         "college_id": "3",
@@ -2884,11 +2961,10 @@
         "conditions": "학생증 제시, 추가 메뉴 선택 또는 4인 이상 주문 시 (포장 시에도 적용 가능)",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍛"
+    ]
   },
   {
-    "id": "72",
+    "id": "64",
     "name": "보배반점",
     "category": "food",
     "is_active": true,
@@ -2899,6 +2975,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥡",
     "partnerships": [
       {
         "college_id": "3",
@@ -2924,11 +3001,10 @@
         "conditions": "학생증 제시, 4인 이상 테이블에 한함",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🥡"
+    ]
   },
   {
-    "id": "74",
+    "id": "65",
     "name": "예산 닭갈비감자탕",
     "category": "food",
     "is_active": true,
@@ -2939,6 +3015,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥓",
     "partnerships": [
       {
         "college_id": "3",
@@ -2964,11 +3041,10 @@
         "conditions": "학생증 제시, 테이블당 적용",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🥓"
+    ]
   },
   {
-    "id": "75",
+    "id": "66",
     "name": "오늘도 부찌",
     "category": "food",
     "is_active": true,
@@ -2979,6 +3055,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍛",
     "partnerships": [
       {
         "college_id": "3",
@@ -2992,11 +3069,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🍛"
+    ]
   },
   {
-    "id": "76",
+    "id": "67",
     "name": "오타코",
     "category": "food",
     "is_active": true,
@@ -3007,6 +3083,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🌮",
     "partnerships": [
       {
         "college_id": "3",
@@ -3020,11 +3097,10 @@
         "conditions": "학생증 제시, 2인당",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ],
-    "emoji": "🌮"
+    ]
   },
   {
-    "id": "77",
+    "id": "68",
     "name": "자이카 인도요리",
     "category": "food",
     "is_active": true,
@@ -3035,6 +3111,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥘",
     "partnerships": [
       {
         "college_id": "3",
@@ -3048,11 +3125,10 @@
         "conditions": "학생증 제시, 테이블당 적용 혹은 5인 이상 방문 시 (중복 불가)",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🥘"
+    ]
   },
   {
-    "id": "78",
+    "id": "69",
     "name": "올리바샌드위치",
     "category": "food",
     "is_active": true,
@@ -3063,6 +3139,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥪",
     "partnerships": [
       {
         "college_id": "3",
@@ -3076,11 +3153,10 @@
         "conditions": "학생증 제시, 8천원 이상 구매 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🥪"
+    ]
   },
   {
-    "id": "79",
+    "id": "70",
     "name": "유가네닭갈비",
     "category": "food",
     "is_active": true,
@@ -3091,6 +3167,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍗",
     "partnerships": [
       {
         "college_id": "3",
@@ -3116,11 +3193,10 @@
         "conditions": "학생증 제시, 2인 이상 방문 혹은 단품(고기)메뉴 주문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍗"
+    ]
   },
   {
-    "id": "80",
+    "id": "71",
     "name": "정직유부초밥",
     "category": "food",
     "is_active": true,
@@ -3131,6 +3207,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍣",
     "partnerships": [
       {
         "college_id": "3",
@@ -3156,11 +3233,10 @@
         "conditions": "학생증 제시, 1인분 구매 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🍣"
+    ]
   },
   {
-    "id": "81",
+    "id": "72",
     "name": "조박사부대찌개",
     "category": "food",
     "is_active": true,
@@ -3171,6 +3247,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍲",
     "partnerships": [
       {
         "college_id": "3",
@@ -3184,11 +3261,10 @@
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍲"
+    ]
   },
   {
-    "id": "82",
+    "id": "73",
     "name": "탐나는 바지락 손칼국수",
     "category": "food",
     "is_active": true,
@@ -3199,6 +3275,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍜",
     "partnerships": [
       {
         "college_id": "3",
@@ -3212,11 +3289,10 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🍜"
+    ]
   },
   {
-    "id": "83",
+    "id": "74",
     "name": "텐버거",
     "category": "food",
     "is_active": true,
@@ -3227,6 +3303,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍔",
     "partnerships": [
       {
         "college_id": "3",
@@ -3240,11 +3317,10 @@
         "conditions": "학생증 제시, 15,000원 이상 주문 시, 11:00~13:30 시간대 제외, 자체 이벤트와 중복 불가",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍔"
+    ]
   },
   {
-    "id": "84",
+    "id": "75",
     "name": "참새방앗간",
     "category": "food",
     "is_active": true,
@@ -3255,6 +3331,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🌶️",
     "partnerships": [
       {
         "college_id": "3",
@@ -3280,11 +3357,10 @@
         "conditions": "학생증 제시, 3인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ],
-    "emoji": "🌶️"
+    ]
   },
   {
-    "id": "85",
+    "id": "76",
     "name": "큰맘할매순대국",
     "category": "food",
     "is_active": true,
@@ -3295,6 +3371,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍲",
     "partnerships": [
       {
         "college_id": "3",
@@ -3308,11 +3385,10 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍲"
+    ]
   },
   {
-    "id": "86",
+    "id": "77",
     "name": "행컵",
     "category": "food",
     "is_active": true,
@@ -3323,6 +3399,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍱",
     "partnerships": [
       {
         "college_id": "3",
@@ -3336,11 +3413,10 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍱"
+    ]
   },
   {
-    "id": "87",
+    "id": "78",
     "name": "한양솥밥",
     "category": "food",
     "is_active": true,
@@ -3351,6 +3427,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍚",
     "partnerships": [
       {
         "college_id": "3",
@@ -3364,11 +3441,10 @@
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍚"
+    ]
   },
   {
-    "id": "88",
+    "id": "79",
     "name": "토핑스온패티스",
     "category": "food",
     "is_active": true,
@@ -3379,6 +3455,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍔",
     "partnerships": [
       {
         "college_id": "3",
@@ -3392,11 +3469,10 @@
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🍔"
+    ]
   },
   {
-    "id": "89",
+    "id": "80",
     "name": "파익스피크소다",
     "category": "food",
     "is_active": true,
@@ -3407,6 +3483,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🥤",
     "partnerships": [
       {
         "college_id": "3",
@@ -3420,11 +3497,10 @@
         "conditions": "학생증 제시, 4인 이상 방문 시",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ],
-    "emoji": "🥤"
+    ]
   },
   {
-    "id": "90",
+    "id": "81",
     "name": "삐노누아",
     "category": "cafe",
     "is_active": true,
@@ -3435,6 +3511,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍹",
     "partnerships": [
       {
         "college_id": "3",
@@ -3448,11 +3525,10 @@
         "conditions": "학생증 제시, 테이크 아웃 시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "🍹"
+    ]
   },
   {
-    "id": "91",
+    "id": "82",
     "name": "사리(디저트카페)",
     "category": "cafe",
     "is_active": true,
@@ -3463,6 +3539,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "3",
@@ -3476,11 +3553,10 @@
         "conditions": "학생증 제시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "🍰"
+    ]
   },
   {
-    "id": "92",
+    "id": "83",
     "name": "오멜트",
     "category": "cafe",
     "is_active": true,
@@ -3491,6 +3567,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍳",
     "partnerships": [
       {
         "college_id": "3",
@@ -3516,11 +3593,10 @@
         "conditions": "학생증 제시, 구매 조건 및 이용 방식(매장/테이크아웃)에 따른 차등 적용",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍳"
+    ]
   },
   {
-    "id": "93",
+    "id": "84",
     "name": "오쏘커피",
     "category": "cafe",
     "is_active": true,
@@ -3531,6 +3607,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "3",
@@ -3544,51 +3621,10 @@
         "conditions": "학생증 제시, 테이크아웃 시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "94",
-    "name": "묵커피바",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "15,000원 이상 주문 시 10% 할인 (테이크 아웃 시 할인 적용된 최종 가격이 15,000원 이상일 경우 적용)",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 최종 결제 금액 15,000원 이상 시",
-        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "15,000원 이상 결제 시 결제 금액의 10% 할인 / 주문제작 케이크 2,000원 할인 (주말 제외 적용)",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 15,000원 이상 결제 혹은 주문제작 케이크 구매 시 (주말 제외)",
-        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
-      }
-    ],
-    "emoji": "🍹"
-  },
-  {
-    "id": "95",
+    "id": "85",
     "name": "썬더커피",
     "category": "cafe",
     "is_active": true,
@@ -3599,6 +3635,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "3",
@@ -3624,11 +3661,10 @@
         "conditions": "학생증 제시, 음료 4잔 주문 및 테이크 아웃 시 (더치페이 가능)",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "96",
+    "id": "86",
     "name": "아로하",
     "category": "cafe",
     "is_active": true,
@@ -3639,6 +3675,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "3",
@@ -3652,11 +3689,10 @@
         "conditions": "학생증 제시, 주문한 메뉴 유형별 차등 적용",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "97",
+    "id": "87",
     "name": "후식집",
     "category": "cafe",
     "is_active": true,
@@ -3667,6 +3703,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "3",
@@ -3680,11 +3717,10 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "🍰"
+    ]
   },
   {
-    "id": "98",
+    "id": "88",
     "name": "코지홀리데이",
     "category": "cafe",
     "is_active": true,
@@ -3695,6 +3731,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "3",
@@ -3708,11 +3745,10 @@
         "conditions": "학생증 제시, 4인 이상 테이크아웃 혹은 음료 현금(계좌) 결제 시",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🍰"
+    ]
   },
   {
-    "id": "99",
+    "id": "89",
     "name": "투썸플레이스",
     "category": "cafe",
     "is_active": true,
@@ -3723,6 +3759,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "3",
@@ -3736,11 +3773,10 @@
         "conditions": "학생증 제시, 15,000원 이상 주문 시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "100",
+    "id": "90",
     "name": "헤브론",
     "category": "cafe",
     "is_active": true,
@@ -3751,6 +3787,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍹",
     "partnerships": [
       {
         "college_id": "3",
@@ -3776,11 +3813,10 @@
         "conditions": "학생증 제시, 대상 메뉴 주문 혹은 음료 주문 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍹"
+    ]
   },
   {
-    "id": "101",
+    "id": "91",
     "name": "카페미올루",
     "category": "cafe",
     "is_active": true,
@@ -3791,6 +3827,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "3",
@@ -3804,51 +3841,10 @@
         "conditions": "학생증 제시, 음료 주문 시",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "102",
-    "name": "코이노커피",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "학생증 제시 시 인당 500원 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시 시 인당 적용",
-        "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "방문 인원 수 만큼 500원 할인 (테이크 아웃, 매장 이용 둘 다 가능)",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 인당 적용 (테이크 아웃 및 매장 이용 가능)",
-        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
-      }
-    ],
-    "emoji": "🍰"
-  },
-  {
-    "id": "103",
+    "id": "92",
     "name": "오토르테",
     "category": "cafe",
     "is_active": true,
@@ -3859,6 +3855,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🧁",
     "partnerships": [
       {
         "college_id": "3",
@@ -3872,11 +3869,10 @@
         "conditions": "학생증 제시, 4인 이상 방문 시, 최소 2시간 전 카톡 오픈채팅 공지 필요",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "🧁"
+    ]
   },
   {
-    "id": "104",
+    "id": "93",
     "name": "워터킹 커피 로스터스",
     "category": "cafe",
     "is_active": true,
@@ -3887,6 +3883,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "☕",
     "partnerships": [
       {
         "college_id": "3",
@@ -3900,11 +3897,10 @@
         "conditions": "학생증 제시, 점심시간(12:00-14:00) 제외, 병음료 제외, 중복 할인/적립 불가",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ],
-    "emoji": "☕"
+    ]
   },
   {
-    "id": "105",
+    "id": "94",
     "name": "동그라미(써클)",
     "category": "pub",
     "is_active": true,
@@ -3915,6 +3911,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍻",
     "partnerships": [
       {
         "college_id": "3",
@@ -3940,11 +3937,10 @@
         "conditions": "학생증 제시, 현금 또는 계좌이체 금액 조건 충족 시 혹은 4인 이상 방문 혹은 메인 메뉴 주문 개수 충족 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍻"
+    ]
   },
   {
-    "id": "106",
+    "id": "95",
     "name": "락",
     "category": "pub",
     "is_active": true,
@@ -3955,6 +3951,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍷",
     "partnerships": [
       {
         "college_id": "3",
@@ -3968,11 +3965,10 @@
         "conditions": "학생증 제시, 오후 9시 이전 주문 및 매장 이용 고객 대상",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       }
-    ],
-    "emoji": "🍷"
+    ]
   },
   {
-    "id": "107",
+    "id": "96",
     "name": "밤새",
     "category": "pub",
     "is_active": true,
@@ -3983,6 +3979,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍾",
     "partnerships": [
       {
         "college_id": "3",
@@ -3996,51 +3993,10 @@
         "conditions": "학생증 제시, 2~8인 방문 시 (9인 이상 테이블 미적용, 제휴 내용 중복 불가, 테이블 당 1회 제공)",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🍾"
+    ]
   },
   {
-    "id": "108",
-    "name": "에이플러스",
-    "category": "pub",
-    "is_active": true,
-    "summary_benefit": "사리 리필 및 혜택 제공",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "찌개류 주문 시 라면사리 무한리필 추가 제공 / 10인 이하 방문 시 인당 쭈쭈바 1개 제공 / 오후 8시 이전 방문 시 소주 1병 무료 제공 (중복 적용 가능, 단 인스타그램 스토리 태그 업로드 필수)",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 인스타그램 스토리 태그 필요, 중복 적용 가능",
-        "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "찌개류 주문 시 라면사리 무한 / 10인 이하 테이블 쭈쭈바 제공 / 스토리 업로드 시 기본안주로 라면 제공 (심야타임 1시~5시 해당)",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 대상 찌개 주문 혹은 10인 이하 방문 혹은 스토리 업로드 시 (심야타임 1시~5시 한정)",
-        "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
-      }
-    ],
-    "emoji": "🍶"
-  },
-  {
-    "id": "109",
+    "id": "97",
     "name": "브리쓰 복싱앤 크로스핏",
     "category": "life",
     "is_active": true,
@@ -4051,6 +4007,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "💪",
     "partnerships": [
       {
         "college_id": "3",
@@ -4064,11 +4021,10 @@
         "conditions": "학생증 제시 (최초 가입 시 필수), 3개월 이상 가입 시 (최초 가입자 한정)",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ],
-    "emoji": "💪"
+    ]
   },
   {
-    "id": "110",
+    "id": "98",
     "name": "샛별 코인노래연습장",
     "category": "play",
     "is_active": true,
@@ -4079,6 +4035,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🎤",
     "partnerships": [
       {
         "college_id": "3",
@@ -4104,51 +4061,10 @@
         "conditions": "학생증 제시, 3,000원 이상 결제 시",
         "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       }
-    ],
-    "emoji": "🎤"
+    ]
   },
   {
-    "id": "111",
-    "name": "슈퍼스타 코인노래연습장",
-    "category": "play",
-    "is_active": true,
-    "summary_benefit": "곡/시간 추가 및 생수",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "3,000원 이상 결제 시 물 1병 제공 및 9곡 이상 결제 시 2곡 추가 또는 30분 이상 결제 시 10분 추가 제공 (중복 가능)",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시 (중복 가능)",
-        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "3,000원 이상 결제 시 물 1병 서비스\n9곡 결제 시 2곡 서비스\n30분 이상 결제 시 10분 서비스",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시",
-        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
-      }
-    ],
-    "emoji": "🎤"
-  },
-  {
-    "id": "112",
+    "id": "99",
     "name": "스튜디오 나우 필라테스",
     "category": "life",
     "is_active": true,
@@ -4159,6 +4075,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "💪",
     "partnerships": [
       {
         "college_id": "3",
@@ -4172,11 +4089,10 @@
         "conditions": "학생증 제시, 최초 등록 및 재등록 2회까지 적용",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ],
-    "emoji": "💪"
+    ]
   },
   {
-    "id": "113",
+    "id": "100",
     "name": "큐 당구장",
     "category": "play",
     "is_active": true,
@@ -4187,6 +4103,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🎳",
     "partnerships": [
       {
         "college_id": "3",
@@ -4200,11 +4117,10 @@
         "conditions": "학생증 제시, 이용금액 1만원 이상 시",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ],
-    "emoji": "🎳"
+    ]
   },
   {
-    "id": "114",
+    "id": "101",
     "name": "트윈스 당구클럽",
     "category": "play",
     "is_active": true,
@@ -4215,6 +4131,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🎳",
     "partnerships": [
       {
         "college_id": "3",
@@ -4228,79 +4145,10 @@
         "conditions": "학생증 제시, 기본 시간 초과 시 적용",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ],
-    "emoji": "🎳"
+    ]
   },
   {
-    "id": "115",
-    "name": "포세이돈 PC카페",
-    "category": "play",
-    "is_active": true,
-    "summary_benefit": "음료수 서비스",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "만원 이상 충전 시 음료 S사이즈 제공 / 2만원 이상 충전 시 음료 L사이즈 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 충전 금액 조건 충족 시",
-        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
-      }
-    ],
-    "emoji": "💻"
-  },
-  {
-    "id": "116",
-    "name": "한양사 인쇄복사제본",
-    "category": "life",
-    "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "5,000원 이상 현금 또는 계좌이체 결제 시 10% 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 5,000원 이상 현금 또는 계좌이체 결제 시",
-        "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "5,000원 이상 현금 결제 시 10% 할인",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 5,000원 이상 현금 결제 시",
-        "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
-      }
-    ],
-    "emoji": "🖨️"
-  },
-  {
-    "id": "117",
+    "id": "102",
     "name": "청학칡냉면",
     "category": "food",
     "is_active": true,
@@ -4311,6 +4159,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍜",
     "partnerships": [
       {
         "college_id": "3",
@@ -4324,11 +4173,10 @@
         "conditions": "학생증 제시, 방문 인원 및 결제 금액 조건 충족 시",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🍜"
+    ]
   },
   {
-    "id": "118",
+    "id": "103",
     "name": "트라이쁘띠",
     "category": "cafe",
     "is_active": true,
@@ -4339,6 +4187,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍩",
     "partnerships": [
       {
         "college_id": "3",
@@ -4352,51 +4201,10 @@
         "conditions": "학생증 제시, 8천원 이상 구매 시",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ],
-    "emoji": "🍩"
+    ]
   },
   {
-    "id": "119",
-    "name": "레드버튼 고잔점",
-    "category": "play",
-    "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "음식&음료 10% 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시",
-        "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
-      },
-      {
-        "college_id": "10",
-        "college_name": "첨단융합대학",
-        "benefit": "식음료 결제 금액 10% 할인 / 첨단융합대 재학생 4인 이상 방문 시 1시간 쿠폰(1인 1매) 증정",
-        "period": {
-          "start_date": "2026-03-03",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 4인 이상 방문 시 쿠폰 적용",
-        "source_url": "https://www.instagram.com/p/DW-e137iV6g/"
-      }
-    ],
-    "emoji": "🎮"
-  },
-  {
-    "id": "120",
+    "id": "104",
     "name": "카페 디캔바스",
     "category": "cafe",
     "is_active": true,
@@ -4407,6 +4215,7 @@
       "address": null,
       "full_address": null
     },
+    "emoji": "🍹",
     "partnerships": [
       {
         "college_id": "10",
@@ -4420,7 +4229,6 @@
         "conditions": "학생증 제시, 아메리카노 주문 시",
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ],
-    "emoji": "🍹"
+    ]
   }
 ]
