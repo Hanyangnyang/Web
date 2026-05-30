@@ -26,8 +26,7 @@ export function BootProvider({ children }) {
   });
 
   const [splashDone, setSplashDone] = useState(() => {
-    // 앱(Capacitor)에서는 네이티브 스플래시로 대체하므로 웹 스플래시 skip
-    // Capacitor 앱은 반드시 localhost에서 서빙되므로 타이밍 이슈 없이 판단 가능
+    // 앱(Capacitor Android)에서는 네이티브 스플래시로 대체하므로 웹 스플래시 skip
     if (isCapacitorApp()) return true;
     return sessionStorage.getItem('splashShown') === 'true';
   });
