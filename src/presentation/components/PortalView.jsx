@@ -8,6 +8,7 @@ import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
+
 function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
   const [displayed, setDisplayed] = useState(() => {
     return hasAnimatedThisSession ? text : '';
@@ -234,7 +235,7 @@ export function PortalView({ isVisible = true }) {
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
         {/* 1. 오늘의 날씨 & 소식 섹션 */}
         {(loading || weather) && (
-          <section className="mb-10">
+          <section className="mb-2">
             <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
@@ -297,7 +298,7 @@ export function PortalView({ isVisible = true }) {
             {renderedHourlyForecast.length > 0 && (
               <div 
                 ref={scrollContainerRef}
-                className="mt-4 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
+                className="mt-2 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
               >
                 <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
                   {renderedHourlyForecast.map((h, idx) => {
@@ -330,6 +331,31 @@ export function PortalView({ isVisible = true }) {
             )}
           </section>
         )}
+
+      {/* Monster Energy 배너 */}
+      <div className="mb-6 mt-2">
+        <img
+          src="/monster_banner_home.png"
+          className="w-full h-auto rounded-xl cursor-pointer"
+          alt="Monster Energy"
+          onClick={() => {
+            const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
+            // TODO: 구글 플레이 스토어 출시 후 실제 링크로 교체
+            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
+
+            const ua = navigator.userAgent;
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            const isAndroid = /Android/i.test(ua);
+
+            if (isIOS) {
+              window.open(APP_STORE_URL, '_blank');
+            } else {
+              // Android 또는 데스크톱 → Play Store
+              window.open(PLAY_STORE_URL, '_blank');
+            }
+          }}
+        />
+      </div>
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">

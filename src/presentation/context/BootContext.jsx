@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 import { supabase } from '../../lib/supabase.js';
-import { isCapacitorApp } from '../../lib/platform.js';
 
 const BootContext = createContext(null);
 
@@ -26,8 +25,6 @@ export function BootProvider({ children }) {
   });
 
   const [splashDone, setSplashDone] = useState(() => {
-    // 앱(Capacitor Android)에서는 네이티브 스플래시로 대체하므로 웹 스플래시 skip
-    if (isCapacitorApp()) return true;
     return sessionStorage.getItem('splashShown') === 'true';
   });
 
