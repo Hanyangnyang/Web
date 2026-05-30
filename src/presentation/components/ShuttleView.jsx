@@ -240,8 +240,8 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
           <span className={`inline-flex justify-center items-center w-[58px] min-h-[34px] text-[10px] font-extrabold py-1 rounded flex-shrink-0 transition-all duration-200 whitespace-pre-line leading-[1.1] text-center ${ROUTE_STYLE[routeKey]}`}>
             {rLabel}
           </span>
-          <div className={`perspective-container ${hideSubwayCol ? '' : 'flex-1'}`} style={{ height: 50, ...(hideSubwayCol && { width: 120 }) }}>
-            <div className={`flip-card-inner ${(!isFullMode && showRowRelative) ? 'flipped' : ''}`}>
+          <div className="perspective-container flex-1" style={{ height: 50 }}>
+            <div className={`flip-card-inner ${(!isFullMode && showRowRelative) ? 'flipped' : ''}`} style={hideSubwayCol ? { transformOrigin: '35px center' } : undefined}>
               {/* Front side (Absolute time) */}
               <div className="flip-card-front flex flex-col justify-center">
                 <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast && !isFullMode ? 'text-text-hint' : 'text-text-main'}`}>
