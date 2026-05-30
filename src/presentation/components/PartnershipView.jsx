@@ -1,6 +1,6 @@
 // 컴포넌트: 단과대 제휴 업체 검색 및 혜택 조회
 import React, { useState, useMemo, useCallback, useRef } from 'react';
-import { Search, X, ChevronDown, ChevronUp, ExternalLink, Info } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronUp, ExternalLink, Info, Clock } from 'lucide-react';
 import partnershipsData from '../../data/partnerships.json';
 
 // ─── 카테고리 enum (데이터 스키마 기준) ───
@@ -29,6 +29,36 @@ const COLLEGES = [
   { id: '11',  name: '총학생회' },
 ];
 
+// 단과대별 이모지
+const COLLEGE_EMOJI = {
+  '1': '🦁',   // LIONS 칼리지
+  '2': '📢',   // 커뮤니케이션&컬쳐대학
+  '3': '⚙️',   // 공과대학
+  '4': '💊',   // 약학대학
+  '5': '🎨',   // 디자인대학
+  '6': '🌍',   // 글로벌문화통상대학
+  '7': '💰',   // 경상대학
+  '8': '💻',   // 소프트웨어융합대학
+  '9': '🎵',   // 예체능대학
+  '10': '🚀',  // 첨단융합대학
+  '11': '👥',  // 총학생회
+};
+
+// 단과대별 색상 스타일
+const COLLEGE_STYLE = {
+  '1': 'bg-[rgba(254,215,170,0.5)] text-[#1f2937]',    // LIONS 칼리지 - 주황 (🦁)
+  '2': 'bg-[rgba(254,202,202,0.5)] text-[#1f2937]',    // 커뮤니케이션 - 빨강 (📢)
+  '3': 'bg-[rgba(229,231,235,0.6)] text-[#1f2937]',    // 공과대학 - 회색 (⚙️)
+  '4': 'bg-[rgba(254,226,226,0.5)] text-[#1f2937]',    // 약학대학 - 빨강 (💊)
+  '5': 'bg-[rgba(233,213,255,0.5)] text-[#1f2937]',    // 디자인대학 - 보라 (🎨)
+  '6': 'bg-[rgba(187,247,208,0.5)] text-[#1f2937]',    // 글로벌 - 초록 (🌍)
+  '7': 'bg-[rgba(254,240,138,0.5)] text-[#1f2937]',    // 경상대학 - 노랑 (💰)
+  '8': 'bg-[rgba(191,219,254,0.5)] text-[#1f2937]',    // 소프트웨어 - 파랑 (💻)
+  '9': 'bg-[rgba(251,207,232,0.5)] text-[#1f2937]',    // 예체능대학 - 분홍 (🎵)
+  '10': 'bg-[rgba(254,215,170,0.5)] text-[#1f2937]',   // 첨단융합 - 주황 (🚀)
+  '11': 'bg-[rgba(219,234,254,0.6)] text-[#1f2937]',   // 총학생회 - 파랑 (👥)
+};
+
 // 카테고리별 이모지 (카드 좌측 아이콘용)
 const CATEGORY_EMOJI = {
   food: '🍽️', cafe: '☕', pub: '🍺', play: '🎮', life: '✂️',
@@ -54,8 +84,8 @@ function StoreCard({ store, collegeFilter }) {
         className="w-full flex items-center gap-3 px-4 py-3 text-left [-webkit-tap-highlight-color:transparent] active:bg-slate-50/50 transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
-        {/* 카테고리 이모지 */}
-        <span className="text-xl flex-shrink-0">{CATEGORY_EMOJI[store.category] || '🏪'}</span>
+        {/* 업체 이모지 */}
+        <span className="text-xl flex-shrink-0">{store.emoji || '🏪'}</span>
 
         {/* 업체명 + 혜택 요약 */}
         <div className="flex-1 min-w-0">
@@ -71,9 +101,9 @@ function StoreCard({ store, collegeFilter }) {
         {/* 단과대 카운트 */}
         <div className="flex items-center gap-1 flex-shrink-0">
           {uniqueColleges.length === 1 ? (
-            <span className="text-[10px] font-bold text-text-hint bg-surface px-1.5 py-0.5 rounded-full">{uniqueColleges[0].college_name}</span>
+            <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">{uniqueColleges[0].college_name}</span>
           ) : (
-            <span className="text-[10px] font-bold text-text-hint bg-surface px-1.5 py-0.5 rounded-full">{uniqueColleges.length}개 단과대</span>
+            <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">{uniqueColleges.length}개 단과대</span>
           )}
         </div>
 
@@ -93,40 +123,53 @@ function StoreCard({ store, collegeFilter }) {
             {displayedPartnerships.map((p, idx) => (
               <div
                 key={`${p.college_id}-${idx}`}
-                className="bg-surface rounded-xl p-3"
+                className="flex items-center gap-3 bg-surface rounded-xl p-4"
               >
-                {/* 단과대 + 기간 */}
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-extrabold text-primary">🎓 {p.college_name}</span>
-                  <span className="text-[9px] text-text-hint font-medium">
-                    {p.period?.start_date?.slice(5)} ~ {p.period?.end_date?.slice(5)}
+                {/* 좌측: 단과대 라벨 */}
+                <div className={`flex-shrink-0 w-[70px] flex flex-col items-center justify-center rounded-lg px-1.5 py-4 text-center gap-1 ${COLLEGE_STYLE[p.college_id]}`}>
+                  <span className="text-[20px] leading-none">
+                    {COLLEGE_EMOJI[p.college_id]}
+                  </span>
+                  <span className="text-[11px] font-extrabold leading-tight break-words">
+                    {p.college_name}
                   </span>
                 </div>
 
-                {/* 혜택 */}
-                <p className="text-[12px] text-text-main font-semibold leading-[1.65] whitespace-pre-line">{p.benefit}</p>
+                {/* 우측: 혜택, 조건, 기간 */}
+                <div className="flex-1 min-w-0">
+                  {/* 혜택 */}
+                  <p className="text-[12px] text-text-main font-semibold leading-[1.65] whitespace-pre-line mb-1">{p.benefit}</p>
 
-                {/* 조건 */}
-                {p.conditions && (
-                  <div className="flex items-start gap-1 mt-2">
-                    <Info size={10} className="text-text-hint mt-0.5 flex-shrink-0" />
-                    <p className="text-[10px] text-text-hint leading-[1.5] font-medium">{p.conditions}</p>
+                  {/* 조건 */}
+                  {p.conditions && (
+                    <div className="flex items-start gap-1 mt-1">
+                      <Info size={10} className="text-text-hint mt-0.5 flex-shrink-0" />
+                      <p className="text-[10px] text-text-hint leading-[1.5] font-medium">{p.conditions}</p>
+                    </div>
+                  )}
+
+                  {/* 기간 + 출처 */}
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <div className="flex items-center gap-1">
+                      <Clock size={10} className="text-text-hint flex-shrink-0" />
+                      <span className="text-[10px] text-text-hint font-medium">
+                        {p.period?.start_date?.slice(2).replace(/-/g, '.')} ~ {p.period?.end_date?.slice(2).replace(/-/g, '.')}
+                      </span>
+                    </div>
+                    {p.source_url && (
+                      <a
+                        href={p.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-text-hint hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink size={9} />
+                        출처
+                      </a>
+                    )}
                   </div>
-                )}
-
-                {/* 출처 */}
-                {p.source_url && (
-                  <a
-                    href={p.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 mt-1.5 text-[10px] font-semibold text-primary hover:underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <ExternalLink size={9} />
-                    출처 확인
-                  </a>
-                )}
+                </div>
               </div>
             ))}
           </div>
@@ -188,11 +231,10 @@ export function PartnershipView() {
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 헤더 */}
       <h2 className="text-2xl font-extrabold text-text-main mb-1">제휴 혜택</h2>
-      <p className="text-[13px] text-text-sub font-medium mb-5">학생증 제시 시 받을 수 있는 혜택을 검색하세요</p>
 
       {/* 검색 바 */}
       <div className="relative mb-4">
-        <div className="flex items-center gap-2.5 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
+        <div className="flex items-center gap-2.5 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
           <Search size={16} className="text-text-hint flex-shrink-0" />
           <input
             ref={inputRef}
@@ -211,47 +253,50 @@ export function PartnershipView() {
       </div>
 
       {/* 단과대 칩 */}
-      <div className="mb-2">
-        <span className="text-[11px] font-bold text-text-hint mb-1.5 block">🎓 내 단과대</span>
+      <div className="mb-4">
+        <span className="text-[11px] font-bold text-text-hint mb-1.5 block">단과대</span>
         <div className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
           {COLLEGES.map(c => (
             <button
               key={c.id}
               onClick={() => handleCollegeChange(c.id)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
+              className={`flex items-center gap-1 px-3 py-2.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                 college === c.id
                   ? 'bg-[#0E4A84] text-white border-[#0E4A84]'
-                  : 'bg-white text-text-sub border-[#e2e8f0]'
+                  : 'bg-[#f8fafc] text-[#334155] border-[#cbd5e1]'
               }`}
             >
-              {c.name}
+              {c.id !== 'all' && COLLEGE_EMOJI[c.id]} {c.name}
             </button>
           ))}
         </div>
       </div>
 
       {/* 카테고리 칩 */}
-      <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat.key}
-            onClick={() => setCategory(cat.key)}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
-              category === cat.key
-                ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]'
-                : 'bg-white text-text-sub border-[#e2e8f0]'
-            }`}
-          >
-            <span className="text-[13px]">{cat.emoji}</span>
-            {cat.label}
-          </button>
-        ))}
+      <div className="mb-4">
+        <span className="text-[11px] font-bold text-text-hint mb-1.5 block">카테고리</span>
+        <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.key}
+              onClick={() => setCategory(cat.key)}
+              className={`flex items-center gap-1 px-3 py-2.5 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
+                category === cat.key
+                  ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]'
+                  : 'bg-[#f8fafc] text-[#334155] border-[#cbd5e1]'
+              }`}
+            >
+              <span className="text-[12px]">{cat.emoji}</span>
+              {cat.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 결과 카운트 */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-4">
         <span className="text-[11px] text-text-hint font-semibold">
-          {filtered.length}개 업체
+          제휴업체 {filtered.length}개
           {college !== 'all' && <span className="text-primary"> · {selectedCollegeName}</span>}
           {query && <span className="text-primary"> · "{query}"</span>}
         </span>
