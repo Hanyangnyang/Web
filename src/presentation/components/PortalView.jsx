@@ -274,7 +274,7 @@ export function PortalView({ isVisible = true }) {
                 </div>
 
                 {weather.airQuality && (
-                  <div className="grid grid-cols-3 gap-3 mt-8 relative z-10">
+                  <div className="grid gap-2 mt-8 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
                     {[
                       { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
                       { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
@@ -282,9 +282,9 @@ export function PortalView({ isVisible = true }) {
                     ].map((item, idx) => (
                       <div key={idx} className="bg-white/95 backdrop-blur-sm rounded-2xl py-3.5 px-2 flex flex-col items-center gap-1.5 shadow-md">
                         <span className="text-[10px] text-text-sub font-black uppercase tracking-widest opacity-80">{item.label}</span>
-                        <div className="flex items-center gap-1 min-w-0">
-                          <item.icon size={12} color={item.data.color} strokeWidth={3} className="flex-shrink-0" />
-                          <span className="font-black leading-tight text-center whitespace-nowrap" style={{ color: item.data.color, fontSize: 'clamp(10px, 2.8vw, 14px)' }}>{item.data.label}</span>
+                        <div className="flex items-center gap-1.5">
+                          <item.icon size={14} color={item.data.color} strokeWidth={3} />
+                          <span className="text-[14px] font-black whitespace-nowrap" style={{ color: item.data.color }}>{item.data.label}</span>
                         </div>
                       </div>
                     ))}
