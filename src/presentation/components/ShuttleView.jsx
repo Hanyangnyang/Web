@@ -287,7 +287,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
                 <Loader2 className="text-[#cbd5e1] animate-[spin_1s_linear_infinite]" size={16} />
               </div>
             ) : trains.length > 0 ? trains.map((tr, i) => (
-              <div key={i} className="grid grid-cols-[1fr_auto_48px] items-center gap-x-2">
+              <div key={i} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-1">
                 <div /> {/* 1fr Spacer to push subway line info to the right */}
                 <div className="flex items-center gap-1.5">
                   <LineBadge opt={opt} size={20} />
