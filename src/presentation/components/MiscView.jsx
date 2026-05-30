@@ -1,6 +1,6 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Megaphone, Send } from 'lucide-react';
+import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
 import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
@@ -74,23 +74,17 @@ function FeedbackSection({ onBack }) {
       <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
         <div className="bg-emerald-50/70 border border-emerald-100/50 rounded-card p-8 text-center animate-[fadeIn_0.3s_ease] shadow-sm">
           <span className="text-4xl">🎉</span>
-          <h4 className="text-emerald-900 font-extrabold text-[17px] mt-4">소중한 피드백이 전송되었습니다</h4>
+          <h4 className="text-emerald-900 font-extrabold text-[17px] mt-4">소중한 피드백이 전송되었어요</h4>
           <p className="text-emerald-700 text-xs font-bold mt-2 leading-relaxed">
-            보내주신 고견을 바탕으로 더욱 유용하고<br />
-            사랑받는 하냥냥을 만들어 나가겠습니다.
+            보내주신 의견을 바탕으로 더욱 유용하고<br />
+            사랑받는 하냥냥을 만들어갈게요!
           </p>
-          <div className="flex gap-3 justify-center mt-6">
+          <div className="flex justify-center mt-6">
             <button
               onClick={onBack}
-              className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-text-main font-bold text-xs rounded-full transition-all active:scale-95"
+              className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-full transition-all active:scale-95 shadow-sm"
             >
-              목록으로
-            </button>
-            <button
-              onClick={() => setSubmitted(false)}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full transition-all active:scale-95 shadow-sm"
-            >
-              추가 작성
+              확인
             </button>
           </div>
         </div>
@@ -101,8 +95,8 @@ function FeedbackSection({ onBack }) {
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       <div className="flex items-center gap-3.5 mb-6">
-        <button 
-          onClick={onBack} 
+        <button
+          onClick={onBack}
           className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center bg-white shadow-sm active:scale-90 transition-all"
         >
           <svg className="w-4 h-4 text-text-main" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -114,13 +108,13 @@ function FeedbackSection({ onBack }) {
 
       <div className="bg-white border border-[#e2e8f0] rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2 mb-3">
-          <Megaphone size={18} className="text-[#0e4a84] font-extrabold" />
+          <Laugh size={18} className="text-[#0e4a84] font-extrabold" />
           <span className="font-extrabold text-[15px] text-text-main">하냥냥에게 피드백 보내기</span>
         </div>
-        
+
         <p className="text-[#64748b] text-[11px] font-medium leading-relaxed mb-4">
-          기능 제안, 오류 제보, 응원의 말 등 무엇이든 좋습니다!<br />
-          남겨주신 의견은 **100% 익명**으로 안전하게 수집됩니다.
+          하냥냥은 여러분들의 소중한 의견을 듣고 싶어요<br />
+          기능 제안, 오류 제보, 칭찬의 말 등 무엇이든 알려주세요!
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -171,8 +165,8 @@ export function MiscView({ resetSignal }) {
     return () => popBackHandler();
   }, [subView]);
 
-  if (subView === 'gym')      return <GymTimetable onBack={() => setSubView('list')} />;
-  if (subView === 'insta')    return <InstagramListView onBack={() => setSubView('list')} />;
+  if (subView === 'gym') return <GymTimetable onBack={() => setSubView('list')} />;
+  if (subView === 'insta') return <InstagramListView onBack={() => setSubView('list')} />;
   if (subView === 'feedback') return <FeedbackSection onBack={() => setSubView('list')} />;
 
   return (
@@ -227,7 +221,7 @@ export function MiscView({ resetSignal }) {
 
         <div className={cardClass} onClick={() => setSubView('feedback')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <Megaphone size={28} color="#0EA5E9" />
+            <Laugh size={28} color="#0E4A84" />
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">피드백 보내기</span>
