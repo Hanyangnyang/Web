@@ -20,6 +20,11 @@ CREATE OR REPLACE FUNCTION upsert_alarm_subscription(
   p_platform text DEFAULT 'web'
 ) RETURNS void AS $$
 BEGIN
+  -- 🚨 [IDOR 해킹 방지] 토큰 소유주 유효성 검증 가드 추가
+  IF auth.uid() <> p_device_id THEN
+    RAISE EXCEPTION 'Unauthorized: You do not own this device';
+  END IF;
+
   -- 1) FCM 토큰이 전달된 경우 Devices 테이블 갱신
   IF p_fcm_token IS NOT NULL THEN
     INSERT INTO public.devices (id, fcm_token, platform, last_active_at)
@@ -50,6 +55,11 @@ CREATE OR REPLACE FUNCTION get_alarm_subscription(
 DECLARE
   v_sub jsonb;
 BEGIN
+  -- 🚨 [IDOR 해킹 방지] 토큰 소유주 유효성 검증 가드 추가
+  IF auth.uid() <> p_device_id THEN
+    RAISE EXCEPTION 'Unauthorized: You do not own this device';
+  END IF;
+
   SELECT jsonb_build_object(
     'is_active', is_active,
     'params', params

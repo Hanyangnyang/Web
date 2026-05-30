@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import admin from 'npm:firebase-admin@11.8.0';
+import { jwtVerify } from 'npm:jose@5.1.3';
 
 // 한국 표준시(KST) 상세 날짜/시간 정보를 신뢰할 수 있게 반환하는 헬퍼 함수
 function getKSTDateDetails() {
@@ -113,8 +114,7 @@ Deno.serve(async (req) => {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
-  // 보안 검증: 오직 service_role 권한만 함수를 실행할 수 있도록 검사합니다.
-  // 게이트웨이가 JWT 유효성(서명)은 이미 검증했으므로, 우리는 페이로드의 'role'만 확인하면 됩니다.
+  // 보안 검증: jose 라이브러리를 사용해 토큰 서명의 유효성을 엄격하게 확인하고 service_role인지 인가합니다.
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return new Response(JSON.stringify({ error: 'Missing or invalid Authorization header' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
@@ -122,18 +122,19 @@ Deno.serve(async (req) => {
 
   try {
     const token = authHeader.split(' ')[1];
-    const payloadBase64Url = token.split('.')[1];
-    // Base64Url 형식을 Base64로 변환
-    const payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const decodedPayload = JSON.parse(atob(payloadBase64));
+    // Supabase 프로젝트 고유의 JWT 비밀키 로드
+    const jwtSecret = new TextEncoder().encode(Deno.env.get('SUPABASE_JWT_SECRET')!);
 
-    if (decodedPayload.role !== 'service_role') {
-      console.warn('Unauthorized role attempted access:', decodedPayload.role);
+    // 🚨 서명 검증 및 해독 수행 (위조 토큰 전면 차단)
+    const { payload } = await jwtVerify(token, jwtSecret);
+
+    if (payload.role !== 'service_role') {
+      console.warn('Unauthorized role attempted access:', payload.role);
       return new Response(JSON.stringify({ error: 'Forbidden: Requires service_role' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
   } catch (error) {
-    console.error('JWT payload parsing error:', error);
-    return new Response(JSON.stringify({ error: 'Invalid token payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    console.error('JWT signature verification failed:', error);
+    return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token signature or expired' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   }
 
 

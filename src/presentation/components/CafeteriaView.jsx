@@ -6,6 +6,17 @@ import { getKSTDate } from '../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
 import { ShareSheet } from './ShareSheet.jsx';
 
+function parseBoldText(text) {
+  const parts = text.split(/(<b>.*?<\/b>)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('<b>') && part.endsWith('</b>')) {
+      const innerText = part.slice(3, -4);
+      return <strong key={index} className="font-bold">{innerText}</strong>;
+    }
+    return part;
+  });
+}
+
 function MenuItemLine({ html }) {
   const scrollWrapRef = useRef(null);
   const spanRef = useRef(null);
@@ -27,6 +38,8 @@ function MenuItemLine({ html }) {
     }
   }, [html]);
 
+  const parsedContent = parseBoldText(content);
+
   return (
     <div className="flex items-baseline whitespace-nowrap leading-[1.8]">
       {bullet && <span className="flex-shrink-0 mr-[0.4rem]">{bullet}</span>}
@@ -35,12 +48,13 @@ function MenuItemLine({ html }) {
           ref={spanRef}
           className="inline-block"
           style={marquee ? { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' } : undefined}
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        >
+          {parsedContent}
+        </span>
         {marquee && (
           <span className="menu-item-marquee-track" style={{ animationDuration: `${marquee.duration}s` }}>
-            <span className="inline-block menu-item-gap" dangerouslySetInnerHTML={{ __html: content }} />
-            <span className="inline-block menu-item-gap" aria-hidden="true" dangerouslySetInnerHTML={{ __html: content }} />
+            <span className="inline-block menu-item-gap">{parsedContent}</span>
+            <span className="inline-block menu-item-gap" aria-hidden="true">{parsedContent}</span>
           </span>
         )}
       </div>
