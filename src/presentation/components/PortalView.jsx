@@ -350,14 +350,14 @@ export function PortalView({ isVisible = true }) {
               const emptySeats = Math.max(0, room.total - room.occupied);
               return (
                 <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-black text-[0.95rem] text-text-main truncate leading-tight min-w-0 flex-1">
+                  <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2 min-w-0">
+                    <span className="font-black text-[0.95rem] text-text-main leading-tight sm:truncate sm:flex-1 sm:min-w-0">
                       {room.name.replace(' (2F)', '').replace(' (4F)', '')}
                     </span>
-                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-black flex-shrink-0 shadow-sm" style={{ 
+                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold self-start sm:flex-shrink-0 sm:self-auto" style={{
                       backgroundColor: `${room.color}15`,
                       color: room.color,
-                      border: `1px solid ${room.color}20`
+                      border: `1px solid ${room.color}25`
                     }}>
                       {room.emoji} {room.status}
                     </div>
