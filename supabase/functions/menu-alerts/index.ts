@@ -103,37 +103,45 @@ function buildFCMMessage(token: string, platform: string, title: string, body: s
 }
 
 Deno.serve(async (req) => {
+  console.info(`🚀 [Edge Function Triggered] Method: ${req.method}, URL: ${req.url}`);
+
   // CORS preflight
   if (req.method === 'OPTIONS') {
+    console.info(`[Preflight] OPTIONS request received. Returning CORS headers.`);
     return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*' } });
   }
 
   if (req.method !== 'GET' && req.method !== 'POST') {
+    console.warn(`[Method Not Allowed] Received method: ${req.method}. GET or POST is required.`);
     return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
       status: 405,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
+
   // 보안 검증: jose 라이브러리를 사용해 토큰 서명의 유효성을 엄격하게 확인하고 service_role인지 인가합니다.
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.error(`🚨 [Security Check Failed] Missing or invalid Authorization header. Header value: ${authHeader}`);
     return new Response(JSON.stringify({ error: 'Missing or invalid Authorization header' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   }
 
   try {
     const token = authHeader.split(' ')[1];
-    // Supabase 프로젝트 고유의 JWT 비밀키 로드
-    const jwtSecret = new TextEncoder().encode(Deno.env.get('SUPABASE_JWT_SECRET')!);
+    // Supabase 프로젝트 고유의 JWT 비밀키 로드 (클라우드 환경 변수 정책 대응을 위해 JWT_SECRET 조회)
+    const jwtSecret = new TextEncoder().encode(Deno.env.get('JWT_SECRET')!);
 
     // 🚨 서명 검증 및 해독 수행 (위조 토큰 전면 차단)
     const { payload } = await jwtVerify(token, jwtSecret);
 
     if (payload.role !== 'service_role') {
-      console.warn('Unauthorized role attempted access:', payload.role);
+      console.error(`🚨 [Security Check Failed] Unauthorized role attempted access: ${payload.role}. Service_role is required.`);
       return new Response(JSON.stringify({ error: 'Forbidden: Requires service_role' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
+    
+    console.info(`🔑 [Security Check Passed] JWT verified successfully for role: ${payload.role}`);
   } catch (error) {
-    console.error('JWT signature verification failed:', error);
+    console.error('🚨 [Security Check Failed] JWT signature verification failed:', error);
     return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token signature or expired' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   }
 
