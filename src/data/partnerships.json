@@ -49,7 +49,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🍖"
+    "emoji": "🥓"
   },
   {
     "id": "2",
@@ -333,7 +333,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍲"
   },
   {
     "id": "7",
@@ -373,7 +373,7 @@
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍱"
   },
   {
     "id": "8",
@@ -425,7 +425,7 @@
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
     ],
-    "emoji": "🌮"
+    "emoji": "🐷"
   },
   {
     "id": "9",
@@ -489,7 +489,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍗"
   },
   {
     "id": "10",
@@ -541,7 +541,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍛"
   },
   {
     "id": "11",
@@ -646,58 +646,6 @@
       }
     ],
     "emoji": "🍚"
-  },
-  {
-    "id": "13",
-    "name": "홍성마라미방",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "1",
-        "college_name": "LIONS 칼리지 학생회",
-        "benefit": "3인 이상 주문 시 음료 1개 제공(한 테이블 기준) / 1만원 이상 현금 또는 계좌이체 결제 시 500원 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "음료 혜택: 한 테이블 기준 3인 이상 주문 필수 / 할인 혜택: 1만원 이상 현금·계좌이체 결제 필수",
-        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
-      },
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "5천원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIkBtEXHm"
-      },
-      {
-        "college_id": "4",
-        "college_name": "약학대학",
-        "benefit": "3인 이상 식사 시 음료 1개 제공 / 6만원 이상 결제 시 물만두 제공 / 7만원 이상 결제 시 귀바로우(소) 또는 라조기 제공 (위 조항 간 중복 적용 불가, 주방 상황에 따라 사장님이 메뉴 선택)",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
-        "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
-      }
-    ],
-    "emoji": "🏪"
   },
   {
     "id": "14",
@@ -865,7 +813,7 @@
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍗"
   },
   {
     "id": "17",
@@ -1225,7 +1173,7 @@
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍺"
   },
   {
     "id": "23",
@@ -1305,7 +1253,7 @@
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍹"
   },
   {
     "id": "25",
@@ -1357,7 +1305,7 @@
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "☕"
   },
   {
     "id": "26",
@@ -1397,7 +1345,7 @@
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "💻"
   },
   {
     "id": "27",
@@ -1437,7 +1385,7 @@
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🎤"
   },
   {
     "id": "28",
@@ -1465,7 +1413,7 @@
         "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🖨️"
   },
   {
     "id": "29",
@@ -1493,7 +1441,7 @@
         "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🎮"
   },
   {
     "id": "30",
@@ -1729,7 +1677,7 @@
         "source_url": "https://www.instagram.com/p/DVfH4I-ARV3"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍰"
   },
   {
     "id": "35",
@@ -1781,7 +1729,7 @@
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "☕"
   },
   {
     "id": "36",
@@ -1833,7 +1781,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍕"
   },
   {
     "id": "37",
@@ -1861,7 +1809,7 @@
         "source_url": "https://www.instagram.com/p/DVfIJj3ASWG"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍲"
   },
   {
     "id": "38",
@@ -1953,7 +1901,7 @@
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ],
-    "emoji": "🍖"
+    "emoji": "🥓"
   },
   {
     "id": "40",
@@ -1981,7 +1929,7 @@
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍺"
   },
   {
     "id": "41",
@@ -2009,7 +1957,7 @@
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "📚"
   },
   {
     "id": "42",
@@ -2037,7 +1985,7 @@
         "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🦆"
   },
   {
     "id": "43",
@@ -2065,7 +2013,7 @@
         "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍗"
   },
   {
     "id": "44",
@@ -2093,7 +2041,7 @@
         "source_url": "https://www.instagram.com/p/DVaLpzSDz37"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍜"
   },
   {
     "id": "45",
@@ -2133,7 +2081,7 @@
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🥘"
   },
   {
     "id": "46",
@@ -2185,7 +2133,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍕"
   },
   {
     "id": "47",
@@ -2265,7 +2213,7 @@
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍹"
   },
   {
     "id": "49",
@@ -2293,7 +2241,7 @@
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "☕"
   },
   {
     "id": "50",
@@ -2321,7 +2269,7 @@
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍰"
   },
   {
     "id": "51",
@@ -2401,62 +2349,6 @@
         "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
       }
     ],
-    "emoji": "🏪"
-  },
-  {
-    "id": "53",
-    "name": "이스턴문",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "4",
-        "college_name": "약학대학",
-        "benefit": "12시-5시 이스턴문 태그 스토리 공유 시 음료 메뉴 500원 할인(1회) / 6시 이후 주류 4잔 스토리 공유 시 깜자칠 or 웨지 1회 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
-        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
-      }
-    ],
-    "emoji": "🏪"
-  },
-  {
-    "id": "54",
-    "name": "모모커피",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "4",
-        "college_name": "약학대학",
-        "benefit": "음료 5잔 이상 구매 시 아메리카노 S사이즈 1잔 증정 or 아이스크림 토핑 증정 (아메리카노 s사이즈 및 마카롱은 구매 시 제외, 조항 간 중복 적용 불가)",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
-        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
-      }
-    ],
     "emoji": "☕"
   },
   {
@@ -2525,7 +2417,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🍖"
+    "emoji": "🍚"
   },
   {
     "id": "57",
@@ -2593,7 +2485,7 @@
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ],
-    "emoji": "🌶️"
+    "emoji": "🍛"
   },
   {
     "id": "59",
@@ -2857,7 +2749,7 @@
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍣"
   },
   {
     "id": "68",
@@ -2885,7 +2777,7 @@
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍕"
   },
   {
     "id": "69",
@@ -2953,7 +2845,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍜"
   },
   {
     "id": "71",
@@ -3036,34 +2928,6 @@
     "emoji": "🥡"
   },
   {
-    "id": "73",
-    "name": "소담골 오리마을",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "음료수 서비스",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "partnerships": [
-      {
-        "college_id": "3",
-        "college_name": "공과대학",
-        "benefit": "2인 이상 방문 시 테이블 당 음료 1캔 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
-        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
-      }
-    ],
-    "emoji": "🏪"
-  },
-  {
     "id": "74",
     "name": "예산 닭갈비감자탕",
     "category": "food",
@@ -3101,7 +2965,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🥓"
   },
   {
     "id": "75",
@@ -3129,7 +2993,7 @@
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🍛"
   },
   {
     "id": "76",
@@ -3157,7 +3021,7 @@
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🌮"
   },
   {
     "id": "77",
@@ -3185,7 +3049,7 @@
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
     ],
-    "emoji": "🏪"
+    "emoji": "🥘"
   },
   {
     "id": "78",
@@ -3253,7 +3117,7 @@
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ],
-    "emoji": "🍖"
+    "emoji": "🍗"
   },
   {
     "id": "80",
@@ -3585,7 +3449,7 @@
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ],
-    "emoji": "☕"
+    "emoji": "🍹"
   },
   {
     "id": "91",
@@ -3721,7 +3585,7 @@
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ],
-    "emoji": "☕"
+    "emoji": "🍹"
   },
   {
     "id": "95",
@@ -3913,7 +3777,7 @@
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ],
-    "emoji": "☕"
+    "emoji": "🍹"
   },
   {
     "id": "101",
@@ -3981,7 +3845,7 @@
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ],
-    "emoji": "☕"
+    "emoji": "🍰"
   },
   {
     "id": "103",
@@ -4557,6 +4421,6 @@
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ],
-    "emoji": "☕"
+    "emoji": "🍹"
   }
 ]
