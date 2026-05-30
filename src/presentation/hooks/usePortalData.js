@@ -90,7 +90,7 @@ function triggerBackoffRetry() {
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────
-export function usePortalData() {
+export function usePortalData(isVisible = true) {
   // 초기값: 1순위 메모리 캐시 → 2순위 localStorage 캐시 → null
   const [data, setData] = useState(() => {
     const checkStale = (parsed) => {
@@ -161,6 +161,20 @@ export function usePortalData() {
       listeners = listeners.filter(fn => fn !== handler);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 🚨 [탭 재접속 조건부 정각 갱신 감지]
+  // 사용자가 portal 탭에 재진입했을 때(isVisible = true), 마지막 캐시 갱신 시간의 Hour와 현재 실제 Hour가 다르면 자동 갱신 트리거
+  useEffect(() => {
+    if (isVisible && memoryCache?.timestamp) {
+      const lastFetchedHour = new Date(memoryCache.timestamp).getHours();
+      const currentHour = new Date().getHours();
+
+      if (lastFetchedHour !== currentHour) {
+        console.log(`[Portal] 시간 변경 감지 (${lastFetchedHour}시 -> ${currentHour}시). 백그라운드 리로드 수행.`);
+        prefetchPortalData();
+      }
+    }
+  }, [isVisible]);
 
   return {
     weather: data?.weather || null,

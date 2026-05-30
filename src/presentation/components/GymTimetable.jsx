@@ -85,7 +85,7 @@ export function GymTimetable({ onBack }) {
   };
 
   return (
-    <div className="p-5 bg-surface min-h-screen font-['Pretendard',-apple-system,sans-serif]">
+    <div className="pb-20 font-['Pretendard',-apple-system,sans-serif] [animation:slideUp_0.4s_ease-out]">
       <header className="flex items-center gap-4 mb-6">
         <button
           className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
@@ -110,7 +110,7 @@ export function GymTimetable({ onBack }) {
             <div className="absolute left-0 right-0 z-[50] pointer-events-none transition-[top_0.3s_cubic-bezier(0.4,0,0.2,1)]" style={{ top: `${now.top}px` }}>
               <div className="h-[1.5px] bg-error w-full opacity-20" />
               <div
-                className="absolute top-0 -translate-x-1/2 -translate-y-1/2 bg-error text-white px-[6px] py-px rounded-full text-[0.55rem] font-black shadow-[0_4px_10px_rgba(239,68,68,0.3)] flex items-center gap-[3px] cal-now-marker"
+                className="absolute top-0 -translate-x-1/2 -translate-y-1/2 bg-error text-white px-[6px] py-px rounded-full text-[0.55rem] font-black shadow-[0_4px_10px_rgba(239,68,68,0.3)] flex items-center gap-[3px] whitespace-nowrap cal-now-marker"
                 style={{ left: `calc(12% + (88% / 5) * ${now.dayIndex} + (88% / 10))` }}
               >
                 <span>지금</span>

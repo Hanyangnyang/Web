@@ -75,7 +75,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 }
 
 export function PortalView({ isVisible = true }) {
-  const { weather, library, loading } = usePortalData();
+  const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
   const scrollContainerRef = useRef(null);
@@ -275,7 +275,7 @@ export function PortalView({ isVisible = true }) {
                 </div>
 
                 {weather.airQuality && (
-                  <div className="grid grid-cols-3 gap-3 mt-8 relative z-10">
+                  <div className="grid gap-2 mt-8 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
                     {[
                       { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
                       { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
@@ -285,7 +285,7 @@ export function PortalView({ isVisible = true }) {
                         <span className="text-[10px] text-text-sub font-black uppercase tracking-widest opacity-80">{item.label}</span>
                         <div className="flex items-center gap-1.5">
                           <item.icon size={14} color={item.data.color} strokeWidth={3} />
-                          <span className="text-[14px] font-black" style={{ color: item.data.color }}>{item.data.label}</span>
+                          <span className="text-[14px] font-black whitespace-nowrap" style={{ color: item.data.color }}>{item.data.label}</span>
                         </div>
                       </div>
                     ))}
@@ -375,15 +375,15 @@ export function PortalView({ isVisible = true }) {
             library.list.map((room) => {
               const emptySeats = Math.max(0, room.total - room.occupied);
               return (
-                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-5 flex flex-col gap-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-black text-[0.95rem] text-text-main truncate leading-tight min-w-0 flex-1">
+                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-3.5 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
                       {room.name.replace(' (2F)', '').replace(' (4F)', '')}
                     </span>
-                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-black flex-shrink-0 shadow-sm" style={{ 
+                    <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0" style={{
                       backgroundColor: `${room.color}15`,
                       color: room.color,
-                      border: `1px solid ${room.color}20`
+                      border: `1px solid ${room.color}25`
                     }}>
                       {room.emoji} {room.status}
                     </div>

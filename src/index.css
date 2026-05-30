@@ -4,7 +4,7 @@
   font-family: 'HakgyoansimDunggeunmiso';
   src: url('/fonts/HakgyoansimDunggeunmiso-B.otf') format('opentype');
   font-weight: bold;
-  font-display: swap;
+  font-display: block;
 }
 
 @tailwind base;
@@ -82,18 +82,18 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideInFromRight {
-  from { opacity: 0; transform: translateX(40px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideInFromLeft {
-  from { opacity: 0; transform: translateX(-40px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes popIn {
@@ -332,6 +332,39 @@ body {
 /* ═══ 링크 복사 토스트 (JS로 동적 생성) ═══ */
 .copy-toast { animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards; }
 
+/* ═══ 모달/시트 열릴 때 배경 스크롤 잠금 (레이아웃 점프 없이) ═══ */
+.scroll-locked {
+  overflow: hidden;
+}
+
+/* ═══ 3D 카드 플립 트랜지션 (셔틀/지하철 시간 토글용) ═══ */
+.perspective-container {
+  perspective: 1000px;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -345,4 +378,19 @@ body {
 @keyframes sttDropIn {
   from { opacity: 0; transform: translateY(-10px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulseHighlight {
+  0% {
+    background-color: rgba(14, 74, 132, 0.03);
+    box-shadow: 0 0 10px rgba(14, 74, 132, 0.05);
+  }
+  50% {
+    background-color: rgba(14, 74, 132, 0.09);
+    box-shadow: 0 0 20px rgba(14, 74, 132, 0.15);
+  }
+  100% {
+    background-color: rgba(14, 74, 132, 0.03);
+    box-shadow: 0 0 10px rgba(14, 74, 132, 0.05);
+  }
 }
