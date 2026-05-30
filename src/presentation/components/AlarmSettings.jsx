@@ -462,6 +462,16 @@ const settingsEqual = (a, b) =>
   a.notifyDay === b.notifyDay &&
   JSON.stringify(a.keywords) === JSON.stringify(b.keywords);
 
+async function getOrCreateSecureDeviceId() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user?.id) {
+    return session.user.id;
+  }
+  const { data, error } = await supabase.auth.signInAnonymously();
+  if (error) throw error;
+  return data.session.user.id;
+}
+
 export function AlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
   const [settings, setSettings] = useState(() => ({
@@ -578,7 +588,7 @@ export function AlarmSettings({ onClose }) {
   };
 
   const removeKeyword = (kw) =>
-    setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }));
+      setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }));
 
   // 닫힘 애니메이션 후 실제 onClose 호출
   const triggerClose = (msg) => {
@@ -592,10 +602,8 @@ export function AlarmSettings({ onClose }) {
   // 서버 설정과 동기화 (RPC 호출)
   useEffect(() => {
     async function syncWithServer() {
-      const deviceId = localStorage.getItem('device_id');
-      if (!deviceId) return;
-
       try {
+        const deviceId = await getOrCreateSecureDeviceId();
         const { data, error } = await supabase.rpc('get_alarm_subscription', {
           p_device_id: deviceId,
           p_topic: 'CAFETERIA_KEYWORD'
@@ -635,11 +643,7 @@ export function AlarmSettings({ onClose }) {
           try {
             const token = await requestNotificationPermission();
             if (token) {
-              let deviceId = localStorage.getItem('device_id');
-              if (!deviceId) {
-                deviceId = crypto.randomUUID();
-                localStorage.setItem('device_id', deviceId);
-              }
+              const deviceId = await getOrCreateSecureDeviceId();
 
               const params = {
                 mode: settings.mode,
@@ -663,17 +667,21 @@ export function AlarmSettings({ onClose }) {
           }
         })();
       } else if (!settings.jeyukAlert) {
-        const deviceId = localStorage.getItem('device_id');
-        if (deviceId) {
-          supabase.rpc('upsert_alarm_subscription', {
-            p_device_id: deviceId,
-            p_fcm_token: null,
-            p_topic: 'CAFETERIA_KEYWORD',
-            p_params: null,
-            p_is_active: false,
-            p_platform: getPlatform()
-          }).then();
-        }
+        (async () => {
+          try {
+            const deviceId = await getOrCreateSecureDeviceId();
+            await supabase.rpc('upsert_alarm_subscription', {
+              p_device_id: deviceId,
+              p_fcm_token: null,
+              p_topic: 'CAFETERIA_KEYWORD',
+              p_params: null,
+              p_is_active: false,
+              p_platform: getPlatform()
+            });
+          } catch (err) {
+            console.error('Failed to sync alarm status', err);
+          }
+        })();
       }
     }
     triggerClose(successMsg);

@@ -475,6 +475,16 @@ const settingsEqual = (a, b) =>
   a.notifyDay === b.notifyDay &&
   JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
 
+async function getOrCreateSecureDeviceId() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user?.id) {
+    return session.user.id;
+  }
+  const { data, error } = await supabase.auth.signInAnonymously();
+  if (error) throw error;
+  return data.session.user.id;
+}
+
 export function WeatherAlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
   const [settings, setSettings] = useState(() => ({ ...savedRef.current }));
@@ -560,9 +570,8 @@ export function WeatherAlarmSettings({ onClose }) {
 
   useEffect(() => {
     async function syncWithServer() {
-      const deviceId = localStorage.getItem('device_id');
-      if (!deviceId) return;
       try {
+        const deviceId = await getOrCreateSecureDeviceId();
         const { data, error } = await supabase.rpc('get_alarm_subscription', {
           p_device_id: deviceId,
           p_topic: 'WEATHER_ALERT'
@@ -668,7 +677,6 @@ export function WeatherAlarmSettings({ onClose }) {
             } else {
               joined = activeKeywords[0];
             }
-            const josaJoined = josa(joined, '이/가');
             successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
           } else {
             successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
@@ -679,11 +687,7 @@ export function WeatherAlarmSettings({ onClose }) {
           try {
             const token = await requestNotificationPermission();
             if (token) {
-              let deviceId = localStorage.getItem('device_id');
-              if (!deviceId) {
-                deviceId = crypto.randomUUID();
-                localStorage.setItem('device_id', deviceId);
-              }
+              const deviceId = await getOrCreateSecureDeviceId();
               await supabase.rpc('upsert_alarm_subscription', {
                 p_device_id: deviceId,
                 p_fcm_token: token,
@@ -702,17 +706,21 @@ export function WeatherAlarmSettings({ onClose }) {
           }
         })();
       } else {
-        const deviceId = localStorage.getItem('device_id');
-        if (deviceId) {
-          supabase.rpc('upsert_alarm_subscription', {
-            p_device_id: deviceId,
-            p_fcm_token: null,
-            p_topic: 'WEATHER_ALERT',
-            p_params: null,
-            p_is_active: false,
-            p_platform: getPlatform(),
-          }).then();
-        }
+        (async () => {
+          try {
+            const deviceId = await getOrCreateSecureDeviceId();
+            await supabase.rpc('upsert_alarm_subscription', {
+              p_device_id: deviceId,
+              p_fcm_token: null,
+              p_topic: 'WEATHER_ALERT',
+              p_params: null,
+              p_is_active: false,
+              p_platform: getPlatform(),
+            });
+          } catch (err) {
+            console.error('Failed to sync weather alarm status', err);
+          }
+        })();
       }
     }
     triggerClose(successMsg);

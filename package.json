@@ -19,6 +19,7 @@
     "@capacitor/push-notifications": "^8.1.1",
     "@capacitor/share": "^8.0.1",
     "@supabase/supabase-js": "^2.105.4",
+    "capacitor-secure-storage-plugin": "^0.13.0",
     "cheerio": "^1.2.0",
     "firebase": "^12.13.0",
     "firebase-admin": "^13.9.0",
