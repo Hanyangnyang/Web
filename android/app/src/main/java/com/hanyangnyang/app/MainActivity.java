@@ -95,7 +95,7 @@ public class MainActivity extends BridgeActivity {
 
     // iOS applicationDidBecomeActive에 대응: onPageFinished가 누락된 경우 보장
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!deepLinkInjectionStarted && pendingDeepLinkParams != null) {
             deepLinkInjectionStarted = true;
