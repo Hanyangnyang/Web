@@ -309,7 +309,9 @@ Deno.serve(async (req) => {
         try {
           const menuRes = await fetch(`${protocol}://${host}/api/menu`);
           const menuData = await menuRes.json();
-          if (menuData.success) processGroup(todaySubs, menuData);
+          if (menuData.success) {
+            processGroup(todaySubs, menuData);
+          }
         } catch (e) {
           console.error("Today's menu fetch failed:", e);
         }
@@ -320,7 +322,9 @@ Deno.serve(async (req) => {
         try {
           const menuRes = await fetch(`${protocol}://${host}/api/menu?date=${kst.tomorrowISODateStr}`);
           const menuData = await menuRes.json();
-          if (menuData.success) processGroup(tomorrowSubs, menuData);
+          if (menuData.success) {
+            processGroup(tomorrowSubs, menuData);
+          }
         } catch (e) {
           console.error("Tomorrow's menu fetch failed:", e);
         }
@@ -417,6 +421,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    console.info(`[FCM] 총 ${messages.length}개의 알림 메시지를 발송 시도합니다.`);
+
     const BATCH_SIZE = 500;
     let successCount = 0;
     let failureCount = 0;
@@ -428,10 +434,22 @@ Deno.serve(async (req) => {
     }
 
     const responses = await Promise.all(batchPromises);
-    responses.forEach(response => {
+    responses.forEach((response, batchIdx) => {
       successCount += response.successCount;
       failureCount += response.failureCount;
+
+      // 발송에 실패한 메시지가 있을 경우 상세 로그 기록
+      if (response.failureCount > 0) {
+        console.warn(`[FCM Batch #${batchIdx + 1}] 발송 중 ${response.failureCount}건의 실패가 감지되었습니다.`);
+        response.responses.forEach((res, resIdx) => {
+          if (!res.success) {
+            console.error(`[FCM Error] index: ${resIdx}, error:`, res.error);
+          }
+        });
+      }
     });
+
+    console.info(`[FCM Finished] 성공: ${successCount}건, 실패: ${failureCount}건`);
 
     return new Response(
       JSON.stringify({
@@ -445,7 +463,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Cron job error:', error);
+    console.error('🚨 [Fatal Error] Cron job execution failed:', error);
     return new Response(JSON.stringify({ success: false, error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }

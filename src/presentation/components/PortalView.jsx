@@ -74,7 +74,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 }
 
 export function PortalView({ isVisible = true }) {
-  const { weather, library, loading } = usePortalData();
+  const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
   const scrollContainerRef = useRef(null);
