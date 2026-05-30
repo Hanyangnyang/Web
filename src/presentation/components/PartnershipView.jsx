@@ -263,7 +263,7 @@ export function PartnershipView() {
         <h2 className="text-2xl font-extrabold text-text-main mb-3">제휴 혜택</h2>
 
         {/* 검색 바 */}
-        <div className="relative mb-2">
+        <div className="relative mb-3">
           <div className="flex items-center gap-2.5 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
             <Search size={16} className="text-text-hint flex-shrink-0" />
             <input
@@ -283,8 +283,7 @@ export function PartnershipView() {
         </div>
 
         {/* 단과대 칩 */}
-        <div className="mb-2">
-          <span className="text-[11px] font-bold text-text-hint mb-1.5 block">단과대</span>
+        <div className="mb-1">
           <div className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
             {COLLEGES.filter(c => c.id !== '11').map(c => (
               <button
@@ -303,8 +302,7 @@ export function PartnershipView() {
         </div>
 
         {/* 카테고리 칩 */}
-        <div className="mb-2">
-          <span className="text-[11px] font-bold text-text-hint mb-1.5 block">카테고리</span>
+        <div className="mb-1">
           <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {CATEGORIES.map(cat => (
               <button
