@@ -240,7 +240,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
           <span className={`inline-flex justify-center items-center w-[58px] min-h-[34px] text-[10px] font-extrabold py-1 rounded flex-shrink-0 transition-all duration-200 whitespace-pre-line leading-[1.1] text-center ${ROUTE_STYLE[routeKey]}`}>
             {rLabel}
           </span>
-          <div className={`perspective-container ${hideSubwayCol ? '' : 'flex-1'}`} style={{ height: 50, ...(hideSubwayCol && { width: 120 }) }}>
+          <div className={`perspective-container ${hideSubwayCol ? '' : 'flex-1'}`} style={{ height: 50, ...(hideSubwayCol && { width: 70 }) }}>
             <div className={`flip-card-inner ${(!isFullMode && showRowRelative) ? 'flipped' : ''}`}>
               {/* Front side (Absolute time) */}
               <div className="flip-card-front flex flex-col justify-center">
@@ -267,7 +267,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                   <span style={{ fontSize: 12, color: 'var(--color-text-hint)', fontWeight: 600 }} className="whitespace-nowrap">
-                    {row.arrLabel} {getShuttleArrivalRelativeTime()}
+                    {row.arrLabel} {row.arr}
                   </span>
                 </div>
               </div>
