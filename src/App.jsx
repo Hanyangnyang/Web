@@ -60,6 +60,14 @@ function MainLayout() {
     prefetchPortalData();
   }, []);
 
+  // 카페 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거
+  // 카페 로더가 화면을 덮고 있으므로 사용자에게는 보이지 않고, 로더 페이드아웃 시 하냥냥 마스코트가 잠깐 비치는 현상 방지
+  useEffect(() => {
+    if (showCafeDeepLinkLoader && !splashDone) {
+      completeSplash();
+    }
+  }, [showCafeDeepLinkLoader, splashDone, completeSplash]);
+
   // 탭 라우팅 공통 함수 - Kakao 딥링크 / 푸시 알림 양쪽에서 재사용
   const routeFromParams = useCallback((paramString) => {
     const params = new URLSearchParams(paramString);
