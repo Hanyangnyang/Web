@@ -84,8 +84,10 @@ function MainLayout() {
   // Android Kakao 딥링크 처리 (MainActivity.java가 evaluateJavascript로 주입)
   // window.__pendingDeepLinkParams: 초기 실행 시 React 마운트 전에 도착한 파라미터
   // hanyang-deeplink 이벤트: 앱이 이미 실행 중일 때 onNewIntent로 수신
+  // window.__reactReady: Android injectOrDefer 폴링이 리스너 등록 완료를 확인하는 신호
   useEffect(() => {
     if (!isApp) return;
+    window.__reactReady = true;
     const pending = window.__pendingDeepLinkParams;
     if (pending) {
       window.__pendingDeepLinkParams = null;
