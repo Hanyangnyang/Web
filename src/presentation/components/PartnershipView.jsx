@@ -289,7 +289,7 @@ export function PartnershipView() {
               <button
                 key={c.id}
                 onClick={() => handleCollegeChange(c.id)}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
+                className={`flex items-center gap-1 px-3 py-[7px] rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                   college === c.id
                     ? 'bg-[#0E4A84] text-white border-[#0E4A84]'
                     : 'bg-white text-[#334155] border-[#cbd5e1]'
@@ -308,7 +308,7 @@ export function PartnershipView() {
               <button
                 key={cat.key}
                 onClick={() => handleCategoryChange(cat.key)}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
+                className={`flex items-center gap-1 px-3 py-[7px] rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                   category === cat.key
                     ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]'
                     : 'bg-white text-[#334155] border-[#cbd5e1]'
