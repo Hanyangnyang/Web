@@ -21,18 +21,7 @@ export const hybridSecureStorage = {
   },
   setItem: async (key, value) => {
     if (isNativeApp()) {
-      try {
-        await SecureStoragePlugin.set({ key, value });
-        // 심층 방어: 만약 플러그인이 정상 작동하더라도 백업 조회를 위해 localStorage에도 동기화해 둡니다.
-        localStorage.setItem(key, value);
-      } catch (e) {
-        console.error('SecureStorage setItem failed, writing to localStorage:', e);
-        try {
-          localStorage.setItem(key, value);
-        } catch (localErr) {
-          console.error('localStorage setItem fallback failed:', localErr);
-        }
-      }
+      await SecureStoragePlugin.set({ key, value });
     } else {
       localStorage.setItem(key, value);
     }
@@ -41,15 +30,11 @@ export const hybridSecureStorage = {
     if (isNativeApp()) {
       try {
         await SecureStoragePlugin.remove({ key });
-        localStorage.removeItem(key);
       } catch (e) {
-        console.error('SecureStorage removeItem failed, removing from localStorage:', e);
-        try {
-          localStorage.removeItem(key);
-        } catch (localErr) {
-          console.error('localStorage removeItem fallback failed:', localErr);
-        }
+        console.warn('SecureStorage removeItem failed:', e);
       }
+      // 이전 버전에서 localStorage에 저장된 잔여 데이터도 함께 제거
+      try { localStorage.removeItem(key); } catch (_) {}
     } else {
       localStorage.removeItem(key);
     }
