@@ -121,17 +121,9 @@ function BannerCarousel() {
             />
           ))}
         </div>
-      </div>
-      <div className="flex justify-center gap-1.5 mt-2">
-        {BANNERS.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={`rounded-full transition-all duration-200 ${
-              i === current ? 'w-4 h-2 bg-gray-500' : 'w-2 h-2 bg-gray-300'
-            }`}
-          />
-        ))}
+        <div className="absolute top-2.5 right-3 bg-black/40 text-white text-xs font-semibold px-2 py-0.5 rounded-full pointer-events-none">
+          {current + 1}/{BANNERS.length}
+        </div>
       </div>
     </div>
   );
