@@ -26,7 +26,9 @@ const BANNERS = [
   {
     src: '/monster_banner_for_follow_home.png',
     alt: 'Monster Energy Follow',
-    onClick: null,
+    onClick: () => {
+      window.open('https://www.instagram.com/mek_c.a.t?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', '_blank');
+    },
   },
 ];
 
@@ -34,8 +36,24 @@ function BannerCarousel() {
   const [current, setCurrent] = useState(0);
   const startXRef = useRef(null);
   const isDraggingRef = useRef(false);
+  const timerRef = useRef(null);
 
-  const goTo = (index) => setCurrent(index);
+  const resetTimer = () => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % BANNERS.length);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    resetTimer();
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const goTo = (index) => {
+    setCurrent(index);
+    resetTimer();
+  };
 
   const handleTouchStart = (e) => {
     startXRef.current = e.touches[0].clientX;
@@ -46,8 +64,11 @@ function BannerCarousel() {
     if (startXRef.current === null) return;
     const delta = e.changedTouches[0].clientX - startXRef.current;
     if (Math.abs(delta) > 40) {
-      if (delta < 0 && current < BANNERS.length - 1) setCurrent(current + 1);
-      if (delta > 0 && current > 0) setCurrent(current - 1);
+      setCurrent((prev) => {
+        if (delta < 0) return (prev + 1) % BANNERS.length;
+        return (prev - 1 + BANNERS.length) % BANNERS.length;
+      });
+      resetTimer();
     }
     startXRef.current = null;
   };
@@ -62,8 +83,11 @@ function BannerCarousel() {
     const delta = e.clientX - startXRef.current;
     if (Math.abs(delta) > 40) {
       isDraggingRef.current = true;
-      if (delta < 0 && current < BANNERS.length - 1) setCurrent(current + 1);
-      if (delta > 0 && current > 0) setCurrent(current - 1);
+      setCurrent((prev) => {
+        if (delta < 0) return (prev + 1) % BANNERS.length;
+        return (prev - 1 + BANNERS.length) % BANNERS.length;
+      });
+      resetTimer();
     }
     startXRef.current = null;
   };
