@@ -8,6 +8,111 @@ import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
+const BANNERS = [
+  {
+    src: '/monster_banner_home.png',
+    alt: 'Monster Energy',
+    onClick: () => {
+      const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
+      const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
+      const ua = navigator.userAgent;
+      if (/iPhone|iPad|iPod/i.test(ua)) {
+        window.open(APP_STORE_URL, '_blank');
+      } else {
+        window.open(PLAY_STORE_URL, '_blank');
+      }
+    },
+  },
+  {
+    src: '/monster_banner_for_follow_home.png',
+    alt: 'Monster Energy Follow',
+    onClick: null,
+  },
+];
+
+function BannerCarousel() {
+  const [current, setCurrent] = useState(0);
+  const startXRef = useRef(null);
+  const isDraggingRef = useRef(false);
+
+  const goTo = (index) => setCurrent(index);
+
+  const handleTouchStart = (e) => {
+    startXRef.current = e.touches[0].clientX;
+    isDraggingRef.current = false;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (startXRef.current === null) return;
+    const delta = e.changedTouches[0].clientX - startXRef.current;
+    if (Math.abs(delta) > 40) {
+      if (delta < 0 && current < BANNERS.length - 1) setCurrent(current + 1);
+      if (delta > 0 && current > 0) setCurrent(current - 1);
+    }
+    startXRef.current = null;
+  };
+
+  const handleMouseDown = (e) => {
+    startXRef.current = e.clientX;
+    isDraggingRef.current = false;
+  };
+
+  const handleMouseUp = (e) => {
+    if (startXRef.current === null) return;
+    const delta = e.clientX - startXRef.current;
+    if (Math.abs(delta) > 40) {
+      isDraggingRef.current = true;
+      if (delta < 0 && current < BANNERS.length - 1) setCurrent(current + 1);
+      if (delta > 0 && current > 0) setCurrent(current - 1);
+    }
+    startXRef.current = null;
+  };
+
+  const handleClick = (banner) => {
+    if (isDraggingRef.current) return;
+    banner.onClick?.();
+  };
+
+  return (
+    <div className="mb-6 mt-2">
+      <div
+        className="relative overflow-hidden rounded-xl"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      >
+        <div
+          className="flex transition-transform duration-300 ease-in-out"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {BANNERS.map((banner, i) => (
+            <img
+              key={i}
+              src={banner.src}
+              alt={banner.alt}
+              className={`w-full h-auto flex-shrink-0 ${banner.onClick ? 'cursor-pointer' : ''}`}
+              draggable={false}
+              onClick={() => handleClick(banner)}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="flex justify-center gap-1.5 mt-2">
+        {BANNERS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`rounded-full transition-all duration-200 ${
+              i === current ? 'w-4 h-2 bg-gray-500' : 'w-2 h-2 bg-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
   const [displayed, setDisplayed] = useState(() => {
@@ -332,30 +437,8 @@ export function PortalView({ isVisible = true }) {
           </section>
         )}
 
-      {/* Monster Energy 배너 */}
-      <div className="mb-6 mt-2">
-        <img
-          src="/monster_banner_home.png"
-          className="w-full h-auto rounded-xl cursor-pointer"
-          alt="Monster Energy"
-          onClick={() => {
-            const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
-            // TODO: 구글 플레이 스토어 출시 후 실제 링크로 교체
-            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
-
-            const ua = navigator.userAgent;
-            const isIOS = /iPhone|iPad|iPod/i.test(ua);
-            const isAndroid = /Android/i.test(ua);
-
-            if (isIOS) {
-              window.open(APP_STORE_URL, '_blank');
-            } else {
-              // Android 또는 데스크톱 → Play Store
-              window.open(PLAY_STORE_URL, '_blank');
-            }
-          }}
-        />
-      </div>
+      {/* 배너 캐러셀 */}
+      <BannerCarousel />
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
