@@ -16,6 +16,7 @@ import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
 import './lib/androidBackHandler.js';
+import { EventAlarmPrompt } from './presentation/components/EventAlarmPrompt.jsx';
 
 const TAB_ORDER = ['cafe', 'shuttle', 'portal', 'partner', 'misc'];
 
@@ -205,6 +206,7 @@ function MainLayout() {
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
+      <EventAlarmPrompt />
     </>
   );
 }
