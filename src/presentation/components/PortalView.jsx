@@ -121,7 +121,7 @@ function BannerCarousel() {
             />
           ))}
         </div>
-        <div className="absolute top-2.5 right-3 bg-black/40 text-white text-xs font-semibold px-2 py-0.5 rounded-full pointer-events-none">
+        <div className="absolute bottom-2.5 right-3 text-xs font-semibold px-2 py-0.5 rounded-full pointer-events-none" style={{ backgroundColor: 'rgba(223, 255, 115, 0.6)', color: '#333' }}>
           {current + 1}/{BANNERS.length}
         </div>
       </div>
