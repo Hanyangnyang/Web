@@ -133,26 +133,26 @@ export function EventAlarmPrompt() {
         </div>
 
         <div className="text-center py-2">
-          <span className="text-[26px]">🔔</span>
+          <span className="text-[26px]">📢</span>
           <h3 className="text-[17px] font-extrabold text-text-main mt-2.5 leading-snug">
-            이벤트 및 소식 알림 받기
+            이벤트 알림 받기
           </h3>
           <p className="text-[12px] text-text-sub mt-2 leading-relaxed">
-            내일부터 시작되는 앱 홍보 이벤트 혜택 소식과<br />
-            실시간 중요 공지사항을 받아보시겠어요?
+            하냥냥은 많은 이벤트를 준비하고 있어요<br />
+            제일 먼저 소식을 알려드릴게요
           </p>
         </div>
 
         <div className="flex gap-2.5 mt-5">
           <button
             onClick={handleDismiss}
-            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-text-sub rounded-button text-[13px] font-extrabold transition-all"
+            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-text-sub rounded-xl text-[13px] font-extrabold transition-all"
           >
             다음에 하기
           </button>
           <button
             onClick={handleAccept}
-            className="flex-1 py-3 bg-primary text-white rounded-button text-[13px] font-extrabold transition-all shadow-[0_2px_8px_rgba(14,74,132,0.18)]"
+            className="flex-1 py-3 bg-primary text-white rounded-xl text-[13px] font-extrabold transition-all shadow-[0_2px_8px_rgba(14,74,132,0.18)]"
           >
             알림 받기
           </button>
