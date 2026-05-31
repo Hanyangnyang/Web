@@ -1,4 +1,5 @@
 import { PushNotifications } from '@capacitor/push-notifications';
+import { App } from '@capacitor/app';
 import { isNativeApp } from './platform';
 
 const PROMPT_LIMIT_KEY = 'hide_event_alarm_until';
@@ -52,3 +53,27 @@ export const checkShouldShowAlarmPrompt = async () => {
     return false;
   }
 };
+
+/**
+ * PWA standalone 모드 실행 여부를 감지합니다.
+ */
+export const isPwaStandalone = () => {
+  if (typeof window === 'undefined') return false;
+  const isIosPwa = window.navigator.standalone === true;
+  const isAndroidPwa = window.matchMedia('(display-mode: standalone)').matches;
+  return isIosPwa || isAndroidPwa;
+};
+
+/**
+ * 네이티브 앱의 설정 화면을 직접 엽니다.
+ */
+export const openSystemSettings = async () => {
+  if (isNativeApp()) {
+    try {
+      await App.openAppSettings();
+    } catch (err) {
+      console.error('Failed to open app settings:', err);
+    }
+  }
+};
+

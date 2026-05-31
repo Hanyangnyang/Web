@@ -2,6 +2,7 @@ import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 're
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 import { getPlatform } from '../../lib/platform';
+import { PermissionDeniedGuide } from './PermissionDeniedGuide';
 
 // 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
 const josa = (word, type) => {
@@ -489,6 +490,7 @@ export function WeatherAlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
   const [settings, setSettings] = useState(() => ({ ...savedRef.current }));
   const [closing, setClosing] = useState(false);
+  const [showDeniedGuide, setShowDeniedGuide] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
@@ -627,7 +629,7 @@ export function WeatherAlarmSettings({ onClose }) {
     if (!settings.weatherAlert) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
-        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        setShowDeniedGuide(true);
         return false;
       }
       setSettings(prev => ({ ...prev, weatherAlert: true }));
@@ -641,7 +643,7 @@ export function WeatherAlarmSettings({ onClose }) {
     if (turningOn) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
-        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        setShowDeniedGuide(true);
         setSettings(p => ({ ...p, weatherAlert: false }));
       }
     }
@@ -928,6 +930,7 @@ export function WeatherAlarmSettings({ onClose }) {
 
         </div>
       </div>
+      {showDeniedGuide && <PermissionDeniedGuide onClose={() => setShowDeniedGuide(false)} />}
     </div>
   );
 }

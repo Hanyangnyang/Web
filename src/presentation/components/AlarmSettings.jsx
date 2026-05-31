@@ -3,6 +3,7 @@ import { X, Plus } from 'lucide-react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 import { getPlatform } from '../../lib/platform';
+import { PermissionDeniedGuide } from './PermissionDeniedGuide';
 
 const ITEM_H = 36;
 const VISIBLE = 3;
@@ -480,6 +481,7 @@ export function AlarmSettings({ onClose }) {
   }));
   const [keywordInput, setKeywordInput] = useState('');
   const [closing, setClosing] = useState(false);
+  const [showDeniedGuide, setShowDeniedGuide] = useState(false);
   const [dragY, setDragY] = useState(0); // 드래그 거리
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
@@ -552,7 +554,7 @@ export function AlarmSettings({ onClose }) {
     if (!settings.jeyukAlert) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
-        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        setShowDeniedGuide(true);
         return false;
       }
       setSettings(prev => ({ ...prev, jeyukAlert: true }));
@@ -566,7 +568,7 @@ export function AlarmSettings({ onClose }) {
     if (turningOn) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
-        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        setShowDeniedGuide(true);
         setSettings(p => ({ ...p, jeyukAlert: false }));
       }
     }
@@ -884,6 +886,7 @@ export function AlarmSettings({ onClose }) {
           })()}
         </div>
       </div>
+      {showDeniedGuide && <PermissionDeniedGuide onClose={() => setShowDeniedGuide(false)} />}
     </div>
   );
 }
