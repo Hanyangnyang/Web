@@ -34,9 +34,13 @@ const BANNERS = [
 
 function BannerCarousel() {
   const [current, setCurrent] = useState(0);
-  const startXRef = useRef(null);
-  const isDraggingRef = useRef(false);
+  const containerRef = useRef(null);
   const timerRef = useRef(null);
+  const touchStartXRef = useRef(null);
+  const touchStartYRef = useRef(null);
+  const axisLockedRef = useRef(null); // 'h' | 'v' | null
+  const isSwiping = useRef(false);
+  const mouseStartXRef = useRef(null);
 
   const resetTimer = () => {
     clearInterval(timerRef.current);
@@ -45,9 +49,56 @@ function BannerCarousel() {
     }, 5000);
   };
 
+  // 타이머 초기화
   useEffect(() => {
     resetTimer();
     return () => clearInterval(timerRef.current);
+  }, []);
+
+  // 터치 스와이프: 네이티브 리스너로 등록해야 passive:false 가 적용됨
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e) => {
+      touchStartXRef.current = e.touches[0].clientX;
+      touchStartYRef.current = e.touches[0].clientY;
+      axisLockedRef.current = null;
+      isSwiping.current = false;
+    };
+
+    const onTouchMove = (e) => {
+      if (touchStartXRef.current === null) return;
+      const dx = Math.abs(e.touches[0].clientX - touchStartXRef.current);
+      const dy = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+      if (!axisLockedRef.current) {
+        axisLockedRef.current = dx > dy ? 'h' : 'v';
+      }
+      if (axisLockedRef.current === 'h') {
+        e.preventDefault(); // 수평 스와이프일 때 페이지 스크롤 차단
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (touchStartXRef.current === null) return;
+      const delta = e.changedTouches[0].clientX - touchStartXRef.current;
+      if (axisLockedRef.current === 'h' && Math.abs(delta) > 40) {
+        isSwiping.current = true;
+        setCurrent((prev) => (delta < 0 ? (prev + 1) % BANNERS.length : (prev - 1 + BANNERS.length) % BANNERS.length));
+        resetTimer();
+        setTimeout(() => { isSwiping.current = false; }, 0);
+      }
+      touchStartXRef.current = null;
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
   }, []);
 
   const goTo = (index) => {
@@ -55,54 +106,29 @@ function BannerCarousel() {
     resetTimer();
   };
 
-  const handleTouchStart = (e) => {
-    startXRef.current = e.touches[0].clientX;
-    isDraggingRef.current = false;
-  };
-
-  const handleTouchEnd = (e) => {
-    if (startXRef.current === null) return;
-    const delta = e.changedTouches[0].clientX - startXRef.current;
-    if (Math.abs(delta) > 40) {
-      setCurrent((prev) => {
-        if (delta < 0) return (prev + 1) % BANNERS.length;
-        return (prev - 1 + BANNERS.length) % BANNERS.length;
-      });
-      resetTimer();
-    }
-    startXRef.current = null;
-  };
-
-  const handleMouseDown = (e) => {
-    startXRef.current = e.clientX;
-    isDraggingRef.current = false;
-  };
-
+  const handleMouseDown = (e) => { mouseStartXRef.current = e.clientX; };
   const handleMouseUp = (e) => {
-    if (startXRef.current === null) return;
-    const delta = e.clientX - startXRef.current;
+    if (mouseStartXRef.current === null) return;
+    const delta = e.clientX - mouseStartXRef.current;
     if (Math.abs(delta) > 40) {
-      isDraggingRef.current = true;
-      setCurrent((prev) => {
-        if (delta < 0) return (prev + 1) % BANNERS.length;
-        return (prev - 1 + BANNERS.length) % BANNERS.length;
-      });
+      isSwiping.current = true;
+      setCurrent((prev) => (delta < 0 ? (prev + 1) % BANNERS.length : (prev - 1 + BANNERS.length) % BANNERS.length));
       resetTimer();
+      setTimeout(() => { isSwiping.current = false; }, 0);
     }
-    startXRef.current = null;
+    mouseStartXRef.current = null;
   };
 
   const handleClick = (banner) => {
-    if (isDraggingRef.current) return;
+    if (isSwiping.current) return;
     banner.onClick?.();
   };
 
   return (
     <div className="mb-6 mt-2">
       <div
+        ref={containerRef}
         className="relative overflow-hidden rounded-xl"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
       >
