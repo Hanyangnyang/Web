@@ -36,11 +36,5 @@ export const createInstagramRepository = ({ instagramApiDataSource }) => ({
     }
   },
 
-  getProxiedImageUrl: (originalUrl) => {
-    if (!originalUrl) return originalUrl;
-    // 로컬 에셋은 프록시가 필요 없음
-    if (originalUrl.startsWith('/assets/')) return originalUrl;
-    if (originalUrl.includes('ui-avatars.com') || originalUrl.includes('hanyang_insta_fallback.png')) return originalUrl;
-    return `/api/insta-proxy?url=${encodeURIComponent(originalUrl)}`;
-  },
+  getProxiedImageUrl: (originalUrl) => originalUrl,
 });

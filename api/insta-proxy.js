@@ -75,40 +75,15 @@ const fetchWithRetry = (username, retries = 3) => {
 };
 
 export default async function handler(req, res) {
-  const { username, url } = req.query;
+  const { username } = req.query;
 
-  // Image Proxy Mode
-  if (url) {
-    if (!url.includes('cdninstagram.com')) return res.status(403).send('Invalid URL');
-    
-    // Set long cache for images that are successfully proxied
-    res.setHeader('Cache-Control', `public, max-age=${S_MAXAGE}, s-maxage=${S_MAXAGE}, stale-while-revalidate=86400`);
-    
-    return new Promise((resolve) => {
-      const imgReq = https.get(url, (imgRes) => {
-        if (imgRes.statusCode === 200) {
-          res.setHeader('Content-Type', imgRes.headers['content-type'] || 'image/jpeg');
-          imgRes.pipe(res);
-        } else {
-          // If Instagram CDN fails (likely expired), redirect to local fallback
-          res.writeHead(302, { 'Location': '/hanyang_insta_fallback.png', 'Cache-Control': 'no-cache' });
-          res.end();
-        }
-        imgRes.on('end', resolve);
-      });
-      
-      imgReq.on('error', () => {
-        res.writeHead(302, { 'Location': '/hanyang_insta_fallback.png', 'Cache-Control': 'no-cache' });
-        res.end();
-        resolve();
-      });
-    });
-  }
-
-  // Data Proxy Mode
   if (!username) return res.status(400).send('Username required');
 
-  const cachePath = path.join(CACHE_DIR, `${username}.json`);
+  // Prevent path traversal: only allow alphanumeric, underscores, hyphens, and dots
+  const safeUsername = String(username).replace(/[^a-zA-Z0-9_.\-]/g, '');
+  if (!safeUsername || safeUsername !== username) return res.status(400).send('Invalid username');
+
+  const cachePath = path.join(CACHE_DIR, `${safeUsername}.json`);
 
   // 1. Try local cache
   try {
@@ -124,8 +99,8 @@ export default async function handler(req, res) {
 
   try {
     // 2. Fetch with retry
-    const result = await fetchWithRetry(username);
-    
+    const result = await fetchWithRetry(safeUsername);
+
     // 3. If successful, set long cache and save
     res.setHeader('Cache-Control', `s-maxage=${S_MAXAGE}, stale-while-revalidate=86400`);
     try {
@@ -134,13 +109,13 @@ export default async function handler(req, res) {
 
     res.status(200).json(result);
   } catch (error) {
-    console.error(`Insta Proxy Final Error for ${username}:`, error.message);
-    
+    console.error(`Insta Proxy Final Error for ${safeUsername}:`, error.message);
+
     // 4. IMPORTANT: On failure, return the local fallback image info
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.status(200).json({
-      username,
-      fullName: username,
+      username: safeUsername,
+      fullName: safeUsername,
       profilePicUrl: '/hanyang_insta_fallback.png',
       error: true,
       success: false
