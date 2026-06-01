@@ -230,13 +230,15 @@ export function PartnershipView() {
     }
 
     if (query.trim()) {
-      const q = query.trim().toLowerCase();
+      // 띄어쓰기 무관 검색 (공백 제거 후 비교):
+      // 현재 제휴 업체 데이터셋 규모가 작아(수백 개 수준) 실시간 공백 제거 정규식 연산의 성능 오버헤드가 무시할 수 있을 정도로 작아 채택함.
+      const q = query.trim().replace(/\s+/g, '').toLowerCase();
       list = list.filter(s =>
-        s.name.toLowerCase().includes(q) ||
-        s.summary_benefit?.toLowerCase().includes(q) ||
+        s.name.replace(/\s+/g, '').toLowerCase().includes(q) ||
+        s.summary_benefit?.replace(/\s+/g, '').toLowerCase().includes(q) ||
         s.partnerships.some(p =>
-          p.college_name?.toLowerCase().includes(q) ||
-          p.benefit?.toLowerCase().includes(q)
+          p.college_name?.replace(/\s+/g, '').toLowerCase().includes(q) ||
+          p.benefit?.replace(/\s+/g, '').toLowerCase().includes(q)
         )
       );
     }
