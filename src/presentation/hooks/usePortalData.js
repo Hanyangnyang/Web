@@ -12,7 +12,7 @@ const MAX_RETRIES = 5;    // 최대 재시도 횟수 제한
 const BASE_RETRY_DELAY = 3000; // 기본 백오프 딜레이 3초
 
 const CACHE_KEY = 'hyu_portal_cache_v3';
-const CACHE_TTL = 10800000; // 3시간 (서버 s-maxage 와 동일)
+const CACHE_TTL = 900000; // 15분 (실시간성 강화를 위해 기존 3시간에서 단축)
 
 function notifyListeners(data) {
   listeners.forEach(fn => fn(data));

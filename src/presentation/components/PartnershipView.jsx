@@ -37,7 +37,7 @@ const COLLEGE_EMOJI = {
   '4': '💊',   // 약학대학
   '5': '🎨',   // 디자인대학
   '6': '🌍',   // 글로벌문화통상대학
-  '7': '💰',   // 경상대학
+  '7': '📊',   // 경상대학
   '8': '💻',   // 소프트웨어융합대학
   '9': '🎵',   // 예체능대학
   '10': '🚀',  // 첨단융합대학
@@ -52,7 +52,7 @@ const COLLEGE_STYLE = {
   '4': 'bg-[rgba(254,226,226,0.5)] text-[#1f2937]',    // 약학대학 - 빨강 (💊)
   '5': 'bg-[rgba(233,213,255,0.5)] text-[#1f2937]',    // 디자인대학 - 보라 (🎨)
   '6': 'bg-[rgba(187,247,208,0.5)] text-[#1f2937]',    // 글로벌 - 초록 (🌍)
-  '7': 'bg-[rgba(254,240,138,0.5)] text-[#1f2937]',    // 경상대학 - 노랑 (💰)
+  '7': 'bg-[rgba(254,240,138,0.5)] text-[#1f2937]',    // 경상대학 - 노랑 (📊)
   '8': 'bg-[rgba(191,219,254,0.5)] text-[#1f2937]',    // 소프트웨어 - 파랑 (💻)
   '9': 'bg-[rgba(251,207,232,0.5)] text-[#1f2937]',    // 예체능대학 - 분홍 (🎵)
   '10': 'bg-[rgba(254,215,170,0.5)] text-[#1f2937]',   // 첨단융합 - 주황 (🚀)
@@ -230,13 +230,15 @@ export function PartnershipView() {
     }
 
     if (query.trim()) {
-      const q = query.trim().toLowerCase();
+      // 띄어쓰기 무관 검색 (공백 제거 후 비교):
+      // 현재 제휴 업체 데이터셋 규모가 작아(수백 개 수준) 실시간 공백 제거 정규식 연산의 성능 오버헤드가 무시할 수 있을 정도로 작아 채택함.
+      const q = query.trim().replace(/\s+/g, '').toLowerCase();
       list = list.filter(s =>
-        s.name.toLowerCase().includes(q) ||
-        s.summary_benefit?.toLowerCase().includes(q) ||
+        s.name.replace(/\s+/g, '').toLowerCase().includes(q) ||
+        s.summary_benefit?.replace(/\s+/g, '').toLowerCase().includes(q) ||
         s.partnerships.some(p =>
-          p.college_name?.toLowerCase().includes(q) ||
-          p.benefit?.toLowerCase().includes(q)
+          p.college_name?.replace(/\s+/g, '').toLowerCase().includes(q) ||
+          p.benefit?.replace(/\s+/g, '').toLowerCase().includes(q)
         )
       );
     }
