@@ -1,5 +1,59 @@
 // Vercel Serverless Function: Portal Data (Weather + Library)
 // Hobby 플랜의 12개 함수 제한을 피하기 위해 기능을 통합했습니다.
+import fs from 'fs';
+import path from 'path';
+
+const HOLIDAYS_2026 = [
+  '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01', '2026-03-02',
+  '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-06', '2026-08-15', '2026-08-17',
+  '2026-09-24', '2026-09-25', '2026-09-26', '2026-10-03', '2026-10-05', '2026-10-09',
+  '2026-12-25'
+];
+
+async function getHolidays(year) {
+  const cacheDir = path.join(process.cwd(), 'api', 'cache');
+  if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+  const cachePath = path.join(cacheDir, `holidays_${year}.json`);
+
+  let cache = null;
+  if (fs.existsSync(cachePath)) {
+    try {
+      cache = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+      if (Date.now() - cache.lastUpdated < 30 * 24 * 60 * 60 * 1000) {
+        return cache.data;
+      }
+    } catch (e) { console.error('Holiday cache read error:', e); }
+  }
+
+  try {
+    const key = process.env.HOLIDAY_KEY;
+    if (!key) throw new Error('HOLIDAY_KEY not configured');
+    
+    const url = `http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?ServiceKey=${key}&solYear=${year}&_type=json&numOfRows=100`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const json = await res.json();
+    
+    if (json.response?.header?.resultCode === '00') {
+      let items = json.response.body?.items?.item || [];
+      if (!Array.isArray(items)) items = [items];
+      
+      const holidayDates = items
+        .filter(item => item.isHoliday === 'Y')
+        .map(item => {
+          const s = String(item.locdate);
+          return `${s.substring(0, 4)}-${s.substring(4, 6)}-${s.substring(6, 8)}`;
+        });
+      
+      const uniqueHolidays = Array.from(new Set(holidayDates)).sort();
+      fs.writeFileSync(cachePath, JSON.stringify({ data: uniqueHolidays, lastUpdated: Date.now() }));
+      return uniqueHolidays;
+    }
+  } catch (e) {
+    console.error('[Weather Portal API] Holiday fetch failed:', e.message);
+  }
+
+  return cache ? cache.data : (year === 2026 ? HOLIDAYS_2026 : []);
+}
 
 export default async function handler(req, res) {
   const { type } = req.query;
@@ -113,18 +167,30 @@ async function handleWeather(req, res) {
     let timeOfDayLabel = '하루';
     let timeContext = '현재 기상 정보를 요약해줘.';
 
-    if (hour >= 5 && hour < 12) {
-      timeOfDayLabel = '아침/등교 시간대';
-      timeContext = '상쾌한 아침 등교길 인사와 함께 오늘 하루 전반적인 날씨 대비 요령을 조언해줘.';
-    } else if (hour >= 12 && hour < 17) {
-      timeOfDayLabel = '낮/활동 시간대';
-      timeContext = '활기찬 낮 일과 중 조언과 함께 자외선, 미세먼지 등 실외 활동 대비 요령을 조언해줘.';
-    } else if (hour >= 17 && hour < 21) {
-      timeOfDayLabel = '저녁/하교 시간대';
-      timeContext = '수고한 하루를 마무리하는 따뜻한 인사와 함께 퇴근/하굣길 날씨(쌀쌀함 등)나 밤사이 유의사항을 조언해줘.';
+    const year = nowKST.getFullYear();
+    const holidays = await getHolidays(year);
+    const yyyymmdd = `${year}-${String(nowKST.getMonth() + 1).padStart(2, '0')}-${String(nowKST.getDate()).padStart(2, '0')}`;
+    const isHoliday = holidays.includes(yyyymmdd);
+    const day = nowKST.getDay();
+    const isWeekend = day === 0 || day === 6;
+
+    if (isHoliday || isWeekend) {
+      timeOfDayLabel = '휴일/주말';
+      timeContext = '오늘은 편안한 주말 또는 공휴일입니다. 학교, 등교, 하교, 출근, 퇴근 관련 언급을 절대 하지 말고, 오늘 날씨가 어떤지(기온, 미세먼지, 비 소식 등)만 가볍고 친근하게 알려주세요.';
     } else {
-      timeOfDayLabel = '밤/새벽 시간대';
-      timeContext = '편안한 밤을 보내기 위한 인사와 함께 내일 등교길이나 출근길 날씨를 가볍게 대비할 수 있도록 조언해줘.';
+      if (hour >= 5 && hour < 12) {
+        timeOfDayLabel = '아침/등교 시간대';
+        timeContext = '상쾌한 아침 등교길 인사와 함께 오늘 하루 전반적인 날씨 대비 요령을 조언해줘.';
+      } else if (hour >= 12 && hour < 17) {
+        timeOfDayLabel = '낮/활동 시간대';
+        timeContext = '활기찬 낮 일과 중 조언과 함께 자외선, 미세먼지 등 실외 활동 대비 요령을 조언해줘.';
+      } else if (hour >= 17 && hour < 21) {
+        timeOfDayLabel = '저녁/하교 시간대';
+        timeContext = '수고한 하루를 마무리하는 따뜻한 인사와 함께 퇴근/하굣길 날씨(쌀쌀함 등)나 밤사이 유의사항을 조언해줘.';
+      } else {
+        timeOfDayLabel = '밤/새벽 시간대';
+        timeContext = '편안한 밤을 보내기 위한 인사와 함께 내일 등교길이나 출근길 날씨를 가볍게 대비할 수 있도록 조언해줘.';
+      }
     }
 
     // 오늘 중 현재 시간 이후 비/눈 예보가 있는지 판단
@@ -156,6 +222,7 @@ async function handleWeather(req, res) {
 - 이모지 사용 금지
 - 반말 금지, 친근한 존댓말 사용
 - 문장 부호로만 끝낼 것 (마침표 또는 느낌표)
+- 주말이나 공휴일일 경우(현재 시간대가 '휴일/주말'일 경우), 학교, 등교, 하교, 출근, 퇴근, 과제, 수업 등의 학업/업무 관련 표현을 절대로 사용하지 말 것
 - 오직 코멘트 문장만 출력, 다른 말 하지 말 것`;
 
         const geminiRes = await fetch(
