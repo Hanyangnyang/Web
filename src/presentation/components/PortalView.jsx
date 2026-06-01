@@ -8,20 +8,13 @@ import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
+const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
+
 const BANNERS = [
   {
+    id: 'monster',
     src: '/monster_banner_home.png',
     alt: 'Monster Energy',
-    onClick: () => {
-      const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
-      const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
-      const ua = navigator.userAgent;
-      if (/iPhone|iPad|iPod/i.test(ua)) {
-        window.open(APP_STORE_URL, '_blank');
-      } else {
-        window.open(PLAY_STORE_URL, '_blank');
-      }
-    },
   },
   {
     src: '/monster_banner_for_follow_home.png',
@@ -34,6 +27,7 @@ const BANNERS = [
 
 function BannerCarousel() {
   const [current, setCurrent] = useState(0);
+  const [showAndroidPopup, setShowAndroidPopup] = useState(false);
   const containerRef = useRef(null);
   const timerRef = useRef(null);
   const touchStartXRef = useRef(null);
@@ -121,10 +115,45 @@ function BannerCarousel() {
 
   const handleClick = (banner) => {
     if (isSwiping.current) return;
-    banner.onClick?.();
+    if (banner.id === 'monster') {
+      const ua = navigator.userAgent;
+      if (/iPhone|iPad|iPod/i.test(ua)) {
+        window.open(APP_STORE_URL, '_blank');
+      } else {
+        setShowAndroidPopup(true);
+      }
+    } else {
+      banner.onClick?.();
+    }
   };
 
   return (
+    <>
+    {showAndroidPopup && (
+      <div
+        className="fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center"
+        onClick={() => setShowAndroidPopup(false)}
+      >
+        <div
+          className="bg-white rounded-t-3xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] w-full max-w-sm"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
+          <div className="text-center text-4xl mb-3">🤖</div>
+          <h3 className="text-lg font-black text-text-main text-center mb-2">갤럭시 앱 출시 준비중</h3>
+          <p className="text-text-sub text-sm text-center leading-relaxed mb-6">
+            안드로이드 앱은 현재 출시 준비중이에요.<br />
+            조금만 기다려주시면 곧 플레이스토어에서<br />만나실 수 있어요! 🙏
+          </p>
+          <button
+            className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-2xl text-sm active:scale-[0.97] transition-transform"
+            onClick={() => setShowAndroidPopup(false)}
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    )}
     <div className="mb-6 mt-2">
       <div
         ref={containerRef}
@@ -141,7 +170,7 @@ function BannerCarousel() {
               key={i}
               src={banner.src}
               alt={banner.alt}
-              className={`w-full h-auto flex-shrink-0 ${banner.onClick ? 'cursor-pointer' : ''}`}
+              className={`w-full h-auto flex-shrink-0 ${(banner.onClick || banner.id === 'monster') ? 'cursor-pointer' : ''}`}
               draggable={false}
               onClick={() => handleClick(banner)}
             />
@@ -160,6 +189,7 @@ function BannerCarousel() {
         ))}
       </div>
     </div>
+    </>
   );
 }
 
