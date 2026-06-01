@@ -662,16 +662,29 @@ export function ShuttleView({ isActive }) {
                 </div>
                 <button
                   onClick={async () => {
-                    const url = lineId.startsWith('line4-') 
-                      ? 'https://place.map.kakao.com/SES1755' 
-                      : 'https://place.map.kakao.com/SES44M235';
+                    const is4Line = lineId.startsWith('line4-');
+                    const itemId = is4Line ? '13289066' : '1018596639';
+                    const cacheBuster = new Date().getTime();
+                    
+                    let url = `https://place.map.kakao.com/${is4Line ? 'SES1755' : 'SES44M235'}?t=${cacheBuster}`;
                     
                     if (Capacitor.isNativePlatform()) {
-                      await Browser.open({
-                        url,
-                        presentationStyle: 'popover',
-                        toolbarColor: '#0E4A84'
-                      });
+                      try {
+                        const platform = Capacitor.getPlatform();
+                        if (platform === 'android') {
+                          // [갤럭시 딥링크 앱 전환 원천 회피]
+                          // 모바일 크롬 앱 낚시질 방지를 위해 데스크톱 맵 라우터로 무력화!
+                          url = `https://map.kakao.com/?map_type=TYPE_MAP&itemId=${itemId}&t=${cacheBuster}`;
+                        }
+                        await Browser.open({
+                          url,
+                          presentationStyle: 'popover',
+                          toolbarColor: '#FFFFFF'
+                        });
+                      } catch (err) {
+                        const fallbackUrl = `https://map.kakao.com/?map_type=TYPE_MAP&itemId=${itemId}&t=${cacheBuster}`;
+                        window.open(fallbackUrl, '_blank');
+                      }
                     } else {
                       setSubwayRedirecting(true);
                       setTimeout(() => {
