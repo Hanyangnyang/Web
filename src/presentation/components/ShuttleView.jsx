@@ -522,6 +522,21 @@ export function ShuttleView({ isActive }) {
     }
   }, [justToggledFullMode]);
 
+  // 사용자가 외부 카카오 지도 이동 후 브라우저로 돌아왔을 때 스피너를 복구시킵니다.
+  useEffect(() => {
+    if (!subwayRedirecting) return;
+
+    const handleFocus = () => setSubwayRedirecting(false);
+    
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, [subwayRedirecting]);
+
   // 출발지 칩(stop) 이나 학기/요일 필터 변경 시 전체 시간표 스크롤을 맨 위(첫차)로 초기화
   const containerRef = useRef(null);
   useEffect(() => {
