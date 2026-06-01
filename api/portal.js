@@ -135,6 +135,7 @@ async function handleWeather(req, res) {
 
     let aiMessage = info.message; // 기본 폴백
     const geminiKey = process.env.GEMINI_API_KEY;
+    let isAiSuccess = false;
 
     if (geminiKey && geminiKey !== '여기에_API_키_입력') {
       try {
@@ -174,6 +175,7 @@ async function handleWeather(req, res) {
           const generated = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
           if (generated && generated.length > 0) {
             aiMessage = generated;
+            isAiSuccess = true;
           }
         }
       } catch (e) {
@@ -181,8 +183,18 @@ async function handleWeather(req, res) {
       }
     }
 
-    // 1시간 서버 캐시 (LLM 호출 빈도 제한)
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+    // 매 정각에 캐시가 만료되도록 동적 남은 시간(초) 계산
+    const now = new Date();
+    const minutes = now.getUTCMinutes();
+    const seconds = now.getUTCSeconds();
+    const secondsRemainingInHour = 3600 - (minutes * 60 + seconds);
+
+    if (isAiSuccess) {
+      res.setHeader('Cache-Control', `public, max-age=60, s-maxage=${secondsRemainingInHour}, stale-while-revalidate`);
+    } else {
+      // AI 요청이 실패한 경우, 캐시하지 않아 다음 요청 때 재시도를 즉시 유도함
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    }
     return res.status(200).json({
       temp: Math.round(current.temperature_2m),
       description: info.label,

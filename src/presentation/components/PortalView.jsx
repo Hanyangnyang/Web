@@ -104,6 +104,7 @@ export function PortalView({ isVisible = true }) {
       return {
         ...item,
         hour: localHour, // 브라우저 KST 기준 시각으로 덮어쓰기
+        temp: isCurrent ? weather.temp : item.temp, // 실시간 메인 카드 온도와 싱크 맞춤
         isCurrent,
         isPast
       };
@@ -125,7 +126,7 @@ export function PortalView({ isVisible = true }) {
           closestIdx = idx;
         }
       });
-      filtered[closestIdx] = { ...filtered[closestIdx], isCurrent: true, isPast: false };
+      filtered[closestIdx] = { ...filtered[closestIdx], temp: weather.temp, isCurrent: true, isPast: false };
       for (let i = 0; i < closestIdx; i++) {
         filtered[i] = { ...filtered[i], isPast: true };
       }
