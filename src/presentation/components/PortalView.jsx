@@ -8,6 +8,191 @@ import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
+const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
+
+const BANNERS = [
+  {
+    id: 'monster',
+    src: '/monster_banner_home.png',
+    alt: 'Monster Energy',
+  },
+  {
+    src: '/monster_banner_for_follow_home.png',
+    alt: 'Monster Energy Follow',
+    onClick: () => {
+      window.open('https://www.instagram.com/mek_c.a.t?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', '_blank');
+    },
+  },
+];
+
+function BannerCarousel() {
+  const [current, setCurrent] = useState(0);
+  const [showAndroidPopup, setShowAndroidPopup] = useState(false);
+  const containerRef = useRef(null);
+  const timerRef = useRef(null);
+  const touchStartXRef = useRef(null);
+  const touchStartYRef = useRef(null);
+  const axisLockedRef = useRef(null); // 'h' | 'v' | null
+  const isSwiping = useRef(false);
+  const mouseStartXRef = useRef(null);
+
+  const resetTimer = () => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % BANNERS.length);
+    }, 5000);
+  };
+
+  // 타이머 초기화
+  useEffect(() => {
+    resetTimer();
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  // 터치 스와이프: 네이티브 리스너로 등록해야 passive:false 가 적용됨
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e) => {
+      touchStartXRef.current = e.touches[0].clientX;
+      touchStartYRef.current = e.touches[0].clientY;
+      axisLockedRef.current = null;
+      isSwiping.current = false;
+    };
+
+    const onTouchMove = (e) => {
+      if (touchStartXRef.current === null) return;
+      const dx = Math.abs(e.touches[0].clientX - touchStartXRef.current);
+      const dy = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+      if (!axisLockedRef.current) {
+        axisLockedRef.current = dx > dy ? 'h' : 'v';
+      }
+      if (axisLockedRef.current === 'h') {
+        e.preventDefault(); // 수평 스와이프일 때 페이지 스크롤 차단
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (touchStartXRef.current === null) return;
+      const delta = e.changedTouches[0].clientX - touchStartXRef.current;
+      if (axisLockedRef.current === 'h' && Math.abs(delta) > 40) {
+        isSwiping.current = true;
+        setCurrent((prev) => (delta < 0 ? (prev + 1) % BANNERS.length : (prev - 1 + BANNERS.length) % BANNERS.length));
+        resetTimer();
+        setTimeout(() => { isSwiping.current = false; }, 0);
+      }
+      touchStartXRef.current = null;
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
+
+  const goTo = (index) => {
+    setCurrent(index);
+    resetTimer();
+  };
+
+  const handleMouseDown = (e) => { mouseStartXRef.current = e.clientX; };
+  const handleMouseUp = (e) => {
+    if (mouseStartXRef.current === null) return;
+    const delta = e.clientX - mouseStartXRef.current;
+    if (Math.abs(delta) > 40) {
+      isSwiping.current = true;
+      setCurrent((prev) => (delta < 0 ? (prev + 1) % BANNERS.length : (prev - 1 + BANNERS.length) % BANNERS.length));
+      resetTimer();
+      setTimeout(() => { isSwiping.current = false; }, 0);
+    }
+    mouseStartXRef.current = null;
+  };
+
+  const handleClick = (banner) => {
+    if (isSwiping.current) return;
+    if (banner.id === 'monster') {
+      const ua = navigator.userAgent;
+      if (/iPhone|iPad|iPod/i.test(ua)) {
+        window.open(APP_STORE_URL, '_blank');
+      } else {
+        setShowAndroidPopup(true);
+      }
+    } else {
+      banner.onClick?.();
+    }
+  };
+
+  return (
+    <>
+    {showAndroidPopup && (
+      <div
+        className="fixed inset-0 bg-black/50 z-[2000] flex items-end justify-center"
+        onClick={() => setShowAndroidPopup(false)}
+      >
+        <div
+          className="bg-white rounded-t-3xl px-6 pt-5 pb-[calc(2rem+env(safe-area-inset-bottom))] w-full max-w-sm"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
+          <div className="text-center text-4xl mb-3">🤖</div>
+          <h3 className="text-lg font-black text-text-main text-center mb-2">갤럭시 앱 출시 준비중</h3>
+          <p className="text-text-sub text-sm text-center leading-relaxed mb-6">
+            안드로이드 앱은 현재 출시 준비중이에요.<br />
+            조금만 기다려주시면 곧 플레이스토어에서<br />만나실 수 있어요! 🙏
+          </p>
+          <button
+            className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-2xl text-sm active:scale-[0.97] transition-transform"
+            onClick={() => setShowAndroidPopup(false)}
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    )}
+    <div className="mb-6 mt-2">
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden rounded-xl"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      >
+        <div
+          className="flex transition-transform duration-300 ease-in-out"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {BANNERS.map((banner, i) => (
+            <img
+              key={i}
+              src={banner.src}
+              alt={banner.alt}
+              className={`w-full h-auto flex-shrink-0 ${(banner.onClick || banner.id === 'monster') ? 'cursor-pointer' : ''}`}
+              draggable={false}
+              onClick={() => handleClick(banner)}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="flex justify-center gap-1.5 mt-2">
+        {BANNERS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`rounded-full transition-all duration-200 ${
+              i === current ? 'w-4 h-2 bg-gray-500' : 'w-2 h-2 bg-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+    </>
+  );
+}
+
 
 function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
   const [displayed, setDisplayed] = useState(() => {
@@ -333,30 +518,8 @@ export function PortalView({ isVisible = true }) {
           </section>
         )}
 
-      {/* Monster Energy 배너 */}
-      <div className="mb-6 mt-2">
-        <img
-          src="/monster_banner_home.png"
-          className="w-full h-auto rounded-xl cursor-pointer"
-          alt="Monster Energy"
-          onClick={() => {
-            const APP_STORE_URL = 'https://apps.apple.com/kr/app/%ED%95%98%EB%83%A5%EB%83%A5/id6770033067';
-            // TODO: 구글 플레이 스토어 출시 후 실제 링크로 교체
-            const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app';
-
-            const ua = navigator.userAgent;
-            const isIOS = /iPhone|iPad|iPod/i.test(ua);
-            const isAndroid = /Android/i.test(ua);
-
-            if (isIOS) {
-              window.open(APP_STORE_URL, '_blank');
-            } else {
-              // Android 또는 데스크톱 → Play Store
-              window.open(PLAY_STORE_URL, '_blank');
-            }
-          }}
-        />
-      </div>
+      {/* 배너 캐러셀 */}
+      <BannerCarousel />
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
