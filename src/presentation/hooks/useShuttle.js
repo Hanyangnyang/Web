@@ -49,7 +49,8 @@ export function useShuttle(isActive = false) {
   useEffect(() => {
     if (!isActive) return;
 
-    Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 })
+    Geolocation.requestPermissions()
+      .then(() => Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 }))
       .then((position) => {
         const { latitude, longitude } = position.coords;
         
