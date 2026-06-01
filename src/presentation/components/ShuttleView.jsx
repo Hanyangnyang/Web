@@ -1,8 +1,10 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, ChevronDown } from 'lucide-react';
+import { Loader2, ChevronDown, Train, X } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
 const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
 
@@ -506,6 +508,7 @@ export function ShuttleView({ isActive }) {
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
   const [tooltipStop, setTooltipStop] = useState(stop);
   const [justToggledFullMode, setJustToggledFullMode] = useState(false);
+  const [subwayRedirecting, setSubwayRedirecting] = useState(false);
   const hasInteractedRef = useRef(false);
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
@@ -638,8 +641,34 @@ export function ShuttleView({ isActive }) {
               />
             </div>
             {needsSubway && (
-              <div className="shrink basis-[125px] min-w-0">
-                <SubwayDropdown selected={lineId} onChange={setLineId} />
+              <div className="flex items-center gap-1.5 shrink basis-[176px] min-w-0">
+                <div className="flex-1 min-w-0">
+                  <SubwayDropdown selected={lineId} onChange={setLineId} />
+                </div>
+                <button
+                  onClick={async () => {
+                    const url = lineId.startsWith('line4-') 
+                      ? 'https://place.map.kakao.com/SES1755' 
+                      : 'https://place.map.kakao.com/SES44M235';
+                    
+                    if (Capacitor.isNativePlatform()) {
+                      await Browser.open({
+                        url,
+                        presentationStyle: 'popover',
+                        toolbarColor: '#0E4A84'
+                      });
+                    } else {
+                      setSubwayRedirecting(true);
+                      setTimeout(() => {
+                        window.location.href = url;
+                      }, 1200);
+                    }
+                  }}
+                  className="w-[44px] h-[44px] rounded-card bg-white border-[1.5px] border-[#e2e8f0] flex items-center justify-center cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:border-primary active:bg-slate-50 flex-shrink-0"
+                  title="실시간 지하철 위치 확인 (카카오맵)"
+                >
+                  <Train size={20} className="text-[#475569]" />
+                </button>
               </div>
             )}
           </div>
@@ -711,6 +740,23 @@ export function ShuttleView({ isActive }) {
           </div>
         )}
       </div>
+
+      {/* 실시간 지하철 정보 페이지 리다이렉팅 로딩 뷰 */}
+      {subwayRedirecting && (
+        <div 
+          className="fixed inset-0 bg-[rgba(15,23,42,0.78)] backdrop-blur-[6px] z-[10000] flex flex-col justify-center items-center gap-4 text-center select-none"
+          style={{ animation: 'sttFadeIn 0.25s ease-out' }}
+        >
+          <div className="w-12 h-12 border-[3.5px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-2" />
+          <p className="text-white text-[1.05rem] font-bold tracking-tight leading-snug whitespace-pre-line">
+            실시간 지하철 위치 확인을 위해<br />
+            카카오 지도로 이동하고 있어요!
+          </p>
+          <p className="text-white/40 text-[0.78rem] font-medium tracking-wide">
+            잠시만 기다려 주세요
+          </p>
+        </div>
+      )}
     </div>
   );
 }
