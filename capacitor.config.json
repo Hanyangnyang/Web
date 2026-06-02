@@ -3,7 +3,7 @@
   "appName": "하냥냥",
   "webDir": "dist",
   "server": {
-    "url": "https://hyuqr-git-feat-subway-kakaomap-link-kdjidkrs-projects.vercel.app/",
+    "url": "https://www.hanyang.life",
     "cleartext": false
   },
   "plugins": {
