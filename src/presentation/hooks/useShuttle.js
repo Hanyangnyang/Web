@@ -113,14 +113,21 @@ export function useShuttle(isActive = false) {
         setSubwayArrivals(d.arrivals); 
         setSubwayOffPeak(d.offPeak); 
         setIsHolidayServer(d.isHoliday ?? false);
-        // 기본 dayType 초기화 (한 번만)
+        // 기본 dayType 초기화 (한 번만) — custom_holidays, force_weekend 포함
         if (!fullMode && isFullMode === false) {
-           setFullDayType(d.isHoliday || [0,6].includes(new Date().getDay()) ? '주말' : '평일');
+          const today = new Date();
+          const yyyymmdd = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+          const customHols = appConfig.custom_holidays || [];
+          const isHol = d.isHoliday
+            || [0, 6].includes(today.getDay())
+            || customHols.includes(yyyymmdd)
+            || !!appConfig.force_weekend;
+          setFullDayType(isHol ? '주말' : '평일');
         }
       })
       .catch(() => {})
       .finally(() => setIsSubwayLoading(false));
-  }, [isFullMode, fullDayType]);
+  }, [isFullMode, fullDayType, appConfig]);
 
   useEffect(() => {
     // 무조건 한 번 호출해서 isHoliday 서버 상태를 가져오고, needsSubway면 2분마다 갱신
@@ -152,7 +159,13 @@ export function useShuttle(isActive = false) {
     }
   }
 
-  const isWeekend = [0, 6].includes(new Date().getDay());
+  // isWeekend: 요일 + custom_holidays + force_weekend 모두 반영
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const customHols = appConfig.custom_holidays || [];
+  const isWeekend = [0, 6].includes(today.getDay())
+    || customHols.includes(todayStr)
+    || !!appConfig.force_weekend;
 
   return {
     stop, setStop,
