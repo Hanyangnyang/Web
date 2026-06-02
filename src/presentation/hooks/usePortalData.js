@@ -47,7 +47,7 @@ export async function prefetchPortalData() {
         timestamp: Date.now()
       };
       memoryCache = newData;
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch (_) {}
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch { /* ignore */ }
       notifyListeners(newData);
       retryCount = 0;
     } else if (weatherData || libData) {
@@ -58,7 +58,7 @@ export async function prefetchPortalData() {
         timestamp: memoryCache?.timestamp || (Date.now() - CACHE_TTL + 30000) // 30초 후 즉시 갱신되도록 세팅
       };
       memoryCache = newData;
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch (_) {}
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch { /* ignore */ }
       notifyListeners(newData);
       triggerBackoffRetry();
     } else {
@@ -115,7 +115,7 @@ export function usePortalData(isVisible = true) {
           return parsed;
         }
       }
-    } catch (_) {}
+    } catch { /* ignore */ }
     return null;
   });
 
@@ -153,8 +153,10 @@ export function usePortalData(isVisible = true) {
     }
 
     if (!memoryCache || isPartialCache || isStaleTimeline || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
-      setLoading(true);
-      prefetchPortalData();
+      setTimeout(() => {
+        setLoading(true);
+        prefetchPortalData();
+      }, 0);
     }
 
     return () => {

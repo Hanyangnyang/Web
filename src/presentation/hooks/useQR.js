@@ -11,6 +11,8 @@ export function useQR({ user, reloginFn, onNameDiscovered, onLogout }) {
   const [refreshing, setRefreshing] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
 
+  const refreshRef = useRef(null);
+
   const refresh = useCallback(async (explicitToken) => {
     const token = explicitToken ?? userRef.current?.token;
     if (!token) return;
@@ -28,7 +30,7 @@ export function useQR({ user, reloginFn, onNameDiscovered, onLogout }) {
       if (isAuthErr && !explicitToken) {
         try {
           const updatedUser = await reloginFn?.();
-          if (updatedUser?.token) { await refresh(updatedUser.token); return; }
+          if (updatedUser?.token) { await refreshRef.current?.(updatedUser.token); return; }
         } catch { /* 재로그인 실패 → 로그아웃 */ }
         onLogout?.();
       } else {
@@ -39,15 +41,27 @@ export function useQR({ user, reloginFn, onNameDiscovered, onLogout }) {
     }
   }, [reloginFn, onNameDiscovered, onLogout]);
 
+  useEffect(() => {
+    refreshRef.current = refresh;
+  }, [refresh]);
+
   // 최초 로드
   useEffect(() => {
-    if (user?.token) refresh();
+    if (user?.token) {
+      setTimeout(() => {
+        refresh();
+      }, 0);
+    }
   }, [user?.token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 30초 카운트다운 후 자동 갱신
   useEffect(() => {
     if (status !== 'ready' || timeLeft <= 0 || refreshing) {
-      if (timeLeft === 0 && !refreshing) refresh();
+      if (timeLeft === 0 && !refreshing) {
+        setTimeout(() => {
+          refresh();
+        }, 0);
+      }
       return;
     }
     const timer = setInterval(() => setTimeLeft(p => p - 1), 1000);

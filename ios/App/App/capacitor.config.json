@@ -13,7 +13,10 @@
 	},
 	"packageClassList": [
 		"FCMPlugin",
+		"CAPBrowserPlugin",
+		"GeolocationPlugin",
 		"PushNotificationsPlugin",
-		"SharePlugin"
+		"SharePlugin",
+		"SecureStoragePlugin"
 	]
 }
