@@ -1,7 +1,7 @@
 // 훅(ViewModel): 셔틀 시간표 로딩·정류장 선택·지하철 연동 상태 관리
 import { useState, useEffect, useCallback } from 'react';
 import { Geolocation } from '@capacitor/geolocation';
-import { computeSchedule, computeFullSchedule, curMin, dayType } from '../../domain/entities/Shuttle.js';
+import { computeSchedule, computeFullSchedule, curMin } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayArrivalsUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 
@@ -41,7 +41,9 @@ export function useShuttle(isActive = false) {
 
   useEffect(() => {
     if (appConfig.current_period) {
-      setFullPeriod(appConfig.current_period);
+      setTimeout(() => {
+        setFullPeriod(appConfig.current_period);
+      }, 0);
     }
   }, [appConfig.current_period]);
 
@@ -122,7 +124,9 @@ export function useShuttle(isActive = false) {
 
   useEffect(() => {
     // 무조건 한 번 호출해서 isHoliday 서버 상태를 가져오고, needsSubway면 2분마다 갱신
-    fetchSubway(isFullMode, fullDayType);
+    setTimeout(() => {
+      fetchSubway(isFullMode, fullDayType);
+    }, 0);
     let id;
     if (needsSubway && !isFullMode) {
       id = setInterval(() => fetchSubway(false, null), 2 * 60_000);
