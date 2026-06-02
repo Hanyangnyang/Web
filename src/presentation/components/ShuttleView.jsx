@@ -670,88 +670,70 @@ export function ShuttleView({ isActive }) {
           </div>
         </div>
 
-        <div className="flex py-0 pb-1.5 border-b border-[#f1f5f9]">
-          <div
-            style={{ flex: hideSubwayCol ? 1 : '0 0 52%', paddingLeft: 0 }}
-            className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex items-center"
-          >
+        <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8}}>
+          <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0">
             출발 시간
-            {hideSubwayCol && (
-              <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
-                <div
-                  onClick={() => {
-                    if (!isFullMode) setJustToggledFullMode(true);
-                    setIsFullMode(!isFullMode);
-                  }}
-                  style={{ width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer', background: isFullMode ? 'var(--color-primary)' : '#e0e0e0', position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)', flexShrink: 0 }}
-                >
-                  <div style={{ width: 17, height: 17, borderRadius: '50%', background: 'white', boxShadow: '0 2px 3px rgba(0,0,0,0.15)', position: 'absolute', top: 2, left: isFullMode ? 19 : 2, transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                </div>
-                <span style={{ fontSize: 10, fontWeight: 800, color: isFullMode ? 'var(--color-primary)' : 'var(--color-text-hint)', whiteSpace: 'nowrap' }}>
-                  전체 시간표
-                </span>
-              </div>
-            )}
-          </div>
+          </span>
           {!hideSubwayCol && (
-            <div style={{ flex: 1, paddingLeft: 4 }} className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex items-center gap-2 min-w-0">
-              {needsSubway ? (
-                <button
-                  onClick={async () => {
-                    const is4Line = lineId.startsWith('line4-');
-                    const cacheBuster = new Date().getTime();
-                    let url = `https://place.map.kakao.com/${is4Line ? 'SES1755' : 'SES44M235'}?t=${cacheBuster}`;
-                    if (Capacitor.isNativePlatform()) {
-                      try {
-                        const platform = Capacitor.getPlatform();
-                        if (platform === 'android') {
-                          await App.openUrl({ url });
-                        } else {
-                          await Browser.open({ url, presentationStyle: 'popover', toolbarColor: '#FFFFFF' });
-                        }
-                      } catch (err) {
-                        window.open(url, '_blank');
+            needsSubway ? (
+              <button
+                onClick={async () => {
+                  const is4Line = lineId.startsWith('line4-');
+                  const cacheBuster = new Date().getTime();
+                  let url = `https://place.map.kakao.com/${is4Line ? 'SES1755' : 'SES44M235'}?t=${cacheBuster}`;
+                  if (Capacitor.isNativePlatform()) {
+                    try {
+                      const platform = Capacitor.getPlatform();
+                      if (platform === 'android') {
+                        await App.openUrl({ url });
+                      } else {
+                        await Browser.open({ url, presentationStyle: 'popover', toolbarColor: '#FFFFFF' });
                       }
-                    } else {
-                      setSubwayRedirecting(true);
-                      setTimeout(() => { window.location.href = url; }, 1200);
+                    } catch (err) {
+                      window.open(url, '_blank');
                     }
-                  }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    fontSize: 10.5,
-                    fontWeight: 600,
-                    color: '#64748b',
-                    letterSpacing: '0.01em',
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                  }}
-                >
-                  카카오 지하철
-                  <ArrowUpRight size={10} strokeWidth={2.2} />
-                </button>
-              ) : <span>도착</span>}
-              <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
-                <div
-                  onClick={() => {
-                    if (!isFullMode) setJustToggledFullMode(true);
-                    setIsFullMode(!isFullMode);
-                  }}
-                  style={{ width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer', background: isFullMode ? 'var(--color-primary)' : '#e0e0e0', position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)', flexShrink: 0 }}
-                >
-                  <div style={{ width: 17, height: 17, borderRadius: '50%', background: 'white', boxShadow: '0 2px 3px rgba(0,0,0,0.15)', position: 'absolute', top: 2, left: isFullMode ? 19 : 2, transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} />
-                </div>
-                <span style={{ fontSize: 10, fontWeight: 800, color: isFullMode ? 'var(--color-primary)' : 'var(--color-text-hint)', whiteSpace: 'nowrap' }}>
-                  전체 시간표
-                </span>
-              </div>
-            </div>
+                  } else {
+                    setSubwayRedirecting(true);
+                    setTimeout(() => { window.location.href = url; }, 1200);
+                  }
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  color: '#64748b',
+                  letterSpacing: '0.01em',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  marginLeft: 'auto',
+                }}
+              >
+                카카오 지하철
+                <ArrowUpRight size={10} strokeWidth={2.2} />
+              </button>
+            ) : (
+              <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0" style={{ marginLeft: 'auto' }}>도착</span>
+            )
           )}
+          <div className={`flex items-center gap-1.5 flex-shrink-0${hideSubwayCol ? ' ml-auto' : ''}`}>
+            <div
+              onClick={() => {
+                if (!isFullMode) setJustToggledFullMode(true);
+                setIsFullMode(!isFullMode);
+              }}
+              style={{ width: 38, height: 21, borderRadius: 20, padding: 2, cursor: 'pointer', background: isFullMode ? 'var(--color-primary)' : '#e0e0e0', position: 'relative', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)', flexShrink: 0 }}
+            >
+              <div style={{ width: 17, height: 17, borderRadius: '50%', background: 'white', boxShadow: '0 2px 3px rgba(0,0,0,0.15)', position: 'absolute', top: 2, left: isFullMode ? 19 : 2, transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+            </div>
+            <span style={{ fontSize: 10, fontWeight: 800, color: isFullMode ? 'var(--color-primary)' : 'var(--color-text-hint)', whiteSpace: 'nowrap' }}>
+              전체 시간표
+            </span>
+          </div>
         </div>
 
         <div ref={containerRef} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
