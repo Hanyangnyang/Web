@@ -7,7 +7,14 @@ import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 
-const ROUTE_LABEL = { 'DH': '직행', 'D': '직행', 'DY': '예술인\n직행', 'C': '순환', '중앙역': '중앙역' };
+const ROUTE_LABEL = {
+  '순환':     '순환',
+  '직행':     '직행',
+  '예술인직행': '예술인\n직행',
+  '중앙역':   '중앙역',
+  '아침직행':  '직행',
+  '아침예술인': '예술인\n직행',
+};
 
 // ── 지하철 노선 뱃지
 function LineBadge({ opt, size = 32 }) {
@@ -104,7 +111,10 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     ? (subwayOffPeak ? '운행 시간 외' : '연결 열차 없음') : null;
 
   const rLabel = ROUTE_LABEL[row.route] || row.route;
-  const routeKey = row.route === 'DY' ? 'dy' : (row.route === '중앙역' ? 'ja' : (row.route === 'C' ? 'c' : 'd'));
+  const routeKey =
+    row.route === '순환'                              ? 'c'  :
+    row.route === '예술인직행' || row.route === '아침예술인' ? 'dy' :
+    row.route === '중앙역'                             ? 'ja' : 'd';
 
   const tagBase = "absolute top-0 left-0 text-[10px] font-black text-white z-[10]";
 
