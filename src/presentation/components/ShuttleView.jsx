@@ -712,7 +712,7 @@ export function ShuttleView({ isActive }) {
                     alignItems: 'center',
                     gap: 2,
                     fontSize: 10.5,
-                    fontWeight: 600,
+                    fontWeight: 800,
                     color: '#64748b',
                     letterSpacing: '0.01em',
                     background: 'none',
