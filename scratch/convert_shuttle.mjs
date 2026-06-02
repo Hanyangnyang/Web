@@ -387,7 +387,9 @@ function parseHeader(line) {
   // <학기중, 평일, 기숙사> → { period, dayType, firstStop }
   const inner = line.slice(1, -1);
   const [period, dayType, firstStop] = inner.split(',').map(s => s.trim());
-  return { period, dayType, firstStop };
+  // '방학' → '방학중' 정규화
+  const normalizedPeriod = period === '방학' ? '방학중' : period;
+  return { period: normalizedPeriod, dayType, firstStop };
 }
 
 const results = [];
@@ -447,7 +449,7 @@ for (const line of lines) {
 // ────────────────────────────────────────────
 // 정렬 & 출력
 // ────────────────────────────────────────────
-const PERIOD_ORDER = { '학기중': 0, '계절학기': 1, '방학': 2 };
+const PERIOD_ORDER = { '학기중': 0, '계절학기': 1, '방학중': 2 };
 const DAY_ORDER    = { '평일': 0, '주말': 1 };
 
 results.sort((a, b) => {
