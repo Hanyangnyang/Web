@@ -16,7 +16,7 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 // Korean Public Holidays 2026 (Base fallback)
 const HOLIDAYS_2026 = [
   '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01', '2026-03-02',
-  '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-06', '2026-08-15', '2026-08-17',
+  '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-03', '2026-06-06', '2026-08-15', '2026-08-17',
   '2026-09-24', '2026-09-25', '2026-09-26', '2026-10-03', '2026-10-05', '2026-10-09',
   '2026-12-25'
 ];
@@ -31,7 +31,7 @@ async function getHolidays(year) {
     try {
       cache = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
       // Refresh once a month (30 days)
-      if (Date.now() - cache.lastUpdated < 30 * 24 * 60 * 60 * 1000) {
+      if (Date.now() - cache.lastUpdated < 7 * 24 * 60 * 60 * 1000) {
         return cache.data;
       }
     } catch (e) { console.error('Holiday cache read error:', e); }
