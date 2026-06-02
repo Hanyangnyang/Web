@@ -26,6 +26,10 @@ input, textarea, [contenteditable="true"] {
 }
 
 /* ─── CSS 변수 (style={} 인라인에서 계속 참조됨) ─── */
+:root, html {
+  color-scheme: light;
+}
+
 :root {
   --color-primary: #0E4A84;
   --color-primary-glow: rgba(14, 74, 132, 0.2);
