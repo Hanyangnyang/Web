@@ -660,7 +660,7 @@ export function ShuttleView({ isActive }) {
           </div>
         </div>
 
-        <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(4px, 2vw, 8px)', paddingRight: 2 }}>
+        <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 12px)', paddingRight: 6 }}>
           <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0">
             출발 시간
           </span>
