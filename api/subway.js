@@ -23,19 +23,23 @@ const HOLIDAYS_2026 = [
 
 async function getHolidays(year) {
   const cacheDir = path.join(process.cwd(), 'api', 'cache');
-  if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+  try {
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+  } catch (e) {
+    console.warn('[Subway API] Cache directory creation failed (expected in read-only environments):', e.message);
+  }
   const cachePath = path.join(cacheDir, `holidays_${year}.json`);
 
   let cache = null;
-  if (fs.existsSync(cachePath)) {
-    try {
+  try {
+    if (fs.existsSync(cachePath)) {
       cache = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
       // Refresh once a month (30 days)
       if (Date.now() - cache.lastUpdated < 7 * 24 * 60 * 60 * 1000) {
         return cache.data;
       }
-    } catch (e) { console.error('Holiday cache read error:', e); }
-  }
+    }
+  } catch (e) { console.error('Holiday cache read error:', e); }
 
   try {
     const key = process.env.HOLIDAY_KEY;
@@ -57,7 +61,11 @@ async function getHolidays(year) {
         });
       
       const uniqueHolidays = Array.from(new Set(holidayDates)).sort();
-      fs.writeFileSync(cachePath, JSON.stringify({ data: uniqueHolidays, lastUpdated: Date.now() }));
+      try {
+        fs.writeFileSync(cachePath, JSON.stringify({ data: uniqueHolidays, lastUpdated: Date.now() }));
+      } catch (writeErr) {
+        console.error('[Subway API] Failed to write holidays cache file:', writeErr.message);
+      }
       return uniqueHolidays;
     }
   } catch (e) {
@@ -120,8 +128,12 @@ async function refreshTimetableIfNeeded(lineId, key) {
 
     // Only write if we actually got some data (avoid wiping file on API failure)
     if (result.weekday.upward.length > 0) {
-      fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
-      console.log(`[Subway API] Successfully updated ${fileName}`);
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
+        console.log(`[Subway API] Successfully updated ${fileName}`);
+      } catch (writeErr) {
+        console.error(`[Subway API] Failed to write timetable file (expected in read-only environments):`, writeErr.message);
+      }
       return result;
     }
     return currentData; // Fallback to old data if refresh failed
