@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 export function SplashScreen({ ready, onDone, variant = 'default' }) {
   const [fading, setFading] = useState(false);
   const [minDone, setMinDone] = useState(false);
-  const [bannerLoaded, setBannerLoaded] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setMinDone(true), 1500);
@@ -11,8 +10,8 @@ export function SplashScreen({ ready, onDone, variant = 'default' }) {
   }, []);
 
   useEffect(() => {
-    if (ready && minDone && (variant !== 'default' || bannerLoaded)) setFading(true);
-  }, [ready, minDone, bannerLoaded, variant]);
+    if (ready && minDone) setFading(true);
+  }, [ready, minDone]);
 
   if (variant === 'menu') {
     return (
@@ -55,16 +54,7 @@ export function SplashScreen({ ready, onDone, variant = 'default' }) {
           에리카 생활을 위한 꿀정보 모음
         </p>
       </div>
-      <div className="w-full max-w-app px-12 mt-auto" style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
-        <img
-          src="/monster_banner_splash.png"
-          className="w-full rounded-xl"
-          style={{ aspectRatio: '1200 / 473', objectFit: 'cover' }}
-          alt="Monster Energy"
-          onLoad={() => setBannerLoaded(true)}
-          onError={() => setBannerLoaded(true)}
-        />
-      </div>
+
     </div>
   );
 }
