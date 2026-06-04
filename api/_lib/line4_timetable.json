@@ -1,9 +1,29 @@
 {
   "metadata": {
-    "lastUpdated": "2026-05-05T04:04:35.601Z"
+    "lastUpdated": "2026-06-04T08:11:39.156Z"
   },
   "weekday": {
     "upward": [
+      {
+        "time": "06:58:00",
+        "destination": "불암산",
+        "train_no": "4422K"
+      },
+      {
+        "time": "07:15:30",
+        "destination": "불암산",
+        "train_no": "4426K"
+      },
+      {
+        "time": "08:05:30",
+        "destination": "불암산",
+        "train_no": "4442K"
+      },
+      {
+        "time": "08:19:30",
+        "destination": "불암산",
+        "train_no": "4446K"
+      },
       {
         "time": "05:17:00",
         "destination": "불암산",
@@ -70,11 +90,6 @@
         "train_no": "4308K"
       },
       {
-        "time": "06:58:00",
-        "destination": "불암산",
-        "train_no": "4422K"
-      },
-      {
         "time": "07:06:30",
         "destination": "불암산",
         "train_no": "4524K"
@@ -83,11 +98,6 @@
         "time": "07:12:30",
         "destination": "불암산",
         "train_no": "4528"
-      },
-      {
-        "time": "07:15:30",
-        "destination": "불암산",
-        "train_no": "4426K"
       },
       {
         "time": "07:23:00",
@@ -125,19 +135,9 @@
         "train_no": "4540"
       },
       {
-        "time": "08:05:30",
-        "destination": "불암산",
-        "train_no": "4442K"
-      },
-      {
         "time": "08:10:00",
         "destination": "불암산",
         "train_no": "4544"
-      },
-      {
-        "time": "08:19:30",
-        "destination": "불암산",
-        "train_no": "4446K"
       },
       {
         "time": "08:22:00",
@@ -642,21 +642,6 @@
     ],
     "downward": [
       {
-        "time": "00:00:00",
-        "destination": "오이도",
-        "train_no": "K4469"
-      },
-      {
-        "time": "00:00:00",
-        "destination": "오이도",
-        "train_no": "K4487"
-      },
-      {
-        "time": "00:00:00",
-        "destination": "오이도",
-        "train_no": "K4495"
-      },
-      {
         "time": "06:00:30",
         "destination": "오이도",
         "train_no": "K4503"
@@ -1122,6 +1107,11 @@
         "train_no": "S4667"
       },
       {
+        "time": "00:00:00",
+        "destination": "오이도",
+        "train_no": "K4469"
+      },
+      {
         "time": "19:54:00",
         "destination": "안산",
         "train_no": "K4321"
@@ -1172,6 +1162,11 @@
         "train_no": "S4685"
       },
       {
+        "time": "00:00:00",
+        "destination": "오이도",
+        "train_no": "K4487"
+      },
+      {
         "time": "21:16:30",
         "destination": "오이도",
         "train_no": "K4689"
@@ -1195,6 +1190,11 @@
         "time": "21:46:00",
         "destination": "안산",
         "train_no": "K4327"
+      },
+      {
+        "time": "00:00:00",
+        "destination": "오이도",
+        "train_no": "K4495"
       },
       {
         "time": "22:01:00",
