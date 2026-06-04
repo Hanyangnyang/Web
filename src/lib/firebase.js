@@ -71,9 +71,22 @@ export const requestNotificationPermission = async () => {
 
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
-      const token = await getToken(msg, {
-        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-      });
+      let token;
+      try {
+        // iOS PWA 및 Vite-PWA(sw.js)의 루트 스코프와의 충돌을 차단하기 위해 Firebase 서비스 워커 전용 스코프로 수동 등록합니다.
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+          scope: '/firebase-cloud-messaging-push-scope'
+        });
+        token = await getToken(msg, {
+          vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+          serviceWorkerRegistration: registration,
+        });
+      } catch (err) {
+        console.warn('Failed to register firebase-messaging-sw.js on custom scope, falling back to default:', err);
+        token = await getToken(msg, {
+          vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+        });
+      }
       return token;
     } else {
       console.warn('Notification permission denied');
