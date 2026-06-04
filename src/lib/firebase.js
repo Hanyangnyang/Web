@@ -75,7 +75,7 @@ export const requestNotificationPermission = async () => {
       try {
         // iOS PWA 및 Vite-PWA(sw.js)의 루트 스코프와의 충돌을 차단하기 위해 Firebase 서비스 워커 전용 스코프로 수동 등록합니다.
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-          scope: '/firebase-cloud-messaging-push-scope'
+          scope: '/firebase-cloud-messaging-push-scope/'
         });
         token = await getToken(msg, {
           vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,

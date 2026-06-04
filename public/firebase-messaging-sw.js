@@ -40,8 +40,8 @@ self.addEventListener('notificationclick', function(event) {
       clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
         // 이미 앱이 열려있는 탭이 있다면 그 탭을 포커스하고 URL 이동
         for (let i = 0; i < windowClients.length; i++) {
-          const client = windowClients[i];
-          if (client.url.includes(self.registration.scope) && 'focus' in client) {
+          // self.registration.scope가 커스텀 서브스코프로 설정되어 있어도 실제 웹앱 origin 기준의 열린 창을 찾도록 변경합니다.
+          if (client.url.startsWith(self.location.origin) && 'focus' in client) {
             return client.focus().then(() => client.navigate(urlToOpen));
           }
         }
