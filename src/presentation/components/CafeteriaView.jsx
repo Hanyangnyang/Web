@@ -445,7 +445,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                         onClick={() => handleCafeDetailNavigate(group.cafeId, type)}
                                       >
                                         <div className="flex items-center justify-between pb-1">
-                                          <span className="text-[14px] font-black text-text-main">
+                                          <span className="text-[14px] font-black text-primary">
                                             {group.cafeName}
                                           </span>
                                           <div className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center transition-colors duration-150 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
