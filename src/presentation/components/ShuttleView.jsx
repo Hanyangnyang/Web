@@ -102,7 +102,7 @@ const ROUTE_STYLE = {
 };
 
 // ── 시간표 행
-function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull, shouldScroll }) {
+function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull, shouldScroll, autoFlip }) {
   const [showRowRelative, setShowRowRelative] = useState(false);
   const elementRef = useRef(null);
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
@@ -132,6 +132,16 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     if (diff === 0) return '곧 도착';
     return diff > 0 ? `${diff}분 뒤 도착` : `${Math.abs(diff)}분 전 도착`;
   };
+
+  // 첫 진입 시 다음 셔틀 자동 뒤집기
+  useEffect(() => {
+    if (isNext && autoFlip) {
+      const timer = setTimeout(() => {
+        setShowRowRelative(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isNext, autoFlip]);
 
   // 전체 시간표 전환 시 해당 위치로 부드러운 스크롤 (속도 1.5배 개선) + 시각효과
   useEffect(() => {
@@ -494,6 +504,9 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   );
 }
 
+// ── 세션 단위 자동 플립 여부 기록
+let hasAutoFlippedThisSession = false;
+
 // ── 메인 컴포넌트
 export function ShuttleView({ isActive }) {
   const {
@@ -510,6 +523,15 @@ export function ShuttleView({ isActive }) {
     fullPeriod, setFullPeriod,
     appConfig,
   } = useShuttle(isActive);
+
+  const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
+
+  useEffect(() => {
+    if (isActive && !isLoading && schedule.length > 0 && !hasAutoFlippedThisSession) {
+      hasAutoFlippedThisSession = true;
+      setTriggerAutoFlip(true);
+    }
+  }, [isActive, isLoading, schedule.length]);
 
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
@@ -755,6 +777,7 @@ export function ShuttleView({ isActive }) {
                 isFullMode={isFullMode}
                 isActiveInFull={isFullMode && i === fullActiveIdx}
                 shouldScroll={justToggledFullMode}
+                autoFlip={triggerAutoFlip}
               />
             ));
           })() : (
