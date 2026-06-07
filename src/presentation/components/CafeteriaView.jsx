@@ -270,6 +270,8 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   const toggleGroup = (type) =>
     setExpandedGroups(prev => ({ ...prev, [type]: !prev[type] }));
 
+  const isDateStale = cafesDate !== date.toISOString().split('T')[0];
+
   const groupedMenus = selectedCafe.menus.reduce((acc, m) => {
     if (!acc[m.type]) acc[m.type] = [];
     acc[m.type].push(m);
@@ -386,15 +388,20 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
       {/* 메뉴 목록 */}
       <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
-        {loading && (
+        {loading && !isDateStale && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
             <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
             <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>식단 정보를 가져오는 중...</span>
           </div>
         )}
 
-        <div style={{ filter: loading ? 'blur(2px)' : 'none', transition: 'filter 0.3s ease' }}>
-          {cafes.length > 0 ? (
+        <div style={{ filter: (loading && !isDateStale) ? 'blur(2px)' : 'none', transition: 'filter 0.3s ease' }}>
+          {loading || isDateStale ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+              <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite]" />
+              <span className="text-xs font-semibold text-text-sub">식단 정보를 가져오는 중...</span>
+            </div>
+          ) : cafes.length > 0 ? (
             Object.keys(groupedMenus).length > 0 ? (
               Object.entries(groupedMenus).map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
@@ -410,11 +417,11 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                             onClick={() => toggleGroup(type)}
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-xl">{getMenuIcon(type)}</span>
-                              <span className="font-extrabold text-[1.05rem] text-text-main">{type}</span>
-                              <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
-                                {menus.length}개 메뉴
-                              </span>
+                               <span className="text-xl">{getMenuIcon(type)}</span>
+                               <span className="font-extrabold text-[1.05rem] text-text-main">{type}</span>
+                               <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
+                                 {menus.length}개 메뉴
+                               </span>
                             </div>
                             <ChevronRight
                               style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
@@ -548,7 +555,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
             ) : (
               <div className="text-center py-12 px-4 text-text-sub">해당 식당은 오늘 등록된 메뉴가 없습니다.</div>
             )
-          ) : !loading && (
+          ) : (
             <div className="text-center py-12 px-4 text-text-sub">정보를 불러올 수 없습니다.</div>
           )}
         </div>
