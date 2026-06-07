@@ -98,8 +98,14 @@ async function refreshTimetableIfNeeded(lineId, key) {
   try {
     let currentData = null;
     if (fs.existsSync(tempFilePath)) {
-      currentData = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-    } else if (fs.existsSync(bundledFilePath)) {
+      try {
+        currentData = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+      } catch (parseErr) {
+        console.error(`[Subway API] Temp cache parse failed for ${fileName}, falling back to bundled file:`, parseErr.message);
+      }
+    }
+    
+    if (!currentData && fs.existsSync(bundledFilePath)) {
       currentData = JSON.parse(fs.readFileSync(bundledFilePath, 'utf8'));
     }
 

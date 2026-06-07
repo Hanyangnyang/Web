@@ -530,6 +530,8 @@ export function ShuttleView({ isActive }) {
     if (isActive && !isLoading && schedule.length > 0 && !hasAutoFlippedThisSession) {
       hasAutoFlippedThisSession = true;
       setTriggerAutoFlip(true);
+      const t = setTimeout(() => setTriggerAutoFlip(false), 1000);
+      return () => clearTimeout(t);
     }
   }, [isActive, isLoading, schedule.length]);
 
