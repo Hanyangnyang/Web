@@ -111,11 +111,31 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
     () => urlParams.get('cafe') || localStorage.getItem('lastSelectedCafeId') || 're12'
   );
 
+  const selectedCafe = selectedCafeId === 'all'
+    ? {
+        id: 'all',
+        name: '전체',
+        menus: cafes.reduce((acc, c) => {
+          if (!c.available || !c.menus) return acc;
+          return acc.concat(c.menus.map(m => ({ ...m, cafeName: c.name, cafeId: c.id })));
+        }, []),
+        hours: {}
+      }
+    : (cafes.find(c => c.id === selectedCafeId) || { menus: [] });
+
   const handleCafeSelect = (id) => {
     setSelectedCafeId(id);
     localStorage.setItem('lastSelectedCafeId', id);
     scrollToTop();
   };
+
+  const handleCafeDetailNavigate = (cafeId, mealType) => {
+    urlTypeRef.current = mealType;
+    setSelectedCafeId(cafeId);
+    localStorage.setItem('lastSelectedCafeId', cafeId);
+    scrollToTop();
+  };
+
   const [expandedGroups, setExpandedGroups] = useState({});
   const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
   const [showAlarm, setShowAlarm] = useState(false);
@@ -124,17 +144,16 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   const [alarmPopup, setAlarmPopup] = useState('');
   const listRef = useRef(null);
 
-  const selectedCafe = cafes.find(c => c.id === selectedCafeId) || { menus: [] };
-
   // 식당 자동 선택 및 메뉴 유무 확인
   useEffect(() => {
     if (!cafes.length) return;
+    if (selectedCafeId === 'all') return;
     const current = cafes.find(c => c.id === selectedCafeId);
     if (!current?.menus?.length) {
       const fallback = cafes.find(c => c.menus?.length > 0);
       if (fallback) setSelectedCafeId(fallback.id);
     }
-  }, [cafes]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cafes, selectedCafeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 딥링크 처리: 날짜 동기화
   useEffect(() => {
@@ -325,19 +344,33 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
         </div>
 
         <div
-          className="flex gap-1.5 pt-2.5"
+          className="flex gap-1.5 pt-2.5 overflow-x-auto no-scrollbar scroll-smooth"
           style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
         >
+          {/* 전체 조회 탭 */}
+          <div
+            className={`flex-shrink-0 py-2 border rounded-card text-[clamp(0.65rem,3.1vw,0.82rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
+              selectedCafeId === 'all'
+                ? 'bg-primary text-white border-primary shadow-sm'
+                : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary hover:text-primary'
+            }`}
+            style={{ paddingLeft: '18px', paddingRight: '18px' }}
+            onClick={() => handleCafeSelect('all')}
+          >
+            전체
+          </div>
+
           {cafes.map(cafe => (
             <div
               key={cafe.id}
-              className={`flex-1 min-w-0 py-2 px-[0.15rem] border rounded-card text-[clamp(0.65rem,3.3vw,0.85rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
+              className={`flex-shrink-0 py-2 border rounded-card text-[clamp(0.65rem,3.1vw,0.82rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
                 selectedCafeId === cafe.id
-                  ? 'bg-primary text-white border-primary'
+                  ? 'bg-primary text-white border-primary shadow-sm'
                   : !cafe.available
                     ? 'bg-white border-[#e2e8f0] text-text-sub opacity-30'
                     : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary hover:text-primary'
               }`}
+              style={{ paddingLeft: '13px', paddingRight: '13px' }}
               onClick={() => handleCafeSelect(cafe.id)}
             >
               {cafe.name}
@@ -391,49 +424,119 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                           </div>
                           <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
                             <div className="accordion-inner">
-                              {menus.map((m, i) => {
-                                const isCheonwon = type.includes('천원') || m.menu.includes('천원의아침밥');
-                                const shareUrl = `${window.location.origin}/?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
-                                const nowKst = getKSTDate();
-                                const targetStr = date.toISOString().split('T')[0];
-                                const dateLabel = targetStr === nowKst.toISOString().split('T')[0] ? '오늘'
-                                  : targetStr === new Date(nowKst.getTime() + 86400000).toISOString().split('T')[0] ? '내일'
-                                  : targetStr === new Date(nowKst.getTime() - 86400000).toISOString().split('T')[0] ? '어제'
-                                  : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
-                                const menuLines = m.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
-                                return (
-                                  <div
-                                    key={i}
-                                    className="menu-card bg-white rounded-card p-6 border border-[#e2e8f0] text-left transition-transform duration-200 relative active:scale-[0.98] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]"
-                                  >
-                                    {m.price && (
-                                      <div className="absolute top-5 right-5 text-primary font-bold text-[0.9rem] bg-[rgba(14,74,132,0.06)] px-2.5 py-1 rounded z-[1]">
-                                        {isCheonwon ? `${m.price}💕` : m.price}
-                                      </div>
-                                    )}
-                                    <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]" data-menu-content>
-                                      {menuLines.map((line, idx) => (
-                                        <MenuItemLine key={idx} html={line} />
-                                      ))}
-                                    </div>
-                                    <div className="flex justify-between items-center mt-[0.6rem] pt-[0.6rem] pl-[0.2rem] border-t border-[#e2e8f0]">
-                                      {hoursText ? (
-                                        <div className="flex items-center gap-1 text-xs text-text-hint">
-                                          <Clock size={12} />
-                                          <span>{hoursText}</span>
-                                        </div>
-                                      ) : <span />}
-                                      <button
-                                        className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
-                                        onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
-                                        aria-label="메뉴 공유"
+                              {selectedCafeId === 'all' ? (
+                                <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)] text-left flex flex-col overflow-hidden w-full">
+                                  {(() => {
+                                    const cafeGroups = {};
+                                    menus.forEach(m => {
+                                      if (!cafeGroups[m.cafeId]) {
+                                        cafeGroups[m.cafeId] = {
+                                          cafeId: m.cafeId,
+                                          cafeName: m.cafeName,
+                                          items: []
+                                        };
+                                      }
+                                      cafeGroups[m.cafeId].items.push(m);
+                                    });
+                                    return Object.values(cafeGroups).map((group, groupIdx) => (
+                                      <div
+                                        key={group.cafeId}
+                                        className={`group p-5 flex flex-col gap-3 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
+                                        onClick={() => handleCafeDetailNavigate(group.cafeId, type)}
                                       >
-                                        <Share2 size={14} />
-                                      </button>
+                                        <div className="flex items-center justify-between pb-1">
+                                          <span className="text-[14px] font-black text-primary">
+                                            {group.cafeName}
+                                          </span>
+                                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center transition-colors duration-150 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
+                                            <ChevronRight size={13} strokeWidth={3} />
+                                          </div>
+                                        </div>
+                                        <div className="flex flex-col gap-2 pl-1 pr-1">
+                                          {group.items.map((item, idx) => {
+                                            const menuLines = item.menu.split('\n')
+                                              .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
+                                            const processedLines = menuLines.map((line, lineIdx) => {
+                                              let cleaned = line;
+                                              if (lineIdx > 0) {
+                                                cleaned = cleaned.replace(/<\/?b>/g, '');
+                                                if (cleaned.startsWith('•')) {
+                                                  cleaned = cleaned.slice(1).trimStart();
+                                                }
+                                              }
+                                              return cleaned;
+                                            });
+                                            const joinedMenu = processedLines.join(', ');
+                                            return (
+                                              <div key={idx} className="flex items-baseline justify-between text-[0.93rem] text-text-main gap-3">
+                                                <div className="flex-1 min-w-0 font-normal text-left truncate">
+                                                  {joinedMenu.startsWith('•') ? (
+                                                    <>
+                                                      <span className="mr-[0.4rem]">•</span>
+                                                      {parseBoldText(joinedMenu.slice(1).trimStart())}
+                                                    </>
+                                                  ) : (
+                                                    parseBoldText(joinedMenu)
+                                                  )}
+                                                </div>
+                                                {item.price && (
+                                                  <span className="flex-shrink-0 text-[11px] font-bold text-text-sub">
+                                                    {item.price}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    ));
+                                  })()}
+                                </div>
+                              ) : (
+                                menus.map((m, i) => {
+                                  const isCheonwon = type.includes('천원') || m.menu.includes('천원의아침밥');
+                                  const shareUrl = `${window.location.origin}/?date=${date.toISOString().split('T')[0]}&cafe=${selectedCafeId}&type=${encodeURIComponent(type)}`;
+                                  const nowKst = getKSTDate();
+                                  const targetStr = date.toISOString().split('T')[0];
+                                  const dateLabel = targetStr === nowKst.toISOString().split('T')[0] ? '오늘'
+                                    : targetStr === new Date(nowKst.getTime() + 86400000).toISOString().split('T')[0] ? '내일'
+                                    : targetStr === new Date(nowKst.getTime() - 86400000).toISOString().split('T')[0] ? '어제'
+                                    : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
+                                  const menuLines = m.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
+                                  return (
+                                    <div
+                                      key={i}
+                                      className="menu-card bg-white rounded-card p-6 border border-[#e2e8f0] text-left transition-transform duration-200 relative active:scale-[0.98] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]"
+                                    >
+                                      {m.price && (
+                                        <div className="absolute top-5 right-5 text-primary font-bold text-[0.9rem] bg-[rgba(14,74,132,0.06)] px-2.5 py-1 rounded z-[1]">
+                                          {isCheonwon ? `${m.price}💕` : m.price}
+                                        </div>
+                                      )}
+                                      <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]" data-menu-content>
+                                        {menuLines.map((line, idx) => (
+                                          <MenuItemLine key={idx} html={line} />
+                                        ))}
+                                      </div>
+                                      <div className="flex justify-between items-center mt-[0.6rem] pt-[0.6rem] pl-[0.2rem] border-t border-[#e2e8f0]">
+                                        {hoursText ? (
+                                          <div className="flex items-center gap-1 text-xs text-text-hint">
+                                            <Clock size={12} />
+                                            <span>{hoursText}</span>
+                                          </div>
+                                        ) : <span />}
+                                        <button
+                                          className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
+                                          onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
+                                          aria-label="메뉴 공유"
+                                        >
+                                          <Share2 size={14} />
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })
+                              )}
                             </div>
                           </div>
                         </>
