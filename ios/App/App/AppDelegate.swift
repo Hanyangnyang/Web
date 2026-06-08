@@ -35,6 +35,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
+        // 앱 실행 또는 활성화 시 홈 화면의 알림 배지(Badge) 숫자 초기화
+        UIApplication.shared.applicationIconBadgeNumber = 0
+
         // 콜드 스타트 대비: 앱이 활성화된 후 pending 파라미터 주입 시도
         if let params = pendingDeepLinkParams {
             pendingDeepLinkParams = nil
