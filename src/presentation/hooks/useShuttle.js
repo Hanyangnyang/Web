@@ -98,9 +98,9 @@ export function useShuttle(isActive = false) {
       .catch(() => setLoadErr('셔틀 시간표를 불러오지 못했습니다.'));
   }, []);
 
-  // 1분마다 현재 시각 갱신
+  // 10초마다 현재 시각 갱신 (시간 경과가 UI에 즉각 반영되도록 주기 단축)
   useEffect(() => {
-    const id = setInterval(() => setNow(curMin()), 60_000);
+    const id = setInterval(() => setNow(curMin()), 10_000);
     return () => clearInterval(id);
   }, []);
 

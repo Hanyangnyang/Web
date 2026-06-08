@@ -133,15 +133,16 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     return diff > 0 ? `${diff}분 뒤 도착` : `${Math.abs(diff)}분 전 도착`;
   };
 
-  // 첫 진입 시 다음 셔틀 자동 뒤집기
+  // 첫 진입 시 다음 셔틀 자동 뒤집기 (1초 뒤, 남은 시간이 5분 미만일 때만)
   useEffect(() => {
-    if (isNext && autoFlip) {
+    const diff = row.depMin - now;
+    if (isNext && autoFlip && diff < 5) {
       const timer = setTimeout(() => {
         setShowRowRelative(true);
-      }, 500);
+      }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [isNext, autoFlip]);
+  }, [isNext, autoFlip, row.depMin, now]);
 
   // 전체 시간표 전환 시 해당 위치로 부드러운 스크롤 (속도 1.5배 개선) + 시각효과
   useEffect(() => {
@@ -530,7 +531,7 @@ export function ShuttleView({ isActive }) {
     if (isActive && !isLoading && schedule.length > 0 && !hasAutoFlippedThisSession) {
       hasAutoFlippedThisSession = true;
       setTriggerAutoFlip(true);
-      const t = setTimeout(() => setTriggerAutoFlip(false), 1000);
+      const t = setTimeout(() => setTriggerAutoFlip(false), 3000);
       return () => clearTimeout(t);
     }
   }, [isActive, isLoading, schedule.length]);
