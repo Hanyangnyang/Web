@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 let subwayCache = null;
 let subwayCacheTime = 0;
@@ -22,11 +23,11 @@ const HOLIDAYS_2026 = [
 ];
 
 async function getHolidays(year) {
-  const cacheDir = path.join(process.cwd(), 'api', 'cache');
+  const cacheDir = path.join(os.tmpdir(), 'hanyang-subway-cache');
   try {
     if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
   } catch (e) {
-    console.warn('[Subway API] Cache directory creation failed (expected in read-only environments):', e.message);
+    console.warn('[Subway API] Cache directory creation failed:', e.message);
   }
   const cachePath = path.join(cacheDir, `holidays_${year}.json`);
 
@@ -85,13 +86,30 @@ const TTL_30_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 async function refreshTimetableIfNeeded(lineId, key) {
   const fileName = lineId === '1004' ? 'line4_timetable.json' : 'suin_timetable.json';
-  const filePath = path.join(process.cwd(), 'api', '_lib', fileName);
+  const cacheDir = path.join(os.tmpdir(), 'hanyang-subway-cache');
+  const tempFilePath = path.join(cacheDir, fileName);
+  const bundledFilePath = path.join(process.cwd(), 'api', '_lib', fileName);
   const stCode = STATION_CODES[lineId];
 
   try {
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+  } catch (e) {}
+
+  try {
     let currentData = null;
-    if (fs.existsSync(filePath)) {
-      currentData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    if (fs.existsSync(tempFilePath)) {
+      try {
+        currentData = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+      } catch (parseErr) {
+        console.error(`[Subway API] Temp cache parse failed for ${fileName}, falling back to bundled file:`, parseErr.message);
+      }
+    }
+    
+    if (!currentData && fs.existsSync(bundledFilePath)) {
+      currentData = JSON.parse(fs.readFileSync(bundledFilePath, 'utf8'));
+    }
+
+    if (currentData) {
       const lastUpdated = new Date(currentData.metadata?.lastUpdated || 0).getTime();
       if (Date.now() - lastUpdated < TTL_30_DAYS) {
         return currentData;
@@ -129,10 +147,10 @@ async function refreshTimetableIfNeeded(lineId, key) {
     // Only write if we actually got some data (avoid wiping file on API failure)
     if (result.weekday.upward.length > 0) {
       try {
-        fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
-        console.log(`[Subway API] Successfully updated ${fileName}`);
+        fs.writeFileSync(tempFilePath, JSON.stringify(result, null, 2));
+        console.log(`[Subway API] Successfully updated temp cache for ${fileName}`);
       } catch (writeErr) {
-        console.error(`[Subway API] Failed to write timetable file (expected in read-only environments):`, writeErr.message);
+        console.error(`[Subway API] Failed to write temp timetable file:`, writeErr.message);
       }
       return result;
     }
