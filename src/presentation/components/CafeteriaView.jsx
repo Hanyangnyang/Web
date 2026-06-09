@@ -108,7 +108,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   }, []);
 
   const [selectedCafeId, setSelectedCafeId] = useState(
-    () => urlParams.get('cafe') || localStorage.getItem('lastSelectedCafeId') || 're12'
+    () => urlParams.get('cafe') || 'all'
   );
 
   const selectedCafe = selectedCafeId === 'all'
@@ -125,14 +125,12 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
   const handleCafeSelect = (id) => {
     setSelectedCafeId(id);
-    localStorage.setItem('lastSelectedCafeId', id);
     scrollToTop();
   };
 
   const handleCafeDetailNavigate = (cafeId, mealType) => {
     urlTypeRef.current = mealType;
     setSelectedCafeId(cafeId);
-    localStorage.setItem('lastSelectedCafeId', cafeId);
     scrollToTop();
   };
 
@@ -186,7 +184,6 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
     }
     if (cafeId) {
       setSelectedCafeId(cafeId);
-      localStorage.setItem('lastSelectedCafeId', cafeId);
     }
     if (mealType) {
       urlTypeRef.current = mealType;
