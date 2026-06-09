@@ -229,7 +229,7 @@ export function PortalView({ isVisible = true }) {
     const twelveHoursAgo = nowEpoch - (12 * 60 * 60 * 1000);
     const twelveHoursLater = nowEpoch + (12 * 60 * 60 * 1000);
 
-    // epoch 기준 ±30분 이내이면 "지금" 노드로 판정 (문자열 비교 없음)
+    // 현재 시각이 속한 정각 구간(정각 <= 현재 < 다음 정각)의 노드를 "지금"으로 판정
     const mapped = weather.hourlyForecast.map(item => {
       const epoch = item.epoch;
       if (!epoch) return null; // epoch 없는 구형 캐시 데이터 제거
@@ -237,8 +237,8 @@ export function PortalView({ isVisible = true }) {
       // 브라우저 로컬 시각(KST)으로 hour 직접 계산 (서버의 UTC hour 사용 안 함)
       const localHour = new Date(epoch).getHours();
 
-      const isCurrent = Math.abs(epoch - nowEpoch) < 30 * 60 * 1000;
-      const isPast = epoch < nowEpoch - (30 * 60 * 1000);
+      const isCurrent = epoch <= nowEpoch && epoch > nowEpoch - 60 * 60 * 1000;
+      const isPast = epoch <= nowEpoch - 60 * 60 * 1000;
 
       return {
         ...item,
