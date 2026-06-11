@@ -10,6 +10,25 @@ import { App } from '@capacitor/app';
 
 const BUS_3102_STOPS = ['ERICA컨벤션센터', '한국생산기술연구원', '한양대기숙사앞'];
 
+const TRANSPORT_MODES = [
+  {
+    id: 'shuttle',
+    label: '셔틀·지하철',
+    icon: (
+      <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="5" width="20" height="13" rx="2" /><path d="M2 11h20" />
+        <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
+      </svg>
+    ),
+  },
+  {
+    id: 'bus3102',
+    label: '3102 버스',
+    icon: <BusFront size={18} strokeWidth={2} />,
+  },
+  // 새 노선 추가 시 여기에 항목 추가
+];
+
 const ROUTE_LABEL = {
   '순환':     '순환',
   '직행':     '직행',
@@ -630,6 +649,8 @@ export function ShuttleView({ isActive }) {
   const [viewMode, setViewMode] = useState('shuttle');
   const [bus3102Stop, setBus3102Stop] = useState(BUS_3102_STOPS[0]);
   const [bus3102DayType, setBus3102DayType] = useState('평일');
+  const [fabOpen, setFabOpen] = useState(false);
+  const fabRef = useRef(null);
 
   const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
 
@@ -719,6 +740,12 @@ export function ShuttleView({ isActive }) {
       clearTimeout(hideTimer);
     };
   }, [stop]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
+
+  useEffect(() => {
+    const handler = (e) => { if (fabRef.current && !fabRef.current.contains(e.target)) setFabOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const handleStopClick = (s) => {
     setStop(s);
@@ -930,32 +957,62 @@ export function ShuttleView({ isActive }) {
         )}
       </div>
 
-      {/* 3102 버스 / 셔틀 전환 FAB — portal로 body에 마운트해야 overflow 컨테이너 영향 안 받음 */}
+      {/* 교통수단 전환 FAB + 드롭다운 */}
       {isActive && createPortal(
-        <button
-          onClick={() => setViewMode(v => v === 'shuttle' ? 'bus3102' : 'shuttle')}
-          className="fixed z-[1100] w-[58px] h-[58px] rounded-full bg-primary shadow-[0_4px_16px_rgba(14,74,132,0.35)] flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
+        <div
+          ref={fabRef}
           style={{
+            position: 'fixed',
             bottom: 'calc(24px + 64px + 24px + env(safe-area-inset-bottom))',
             right: 'calc(50vw - min(360px, 100vw - 4rem) * 2 / 5 - 1.75rem)',
+            zIndex: 1100,
           }}
         >
-          {viewMode === 'shuttle' ? (
-            <>
-              <BusFront size={26} strokeWidth={2} className="text-white" />
-              <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">3102</span>
-            </>
-          ) : (
-            <>
-              <svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="5" width="20" height="13" rx="2" />
-                <path d="M2 11h20" />
-                <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
-              </svg>
-              <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">셔틀·지하철</span>
-            </>
+          {/* 드롭다운 메뉴 */}
+          {fabOpen && (
+            <div
+              className="absolute bottom-0 right-[calc(100%+12px)] bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.18)] border border-[#e2e8f0] overflow-hidden"
+              style={{ minWidth: 160, animation: 'sttDropIn 0.18s cubic-bezier(0.16,1,0.3,1)' }}
+            >
+              {TRANSPORT_MODES.map((mode, i) => (
+                <button
+                  key={mode.id}
+                  onClick={() => { setViewMode(mode.id); setFabOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors duration-100
+                    ${i < TRANSPORT_MODES.length - 1 ? 'border-b border-[#f1f5f9]' : ''}
+                    ${viewMode === mode.id ? 'bg-[#f0fdf4] text-[#10b981]' : 'text-text-main hover:bg-surface'}`}
+                >
+                  <span className={viewMode === mode.id ? 'text-[#10b981]' : 'text-text-sub'}>{mode.icon}</span>
+                  <span className="text-[13px] font-bold whitespace-nowrap">{mode.label}</span>
+                  {viewMode === mode.id && (
+                    <span className="ml-auto w-2 h-2 rounded-full bg-[#10b981] flex-shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
           )}
-        </button>,
+
+          {/* FAB 버튼 */}
+          <button
+            onClick={() => setFabOpen(p => !p)}
+            className="w-[58px] h-[58px] rounded-full flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
+            style={{
+              background: fabOpen ? '#059669' : '#10b981',
+              boxShadow: '0 4px 16px rgba(5,150,105,0.4)',
+            }}
+          >
+            {fabOpen ? (
+              <X size={22} strokeWidth={2.5} className="text-white" />
+            ) : (
+              <>
+                <BusFront size={26} strokeWidth={2} className="text-white" />
+                <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">
+                  {TRANSPORT_MODES.find(m => m.id === viewMode)?.label ?? ''}
+                </span>
+              </>
+            )}
+          </button>
+        </div>,
         document.body
       )}
 
