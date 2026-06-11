@@ -27,7 +27,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 방문 시 냉국수, 버섯, 된장찌개 중 택 1 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -91,7 +91,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2~5인 방문 시 음료 1개 무료제공 / 6인 이상 방문 시 음료 2개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -167,7 +167,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1인 1메뉴 주문 시 음료 1개씩 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -255,7 +255,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 에이드 or 갈릭바게트 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -343,7 +343,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 당 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -419,7 +419,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 이상 방문 시, 1인 1식사 (백반) 주문 시 펩시제로 355ml 한 캔 제공 / 감자탕 (중) 이상 주문 시 볶음밥 or 사리 중 택 1 제공 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -483,7 +483,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "세트 메뉴 주문 시 500원 할인 (매장 내 식사 한정)",
         "period": {
           "start_date": "2026-03-02",
@@ -559,7 +559,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 테이블 당 우동/당면사리 중 택 1 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -635,7 +635,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인분 이상 주문 시 추가볶음밥 1인분 or 사리 추가 무료 (주문 시 미리 안내 필수)",
         "period": {
           "start_date": "2026-03-02",
@@ -711,7 +711,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "12,000원 이상 주문 시 꼬치 1개 무료",
         "period": {
           "start_date": "2026-03-02",
@@ -775,7 +775,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "인원 수만큼 군만두 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -839,7 +839,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 된장 or 순두부찌개 제공 (1인 1메뉴 주문 필수)",
         "period": {
           "start_date": "2026-03-02",
@@ -927,7 +927,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "메뉴 4개 이상 주문 시 육회비빔밥 1개 제공 / 오후 6시 이후 방문 시 소주 3천원",
         "period": {
           "start_date": "2026-03-02",
@@ -1027,7 +1027,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "사계천왕 혹은 치뽀끼 주문 시 감자튀김 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -1127,7 +1127,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이블 당 1천원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문시 떡볶이 1인분 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -1239,7 +1239,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "생일자 동반 4인 이상 방문 시 서비스 안주 뽑기 기회 제공 (생일 전후 하루씩 적용 가능, 인스타그램 스토리에 더술 태그 후 게시 필수, 서비스 외 일반 안주 1개 이상 주문 필수)",
         "period": {
           "start_date": "2026-03-02",
@@ -1351,7 +1351,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "계좌이체 시 10% 할인 또는 주류 1병 500원 할인 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -1427,7 +1427,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "탕 세트 주문 시 음료 또는 주류 1병 제공 / 20인 이상 단체 방문 시 테이블당 주류 1병 제공 (중복 적용 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -1503,7 +1503,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이블당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -1579,7 +1579,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 파인애플 샤베트 무료 제공 또는 주류 병당 500원 할인 또는 계좌/현금 결제 시 5% 할인 또는 시험기간 3인 이상 방문 시 주류 반값 할인 (중복 적용 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -1703,7 +1703,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "찌개류 주문 시 라면사리 무한리필 추가 제공 / 10인 이하 방문 시 인당 쭈쭈바 1개 제공 / 오후 8시 이전 방문 시 소주 1병 무료 제공 (중복 적용 가능, 단 인스타그램 스토리 태그 업로드 필수)",
         "period": {
           "start_date": "2026-03-02",
@@ -1803,7 +1803,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "메뉴 5개 이상 동시 주문 시 아메리카노 S 사이즈 1잔 제공 (12:00~14:00 제외, 아메리카노 S사이즈 & 뚱카롱은 기준 메뉴 대상에서 제외)",
         "period": {
           "start_date": "2026-03-02",
@@ -1867,7 +1867,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음료 500원 할인 (인원 무관)",
         "period": {
           "start_date": "2026-03-02",
@@ -1943,7 +1943,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이크아웃 시 전 음료 500원 할인 / 홀 이용 시 아메리카노 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -2031,7 +2031,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "만원 이상 충전 시 음료 S사이즈 제공 / 2만원 이상 충전 시 음료 L사이즈 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -2083,7 +2083,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3,000원 이상 결제 시 물 1병 제공 및 9곡 이상 결제 시 2곡 추가 또는 30분 이상 결제 시 10분 추가 제공 (중복 가능)",
         "period": {
           "start_date": "2026-03-02",
@@ -2159,7 +2159,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "5,000원 이상 현금 또는 계좌이체 결제 시 10% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -2211,7 +2211,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음식&음료 10% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -2287,7 +2287,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "토스트 & 음료 구매 시 음료 1천원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -2375,7 +2375,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 당 탄산 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -2451,7 +2451,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음료 주문 시 2인: 500원 할인 / 3인: 1,000원 할인 + 아메리카노 사이즈업 / 4인: 1,500원 할인 + 아메리카노 2잔 사이즈업 + 원쿠키 1개 제공 (일행 중 1명만 공대생이어도 가능, 인쇄복사 10장 이벤트와 별개, 쿠폰 중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -2515,7 +2515,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "전 메뉴 500원 할인 (타 이벤트 중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -2619,7 +2619,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "12시~17시 인당 음료 500원 할인 / 17시 이후 주류 메뉴 4잔 이상 주문 시 감자칩 1개 제공 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -2707,7 +2707,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "피자 1판 당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -2835,7 +2835,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -2899,7 +2899,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1. 현금 or 계좌이체 시 5% 할인 / 2. 냉면 주문 시 500원 할인 / 3. 소주 500원 할인 (중복 가능)",
         "period": {
           "start_date": "2026-03-02",
@@ -2975,7 +2975,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "(식사) 4인 이상 방문 시 음료 2개 제공 / (포차) 3만원 이상 이용 시 육회 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -3131,7 +3131,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -3195,7 +3195,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "사리 (야채/버섯/칼국수/물만두 중 택 1), 볶음밥, 탄산음료 중 1가지 제공 (테이블당, 인원 수 무관, 네이버 리뷰 이벤트와 중복 가능)",
         "period": {
           "start_date": "2026-03-02",
@@ -3259,7 +3259,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 1캔 or 튀김(고구마롤, 새우롤, 꽃게롤, 샤오마이 중 택1) 제공 (네이버 리뷰 중복 가능)",
         "period": {
           "start_date": "2026-03-02",
@@ -3311,7 +3311,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 테이블 당 음료 1캔 제공 or 현금결제/계좌이체 시 메인 메뉴 당 1천원 할인 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -3399,7 +3399,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 당 음료 1캔 제공 / 4인 당 음료 2캔 또는 주류 1병 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -3487,7 +3487,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "15,000원 이상 주문 시 10% 할인 (테이크 아웃 시 할인 적용된 최종 가격이 15,000원 이상일 경우 적용)",
         "period": {
           "start_date": "2026-03-02",
@@ -3615,7 +3615,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "학생증 제시 시 인당 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -3679,7 +3679,7 @@
       },
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 50,000원 이상 주문 시 7% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -3755,14 +3755,14 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 방문 시 사이드(랜덤) 1개 제공 (방학 기간 4인 중 1명만 공대여도 제휴 가능)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시 (방학 기간에는 4인 중 1명만 공과대학 학생이어도 가능)",
+        "conditions": "학생증 제시, 4인 이상 방문 시 (방학 기간에는 4인 중 1명만 공학대학 학생이어도 가능)",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3807,7 +3807,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1만원 이상 현금 결제 시 500원 할인 또는 3인 이상 방문 시 테이블 당 음료 1개 제공 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -3883,7 +3883,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -3911,7 +3911,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 홀 방문 시 음료(소) 1개 제공 / 4만원 이상 주문 시 감자튀김 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -3939,7 +3939,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 이상 무한리필 주문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -3979,7 +3979,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "현금 or 계좌이체 시 500원 할인 / 카드결제 시 붕어빵 1개 제공 (겨울한정)",
         "period": {
           "start_date": "2026-03-02",
@@ -4007,7 +4007,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 주문 시 만두 1천원 할인 or 음료 1개 제공 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -4071,7 +4071,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이블 당 15,000원 이상 주문 시 기본 튀김류 1개 (오뎅, 김말이, 잡채, 만두) or 쿨피스 제공 (택1)",
         "period": {
           "start_date": "2026-03-02",
@@ -4111,7 +4111,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 방문 시 음료 1개 무료 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4151,7 +4151,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4203,7 +4203,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "피자 주문 시 한판 당 음료 500ml 1개 제공 (전화 포장 주문 시)",
         "period": {
           "start_date": "2026-03-02",
@@ -4231,7 +4231,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 이상 방문 시 음료 1개 제공 or 전골류 주문 시 사리 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4259,7 +4259,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 추가 제외) or 4인 이상 주문 시 음료 1캔 제공 (중복 불가, 포장 시 동일 적용)",
         "period": {
           "start_date": "2026-03-02",
@@ -4335,7 +4335,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 테이블 당 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4375,7 +4375,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이블 1개 당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4415,7 +4415,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 or 당면 or 포두부 사리 중 1개 무료 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4443,7 +4443,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 당 음료수 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4495,7 +4495,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이블 당 음료 1개 제공 / 5인 이상 방문 시 믹스샐러드 1개 제공 (중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -4547,7 +4547,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "8천원 이상 구매 시 탄산 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4587,7 +4587,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "단품메뉴 (고기메뉴) 주문 시 음료 1캔 제공 (인원무관)",
         "period": {
           "start_date": "2026-03-02",
@@ -4651,7 +4651,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1인분 이상 주문 시 음료 1개 무료 제공 / 6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반 제외, 원하는 맛 1가지)",
         "period": {
           "start_date": "2026-03-02",
@@ -4727,7 +4727,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 이상 방문 시 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4791,7 +4791,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "현금/계좌이체 시 10% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -4855,7 +4855,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "15,000원 이상 주문 시 치즈스틱 (2개)/어니언링 (3개)/오징어링 (2개) 중 택 1 (11:00~13:30 제휴 불가, 자체 이벤트와 중복 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -4919,7 +4919,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3인 이상 주문 시 사리 1개 or 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -4995,7 +4995,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "현금 or 계좌이체 시 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5023,7 +5023,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "현금 or 계좌이체 시 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5087,7 +5087,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 이상 방문 시 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -5115,7 +5115,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "2인 이상 방문 시 감자튀김 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -5179,7 +5179,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 방문 시 이달의 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -5219,7 +5219,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이크 아웃 시 음료 10% 할인, 디저트 5% 할인 (쿠폰 적립 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -5259,7 +5259,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "전 메뉴 10% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5287,7 +5287,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1. 음료 매장 취식 시 500원 할인 / 2. 음료 테이크 아웃 시 1,000원 할인 / 3. 디저트+음료 매장 취식 시 1,000원 할인 / 4. 음료+디저트 테이크 아웃 시 1,500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5327,7 +5327,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "테이크아웃 시 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5379,7 +5379,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음료 4잔 이상 주문 시 아이스 아메리카노 벤티 사이즈 1개 증정 (더치페이 가능)",
         "period": {
           "start_date": "2026-03-02",
@@ -5443,7 +5443,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "커피 메뉴 10% 할인 / 그 외 메뉴 5% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5483,7 +5483,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "현금 or 계좌이체 시 5% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5511,7 +5511,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 테이크아웃 주문 시 1000원 추가 할인 / 음료 현금(계좌) 결제 시 음료 10% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5575,7 +5575,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "15,000원 이상 주문 시 10% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5603,7 +5603,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "만원의 행복 세트 1,000원 할인 또는 음료 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5643,7 +5643,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음료 전 메뉴 500원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5671,7 +5671,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 방문 및 단체석 이용 시 음료 1잔당 300원 할인 (최대 3시간 이용 가능, 단체 이용 시 최소 2시간 전 카카오톡 오픈채팅 사전 공지 필수)",
         "period": {
           "start_date": "2026-03-02",
@@ -5699,7 +5699,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "음료 (병음료 제외) 500원 할인 (점심시간 12:00-14:00 제외, 중복 할인 및 포인트 적립 불가)",
         "period": {
           "start_date": "2026-03-02",
@@ -5751,7 +5751,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "4인 이상 방문 시 음료수 1개 제공 & 현금 또는 계좌이체 결제 시 5% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -5827,7 +5827,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "9시 전까지 소주 무제한 4,000원 이용 가능",
         "period": {
           "start_date": "2026-03-02",
@@ -5867,7 +5867,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1. 2~4인 방문 시 라면사리/음료수/셀프주먹밥 중 택 1 제공\n2. 5~8인 방문 시 감자튀김/국물계란찜 중 택 1 제공 or 생맥주 1700cc 주문 시 2700cc 사이즈업 (9인 이상 테이블 미적용/제휴 내용 중복 불가/테이블 당 1회 제공)",
         "period": {
           "start_date": "2026-03-02",
@@ -5895,7 +5895,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3개월 이상 가입 시 2만원 추가 할인 및 사물함/티셔츠 이용권(2만원 상당) 무료 제공 (총 4만원 상당 혜택, 최초 가입자 대상)",
         "period": {
           "start_date": "2026-03-02",
@@ -5947,7 +5947,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "3,000원 이상 결제 시 물 1병 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -5999,7 +5999,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "등록 시 5% 할인 (재등록 2회 포함 총 3회 적용)",
         "period": {
           "start_date": "2026-03-02",
@@ -6027,7 +6027,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "만원 이상 이용 시 5% 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -6067,7 +6067,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "기본 시간 초과 시 10분당 100원 할인",
         "period": {
           "start_date": "2026-03-02",
@@ -6095,7 +6095,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "1. 25,000원 이상 결제 시 음료 1캔 제공\n2. 4인 이상 방문&만두 주문 시 만두 추가 제공\n3. 5만원 이상 결제 시 만두&사리 or 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
@@ -6123,7 +6123,7 @@
     "partnerships": [
       {
         "college_id": "3",
-        "college_name": "공과대학",
+        "college_name": "공학대학",
         "benefit": "8천원 이상 구매 시 500원 할인",
         "period": {
           "start_date": "2026-03-02",
