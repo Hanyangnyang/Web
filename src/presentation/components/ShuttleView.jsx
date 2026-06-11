@@ -1,11 +1,14 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, ChevronDown, ArrowUpRight, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Loader2, ChevronDown, ArrowUpRight, X, Bus, TrainFront } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+
+const BUS_3102_STOPS = ['ERICA컨벤션센터', '한국생산기술연구원', '한양대기숙사앞'];
 
 const ROUTE_LABEL = {
   '순환':     '순환',
@@ -505,6 +508,105 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   );
 }
 
+// ── 3102 버스 요일 선택기 (평일 / 토요일 / 일요일)
+function Bus3102Selector({ isFullMode, dayType, setDayType }) {
+  const [open, setOpen] = useState(false);
+  const [localDay, setLocalDay] = useState(dayType);
+  const ref = useRef(null);
+  const scrollRef = useRef(null);
+  const days = ['평일', '토요일', '일요일'];
+
+  const todayDayType = (() => {
+    const dow = new Date().getDay();
+    if (dow === 6) return '토요일';
+    if (dow === 0) return '일요일';
+    return '평일';
+  })();
+
+  useEffect(() => {
+    if (open) {
+      setLocalDay(dayType);
+    } else {
+      setDayType(localDay);
+    }
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        const idx = days.indexOf(dayType);
+        if (scrollRef.current && idx !== -1) scrollRef.current.scrollTop = idx * 36;
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [open, dayType]);
+
+  const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
+
+  if (!isFullMode) {
+    return (
+      <div className={`${boxBase} border-primary/20 bg-primary/5 w-full px-2 gap-1.5 justify-center items-center h-[44px]`}>
+        <div className="flex flex-col items-center">
+          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">3102 버스</span>
+          <span className="text-[clamp(12px,3vw,13px)] font-black text-text-main leading-tight whitespace-nowrap">{todayDayType}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative select-none w-full" ref={ref}>
+      <div
+        className={`${boxBase} cursor-pointer w-full px-2 gap-1.5 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        onClick={() => setOpen(p => !p)}
+      >
+        <div className="flex flex-col flex-1 min-w-0 items-center">
+          <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] uppercase whitespace-nowrap">3102 버스</span>
+          <span className="text-[clamp(12px,3vw,13px)] font-black text-text-main leading-tight whitespace-nowrap">{dayType}</span>
+        </div>
+        <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
+      </div>
+
+      {open && (
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[120px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+          <div className="flex relative" style={{ height: 36 * 3, background: 'white' }}>
+            <div style={{ position: 'absolute', top: '50%', left: 6, right: 6, height: 36, transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.06)', borderRadius: 8, pointerEvents: 'none', zIndex: 10 }} />
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              onScroll={(e) => {
+                const idx = Math.round(e.target.scrollTop / 36);
+                if (days[idx] && days[idx] !== localDay) setLocalDay(days[idx]);
+              }}
+            >
+              <div style={{ height: 36 }} />
+              {days.map(d => (
+                <div
+                  key={d}
+                  style={{ height: 36, scrollSnapAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: localDay === d ? 700 : 400, color: localDay === d ? '#1e293b' : '#d1d5db', transition: 'all 0.2s', cursor: 'pointer' }}
+                  onClick={() => {
+                    setLocalDay(d);
+                    if (scrollRef.current) scrollRef.current.scrollTop = days.indexOf(d) * 36;
+                  }}
+                >
+                  {d}
+                </div>
+              ))}
+              <div style={{ height: 36 }} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── 세션 단위 자동 플립 여부 기록
 let hasAutoFlippedThisSession = false;
 
@@ -524,6 +626,10 @@ export function ShuttleView({ isActive }) {
     fullPeriod, setFullPeriod,
     appConfig,
   } = useShuttle(isActive);
+
+  const [viewMode, setViewMode] = useState('shuttle');
+  const [bus3102Stop, setBus3102Stop] = useState(BUS_3102_STOPS[0]);
+  const [bus3102DayType, setBus3102DayType] = useState('평일');
 
   const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
 
@@ -633,40 +739,57 @@ export function ShuttleView({ isActive }) {
         <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
           출발지
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          {STOPS.map((s, idx) => (
-            <div
-              key={s}
-              className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${stop === s
-                ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                }`}
-              onClick={() => handleStopClick(s)}
-              style={{ position: 'relative' }}
-            >
-              {tooltipStop === s && showTooltip && (() => {
-                const isTop = idx < 3;
-                const arrowClass = isTop ? 'top' : 'bottom';
-                const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
-                const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
-                const fadeY = isTooltipFadingOut ? (isTop ? ' translateY(-0.5rem)' : ' translateY(0.5rem)') : '';
-                const origin = isTop ? 'bottom center' : 'top center';
-                return (
-                  <div
-                    className={`stt-tooltip ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
-                    style={{ transform: `translateX(-50%) scale(0.85)${fadeY}`, transformOrigin: origin, animation: `${anim} 0.4s cubic-bezier(0.175,0.885,0.32,1.275)` }}
-                  >
-                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
-                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    잠깐! 이 출발지가 맞나요?
-                  </div>
-                );
-              })()}
-              {s}
-            </div>
-          ))}
-        </div>
+        {viewMode === 'shuttle' ? (
+          <div className="grid grid-cols-3 gap-2">
+            {STOPS.map((s, idx) => (
+              <div
+                key={s}
+                className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${stop === s
+                  ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                  : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+                  }`}
+                onClick={() => handleStopClick(s)}
+                style={{ position: 'relative' }}
+              >
+                {tooltipStop === s && showTooltip && (() => {
+                  const isTop = idx < 3;
+                  const arrowClass = isTop ? 'top' : 'bottom';
+                  const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
+                  const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
+                  const fadeY = isTooltipFadingOut ? (isTop ? ' translateY(-0.5rem)' : ' translateY(0.5rem)') : '';
+                  const origin = isTop ? 'bottom center' : 'top center';
+                  return (
+                    <div
+                      className={`stt-tooltip ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
+                      style={{ transform: `translateX(-50%) scale(0.85)${fadeY}`, transformOrigin: origin, animation: `${anim} 0.4s cubic-bezier(0.175,0.885,0.32,1.275)` }}
+                    >
+                      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+                        <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                      잠깐! 이 출발지가 맞나요?
+                    </div>
+                  );
+                })()}
+                {s}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2">
+            {BUS_3102_STOPS.map((s) => (
+              <div
+                key={s}
+                className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${bus3102Stop === s
+                  ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                  : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+                  }`}
+                onClick={() => setBus3102Stop(s)}
+              >
+                {s}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 시간표 */}
@@ -676,18 +799,22 @@ export function ShuttleView({ isActive }) {
 
           <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
             <div className="shrink basis-[125px] min-w-0">
-              <ShuttleSelector
-                isFullMode={isFullMode}
-                fullPeriod={fullPeriod}
-                setFullPeriod={setFullPeriod}
-                fullDayType={fullDayType}
-                setFullDayType={setFullDayType}
-                appConfig={appConfig}
-                isHolidayServer={isHolidayServer}
-                isWeekend={isWeekend}
-              />
+              {viewMode === 'bus3102' ? (
+                <Bus3102Selector isFullMode={isFullMode} dayType={bus3102DayType} setDayType={setBus3102DayType} />
+              ) : (
+                <ShuttleSelector
+                  isFullMode={isFullMode}
+                  fullPeriod={fullPeriod}
+                  setFullPeriod={setFullPeriod}
+                  fullDayType={fullDayType}
+                  setFullDayType={setFullDayType}
+                  appConfig={appConfig}
+                  isHolidayServer={isHolidayServer}
+                  isWeekend={isWeekend}
+                />
+              )}
             </div>
-            {needsSubway && (
+            {viewMode === 'shuttle' && needsSubway && (
               <div className="shrink-0 min-w-0">
                 <SubwayDropdown selected={lineId} onChange={setLineId} />
               </div>
@@ -738,7 +865,7 @@ export function ShuttleView({ isActive }) {
                   marginLeft: 'auto',
                 }}
               >
-                카카오 지하철
+                {viewMode === 'bus3102' ? '카카오 버스' : '카카오 지하철'}
                 <ArrowUpRight size={10} strokeWidth={2.2} />
               </button>
             ) : (
@@ -802,6 +929,31 @@ export function ShuttleView({ isActive }) {
           </div>
         )}
       </div>
+
+      {/* 3102 버스 / 셔틀 전환 FAB — portal로 body에 마운트해야 overflow 컨테이너 영향 안 받음 */}
+      {createPortal(
+        <button
+          onClick={() => setViewMode(v => v === 'shuttle' ? 'bus3102' : 'shuttle')}
+          className="fixed z-[1100] w-14 h-14 rounded-full bg-primary shadow-[0_4px_16px_rgba(14,74,132,0.35)] flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
+          style={{
+            bottom: 'calc(24px + 64px + 12px + env(safe-area-inset-bottom))',
+            right: 'calc(50vw - min(360px, 100vw - 4rem) * 2 / 5 - 1.75rem)',
+          }}
+        >
+          {viewMode === 'shuttle' ? (
+            <>
+              <Bus size={22} strokeWidth={2} className="text-white" />
+              <span className="text-white text-[9px] font-extrabold tracking-tight leading-none">3102</span>
+            </>
+          ) : (
+            <>
+              <TrainFront size={22} strokeWidth={2} className="text-white" />
+              <span className="text-white text-[9px] font-extrabold tracking-tight leading-none">셔틀/지하철</span>
+            </>
+          )}
+        </button>,
+        document.body
+      )}
 
       {/* 실시간 지하철 정보 페이지 리다이렉팅 로딩 뷰 */}
       {subwayRedirecting && (
