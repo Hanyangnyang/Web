@@ -1,7 +1,6 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { Loader2, ChevronDown, ArrowUpRight, X, BusFront } from 'lucide-react';
+import { Loader2, ChevronDown, ArrowUpRight, X } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
@@ -736,8 +735,23 @@ export function ShuttleView({ isActive }) {
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 선택 (고정 상단) */}
       <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
-        <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
-          출발지
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-2xl font-extrabold text-text-main">출발지</div>
+          <div className="flex items-center bg-[#d1fae5] rounded-full p-[3px] gap-[2px]">
+            {['shuttle', 'bus3102'].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`px-3 py-[5px] rounded-full text-[11px] font-extrabold transition-all duration-200 whitespace-nowrap ${
+                  viewMode === mode
+                    ? 'bg-[#059669] text-white shadow-[0_2px_6px_rgba(5,150,105,0.35)]'
+                    : 'text-[#065f46]'
+                }`}
+              >
+                {mode === 'shuttle' ? '셔틀·지하철' : '3102'}
+              </button>
+            ))}
+          </div>
         </div>
         {viewMode === 'shuttle' ? (
           <div className="grid grid-cols-3 gap-2">
@@ -930,34 +944,6 @@ export function ShuttleView({ isActive }) {
         )}
       </div>
 
-      {/* 3102 버스 / 셔틀 전환 FAB — portal로 body에 마운트해야 overflow 컨테이너 영향 안 받음 */}
-      {isActive && createPortal(
-        <button
-          onClick={() => setViewMode(v => v === 'shuttle' ? 'bus3102' : 'shuttle')}
-          className="fixed z-[1100] w-[58px] h-[58px] rounded-full bg-primary shadow-[0_4px_16px_rgba(14,74,132,0.35)] flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
-          style={{
-            bottom: 'calc(24px + 64px + 24px + env(safe-area-inset-bottom))',
-            right: 'calc(50vw - min(360px, 100vw - 4rem) * 2 / 5 - 1.75rem)',
-          }}
-        >
-          {viewMode === 'shuttle' ? (
-            <>
-              <BusFront size={26} strokeWidth={2} className="text-white" />
-              <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">3102</span>
-            </>
-          ) : (
-            <>
-              <svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="5" width="20" height="13" rx="2" />
-                <path d="M2 11h20" />
-                <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
-              </svg>
-              <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">셔틀·지하철</span>
-            </>
-          )}
-        </button>,
-        document.body
-      )}
 
       {/* 실시간 지하철 정보 페이지 리다이렉팅 로딩 뷰 */}
       {subwayRedirecting && (
