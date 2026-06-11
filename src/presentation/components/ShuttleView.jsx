@@ -934,25 +934,25 @@ export function ShuttleView({ isActive }) {
       {isActive && createPortal(
         <button
           onClick={() => setViewMode(v => v === 'shuttle' ? 'bus3102' : 'shuttle')}
-          className="fixed z-[1100] w-14 h-14 rounded-full bg-primary shadow-[0_4px_16px_rgba(14,74,132,0.35)] flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
+          className="fixed z-[1100] w-[58px] h-[58px] rounded-full bg-primary shadow-[0_4px_16px_rgba(14,74,132,0.35)] flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
           style={{
-            bottom: 'calc(24px + 64px + 12px + env(safe-area-inset-bottom))',
+            bottom: 'calc(24px + 64px + 24px + env(safe-area-inset-bottom))',
             right: 'calc(50vw - min(360px, 100vw - 4rem) * 2 / 5 - 1.75rem)',
           }}
         >
           {viewMode === 'shuttle' ? (
             <>
-              <BusFront size={22} strokeWidth={2} className="text-white" />
-              <span className="text-white text-[9px] font-extrabold tracking-tight leading-none">3102</span>
+              <BusFront size={26} strokeWidth={2} className="text-white" />
+              <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">3102</span>
             </>
           ) : (
             <>
-              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <svg width={26} height={26} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="5" width="20" height="13" rx="2" />
                 <path d="M2 11h20" />
                 <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
               </svg>
-              <span className="text-white text-[9px] font-extrabold tracking-tight leading-none">셔틀/지하철</span>
+              <span className="text-white text-[10px] font-extrabold tracking-tight leading-none">셔틀·지하철</span>
             </>
           )}
         </button>,
