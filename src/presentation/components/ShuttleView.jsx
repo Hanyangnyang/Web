@@ -1,7 +1,7 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Loader2, ChevronDown, ArrowUpRight, X, Bus, TrainFront } from 'lucide-react';
+import { Loader2, ChevronDown, ArrowUpRight, X, BusFront } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
@@ -931,7 +931,7 @@ export function ShuttleView({ isActive }) {
       </div>
 
       {/* 3102 버스 / 셔틀 전환 FAB — portal로 body에 마운트해야 overflow 컨테이너 영향 안 받음 */}
-      {createPortal(
+      {isActive && createPortal(
         <button
           onClick={() => setViewMode(v => v === 'shuttle' ? 'bus3102' : 'shuttle')}
           className="fixed z-[1100] w-14 h-14 rounded-full bg-primary shadow-[0_4px_16px_rgba(14,74,132,0.35)] flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95"
@@ -942,12 +942,16 @@ export function ShuttleView({ isActive }) {
         >
           {viewMode === 'shuttle' ? (
             <>
-              <Bus size={22} strokeWidth={2} className="text-white" />
+              <BusFront size={22} strokeWidth={2} className="text-white" />
               <span className="text-white text-[9px] font-extrabold tracking-tight leading-none">3102</span>
             </>
           ) : (
             <>
-              <TrainFront size={22} strokeWidth={2} className="text-white" />
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="5" width="20" height="13" rx="2" />
+                <path d="M2 11h20" />
+                <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
+              </svg>
               <span className="text-white text-[9px] font-extrabold tracking-tight leading-none">셔틀/지하철</span>
             </>
           )}
