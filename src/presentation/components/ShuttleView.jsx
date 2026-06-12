@@ -514,7 +514,7 @@ export function ShuttleView({ isActive }) {
     subwayArrivals, subwayOffPeak,
     isHolidayServer, isWeekend,
     needsSubway,
-    loadErr, isLoading, isSubwayLoading,
+    loadErr, isLoading, isSubwayLoading, isGpsLoading,
     visibleCount, loadMore,
     isFullMode, setIsFullMode,
     fullDayType, setFullDayType,
@@ -594,6 +594,8 @@ export function ShuttleView({ isActive }) {
   }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
 
   useEffect(() => {
+    if (isGpsLoading) return;
+
     // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
     const showTimer = setTimeout(() => {
       if (!hasInteractedRef.current) {
@@ -609,7 +611,7 @@ export function ShuttleView({ isActive }) {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
-  }, [stop]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
+  }, [stop, isGpsLoading]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
 
   const handleStopClick = (s) => {
     setStop(s);
