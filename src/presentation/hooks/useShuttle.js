@@ -39,6 +39,8 @@ export function useShuttle(isActive = false) {
   const [fullDayType,     setFullDayType]     = useState('평일');
   const [fullPeriod,      setFullPeriod]      = useState(appConfig.current_period);
 
+  const [isGpsLoading, setIsGpsLoading] = useState(() => isActive);
+
   useEffect(() => {
     if (appConfig.current_period) {
       setTimeout(() => {
@@ -50,6 +52,8 @@ export function useShuttle(isActive = false) {
   // 지오로케이션으로 현재 위치 판단하여 셔틀 정류장 자동 선택 (셔틀 탭 활성화 시에만 지연 로드)
   useEffect(() => {
     if (!isActive) return;
+
+    setIsGpsLoading(true);
 
     Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 5000 })
       .then((position) => {
@@ -81,6 +85,9 @@ export function useShuttle(isActive = false) {
       .catch((error) => {
         // 위치 권한이 꺼져 있거나 오류가 난 경우에는 localStorage의 이전 저장값을 그대로 유지하기 위해 덮어쓰지 않습니다.
         console.warn('Geolocation failed or permission denied. Retaining localStorage stop.', error);
+      })
+      .finally(() => {
+        setIsGpsLoading(false);
       });
   }, [isActive]);
 
@@ -176,6 +183,7 @@ export function useShuttle(isActive = false) {
     loadErr,
     isLoading: !allData && !loadErr,
     isSubwayLoading,
+    isGpsLoading,
     isHolidayServer,
     isWeekend,
     visibleCount,
