@@ -133,10 +133,10 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
     return diff > 0 ? `${diff}분 뒤 도착` : `${Math.abs(diff)}분 전 도착`;
   };
 
-  // 첫 진입 시 다음 셔틀 자동 뒤집기 (1초 뒤, 남은 시간이 5분 미만일 때만)
+  // 첫 진입 시 다음 셔틀 자동 뒤집기 (1초 뒤, 남은 시간이 30분 이하일 때만)
   useEffect(() => {
     const diff = row.depMin - now;
-    if (isNext && autoFlip && diff < 5) {
+    if (isNext && autoFlip && diff <= 30) {
       const timer = setTimeout(() => {
         setShowRowRelative(true);
       }, 1000);
@@ -505,9 +505,6 @@ function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, s
   );
 }
 
-// ── 세션 단위 자동 플립 여부 기록
-let hasAutoFlippedThisSession = false;
-
 // ── 메인 컴포넌트
 export function ShuttleView({ isActive }) {
   const {
@@ -517,7 +514,7 @@ export function ShuttleView({ isActive }) {
     subwayArrivals, subwayOffPeak,
     isHolidayServer, isWeekend,
     needsSubway,
-    loadErr, isLoading, isSubwayLoading,
+    loadErr, isLoading, isSubwayLoading, isGpsLoading,
     visibleCount, loadMore,
     isFullMode, setIsFullMode,
     fullDayType, setFullDayType,
@@ -527,14 +524,14 @@ export function ShuttleView({ isActive }) {
 
   const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
 
+  // 칩(출발지)을 바꿀 때마다 30분 이내의 다음 셔틀 자동 뒤집기 트리거 실행
   useEffect(() => {
-    if (isActive && !isLoading && schedule.length > 0 && !hasAutoFlippedThisSession) {
-      hasAutoFlippedThisSession = true;
+    if (isActive && !isLoading && schedule.length > 0) {
       setTriggerAutoFlip(true);
       const t = setTimeout(() => setTriggerAutoFlip(false), 3000);
       return () => clearTimeout(t);
     }
-  }, [isActive, isLoading, schedule.length]);
+  }, [isActive, isLoading, stop]);
 
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
@@ -597,6 +594,8 @@ export function ShuttleView({ isActive }) {
   }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
 
   useEffect(() => {
+    if (isGpsLoading) return;
+
     // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
     const showTimer = setTimeout(() => {
       if (!hasInteractedRef.current) {
@@ -612,7 +611,7 @@ export function ShuttleView({ isActive }) {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
-  }, [stop]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
+  }, [stop, isGpsLoading]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
 
   const handleStopClick = (s) => {
     setStop(s);
@@ -766,7 +765,7 @@ export function ShuttleView({ isActive }) {
             const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
             return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
               <TimetableRow
-                key={i}
+                key={`${stop}-${i}`}
                 row={row}
                 lineId={lineId}
                 isNext={!isFullMode && i === nextIdx && nextIdx !== -1}
