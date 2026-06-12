@@ -60,6 +60,18 @@
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
         "conditions": "학생증 제시, 4인 이상 방문 시",
         "benefit": "4인이상 방문 시, 돈장찌개 or 버섯 or 냉국수 중 택1"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "4인 이상 테이블당 서비스 택 2 제공 (된장찌개, 냉국수, 버섯 중 택 2)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "4인 이상 테이블 기준, 혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -154,18 +166,6 @@
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "5천원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIXAWAVQE"
-      },
-      {
         "college_id": "3",
         "college_name": "공학대학",
         "benefit": "1인 1메뉴 주문 시 음료 1개씩 제공",
@@ -240,18 +240,6 @@
         },
         "conditions": "2인 이상 방문 시 음료수·바게트 중 택1 / 4인 이상 방문 시 음료 2캔으로 혜택 상향",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
-      },
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "5천원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIBVNAYTP"
       },
       {
         "college_id": "3",
@@ -388,6 +376,18 @@
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
         "conditions": "학생증 제시, 2인 이상 방문 시",
         "benefit": "2인 이상 방문 시, 음료 1캔 증정"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "2인 이상 방문 시 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -808,6 +808,18 @@
         },
         "conditions": "학생증 제시, 주문 인원 기준 충족 시",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "인원 수에 맞춰 만두 1개씩 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "방문 인원 전원 대상 제공, 혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -1084,6 +1096,18 @@
         },
         "conditions": "학생증 제시, 지정 메뉴 주문 시",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "사계천왕 or 치뽀끼 주문 시 감자튀김 추가 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -1214,18 +1238,6 @@
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "5만원 이상 결제 시 1만원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수 / 5만원 이상 결제 시 적용",
-        "source_url": "https://www.instagram.com/p/DVfHiDGAUT1"
-      },
-      {
         "college_id": "4",
         "college_name": "약학대학",
         "benefit": "현금/계좌이체 결제 시 10% 할인 / 2-3명 방문 시 음료수 제공 / 4명 이상 방문 시 더술 서비스 메뉴 제공 (중복 적용 가능)",
@@ -1308,6 +1320,18 @@
         },
         "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 (인원별 음료/안주 서비스 혜택과 중복 가능)",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "계좌이체 or 현금 결제 시 10% 할인 / 2~3인 방문 시 음료 1캔 제공 / 4인 이상 방문 시 서비스 메뉴 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "이체 현금 할인은 인원 제휴와 중복 가능. 인원 제휴는 그 자체로 중복 불가하나 인스타 업로드 시 중복 가능. 혜택을 받는 인원이 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -1678,18 +1702,6 @@
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "5만원 이상 결제 시 1만원 할인쿠폰 제공 / 10만원 이상 결제 시 2만원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수 / 5만원 이상: 1만원 쿠폰 / 10만원 이상: 2만원 쿠폰",
-        "source_url": "https://www.instagram.com/p/DVfHaqFAXNc"
-      },
-      {
         "college_id": "4",
         "college_name": "약학대학",
         "benefit": "찌개류 주문 시 라면사리 무한리필 / 오후 5-8시 약대 재학생 포함 방문 시 병당 500원 할인(병 수 제한 없음) / 단체 행사 예약 시 인원수대로 아이스크림 제공 / 일요일 휴무일 장소 무료 대관",
@@ -1912,6 +1924,18 @@
         },
         "conditions": "학생증 제시, 메뉴 당 적용",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "모든 제조 음료 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2128,6 +2152,18 @@
         },
         "conditions": "학생증 제시, 3,000원 이상 결제 시 혹은 곡/시간 요건 충족 시",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "3000원당 물 한 병 제공 and (9곡 선택 시 2곡 추가 or 30분 선택 시 10분 추가)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2332,6 +2368,18 @@
         },
         "conditions": "학생증 제시, 세트 메뉴 주문 시 세트당 1,000원 할인",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "토스트와 음료 세트 구매 시 1000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2484,6 +2532,18 @@
         },
         "conditions": "학생증 제시, 인원 또는 세트 주문 요건 달성 시 (중복 불가)",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "2인 방문 시 500원 할인 / 3인 방문 시 1000원 할인 or 아메리카노 사이즈업 / 4인 방문 시 1500원 할인 or 아메리카노 2잔 사이즈업 or 쿠키 1개 증정",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2501,18 +2561,6 @@
     },
     "emoji": "☕",
     "partnerships": [
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "아메리카노 무료 쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfHyHkgUE-"
-      },
       {
         "college_id": "3",
         "college_name": "공학대학",
@@ -2560,6 +2608,18 @@
         },
         "conditions": "학생증 제시, 음료 주문 시 인당 500원 할인",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "음료 주문 시 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2576,20 +2636,7 @@
       "full_address": null
     },
     "emoji": "🍰",
-    "partnerships": [
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "1만원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfH4I-ARV3"
-      }
-    ]
+    "partnerships": []
   },
   {
     "id": "34",
@@ -2605,18 +2652,6 @@
     },
     "emoji": "☕",
     "partnerships": [
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "3인 이상 방문 시 7천원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-03-31",
-          "is_active": true
-        },
-        "conditions": "3인 이상 방문 필수 / 쿠폰 만료일 2026.03.31 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfH8MDAVGj"
-      },
       {
         "college_id": "3",
         "college_name": "공학대학",
@@ -2694,18 +2729,6 @@
     "emoji": "🍕",
     "partnerships": [
       {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "버터갈릭 프라이 쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIF9GAeJE"
-      },
-      {
         "college_id": "3",
         "college_name": "공학대학",
         "benefit": "피자 1판 당 음료 1개 제공",
@@ -2764,6 +2787,18 @@
         },
         "conditions": "학생증 제시, 피자 1판당 음료 1개 또는 플레인 프라이 제공 (택 1)",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "피자 주문 시 콜라/사이다 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2781,18 +2816,6 @@
     },
     "emoji": "🍲",
     "partnerships": [
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "1만원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIJj3ASWG"
-      },
       {
         "college_id": "7",
         "college_name": "경상대학",
@@ -2822,18 +2845,6 @@
     "emoji": "🍲",
     "partnerships": [
       {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "1만원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIMzDAVH_"
-      },
-      {
         "college_id": "3",
         "college_name": "공학대학",
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
@@ -2856,6 +2867,18 @@
         },
         "conditions": "학생증 제시, 3인 이상 방문 시 음료 1개 제공",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "3인 이상 방문 시 음료수 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -2873,18 +2896,6 @@
     },
     "emoji": "🥓",
     "partnerships": [
-      {
-        "college_id": "2",
-        "college_name": "커뮤니케이션&컬쳐대학",
-        "benefit": "1만원 할인쿠폰 제공",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
-          "is_active": true
-        },
-        "conditions": "쿠폰 만료일 2026.06.30 이내 사용 필수",
-        "source_url": "https://www.instagram.com/p/DVfIuBTEXkM"
-      },
       {
         "college_id": "4",
         "college_name": "약학대학",
@@ -3368,6 +3379,18 @@
         },
         "conditions": "학생증 제시, 3인 이상 테이블 이용 시 음료 1개 제공 및 현금/계좌이체 결제 시 메뉴 당 1,000원 할인 적용",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "3인 이상 방문 시 테이블 당 음료 1캔 제공 / 현금 or 계좌이체 결제 시 메인메뉴 당 1000원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -3864,6 +3887,18 @@
         },
         "conditions": "학생증 제시, 인원 요건 만족 시 또는 1만원 이상 현금 결제 시 적용",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "3인 이상 방문 시 음료수 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -4052,6 +4087,18 @@
         },
         "conditions": "학생증 제시, 3인 이상 방문 시 적용",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "3인 이상 방문 시 테이블당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -4632,6 +4679,18 @@
         },
         "conditions": "학생증 제시, 고기 단품 메뉴 주문 시 테이블당 음료 1개 제공",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "단품 메뉴 주문 시 음료수 1캔 제공 (※ 볶음밥 제외)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -4772,6 +4831,18 @@
         },
         "conditions": "학생증 제시, 2인 이상 방문 시 음료 1개 제공",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "테이블 당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -4900,6 +4971,18 @@
         },
         "conditions": "학생증 제시, 15,000원 이상 주문 시 (단, 11:00 ~ 13:00 및 타 이벤트와 중복 제외)",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "15,000원 이상 주문 시 택 1 (치즈스틱(2개) or 어니언링(3개) or 오징어링(2개))",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
@@ -6104,6 +6187,18 @@
         },
         "conditions": "학생증 제시, 방문 인원 및 결제 금액 조건 충족 시",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
+      },
+      {
+        "college_id": "2",
+        "college_name": "커뮤니케이션&컬쳐대학",
+        "benefit": "4인 이상 방문 시 만두 추가 (만두 주문 시) / 25,000원 이상 주문 시 음료수 1캔 제공 / 50,000원 이상 주문 시 만두 추가 및 사리 or 음료수 택 1 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
+        "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
     ]
   },
