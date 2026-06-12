@@ -16,13 +16,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "고기 4인분 이상 주문 시 찌개 / 버섯 / 냉국수 중 택1 제공",
+        "benefit": "찌개 / 버섯 / 냉국수 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "고기 4인분 이상 주문 필수",
+        "conditions": "고기 4인분 이상 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -92,13 +92,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "4인 이상 방문 시 콜라 한 병 제공 / 6인 이상 방문 시 콜라 두 병 제공",
+        "benefit": "4인 이상 방문 시 콜라 한 병 제공\n6인 이상 방문 시 콜라 두 병 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "4인 이상 방문 시 콜라 1병 / 6인 이상 방문 시 콜라 2병 차등 적용",
+        "conditions": "4인 이상 방문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -156,13 +156,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "1인 1메뉴 주문 시 음료 1개 제공",
+        "benefit": "음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "1인 1메뉴 주문 필수",
+        "conditions": "1인 1메뉴 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -232,13 +232,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 방문 시 음료수 / 바게트 중 택1 제공 / 4인 이상 방문 시 음료 2캔 제공",
+        "benefit": "2인 이상 방문 시 음료수 / 바게트 중 택1 제공\n4인 이상 방문 시 음료 2캔 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인 이상 방문 시 음료수·바게트 중 택1 / 4인 이상 방문 시 음료 2캔으로 혜택 상향",
+        "conditions": "2인 이상 방문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -308,13 +308,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 주문 시 음료 1개 제공",
+        "benefit": "음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인 이상 주문 필수",
+        "conditions": "2인 이상 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -408,13 +408,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 주문 시 음료 1개 제공 / 감자탕(중) 이상 주문 시 볶음밥 또는 사리 중 택1 제공",
+        "benefit": "2인 이상 주문 시 음료 1개 제공\n감자탕(중) 이상 주문 시 볶음밥 / 사리 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인 이상 주문 필수 / 볶음밥·사리 혜택은 감자탕 중 사이즈 이상 주문 시 적용",
+        "conditions": "2인 이상 주문 또는 감자탕(중) 이상 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -472,13 +472,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "세트메뉴 주문 시 500원 할인",
+        "benefit": "500원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "세트메뉴 주문 필수",
+        "conditions": "세트메뉴 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -536,13 +536,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "4인 이상 방문 시 우동사리 / 당면사리 중 택1 제공",
+        "benefit": "우동사리 / 당면사리 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "4인 이상 방문 필수",
+        "conditions": "4인 이상 방문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -612,13 +612,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "일미 닭갈비 3인분 이상 주문 시 볶음밥 1인분 제공",
+        "benefit": "볶음밥 1인분 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "일미 닭갈비 메뉴 3인분 이상 주문 필수",
+        "conditions": "일미 닭갈비 3인분 이상 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -700,13 +700,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 주문 시 음료 1개 제공 또는 주류 2,000원 할인 중 택1",
+        "benefit": "음료 1개 / 주류 2천원 할인 중 택1",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인 이상 주문 필수",
+        "conditions": "2인 이상 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -764,13 +764,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 방문 시 만두 제공",
+        "benefit": "만두 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인 이상 방문 필수",
+        "conditions": "2인 이상 방문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -840,13 +840,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "4인 이상 방문 시 된장찌개 / 순두부찌개 중 택1 제공",
+        "benefit": "된장찌개 / 순두부찌개 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "4인 이상 방문 필수, 1인 1메뉴 주문 필수",
+        "conditions": "4인 이상 방문 시 적용 가능, 1인 1메뉴 주문 필수!",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -916,13 +916,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "4인 이상 방문 시 육회비빔밥 / 샤브샤브 1인분 중 택1 제공",
+        "benefit": "육회비빔밥 / 샤브샤브 1인분 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "4인 이상 방문 필수, 1인 1메뉴 주문 필수",
+        "conditions": "4인 이상 방문 시 적용 가능, 1인 1메뉴 주문 필수",
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       },
       {
@@ -1016,13 +1016,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "사계천왕 / 치뽀끼 주문 시 감자튀김 제공",
+        "benefit": "감자튀김 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "사계천왕 또는 치뽀끼 메뉴 주문 필수",
+        "conditions": "사계천왕 또는 치뽀끼 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1128,13 +1128,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "한 테이블 당 1,000원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "benefit": "한 테이블 당 1천원 상당의 서비스 제공\n테이블 당 7만원 이상 주문 시 떡볶이 1인분 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "테이블 기준 적용 / 떡볶이 혜택은 7만원 이상 주문 시",
+        "conditions": null, 
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1228,13 +1228,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "4인 미만 방문 시 음료 1병 제공 / 4인 이상 방문 시 서비스 메뉴 제공 / 생일자 생일파티 시 뽑기를 통해 안주 제공",
+        "benefit": "4인 미만 방문 시 음료 1병 제공\n4인 이상 방문 시 서비스 메뉴 제공 (매장 사정에 따라 달라질 수 있음)\n생일자 생일파티 시 뽑기를 통해 안주 제공 (메인 안주 주문 필수)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "4인 미만: 음료 1병 / 4인 이상: 서비스 메뉴(매장 사정에 따라 변동 가능) / 생일파티: 메인 안주 주문 필수 / 더술 1·2호점 인스타 업로드 시 중복 혜택 가능",
+        "conditions": "더술 1·2호점 인스타 업로드 시 중복 혜택 가능",
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1352,13 +1352,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "현금 / 계좌이체 결제 시 10% 할인 / 2인 이상 방문 시 캔 음료 1개 제공",
+        "benefit": "현금 또는 계좌이체 결제 시 10% 할인\n2인 이상 방문 시 캔 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "할인 혜택: 현금 또는 계좌이체 결제 필수 / 음료 혜택: 2인 이상 방문 필수",
+        "conditions": null, 
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1440,13 +1440,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "치킨 메뉴 + 탕 메뉴 동시 주문 시 주류 1병 제공",
+        "benefit": "주류 1병 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "치킨 메뉴와 탕 메뉴 동시 주문 필수",
+        "conditions": "치킨 메뉴 + 탕 메뉴 동시 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1516,13 +1516,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "benefit": "음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "3인 이상 방문 필수",
+        "conditions": "3인 이상 방문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1580,13 +1580,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 주문 시 음료 1개 제공 / 4인 이상 주문 시 샤베트 1개 제공",
+        "benefit": "2인 이상 주문 시 음료 1개 제공\n4인 이상 주문 시 샤베트 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인 이상 주문 시 음료 1개 / 4인 이상 주문 시 샤베트 1개로 혜택 상향",
+        "conditions": "2인 이상 주문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1692,13 +1692,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "찌개 주문 시 라면사리 1개 제공 / 현금·계좌이체 결제 시 미니 쮸쮸바 제공 / 에이쁠 인스타 태그 후 스토리 게시 시 500원 할인",
+        "benefit": "찌개 주문 시 라면사리 1개 제공\n현금/계좌이체 결제 시 미니 쮸쮸바 제공\n에이쁠 인스타 태그 후 스토리 게시 시 500원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "사리: 찌개 메뉴 주문 필수 / 쮸쮸바: 현금 또는 계좌이체 결제 필수 / 500원 할인: 에이쁠 인스타 태그 후 스토리 게시 필수",
+        "conditions": null, 
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1804,13 +1804,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "음료 5잔 이상 구매 시 아메리카노 S사이즈 1잔 또는 아이스크림 토핑 제공",
+        "benefit": "아메리카노 S사이즈 1잔 또는 아이스크림 토핑 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "음료 5잔 이상 구매 필수 / 아메리카노 S사이즈·디저트는 5잔 카운트에 포함되지 않음",
+        "conditions": "음료 5잔 이상 구매 시 적용 가능, 아메리카노 S사이즈&디저트는 5잔 카운트에 포함되지 않음",
         "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
       },
       {
@@ -1956,13 +1956,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "테이크 아웃 시 전 음료 500원 할인 / 매장 이용 시 아메리카노(M/L) 500원 할인",
+        "benefit": "테이크 아웃 시 전 음료 500원 할인\n매장 이용 시 아메리카노(M/L) 500원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "테이크 아웃: 전 음료 적용 / 매장 이용: 아메리카노 M·L 사이즈에 한해 적용",
+        "conditions": null, 
         "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
       },
       {
@@ -2017,7 +2017,7 @@
   },
   {
     "id": "25",
-    "name": "포세이돈 PC카페",
+    "name": "포세이돈 PC",
     "category": "play",
     "is_active": true,
     "summary_benefit": null,
@@ -2032,13 +2032,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "1만원 이상 충전 시 음료수 S사이즈 1개 제공",
+        "benefit": "음료수 S사이즈 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "1만원 이상 충전 필수",
+        "conditions": "1만원 이상 충전 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
       },
       {
@@ -2069,7 +2069,7 @@
   },
   {
     "id": "26",
-    "name": "슈퍼스타 코인노래연습장",
+    "name": "슈퍼스타 코인노래방",
     "category": "play",
     "is_active": true,
     "summary_benefit": null,
@@ -2084,13 +2084,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "3천원 이상 결제 시 물 한 병 제공 / 9곡 결제 시 2곡 추가 서비스 / 30분 충전 시 10분 추가 서비스",
+        "benefit": "3천원 이상 결제 시 물 한 병 제공\n9곡 결제 시 2곡 서비스\n30분 충전 시 10분 서비스",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "물: 3천원 이상 결제 필수 / 추가 곡·시간 혜택 두 항목 중복 적용 가능",
+        "conditions": "2곡/10분 서비스 혜택, 두 항목은 중복 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
       },
       {
@@ -2184,13 +2184,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "5천원 이상 현금 결제 시 10% 할인",
+        "benefit": "10% 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "5천원 이상 현금 결제 필수",
+        "conditions": "5천원 이상 현금 결제 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
       },
       {
@@ -2221,7 +2221,7 @@
   },
   {
     "id": "28",
-    "name": "레드버튼 고잔점",
+    "name": "레드버튼 안산고잔점",
     "category": "play",
     "is_active": true,
     "summary_benefit": null,
@@ -2300,13 +2300,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "토스트&음료 구매 시 1,000원 할인",
+        "benefit": "1,000원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "토스트와 음료 동시 구매 필수",
+        "conditions": "토스트와 음료 동시 구매 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
       },
       {
@@ -2400,13 +2400,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "3인 이상 방문 시 음료 1캔 제공",
+        "benefit": "음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "3인 이상 방문 필수",
+        "conditions": "3인 이상 방문 시 적용 가능",
         "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
       },
       {
@@ -2488,13 +2488,13 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "2인 이상 주문 시 500원 할인 / 3인 이상 주문 시 1,000원 할인 또는 아메리카노 사이즈업 / 4인 이상 주문 시 1,500원 할인 또는 아메리카노 2개 사이즈업 또는 원쿠키 제공",
+        "benefit": "2인 이상 주문 시 500원 할인\n3인 이상 주문 시 1,000원 할인 or 아메리카노 사이즈업\n4인 이상 주문 시 1,500원 할인 or 아메리카노 2개 사이즈업 or 원쿠키 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": "2인: 500원 할인 / 3인: 1,000원 할인 or 아메리카노 사이즈업 / 4인: 1,500원 할인 or 아메리카노 2개 사이즈업 or 원쿠키 중 택1",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DXJGH8pkkwg"
       },
       {
@@ -3899,6 +3899,18 @@
         },
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
+      },
+      {
+        "college_id": "1",
+        "college_name": "LIONS\n칼리지",
+        "benefit": "3인 이상 주문 시 음료 1개 제공 (한 테이블 기준)\n1만원 이상 현금 결제 시 500원 할인 (계좌이체 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-06-30",
+          "is_active": true
+        },
+        "conditions": "3인 이상 주문 시 또는 1만원 이상 현금 결제/계좌이체 시 적용 가능",
+        "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       }
     ]
   },
