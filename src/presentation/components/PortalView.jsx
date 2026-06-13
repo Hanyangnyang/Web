@@ -375,7 +375,7 @@ export function PortalView({ isVisible = true }) {
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
         {/* 1. 오늘의 날씨 & 소식 섹션 */}
         {(loading || weather) && (
-          <section className="mb-2">
+          <section className="mb-4">
             <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
