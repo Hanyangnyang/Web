@@ -1047,12 +1047,12 @@ export function ShuttleView({ isActive }) {
               <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
                 버스 노선
               </div>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2.5 pb-2 -mx-5 px-5">
+              <div className="grid grid-cols-2 gap-2">
                 {BUSES.map(bus => {
                   const isSelected = selectedBuses.includes(bus.id);
                   const is3102 = bus.id === '3102';
                   return (
-                    <div key={bus.id} className="relative select-none flex-shrink-0">
+                    <div key={bus.id} className="relative select-none">
                       <div
                         onClick={() => {
                           setSelectedBuses(prev => 
@@ -1061,7 +1061,7 @@ export function ShuttleView({ isActive }) {
                               : [...prev, bus.id]
                           );
                         }}
-                        className={`py-[7px] px-4 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
+                        className={`py-[7px] px-2 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
                           isSelected
                             ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                             : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
