@@ -323,7 +323,7 @@
         "benefit": "2인 이상 방문 시 음료수 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -536,7 +536,7 @@
       {
         "college_id": "1",
         "college_name": "LIONS\n칼리지",
-        "benefit": "4인 이상 방문 시 우동사리 / 당면사리 중 택1 제공",
+        "benefit": "4인 이상 방문 시 우동사리 or 당면사리 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-06-30",
@@ -548,10 +548,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "4인 테이블당 우동 또는 당면사리 중 택1 제공",
+        "benefit": "4인 테이블당 우동 or 당면사리 중 택1 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -627,7 +627,7 @@
         "benefit": "인원 수 상관없이 3인분 이상 주문 시 볶음밥 1인분 무료 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -931,7 +931,7 @@
         "benefit": "오후 6시 이후 4인분 이상 주문 시 테이블당 육회비빔밥 또는 샤브샤브 1인분 제공 (샤브샤브는 4인분 이상 주문 시 선택 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1028,10 +1028,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "사계천왕 또는 치뽀끼 주문 시 감자튀김 추가 제공",
+        "benefit": "사계천왕 또는 치뽀끼 주문 시 감자튀김 추가",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1134,16 +1134,16 @@
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": null, 
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "테이블당 1,000원 상당의 서비스 제공 / 테이블당 7만원 이상 주문 시 떡볶이 1인분 제공 (중복 적용 가능)",
+        "benefit": "테이블당 1,000원 상당의 서비스 제공\n테이블당 7만원 이상 주문 시 떡볶이 1인분 제공\n(위 조항들 간 중복 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1240,10 +1240,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "현금/계좌이체 결제 시 10% 할인 / 2-3명 방문 시 음료수 제공 / 4명 이상 방문 시 더술 서비스 메뉴 제공 (중복 적용 가능)",
+        "benefit": "현금/계좌이체 결제 시 10% 할인\n2-3명 방문 시 음료수 제공\n4명 이상 방문 시 더술 서비스 메뉴 제공\n(위 조항들 간 중복 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1358,7 +1358,7 @@
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": null, 
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
@@ -1367,7 +1367,7 @@
         "benefit": "계좌이체 결제 시 소주/맥주 병당 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1595,7 +1595,7 @@
         "benefit": "4인 이상 방문 시 샤베트 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1698,16 +1698,16 @@
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": null, 
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DVfqTGakoPU"
       },
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "찌개류 주문 시 라면사리 무한리필 / 오후 5-8시 약대 재학생 포함 방문 시 병당 500원 할인(병 수 제한 없음) / 단체 행사 예약 시 인원수대로 아이스크림 제공 / 일요일 휴무일 장소 무료 대관",
+        "benefit": "찌개류 주문 시 라면사리 무한리필\n오후 5-8시 약대 재학생 포함 방문 시 병당 500원 할인(병 수 제한 없음)\n단체 행사 예약 시 인원수대로 아이스크림 제공(개강, 종강 총회 제외)\n일요일 휴무일에도 장소 무료 대관(사전 연락 3일전 및 뒷정리 필수)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수 / 무료 대관: 사전 연락(3일 전) 및 뒷정리 필수 / 아이스크림: 개강·종강 총회 제외",
@@ -1814,6 +1814,18 @@
         "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
       },
       {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "음료 5잔 이상 구매 시 아메리카노 S사이즈 1잔 증정 or 아이스크림 토핑 제공 (아메리카노 s사이즈 및 마카롱은 구매 시 제외)\n(조항 간 중복 적용 불가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
         "college_id": "3",
         "college_name": "공학대학",
         "benefit": "메뉴 5개 이상 동시 주문 시 아메리카노 S 사이즈 1잔 제공 (12:00~14:00 제외, 아메리카노 S사이즈 & 뚱카롱은 기준 메뉴 대상에서 제외)",
@@ -1827,8 +1839,8 @@
       },
       {
         "college_id": "6",
-        "benefit": "음료 5잔 이상 동시 주문 시 아메리카노 S사이즈 1잔 or 아이스크림 제공 (2가지 중 택1)",
         "college_name": "글로벌문화통상대학",
+        "benefit": "음료 5잔 이상 동시 주문 시 아메리카노 S사이즈 1잔 or 아이스크림 제공 (2가지 중 택1)",
         "conditions": "학생증 제시, 음료 5잔 이상 동시 주문 시",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
@@ -1853,7 +1865,7 @@
   },
   {
     "id": "23",
-    "name": "오얏리 커피",
+    "name": "오얏리커피",
     "category": "cafe",
     "is_active": true,
     "summary_benefit": null,
@@ -1895,7 +1907,7 @@
         "benefit": "전 메뉴 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -1962,7 +1974,7 @@
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": null, 
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DVfqYRWkiUz"
       },
       {
@@ -2003,8 +2015,8 @@
       },
       {
         "college_id": "6",
-        "benefit": "테이크 아웃 시 음료 500원 할인 / 매장 취식 시 아메리카노 500원 할인",
         "college_name": "글로벌문화통상대학",
+        "benefit": "테이크 아웃 시 음료 500원 할인 / 매장 취식 시 아메리카노 500원 할인",
         "conditions": "학생증 제시, 테이크 아웃 또는 매장 아메리카노 이용 시",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
@@ -2047,7 +2059,7 @@
         "benefit": "1만원 이상 충전 시 음료수 S사이즈 1잔 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -2096,10 +2108,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "3,000원 이상 결제 시 물 한 병 제공 / 9곡 결제 시 2곡 서비스 또는 30분 결제 시 10분 서비스",
+        "benefit": "3천원 이상 결제 시 물 한 병 제공\n9곡 결제 시 2곡 서비스 or 30분 결제 시 10분 서비스",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -2190,7 +2202,7 @@
           "end_date": "2026-06-30",
           "is_active": true
         },
-        "conditions": null, 
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DVfqd03Ejmf"
       },
       {
@@ -2312,10 +2324,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "토스트와 음료 세트 구매 시 1,000원 할인",
+        "benefit": "토스트와 음료 세트 구매 시 1천원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -2415,7 +2427,7 @@
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -2652,6 +2664,18 @@
     },
     "emoji": "☕",
     "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "12-5시 이스턴문 태그 스토리 공유 시 음료 메뉴 500원 할인(1회)\n6시 이후 주류 4잔 스토리 공유 시 감자칩 or 웨지 1회 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
       {
         "college_id": "3",
         "college_name": "공학대학",
@@ -2899,10 +2923,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "현금/계좌이체 결제 시 결제 금액의 5% 할인 / 냉면류 500원 할인 (중복 적용 가능)",
+        "benefit": "현금 결제/계좌이체 시 결제 금액의 5% 할인\n냉면류 500원 할인\n(위 조항들 간 중복 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -2975,10 +2999,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "(식사 제휴) 4인 기준 음료 2개 제공 / (포차 제휴) 3만원 이상 주문 시 육회 1접시 제공",
+        "benefit": "(식사 제휴) 4인 기준 음료 2개 제공\n(포차 제휴) 3만원 이상 주문 시 육회 1접시 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3063,10 +3087,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "기간권·정액권 구매 시 10% 할인 / 기간권의 경우 1개월간 사물함 무료 제공",
+        "benefit": "기간권이나 정액권 구매 시 10% 할인\n기간권의 경우 1개월간 사물함 무료 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3094,7 +3118,7 @@
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3134,7 +3158,7 @@
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3198,7 +3222,7 @@
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3262,7 +3286,7 @@
         "benefit": "4인 이상 방문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3311,10 +3335,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "3인 이상 방문 시 테이블당 음료수 1개 제공 / 현금·계좌이체 결제 시 메인 메뉴당 1,000원 할인 (중복 적용 가능)",
+        "benefit": "3인 이상 방문 시 테이블당 음료수 1개 제공\n현금 결제 / 계좌이체 시 메인 메뉴당 1천원 할인\n(위 조항들 간 중복 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3411,10 +3435,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "2인 이상 식사 시 음료 1병 무료 제공 / 4인 이상 식사 시 주류 1병 또는 음료 2병 무료 제공 (중복 적용 불가)",
+        "benefit": "2인 이상 식사 시 음료 1병 무료 제공\n4인 이상 식사 시 주류 1병 or 음료 2병 무료 제공\n(위 조항들 간 중복 적용 불가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3499,10 +3523,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "총 결제 금액 15,000원 이상 시 결제 금액의 10% 할인 / 주문 제작 홀케이크 가격 2,000원 할인 (모든 제휴 조건은 주문에는 제공하지 않음)",
+        "benefit": "총 결제 금액 1만5천원 이상 시 결제 금액의 10% 할인\n주문 제작 홀케이크 가격 2천원 할인\n(모든 제휴 조건은 주문에는 제공하지 않음)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3587,10 +3611,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "테이크아웃 음료 전체 500원 할인 / 홀 내에서 아메리카노 사이즈 상관없이 500원 할인",
+        "benefit": "테이크아웃 음료 전체 500원 할인\n홀 내에서 아메리카노 사이즈 상관없이 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3630,7 +3654,7 @@
         "benefit": "학생증을 제시한 인원 수 대상으로 전 메뉴 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -3691,10 +3715,10 @@
       {
         "college_id": "4",
         "college_name": "약학대학",
-        "benefit": "현금 or 계좌 이체로 도넛+음료 만원 이상 구매 시 5% 할인",
+        "benefit": "현금 or 계좌 이체로 도넛+음료 1만원 이상 구매 시 5% 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-06-30",
+          "end_date": "2026-12-31",
           "is_active": true
         },
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
@@ -5604,6 +5628,18 @@
     },
     "emoji": "🍰",
     "partnerships": [
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "4잔 이상 테이크아웃 주문 시 1천원 추가 할인(도장은 2개로 인정됨-쿠폰)\n음료 현금 결제 또는 계좌 이체 시 10% 할인\n(위 조항들 간 중복 적용 가능)",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
+      },
       {
         "college_id": "3",
         "college_name": "공학대학",
