@@ -154,6 +154,7 @@ export function GymTimetable({ onBack }) {
       <footer className="px-2 flex flex-col gap-1.5">
         <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 수업 시간에는 일반 학생 이용이 제한됩니다.</p>
         <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 학기별 수업 일정에 따라 변동될 수 있습니다.</p>
+        <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 기상악화로 인해 체대 실외수업이 실내수업으로 전환되거나, 체대에서 행사가 진행될 경우 체대 사용이 어려울 수 있습니다. 이 경우 체대 정문이나 헬스장 출입문에 관련 안내가 부착되니 참고 바랍니다.</p>
       </footer>
     </div>
   );
