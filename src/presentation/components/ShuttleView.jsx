@@ -1041,15 +1041,17 @@ export function ShuttleView({ isActive }) {
       ) : (
         <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
           {/* 버스 선택 필터 */}
-          <div className="mb-4 pt-2">
-            <p className="text-[11px] font-extrabold text-text-hint uppercase tracking-wider mb-2">버스 노선</p>
-            <div className="flex gap-2">
+          <div className="mb-6 pt-2">
+            <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
+              버스 노선
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
               {BUSES.map(bus => {
                 const isSelected = selectedBuses.includes(bus.id);
                 const is3102 = bus.id === '3102';
                 return (
-                  <div key={bus.id} className="relative select-none">
-                    <button
+                  <div key={bus.id} className="relative select-none flex-shrink-0">
+                    <div
                       onClick={() => {
                         setSelectedBuses(prev => 
                           prev.includes(bus.id) 
@@ -1057,27 +1059,33 @@ export function ShuttleView({ isActive }) {
                             : [...prev, bus.id]
                         );
                       }}
-                      className={`h-11 px-4 rounded-full flex items-center justify-center gap-1.5 border-[1.5px] text-[13px] font-extrabold cursor-pointer transition-all duration-150 ${
+                      className={`py-[7px] px-4 text-center flex items-center justify-center gap-1.5 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
                         isSelected
-                          ? `text-white border-[#EE2737] shadow-[0_4px_12px_rgba(238,39,55,0.25)]`
-                          : `bg-white border-[#e2e8f0] text-text-sub hover:bg-surface`
+                          ? 'text-white border-transparent'
+                          : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
                       }`}
                       style={
                         isSelected
-                          ? { backgroundColor: bus.color, borderColor: bus.color, boxShadow: `0 4px 12px ${bus.color}40` }
+                          ? {
+                              backgroundColor: bus.color,
+                              borderColor: bus.color,
+                              color: 'white',
+                              boxShadow: `0 4px 12px ${bus.color}38`
+                            }
                           : is3102
-                            ? { color: '#EE2737' }
+                            ? { color: '#EE2737', borderColor: '#EE2737' }
                             : undefined
                       }
                     >
                       <Bus size={14} className={isSelected ? 'text-white' : (is3102 ? 'text-[#EE2737]' : 'text-[#3b82f6]')} />
                       {bus.name}
-                    </button>
-                    {is3102 && (
-                      <span className="absolute top-[-8px] right-[-5px] bg-[#EE2737] text-white text-[0.62rem] px-1.5 py-0.5 rounded font-black shadow-[0_2px_6px_rgba(238,39,55,0.3)] pointer-events-none">
-                        🔥 인기
-                      </span>
-                    )}
+                      
+                      {is3102 && (
+                        <span className="absolute top-[-8px] right-[-5px] bg-[#EE2737] text-white text-[0.62rem] px-1.5 py-0.5 rounded font-black shadow-[0_2px_6px_rgba(238,39,55,0.3)] pointer-events-none">
+                          🔥 인기
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -1086,32 +1094,35 @@ export function ShuttleView({ isActive }) {
 
           {/* 정류장 선택 필터 */}
           <div className="mb-6">
-            <p className="text-[11px] font-extrabold text-text-hint uppercase tracking-wider mb-2">정류소</p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
+              정류소
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
               {sortedStopChips.map(stopName => {
                 const isActive = activeStops.includes(stopName);
                 const isSelected = selectedStops.includes(stopName);
                 return (
-                  <button
-                    key={stopName}
-                    disabled={!isActive}
-                    onClick={() => {
-                      setSelectedStops(prev => 
-                        prev.includes(stopName)
-                          ? prev.filter(s => s !== stopName)
-                          : [...prev, stopName]
-                      );
-                    }}
-                    className={`py-1.5 px-3 rounded-full text-xs font-bold border transition-all duration-150 ${
-                      !isActive
-                        ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
-                        : isSelected
-                          ? 'bg-primary text-white border-primary shadow-sm'
-                          : 'bg-white border-[#e2e8f0] text-text-sub hover:bg-surface'
-                    }`}
-                  >
-                    {stopName}
-                  </button>
+                  <div key={stopName} className="flex-shrink-0">
+                    <button
+                      disabled={!isActive}
+                      onClick={() => {
+                        setSelectedStops(prev => 
+                          prev.includes(stopName)
+                            ? prev.filter(s => s !== stopName)
+                            : [...prev, stopName]
+                        );
+                      }}
+                      className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
+                        !isActive
+                          ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                          : isSelected
+                            ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                            : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+                      }`}
+                    >
+                      {stopName}
+                    </button>
+                  </div>
                 );
               })}
             </div>
