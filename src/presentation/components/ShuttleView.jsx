@@ -1064,23 +1064,15 @@ export function ShuttleView({ isActive }) {
                         className={`py-[7px] px-4 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
                           isSelected
                             ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                            : 'bg-white'
+                            : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
                         }`}
                         style={
-                          !isSelected
-                            ? (is3102
-                              ? { color: '#EE2737', borderColor: '#EE2737' }
-                              : { color: '#3b82f6', borderColor: '#3b82f6' })
+                          !isSelected && is3102
+                            ? { color: '#EE2737' }
                             : undefined
                         }
                       >
                         {bus.name}
-                        
-                        {is3102 && (
-                          <span className="absolute top-[-8px] right-[-5px] bg-[#EE2737] text-white text-[0.62rem] px-1.5 py-0.5 rounded font-black shadow-[0_2px_6px_rgba(238,39,55,0.3)] pointer-events-none">
-                            🔥 인기
-                          </span>
-                        )}
                       </div>
                     </div>
                   );
