@@ -184,7 +184,7 @@ function StoreCard({ store, collegeFilter }) {
   );
 }
 
-export function PartnershipView() {
+export function PartnershipView({ isActive }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [college, setCollege] = useState(() => localStorage.getItem('partnerCollegeFilter') || 'all');
@@ -193,10 +193,10 @@ export function PartnershipView() {
   const chipRowRef = useRef(null);
 
   useEffect(() => {
-    if (!chipRowRef.current) return;
+    if (!isActive || !chipRowRef.current) return;
     const activeChip = chipRowRef.current.querySelector('[data-college-active="true"]');
     activeChip?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' });
-  }, []);
+  }, [isActive]);
 
   const scrollToTop = useCallback(() => {
     let node = rootRef.current?.parentNode;

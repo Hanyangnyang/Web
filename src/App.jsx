@@ -200,7 +200,7 @@ function MainLayout() {
             <MiscView resetSignal={miscResetSignal} />
           </div>
           <div style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
-            <PartnershipView />
+            <PartnershipView isActive={activeTab === 'partner'} />
           </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
