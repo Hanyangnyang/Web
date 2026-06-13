@@ -1224,7 +1224,14 @@ export function ShuttleView({ isActive }) {
                           />
                         </button>
                         <span className="font-extrabold text-[15px] text-text-main truncate">
-                          {stopName}
+                          {(() => {
+                            const descMap = {
+                              '기숙사': '기숙사 (한양대기숙사앞)',
+                              '융합교육관': '융합교육관 (한국생산기술연구원)',
+                              '셔틀콕': '셔틀콕 (한양대ERICA컨벤션센터)'
+                            };
+                            return descMap[stopName] || stopName;
+                          })()}
                         </span>
                         {closestStopName === stopName && (
                           <span className="text-[10px] font-extrabold text-[#27AE60] bg-[#27AE60]/10 px-1.5 py-0.5 rounded flex-shrink-0">
