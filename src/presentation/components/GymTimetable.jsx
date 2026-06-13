@@ -24,6 +24,8 @@ const getMergedSchedule = () => {
       while (i + span < BASE_SCHEDULE.length && BASE_SCHEDULE[i + span][day]?.name === current.name) span++;
       if (span > 1) {
         merged[i].spans[day] = span;
+        const lastCell = BASE_SCHEDULE[i + span - 1][day];
+        if (lastCell?.endTime) merged[i][day] = { ...merged[i][day], endTime: lastCell.endTime };
         for (let j = 1; j < span; j++) merged[i + j][day] = null;
         i += span - 1;
       }
@@ -68,15 +70,22 @@ export function GymTimetable({ onBack }) {
 
   const now = getNowPos();
 
-  const renderCell = (cell, span) => {
+  const renderCell = (cell, span, startHour) => {
     if (cell === null) return null;
     if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-surface p-0.5 relative" />;
     const s = COLORS[cell.type];
+    let innerH = '100%';
+    let alignTop = false;
+    if (cell.endTime && span > 1) {
+      const [endH, endM] = cell.endTime.split(':').map(Number);
+      innerH = `${((endH + endM / 60 - startHour) / span) * 100}%`;
+      alignTop = true;
+    }
     return (
-      <td rowSpan={span} className="h-10 border-b border-r border-surface p-0.5 relative">
+      <td rowSpan={span} className={`h-10 border-b border-r border-surface p-0.5 relative${alignTop ? ' align-top' : ''}`}>
         <div
-          className="h-full rounded border flex flex-col justify-center items-center gap-px"
-          style={{ backgroundColor: s.bg, color: s.text, borderColor: s.border }}
+          className="rounded border flex flex-col justify-center items-center gap-px"
+          style={{ backgroundColor: s.bg, color: s.text, borderColor: s.border, height: innerH, flexShrink: 0 }}
         >
           <CourseName name={cell.name} />
         </div>
@@ -130,11 +139,11 @@ export function GymTimetable({ onBack }) {
               {schedule.map((row, i) => (
                 <tr key={i}>
                   <td className="py-2 px-1 text-[0.65rem] font-bold text-[#cbd5e1] text-center border-r border-surface">{row.label}</td>
-                  {renderCell(row.mon, row.spans.mon)}
-                  {renderCell(row.tue, row.spans.tue)}
-                  {renderCell(row.wed, row.spans.wed)}
-                  {renderCell(row.thu, row.spans.thu)}
-                  {renderCell(row.fri, row.spans.fri)}
+                  {renderCell(row.mon, row.spans.mon, row.hour)}
+                  {renderCell(row.tue, row.spans.tue, row.hour)}
+                  {renderCell(row.wed, row.spans.wed, row.hour)}
+                  {renderCell(row.thu, row.spans.thu, row.hour)}
+                  {renderCell(row.fri, row.spans.fri, row.hour)}
                 </tr>
               ))}
             </tbody>
