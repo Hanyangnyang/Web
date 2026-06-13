@@ -24,6 +24,8 @@ const getMergedSchedule = () => {
       while (i + span < BASE_SCHEDULE.length && BASE_SCHEDULE[i + span][day]?.name === current.name) span++;
       if (span > 1) {
         merged[i].spans[day] = span;
+        const lastCell = BASE_SCHEDULE[i + span - 1][day];
+        if (lastCell?.endTime) merged[i][day] = { ...merged[i][day], endTime: lastCell.endTime };
         for (let j = 1; j < span; j++) merged[i + j][day] = null;
         i += span - 1;
       }
@@ -68,15 +70,22 @@ export function GymTimetable({ onBack }) {
 
   const now = getNowPos();
 
-  const renderCell = (cell, span) => {
+  const renderCell = (cell, span, startHour) => {
     if (cell === null) return null;
     if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-surface p-0.5 relative" />;
     const s = COLORS[cell.type];
+    let innerH = '100%';
+    let alignTop = false;
+    if (cell.endTime && span > 1) {
+      const [endH, endM] = cell.endTime.split(':').map(Number);
+      innerH = `${((endH + endM / 60 - startHour) / span) * 100}%`;
+      alignTop = true;
+    }
     return (
-      <td rowSpan={span} className="h-10 border-b border-r border-surface p-0.5 relative">
+      <td rowSpan={span} className={`h-10 border-b border-r border-surface p-0.5 relative${alignTop ? ' align-top' : ''}`}>
         <div
-          className="h-full rounded border flex flex-col justify-center items-center gap-px"
-          style={{ backgroundColor: s.bg, color: s.text, borderColor: s.border }}
+          className="rounded border flex flex-col justify-center items-center gap-px"
+          style={{ backgroundColor: s.bg, color: s.text, borderColor: s.border, height: innerH, flexShrink: 0 }}
         >
           <CourseName name={cell.name} />
         </div>
@@ -130,11 +139,11 @@ export function GymTimetable({ onBack }) {
               {schedule.map((row, i) => (
                 <tr key={i}>
                   <td className="py-2 px-1 text-[0.65rem] font-bold text-[#cbd5e1] text-center border-r border-surface">{row.label}</td>
-                  {renderCell(row.mon, row.spans.mon)}
-                  {renderCell(row.tue, row.spans.tue)}
-                  {renderCell(row.wed, row.spans.wed)}
-                  {renderCell(row.thu, row.spans.thu)}
-                  {renderCell(row.fri, row.spans.fri)}
+                  {renderCell(row.mon, row.spans.mon, row.hour)}
+                  {renderCell(row.tue, row.spans.tue, row.hour)}
+                  {renderCell(row.wed, row.spans.wed, row.hour)}
+                  {renderCell(row.thu, row.spans.thu, row.hour)}
+                  {renderCell(row.fri, row.spans.fri, row.hour)}
                 </tr>
               ))}
             </tbody>
@@ -143,6 +152,7 @@ export function GymTimetable({ onBack }) {
       </div>
 
       <footer className="px-2 flex flex-col gap-1.5">
+        <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 기상악화로 인해 체대 실외수업이 실내수업으로 전환되거나, 체대에서 행사가 진행될 경우 체대 사용이 어려울 수 있습니다. 이 경우 체대 정문이나 헬스장 출입문에 관련 안내가 부착되니 참고 바랍니다.</p>
         <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 수업 시간에는 일반 학생 이용이 제한됩니다.</p>
         <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 학기별 수업 일정에 따라 변동될 수 있습니다.</p>
       </footer>

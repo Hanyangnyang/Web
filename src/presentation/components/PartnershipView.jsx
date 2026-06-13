@@ -1,5 +1,5 @@
 // 컴포넌트: 단과대 제휴 업체 검색 및 혜택 조회
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown, ChevronUp, ExternalLink, Info, Clock } from 'lucide-react';
 import partnershipsData from '../../data/partnerships.json';
 
@@ -190,6 +190,13 @@ export function PartnershipView() {
   const [college, setCollege] = useState(() => localStorage.getItem('partnerCollegeFilter') || 'all');
   const inputRef = useRef(null);
   const rootRef = useRef(null);
+  const chipRowRef = useRef(null);
+
+  useEffect(() => {
+    if (!chipRowRef.current) return;
+    const activeChip = chipRowRef.current.querySelector('[data-college-active="true"]');
+    activeChip?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' });
+  }, []);
 
   const scrollToTop = useCallback(() => {
     let node = rootRef.current?.parentNode;
@@ -286,10 +293,11 @@ export function PartnershipView() {
 
         {/* 단과대 칩 */}
         <div className="mb-1">
-          <div className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
+          <div ref={chipRowRef} className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
             {COLLEGES.filter(c => c.id !== '11').map(c => (
               <button
                 key={c.id}
+                data-college-active={college === c.id}
                 onClick={() => handleCollegeChange(c.id)}
                 className={`flex items-center gap-1 px-3 py-[7px] rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                   college === c.id
