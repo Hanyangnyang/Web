@@ -682,7 +682,7 @@ export function ShuttleView({ isActive }) {
       { busId: '3102', time: '25분', info: '회차 대기 중', direction: '에리카 방면' }
     ],
     '의왕톨게이트': [
-      { busId: '3102', time: '12분', info: '5번째전·5석', direction: '강남역 방면' }
+      { busId: '3102', time: '12분', info: '5번째전·5석', direction: '에리카 방면' }
     ]
   };
 
@@ -1196,9 +1196,7 @@ export function ShuttleView({ isActive }) {
                 const arrivals = MOCK_ARRIVALS[stopName] || [];
                 const distanceStr = getDistanceStr(stopName);
                 
-                const filteredArrivals = selectedBuses.length === 0
-                  ? arrivals
-                  : arrivals.filter(arr => selectedBuses.includes(arr.busId));
+                const filteredArrivals = arrivals;
                   
                 return (
                   <div key={stopName} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
