@@ -49,25 +49,25 @@ function BusDropdown({ selected, onChange }) {
   const currentOpt = OPTIONS.find(o => o.id === (selected[0] || 'all'));
 
   return (
-    <div className="relative select-none text-[13px] font-extrabold" ref={ref}>
+    <div className="relative select-none text-[13px] font-extrabold w-[105px]" ref={ref}>
       <div
-        className={`flex items-center gap-1.5 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${
+        className={`flex items-center justify-between gap-1 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${
           open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.15)]' : 'border-[#e2e8f0]'
         }`}
         onClick={() => setOpen(p => !p)}
       >
-        <span className={currentOpt.id === '3102' ? 'text-[#EE2737]' : currentOpt.id === '10-1' ? 'text-[#53B332]' : 'text-text-main'}>
+        <span className={`flex-1 text-center ${currentOpt.id === '3102' ? 'text-[#EE2737]' : currentOpt.id === '10-1' ? 'text-[#53B332]' : 'text-text-main'}`}>
           {currentOpt.name}
         </span>
-        <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[120px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden z-[200] [animation:sttDropIn_0.15s_ease-out]">
+        <div className="absolute top-[calc(100%+6px)] right-0 w-full bg-white border border-[#e2e8f0] rounded-card shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden z-[200] [animation:sttDropIn_0.15s_ease-out]">
           {OPTIONS.map(o => (
             <div
               key={o.id}
-              className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-left hover:bg-surface ${
+              className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-center hover:bg-surface ${
                 (selected[0] || 'all') === o.id ? 'bg-[rgba(14,74,132,0.04)] text-primary font-extrabold' : 'text-text-sub'
               }`}
               onClick={() => {
