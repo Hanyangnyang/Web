@@ -1287,9 +1287,9 @@
       },
       {
         "college_id": "5",
-        "benefit": "2~3인 방문 시 음료 1캔 제공 / 4인 이상 방문 시 더술 서비스 메뉴 제공 / 현금 흑은 계좌이체 시 10% 할인",
         "college_name": "디자인대학",
-        "conditions": "학생증 제시, 2~3인 음료 혜택과 4인 이상 메뉴 중복 불가, 현금/계좌이체 할인은 별도 적용 가능",
+        "benefit": "2~3인 방문 시 음료 1캔 제공\n4인 이상 방문 시 더술 서비스 메뉴 제공(메뉴 가게 사정에 따라 상이/단체X)\n현금 흑은 계좌이체 시 10% 할인",
+        "conditions": "1,2번 혜택 중복 불가, 하지만 인스타 게시물이나 스토리에 방문 사진 혹은 주문 메뉴 올리면 중복 가능, 1 혹은 2번 혜택 사용했어도 3번 제휴는 중복 가능",
         "source_url": "https://www.instagram.com/p/DV8L_ewEZpq",
         "period": {
           "start_date": "2026-03-02",
@@ -1639,9 +1639,9 @@
       },
       {
         "college_id": "5",
-        "benefit": "2인 이상 방문 시 음료 1캔 제공 / 4인 이상 방문 시 서벳 제공",
         "college_name": "디자인대학",
-        "conditions": "학생증 제시, 2인 이상 방문 시 음료 / 4인 이상 방문 시 서벳 제공",
+        "benefit": "2인 이상 방문 시 음료 1캔 제공\n4인 이상 방문 시 셔벗 제공",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DV8L_ewEZpq",
         "period": {
           "start_date": "2026-03-02",
@@ -1763,9 +1763,9 @@
       },
       {
         "college_id": "5",
-        "benefit": "20시 이전 방문 시 소주 1병 제공 / 찌개류 주문 시 라면사리 무한리필 / 스토리 태그 시 과자 1봉지 제공 / 현금·계좌이체 5% 할인 / 스토리 업로드 후 재업로드 시 미니 아이스크림 제공(10인 이하) / 생일자 1~3일 전 예약 시 생일패키지 / 결제 금액 25,000원당 디대도장쿠폰 1개 (10개=14,000원, 20개=24,000원 상품)",
         "college_name": "디자인대학",
-        "conditions": "학생증 제시, 20시 이전 방문/찌개 주문/스토리 태그 업로드/현금계좌이체/생일 예약 등 각 조건별로 적용 가능, 다 채운 쿠폰 2장 시 모스카토 과실 샴페인 증정 포함",
+        "benefit": "· 20시 이전 방문 시 소주 1병 제공\n· 찌개류 주문 시 라면사리 무한리필\n· 스토리 에이플러스, 디자인대학 태그 시 과자 1봉지 제공\n· 현금 결제 및 계좌이체 시 5% 할인\n· 스토리 업로드 이후 결제 전, 한개 더 업로드 시 테이블 전원 미니 아이스크림 제공(10인 이하)\n· 생일자 1~3일 전 예약 후 방문 시 생일패키지 제공\n· 결제 금액 25,000원당 디대도장쿠폰 스탬프 1개\n(10개->14,000원, 20개->24,000원 이하 안주 택 무료 제공, 다 채운 쿠폰 2장->모스카토 과실 샴페인 증정 및 폭죽 포함)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DV8ME6xkRmu",
         "period": {
           "start_date": "2026-03-02",
@@ -2740,7 +2740,7 @@
   },
   {
     "id": "35",
-    "name": "페퍼로니 버튼",
+    "name": "페퍼로니버튼",
     "category": "food",
     "is_active": true,
     "summary_benefit": null,
@@ -2790,9 +2790,9 @@
       },
       {
         "college_id": "5",
-        "benefit": "피자 한 판당 음료 한 캔 제공",
         "college_name": "디자인대학",
-        "conditions": "학생증 제시",
+        "benefit": "피자 한 판당 음료 한 캔 제공",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DV8L8c5kd8F",
         "period": {
           "start_date": "2026-03-02",
@@ -3034,13 +3034,13 @@
       },
       {
         "college_id": "5",
-        "benefit": "4인 이상 방문 시 음료 2캔 제공 (식사) / 3만원 이상 주문 시 육회 제공 (주류, 안주)",
         "college_name": "디자인대학",
-        "conditions": "학생증 제시, 4인 이상 방문 시 음료 혜택 / 3만원 이상 주문 시 육회 제공",
+        "benefit": "4인 이상 방문 시 음료 2캔 제공 (식사)\n3만원 이상 주문 시 육회 제공 (주류, 안주)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DV8L8c5kd8F",
         "period": {
-          "start_date": "2026-03-02",
           "is_active": true,
+          "start_date": "2026-03-02",
           "end_date": "2026-12-31"
         }
       },
@@ -3878,9 +3878,9 @@
       },
       {
         "college_id": "5",
-        "benefit": "3인 이상 방문 시 테이블당 음료 1캔 제공",
         "college_name": "디자인대학",
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "benefit": "3인 이상 방문 시 테이블당 음료 1캔 제공",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DV8L8c5kd8F",
         "period": {
           "start_date": "2026-03-02",
