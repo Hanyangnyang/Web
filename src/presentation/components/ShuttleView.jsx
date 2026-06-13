@@ -1040,91 +1040,88 @@ export function ShuttleView({ isActive }) {
         )
       ) : (
         <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
-          {/* 버스 선택 필터 */}
-          <div className="mb-6 pt-2">
-            <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
-              버스 노선
-            </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
-              {BUSES.map(bus => {
-                const isSelected = selectedBuses.includes(bus.id);
-                const is3102 = bus.id === '3102';
-                return (
-                  <div key={bus.id} className="relative select-none flex-shrink-0">
-                    <div
-                      onClick={() => {
-                        setSelectedBuses(prev => 
-                          prev.includes(bus.id) 
-                            ? prev.filter(id => id !== bus.id) 
-                            : [...prev, bus.id]
-                        );
-                      }}
-                      className={`py-[7px] px-4 text-center flex items-center justify-center gap-1.5 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
-                        isSelected
-                          ? 'text-white border-transparent'
-                          : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                      }`}
-                      style={
-                        isSelected
-                          ? {
-                              backgroundColor: bus.color,
-                              borderColor: bus.color,
-                              color: 'white',
-                              boxShadow: `0 4px 12px ${bus.color}38`
-                            }
-                          : is3102
-                            ? { color: '#EE2737', borderColor: '#EE2737' }
-                            : undefined
-                      }
-                    >
-                      <Bus size={14} className={isSelected ? 'text-white' : (is3102 ? 'text-[#EE2737]' : 'text-[#3b82f6]')} />
-                      {bus.name}
-                      
-                      {is3102 && (
-                        <span className="absolute top-[-8px] right-[-5px] bg-[#EE2737] text-white text-[0.62rem] px-1.5 py-0.5 rounded font-black shadow-[0_2px_6px_rgba(238,39,55,0.3)] pointer-events-none">
-                          🔥 인기
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 정류장 선택 필터 */}
-          <div className="mb-6">
-            <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
-              정류소
-            </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
-              {sortedStopChips.map(stopName => {
-                const isActive = activeStops.includes(stopName);
-                const isSelected = selectedStops.includes(stopName);
-                return (
-                  <div key={stopName} className="flex-shrink-0">
-                    <button
-                      disabled={!isActive}
-                      onClick={() => {
-                        setSelectedStops(prev => 
-                          prev.includes(stopName)
-                            ? prev.filter(s => s !== stopName)
-                            : [...prev, stopName]
-                        );
-                      }}
-                      className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
-                        !isActive
-                          ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
-                          : isSelected
+          {/* 고정 상단 필터 영역 */}
+          <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+            {/* 버스 선택 필터 */}
+            <div className="mb-4">
+              <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
+                버스 노선
+              </div>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2.5 pb-2 -mx-5 px-5">
+                {BUSES.map(bus => {
+                  const isSelected = selectedBuses.includes(bus.id);
+                  const is3102 = bus.id === '3102';
+                  return (
+                    <div key={bus.id} className="relative select-none flex-shrink-0">
+                      <div
+                        onClick={() => {
+                          setSelectedBuses(prev => 
+                            prev.includes(bus.id) 
+                              ? prev.filter(id => id !== bus.id) 
+                              : [...prev, bus.id]
+                          );
+                        }}
+                        className={`py-[7px] px-4 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
+                          isSelected
                             ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                            : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                      }`}
-                    >
-                      {stopName}
-                    </button>
-                  </div>
-                );
-              })}
+                            : 'bg-white'
+                        }`}
+                        style={
+                          !isSelected
+                            ? (is3102
+                              ? { color: '#EE2737', borderColor: '#EE2737' }
+                              : { color: '#3b82f6', borderColor: '#3b82f6' })
+                            : undefined
+                        }
+                      >
+                        {bus.name}
+                        
+                        {is3102 && (
+                          <span className="absolute top-[-8px] right-[-5px] bg-[#EE2737] text-white text-[0.62rem] px-1.5 py-0.5 rounded font-black shadow-[0_2px_6px_rgba(238,39,55,0.3)] pointer-events-none">
+                            🔥 인기
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 정류장 선택 필터 */}
+            <div>
+              <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
+                정류소
+              </div>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
+                {sortedStopChips.map(stopName => {
+                  const isActive = activeStops.includes(stopName);
+                  const isSelected = selectedStops.includes(stopName);
+                  return (
+                    <div key={stopName} className="flex-shrink-0">
+                      <button
+                        disabled={!isActive}
+                        onClick={() => {
+                          setSelectedStops(prev => 
+                            prev.includes(stopName)
+                              ? prev.filter(s => s !== stopName)
+                              : [...prev, stopName]
+                          );
+                        }}
+                        className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
+                          !isActive
+                            ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                            : isSelected
+                              ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                              : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+                        }`}
+                      >
+                        {stopName}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
