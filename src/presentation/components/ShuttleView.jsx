@@ -29,6 +29,61 @@ function LineBadge({ opt, size = 32 }) {
   );
 }
 
+// ── 버스 노선 드롭다운
+function BusDropdown({ selected, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const OPTIONS = [
+    { id: 'all', name: '전체 노선' },
+    { id: '3102', name: '3102' },
+    { id: '10-1', name: '10-1' }
+  ];
+
+  const currentOpt = OPTIONS.find(o => o.id === (selected[0] || 'all'));
+
+  return (
+    <div className="relative select-none text-[13px] font-extrabold" ref={ref}>
+      <div
+        className={`flex items-center gap-1.5 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${
+          open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.15)]' : 'border-[#e2e8f0]'
+        }`}
+        onClick={() => setOpen(p => !p)}
+      >
+        <span className={currentOpt.id === '3102' ? 'text-[#EE2737]' : currentOpt.id === '10-1' ? 'text-[#53B332]' : 'text-text-main'}>
+          {currentOpt.name}
+        </span>
+        <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </div>
+
+      {open && (
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[120px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden z-[200] [animation:sttDropIn_0.15s_ease-out]">
+          {OPTIONS.map(o => (
+            <div
+              key={o.id}
+              className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-left hover:bg-surface ${
+                (selected[0] || 'all') === o.id ? 'bg-[rgba(14,74,132,0.04)] text-primary font-extrabold' : 'text-text-sub'
+              }`}
+              onClick={() => {
+                onChange(o.id === 'all' ? [] : [o.id]);
+                setOpen(false);
+              }}
+            >
+              {o.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── 지하철 노선 드롭다운
 function SubwayDropdown({ selected, onChange }) {
   const [open, setOpen] = useState(false);
@@ -584,7 +639,7 @@ export function ShuttleView({ isActive }) {
 
   const BUSES = [
     { id: '3102', name: '3102', type: '광역', color: '#EE2737', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역', '의왕톨게이트', '강남역우리은행'], isPopular: true },
-    { id: '10-1', name: '10-1', type: '시내', color: '#3b82f6', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역'] }
+    { id: '10-1', name: '10-1', type: '시내', color: '#53B332', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역'] }
   ];
 
   const DEFAULT_PRIORITY = [
@@ -607,27 +662,27 @@ export function ShuttleView({ isActive }) {
 
   const MOCK_ARRIVALS = {
     '셔틀콕': [
-      { busId: '3102', time: '4분 30초 후', info: '2석 남음', direction: '강남역행' },
-      { busId: '10-1', time: '2분 10초 후', info: '여유', direction: '상록수역행' },
-      { busId: '3102', time: '18분 후', info: '12석 남음', direction: '강남역행' }
+      { busId: '3102', time: '4분 16초', info: '2번째전·26석', direction: '강남역 방면' },
+      { busId: '10-1', time: '2분 10초', info: '3번째전·여유', direction: '상록수역 방면' },
+      { busId: '3102', time: '40분', info: '20번째전·39석', direction: '강남역 방면' }
     ],
     '기숙사': [
-      { busId: '3102', time: '2분 후', info: '3석 남음', direction: '강남역행' },
-      { busId: '10-1', time: '5분 후', info: '보통', direction: '상록수역행' }
+      { busId: '3102', time: '2분', info: '1번째전·15석', direction: '강남역 방면' },
+      { busId: '10-1', time: '5분', info: '4번째전·보통', direction: '상록수역 방면' }
     ],
     '융합교육관': [
-      { busId: '3102', time: '3분 20초 후', info: '2석 남음', direction: '강남역행' },
-      { busId: '10-1', time: '1분 후', info: '여유', direction: '상록수역행' }
+      { busId: '3102', time: '3분 20초', info: '2번째전·22석', direction: '강남역 방면' },
+      { busId: '10-1', time: '1분', info: '1번째전·여유', direction: '상록수역 방면' }
     ],
     '상록수역': [
-      { busId: '3102', time: '15분 후', info: '빈자리 많음', direction: '에리카행' },
-      { busId: '10-1', time: '8분 후', info: '보통', direction: '에리카행' }
+      { busId: '3102', time: '15분', info: '8번째전·빈자리많음', direction: '에리카 방면' },
+      { busId: '10-1', time: '8분', info: '6번째전·보통', direction: '에리카 방면' }
     ],
     '강남역우리은행': [
-      { busId: '3102', time: '25분 후', info: '회차 대기 중', direction: '에리카행' }
+      { busId: '3102', time: '25분', info: '회차 대기 중', direction: '에리카 방면' }
     ],
     '의왕톨게이트': [
-      { busId: '3102', time: '12분 후', info: '5석 남음', direction: '강남역행' }
+      { busId: '3102', time: '12분', info: '5번째전·5석', direction: '강남역 방면' }
     ]
   };
 
@@ -656,6 +711,39 @@ export function ShuttleView({ isActive }) {
     }
     return `${dist.toFixed(1)}km`;
   };
+
+  // Get closest stop name for badge
+  const getClosestStopName = () => {
+    if (!userCoords) return null;
+    let minDistance = 999999;
+    let closestStop = null;
+    
+    DEFAULT_PRIORITY.forEach(stopName => {
+      const coord = STOP_COORDS[stopName];
+      if (coord) {
+        const lat1 = userCoords.latitude;
+        const lon1 = userCoords.longitude;
+        const lat2 = coord.lat;
+        const lon2 = coord.lon;
+        const R = 6371; // km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const dist = R * calcC;
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestStop = stopName;
+        }
+      }
+    });
+    
+    return closestStop;
+  };
+
+  const closestStopName = getClosestStopName();
 
   // Get active stops based on selected buses
   const activeStops = selectedBuses.length === 0
@@ -1042,78 +1130,55 @@ export function ShuttleView({ isActive }) {
         <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
           {/* 고정 상단 필터 영역 */}
           <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
-            {/* 버스 선택 필터 */}
-            <div className="mb-4">
-              <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
-                버스 노선
+            {/* 정류장 선택 필터 헤더 (오른쪽에 버스 노선 드롭다운) */}
+            <div className="flex items-center justify-between text-2xl font-extrabold text-text-main mb-3">
+              <span>정류소</span>
+              <BusDropdown selected={selectedBuses} onChange={setSelectedBuses} />
+            </div>
+            
+            {/* 정류장 선택 필터 칩 리스트 */}
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-3.5 -my-3.5 -mx-5 px-5">
+              {/* 전체 선택 칩 */}
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => setSelectedStops([])}
+                  className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
+                    selectedStops.length === 0
+                      ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
+                      : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+                  }`}
+                >
+                  전체
+                </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {BUSES.map(bus => {
-                  const isSelected = selectedBuses.includes(bus.id);
-                  const is3102 = bus.id === '3102';
-                  return (
-                    <div key={bus.id} className="relative select-none">
-                      <div
-                        onClick={() => {
-                          setSelectedBuses(prev => 
-                            prev.includes(bus.id) 
-                              ? prev.filter(id => id !== bus.id) 
-                              : [...prev, bus.id]
-                          );
-                        }}
-                        className={`py-[7px] px-2 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${
-                          isSelected
+
+              {sortedStopChips.map(stopName => {
+                const isActive = activeStops.includes(stopName);
+                const isSelected = selectedStops.includes(stopName);
+                return (
+                  <div key={stopName} className="flex-shrink-0">
+                    <button
+                      disabled={!isActive}
+                      onClick={() => {
+                        setSelectedStops(prev => 
+                          prev.includes(stopName)
+                            ? prev.filter(s => s !== stopName)
+                            : [...prev, stopName]
+                        );
+                      }}
+                      className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
+                        !isActive
+                          ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                          : isSelected
                             ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                             : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                        }`}
-                        style={
-                          !isSelected && is3102
-                            ? { color: '#EE2737' }
-                            : undefined
-                        }
-                      >
-                        {bus.name}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 정류장 선택 필터 */}
-            <div>
-              <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
-                정류소
-              </div>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
-                {sortedStopChips.map(stopName => {
-                  const isActive = activeStops.includes(stopName);
-                  const isSelected = selectedStops.includes(stopName);
-                  return (
-                    <div key={stopName} className="flex-shrink-0">
-                      <button
-                        disabled={!isActive}
-                        onClick={() => {
-                          setSelectedStops(prev => 
-                            prev.includes(stopName)
-                              ? prev.filter(s => s !== stopName)
-                              : [...prev, stopName]
-                          );
-                        }}
-                        className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
-                          !isActive
-                            ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
-                            : isSelected
-                              ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                              : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                        }`}
-                      >
-                        {stopName}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+                      }`}
+                    >
+                      {stopName}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -1161,20 +1226,14 @@ export function ShuttleView({ isActive }) {
                         <span className="font-extrabold text-[15px] text-text-main truncate">
                           {stopName}
                         </span>
-                        {distanceStr && (
-                          <span className="text-[10px] font-bold text-primary bg-primary/5 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                            <MapPin size={8} />
-                            {distanceStr}
+                        {closestStopName === stopName && (
+                          <span className="text-[10px] font-extrabold text-[#27AE60] bg-[#27AE60]/10 px-1.5 py-0.5 rounded flex-shrink-0">
+                            가장 근처
                           </span>
                         )}
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        {!isExpanded && filteredArrivals.length > 0 && (
-                          <span className="text-[10px] font-extrabold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                            가장 빠른 버스 {filteredArrivals[0].time}
-                          </span>
-                        )}
                         <ChevronDown 
                           size={18} 
                           className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -1182,47 +1241,126 @@ export function ShuttleView({ isActive }) {
                       </div>
                     </div>
                     
-                    {/* 아코디언 내용 */}
-                    {isExpanded && (
-                      <div className="border-t border-[#f1f5f9] bg-slate-50/50 p-4 space-y-2.5">
-                        {filteredArrivals.length > 0 ? (
-                          filteredArrivals.map((arr, index) => {
-                            const is3102 = arr.busId === '3102';
-                            return (
-                              <div key={index} className="flex justify-between items-center bg-white p-3 border border-[#e2e8f0] rounded-card shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                                <div className="flex items-center gap-2">
-                                  <span 
-                                    className="px-2.5 py-1 rounded text-xs font-black text-white"
-                                    style={{ backgroundColor: is3102 ? '#EE2737' : '#3b82f6' }}
-                                  >
-                                    {arr.busId}
-                                  </span>
-                                  <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-text-main">
-                                      {arr.direction}
+                      {/* 아코디언 내용 */}
+                      {isExpanded && (
+                        <div className="border-t border-[#f1f5f9] bg-white divide-y divide-[#f1f5f9]">
+                          {filteredArrivals.length > 0 ? (() => {
+                            const uniqueBusIds = Array.from(new Set(filteredArrivals.map(arr => arr.busId)));
+                            return uniqueBusIds.map(busId => {
+                              const is3102 = busId === '3102';
+                              const busArrivals = filteredArrivals.filter(arr => arr.busId === busId);
+                              const firstArrival = busArrivals[0];
+                              const secondArrival = busArrivals[1];
+                              return (
+                                <div key={busId} className="px-4 py-3 flex justify-between items-center">
+                                  {/* 왼쪽 열: 버스번호 및 행선지 */}
+                                  <div className="flex flex-col gap-0.5">
+                                    <span 
+                                      className="text-[16px] font-extrabold"
+                                      style={{ color: busId === '3102' ? '#EE2737' : busId === '10-1' ? '#53B332' : '#212529' }}
+                                    >
+                                      {busId}
                                     </span>
-                                    <span className="text-[10px] text-text-hint">
-                                      실시간 정보
+                                    <span className="text-[12px] font-medium text-text-sub">
+                                      {firstArrival ? firstArrival.direction : ''}
                                     </span>
                                   </div>
+                                  
+                                  {/* 오른쪽 열: 도착 정보 (첫 번째 & 두 번째) */}
+                                  <div className="flex flex-col items-end gap-1.5">
+                                    {/* 첫 번째 도착 */}
+                                    {firstArrival ? (() => {
+                                      const parts = firstArrival.info ? firstArrival.info.split('·') : [];
+                                      const beforeStr = parts[0] || '';
+                                      const seatStr = parts[1] || '';
+                                      
+                                      // 10석 이하 여부 판단
+                                      let isLowSeats = false;
+                                      if (seatStr) {
+                                        const match = seatStr.match(/(\d+)석/);
+                                        if (match) {
+                                          const seatNum = parseInt(match[1], 10);
+                                          if (seatNum <= 10) {
+                                            isLowSeats = true;
+                                          }
+                                        }
+                                      }
+
+                                      return (
+                                        <div className="flex items-center gap-1.5 text-right">
+                                          <span className="text-[14px] font-extrabold text-[#212529]">
+                                            {firstArrival.time}
+                                          </span>
+                                          {firstArrival.info && (
+                                            <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1">
+                                              <span>{beforeStr}</span>
+                                              {seatStr && (
+                                                <span 
+                                                  className="font-extrabold"
+                                                  style={{ color: isLowSeats ? '#EE2737' : '#3b82f6' }}
+                                                >
+                                                  {seatStr}
+                                                </span>
+                                              )}
+                                            </span>
+                                          )}
+                                        </div>
+                                      );
+                                    })() : (
+                                      <span className="text-[12px] font-semibold text-text-hint">정보 없음</span>
+                                    )}
+                                    
+                                    {/* 두 번째 도착 */}
+                                    {secondArrival ? (() => {
+                                      const parts = secondArrival.info ? secondArrival.info.split('·') : [];
+                                      const beforeStr = parts[0] || '';
+                                      const seatStr = parts[1] || '';
+
+                                      // 10석 이하 여부 판단
+                                      let isLowSeats = false;
+                                      if (seatStr) {
+                                        const match = seatStr.match(/(\d+)석/);
+                                        if (match) {
+                                          const seatNum = parseInt(match[1], 10);
+                                          if (seatNum <= 10) {
+                                            isLowSeats = true;
+                                          }
+                                        }
+                                      }
+
+                                      return (
+                                        <div className="flex items-center gap-1.5 text-right">
+                                          <span className="text-[14px] font-extrabold text-[#212529]">
+                                            {secondArrival.time}
+                                          </span>
+                                          {secondArrival.info && (
+                                            <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1">
+                                              <span>{beforeStr}</span>
+                                              {seatStr && (
+                                                <span 
+                                                  className="font-extrabold"
+                                                  style={{ color: isLowSeats ? '#EE2737' : '#3b82f6' }}
+                                                >
+                                                  {seatStr}
+                                                </span>
+                                              )}
+                                            </span>
+                                          )}
+                                        </div>
+                                      );
+                                    })() : (
+                                      <span className="text-[11px] font-medium text-text-hint">-</span>
+                                    )}
+                                  </div>
                                 </div>
-                                <div className="flex flex-col items-end">
-                                  <span className="text-sm font-extrabold" style={{ color: is3102 ? '#EE2737' : '#3b82f6' }}>
-                                    {arr.time}
-                                  </span>
-                                  <span className="text-[10px] font-bold text-[#6C757D]">
-                                    {arr.info}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <p className="text-center text-xs font-semibold text-text-hint py-2">
-                            운행 정보가 없습니다.
-                          </p>
-                        )}
-                      </div>
+                              );
+                            });
+                          })() : (
+                            <p className="text-center text-xs font-semibold text-text-hint py-4">
+                              운행 정보가 없습니다.
+                            </p>
+                          )}
+                        </div>
                     )}
                   </div>
                 );
