@@ -1185,7 +1185,11 @@ export function ShuttleView({ isActive }) {
           {/* 정류장별 버스 도착 정보 목록 */}
           <div className="space-y-3">
             {sortedStops
-              .filter(stopName => selectedStops.length === 0 || selectedStops.includes(stopName))
+              .filter(stopName => {
+                const passesBus = activeStops.includes(stopName);
+                const matchesStopFilter = selectedStops.length === 0 || selectedStops.includes(stopName);
+                return passesBus && matchesStopFilter;
+              })
               .map(stopName => {
                 const isExpanded = !!expandedStops[stopName];
                 const isFav = favorites.includes(stopName);
