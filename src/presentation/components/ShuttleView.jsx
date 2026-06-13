@@ -1277,8 +1277,7 @@ export function ShuttleView({ isActive }) {
                                         />
                                       </div>
                                       <span 
-                                        className="text-[16px] font-extrabold"
-                                        style={{ color: busId === '3102' ? '#EE2737' : busId === '10-1' ? '#53B332' : '#212529' }}
+                                        className="text-[16px] font-bold text-[#334155]"
                                       >
                                         {busId}
                                       </span>
@@ -1396,15 +1395,46 @@ export function ShuttleView({ isActive }) {
         className="fixed left-0 right-0 max-w-app mx-auto px-6 pointer-events-none z-[999] flex justify-end"
         style={{ bottom: 'calc(108px + env(safe-area-inset-bottom, 0px))' }}
       >
-        <button
+        <div 
+          className="pointer-events-auto w-14 h-14 cursor-pointer select-none"
+          style={{ perspective: '1000px' }}
           onClick={() => setViewMode(prev => prev === 'shuttle' ? 'bus' : 'shuttle')}
-          className="pointer-events-auto w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-[0_8px_16px_rgba(14,74,132,0.3)] hover:scale-105 active:scale-95 transition-all duration-200 text-[14px] font-bold tracking-wider"
-          style={{
-            background: 'linear-gradient(135deg, var(--color-primary) 0%, #1e6091 100%)',
-          }}
         >
-          {viewMode === 'shuttle' ? '셔틀' : '버스'}
-        </button>
+          <div 
+            className="w-full h-full relative transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            style={{ 
+              transformStyle: 'preserve-3d',
+              transform: viewMode === 'bus' ? 'rotateY(180deg)' : 'rotateY(0deg)'
+            }}
+          >
+            {/* 앞면: 셔틀 상태일 때 보이는 면 */}
+            <div 
+              className="absolute inset-0 w-full h-full rounded-full flex flex-col items-center justify-center text-white shadow-[0_8px_16px_rgba(59,130,246,0.25)] hover:scale-105 active:scale-95 transition-transform duration-200"
+              style={{ 
+                backfaceVisibility: 'hidden',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              }}
+            >
+              <span className="text-[12px] font-bold tracking-wider leading-[1.3] text-center">
+                셔틀<br />버스
+              </span>
+            </div>
+
+            {/* 뒷면: 버스 상태일 때 보이는 면 */}
+            <div 
+              className="absolute inset-0 w-full h-full rounded-full flex flex-col items-center justify-center text-white shadow-[0_8px_16px_rgba(83,179,50,0.25)] hover:scale-105 active:scale-95 transition-transform duration-200"
+              style={{ 
+                backfaceVisibility: 'hidden',
+                transform: 'rotateY(180deg)',
+                background: 'linear-gradient(135deg, #53B332 0%, #449729 100%)',
+              }}
+            >
+              <span className="text-[12px] font-bold tracking-wider leading-[1.3] text-center">
+                노선<br />버스
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
