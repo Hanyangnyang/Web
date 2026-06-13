@@ -34,7 +34,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -104,13 +104,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "2~5인 방문 시 음료 1개 무료제공 / 6인 이상 방문 시 음료 2개 제공",
+        "benefit": "2~5인 방문 시 음료 1개 무료제공\n6인 이상 방문 시 음료 2개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 기준에 따라 제공",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -174,7 +174,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인 1메뉴 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -250,7 +250,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -338,7 +338,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인당",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -426,7 +426,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 1식사 주문 혹은 감자탕(중) 이상 주문 시 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -490,7 +490,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 세트 메뉴 주문 및 매장 내 식사 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -566,7 +566,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 테이블 당",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
@@ -642,7 +642,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인분 이상 주문 시 (주문 시 미리 안내 필수)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -718,13 +718,13 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 12,000원 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "2인 이상 방문 시 음료 제공 (탄산, 중국음료) or 주류 한 병 2,000원 할인 / 마라탕 12,000원 이상 주문 시 꼬치 1개 서비스 (중복 적용 불가)",
+        "benefit": "2인 이상 방문 시 음료 제공 (탄산, 중국음료) or 주류 한 병 2,000원 할인 / 마라탕 12,000원 이상 주문 시 꼬치 1개 서비스 (중복 불가)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
@@ -742,7 +742,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 또는 결제 금액 조건 달성 시 (중복 적용 불가)",
+        "conditions": "학생증 제시, 방문 인원 또는 결제 금액 조건 달성 시 (중복 불가)",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -782,7 +782,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문 인원 기준",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -858,7 +858,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 및 1인 1메뉴 주문 필수",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -940,13 +940,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "메뉴 4개 이상 주문 시 육회비빔밥 1개 제공 / 오후 6시 이후 방문 시 소주 3천원",
+        "benefit": "메뉴 4개 이상 주문 시 육회비빔밥 1개 제공\n오후 6시 이후 방문 시 소주 3천원",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 메뉴 4개 이상 주문 시 혹은 오후 6시 이후 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -1046,7 +1046,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 사계천왕 혹은 치뽀끼 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -1152,13 +1152,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "테이블 당 1천원 상당의 서비스 제공 / 테이블 당 7만원 이상 주문시 떡볶이 1인분 제공",
+        "benefit": "테이블 당 1천원 상당의 서비스 제공\n테이블 당 7만원 이상 주문시 떡볶이 1인분 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 7만원 이상 주문 여부에 따라 추가 서비스 제공",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -1252,13 +1252,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "생일자 동반 4인 이상 방문 시 서비스 안주 뽑기 기회 제공 (생일 전후 하루씩 적용 가능, 인스타그램 스토리에 더술 태그 후 게시 필수, 서비스 외 일반 안주 1개 이상 주문 필수)",
+        "benefit": "생일자 동반 4인 이상 방문 시, 서비스 안주 뽑기 기회 제공\n(생일 날짜 기준 하루 전, 후 가능)\n(인스타그램 스토리에 더술 태그 후 게시)\n(서비스 안주 외 안주 주문 필수)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 생일자 동반 4인 이상, 인스타 스토리 태그 업로드, 추가 안주 주문 필수",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -1376,13 +1376,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "계좌이체 시 10% 할인 또는 주류 1병 500원 할인 (중복 불가)",
+        "benefit": "계좌이체 시 10% 할인 or 주류 1병 500원 할인\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 계좌이체 혹은 조건에 맞춰 택 1 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -1452,13 +1452,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "탕 세트 주문 시 음료 또는 주류 1병 제공 / 20인 이상 단체 방문 시 테이블당 주류 1병 제공 (중복 적용 불가)",
+        "benefit": "탕 세트 주문 시 음료 또는 주류 1병 제공\n20인 이상 단체 방문 시 테이블당 주류 1병 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 대상 세트 주문 혹은 20인 이상 단체 방문 시 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -1534,7 +1534,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 적용",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -1604,13 +1604,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "4인 이상 파인애플 샤베트 무료 제공 또는 주류 병당 500원 할인 또는 계좌/현금 결제 시 5% 할인 또는 시험기간 3인 이상 방문 시 주류 반값 할인 (중복 적용 불가)",
+        "benefit": "4인 이상 방문 시, 파인애플 샤베트\nor 주류 병당 500원 할인\nor 계좌/현금 결제 시 5% 할인\nor 시험기간 3인 이상 방문 시 주류 반값 할인\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 선택 조건별 차등 적용 (중복 불가, 시험기간 특별 할인 포함)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -1716,13 +1716,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "찌개류 주문 시 라면사리 무한리필 추가 제공 / 10인 이하 방문 시 인당 쭈쭈바 1개 제공 / 오후 8시 이전 방문 시 소주 1병 무료 제공 (중복 적용 가능, 단 인스타그램 스토리 태그 업로드 필수)",
+        "benefit": "찌개류: 라면사리 추가 무한리필\n10인 이하 방문 시 쭈쭈바 인당 1개 제공\n8시 이전 방문 시 소주 1병 무료\n(중복 적용 가능 / 스토리 태그 필요)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인스타그램 스토리 태그 필요, 중복 적용 가능",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -1828,13 +1828,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "메뉴 5개 이상 동시 주문 시 아메리카노 S 사이즈 1잔 제공 (12:00~14:00 제외, 아메리카노 S사이즈 & 뚱카롱은 기준 메뉴 대상에서 제외)",
+        "benefit": "메뉴 5개 이상 동시 주문시 아메리카노 S 사이즈 1잔 제공\n(12:00~14:00 제외)\n(아메리카노 S사이즈 & 뚱카롱은 기준 메뉴 대상에서 제외)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 메뉴 5개 이상 동시 주문 시, 12:00~14:00 제외, 제외 메뉴 존재",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -1898,7 +1898,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -1953,7 +1953,7 @@
   },
   {
     "id": "24",
-    "name": "어반 플레이스",
+    "name": "어반플레이스",
     "category": "cafe",
     "is_active": true,
     "summary_benefit": null,
@@ -1980,13 +1980,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "테이크아웃 시 전 음료 500원 할인 / 홀 이용 시 아메리카노 500원 할인",
+        "benefit": "테이크아웃 시 전 음료 500원 할인\n홀 이용 시 아메리카노 500원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이크아웃 혹은 홀 아메리카노 이용 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -2024,6 +2024,30 @@
           "is_active": true,
           "end_date": "2026-12-31"
         }
+      },
+      {
+        "college_id": "4",
+        "college_name": "약학대학",
+        "benefit": "테이크아웃 음료 전체 500원 할인\n홀 내에서 아메리카노 사이즈 상관없이 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
+        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "매장 이용 시 아메리카노 500원 할인 / Take Out 시 모든 음료 500원 할인",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "학생증 제시, 매장 이용 형태에 따라 할인 적용",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
   },
@@ -2068,13 +2092,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "만원 이상 충전 시 음료 S사이즈 제공 / 2만원 이상 충전 시 음료 L사이즈 제공",
+        "benefit": "1만원 이상 충전 시 음료 S사이즈 제공\n2만원 이상 충전 시 음료 L사이즈 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 충전 금액 조건 충족 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
     ]
@@ -2120,13 +2144,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "3,000원 이상 결제 시 물 1병 제공 및 9곡 이상 결제 시 2곡 추가 또는 30분 이상 결제 시 10분 추가 제공 (중복 가능)",
+        "benefit": "3,000원 이상 결제 시 물 1병 제공\n9곡 이상 결제 시 2곡 추가 or 30분 이상 결제 시 10분 추가 제공\n(중복 가능)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시 (중복 가능)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       },
       {
@@ -2214,7 +2238,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 5,000원 이상 현금 또는 계좌이체 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       },
       {
@@ -2266,7 +2290,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
@@ -2342,7 +2366,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 토스트와 음료 함께 구매 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -2442,7 +2466,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인당",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -2512,13 +2536,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "음료 주문 시 2인: 500원 할인 / 3인: 1,000원 할인 + 아메리카노 사이즈업 / 4인: 1,500원 할인 + 아메리카노 2잔 사이즈업 + 원쿠키 1개 제공 (일행 중 1명만 공대생이어도 가능, 인쇄복사 10장 이벤트와 별개, 쿠폰 중복 불가)",
+        "benefit": "음료 주문 시\n2인: 500원 할인\n3인: 1,000원 할인 / 아메리카노 사이즈업\n4인: 1,500원 할인 / 아메리카노 2잔 사이즈업 / 원쿠키 1개 제공\n(일행 중 1명만 공대생이어도 가능, 인쇄복사 10장 이벤트와 별개, 쿠폰 중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시 (일행 중 1명 필수), 음료 주문 인원에 맞춰 혜택 차등 적용 (쿠폰 중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -2582,7 +2606,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시 (타 이벤트 중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -2679,13 +2703,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "12시~17시 인당 음료 500원 할인 / 17시 이후 주류 메뉴 4잔 이상 주문 시 감자칩 1개 제공 (중복 불가)",
+        "benefit": "1. 12시~17시 인당 음료 500원 할인\n2. 17시 이후 주류 메뉴 4잔 이상 주문 시 감자칩 1개 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 시간 및 주문량 조건 적용 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -2761,7 +2785,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 피자 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -2877,7 +2901,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -2935,13 +2959,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "1. 현금 or 계좌이체 시 5% 할인 / 2. 냉면 주문 시 500원 할인 / 3. 소주 500원 할인 (중복 가능)",
+        "benefit": "1. 현금 or 계좌이체 시 5% 할인\n2. 냉면 주문 시 500원 할인\n3. 소주 500원 할인\n(중복 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 혹은 해당 메뉴 주문 시 (중복 가능)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3011,13 +3035,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "(식사) 4인 이상 방문 시 음료 2개 제공 / (포차) 3만원 이상 이용 시 육회 1개 제공",
+        "benefit": "(식사) 4인 이상 방문 시 음료 2개 제공\n(포차) 3만원 이상 이용 시 육회 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 식사 시 4인 이상 방문 혹은 포차 시 3만원 이상 이용 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3113,6 +3137,18 @@
     "emoji": "🦆",
     "partnerships": [
       {
+        "college_id": "3",
+        "college_name": "공학대학",
+        "benefit": "2인 이상 방문 시 테이블 당 음료 1캔 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
+        "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
+      },
+      {
         "college_id": "4",
         "college_name": "약학대학",
         "benefit": "3인 이상 방문 시 음료 1캔 무료 제공",
@@ -3173,7 +3209,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3231,13 +3267,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "사리 (야채/버섯/칼국수/물만두 중 택 1), 볶음밥, 탄산음료 중 1가지 제공 (테이블당, 인원 수 무관, 네이버 리뷰 이벤트와 중복 가능)",
+        "benefit": "①사리 (야채/버섯/칼국수/물만두 중 택 1) ②볶음밥 ③탄산음료 중 1가지 제공\n(테이블당, 인원 수 무관)\n(네이버 리뷰 이벤트와 중복 가능)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 적용 (네이버 리뷰 이벤트와 중복 가능)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3295,13 +3331,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "3인 이상 방문 시 음료 1캔 or 튀김(고구마롤, 새우롤, 꽃게롤, 샤오마이 중 택1) 제공 (네이버 리뷰 중복 가능)",
+        "benefit": "3인 이상 방문 시 음료 1캔 or 튀김(고구마롤, 새우롤, 꽃게롤, 샤오마이 중 택1) 제공\n(네이버 리뷰 중복 가능)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
@@ -3353,7 +3389,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시 혹은 현금/계좌이체 결제 시 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3447,13 +3483,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "2인 당 음료 1캔 제공 / 4인 당 음료 2캔 또는 주류 1병 제공",
+        "benefit": "2인 당 음료 1캔 제공\n4인 당 음료 2캔 또는 주류 1병 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원에 따른 서비스 제공",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -3541,7 +3577,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 최종 결제 금액 15,000원 이상 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -3595,46 +3631,6 @@
     ]
   },
   {
-    "id": "48",
-    "name": "UP플레이스",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "emoji": "☕",
-    "partnerships": [
-      {
-        "college_id": "4",
-        "college_name": "약학대학",
-        "benefit": "테이크아웃 음료 전체 500원 할인\n홀 내에서 아메리카노 사이즈 상관없이 500원 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
-        "source_url": "https://www.instagram.com/p/DVaMWGkj2NJ"
-      },
-      {
-        "college_id": "8",
-        "college_name": "소프트웨어융합대학",
-        "benefit": "매장 이용 시 아메리카노 500원 할인 / Take Out 시 모든 음료 500원 할인",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
-          "is_active": true
-        },
-        "conditions": "학생증 제시, 매장 이용 형태에 따라 할인 적용",
-        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
-      }
-    ]
-  },
-  {
     "id": "49",
     "name": "코이노커피",
     "category": "cafe",
@@ -3669,7 +3665,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시 시 인당 적용",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -3727,13 +3723,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 50,000원 이상 주문 시 7% 할인",
+        "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인\n음료 + 도넛 50,000원 이상 주문 시 7% 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료와 도넛 함께 주문 및 금액 조건 충족 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -3809,7 +3805,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시 (방학 기간에는 4인 중 1명만 공학대학 학생이어도 가능)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3855,13 +3851,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "1만원 이상 현금 결제 시 500원 할인 또는 3인 이상 방문 시 테이블 당 음료 1개 제공 (중복 불가)",
+        "benefit": "1만원 이상 현금 결제 시 500원 할인\n3인 이상 방문 시 테이블 당 음료 1개 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 1만원 이상 결제 시 혹은 3인 이상 방문 시 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -3961,7 +3957,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ]
@@ -3983,13 +3979,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "3인 이상 홀 방문 시 음료(소) 1개 제공 / 4만원 이상 주문 시 감자튀김 1개 제공",
+        "benefit": "3인 이상 홀 방문 시 음료(소) 1개 제공\n4만원 이상 주문 시 감자튀김 1개 제공",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 홀 방문 혹은 4만원 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ]
@@ -4017,7 +4013,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 무한리필 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4051,13 +4047,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "현금 or 계좌이체 시 500원 할인 / 카드결제 시 붕어빵 1개 제공 (겨울한정)",
+        "benefit": "현금 or 계좌이체 시 500원 할인\n카드결제 시 붕어빵 1개 제공 (겨울한정)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 혹은 카드결제 시 (겨울한정)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ]
@@ -4085,7 +4081,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4161,7 +4157,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 15,000원 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4201,7 +4197,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4241,7 +4237,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4293,7 +4289,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 전화 포장 주문으로 피자 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ]
@@ -4321,7 +4317,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 혹은 전골류 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ]
@@ -4349,7 +4345,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 추가 메뉴 선택 혹은 4인 이상 주문 시 (중복 불가, 포장 시에도 적용 가능)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4425,7 +4421,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4465,7 +4461,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 제공",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4505,7 +4501,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
     ]
@@ -4533,7 +4529,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인당",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       },
       {
@@ -4579,13 +4575,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "테이블 당 음료 1개 제공 / 5인 이상 방문 시 믹스샐러드 1개 제공 (중복 불가)",
+        "benefit": "테이블 당 음료 1개 제공\n5인 이상 방문 시 믹스샐러드 1개 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 적용 혹은 5인 이상 방문 시 (중복 불가)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -4637,7 +4633,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 8천원 이상 구매 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -4677,7 +4673,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 단품메뉴(고기메뉴) 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -4747,13 +4743,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "1인분 이상 주문 시 음료 1개 무료 제공 / 6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반 제외, 원하는 맛 1가지)",
+        "benefit": "1인분 이상 주문 시 음료 1개 무료 제공\n6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반 제외, 원하는 맛 1가지)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인분 이상 주문 혹은 6만원 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -4829,7 +4825,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -4899,13 +4895,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "현금/계좌이체 시 10% 할인",
+        "benefit": "현금 or 계좌이체 시 10% 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
@@ -4963,13 +4959,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "15,000원 이상 주문 시 치즈스틱 (2개)/어니언링 (3개)/오징어링 (2개) 중 택 1 (11:00~13:30 제휴 불가, 자체 이벤트와 중복 불가)",
+        "benefit": "15,000원 이상 주문 시 치즈스틱(2개) / 어니언링(3개) / 오징어링 (2개) 중 택 1\n(11:00~13:30 제휴 불가)\n(텐버거 자체 이벤트와 중복 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 15,000원 이상 주문 시, 11:00~13:30 시간대 제외, 자체 이벤트와 중복 불가",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -5045,7 +5041,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -5121,7 +5117,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
     ]
@@ -5149,7 +5145,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -5213,7 +5209,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
     ]
@@ -5241,7 +5237,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -5305,7 +5301,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       },
       {
@@ -5345,7 +5341,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이크 아웃 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5385,7 +5381,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ]
@@ -5402,18 +5398,18 @@
       "address": null,
       "full_address": null
     },
-    "emoji": "🍳",
+    "emoji": "🍰",
     "partnerships": [
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "1. 음료 매장 취식 시 500원 할인 / 2. 음료 테이크 아웃 시 1,000원 할인 / 3. 디저트+음료 매장 취식 시 1,000원 할인 / 4. 음료+디저트 테이크 아웃 시 1,500원 할인",
+        "benefit": "1. 음료 매장 취식 시 500원 할인\n2. 음료 테이크 아웃 시 1,000원 할인\n3. 디저트+음료 매장 취식 시 1,000원 할인\n4. 음료+디저트 테이크 아웃 시 1,500원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 선택 조건별 할인율 차등 적용",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5453,7 +5449,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이크아웃 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5505,7 +5501,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 4잔 이상 주문 시 (더치페이 가능)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5563,13 +5559,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "커피 메뉴 10% 할인 / 그 외 메뉴 5% 할인",
+        "benefit": "커피 메뉴 10% 할인\n그 외 메뉴 5% 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문한 메뉴 유형별 차등 적용",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5609,7 +5605,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ]
@@ -5643,13 +5639,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "4인 이상 테이크아웃 주문 시 1000원 추가 할인 / 음료 현금(계좌) 결제 시 음료 10% 할인",
+        "benefit": "4인 이상 테이크아웃 주문 시 1000원 추가 할인\n음료 현금(계좌) 결제 시 음료 10% 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 테이크아웃 혹은 음료 현금(계좌) 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
@@ -5713,7 +5709,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 15,000원 이상 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ]
@@ -5735,13 +5731,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "만원의 행복 세트 1,000원 할인 또는 음료 500원 할인",
+        "benefit": "만원의 행복 세트 1,000원 할인 or 음료 500원 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 대상 메뉴 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5781,7 +5777,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 주문 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ]
@@ -5803,13 +5799,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "4인 이상 방문 및 단체석 이용 시 음료 1잔당 300원 할인 (최대 3시간 이용 가능, 단체 이용 시 최소 2시간 전 카카오톡 오픈채팅 사전 공지 필수)",
+        "benefit": "4인 이상 방문 시(단체석 이용), 음료 1잔당 300원 할인(최대 3시간 이용 가능)\n(단체 이용 시 최소 2시간 전 카톡오픈채팅으로 미리 공지)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시, 최소 2시간 전 카톡 오픈채팅 공지 필요",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
     ]
@@ -5831,13 +5827,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "음료 (병음료 제외) 500원 할인 (점심시간 12:00-14:00 제외, 중복 할인 및 포인트 적립 불가)",
+        "benefit": "음료(병음료 제외) 500원 할인\n(점심시간 12:00-14:00 제외)\n(중복 할인 및 포인트 적립 불가)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 점심시간(12:00-14:00) 제외, 병음료 제외, 중복 할인/적립 불가",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       },
       {
@@ -5883,13 +5879,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "4인 이상 방문 시 음료수 1개 제공 & 현금 또는 계좌이체 결제 시 5% 할인",
+        "benefit": "4인 이상 방문 시 음료수 1개 제공\n현금 결제 or 계좌이체 시 5% 할인",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 혹은 현금/계좌 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -5959,13 +5955,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "9시 전까지 소주 무제한 4,000원 이용 가능",
+        "benefit": "9시 전까지 소주 무제한 4,000원",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 오후 9시 이전 주문 및 매장 이용 고객 대상",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYedTDEZTm/"
       },
       {
@@ -5999,13 +5995,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "1. 2~4인 방문 시 라면사리/음료수/셀프주먹밥 중 택 1 제공\n2. 5~8인 방문 시 감자튀김/국물계란찜 중 택 1 제공 or 생맥주 1700cc 주문 시 2700cc 사이즈업 (9인 이상 테이블 미적용/제휴 내용 중복 불가/테이블 당 1회 제공)",
+        "benefit": "1. 2~4인 방문 시 라면사리/음료수/셀프주먹밥 중 택 1 제공\n2. 5~8인 방문 시 감자튀김/국물계란찜 중 택1 제공 or 생맥주 1700cc 주문 시 2700cc 사이즈업\n(9인 이상 테이블 미적용 / 제휴 내용 중복 불가 / 테이블 당 1회 제공)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2~8인 방문 시 (9인 이상 테이블 미적용, 제휴 내용 중복 불가, 테이블 당 1회 제공)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
     ]
@@ -6027,13 +6023,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "3개월 이상 가입 시 2만원 추가 할인 및 사물함/티셔츠 이용권(2만원 상당) 무료 제공 (총 4만원 상당 혜택, 최초 가입자 대상)",
+        "benefit": "3개월 이상 가입 시 2만원 할인(이벤트 가에서 2만원 추가할인) \n+ 사물함, 티셔츠 이용권(2만원->무료) 제공 (총 4만원 상당 할인)\n(단, 최초 가입자에 한해 적용, 최초 가입시 학생증 제시 필수)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시 (최초 가입 시 필수), 3개월 이상 가입 시 (최초 가입자 한정)",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       },
       {
@@ -6085,7 +6081,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3,000원 이상 결제 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       },
       {
@@ -6131,13 +6127,13 @@
       {
         "college_id": "3",
         "college_name": "공학대학",
-        "benefit": "등록 시 5% 할인 (재등록 2회 포함 총 3회 적용)",
+        "benefit": "등록 시 5% 할인 (재등록 2회까지, 총 3회 적용)",
         "period": {
           "start_date": "2026-03-02",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 최초 등록 및 재등록 2회까지 적용",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
     ]
@@ -6165,7 +6161,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 이용금액 1만원 이상 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       },
       {
@@ -6205,7 +6201,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 기본 시간 초과 시 적용",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
     ]
@@ -6233,7 +6229,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 및 결제 금액 조건 충족 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
@@ -6252,7 +6248,7 @@
   },
   {
     "id": "103",
-    "name": "트라이쁘띠",
+    "name": "트라이뽀티",
     "category": "cafe",
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
@@ -6273,7 +6269,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 8천원 이상 구매 시",
+        "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       },
       {
