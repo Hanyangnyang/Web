@@ -1,6 +1,6 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, ChevronDown, ArrowUpRight, X } from 'lucide-react';
+import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
@@ -525,6 +525,220 @@ export function ShuttleView({ isActive }) {
   const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
   const [viewMode, setViewMode] = useState('shuttle'); // 'shuttle' | 'bus'
 
+  // Geolocation & GPS
+  const [userCoords, setUserCoords] = useState(null);
+
+  useEffect(() => {
+    if (viewMode === 'bus') {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setUserCoords({
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude
+            });
+          },
+          (err) => console.log("GPS Error:", err),
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      }
+    }
+  }, [viewMode]);
+
+  // Public Bus States
+  const [selectedBuses, setSelectedBuses] = useState(() => {
+    try {
+      const saved = localStorage.getItem('public_bus_selected_buses');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  const [selectedStops, setSelectedStops] = useState(() => {
+    try {
+      const saved = localStorage.getItem('public_bus_selected_stops');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const saved = localStorage.getItem('public_bus_favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  const [expandedStops, setExpandedStops] = useState({});
+
+  // Save states to localStorage
+  useEffect(() => {
+    localStorage.setItem('public_bus_selected_buses', JSON.stringify(selectedBuses));
+  }, [selectedBuses]);
+
+  useEffect(() => {
+    localStorage.setItem('public_bus_selected_stops', JSON.stringify(selectedStops));
+  }, [selectedStops]);
+
+  useEffect(() => {
+    localStorage.setItem('public_bus_favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const BUSES = [
+    { id: '3102', name: '3102', type: '광역', color: '#EE2737', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역', '의왕톨게이트', '강남역우리은행'], isPopular: true },
+    { id: '10-1', name: '10-1', type: '시내', color: '#3b82f6', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역'] }
+  ];
+
+  const DEFAULT_PRIORITY = [
+    '셔틀콕',
+    '기숙사',
+    '융합교육관',
+    '상록수역',
+    '강남역우리은행',
+    '의왕톨게이트'
+  ];
+
+  const STOP_COORDS = {
+    '셔틀콕': { lat: 37.2995, lon: 126.8379 },
+    '기숙사': { lat: 37.2965, lon: 126.8345 },
+    '융합교육관': { lat: 37.2985, lon: 126.8385 },
+    '상록수역': { lat: 37.3023, lon: 126.8661 },
+    '강남역우리은행': { lat: 37.4979, lon: 127.0276 },
+    '의왕톨게이트': { lat: 37.3486, lon: 126.9698 }
+  };
+
+  const MOCK_ARRIVALS = {
+    '셔틀콕': [
+      { busId: '3102', time: '4분 30초 후', info: '2석 남음', direction: '강남역행' },
+      { busId: '10-1', time: '2분 10초 후', info: '여유', direction: '상록수역행' },
+      { busId: '3102', time: '18분 후', info: '12석 남음', direction: '강남역행' }
+    ],
+    '기숙사': [
+      { busId: '3102', time: '2분 후', info: '3석 남음', direction: '강남역행' },
+      { busId: '10-1', time: '5분 후', info: '보통', direction: '상록수역행' }
+    ],
+    '융합교육관': [
+      { busId: '3102', time: '3분 20초 후', info: '2석 남음', direction: '강남역행' },
+      { busId: '10-1', time: '1분 후', info: '여유', direction: '상록수역행' }
+    ],
+    '상록수역': [
+      { busId: '3102', time: '15분 후', info: '빈자리 많음', direction: '에리카행' },
+      { busId: '10-1', time: '8분 후', info: '보통', direction: '에리카행' }
+    ],
+    '강남역우리은행': [
+      { busId: '3102', time: '25분 후', info: '회차 대기 중', direction: '에리카행' }
+    ],
+    '의왕톨게이트': [
+      { busId: '3102', time: '12분 후', info: '5석 남음', direction: '강남역행' }
+    ]
+  };
+
+  // Distance helper
+  const getDistanceStr = (stopName) => {
+    if (!userCoords) return null;
+    const coord = STOP_COORDS[stopName];
+    if (!coord) return null;
+    
+    const lat1 = userCoords.latitude;
+    const lon1 = userCoords.longitude;
+    const lat2 = coord.lat;
+    const lon2 = coord.lon;
+    
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const dist = R * c; // in km
+    
+    if (dist < 1) {
+      return `${Math.round(dist * 1000)}m`;
+    }
+    return `${dist.toFixed(1)}km`;
+  };
+
+  // Get active stops based on selected buses
+  const activeStops = selectedBuses.length === 0
+    ? DEFAULT_PRIORITY
+    : Array.from(new Set(
+        BUSES.filter(b => selectedBuses.includes(b.id))
+             .flatMap(b => b.stops)
+      ));
+
+  // Auto clean selectedStops if they become inactive
+  useEffect(() => {
+    if (selectedBuses.length > 0) {
+      setSelectedStops(prev => prev.filter(s => activeStops.includes(s)));
+    }
+  }, [selectedBuses]);
+
+  // Determine stop display ordering
+  const getSortedStops = () => {
+    const stopsList = [...DEFAULT_PRIORITY];
+    
+    const getStopScore = (stopName) => {
+      const isFav = favorites.includes(stopName);
+      const isActive = activeStops.includes(stopName);
+      
+      let dist = 999999;
+      if (userCoords && STOP_COORDS[stopName]) {
+        const c = STOP_COORDS[stopName];
+        const lat1 = userCoords.latitude;
+        const lon1 = userCoords.longitude;
+        const dLat = (c.lat - lat1) * Math.PI / 180;
+        const dLon = (c.lon - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(c.lat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        dist = 6371 * calcC;
+      } else {
+        dist = DEFAULT_PRIORITY.indexOf(stopName);
+      }
+      
+      return { isFav, isActive, dist };
+    };
+
+    return stopsList.sort((a, b) => {
+      const scoreA = getStopScore(a);
+      const scoreB = getStopScore(b);
+      
+      if (scoreA.isFav !== scoreB.isFav) {
+        return scoreA.isFav ? -1 : 1;
+      }
+      if (scoreA.isActive !== scoreB.isActive) {
+        return scoreA.isActive ? -1 : 1;
+      }
+      return scoreA.dist - scoreB.dist;
+    });
+  };
+
+  const sortedStops = getSortedStops();
+
+  // Initialize expandedStops for top 2
+  useEffect(() => {
+    if (viewMode === 'bus') {
+      const top2 = sortedStops.slice(0, 2);
+      setExpandedStops(prev => {
+        const next = { ...prev };
+        top2.forEach(s => {
+          if (next[s] === undefined) next[s] = true;
+        });
+        return next;
+      });
+    }
+  }, [viewMode, userCoords, favorites, selectedBuses]);
+
+  // Sort stop chips: active ones at the front
+  const sortedStopChips = [...DEFAULT_PRIORITY].sort((a, b) => {
+    const aActive = activeStops.includes(a);
+    const bActive = activeStops.includes(b);
+    if (aActive !== bActive) {
+      return aActive ? -1 : 1;
+    }
+    return DEFAULT_PRIORITY.indexOf(a) - DEFAULT_PRIORITY.indexOf(b);
+  });
+
   // 칩(출발지)을 바꿀 때마다 30분 이내의 다음 셔틀 자동 뒤집기 트리거 실행
   useEffect(() => {
     if (isActive && !isLoading && schedule.length > 0) {
@@ -825,18 +1039,195 @@ export function ShuttleView({ isActive }) {
           </div>
         )
       ) : (
-        <div className="min-h-[70vh] bg-white rounded-card flex flex-col items-center justify-center [animation:slideUp_0.4s_ease-out] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-[#e2e8f0] mb-20">
-          <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
-            <svg className="text-slate-400" width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="5" width="20" height="13" rx="2" />
-              <path d="M2 11h20" />
-              <circle cx="7" cy="18" r="1.5" /><circle cx="17" cy="18" r="1.5" />
-            </svg>
+        <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
+          {/* 버스 선택 필터 */}
+          <div className="mb-4 pt-2">
+            <p className="text-[11px] font-extrabold text-text-hint uppercase tracking-wider mb-2">버스 노선</p>
+            <div className="flex gap-2">
+              {BUSES.map(bus => {
+                const isSelected = selectedBuses.includes(bus.id);
+                const is3102 = bus.id === '3102';
+                return (
+                  <div key={bus.id} className="relative select-none">
+                    <button
+                      onClick={() => {
+                        setSelectedBuses(prev => 
+                          prev.includes(bus.id) 
+                            ? prev.filter(id => id !== bus.id) 
+                            : [...prev, bus.id]
+                        );
+                      }}
+                      className={`h-11 px-4 rounded-full flex items-center justify-center gap-1.5 border-[1.5px] text-[13px] font-extrabold cursor-pointer transition-all duration-150 ${
+                        isSelected
+                          ? `text-white border-[#EE2737] shadow-[0_4px_12px_rgba(238,39,55,0.25)]`
+                          : `bg-white border-[#e2e8f0] text-text-sub hover:bg-surface`
+                      }`}
+                      style={
+                        isSelected
+                          ? { backgroundColor: bus.color, borderColor: bus.color, boxShadow: `0 4px 12px ${bus.color}40` }
+                          : is3102
+                            ? { color: '#EE2737' }
+                            : undefined
+                      }
+                    >
+                      <Bus size={14} className={isSelected ? 'text-white' : (is3102 ? 'text-[#EE2737]' : 'text-[#3b82f6]')} />
+                      {bus.name}
+                    </button>
+                    {is3102 && (
+                      <span className="absolute top-[-8px] right-[-5px] bg-[#EE2737] text-white text-[0.62rem] px-1.5 py-0.5 rounded font-black shadow-[0_2px_6px_rgba(238,39,55,0.3)] pointer-events-none">
+                        🔥 인기
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <h3 className="text-lg font-bold text-text-main mb-1">공공버스 정보</h3>
-          <p className="text-text-sub text-xs text-center leading-relaxed">
-            실시간 노선 및 도착 정보를<br />준비하고 있습니다.
-          </p>
+
+          {/* 정류장 선택 필터 */}
+          <div className="mb-6">
+            <p className="text-[11px] font-extrabold text-text-hint uppercase tracking-wider mb-2">정류소</p>
+            <div className="flex flex-wrap gap-1.5">
+              {sortedStopChips.map(stopName => {
+                const isActive = activeStops.includes(stopName);
+                const isSelected = selectedStops.includes(stopName);
+                return (
+                  <button
+                    key={stopName}
+                    disabled={!isActive}
+                    onClick={() => {
+                      setSelectedStops(prev => 
+                        prev.includes(stopName)
+                          ? prev.filter(s => s !== stopName)
+                          : [...prev, stopName]
+                      );
+                    }}
+                    className={`py-1.5 px-3 rounded-full text-xs font-bold border transition-all duration-150 ${
+                      !isActive
+                        ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                        : isSelected
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-white border-[#e2e8f0] text-text-sub hover:bg-surface'
+                    }`}
+                  >
+                    {stopName}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 정류장별 버스 도착 정보 목록 */}
+          <div className="space-y-3">
+            {sortedStops
+              .filter(stopName => selectedStops.length === 0 || selectedStops.includes(stopName))
+              .map(stopName => {
+                const isExpanded = !!expandedStops[stopName];
+                const isFav = favorites.includes(stopName);
+                const arrivals = MOCK_ARRIVALS[stopName] || [];
+                const distanceStr = getDistanceStr(stopName);
+                
+                const filteredArrivals = selectedBuses.length === 0
+                  ? arrivals
+                  : arrivals.filter(arr => selectedBuses.includes(arr.busId));
+                  
+                return (
+                  <div key={stopName} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
+                    {/* 아코디언 헤더 */}
+                    <div 
+                      className="flex justify-between items-center px-4 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors duration-150 select-none"
+                      onClick={() => setExpandedStops(prev => ({ ...prev, [stopName]: !prev[stopName] }))}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {/* 즐겨찾기 별 */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFavorites(prev => 
+                              prev.includes(stopName)
+                                ? prev.filter(s => s !== stopName)
+                                : [...prev, stopName]
+                            );
+                          }}
+                          className="p-1 -ml-1 flex items-center justify-center cursor-pointer transition-transform duration-100 active:scale-75"
+                        >
+                          <Star 
+                            size={18} 
+                            fill={isFav ? '#fbbf24' : 'none'} 
+                            stroke={isFav ? '#fbbf24' : '#cbd5e1'} 
+                            strokeWidth={2}
+                          />
+                        </button>
+                        <span className="font-extrabold text-[15px] text-text-main truncate">
+                          {stopName}
+                        </span>
+                        {distanceStr && (
+                          <span className="text-[10px] font-bold text-primary bg-primary/5 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                            <MapPin size={8} />
+                            {distanceStr}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {!isExpanded && filteredArrivals.length > 0 && (
+                          <span className="text-[10px] font-extrabold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                            가장 빠른 버스 {filteredArrivals[0].time}
+                          </span>
+                        )}
+                        <ChevronDown 
+                          size={18} 
+                          className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* 아코디언 내용 */}
+                    {isExpanded && (
+                      <div className="border-t border-[#f1f5f9] bg-slate-50/50 p-4 space-y-2.5">
+                        {filteredArrivals.length > 0 ? (
+                          filteredArrivals.map((arr, index) => {
+                            const is3102 = arr.busId === '3102';
+                            return (
+                              <div key={index} className="flex justify-between items-center bg-white p-3 border border-[#e2e8f0] rounded-card shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                                <div className="flex items-center gap-2">
+                                  <span 
+                                    className="px-2.5 py-1 rounded text-xs font-black text-white"
+                                    style={{ backgroundColor: is3102 ? '#EE2737' : '#3b82f6' }}
+                                  >
+                                    {arr.busId}
+                                  </span>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-text-main">
+                                      {arr.direction}
+                                    </span>
+                                    <span className="text-[10px] text-text-hint">
+                                      실시간 정보
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                  <span className="text-sm font-extrabold" style={{ color: is3102 ? '#EE2737' : '#3b82f6' }}>
+                                    {arr.time}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-[#6C757D]">
+                                    {arr.info}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="text-center text-xs font-semibold text-text-hint py-2">
+                            운행 정보가 없습니다.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
         </div>
       )}
 
