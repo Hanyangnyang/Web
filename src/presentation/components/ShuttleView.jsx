@@ -1,6 +1,6 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus } from 'lucide-react';
+import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus, BusFront } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
@@ -1266,12 +1266,23 @@ export function ShuttleView({ isActive }) {
                                 <div key={busId} className="px-4 py-3 flex justify-between items-center">
                                   {/* 왼쪽 열: 버스번호 및 행선지 */}
                                   <div className="flex flex-col gap-0.5">
-                                    <span 
-                                      className="text-[16px] font-extrabold"
-                                      style={{ color: busId === '3102' ? '#EE2737' : busId === '10-1' ? '#53B332' : '#212529' }}
-                                    >
-                                      {busId}
-                                    </span>
+                                    <div className="flex items-center gap-1.5">
+                                      <div 
+                                        className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
+                                        style={{ backgroundColor: busId === '3102' ? '#EE2737' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
+                                      >
+                                        <BusFront 
+                                          size={12} 
+                                          className="text-white"
+                                        />
+                                      </div>
+                                      <span 
+                                        className="text-[16px] font-extrabold"
+                                        style={{ color: busId === '3102' ? '#EE2737' : busId === '10-1' ? '#53B332' : '#212529' }}
+                                      >
+                                        {busId}
+                                      </span>
+                                    </div>
                                     <span className="text-[12px] font-medium text-text-sub">
                                       {firstArrival ? firstArrival.direction : ''}
                                     </span>
@@ -1299,7 +1310,7 @@ export function ShuttleView({ isActive }) {
 
                                       return (
                                         <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[14px] font-extrabold text-[#212529]">
+                                          <span className="text-[14px] font-semibold text-[#EE2737]">
                                             {firstArrival.time}
                                           </span>
                                           {firstArrival.info && (
@@ -1341,7 +1352,7 @@ export function ShuttleView({ isActive }) {
 
                                       return (
                                         <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[14px] font-extrabold text-[#212529]">
+                                          <span className="text-[14px] font-semibold text-[#EE2737]">
                                             {secondArrival.time}
                                           </span>
                                           {secondArrival.info && (
