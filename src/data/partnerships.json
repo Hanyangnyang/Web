@@ -128,13 +128,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "4인 방문시 콜라 1캔 / 6인 이상 방문 시 콜라 2캔",
+        "benefit": "4인 방문시 콜라 1캔\n6인 이상 방문 시 콜라 2캔",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 조건 충족 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -207,10 +207,10 @@
         "benefit": "1인 1메뉴 주문 시 인당 음료 1캔 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인 1메뉴 주문 시 인당 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -388,6 +388,18 @@
         },
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
+      },
+      {
+        "college_id": "8",
+        "college_name": "소프트웨어융합대학",
+        "benefit": "2인 테이블 당 음료 1개 제공",
+        "period": {
+          "start_date": "2026-03-02",
+          "end_date": "2026-12-21",
+          "is_active": true
+        },
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
+        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
   },
@@ -444,13 +456,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 2인 이상, 1인 1식사 (백반) 주문 시 펩시 제로 355ml 한 캔 제공 or 2. 감자탕 중짜 이상 주문 시 볶음밥 or 사리 중 택 1",
+        "benefit": "1. 2인 이상, 1인 1식사 (백반)주문 시 펩시 제로 355ml 한 캔 제공 or 2. 감자탕 중짜 이상 주문 시 볶음밥 or 사리 중 택 1",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 백반 인원 주문 요건 또는 감자탕 중사이즈 이상 주문 시 (조건 택1)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -511,10 +523,10 @@
         "benefit": "2인 테이블 당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 테이블 당 음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -599,10 +611,10 @@
         "benefit": "4인 테이블 당 우동 or 당면사리 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 테이블당 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -687,10 +699,10 @@
         "benefit": "3,4인 테이블 당 볶음밥 1인분 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 또는 4인 테이블당 1인분 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -748,13 +760,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "2인 이상 방문 시 음료 1개 제공 or 주류 1개 2,000원 할인 / 12,000원 이상 결제 시 꼬치 1개 제공 (중복 불가)",
+        "benefit": "2인 이상 방문 시 음료 1개 제공 or 주류 1개 2,000원 할인\n12,000원 이상 결제 시 꼬치 1개 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 또는 결제 금액 조건 달성 시 (중복 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -827,10 +839,10 @@
         "benefit": "인원수만큼 군만두 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문 인원 기준 충족 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -915,10 +927,10 @@
         "benefit": "3인 이상 방문 시 된장 or 순두부찌개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시 (된장찌개 또는 순두부찌개 중 택 1)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1015,10 +1027,10 @@
         "benefit": "18시 이후 소주 3,000원 / 샤브 4인분 이상 주문 시 육회비빔밥 or 샤브 1 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 18시 이후 주류 주문 시 소주 병당 3,000원 적용 또는 샤브 4인분 이상 주문 시 육회비빔밥 또는 샤브 1인분 제공 (혜택 택1)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1115,10 +1127,10 @@
         "benefit": "위풍당닭 or 사계천왕 or 치뽀끼 주문 시 감자튀김 서비스 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 지정 메뉴 주문 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -1227,10 +1239,10 @@
         "benefit": "테이블 당 1,000원 상당의 서비스 / 테이블 당 7만원 이상 주문 시 떡볶이 1인분",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 1,000원 상당 서비스 제공 또는 테이블당 70,000원 이상 주문 시 떡볶이 1인분 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1336,13 +1348,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "2-3인 테이블당 음료수 1개 or 4인 이상 방문 시 서비스 메뉴 제공 / 현금결제 or 계좌이체 시 10% 할인 (1번이랑 중복 적용 가능)",
+        "benefit": "2-3인 테이블당 음료수 1개 or 4인 이상 방문 시 서비스 메뉴 제공\n현금결제 or 계좌이체 시 10% 할인 (1번이랑 중복 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 (인원별 음료/안주 서비스 혜택과 중복 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -1451,10 +1463,10 @@
         "benefit": "계좌이체 시 소주/맥주 병당 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 계좌이체 결제 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1524,13 +1536,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "4인 이상 방문 시 음료 1개 or 생맥주 500cc 제공 / 4만원 이상 주문 시 포테이토 메뉴 1개 제공 (중복 불가)",
+        "benefit": "4인 이상 방문 시 음료 1개 or 생맥주 500cc 제공\n4만원 이상 주문 시 포테이토 메뉴 1개 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 조건 또는 주문 금액 조건 충족 시 (혜택 중복 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1591,10 +1603,10 @@
         "benefit": "3인 이상 방문 시 탄산음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시 탄산음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1700,13 +1712,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "4인 테이블 당 샤베트 1회 제공 / 2인 테이블 당 음료 1개 제공",
+        "benefit": "4인 테이블 당 샤베트 1회 제공\n2인 테이블 당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블 인원에 따라 혜택 차등 적용 (4인 테이블: 샤베트 1회, 2인 테이블: 음료 1개 제공)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1812,13 +1824,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "4인 이상 방문 시 에이플러스 인스타 태그 후 스토리 올리면 소주 1병 제공 / 8인 이하 방문 시 주류 병당 500원씩 할인 / 김치찌개(소) 주문 시 라면사리 1개 제공 / 김치찌개(대) 주문 시 라면사리 무한리필 (중복 가능, 에이플러스의 다른 행사와 중복 불가, 오전 2시까지 적용)",
+        "benefit": "4인 이상 방문 시 에이플러스 인스타 태그 후 스토리 올리면 소주 1병 제공\n8인 이하 방문 시 주류 병당 500원씩 할인\n김치찌개(소) 주문 시 라면사리 1개 제공\n김치찌개(대) 주문 시 라면사리 무한리필\n(중복 가능, 에이플러스의 다른 행사와 중복 불가, 오전 2시까지 적용, 인원 중 한 명 이상 소융대 학생이면 제휴 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 중 한 명 이상 소융대 학생이면 적용 가능, 다른 행사와 중복 불가, 오전 2시까지 한정 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1888,13 +1900,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "음료 5개 이상 구매 시 1. 아메리카노 s 사이즈 1개 증정 or 2. 아이스크림 토핑 증정 (아메리카노 s 사이즈와 마카롱 제외)",
+        "benefit": "음료 5개 이상 구매 시 1. 아메리카노 s 사이즈 1개 증정 or 2. 아이스크림 토핑 증정\n(아메리카노 s 사이즈와 마카롱 제외)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 5개 이상 구매 시 (아메리카노 s 사이즈 증정 또는 아메리카노 s 사이즈와 마카롱을 제외한 메뉴에 아이스크림 토핑 증정 중 택 1)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -1967,10 +1979,10 @@
         "benefit": "메뉴 당 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 메뉴 당 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -2076,13 +2088,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "매장 이용 시 아메리카노 500원 할인 / Take Out 시 모든 음료 500원 할인",
+        "benefit": "매장 이용 시 아메리카노 500원 할인\nTake Out 시 모든 음료 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 매장 이용 형태에 따라 할인 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -2216,13 +2228,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "3천원 이상 결제 시 물 1개 제공 / 9곡 시 2곡 추가 or 30분 시 10분 추가",
+        "benefit": "3천원 이상 결제 시 물 1개 제공\n9곡 시 2곡 추가 or 30분 시 10분 추가",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3,000원 이상 결제 시 혹은 곡/시간 요건 충족 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -2347,10 +2359,10 @@
         "benefit": "식음료 전체 결제금액 10% 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 식음료 전체 결제 금액의 10% 할인 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -2435,10 +2447,10 @@
         "benefit": "세트 주문 시 1,000원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 세트 메뉴 주문 시 세트당 1,000원 할인",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -2535,10 +2547,10 @@
         "benefit": "2인 테이블당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 테이블당 음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -2596,13 +2608,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "(여름 한정) 음료+컵빙수 주문 시 500원 할인 / 음료2+빙수(2인) 주문 시 1,500원 할인 // (상시) 2인 음료 주문 시 500원 할인 / 3인 음료 주문 시 1,000원 할인 or 아메리카노 사이즈업 / 4인 이상 음료 주문 시 1,500원 할인 or 아메리카노 2잔 사이즈업 or 원쿠키 제공 (중복 불가)",
+        "benefit": "(여름 한정)\n음료+컵빙수 주문 시 500원 할인\n음료2+빙수(2인) 주문 시 1,500원 할인\n\n(상시)\n2인 음료 주문 시 500원 할인\n3인 음료 주문 시 1,000원 할인 or 아메리카노 사이즈업\n4인 이상 음료 주문 시 1,500원 할인 or 아메리카노 2잔 사이즈업 or 원쿠키 제공\n\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 또는 세트 주문 요건 달성 시 (중복 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -2675,10 +2687,10 @@
         "benefit": "음료 주문 시 인당 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 주문 시 인당 500원 할인",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -2787,13 +2799,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "12시~17시 인당 500원 할인 / 17시 이후 주류 메뉴 4개 이상 주문시 감자칩 1개 제공",
+        "benefit": "12시~17시 인당 500원 할인\n17시 이후 주류 메뉴 4개 이상 주문시 감자칩 1개",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 시간대 및 주문 조건 충족 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -2866,10 +2878,10 @@
         "benefit": "사이즈 상관없이 피자 한 판 당 음료 1개 or 플레인프라이 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 피자 1판당 음료 1개 또는 플레인 프라이 제공 (택 1)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -2946,10 +2958,10 @@
         "benefit": "3인 이상 방문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시 음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -3031,13 +3043,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "현금결제, 계좌이체 시 5% 할인 / 냉면 500원 할인 (중복 가능)",
+        "benefit": "현금결제, 계좌이체 시 5% 할인\n냉면 500원 할인\n(중복 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금/계좌이체 결제 시 또는 냉면 주문 시 (중복 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3119,13 +3131,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "(식사) 4인당 음료 2개 제공 / (포차) 3만원 이상 주문 시 육회 1개 제공 (중복 불가)",
+        "benefit": "(식사) 4인당 음료 2개 제공\n(포차) 3만원 이상 주문 시 육회 1개 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 식사 이용 혹은 포차 조건 금액 이상 주문 시 (중복 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3202,10 +3214,10 @@
         "benefit": "3인 이상 방문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3275,13 +3287,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "세트메뉴 하나 당 주먹밥 or 계란찜 제공 / 통닭메뉴 하나 당 음료 1개 제공 (중복 가능)",
+        "benefit": "세트메뉴 하나 당 주먹밥 or 계란찜 제공\n통닭메뉴 하나 당 음료 1개 제공\n(중복 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 타당한 조건의 메뉴 주문 시 (중복 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3479,13 +3491,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "3인 이상 테이블 당 음료 1개 제공 / 현금결제, 계좌이체 시 메뉴 당 1,000원 할인",
+        "benefit": "3인 이상 테이블 당 음료 1개 제공\n현금결제, 계좌이체 시 메뉴 당 1,000원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 테이블 이용 시 음료 1개 제공 및 현금/계좌이체 결제 시 메뉴 당 1,000원 할인 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -3579,13 +3591,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "2인 이상 방문 시 음료 1개 제공 / 4인 테이블당 음료 2개 or 주류 1병 제공 (중복 불가)",
+        "benefit": "2인 이상 방문 시 음료 1개 제공\n4인 테이블당 음료 2개 or 주류 1병 제공\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 조건 충족 시 (중복 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3667,13 +3679,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "15,000원 이상 주문 시 10% 할인 (중복 가능, 주말 불가) / 주문제작 홀 케이크 2,000원 할인",
+        "benefit": "15,000원 이상 주문 시 10% 할인 (중복 가능, 주말 불가)\n주문제작 홀 케이크 2,000원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 15,000원 이상 주문 시 10% 할인 (타 혜택과 중복 가능, 주말 사용 불가) / 주문 제작 홀 케이크 주문 시 2,000원 할인 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3734,10 +3746,10 @@
         "benefit": "1인 1음료 주문 시 음료 한잔 당 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인 1음료 주문 시 음료 1잔당 500원 할인",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3819,13 +3831,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "음료+도넛 10,000원 이상 주문 시 5% 할인 / 음료+도넛 50,000원 이상 주문 시 7% 할인 (현금/계좌이체 시 적용)",
+        "benefit": "음료+도넛 10,000원 이상 주문 시 5% 할인\n음료+도넛 50,000원 이상 주문 시 7% 할인\n(현금/계좌이체 시 적용)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 한정 및 조건 금액 달성 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -3959,13 +3971,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "3-4인 테이블 당 아이스티 1개 제공 / 1만원 이상 현금 결제시 500원 할인",
+        "benefit": "3-4인 테이블 당 아이스티 1개 / 1만원 이상 현금 결제시 500원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 요건 만족 시 또는 1만원 이상 현금 결제 시 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -4082,10 +4094,10 @@
         "benefit": "2인 이상 무한 리필 주문 시 원하는 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 무한 리필 주문 시 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -4174,10 +4186,10 @@
         "benefit": "3인 이상 방문 시 음료 1개 제공 or 만두 1,000원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -4263,13 +4275,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "현금/계좌이체 시 10% 할인 / 4인 이상 방문 시 음료수 2개 제공 (중복 가능)",
+        "benefit": "현금/계좌이체 시 10% 할인\n4인 이상 방문 시 음료수 2개 제공\n(중복 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금/계좌이체 결제 시 또는 4인 이상 방문 시 (혜택 중복 적용 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -4318,10 +4330,10 @@
         "benefit": "2인 테이블 당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 테이블 당 음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -4450,10 +4462,10 @@
         "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 제외)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 추가 메뉴 1회 무료 제공 (단, 닭고기, 새우, 야채, 볶음밥 품목은 제외)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -4610,10 +4622,10 @@
         "benefit": "2인 테이블당 음료 제공 (2,000원)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 테이블당 2,000원 상당 음료 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -4778,10 +4790,10 @@
         "benefit": "고기 단품 메뉴 주문 시 테이블 당 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 고기 단품 메뉴 주문 시 테이블당 음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -4863,13 +4875,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 1인 1메뉴 주문 시 음료 or 디핑소스 제공 / 2. 3만원 이상 주문 시 작은 컵라면 증정 / 3. 6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반제외, 원하는 맛 1가지)",
+        "benefit": "1. 1인 1메뉴 주문 시 음료 or 디핑소스 제공\n2. 3만원 이상 주문 시 작은 컵라면 증정\n3. 6만원 이상 주문 시 우볶이 or 유부초밥 제공 (반반제외, 원하는 맛 1가지)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인당 메뉴 주문 조건 혹은 결제 조건금액 이상 달성 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -4930,10 +4942,10 @@
         "benefit": "2인 이상 방문 시 음료 1개 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시 음료 1개 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -5006,10 +5018,10 @@
         "benefit": "현금결제, 계좌이체 시 10% 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시 10% 할인",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5067,13 +5079,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "15,000원 이상 주문 시 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 중 택1 (텐버거의 이벤트와 중복 불가, 11:00 ~ 13:00 제휴 불가)",
+        "benefit": "15,000원 이상 주문 시 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 중 택1\n(텐버거의 이벤트와 중복 불가, 11:00~13:00 제휴 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 15,000원 이상 주문 시 (단, 11:00 ~ 13:00 및 타 이벤트와 중복 제외)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       },
       {
@@ -5158,10 +5170,10 @@
         "benefit": "3인분 이상 주문 시 사리 1종류 추가 가능",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인분 이상 주문 시 사리 1종류 추가 가능",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5250,10 +5262,10 @@
         "benefit": "10만원 이상 단체 주문 시 개당 1,000원 할인 및 배달 / 만원 이상 현금결제, 계좌이체 시 토핑1 or 음료1개 제공 (매장 이벤트 중복 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 단체 100,000원 이상 주문 시 개당 1,000원 할인 및 배달 지원 / 10,000원 이상 현금/계좌이체 시 토핑 1개 또는 음료 1개 제공 (매장 이벤트와 중복 적용 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5342,10 +5354,10 @@
         "benefit": "2인 이상 방문 시 감자튀김 서비스 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5382,10 +5394,10 @@
         "benefit": "4인 테이블당 오늘의 음료 1잔 제공 (타코/햄버거로 1인 1메뉴 주문 시)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 타코 또는 햄버거 메뉴로 1인 1메뉴 주문 및 4인 테이블당 오늘의 음료 1잔 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5419,13 +5431,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 테이크아웃 시 모든 음료 10% 할인 (쿠폰 적립 불가) / 2. 매장 취식 시 1인 1음료+디저트 주문 시 디저트 300원 할인",
+        "benefit": "1. 테이크아웃 시 모든 음료 10% 할인 (쿠폰 적립 불가)\n2. 매장 취식 시 1인 1음료+디저트 주문 시 디저트 300원 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이크아웃 결제 시(쿠폰 중복 불가) 또는 매장 취식 메뉴 주문 조건 달성 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5539,13 +5551,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 테이크 아웃 시 음료 1잔 당 500원 할인 / 2. 매장 이용시 음료 1잔 당 500원 할인 (2번은 일요일 제외)",
+        "benefit": "1. 테이크 아웃 시 음료 1잔 당 500원 할인\n2. 매장 이용시 음료 1잔 당 500원 할인 (2번은 일요일 제외)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 1잔 당 적용 (매장 이용 할인은 일요일 제외)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5606,10 +5618,10 @@
         "benefit": "음료 4잔 주문 시 아메리카노(벤티) 한 잔 제공 (더치페이 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 4잔 주문 시 아메리카노(벤티) 1잔 서비스 제공 (더치페이 결제 건도 인정)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5643,13 +5655,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "커피 메뉴 10% 할인 / 커피 메뉴 외 다른 음료 5% 할인 (중복 불가)",
+        "benefit": "커피 메뉴 10% 할인\n커피 메뉴 외 다른 음료 5% 할인\n(중복 불가)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 타 할인 혜택과 중복 적용 불가",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5747,13 +5759,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 4인 이상 테이크 아웃 주문 시 1000원 할인 / 2. 음료/베이커리 (현금/계좌이체)로 결제 시 10% 할인 (1,2 중복 불가능)",
+        "benefit": "1. 4인 이상 테이크 아웃 주문 시 1000원 할인\n2. 음료/베이커리 (현금/계좌이체)로 결제 시 10% 할인\n(1,2 중복 불가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이크 아웃 또는 현금/계좌이체 결제 시 (혜택 1, 2 중복 적용 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5923,13 +5935,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "평일 12시 ~ 14시 제외 특가메뉴를 제외한 커피 및 음료 전메뉴 1잔 당 500원 할인 (포인트 적립 및 사용 불가 & 중복할인 불가) / 1인당 1잔 까지만 적용 가능",
+        "benefit": "평일 12시~14시 제외 특가메뉴를 제외한 커피 및 음료 전메뉴 1잔 당 500원 할인\n(포인트 적립 및 사용 불가 & 중복할인 불가)\n(1인당 1잔 까지만 적용 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 평일 12:00 ~ 14:00 시간대 제외, 특가 메뉴 제외, 1인당 1잔 한정 적용 (중복 할인 및 포인트 적립/사용 불가)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -5999,13 +6011,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 4인 이상 테이블 음료 1캔 서비스 / 2. 5만원 이상 현금/계좌이체 시 5% 할인 (1,2 중복 가능)",
+        "benefit": "1. 4인 이상 테이블 음료 1캔 서비스\n2. 5만원 이상 현금/계좌이체 시 5% 할인\n(1,2 중복 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 테이블 이용 시 또는 5만원 이상 현금/계좌이체 결제 시 (중복 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6054,10 +6066,10 @@
         "benefit": "소주(참이슬, 처음처럼, 진로, 새로) 무제한 1,000원 할인 (일행 전원 소융대 소속 학생일 시)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 일행 전원 소프트웨어융합대학 소속 학생일 시, 지정 소주(참이슬, 처음처럼, 진로, 새로) 병당 무제한 1,000원 할인 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6131,13 +6143,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "3개월 또는 3개월 이상 가입 시 이벤트가에서 2만원 추가 할인 + 사물함, 티셔츠 이용권 무료제공 -> 총 4만원 상당 할인 (단, 최초 가입자에 한해서 적용, 가입 당시 미리 소프트웨어융합대학 학생임을 인증해야 함.)",
+        "benefit": "3개월 또는 3개월 이상 가입 시 이벤트가에서 2만원 추가 할인\n+ 사물함, 티셔츠 이용권 무료제공 -> 총 4만원 상당 할인\n(단, 최초 가입자에 한해서 적용, 가입 당시 미리 소프트웨어융합대학 학생임을 인증해야 함)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 최초 가입자에 한해 3개월 이상 신규 등록 시 적용 (이벤트가 추가 20,000원 할인 + 무료 사물함/티셔츠 이용권 제공으로 총 40,000원 상당 혜택, 가입 전 소융대 학생증 사전 확인 필수)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6183,13 +6195,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "3천원 이상 결제 시 물 1개 제공",
+        "benefit": "3천원 이상 결제 시 물 1개",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3,000원 이상 결제 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6254,10 +6266,10 @@
         "benefit": "요금 1인당 만원 이상 나왔을 시 5% 할인 적용 (모든 시간대에 적용)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인당 이용 요금 10,000원 이상 결제 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6359,13 +6371,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 8000원 이상 구매 시 계좌이체/현금으로 결제할 경우 500원 즉시 할인 / 2. 4잔 이상 구매 시 계좌이체/현금으로 결제할 경우 1000원 즉시 할인",
+        "benefit": "1. 8000원 이상 구매 시 계좌이체/현금으로 결제할 경우 500원 즉시 할인\n2. 4잔 이상 구매 시 계좌이체/현금으로 결제할 경우 1000원 즉시 할인",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 계좌이체 또는 현금 결제 시 조건(구매 금액 8,000원 이상 또는 음료 4잔 이상) 충족 시 즉시 할인 적용",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6439,13 +6451,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "1. 식사류 주문 시 500원 할인 / 2. 2인 이상 3시간 이용권 구매 시 20분 추가 이용 가능",
+        "benefit": "1. 식사류 주문 시 500원 할인\n2. 2인 이상 3시간 이용권 구매 시 20분 추가 이용 가능",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 식사 주문 시 또는 2인 이상 3시간 이용권 구매 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6551,13 +6563,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "현금/계좌이체 시 10% 할인 / 4인 이상 방문 시 음료수 2개 제공 (중복 가능)",
+        "benefit": "현금/계좌이체 시 10% 할인\n4인 이상 방문 시 음료수 2개 제공\n(중복 가능)",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금/계좌이체 결제 시 또는 4인 이상 방문 시 (혜택 중복 적용 가능)",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6579,13 +6591,13 @@
       {
         "college_id": "8",
         "college_name": "소프트웨어융합대학",
-        "benefit": "3인 이상 방문 시 음료 1개 제공",
+        "benefit": "3인 이상 방문 시 음료 1개",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6610,10 +6622,10 @@
         "benefit": "1인당 주류 15000원 이상 결제 시 나쵸 제공",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인당 주류 15,000원 이상 결제 시",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
@@ -6638,10 +6650,10 @@
         "benefit": "테이블당 음료 한 캔",
         "period": {
           "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 제공",
+        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
     ]
