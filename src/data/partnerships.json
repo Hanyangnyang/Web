@@ -118,11 +118,11 @@
         "college_name": "경상대학",
         "benefit": "테이블 당 음료수 1개 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블 당 적용",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -192,13 +192,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 4인 이상 방문 시 가라아게 증정 / 2. 리뷰 1개당 음료 1캔 제공",
+        "benefit": "1. 4인 이상 방문 시 가라아게 증정\n2. 리뷰 1개당 음료 1캔 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 또는 리뷰 작성 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -270,11 +270,11 @@
         "college_name": "경상대학",
         "benefit": "2인 이상 방문 시 갈릭바게트 or 뚱캔 선택",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -358,11 +358,11 @@
         "college_name": "경상대학",
         "benefit": "2인당 음료 1캔 무료 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인당 적용",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -498,11 +498,11 @@
         "college_name": "경상대학",
         "benefit": "세트 메뉴 주문 시 500원 할인 (매장 내 식사 한정)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 세트 메뉴 주문 및 매장 내 식사 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -586,11 +586,11 @@
         "college_name": "경상대학",
         "benefit": "우동, 당면 중 택 1 (단, 4인당 1개)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 기준 테이블 당",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -674,11 +674,11 @@
         "college_name": "경상대학",
         "benefit": "3인분 이상 주문 시 볶음밥 1인분 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인분 이상 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -1000,13 +1000,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 샤브샤브 4인분 이상 주문 시 샤브샤브 or 육회비빔밥 제공 / 2. 소주 18시 이후 주문 시 병당 3,000원 (직원에게 별도 문의)",
+        "benefit": "1. 샤브샤브 4인분 이상 주문 시 샤브샤브 or 육회비빔밥 제공\n2. 소주 18시 이후 주문 시 병당 3,000원 (직원에게 별도 문의)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 18시 이후 방문 소주 주문 혹은 4인분 이상 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -1090,11 +1090,11 @@
         "college_name": "경상대학",
         "benefit": "사계천왕 or 치뽀끼 주문 시 감자튀김 서비스",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -1200,13 +1200,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 테이블 당 천원 상당 서비스 / 2. 테이블 당 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "benefit": "1. 테이블 당 천원 상당 서비스\n2. 테이블 당 7만원 이상 주문 시 떡볶이 1인분 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문 금액 조건 충족 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -1300,13 +1300,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "2-3인 방문 시 음료 증정 / 4인 이상 방문 시 사장님 서비스 / 현금 및 계좌이체 시 10% 할인",
+        "benefit": "2-3인 방문 시 음료 증정\n4인 이상 방문 시 사장님 서비스\n현금 및 계좌이체 시 10% 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 조건에 맞춰 적용 혹은 현금/계좌이체 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
       },
       {
@@ -1436,13 +1436,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "소주, 맥주 병당 500원 할인 / 현금, 계좌이체 시 10% 할인",
+        "benefit": "소주, 맥주 병당 500원 할인\n현금, 계좌이체 시 10% 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주류 주문 시 혹은 현금/계좌이체 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
       },
       {
@@ -1788,13 +1788,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "시험 기간 주류 반값 / 10인 이하 테이블 미니아이스크림 1인 1개 / 인스타 태그 후 스토리 업로드 시 음료 or 홈런볼 / 에이플 생일 패키지 증정(폴라로이드사진, 머리띠, 장미꽃) / 기념일(생일, 입대, 전역) 끝까지 달릴 시 샴페인 증정",
+        "benefit": "시험 기간 주류 반값\n10인 이하 테이블 미니아이스크림 1인 1개\n인스타 태그 후 스토리 업로드 시 음료 or 홈런볼\n에이플 생일 패키지 증정(폴라로이드사진, 머리띠, 장미꽃)\n기념일(생일, 입대, 전역) 끝까지 달릴 시 샴페인 증정",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 시험 기간 주류 반값 적용 및 개별 조건 충족/SNS 이벤트 참여 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
       },
       {
@@ -1954,11 +1954,11 @@
         "college_name": "경상대학",
         "benefit": "현금/계좌이체 결제 시 500원 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -2510,11 +2510,11 @@
         "college_name": "경상대학",
         "benefit": "2인 이상 방문 시 테이블 당 음료수 한 캔 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시 (테이블 당)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -2584,13 +2584,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 음료 주문 시 2인 500원 할인 / 2. 3인 1,000원 할인 or 아메리카노 사이즈업 / 3. 4인 1,500원 할인 or 아메리카노 2잔 사이즈업 or 원쿠키 제공 (경상대 1인만 있어도 일행 전체 혜택 제공, 쿠폰 중복 불가, 복사 10장 상시)",
+        "benefit": "1. 음료 주문 시 2인 500원 할인\n2. 3인 1,000원 할인 or 아메리카노 사이즈업\n3. 4인 1,500원 할인 or 아메리카노 2잔 사이즈업 or 원쿠키 제공\n(경상대 1인만 있어도 일행 전체 혜택 제공, 쿠폰 중복 불가, 복사 10장 상시)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 일행 중 경상대 학생 최소 1인 포함 필수, 쿠폰 중복 적용 불가",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -2660,13 +2660,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "매장 내 음료 주문 시 500원 할인 / 상시 테이크아웃 시 1,000원 할인 / 매장 내 디저트 + 음료 주문 시 1,000원 할인 / 매장 내 음료 주문 후 1,000원 추가 시 아메리카노 리필(테이크아웃 가능)",
+        "benefit": "매장 내 음료 주문 시 500원 할인\n상시) 테이크아웃 시 1,000원 할인\n매장 내 디저트 + 음료 주문 시 1,000원 할인\n매장 내 음료 주문 후 1,000원 추가 시 아메리카노 리필(테이크아웃 가능)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문 방식 및 결제 조건에 따라 상이",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -2763,13 +2763,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 12~17시 인당 500원 할인 / 2. 17시 이후 주류 메뉴 4개 이상 주문 시 감자칩 1개 제공 / 3. 스토리 태그 후 공유 or 영수증 리뷰 시 서비스 제공",
+        "benefit": "1. 12~17시 인당 500원 할인\n2. 17시 이후 주류 메뉴 4개 이상 주문 시 감자칩 1개 제공\n3. 스토리 태그 후 공유 or 영수증 리뷰 시 서비스 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 이용 시간 및 조건 충족 또는 SNS 스토리 공유/영수증 리뷰 참여 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -2841,11 +2841,11 @@
         "college_name": "경상대학",
         "benefit": "테이블 피자 1판 주문 시 음료 1캔",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 피자 1판 이상 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -2905,11 +2905,11 @@
         "college_name": "경상대학",
         "benefit": "2인당 음료 한 캔 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인당 적용",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       }
     ]
@@ -3007,13 +3007,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 현금 결제 시 1.5% 할인 / 2. 냉면 500원 할인 (1, 2 조건 중복 가능)",
+        "benefit": "1. 현금 결제 시 1.5% 할인\n2. 현금 결제 시 냉면 500원 할인 (1,2 조건 중복 가능)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 결제 조건 혹은 냉면 주문 시 (중복 가능)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -3265,11 +3265,11 @@
         "college_name": "경상대학",
         "benefit": "테이블 당 3만원 이상 주문 시 주류 or 음료수 1캔 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블 당 3만원 이상 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -3391,13 +3391,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "4인 이상 방문 시 음료 제공 OR 4인 이상 방문 시 튀김류 4가지 중 택 1 (고구마롤, 새우롤, 꽃게롤, 웨딩샤오마이)",
+        "benefit": "4인 이상 방문 시 음료 제공 or 튀김류 4가지 중 택 1 (고구마롤, 새우롤, 꽃게롤, 웨딩샤오마이)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       }
     ]
@@ -3455,13 +3455,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "3인 이상 방문 시 탄산음료 1캔 제공 / 현금 결제 시 메인메뉴 당 천원 할인",
+        "benefit": "3인 이상 방문 시 탄산음료 1캔 제공\n현금 결제 시 메인메뉴 당 천원 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 또는 현금 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -3555,13 +3555,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "2인 방문 시 음료 1캔 제공 / 4인 방문 시 음료 2캔 or 주류 1병 제공",
+        "benefit": "2인 방문 시 음료 1캔 제공\n4인 방문 시 음료 2캔 or 주류 1병 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 조건 충족 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -3643,13 +3643,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 총 결제 금액 15,000원 이상 시 결제금액의 10% 할인 / 2. 주문제작 홀케이크 제작 2,000원 할인 (주말 제외 적용)",
+        "benefit": "1. 총 결제 금액 15,000원 이상 시 결제금액의 10% 할인\n2. 주문제작 홀케이크 제작 2,000원 할인\n(주말 제외 적용)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 평일 결제 요건 및 금액 조건 달성 시 (주말 제외)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -3795,13 +3795,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 2. 50,000원 이상 주문 시 7% 할인",
+        "benefit": "1. 음료 + 도넛 10,000원 이상 주문 시 5% 할인\n2. 50,000원 이상 주문 시 7% 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료와 도넛 합산 금액 조건 달성 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -3871,13 +3871,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "4인 테이블 당 사이드메뉴 1개 제공",
+        "benefit": "4인 테이블 당 사이드메뉴 1개",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 테이블 당 적용",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       }
     ]
@@ -3911,13 +3911,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "3인 이상 방문 시 음료수 1개 제공 / 10,000원 이상 현금 결제 시 500원 할인(중복 적용X) / 2인 이상 주문 시 쿠폰 추가 적립",
+        "benefit": "3인 이상 방문 시 음료수 1개 제공\n10,000원 이상 현금 결제 시 500원 할인(중복 적용X)\n2인 이상 주문 시 쿠폰 추가 적립",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 결제 및 인원 조건 충족 시 (할인 혜택 중복 적용 불가)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -4135,13 +4135,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "3인 이상 방문 시 음료수 한 캔 제공 / 만두 1,000원 할인",
+        "benefit": "3인 이상 방문 시 음료수 한 캔 제공\n만두 1,000원 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -4411,13 +4411,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 제외) / 4인 이상 방문 시 음료 1캔 (포장 동일 적용)",
+        "benefit": "추가 메뉴 1회 한정 무료 제공 (닭고기, 새우, 야채, 볶음밥 제외)\n4인 이상 방문 시 음료 1캔 (포장 동일 적용)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 또는 메뉴 추가 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -4635,13 +4635,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 주문 테이블 당 음료수 (라씨/콜라/에이드 중 택1) / 2. 5인 이상 방문 시 샐러드 제공",
+        "benefit": "1. 주문 테이블 당 음료수 (라씨/콜라/에이드 중 택1)\n2. 5인 이상 방문 시 샐러드 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문 조건 혹은 방문 인원 조건 충족 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -4753,11 +4753,11 @@
         "college_name": "경상대학",
         "benefit": "단품메뉴(2인 이상, 테이블 당) 음료수 1캔 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 단품메뉴 2인 이상 주문 시 (테이블 당)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -4827,13 +4827,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1인 1메뉴 주문 시 음료수 1개 or 디핑소스 1개 / 60,000원 이상 주문 시 우볶이 or 유부초밥 (반반제외, 원하는 맛 1가지 아무거나)",
+        "benefit": "1인 1메뉴 주문 시 음료수 1개 or 디핑소스 1개\n60,000원 이상 주문 시 우볶이 or 유부초밥 (반반제외, 원하는 맛 1가지 아무거나)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인 1메뉴 주문 시 혹은 60,000원 이상 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -4969,11 +4969,11 @@
         "college_name": "경상대학",
         "benefit": "계좌이체 시 10% 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 계좌이체 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -5031,13 +5031,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "15,000원 이상 주문 시 서비스 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 제공 (11:00 ~ 13:30엔 제휴 적용 불가, 다른 이벤트와 중복 불가)",
+        "benefit": "15,000원 이상 주문 시 서비스 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 제공\n(11:00~13:30엔 제휴 적용 불가, 다른 이벤트와 중복 불가)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 15,000원 이상 주문 시 (단, 11:00~13:30 시간대 및 타 이벤트 중복 적용 제외)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -5121,11 +5121,11 @@
         "college_name": "경상대학",
         "benefit": "3인 이상 방문 시 음료수 제공 or 사리 추가",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -5211,13 +5211,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "1. 10만원 이상 단체주문 시 개당 1,000원 할인 및 배달 / 2. 10,000원 이상 현금결제나 계좌이체 시 원하는 토핑 or 음료 제공",
+        "benefit": "1. 10만원 이상 단체주문 시 개당 1,000원 할인 및 배달\n2. 10,000원 이상 현금결제나 계좌이체 시 원하는 토핑 or 음료 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 단체 주문 시 혹은 현금/계좌이체 10,000원 이상 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -5305,11 +5305,11 @@
         "college_name": "경상대학",
         "benefit": "2인 이상 방문 시 감자튀김 제공",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       },
       {
@@ -5515,13 +5515,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "테이크아웃 음료 500원 할인 / 3인 이상 매장 내 취식 시 1,000원 할인 (일요일 제외)",
+        "benefit": "테이크아웃 음료 500원 할인\n3인 이상 매장 내 취식 시 1,000원 할인 (일요일 제외)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 일요일 및 매장 이용 기준 요건 충족 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -5581,11 +5581,11 @@
         "college_name": "경상대학",
         "benefit": "음료 4잔 주문 시 아메리카노 1잔 증정",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 4잔 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVDgUEzrp/"
       },
       {
@@ -5963,13 +5963,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "인원 무관하게 테이블 당 음료 1개 / 계좌이체 시 5% 할인",
+        "benefit": "인원 무관하게 테이블 당 음료 1개\n계좌이체 시 5% 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인원 관계없이 적용 혹은 계좌이체 결제 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVPSgk4ce"
       },
       {
@@ -6405,11 +6405,11 @@
         "college_name": "경상대학",
         "benefit": "식사류 + 사이드 (총합 10,000원 이상) 주문 시 1,000원 할인",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 식사류 및 사이드 합산 10,000원 이상 주문 시",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVSgfE0Eo/"
       },
       {
@@ -6455,13 +6455,13 @@
       {
         "college_id": "7",
         "college_name": "경상대학",
-        "benefit": "친구랑 동시 등록 시 1. 1개월 1만원 할인 / 2. 3개월 2만원 할인 (인당 할인)",
+        "benefit": "친구랑 동시 등록 시\n1. 1개월 1만원 할인\n2. 3개월 2만원 할인 (인당 할인)",
         "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-31",
+          "start_date": "2026-03-11",
+          "end_date": "2026-12-21",
           "is_active": true
         },
-        "conditions": "학생증 제시, 친구와 함께 동시 등록 시 적용 (인당 적용)",
+        "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVSgfE0Eo/"
       }
     ]
