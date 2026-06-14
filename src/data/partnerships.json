@@ -53,12 +53,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "4인이상 방문 시, 돈장찌개 or 버섯 or 냉국수 중 택1"
       },
       {
@@ -281,12 +281,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "2인 이상 방문 시, 갈릭바게트 or 음료(동캔) 증정"
       }
     ]
@@ -369,12 +369,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "2인 이상 방문 시, 음료 1캔 증정"
       },
       {
@@ -877,12 +877,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 점심시간 음료 제공 / 3인 이상 방문 시 (11~14시 제외)",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "점심시간(11~14시)에 3인 이상 방문 시 캔음료 1개 제공 / 3인 이상 방문 시 손두부 or 된장찌개 제공"
       },
       {
@@ -977,12 +977,12 @@
         "college_id": "6",
         "benefit": "샤브샤브 4인 이상 주문 시 육회비빔밥 or 샤브샤브 1인분 추가 제공 / 소주 3,000원",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 샤브샤브 4인 이상 주문 시 / 소주는 주문 전에 말씀 필수",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -1077,12 +1077,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "사계천왕/치뽀끼 주문 시, 감자튀김 제공"
       },
       {
@@ -1189,12 +1189,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 7만원 이상 주문 시 추가 혜택",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 천원 상품 제공 (할인 X) / 7만원 이상 주문 시 떡볶이(1~2인) 무상 제공"
       },
       {
@@ -1301,12 +1301,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
-        "conditions": "학생증 제시, 2~3인 음료와 4인 이상 메뉴 중복 불가, 현금/계좌이체 할인은 별도 적용 가능",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "2~3인 방문 시 음료 증정 / 4인 이상 방문 시 서비스 메뉴 증정 / 계좌이체·현금 결제 시 10% 할인 (1/2번 중복 불가, 방문 사진 인스타 게시 시 중복 가능, 3번은 별도 적용)"
       },
       {
@@ -1477,12 +1477,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "4인 이상 방문 시 음료 1캔 서비스"
       },
       {
@@ -1653,12 +1653,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
-        "conditions": "학생증 제시, 2인 방문 시 해장 라면 / 4인 이상 방문 시 서벳 제공",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "2인 방문 시 해장 라면 증정 / 4인 이상 방문 시 서벳 증정"
       },
       {
@@ -1841,12 +1841,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "benefit": "음료 5잔 이상 동시 주문 시 아메리카노 S사이즈 1잔 or 아이스크림 제공 (2가지 중 택1)",
-        "conditions": "학생증 제시, 음료 5잔 이상 동시 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -2017,12 +2017,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "benefit": "테이크 아웃 시 음료 500원 할인 / 매장 취식 시 아메리카노 500원 할인",
-        "conditions": "학생증 제시, 테이크 아웃 또는 매장 아메리카노 이용 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -2385,12 +2385,12 @@
         "college_id": "6",
         "benefit": "토스트와 음료 세트 주문 시 1,000원 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 토스트와 음료 세트 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -2485,12 +2485,12 @@
         "college_id": "6",
         "benefit": "2인 이상 방문 시 음료 1개 제공",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -2740,12 +2740,12 @@
         "college_id": "6",
         "benefit": "12:00~17:30 주문 시 음료 메뉴 500원 할인 / 음료 4잔 이상 주문 시 감자칩(소) or 웨지 제공",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 12:00~17:30 시간대 또는 4잔 이상 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -2984,12 +2984,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "인원 당 만두 제공"
       },
       {
@@ -3072,12 +3072,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
-        "conditions": "학생증 제시, 4인 이상 방문 시 음료 / 3만원 이상 주문 시 육회 제공",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "4인 이상 식사 시 음료 2캔 제공 / 술 마실 시 3만원 이상 테이블당 육회 한접시 서비스"
       },
       {
@@ -3292,12 +3292,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 음료 1캔 or 사리중류 제공"
       }
     ]
@@ -3420,12 +3420,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 3인 이상 주문 시 또는 현금/계좌이체 결제 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "3인 이상 주문 시 탄산음료 1캔 제공 / 현금결제/계좌이체 시 메인메뉴 당 1000원 할인"
       },
       {
@@ -3520,12 +3520,12 @@
         "college_id": "6",
         "benefit": "2인 이상 방문 시 음료 1캔 증정 / 4인 이상 방문 시 음료 2캔 or 주류 1병 증정",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 방문 인원에 따라 차등 적용",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -3608,12 +3608,12 @@
         "college_id": "6",
         "benefit": "주문제작 케이크 2,000원 할인 / 15,000원 이상 구매 시 10% 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 주문제작 케이크 또는 15,000원 이상 구매 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -3760,12 +3760,12 @@
         "college_id": "6",
         "benefit": "음료+도넛 1만원 이상 구매 시 5% 할인 / 음료+도넛 5만원 이상 구매 시 6% 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 현금결제 or 계좌이체 시 적용, 구매 금액 기준 차등 적용",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -3888,12 +3888,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 3인 이상 방문 또는 10000원 이상 결제 시 (중복 불가)",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "3인 이상 방문 시 음료 1캔 증정 / 10000원 이상 결제 시 500원 할인"
       },
       {
@@ -4100,12 +4100,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 3인 이상 방문 또는 만두 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "3인 이상 방문 시 음료 1캔 증정 / 만두 주문 시 1000원 할인"
       },
       {
@@ -4164,12 +4164,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 테이블 당 15000원 이상 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 15000원 주문 시 기본 튀김 4종 중 택1 or 쿨피스 한개"
       }
     ]
@@ -4244,12 +4244,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "3인 이상 방문 시 음료 1캔 증정"
       },
       {
@@ -4376,12 +4376,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 4인 이상 주문 시 또는 추가 메뉴 주문 시 (닭고기, 새우, 야채복음밥 제외, 포장 시 동일 적용)",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "추가 메뉴 1회 무료 제공 / 4인 이상 주문 시 음료수 1캔 제공"
       },
       {
@@ -4536,12 +4536,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시, 2인당",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "2인당 2000원 음료 증정"
       },
       {
@@ -4600,12 +4600,12 @@
         "college_id": "6",
         "benefit": "5인 이상 방문 시 샐러드 제공 / 주문 테이블당 라씨 1개 제공 (중복 없이 주문 건당 1회 제공)",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 5인 이상 방문 시 또는 테이블 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       }
     ]
@@ -4640,12 +4640,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlTw_Uk-iY",
-        "conditions": "학생증 제시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 구매금액 8000원 단위마다 탄산음료 1자씩 제공"
       }
     ]
@@ -4780,12 +4780,12 @@
         "college_id": "6",
         "benefit": "1인 1메뉴 주문 시 음료(피크닉) or 디핑소스 제공 / 3만원 이상 주문 시 작은 컵라면 제공 / 6만원 이상 주문 시 우볶이 또는 유부초밥 제공 (반반 제외, 원하는 맛 1가지)",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 주문 금액 기준 차등 적용",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -4844,12 +4844,12 @@
         "college_id": "6",
         "benefit": "테이블 당 음료 1캔 증정",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -4920,12 +4920,12 @@
         "college_id": "6",
         "benefit": "계좌이체 시 10% 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 계좌이체 결제 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -4984,12 +4984,12 @@
         "college_id": "6",
         "benefit": "15,000원 이상 주문 시 치즈스틱(2개) or 어니언링(3개) or 오징어링(2개) 중 택1",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 15,000원 이상 주문 시 (11:00~13:30 제외, 타 이벤트 중복 불가)",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -5072,12 +5072,12 @@
         "college_id": "6",
         "benefit": "3인 이상 방문 시 사리 or 음료 증정",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -5164,12 +5164,12 @@
         "college_id": "6",
         "benefit": "1만원 이상 계좌이체 시 원하는 토핑 혹은 음료 제공 / 10만원 이상 단체 배달 주문 시 컵당 1,000원 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 1만원 이상 계좌이체 또는 10만원 이상 단체 배달 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -5256,12 +5256,12 @@
         "college_id": "6",
         "benefit": "2인 이상 방문 시 감자튀김 무료 제공",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -5664,12 +5664,12 @@
         "college_id": "6",
         "benefit": "4인 이상 테이크 아웃 주문 시 1,000원 할인 / 음료 현금(계좌)결제 시 10% 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 4인 이상 테이크 아웃 시 또는 현금/계좌이체 결제 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -5840,12 +5840,12 @@
         "college_id": "6",
         "benefit": "커피 및 음료 전 메뉴 1잔당 500원 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 평일 12~14시 제외, RTD음료·프리커피·특가메뉴 제외(생딸기우유 가능), 포인트 적립·사용 불가, 중복 할인 불가, 1인당 1잔만 가능",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUIh2E2oV",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -5916,12 +5916,12 @@
         "college_id": "6",
         "college_name": "글로벌문화통상대학",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         },
         "source_url": "https://www.instagram.com/p/DWlOQeAE21l",
-        "conditions": "학생증 제시, 4인 이상 방문 및 메인 메뉴 2개 이상 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "4인 이상 방문 시 음료 1캔 제공 / 테이블당 메인 메뉴 2개 이상 주문 시 감자튀김 서비스"
       },
       {
@@ -6036,12 +6036,12 @@
         "college_id": "6",
         "benefit": "첫 등록 시 (3개월 이상 등록) 2만원 할인 및 사물함&티셔츠 무료 제공",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 첫 등록 시 3개월 이상 등록 필수",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUOwokzmZ",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -6344,12 +6344,12 @@
         "college_id": "6",
         "benefit": "학생증 제시 후 카운터에서 식사류 주문 시 500원 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시 필수, 카운터 주문 시",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUOwokzmZ",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       },
       {
@@ -6412,12 +6412,12 @@
         "college_id": "6",
         "benefit": "샐러드+음료 주문 시 5% 할인",
         "college_name": "글로벌문화통상대학",
-        "conditions": "학생증 제시, 샐러드+음료 주문 시 / 포장 시 사전 전화 필수",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUEBYk6Yj",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       }
     ]
@@ -6440,12 +6440,12 @@
         "college_id": "6",
         "benefit": "(무인매장) 문자로 학생증 인증 후 시간 30분 추가 지급",
         "college_name": "글로벌문화통상대학",
-        "conditions": "문자로 학생증 인증 필수 (무인매장)",
+        "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "source_url": "https://www.instagram.com/p/DWlUOwokzmZ",
         "period": {
-          "start_date": "2026-03-02",
+          "start_date": "2026-03-04",
           "is_active": true,
-          "end_date": "2026-12-31"
+          "end_date": "2026-12-21"
         }
       }
     ]
