@@ -46,7 +46,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -180,13 +180,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "4인 이상 테이블에 카라아게 5p 제공 or 인당 음료 1캔 제공 (중복 불가, 네이버 리뷰 작성 필요)",
+        "benefit": "4인 이상 테이블에 카라아게 5p 제공 or 인당 음료 1캔 제공\n(중복 불가, 네이버 리뷰 작성 필요)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 및 네이버 영수증 리뷰 작성 완료 시 (중복 불가)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -262,7 +262,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -350,7 +350,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -438,7 +438,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인당 적용 혹은 감자탕 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -660,13 +660,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "닭갈비 3인분 주문 시 볶음밥 1인분 제공 (테이블에 첨단융합대학 학생들로만 구성 시)",
+        "benefit": "닭갈비 3인분 주문 시 볶음밥 1인분 제공\n(테이블에 첨단융합대학 학생들로만 구성 시)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 닭갈비 3인분 주문 및 테이블 전체가 첨단융합대학 학생 구성 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -736,13 +736,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "2인 이상 방문 시 음료 제공 (탄산, 중국음료) or 주류 한 병 2,000원 할인 / 마라탕 12,000원 이상 주문 시 꼬치 1개 서비스 (중복 불가)",
+        "benefit": "2인 이상 방문 시 음료 제공 (탄산, 중국음료) or 주류 한 병 2,000원 할인\n마라탕 12,000원 이상 주문 시 꼬치 1개 서비스\n(중복 불가)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 또는 마라탕 주문 금액 조건 충족 시 (중복 불가)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -818,7 +818,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -894,7 +894,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -988,13 +988,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "4인분 이상 주문 시 육회비빔밥 제공 or 소주 3,000원 (두 가지 모두 오후 6시 이후 방문 시 적용)",
+        "benefit": "4인분 이상 주문 시 육회비빔밥 제공 or 소주 3,000원\n(두 가지 모두 오후 6시 이후 방문 시 적용)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 오후 6시 이후 방문 및 4인분 이상 주문 혹은 소주 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -1082,7 +1082,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 사계천왕 또는 치뽀끼 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -1188,13 +1188,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "테이블 당 1,000원 상당의 서비스 제공 / 7만원 이상 주문 시 떡볶이 1인분 제공",
+        "benefit": "테이블 당 1,000원 상당의 서비스 제공\n7만원 이상 주문 시 떡볶이 1인분 제공",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주문 금액에 따른 차등 서비스 제공",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -1288,13 +1288,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "2~3인 방문 시 음료 1캔 제공 / 4인 이상 방문 시 서비스 메뉴 제공 / 현금 및 계좌이체 시 10% 할인",
+        "benefit": "2~3인 방문 시 음료 1캔 제공\n4인 이상 방문 시 서비스 메뉴 제공\n현금 및 계좌이체 시 10% 할인",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원에 따른 서비스 제공 혹은 현금/계좌이체 결제 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -1430,7 +1430,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 계좌이체 결제 시 (타 이벤트 중복 불가)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -1506,7 +1506,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 18시 이전 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -1582,7 +1582,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -1652,13 +1652,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "3인 이상 테이블 (1인 1병) 라면 또는 우동 제공 / 4인 이상 테이블 파인애플 샤베트 1개 제공",
+        "benefit": "3인 이상 테이블 (1인 1병) 라면 또는 우동 제공\n4인 이상 테이블 파인애플 샤베트 1개 제공",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 인원 및 주류 주문 조건 충족 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -1764,13 +1764,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "찌개류 주문 시 라면사리 무한 / 10인 이하 테이블 쭈쭈바 제공 / 스토리 업로드 시 기본안주로 라면 제공 (심야타임 1시~5시 해당)",
+        "benefit": "찌개류 주문 시 라면사리 무한\n10인 이하 테이블 쭈쭈바 제공\n스토리 업로드 시 기본안주로 라면 제공\n->(심야타임 1시~5시 해당)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 대상 찌개 주문 혹은 10인 이하 방문 혹은 스토리 업로드 시 (심야타임 1시~5시 한정)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -2028,13 +2028,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "테이크 아웃 음료 전체 500원 할인 or 홀 내에서 아메리카노 (사이즈 무관) 500원 할인 (중복 가능)",
+        "benefit": "테이크 아웃 음료 전체 500원 할인 or 홀 내에서 아메리카노(사이즈 무관) 500원 할인\n(중복 가능)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이크 아웃 혹은 홀 내에서 아메리카노 이용 시 (중복 가능)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -2198,7 +2198,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 결제 금액 또는 곡수/시간 조건 충족 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       },
       {
@@ -2286,7 +2286,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 5,000원 이상 현금 결제 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       }
     ]
@@ -2332,13 +2332,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "식음료 결제 금액 10% 할인 / 첨단융합대 재학생 4인 이상 방문 시 1시간 쿠폰(1인 1매) 증정",
+        "benefit": "식음료 결제 금액 10% 할인\n첨융대 재학생 4인 이상 방문 시 1시간 쿠폰(1인 1매) 증정",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 방문 시 쿠폰 적용",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DW-e137iV6g/"
       },
       {
@@ -2426,7 +2426,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 토스트와 음료 함께 구매 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -2654,7 +2654,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -2751,13 +2751,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "12~17시 인당 500원 할인 / 17시 이후 주류메뉴 4개 이상 주문 시 감자칩 1개 제공 (스토리 태그 후 공유 or 영수증 리뷰 시)",
+        "benefit": "12~17시 인당 500원 할인\n17시 이후 주류메뉴 4개 이상 주문 시 감자칩 1개 제공\n(스토리 태그 후 공유 or 영수증 리뷰 시)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 시간 또는 주류 주문 개수 조건 충족 및 인증(스토리 태그 공유 또는 영수증 리뷰) 완료 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -2833,7 +2833,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 지참, 피자 주문 시 (피자 사이즈 무관)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -3083,13 +3083,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "30,000원 이상 주문 시 육회 한 접시 제공 / 4인 이상 테이블 음료수 2개 제공",
+        "benefit": "(주류, 안주 메뉴 한정)\n30,000원 이상 주문 시 육회 한 접시 제공\n4인 이상 테이블 음료수 2개 제공",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 주류/안주 메뉴 한정 30,000원 이상 주문 시 혹은 4인 이상 테이블에 한함",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -3333,7 +3333,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 지참, 테이블당 적용 (네이버 영수증 리뷰 이벤트와 중복 가능)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -3443,13 +3443,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "3인 이상 테이블 음료수 하나 제공 / 현금 및 계좌이체 시 메뉴 하나 당 1,000원 할인",
+        "benefit": "3인 이상 테이블 음료수 하나 제공\n현금 및 계좌이체 시 메뉴 하나 당 1,000원 할인",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 테이블 혹은 현금/계좌이체 결제 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -3543,13 +3543,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "2인 이상 방문 시 음료수 1캔 제공 / 4인 이상 방문 시 음료수 2캔 or 주류 1병 제공",
+        "benefit": "2인 이상 방문 시 음료수 1캔 제공\n4인 이상 방문 시 음료수 2캔 or 주류 1병 제공",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 방문 인원 조건 충족 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -3631,13 +3631,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "15,000원 이상 결제 시 결제 금액의 10% 할인 / 주문제작 케이크 2,000원 할인 (주말 제외 적용)",
+        "benefit": "15,000원 이상 결제 시 결제 금액의 10% 할인\n주문제작 케이크 2,000원 할인\n(주말 제외 적용)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 15,000원 이상 결제 혹은 주문제작 케이크 구매 시 (주말 제외)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -3725,7 +3725,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 인당 적용 (테이크 아웃 및 매장 이용 가능)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -3783,13 +3783,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인 / 50,000원 이상 주문 시 7% 할인 (계좌이체 or 현금결제 시 적용)",
+        "benefit": "음료 + 도넛 10,000원 이상 주문 시 5% 할인\n50,000원 이상 주문 시 7% 할인\n(계좌이체 or 현금결제 시 적용)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료와 도넛 금액 조건 충족 및 계좌이체/현금 결제 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -3865,7 +3865,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 지참, 4인 이상 방문 및 카카오톡 채널 추가 완료 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -3919,6 +3919,18 @@
         },
         "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
+      },
+      {
+        "college_id": "10",
+        "college_name": "첨단융합대학",
+        "benefit": "3인 이상 테이블에 음료수 하나 제공 or 10,000원 이상 현금 결제 시 5% 할인",
+        "period": {
+          "start_date": "2026-03-03",
+          "end_date": "2026-12-31",
+          "is_active": true
+        },
+        "conditions": null,
+        "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
         "college_id": "5",
@@ -4399,13 +4411,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "추가 메뉴 1회 무료 제공 (닭고기, 새우, 야채 볶음밥 제외) / 4인 이상 주문 시 음료수 1캔 제공 (포장 시 동일 적용)",
+        "benefit": "추가 메뉴 1회 무료 제공 (닭고기, 새우, 야채 볶음밥 제외)\n4인 이상 주문 시 음료수 1캔 제공 (포장 시 동일 적용)",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 추가 메뉴 선택 또는 4인 이상 주문 시 (포장 시에도 적용 가능)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -4481,7 +4493,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 4인 이상 테이블에 한함",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ]
@@ -4521,7 +4533,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 테이블당 적용",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
     ]
@@ -4745,7 +4757,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 2인 이상 방문 혹은 단품(고기)메뉴 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -4821,7 +4833,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 1인분 구매 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -5113,7 +5125,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3인 이상 방문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       },
       {
@@ -5481,7 +5493,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 구매 조건 및 이용 방식(매장/테이크아웃)에 따른 차등 적용",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ]
@@ -5573,7 +5585,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 음료 4잔 주문 및 테이크 아웃 시 (더치페이 가능)",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -5803,13 +5815,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "음료 주문 시 500원 할인 / 만원의 행복 메뉴 1,000원 할인",
+        "benefit": "음료 주문 시 500원 할인\n만원의 행복 메뉴 1,000원 할인",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 대상 메뉴 주문 혹은 음료 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ]
@@ -5951,13 +5963,13 @@
       {
         "college_id": "10",
         "college_name": "첨단융합대학",
-        "benefit": "5만원 이상 현금 또는 계좌이체 시 5% 할인 / 4인 이상 테이블 음료수 하나 제공 / 메인 메뉴 3개 이상 주문 시 소주 한 병 제공",
+        "benefit": "5만원 이상 현금 또는 계좌이체 시 5% 할인\n4인 이상 테이블 음료수 하나 제공\n메인 메뉴 3개 이상 주문 시 소주 한 병 제공",
         "period": {
           "start_date": "2026-03-03",
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 현금 또는 계좌이체 금액 조건 충족 시 혹은 4인 이상 방문 혹은 메인 메뉴 주문 개수 충족 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       },
       {
@@ -6165,7 +6177,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 3,000원 이상 결제 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       },
       {
@@ -6381,7 +6393,7 @@
           "end_date": "2026-12-31",
           "is_active": true
         },
-        "conditions": "학생증 제시, 아메리카노 주문 시",
+        "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
     ]
