@@ -397,6 +397,7 @@ export function AppleGame({ onBack }) {
                       key={`${rIdx}-${cIdx}`}
                       onMouseDown={() => handleDragStart(rIdx, cIdx)}
                       onMouseEnter={() => handleMouseEnter(rIdx, cIdx)}
+                      onTouchStart={() => handleDragStart(rIdx, cIdx)}
                       className={`
                         aspect-square w-full flex items-center justify-center relative transition-all select-none cursor-pointer duration-700
                         ${isCleared ? 'bg-transparent border border-dashed border-slate-200/10' : ''}
