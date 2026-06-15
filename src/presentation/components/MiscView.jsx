@@ -1,8 +1,9 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
+import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send, ArrowLeft, Gamepad2 } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
+import { GameLobby } from './games/GameLobby.jsx';
 import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
 import { supabase } from '../../lib/supabase.js';
 import { getPlatform } from '../../lib/platform.js';
@@ -165,6 +166,7 @@ export function MiscView({ resetSignal }) {
 
   if (subView === 'gym') return <GymTimetable onBack={() => setSubView('list')} />;
   if (subView === 'insta') return <InstagramListView onBack={() => setSubView('list')} />;
+  if (subView === 'games') return <GameLobby onBack={() => setSubView('list')} />;
   if (subView === 'feedback') return <FeedbackSection onBack={() => setSubView('list')} />;
 
   return (
@@ -214,6 +216,16 @@ export function MiscView({ resetSignal }) {
               동아리 <ArrowUpRight size={14} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle', opacity: 0.8 }} />
             </span>
             <span className="text-[0.8rem] text-text-sub">동아리 조회는 '한자리'</span>
+          </div>
+        </div>
+
+        <div className={cardClass} onClick={() => setSubView('games')}>
+          <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
+            <Gamepad2 size={28} color="#3b82f6" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[0.95rem] font-extrabold text-text-main">미니 게임</span>
+            <span className="text-[0.8rem] text-text-sub">사과게임 등 미니게임</span>
           </div>
         </div>
 
