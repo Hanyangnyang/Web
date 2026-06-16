@@ -1,6 +1,7 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
 import React, { useState, useEffect } from 'react';
 import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
+import { usePostHog } from 'posthog-js/react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
 import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
@@ -151,6 +152,7 @@ function FeedbackSection({ onBack }) {
 }
 
 export function MiscView({ resetSignal }) {
+  const posthog = usePostHog();
   const [subView, setSubView] = useState('list');
 
   useEffect(() => {
@@ -173,7 +175,7 @@ export function MiscView({ resetSignal }) {
       <p className="text-base text-text-sub mb-8">학교 생활을 위한 기능 모음</p>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className={cardClass} onClick={() => setSubView('gym')}>
+        <div className={cardClass} onClick={() => { posthog?.capture('misc_card_clicked', { card: 'gym' }); setSubView('gym'); }}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <Dumbbell size={28} color="#64748B" />
           </div>
@@ -183,7 +185,7 @@ export function MiscView({ resetSignal }) {
           </div>
         </div>
 
-        <div className={cardClass} onClick={() => setSubView('insta')}>
+        <div className={cardClass} onClick={() => { posthog?.capture('misc_card_clicked', { card: 'insta' }); setSubView('insta'); }}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <InstagramIcon size={28} color="#E4405F" />
           </div>
@@ -193,7 +195,7 @@ export function MiscView({ resetSignal }) {
           </div>
         </div>
 
-        <div className={cardClass} onClick={() => window.open('https://www.hanyang.ac.kr/-93', '_blank', 'noopener,noreferrer')}>
+        <div className={cardClass} onClick={() => { posthog?.capture('misc_card_clicked', { card: 'haksa' }); window.open('https://www.hanyang.ac.kr/-93', '_blank', 'noopener,noreferrer'); }}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <CalendarDays size={28} color="#0E4A84" />
           </div>
@@ -205,7 +207,7 @@ export function MiscView({ resetSignal }) {
           </div>
         </div>
 
-        <div className={cardClass} onClick={() => window.location.href = 'https://hanjari.site'}>
+        <div className={cardClass} onClick={() => { posthog?.capture('misc_card_clicked', { card: 'club' }); window.location.href = 'https://hanjari.site'; }}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <PianoIcon size={28} color="#475569" />
           </div>
@@ -217,7 +219,7 @@ export function MiscView({ resetSignal }) {
           </div>
         </div>
 
-        <div className={cardClass} onClick={() => setSubView('feedback')}>
+        <div className={cardClass} onClick={() => { posthog?.capture('misc_card_clicked', { card: 'feedback' }); setSubView('feedback'); }}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <Laugh size={28} color="#3b82f6" />
           </div>

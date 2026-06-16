@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
+import { usePostHog } from 'posthog-js/react';
 
 const KakaoIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -12,6 +13,7 @@ const KakaoIcon = () => (
 
 
 export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }) {
+  const posthog = usePostHog();
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
   const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
 
@@ -61,6 +63,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
         },
         buttons: [{ title: '더 자세히 보기', link }],
       });
+      posthog?.capture('menu_shared', { method: 'kakao', cafe_name: cafeName, meal_type: mealType });
       onClose();
     } catch (e) {
       const code = e?.code ?? e?.status ?? 'UNKNOWN';
@@ -75,10 +78,12 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
     if (nativeShare) {
       try {
         await nativeShare.share({ text: shareText, dialogTitle: '공유하기' });
+        posthog?.capture('menu_shared', { method: 'native', cafe_name: cafeName, meal_type: mealType });
         onClose();
       } catch (e) {
         if (e?.message !== 'Share canceled') {
           await navigator.clipboard.writeText(shareText).catch(() => {});
+          posthog?.capture('menu_shared', { method: 'clipboard', cafe_name: cafeName, meal_type: mealType });
           onClose();
           onCopied?.();
         }
@@ -89,10 +94,12 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
     if (navigator.share) {
       try {
         await navigator.share({ text: shareText });
+        posthog?.capture('menu_shared', { method: 'native', cafe_name: cafeName, meal_type: mealType });
         onClose();
       } catch (e) {
         if (e.name !== 'AbortError') {
           await navigator.clipboard.writeText(shareText).catch(() => {});
+          posthog?.capture('menu_shared', { method: 'clipboard', cafe_name: cafeName, meal_type: mealType });
           onClose();
           onCopied?.();
         }
@@ -108,6 +115,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
         document.execCommand('copy');
         document.body.removeChild(el);
       }
+      posthog?.capture('menu_shared', { method: 'clipboard', cafe_name: cafeName, meal_type: mealType });
       onClose();
       onCopied?.();
     }

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Clock, Bell, Share2 } from 'lucide-react';
 import { getKSTDate } from '../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
 import { ShareSheet } from './ShareSheet.jsx';
+import { usePostHog } from 'posthog-js/react';
 
 function parseBoldText(text) {
   const parts = text.split(/(<b>.*?<\/b>)/g);
@@ -91,6 +92,7 @@ const getMenuIcon = (type) => {
 };
 
 export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, cafeDeepLink, onCafeDeepLinkHandled }) {
+  const posthog = usePostHog();
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef(null);
@@ -124,11 +126,20 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
     : (cafes.find(c => c.id === selectedCafeId) || { menus: [] });
 
   const handleCafeSelect = (id) => {
+    posthog?.capture('cafe_selected', {
+      cafe_id: id,
+      cafe_name: id === 'all' ? '전체' : cafes.find(c => c.id === id)?.name,
+    });
     setSelectedCafeId(id);
     scrollToTop();
   };
 
   const handleCafeDetailNavigate = (cafeId, mealType) => {
+    posthog?.capture('cafe_selected', {
+      cafe_id: cafeId,
+      cafe_name: cafes.find(c => c.id === cafeId)?.name,
+      from: 'menu_detail',
+    });
     urlTypeRef.current = mealType;
     setSelectedCafeId(cafeId);
     scrollToTop();
@@ -264,8 +275,12 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
     }
   }, [selectedCafeId, cafes, cafesDate, date, deepLinkTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const toggleGroup = (type) =>
+  const toggleGroup = (type) => {
+    if (!expandedGroups[type]) {
+      posthog?.capture('menu_expanded', { cafe_id: selectedCafeId, meal_type: type });
+    }
     setExpandedGroups(prev => ({ ...prev, [type]: !prev[type] }));
+  };
 
   const isDateStale = cafesDate !== date.toISOString().split('T')[0];
 
@@ -325,7 +340,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
         <div className="flex justify-between items-center mb-3 bg-white px-5 py-3 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
           <button
             className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
-            onClick={() => changeDate(-1)}
+            onClick={() => { posthog?.capture('date_navigated', { direction: 'prev' }); changeDate(-1); }}
             disabled={loading}
           >
             <ChevronLeft style={{ opacity: loading ? 0.3 : 1 }} />
@@ -335,7 +350,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
           </div>
           <button
             className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
-            onClick={() => changeDate(1)}
+            onClick={() => { posthog?.capture('date_navigated', { direction: 'next' }); changeDate(1); }}
             disabled={loading}
           >
             <ChevronRight style={{ opacity: loading ? 0.3 : 1 }} />
@@ -531,7 +546,10 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                         ) : <span />}
                                         <button
                                           className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
-                                          onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
+                                          onClick={() => {
+                                            posthog?.capture('menu_share_opened', { cafe_id: selectedCafeId, meal_type: type });
+                                            setShareTarget({ type, menu: m, shareUrl, dateLabel });
+                                          }}
                                           aria-label="메뉴 공유"
                                         >
                                           <Share2 size={14} />

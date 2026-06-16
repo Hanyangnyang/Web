@@ -3,6 +3,7 @@ import { X, Plus } from 'lucide-react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
 import { supabase } from '../../lib/supabase';
 import { getPlatform } from '../../lib/platform';
+import { usePostHog } from 'posthog-js/react';
 
 const ITEM_H = 36;
 const VISIBLE = 3;
@@ -473,6 +474,7 @@ async function getOrCreateSecureDeviceId() {
 }
 
 export function AlarmSettings({ onClose }) {
+  const posthog = usePostHog();
   const savedRef = useRef(loadSettings());
   const [settings, setSettings] = useState(() => ({
     ...savedRef.current,
@@ -638,6 +640,12 @@ export function AlarmSettings({ onClose }) {
 
       if (isSubscribed) {
         successMsg = '🔔 설정한 시간에 맞춰\n식단 알림을 보내드릴게요';
+        posthog?.capture('alarm_registered', {
+          success: true,
+          mode: settings.mode,
+          notify_time: settings.notifyTime,
+          notify_day: settings.notifyDay,
+        });
 
         (async () => {
           try {

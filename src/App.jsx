@@ -73,6 +73,25 @@ function MainLayout() {
     prefetchPortalData();
   }, []);
 
+  // 세션 시작 이벤트 (최초 1회)
+  useEffect(() => {
+    posthog?.capture('app_session_start', { platform, entry_tab: activeTab });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 앱이 백그라운드로 가거나 탭을 닫을 때 마지막 탭 체류 시간 기록
+  // tab_time_spent는 탭 전환 시에만 발생하므로 마지막 탭 체류가 누락됨 — 이를 보완
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        const duration = Math.round((Date.now() - tabStartTime.current) / 1000);
+        posthog?.capture('tab_time_spent', { tab: activeTab, duration_seconds: duration });
+        tabStartTime.current = Date.now();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [activeTab, posthog]);
+
   // 카페 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거
   // 카페 로더가 화면을 덮고 있으므로 사용자에게는 보이지 않고, 로더 페이드아웃 시 하냥냥 마스코트가 잠깐 비치는 현상 방지
   useEffect(() => {

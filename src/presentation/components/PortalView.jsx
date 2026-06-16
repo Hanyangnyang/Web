@@ -4,12 +4,13 @@ import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users,
 import { usePortalData } from '../hooks/usePortalData.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 import { supabase } from '../../lib/supabase.js';
+import { usePostHog } from 'posthog-js/react';
 
 
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
-function BannerCarousel({ banners }) {
+function BannerCarousel({ banners, onBannerClick }) {
   const [current, setCurrent] = useState(0);
   const containerRef = useRef(null);
   const timerRef = useRef(null);
@@ -94,6 +95,7 @@ function BannerCarousel({ banners }) {
   const handleClick = (banner) => {
     if (isSwiping.current) return;
     if (banner.click_url) {
+      onBannerClick?.(banner);
       window.open(banner.click_url, '_blank');
     }
   };
@@ -193,6 +195,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 }
 
 export function PortalView({ isVisible = true }) {
+  const posthog = usePostHog();
   const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
@@ -352,7 +355,7 @@ export function PortalView({ isVisible = true }) {
     <>
       <button
         className="fixed bottom-[calc(20px+64px+12px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
-        onClick={() => setShowWeatherAlarm(true)}
+        onClick={() => { posthog?.capture('weather_alarm_clicked'); setShowWeatherAlarm(true); }}
       >
         <Bell size={18} />
         날씨 알림 받기
@@ -472,7 +475,12 @@ export function PortalView({ isVisible = true }) {
           </section>
         )}
 
-      {banners.length > 0 && <BannerCarousel banners={banners} />}
+      {banners.length > 0 && (
+        <BannerCarousel
+          banners={banners}
+          onBannerClick={(banner) => posthog?.capture('banner_clicked', { banner_id: banner.id, alt_text: banner.alt_text })}
+        />
+      )}
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
