@@ -2708,21 +2708,6 @@
     ]
   },
   {
-    "id": "33",
-    "name": "에이피",
-    "category": "cafe",
-    "is_active": true,
-    "summary_benefit": null,
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "emoji": "🍰",
-    "partnerships": []
-  },
-  {
     "id": "34",
     "name": "이스턴문",
     "category": "cafe",
