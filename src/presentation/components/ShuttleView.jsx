@@ -803,19 +803,27 @@ export function ShuttleView({ isActive }) {
 
   const sortedStops = getSortedStops();
 
-  // Initialize expandedStops for top 2
+  // Initialize expandedStops: top 2 for 'all' mode, or all selected stops for filtered mode
   useEffect(() => {
     if (viewMode === 'bus') {
-      const top2 = sortedStops.slice(0, 2);
-      setExpandedStops(prev => {
-        const next = { ...prev };
+      if (selectedStops.length === 0) {
+        // 전체 조회일 때: 가장 가까운 2개만 켬
+        const top2 = sortedStops.slice(0, 2);
+        const next = {};
         top2.forEach(s => {
-          if (next[s] === undefined) next[s] = true;
+          next[s] = true;
         });
-        return next;
-      });
+        setExpandedStops(next);
+      } else {
+        // 특정 정류소 선택했을 때: 선택한 정류소들은 모두 펼침
+        const next = {};
+        selectedStops.forEach(s => {
+          next[s] = true;
+        });
+        setExpandedStops(next);
+      }
     }
-  }, [viewMode, userCoords, favorites, selectedBuses]);
+  }, [viewMode, selectedStops, userCoords, favorites, selectedBuses]);
 
   // Sort stop chips: active ones at the front
   const sortedStopChips = [...DEFAULT_PRIORITY].sort((a, b) => {
@@ -933,7 +941,7 @@ export function ShuttleView({ isActive }) {
         ) : isLoading ? (
           <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>
         ) : (
-          <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
+          <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
             {/* 출발지 선택 (고정 상단) */}
             <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
               <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
@@ -1127,7 +1135,7 @@ export function ShuttleView({ isActive }) {
           </div>
         )
       ) : (
-        <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
+        <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
           {/* 고정 상단 필터 영역 */}
           <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
             {/* 정류장 선택 필터 헤더 (오른쪽에 버스 노선 드롭다운) */}
@@ -1252,7 +1260,7 @@ export function ShuttleView({ isActive }) {
                     
                       {/* 아코디언 내용 */}
                       {isExpanded && (
-                        <div className="border-t border-[#f1f5f9] bg-white divide-y divide-[#f1f5f9]">
+                        <div className="border-t border-[#f1f5f9] bg-white">
                           {filteredArrivals.length > 0 ? (() => {
                             const uniqueBusIds = Array.from(new Set(filteredArrivals.map(arr => arr.busId)));
                             return uniqueBusIds.map(busId => {
@@ -1261,7 +1269,7 @@ export function ShuttleView({ isActive }) {
                               const firstArrival = busArrivals[0];
                               const secondArrival = busArrivals[1];
                               return (
-                                <div key={busId} className="px-4 py-3 flex justify-between items-center">
+                                <div key={busId} className="px-4 py-2 flex justify-between items-center">
                                   {/* 왼쪽 열: 버스번호 및 행선지 */}
                                   <div className="flex flex-col gap-0.5">
                                     <div className="flex items-center gap-1.5">
@@ -1307,7 +1315,7 @@ export function ShuttleView({ isActive }) {
 
                                       return (
                                         <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[14px] font-semibold text-[#EE2737]">
+                                          <span className="text-[14px] font-black text-[#EE2737]">
                                             {firstArrival.time}
                                           </span>
                                           {firstArrival.info && (
@@ -1388,51 +1396,36 @@ export function ShuttleView({ isActive }) {
         </div>
       )}
 
-      {/* Floating Action Button (FAB) */}
+      {/* 셔틀 / 일반 전환 탭 (슬라이딩 글래스모피즘 적용) */}
       <div 
-        className="fixed left-0 right-0 max-w-app mx-auto px-6 pointer-events-none z-[999] flex justify-end"
-        style={{ bottom: 'calc(108px + env(safe-area-inset-bottom, 0px))' }}
+        className="fixed left-1/2 -translate-x-1/2 z-[999] flex bg-white/70 backdrop-blur-lg p-[3px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[160px]"
+        style={{ bottom: 'calc(104px + env(safe-area-inset-bottom, 0px))' }}
       >
+        {/* 슬라이딩 백그라운드 필 */}
         <div 
-          className="pointer-events-auto w-14 h-14 cursor-pointer select-none"
-          style={{ perspective: '1000px' }}
-          onClick={() => setViewMode(prev => prev === 'shuttle' ? 'bus' : 'shuttle')}
-        >
-          <div 
-            className="w-full h-full relative transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-            style={{ 
-              transformStyle: 'preserve-3d',
-              transform: viewMode === 'bus' ? 'rotateY(180deg)' : 'rotateY(0deg)'
-            }}
-          >
-            {/* 앞면: 셔틀 상태일 때 보이는 면 */}
-            <div 
-              className="absolute inset-0 w-full h-full rounded-full flex flex-col items-center justify-center text-white shadow-[0_8px_16px_rgba(59,130,246,0.25)] hover:scale-105 active:scale-95 transition-transform duration-200"
-              style={{ 
-                backfaceVisibility: 'hidden',
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              }}
-            >
-              <span className="text-[12px] font-bold tracking-wider leading-[1.3] text-center">
-                셔틀<br />버스
-              </span>
-            </div>
+          className="absolute top-[3px] bottom-[3px] left-[3px] rounded-full bg-black/80 shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
+          style={{
+            width: 'calc(50% - 3px)',
+            transform: viewMode === 'shuttle' ? 'translateX(0)' : 'translateX(100%)'
+          }}
+        />
 
-            {/* 뒷면: 버스 상태일 때 보이는 면 */}
-            <div 
-              className="absolute inset-0 w-full h-full rounded-full flex flex-col items-center justify-center text-white shadow-[0_8px_16px_rgba(83,179,50,0.25)] hover:scale-105 active:scale-95 transition-transform duration-200"
-              style={{ 
-                backfaceVisibility: 'hidden',
-                transform: 'rotateY(180deg)',
-                background: 'linear-gradient(135deg, #53B332 0%, #449729 100%)',
-              }}
-            >
-              <span className="text-[12px] font-bold tracking-wider leading-[1.3] text-center">
-                노선<br />버스
-              </span>
-            </div>
-          </div>
-        </div>
+        <button
+          onClick={() => setViewMode('shuttle')}
+          className={`flex-1 py-1.5 text-[13px] font-black rounded-full transition-colors duration-300 relative z-10 ${
+            viewMode === 'shuttle' ? 'text-white' : 'text-slate-700'
+          }`}
+        >
+          셔틀
+        </button>
+        <button
+          onClick={() => setViewMode('bus')}
+          className={`flex-1 py-1.5 text-[13px] font-black rounded-full transition-colors duration-300 relative z-10 ${
+            viewMode === 'bus' ? 'text-white' : 'text-slate-700'
+          }`}
+        >
+          일반
+        </button>
       </div>
     </div>
   );
