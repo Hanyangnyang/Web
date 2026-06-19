@@ -55,6 +55,20 @@ export function GymTimetable({ onBack }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = React.useRef(null);
+  const [showNotice, setShowNotice] = useState(false);
+
+  useEffect(() => {
+    if (activePeriodId !== 'vacation') {
+      setShowNotice(false);
+      return;
+    }
+    
+    const showTimer = setTimeout(() => {
+      setShowNotice(true);
+    }, 1000);
+
+    return () => clearTimeout(showTimer);
+  }, [activePeriodId]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -167,6 +181,20 @@ export function GymTimetable({ onBack }) {
           <p className="text-[0.8rem] text-text-sub font-medium m-0">{gymData.location} · {currentPeriod.hours}</p>
         </div>
       </header>
+
+      {/* 방학 단축 운영 안내 배너 (슬라이드 애니메이션 적용) */}
+      <div 
+        className={`overflow-hidden transition-all duration-500 ease-in-out ${showNotice && activePeriodId === 'vacation' ? 'max-h-16 mb-4 opacity-100' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
+      >
+        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/[0.04] border border-primary/10 rounded-card">
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" className="text-primary flex-shrink-0">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span className="text-[12px] font-bold text-text-main leading-tight">
+            방학 기간에는 19시까지로 단축 운영해요 🥲
+          </span>
+        </div>
+      </div>
 
       <div className="mb-8">
         <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden relative">
