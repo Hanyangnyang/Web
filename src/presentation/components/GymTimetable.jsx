@@ -11,20 +11,18 @@ const COLORS = {
   red:    { bg: '#FEF2F2', text: '#B91C1C', border: '#FEE2E2' },
 };
 
-const BASE_SCHEDULE = gymData.schedule;
-
-const getMergedSchedule = () => {
+const getMergedSchedule = (baseSchedule) => {
   const days   = ['mon', 'tue', 'wed', 'thu', 'fri'];
-  const merged = BASE_SCHEDULE.map(row => ({ ...row, spans: {} }));
+  const merged = baseSchedule.map(row => ({ ...row, spans: {} }));
   days.forEach(day => {
-    for (let i = 0; i < BASE_SCHEDULE.length; i++) {
-      const current = BASE_SCHEDULE[i][day];
+    for (let i = 0; i < baseSchedule.length; i++) {
+      const current = baseSchedule[i][day];
       if (current === '-' || current === null) continue;
       let span = 1;
-      while (i + span < BASE_SCHEDULE.length && BASE_SCHEDULE[i + span][day]?.name === current.name) span++;
+      while (i + span < baseSchedule.length && baseSchedule[i + span][day]?.name === current.name) span++;
       if (span > 1) {
         merged[i].spans[day] = span;
-        const lastCell = BASE_SCHEDULE[i + span - 1][day];
+        const lastCell = baseSchedule[i + span - 1][day];
         if (lastCell?.endTime) merged[i][day] = { ...merged[i][day], endTime: lastCell.endTime };
         for (let j = 1; j < span; j++) merged[i + j][day] = null;
         i += span - 1;
@@ -45,6 +43,15 @@ function CourseName({ name }) {
 }
 
 export function GymTimetable({ onBack }) {
+  // 오늘 날짜 기준 현재 기간 자동 판별
+  const initialPeriodId = React.useMemo(() => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const matched = gymData.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
+    return matched ? matched.id : 'semester';
+  }, []);
+
+  const [activePeriodId, setActivePeriodId] = useState(initialPeriodId);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -52,14 +59,16 @@ export function GymTimetable({ onBack }) {
     return () => clearInterval(timer);
   }, []);
 
-  const schedule = getMergedSchedule();
+  const currentPeriod = gymData.periods.find(p => p.id === activePeriodId) || gymData.periods[0];
+  const baseSchedule = currentPeriod.schedule;
+  const schedule = React.useMemo(() => getMergedSchedule(baseSchedule), [baseSchedule]);
 
   const getNowPos = () => {
     const h = currentTime.getHours();
     const m = currentTime.getMinutes();
     const day = currentTime.getDay();
-    if (h < 9 || h >= 21 || day === 0 || day === 6) return null;
-    const rowIndex = BASE_SCHEDULE.findIndex(s => s.hour === h);
+    if (day === 0 || day === 6) return null;
+    const rowIndex = baseSchedule.findIndex(s => s.hour === h);
     if (rowIndex === -1) return null;
     const ROW_H = 40;
     return {
@@ -106,12 +115,32 @@ export function GymTimetable({ onBack }) {
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-xl font-bold text-text-main m-0">체대 헬스장</h1>
             <span className="bg-[rgba(14,74,132,0.1)] text-primary text-[0.65rem] font-extrabold px-2 py-0.5 rounded uppercase">
-              {gymData.semester}
+              {currentPeriod.title}
             </span>
           </div>
-          <p className="text-[0.8rem] text-text-sub font-medium m-0">{gymData.location} · {gymData.hours}</p>
+          <p className="text-[0.8rem] text-text-sub font-medium m-0">{gymData.location} · {currentPeriod.hours}</p>
         </div>
       </header>
+
+      {/* 탭 전환 세그먼트 */}
+      <div className="flex bg-slate-100 p-1 rounded-card mb-6 gap-1 relative z-10">
+        {gymData.periods.map(p => {
+          const isActive = p.id === activePeriodId;
+          return (
+            <button
+              key={p.id}
+              onClick={() => setActivePeriodId(p.id)}
+              className={`flex-1 py-2 text-xs font-bold rounded-card transition-all duration-200 ${
+                isActive 
+                  ? 'bg-primary text-white shadow-[0_2px_8px_rgba(14,74,132,0.25)]' 
+                  : 'text-text-sub hover:text-text-main'
+              }`}
+            >
+              {p.name}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="mb-8">
         <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden relative">
