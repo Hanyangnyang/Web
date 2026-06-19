@@ -76,6 +76,11 @@ export function GymTimetable({ onBack }) {
   const baseSchedule = currentPeriod.schedule;
   const schedule = React.useMemo(() => getMergedSchedule(baseSchedule), [baseSchedule]);
 
+  const closingHour = React.useMemo(() => {
+    const match = currentPeriod.hours.match(/-\s*(\d{2}):\d{2}/);
+    return match ? parseInt(match[1], 10) : null;
+  }, [currentPeriod.hours]);
+
   const getNowPos = () => {
     const h = currentTime.getHours();
     const m = currentTime.getMinutes();
@@ -186,16 +191,27 @@ export function GymTimetable({ onBack }) {
               </tr>
             </thead>
             <tbody>
-              {schedule.map((row, i) => (
-                <tr key={i}>
-                  <td className="py-2 px-1 text-[0.65rem] font-bold text-[#cbd5e1] text-center border-r border-surface">{row.label}</td>
-                  {renderCell(row.mon, row.spans.mon, row.hour)}
-                  {renderCell(row.tue, row.spans.tue, row.hour)}
-                  {renderCell(row.wed, row.spans.wed, row.hour)}
-                  {renderCell(row.thu, row.spans.thu, row.hour)}
-                  {renderCell(row.fri, row.spans.fri, row.hour)}
-                </tr>
-              ))}
+              {schedule.map((row, i) => {
+                const isClosedRow = closingHour !== null && row.hour >= closingHour;
+                return (
+                  <tr key={i}>
+                    <td className="py-2 px-1 text-[0.65rem] font-bold text-[#cbd5e1] text-center border-r border-surface">{row.label}</td>
+                    {isClosedRow ? (
+                      <td colSpan={5} className="bg-slate-50 text-[#cbd5e1] text-[0.65rem] font-bold text-center py-2 h-10 border-b border-surface">
+                        운영 종료
+                      </td>
+                    ) : (
+                      <>
+                        {renderCell(row.mon, row.spans.mon, row.hour)}
+                        {renderCell(row.tue, row.spans.tue, row.hour)}
+                        {renderCell(row.wed, row.spans.wed, row.hour)}
+                        {renderCell(row.thu, row.spans.thu, row.hour)}
+                        {renderCell(row.fri, row.spans.fri, row.hour)}
+                      </>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
