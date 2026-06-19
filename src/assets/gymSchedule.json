@@ -166,74 +166,19 @@
       "title": "26년 여름방학",
       "startDate": "2026-06-22",
       "endDate": "2026-08-31",
-      "hours": "평일 10:00 - 17:00",
+      "hours": "평일 09:00 - 19:00",
       "schedule": [
-        {
-          "hour": 10,
-          "label": "10",
-          "mon": "-",
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        },
-        {
-          "hour": 11,
-          "label": "11",
-          "mon": "-",
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        },
-        {
-          "hour": 12,
-          "label": "12",
-          "mon": "-",
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        },
-        {
-          "hour": 13,
-          "label": "13",
-          "mon": {
-            "name": "청소시간",
-            "type": "red"
-          },
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        },
-        {
-          "hour": 14,
-          "label": "14",
-          "mon": "-",
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        },
-        {
-          "hour": 15,
-          "label": "15",
-          "mon": "-",
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        },
-        {
-          "hour": 16,
-          "label": "16",
-          "mon": "-",
-          "tue": "-",
-          "wed": "-",
-          "thu": "-",
-          "fri": "-"
-        }
+        { "hour": 9,  "label": "09", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 10, "label": "10", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 11, "label": "11", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 12, "label": "12", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 13, "label": "13", "mon": { "name": "청소시간", "type": "red" }, "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 14, "label": "14", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 15, "label": "15", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 16, "label": "16", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 17, "label": "17", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 18, "label": "18", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" },
+        { "hour": 19, "label": "19", "mon": "-", "tue": "-", "wed": "-", "thu": "-", "fri": "-" }
       ]
     }
   ]
