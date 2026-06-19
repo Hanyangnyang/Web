@@ -191,7 +191,7 @@ export function GymTimetable({ onBack }) {
             <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           <span className="text-[12px] font-bold text-text-main leading-tight">
-            방학 기간에는 19시까지로 단축 운영해요 🥲
+            방학 기간에는 수업이 없고 19시까지로 단축 운영해요 💪
           </span>
         </div>
       </div>
