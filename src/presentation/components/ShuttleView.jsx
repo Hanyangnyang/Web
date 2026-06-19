@@ -541,6 +541,41 @@ export function ShuttleView({ isActive }) {
   const [subwayRedirecting, setSubwayRedirecting] = useState(false);
   const hasInteractedRef = useRef(false);
 
+  // 다음 학기/방학/계절학기 전환 알림 툴팁 상태
+  const [showNotice, setShowNotice] = useState(false);
+  const [isNoticeFadingOut, setIsNoticeFadingOut] = useState(false);
+
+  const upcomingSchedule = (() => {
+    if (!appConfig?.period_schedule || appConfig.period_schedule.length === 0) return null;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const futureSchedules = appConfig.period_schedule.filter(item => {
+      const startDate = new Date(item.start);
+      const diffTime = startDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays > 0 && diffDays <= 7;
+    });
+
+    if (futureSchedules.length === 0) return null;
+
+    futureSchedules.sort((a, b) => a.start.localeCompare(b.start));
+    return futureSchedules[0];
+  })();
+
+  useEffect(() => {
+    if (!upcomingSchedule || !isActive) return;
+    
+    // 1초 뒤 나타남 (이후 그대로 유지)
+    const showTimer = setTimeout(() => {
+      setShowNotice(true);
+    }, 1000);
+
+    return () => {
+      clearTimeout(showTimer);
+    };
+  }, [upcomingSchedule, isActive]);
+
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
 
@@ -693,6 +728,61 @@ export function ShuttleView({ isActive }) {
             )}
           </div>
         </div>
+
+        {/* 다가오는 시간표 변경 안내 배너 (슬라이드 애니메이션 적용) */}
+        {upcomingSchedule && (() => {
+          const parts = upcomingSchedule.start.split('-');
+          let formattedStartDate = '';
+          if (parts.length === 3) {
+            const targetDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            const nowObj = new Date();
+            const today = new Date(nowObj.getFullYear(), nowObj.getMonth(), nowObj.getDate());
+            
+            const getMonday = (d) => {
+              const day = d.getDay();
+              const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+              const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+              monday.setHours(0, 0, 0, 0);
+              return monday;
+            };
+            
+            const todayMonday = getMonday(today);
+            const targetMonday = getMonday(targetDate);
+            
+            const diffWeeks = Math.round((targetMonday - todayMonday) / (1000 * 60 * 60 * 24 * 7));
+            const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+            const dayName = weekdays[targetDate.getDay()];
+            
+            if (diffWeeks === 0) {
+              formattedStartDate = `이번 주 ${dayName}`;
+            } else if (diffWeeks === 1) {
+              formattedStartDate = `다음 주 ${dayName}`;
+            } else {
+              formattedStartDate = `${parseInt(parts[1], 10)}월 ${parseInt(parts[2], 10)}일`;
+            }
+          }
+          const nameMap = {
+            '학기중': '정규학기',
+            '방학중': '방학',
+            '계절학기': '계절학기'
+          };
+          const periodDisplayName = nameMap[upcomingSchedule.name] || upcomingSchedule.name;
+          
+          return (
+            <div 
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${showNotice ? 'max-h-16 mb-4 opacity-100' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
+            >
+              <div className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/[0.04] border border-primary/10 rounded-card">
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" className="text-primary flex-shrink-0">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span className="text-[12px] font-bold text-text-main leading-tight">
+                  {formattedStartDate}부터 {periodDisplayName} 시간표로 변경됩니다 😊
+                </span>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8}}>
           <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0">

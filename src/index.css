@@ -13,14 +13,20 @@
 
 /* ─── 모바일 앱 패키징(Capacitor)용 네이티브 터치 UX 최적화 ─── */
 * {
-  -webkit-user-select: none;          /* iOS Safari 텍스트 선택 해제 */
-  user-select: none;                  /* 일반 텍스트 선택 해제 */
-  -webkit-tap-highlight-color: transparent; /* 터치 시 파란색 아웃라인 제거 */
-  -webkit-touch-callout: none;        /* iOS 롱클릭 공유 팝업 해제 */
+  -webkit-user-select: none;
+  /* iOS Safari 텍스트 선택 해제 */
+  user-select: none;
+  /* 일반 텍스트 선택 해제 */
+  -webkit-tap-highlight-color: transparent;
+  /* 터치 시 파란색 아웃라인 제거 */
+  -webkit-touch-callout: none;
+  /* iOS 롱클릭 공유 팝업 해제 */
 }
 
 /* 입력창 및 편집 영역은 정상적인 텍스트 입력을 위해 선택 가능하도록 예외 처리 */
-input, textarea, [contenteditable="true"] {
+input,
+textarea,
+[contenteditable="true"] {
   -webkit-user-select: auto !important;
   user-select: auto !important;
 }
@@ -79,121 +85,271 @@ body {
 }
 
 /* ═══ Keyframes ═══ */
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @keyframes slideUp {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInFromRight {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInFromLeft {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes popIn {
-  0%   { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25%       { transform: translateX(-4px); }
-  75%       { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
 }
 
 @keyframes splash-pop {
-  0%   { transform: scale(0.75); opacity: 0; }
-  70%  { transform: scale(1.08); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.75);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes sheetUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes sheetDown {
-  from { transform: translateY(0); }
-  to   { transform: translateY(120%); }
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(120%);
+  }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse-lite {
-  0%   { transform: scale(1);   opacity: 1; }
-  50%  { transform: scale(1.5); opacity: 0.5; }
-  100% { transform: scale(1);   opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes menu-marquee-loop {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes toastOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes sttDropIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
-  to   { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes tooltipPop {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.9); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 @keyframes tooltipPopDown {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 @keyframes tooltipPopSmall {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.76); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(0.85); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.76);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(0.85);
+  }
 }
 
 @keyframes tooltipPopDownSmall {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.76); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(0.85); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.76);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(0.85);
+  }
 }
 
 @keyframes pulse {
-  0%   { opacity: 0.6; }
-  50%  { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 /* ═══ 동적으로 className에 적용되는 애니메이션 클래스 ═══ */
-.tab-slide-right { animation: slideInFromRight 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-.tab-slide-left  { animation: slideInFromLeft  0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-.spin-animation  { animation: rotate 1s linear infinite; }
+.tab-slide-right {
+  animation: slideInFromRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-slide-left {
+  animation: slideInFromLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spin-animation {
+  animation: rotate 1s linear infinite;
+}
 
 /* ═══ 아코디언 (grid-template-rows 트랜지션 — Tailwind로 표현 불가) ═══ */
 .accordion-content {
@@ -201,13 +357,23 @@ body {
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .accordion-content.expanded {
   grid-template-rows: 1fr;
   margin-bottom: 20px;
 }
-.accordion-inner { overflow: hidden; }
-.accordion-inner .menu-card          { margin-bottom: 0.4rem; }
-.accordion-inner .menu-card:last-child { margin-bottom: 0; }
+
+.accordion-inner {
+  overflow: hidden;
+}
+
+.accordion-inner .menu-card {
+  margin-bottom: 0.4rem;
+}
+
+.accordion-inner .menu-card:last-child {
+  margin-bottom: 0;
+}
 
 /* ═══ 셀렉트 박스 화살표 (SVG 배경 이미지) ═══ */
 .room-select {
@@ -228,7 +394,13 @@ body {
   height: 20px;
   flex-shrink: 0;
 }
-.alarm-toggle input { opacity: 0; width: 0; height: 0; }
+
+.alarm-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
 .alarm-toggle-slider {
   position: absolute;
   inset: 0;
@@ -237,6 +409,7 @@ body {
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .alarm-toggle-slider::before {
   content: '';
   position: absolute;
@@ -249,12 +422,26 @@ body {
   transition: transform 0.2s;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
-.alarm-toggle input:checked + .alarm-toggle-slider { background: #3b82f6; }
-.alarm-toggle input:checked + .alarm-toggle-slider::before { transform: translateX(16px); }
+
+.alarm-toggle input:checked+.alarm-toggle-slider {
+  background: #3b82f6;
+}
+
+.alarm-toggle input:checked+.alarm-toggle-slider::before {
+  transform: translateX(16px);
+}
 
 /* ═══ 픽커 스크롤바 숨기기 ═══ */
-.alarm-picker-scroll { scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-.alarm-picker-scroll::-webkit-scrollbar { display: none; }
+.alarm-picker-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.alarm-picker-scroll::-webkit-scrollbar {
+  display: none;
+}
 
 /* ═══ 마키 애니메이션 ═══ */
 .menu-item-marquee-track {
@@ -262,7 +449,10 @@ body {
   animation: menu-marquee-loop linear infinite;
   will-change: transform;
 }
-.menu-item-gap { padding-right: 1em; }
+
+.menu-item-gap {
+  padding-right: 1em;
+}
 
 /* ═══ 시간 선택 드롭다운 ═══ */
 .alarm-time-select {
@@ -283,6 +473,7 @@ body {
   outline: none;
   transition: border-color 0.2s;
 }
+
 .alarm-time-select:focus {
   border-color: #0E4A84;
   box-shadow: 0 0 0 3px rgba(14, 74, 132, 0.2);
@@ -306,16 +497,23 @@ body {
   transform: translateX(-50%);
   border: 6px solid transparent;
 }
-.stt-tooltip.top::after    { top: 100%; border-top-color: rgba(33, 37, 41, 0.9); }
-.stt-tooltip.bottom::after { bottom: 100%; border-bottom-color: rgba(33, 37, 41, 0.9); }
+
+.stt-tooltip.top::after {
+  top: 100%;
+  border-top-color: rgba(33, 37, 41, 0.9);
+}
+
+.stt-tooltip.bottom::after {
+  bottom: 100%;
+  border-bottom-color: rgba(33, 37, 41, 0.9);
+}
 
 /* ═══ QR 플레이스홀더 (repeating-conic-gradient) ═══ */
 .qr-placeholder {
   width: 220px;
   height: 220px;
   background:
-    repeating-conic-gradient(#2d2d2d 0% 25%, #ffffff 0% 50%)
-    0 0 / 12px 12px;
+    repeating-conic-gradient(#2d2d2d 0% 25%, #ffffff 0% 50%) 0 0 / 12px 12px;
   border-radius: 4px;
 }
 
@@ -326,11 +524,22 @@ body {
 }
 
 /* ═══ 헬스장 수업명 미디어쿼리 ═══ */
-@media (max-width: 375px) { .course-name { letter-spacing: -0.04em; } }
-@media (max-width: 340px) { .course-name { letter-spacing: -0.07em; } }
+@media (max-width: 375px) {
+  .course-name {
+    letter-spacing: -0.04em;
+  }
+}
+
+@media (max-width: 340px) {
+  .course-name {
+    letter-spacing: -0.07em;
+  }
+}
 
 /* ═══ 링크 복사 토스트 (JS로 동적 생성) ═══ */
-.copy-toast { animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards; }
+.copy-toast {
+  animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards;
+}
 
 /* ═══ 모달/시트 열릴 때 배경 스크롤 잠금 (레이아웃 점프 없이) ═══ */
 .scroll-locked {
@@ -341,6 +550,7 @@ body {
 .perspective-container {
   perspective: 1000px;
 }
+
 .flip-card-inner {
   position: relative;
   width: 100%;
@@ -349,10 +559,13 @@ body {
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
 }
+
 .flip-card-inner.flipped {
   transform: rotateY(180deg);
 }
-.flip-card-front, .flip-card-back {
+
+.flip-card-front,
+.flip-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -361,6 +574,7 @@ body {
   top: 0;
   left: 0;
 }
+
 .flip-card-back {
   transform: rotateY(180deg);
 }
@@ -369,6 +583,7 @@ body {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -376,8 +591,15 @@ body {
 }
 
 @keyframes sttDropIn {
-  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes pulseHighlight {
@@ -385,10 +607,12 @@ body {
     background-color: rgba(14, 74, 132, 0.03);
     box-shadow: 0 0 10px rgba(14, 74, 132, 0.05);
   }
+
   50% {
     background-color: rgba(14, 74, 132, 0.09);
     box-shadow: 0 0 20px rgba(14, 74, 132, 0.15);
   }
+
   100% {
     background-color: rgba(14, 74, 132, 0.03);
     box-shadow: 0 0 10px rgba(14, 74, 132, 0.05);
