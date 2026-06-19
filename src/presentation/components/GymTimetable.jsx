@@ -1,6 +1,6 @@
 // 컴포넌트: 체대 헬스장 수업 시간표 캘린더 (현재 시간 인디케이터 포함)
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronDown } from 'lucide-react';
 import gymData from '../../assets/gymSchedule.json';
 
 const COLORS = {
@@ -53,10 +53,23 @@ export function GymTimetable({ onBack }) {
 
   const [activePeriodId, setActivePeriodId] = useState(initialPeriodId);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = React.useRef(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
+  }, []);
+
+  // 드롭다운 바깥 클릭 시 닫기
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const currentPeriod = gymData.periods.find(p => p.id === activePeriodId) || gymData.periods[0];
@@ -112,35 +125,43 @@ export function GymTimetable({ onBack }) {
           <ArrowLeft size={20} />
         </button>
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
+          <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl font-bold text-text-main m-0">체대 헬스장</h1>
-            <span className="bg-[rgba(14,74,132,0.1)] text-primary text-[0.65rem] font-extrabold px-2 py-0.5 rounded uppercase">
-              {currentPeriod.title}
-            </span>
+            
+            {/* 기간 선택 드롭다운 */}
+            <div className="relative inline-block select-none" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(p => !p)}
+                className="bg-[rgba(14,74,132,0.08)] text-primary text-[0.68rem] font-black px-2.5 py-1 rounded-card uppercase flex items-center gap-1 transition-all active:scale-95 duration-100 hover:bg-[rgba(14,74,132,0.14)]"
+              >
+                <span>{currentPeriod.title}</span>
+                <ChevronDown size={11} className={`text-primary transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {dropdownOpen && (
+                <div className="absolute top-[calc(100%+6px)] left-0 min-w-[130px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_12px_24px_rgba(0,0,0,0.08)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+                  {gymData.periods.map(p => (
+                    <div
+                      key={p.id}
+                      onClick={() => {
+                        setActivePeriodId(p.id);
+                        setDropdownOpen(false);
+                      }}
+                      className={`px-3.5 py-2.5 text-[0.78rem] font-bold cursor-pointer transition-colors duration-100 hover:bg-surface flex items-center justify-between ${
+                        p.id === activePeriodId ? 'text-primary bg-[rgba(14,74,132,0.04)]' : 'text-text-sub'
+                      }`}
+                    >
+                      <span>{p.title}</span>
+                      {p.id === activePeriodId && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <p className="text-[0.8rem] text-text-sub font-medium m-0">{gymData.location} · {currentPeriod.hours}</p>
         </div>
       </header>
-
-      {/* 탭 전환 세그먼트 */}
-      <div className="flex bg-slate-100 p-1 rounded-card mb-6 gap-1 relative z-10">
-        {gymData.periods.map(p => {
-          const isActive = p.id === activePeriodId;
-          return (
-            <button
-              key={p.id}
-              onClick={() => setActivePeriodId(p.id)}
-              className={`flex-1 py-2 text-xs font-bold rounded-card transition-all duration-200 ${
-                isActive 
-                  ? 'bg-primary text-white shadow-[0_2px_8px_rgba(14,74,132,0.25)]' 
-                  : 'text-text-sub hover:text-text-main'
-              }`}
-            >
-              {p.name}
-            </button>
-          );
-        })}
-      </div>
 
       <div className="mb-8">
         <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden relative">
