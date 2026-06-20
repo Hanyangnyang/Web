@@ -89,26 +89,33 @@ async function refreshTimetableIfNeeded(lineId, key) {
   const cacheDir = path.join(os.tmpdir(), 'hanyang-subway-cache');
   const tempFilePath = path.join(cacheDir, fileName);
   const bundledFilePath = path.join(process.cwd(), 'api', '_lib', fileName);
-  const stCode = STATION_CODES[lineId];
 
+  let currentData = null;
   try {
-    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-  } catch (e) {}
-
-  try {
-    let currentData = null;
     if (fs.existsSync(tempFilePath)) {
-      try {
-        currentData = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-      } catch (parseErr) {
-        console.error(`[Subway API] Temp cache parse failed for ${fileName}, falling back to bundled file:`, parseErr.message);
-      }
+      currentData = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
     }
-    
-    if (!currentData && fs.existsSync(bundledFilePath)) {
-      currentData = JSON.parse(fs.readFileSync(bundledFilePath, 'utf8'));
-    }
+  } catch (parseErr) {
+    console.error(`[Subway API] Temp cache parse failed for ${fileName}:`, parseErr.message);
+  }
 
+  if (!currentData) {
+    try {
+      if (fs.existsSync(bundledFilePath)) {
+        currentData = JSON.parse(fs.readFileSync(bundledFilePath, 'utf8'));
+      }
+    } catch (parseErr) {
+      console.error(`[Subway API] Failed to read bundled timetable ${fileName}:`, parseErr.message);
+    }
+  }
+
+  // 1. 수인분당선(1075)이거나 API 키가 없으면 실시간 API 호출 없이 로컬 데이터 사용
+  if (lineId === '1075' || !key) {
+    return currentData;
+  }
+
+  // 2. 4호선(1004)이면서 API 키가 있을 경우 30일 캐시 체크 및 실시간 API 호출 시도
+  try {
     if (currentData) {
       const lastUpdated = new Date(currentData.metadata?.lastUpdated || 0).getTime();
       if (Date.now() - lastUpdated < TTL_30_DAYS) {
@@ -117,6 +124,10 @@ async function refreshTimetableIfNeeded(lineId, key) {
       console.log(`[Subway API] ${lineId} timetable is older than 30 days. Refreshing...`);
     }
 
+    try {
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+    } catch (e) {}
+
     const result = {
       metadata: { lastUpdated: new Date().toISOString() },
       weekday: { upward: [], downward: [] },
@@ -124,6 +135,7 @@ async function refreshTimetableIfNeeded(lineId, key) {
       holiday: { upward: [], downward: [] }
     };
 
+    const stCode = STATION_CODES[lineId];
     const dayMap = { '1': 'weekday', '2': 'saturday', '3': 'holiday' };
     for (const [dayTag, dayKey] of Object.entries(dayMap)) {
       for (const upDown of ['1', '2']) {
@@ -140,11 +152,12 @@ async function refreshTimetableIfNeeded(lineId, key) {
               train_no: r.TRAIN_NO
             }));
           }
-        } catch (e) { console.error(`[Subway API] Refresh fetch failed for ${lineId} (${dayKey}):`, e.message); }
+        } catch (e) {
+          console.error(`[Subway API] Refresh fetch failed for ${lineId} (${dayKey}):`, e.message);
+        }
       }
     }
 
-    // Only write if we actually got some data (avoid wiping file on API failure)
     if (result.weekday.upward.length > 0) {
       try {
         fs.writeFileSync(tempFilePath, JSON.stringify(result, null, 2));
@@ -153,11 +166,22 @@ async function refreshTimetableIfNeeded(lineId, key) {
         console.error(`[Subway API] Failed to write temp timetable file:`, writeErr.message);
       }
       return result;
+    } else if (currentData) {
+      // API 호출이 실패(타임아웃 등)한 경우, 매번 5초씩 대기하는 UX 저하를 막기 위해
+      // 기존 로컬 데이터의 lastUpdated 날짜만 현재 시간으로 갱신하여 임시 캐시에 씁니다.
+      try {
+        currentData.metadata = currentData.metadata || {};
+        currentData.metadata.lastUpdated = new Date().toISOString();
+        fs.writeFileSync(tempFilePath, JSON.stringify(currentData, null, 2));
+        console.log(`[Subway API] Refresh failed for ${fileName}. Postponed retry by updating lastUpdated.`);
+      } catch (writeErr) {
+        console.error(`[Subway API] Failed to write fallback temp file:`, writeErr.message);
+      }
     }
-    return currentData; // Fallback to old data if refresh failed
+    return currentData;
   } catch (e) {
     console.error(`[Subway API] Critical error refreshing ${lineId}:`, e.message);
-    return null;
+    return currentData;
   }
 }
 
@@ -182,7 +206,6 @@ export default async function handler(req, res) {
   }
 
   const key = process.env.SUBWAY_KEY;
-  if (!key) return res.status(500).json({ error: 'SUBWAY_KEY env var not configured' });
 
   // Realtime API fetch removed per user request to rely purely on static timetables
 
