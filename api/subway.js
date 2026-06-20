@@ -84,18 +84,94 @@ const STATION_CODES = {
 
 const TTL_30_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-async function refreshTimetableIfNeeded(lineId) {
+async function refreshTimetableIfNeeded(lineId, key) {
   const fileName = lineId === '1004' ? 'line4_timetable.json' : 'suin_timetable.json';
+  const cacheDir = path.join(os.tmpdir(), 'hanyang-subway-cache');
+  const tempFilePath = path.join(cacheDir, fileName);
   const bundledFilePath = path.join(process.cwd(), 'api', '_lib', fileName);
 
+  let currentData = null;
   try {
-    if (fs.existsSync(bundledFilePath)) {
-      return JSON.parse(fs.readFileSync(bundledFilePath, 'utf8'));
+    if (fs.existsSync(tempFilePath)) {
+      currentData = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
     }
   } catch (parseErr) {
-    console.error(`[Subway API] Failed to read bundled timetable ${fileName}:`, parseErr.message);
+    console.error(`[Subway API] Temp cache parse failed for ${fileName}:`, parseErr.message);
   }
-  return null;
+
+  if (!currentData) {
+    try {
+      if (fs.existsSync(bundledFilePath)) {
+        currentData = JSON.parse(fs.readFileSync(bundledFilePath, 'utf8'));
+      }
+    } catch (parseErr) {
+      console.error(`[Subway API] Failed to read bundled timetable ${fileName}:`, parseErr.message);
+    }
+  }
+
+  // 1. 수인분당선(1075)이거나 API 키가 없으면 실시간 API 호출 없이 로컬 데이터 사용
+  if (lineId === '1075' || !key) {
+    return currentData;
+  }
+
+  // 2. 4호선(1004)이면서 API 키가 있을 경우 30일 캐시 체크 및 실시간 API 호출 시도
+  try {
+    if (currentData) {
+      const lastUpdated = new Date(currentData.metadata?.lastUpdated || 0).getTime();
+      if (Date.now() - lastUpdated < TTL_30_DAYS) {
+        return currentData;
+      }
+      console.log(`[Subway API] ${lineId} timetable is older than 30 days. Refreshing...`);
+    }
+
+    try {
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+    } catch (e) {}
+
+    const result = {
+      metadata: { lastUpdated: new Date().toISOString() },
+      weekday: { upward: [], downward: [] },
+      saturday: { upward: [], downward: [] },
+      holiday: { upward: [], downward: [] }
+    };
+
+    const stCode = STATION_CODES[lineId];
+    const dayMap = { '1': 'weekday', '2': 'saturday', '3': 'holiday' };
+    for (const [dayTag, dayKey] of Object.entries(dayMap)) {
+      for (const upDown of ['1', '2']) {
+        const url = `http://openAPI.seoul.go.kr:8088/${key}/json/SearchSTNTimeTableByIDService/1/1000/${stCode}/${dayTag}/${upDown}/`;
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+          const data = await res.json();
+          if (data.SearchSTNTimeTableByIDService) {
+            const rows = data.SearchSTNTimeTableByIDService.row || [];
+            const dirKey = upDown === '1' ? 'upward' : 'downward';
+            result[dayKey][dirKey] = rows.map(r => ({
+              time: r.ARRIVETIME,
+              destination: r.SUBWAYENAME,
+              train_no: r.TRAIN_NO
+            }));
+          }
+        } catch (e) {
+          console.error(`[Subway API] Refresh fetch failed for ${lineId} (${dayKey}):`, e.message);
+        }
+      }
+    }
+
+    if (result.weekday.upward.length > 0) {
+      try {
+        fs.writeFileSync(tempFilePath, JSON.stringify(result, null, 2));
+        console.log(`[Subway API] Successfully updated temp cache for ${fileName}`);
+      } catch (writeErr) {
+        console.error(`[Subway API] Failed to write temp timetable file:`, writeErr.message);
+      }
+      return result;
+    }
+    return currentData;
+  } catch (e) {
+    console.error(`[Subway API] Critical error refreshing ${lineId}:`, e.message);
+    return currentData;
+  }
 }
 
 export default async function handler(req, res) {
@@ -117,6 +193,8 @@ export default async function handler(req, res) {
   if (!isFull && !reqDayType && subwayCache && nowMs - subwayCacheTime < CACHE_TTL) {
     return res.status(200).json(subwayCache);
   }
+
+  const key = process.env.SUBWAY_KEY;
 
   // Realtime API fetch removed per user request to rely purely on static timetables
 
@@ -146,7 +224,7 @@ export default async function handler(req, res) {
 
       // Process both Line 4 and Suin-Bundang
       for (const lineId of ['1004', '1075']) {
-        const localData = await refreshTimetableIfNeeded(lineId);
+        const localData = await refreshTimetableIfNeeded(lineId, key);
         if (localData) {
           // Fallback logic for missing saturday in old JSONs
           const lineData = localData[dayKey] || localData['holiday']; 
