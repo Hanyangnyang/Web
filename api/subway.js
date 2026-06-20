@@ -166,6 +166,17 @@ async function refreshTimetableIfNeeded(lineId, key) {
         console.error(`[Subway API] Failed to write temp timetable file:`, writeErr.message);
       }
       return result;
+    } else if (currentData) {
+      // API 호출이 실패(타임아웃 등)한 경우, 매번 5초씩 대기하는 UX 저하를 막기 위해
+      // 기존 로컬 데이터의 lastUpdated 날짜만 현재 시간으로 갱신하여 임시 캐시에 씁니다.
+      try {
+        currentData.metadata = currentData.metadata || {};
+        currentData.metadata.lastUpdated = new Date().toISOString();
+        fs.writeFileSync(tempFilePath, JSON.stringify(currentData, null, 2));
+        console.log(`[Subway API] Refresh failed for ${fileName}. Postponed retry by updating lastUpdated.`);
+      } catch (writeErr) {
+        console.error(`[Subway API] Failed to write fallback temp file:`, writeErr.message);
+      }
     }
     return currentData;
   } catch (e) {
