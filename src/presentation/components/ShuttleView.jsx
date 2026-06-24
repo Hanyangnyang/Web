@@ -551,7 +551,9 @@ export function ShuttleView({ isActive }) {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
     const futureSchedules = appConfig.period_schedule.filter(item => {
-      const startDate = new Date(item.start);
+      const parts = item.start.split('-');
+      if (parts.length !== 3) return false;
+      const startDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
       const diffTime = startDate - today;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays > 0 && diffDays <= 7;
