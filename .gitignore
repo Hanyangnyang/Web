@@ -41,3 +41,6 @@ android/app/google-services.json
 
 # iOS Firebase config
 ios/App/App/GoogleService-Info.plist
+
+# Scratch directory
+scratch/
