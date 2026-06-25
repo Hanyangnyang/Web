@@ -416,15 +416,17 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                             <div className="flex items-center gap-3">
                                <span className="text-xl">{getMenuIcon(type)}</span>
                                <span className="font-extrabold text-[1.05rem] text-text-main">{type}</span>
-                               <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
-                                 {menus.length}개 메뉴
-                               </span>
                             </div>
-                            <ChevronRight
-                              style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
-                              size={20}
-                              color="#94a3b8"
-                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
+                                {menus.length}개 메뉴
+                              </span>
+                              <ChevronRight
+                                style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+                                size={20}
+                                color="#94a3b8"
+                              />
+                            </div>
                           </div>
                           <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
                             <div className="accordion-inner">
