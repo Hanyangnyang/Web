@@ -198,6 +198,7 @@ const ANDROID_BANNERS = [
   '/assets/banner_for_android_release_blue.png',
   '/assets/banner_for_android_release_yellow.png',
   '/assets/banner_for_android_release_purple.png',
+  '/assets/banner_for_android_release_green.png',
 ];
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app&pcampaignid=web_share';
 
