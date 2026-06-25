@@ -94,6 +94,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef(null);
+  const chipScrollRef = useRef(null);
 
   const scrollToTop = useCallback(() => {
     let node = rootRef.current?.parentNode;
@@ -152,6 +153,23 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
       if (fallback) setSelectedCafeId(fallback.id);
     }
   }, [cafes, selectedCafeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 선택된 칩이 잘릴 경우 자동 스크롤
+  useEffect(() => {
+    const container = chipScrollRef.current;
+    if (!container || selectedCafeId === 'all') return;
+    const chip = container.querySelector(`[data-cafe-id="${selectedCafeId}"]`);
+    if (!chip) return;
+    const containerLeft = container.scrollLeft;
+    const containerRight = containerLeft + container.clientWidth;
+    const chipLeft = chip.offsetLeft;
+    const chipRight = chipLeft + chip.offsetWidth;
+    if (chipRight > containerRight) {
+      container.scrollTo({ left: chipRight - container.clientWidth + 16, behavior: 'smooth' });
+    } else if (chipLeft < containerLeft) {
+      container.scrollTo({ left: chipLeft - 16, behavior: 'smooth' });
+    }
+  }, [selectedCafeId]);
 
   // 딥링크 처리: 날짜 동기화
   useEffect(() => {
@@ -343,6 +361,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
         </div>
 
         <div
+          ref={chipScrollRef}
           className="flex gap-1.5 pt-2.5 overflow-x-auto no-scrollbar scroll-smooth"
           style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
         >
@@ -362,6 +381,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
           {cafes.map(cafe => (
             <div
               key={cafe.id}
+              data-cafe-id={cafe.id}
               className={`flex-shrink-0 py-2 border rounded-card text-[clamp(0.65rem,3.1vw,0.82rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
                 selectedCafeId === cafe.id
                   ? 'bg-primary text-white border-primary shadow-sm'
