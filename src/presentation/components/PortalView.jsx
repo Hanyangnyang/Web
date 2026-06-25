@@ -4,6 +4,7 @@ import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users,
 import { usePortalData } from '../hooks/usePortalData.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 import { supabase } from '../../lib/supabase.js';
+import { getPlatform } from '../../lib/platform.js';
 
 
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
@@ -189,6 +190,107 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
         />
       )}
     </span>
+  );
+}
+
+const ANDROID_BANNERS = [
+  '/assets/banner_for_android_release.png',
+  '/assets/banner_for_android_release_blue.png',
+  '/assets/banner_for_android_release_yellow.png',
+  '/assets/banner_for_android_release_purple.png',
+];
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.hanyangnyang.app&pcampaignid=web_share';
+
+function AndroidBannerCarousel() {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef(null);
+  const touchStartXRef = useRef(null);
+  const isSwiping = useRef(false);
+  const mouseStartXRef = useRef(null);
+
+  const resetTimer = () => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % ANDROID_BANNERS.length);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    resetTimer();
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const handleTouchStart = (e) => { touchStartXRef.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartXRef.current;
+    if (Math.abs(delta) > 40) {
+      isSwiping.current = true;
+      setCurrent((prev) => delta < 0
+        ? (prev + 1) % ANDROID_BANNERS.length
+        : (prev - 1 + ANDROID_BANNERS.length) % ANDROID_BANNERS.length
+      );
+      resetTimer();
+      setTimeout(() => { isSwiping.current = false; }, 0);
+    }
+    touchStartXRef.current = null;
+  };
+
+  const handleMouseDown = (e) => { mouseStartXRef.current = e.clientX; };
+  const handleMouseUp = (e) => {
+    if (mouseStartXRef.current === null) return;
+    const delta = e.clientX - mouseStartXRef.current;
+    if (Math.abs(delta) > 40) {
+      isSwiping.current = true;
+      setCurrent((prev) => delta < 0
+        ? (prev + 1) % ANDROID_BANNERS.length
+        : (prev - 1 + ANDROID_BANNERS.length) % ANDROID_BANNERS.length
+      );
+      resetTimer();
+      setTimeout(() => { isSwiping.current = false; }, 0);
+    }
+    mouseStartXRef.current = null;
+  };
+
+  const handleClick = () => {
+    if (!isSwiping.current) window.open(PLAY_STORE_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div className="mb-4">
+      <div
+        className="rounded-card overflow-hidden border border-[#e2e8f0] cursor-pointer"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onClick={handleClick}
+      >
+        <div
+          className="flex transition-transform duration-300 ease-in-out"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {ANDROID_BANNERS.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt="하냥냥 안드로이드 앱 출시"
+              className="w-full flex-shrink-0"
+              draggable={false}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="flex justify-center gap-1.5 mt-2">
+        {ANDROID_BANNERS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setCurrent(i); resetTimer(); }}
+            className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? 'w-3 bg-[#0E4A84]' : 'w-1.5 bg-[#0E4A84]/25'}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -473,6 +575,8 @@ export function PortalView({ isVisible = true }) {
         )}
 
       {banners.length > 0 && <BannerCarousel banners={banners} />}
+
+      {getPlatform() === 'web' && <AndroidBannerCarousel />}
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
