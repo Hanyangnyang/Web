@@ -420,7 +420,14 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
             </div>
           ) : cafes.length > 0 ? (
             Object.keys(groupedMenus).length > 0 ? (
-              Object.entries(groupedMenus).map(([type, menus]) => {
+              Object.entries(groupedMenus)
+              .sort(([a], [b]) => {
+                const order = ['조식', '중식', '석식'];
+                const ai = order.findIndex(k => a.includes(k));
+                const bi = order.findIndex(k => b.includes(k));
+                return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+              })
+              .map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
                 return (
                   <div key={type} className="mb-[0.6rem]" data-type={type} style={{ scrollMarginTop: '140px' }}>
