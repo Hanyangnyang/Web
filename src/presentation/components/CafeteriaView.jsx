@@ -94,6 +94,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef(null);
+  const chipScrollRef = useRef(null);
 
   const scrollToTop = useCallback(() => {
     let node = rootRef.current?.parentNode;
@@ -152,6 +153,23 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
       if (fallback) setSelectedCafeId(fallback.id);
     }
   }, [cafes, selectedCafeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 선택된 칩이 잘릴 경우 자동 스크롤
+  useEffect(() => {
+    const container = chipScrollRef.current;
+    if (!container || selectedCafeId === 'all') return;
+    const chip = container.querySelector(`[data-cafe-id="${selectedCafeId}"]`);
+    if (!chip) return;
+    const containerLeft = container.scrollLeft;
+    const containerRight = containerLeft + container.clientWidth;
+    const chipLeft = chip.offsetLeft;
+    const chipRight = chipLeft + chip.offsetWidth;
+    if (chipRight > containerRight) {
+      container.scrollTo({ left: chipRight - container.clientWidth + 16, behavior: 'smooth' });
+    } else if (chipLeft < containerLeft) {
+      container.scrollTo({ left: chipLeft - 16, behavior: 'smooth' });
+    }
+  }, [selectedCafeId]);
 
   // 딥링크 처리: 날짜 동기화
   useEffect(() => {
@@ -343,6 +361,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
         </div>
 
         <div
+          ref={chipScrollRef}
           className="flex gap-1.5 pt-2.5 overflow-x-auto no-scrollbar scroll-smooth"
           style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
         >
@@ -362,6 +381,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
           {cafes.map(cafe => (
             <div
               key={cafe.id}
+              data-cafe-id={cafe.id}
               className={`flex-shrink-0 py-2 border rounded-card text-[clamp(0.65rem,3.1vw,0.82rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
                 selectedCafeId === cafe.id
                   ? 'bg-primary text-white border-primary shadow-sm'
@@ -400,7 +420,14 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
             </div>
           ) : cafes.length > 0 ? (
             Object.keys(groupedMenus).length > 0 ? (
-              Object.entries(groupedMenus).map(([type, menus]) => {
+              Object.entries(groupedMenus)
+              .sort(([a], [b]) => {
+                const order = ['조식', '중식', '석식'];
+                const ai = order.findIndex(k => a.includes(k));
+                const bi = order.findIndex(k => b.includes(k));
+                return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+              })
+              .map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
                 return (
                   <div key={type} className="mb-[0.6rem]" data-type={type} style={{ scrollMarginTop: '140px' }}>
@@ -416,15 +443,17 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                             <div className="flex items-center gap-3">
                                <span className="text-xl">{getMenuIcon(type)}</span>
                                <span className="font-extrabold text-[1.05rem] text-text-main">{type}</span>
-                               <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
-                                 {menus.length}개 메뉴
-                               </span>
                             </div>
-                            <ChevronRight
-                              style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
-                              size={20}
-                              color="#94a3b8"
-                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
+                                {menus.length}개 메뉴
+                              </span>
+                              <ChevronRight
+                                style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+                                size={20}
+                                color="#94a3b8"
+                              />
+                            </div>
                           </div>
                           <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
                             <div className="accordion-inner">
