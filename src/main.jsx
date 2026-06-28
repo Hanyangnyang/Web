@@ -4,6 +4,23 @@ import './index.css'
 import App from './App.jsx'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
+import * as Sentry from '@sentry/capacitor'
+import * as SentryReact from '@sentry/react'
+
+Sentry.init(
+  {
+    dsn: "https://bb060324beea4e9a9a8ebcb92d08c0f6@o4511642871267328.ingest.us.sentry.io/4511642938245120",
+    enabled: import.meta.env.PROD,
+    environment: import.meta.env.MODE,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+    ],
+    tracesSampleRate: 1.0,
+    tracePropagationTargets: ["localhost", "https://www.hanyang.life"],
+    enableLogs: true,
+  },
+  SentryReact.init,
+)
 
 if (import.meta.env.VITE_POSTHOG_KEY) {
   posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
