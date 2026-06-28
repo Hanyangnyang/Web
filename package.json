@@ -21,7 +21,7 @@
     "@capacitor/push-notifications": "^8.1.1",
     "@capacitor/share": "^8.0.1",
     "@sentry/capacitor": "^4.2.0",
-    "@sentry/react": "^10.62.0",
+    "@sentry/react": "10.60.0",
     "@sentry/vite-plugin": "^5.3.0",
     "@supabase/supabase-js": "^2.105.4",
     "capacitor-secure-storage-plugin": "^0.13.0",
