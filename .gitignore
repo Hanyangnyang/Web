@@ -44,3 +44,6 @@ ios/App/App/GoogleService-Info.plist
 
 # Scratch directory
 scratch/
+
+# Claude Code local settings
+.claude/
