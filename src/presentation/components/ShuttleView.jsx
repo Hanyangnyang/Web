@@ -1,5 +1,5 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus, BusFront } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
@@ -29,11 +29,13 @@ function LineBadge({ opt, size = 32 }) {
   );
 }
 
-// ── 버스 노선 드롭다운
-function BusDropdown({ selected, onChange }) {
+
+
+// ── 버스 정류소 드롭다운
+function BusStopDropdown({ selected, onChange, activeStops, stops }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  
+
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', handler);
@@ -41,43 +43,50 @@ function BusDropdown({ selected, onChange }) {
   }, []);
 
   const OPTIONS = [
-    { id: 'all', name: '전체 노선' },
-    { id: '3102', name: '3102' },
-    { id: '10-1', name: '10-1' }
+    { id: 'all', name: '전체 정류소' },
+    ...stops.map(s => ({ id: s, name: s }))
   ];
 
-  const currentOpt = OPTIONS.find(o => o.id === (selected[0] || 'all'));
+  const currentOpt = OPTIONS.find(o => o.id === (selected[0] || 'all')) || OPTIONS[0];
 
   return (
-    <div className="relative select-none text-[13px] font-extrabold w-[105px]" ref={ref}>
+    <div className="relative select-none text-[13px] font-extrabold w-[115px]" ref={ref}>
       <div
         className={`flex items-center justify-between gap-1 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${
           open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.15)]' : 'border-[#e2e8f0]'
         }`}
         onClick={() => setOpen(p => !p)}
       >
-        <span className={`flex-1 text-center ${currentOpt.id === '3102' ? 'text-[#EE2737]' : currentOpt.id === '10-1' ? 'text-[#53B332]' : 'text-text-main'}`}>
+        <span className="flex-1 text-center text-text-main truncate">
           {currentOpt.name}
         </span>
         <ChevronDown size={14} className={`text-text-hint transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-full bg-white border border-[#e2e8f0] rounded-card shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden z-[200] [animation:sttDropIn_0.15s_ease-out]">
-          {OPTIONS.map(o => (
-            <div
-              key={o.id}
-              className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-center hover:bg-surface ${
-                (selected[0] || 'all') === o.id ? 'bg-[rgba(14,74,132,0.04)] text-primary font-extrabold' : 'text-text-sub'
-              }`}
-              onClick={() => {
-                onChange(o.id === 'all' ? [] : [o.id]);
-                setOpen(false);
-              }}
-            >
-              {o.name}
-            </div>
-          ))}
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[130px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden z-[200] [animation:sttDropIn_0.15s_ease-out]">
+          {OPTIONS.map(o => {
+            const isActive = o.id === 'all' || activeStops.includes(o.id);
+            return (
+              <div
+                key={o.id}
+                className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-center ${
+                  !isActive 
+                    ? 'text-slate-300 bg-slate-50 cursor-not-allowed'
+                    : (selected[0] || 'all') === o.id 
+                      ? 'bg-[rgba(14,74,132,0.04)] text-primary font-extrabold' 
+                      : 'text-text-sub hover:bg-surface'
+                }`}
+                onClick={() => {
+                  if (!isActive) return;
+                  onChange(o.id === 'all' ? [] : [o.id]);
+                  setOpen(false);
+                }}
+              >
+                {o.name}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -600,13 +609,7 @@ export function ShuttleView({ isActive }) {
     }
   }, [viewMode]);
 
-  // Public Bus States
-  const [selectedBuses, setSelectedBuses] = useState(() => {
-    try {
-      const saved = localStorage.getItem('public_bus_selected_buses');
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
+
 
   const [selectedStops, setSelectedStops] = useState(() => {
     try {
@@ -623,11 +626,16 @@ export function ShuttleView({ isActive }) {
   });
 
   const [expandedStops, setExpandedStops] = useState({});
+  const [busArrivals, setBusArrivals] = useState({});
+  const [isBusLoading, setIsBusLoading] = useState({});
+  const [isPageVisible, setIsPageVisible] = useState(true);
 
-  // Save states to localStorage
+  const busArrivalsRef = useRef({});
   useEffect(() => {
-    localStorage.setItem('public_bus_selected_buses', JSON.stringify(selectedBuses));
-  }, [selectedBuses]);
+    busArrivalsRef.current = busArrivals;
+  }, [busArrivals]);
+
+
 
   useEffect(() => {
     localStorage.setItem('public_bus_selected_stops', JSON.stringify(selectedStops));
@@ -637,10 +645,7 @@ export function ShuttleView({ isActive }) {
     localStorage.setItem('public_bus_favorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  const BUSES = [
-    { id: '3102', name: '3102', type: '광역', color: '#EE2737', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역', '의왕톨게이트', '강남역우리은행'], isPopular: true },
-    { id: '10-1', name: '10-1', type: '시내', color: '#53B332', stops: ['셔틀콕', '기숙사', '융합교육관', '상록수역'] }
-  ];
+
 
   const DEFAULT_PRIORITY = [
     '셔틀콕',
@@ -652,39 +657,15 @@ export function ShuttleView({ isActive }) {
   ];
 
   const STOP_COORDS = {
-    '셔틀콕': { lat: 37.2995, lon: 126.8379 },
-    '기숙사': { lat: 37.2965, lon: 126.8345 },
-    '융합교육관': { lat: 37.2985, lon: 126.8385 },
-    '상록수역': { lat: 37.3023, lon: 126.8661 },
-    '강남역우리은행': { lat: 37.4979, lon: 127.0276 },
-    '의왕톨게이트': { lat: 37.3486, lon: 126.9698 }
+    '셔틀콕': { lat: 37.2989333, lon: 126.83775 },
+    '기숙사': { lat: 37.2939833, lon: 126.83535 },
+    '융합교육관': { lat: 37.2952667, lon: 126.8384667 },
+    '상록수역': { lat: 37.3018167, lon: 126.8652167 },
+    '강남역우리은행': { lat: 37.49575, lon: 127.02835 },
+    '의왕톨게이트': { lat: 37.3485167, lon: 126.9845 }
   };
 
-  const MOCK_ARRIVALS = {
-    '셔틀콕': [
-      { busId: '3102', time: '4분 16초', info: '2번째전·26석', direction: '강남역 방면' },
-      { busId: '10-1', time: '2분 10초', info: '3번째전·여유', direction: '상록수역 방면' },
-      { busId: '3102', time: '40분', info: '20번째전·39석', direction: '강남역 방면' }
-    ],
-    '기숙사': [
-      { busId: '3102', time: '2분', info: '1번째전·15석', direction: '강남역 방면' },
-      { busId: '10-1', time: '5분', info: '4번째전·보통', direction: '상록수역 방면' }
-    ],
-    '융합교육관': [
-      { busId: '3102', time: '3분 20초', info: '2번째전·22석', direction: '강남역 방면' },
-      { busId: '10-1', time: '1분', info: '1번째전·여유', direction: '상록수역 방면' }
-    ],
-    '상록수역': [
-      { busId: '3102', time: '15분', info: '8번째전·빈자리많음', direction: '에리카 방면' },
-      { busId: '10-1', time: '8분', info: '6번째전·보통', direction: '에리카 방면' }
-    ],
-    '강남역우리은행': [
-      { busId: '3102', time: '25분', info: '회차 대기 중', direction: '에리카 방면' }
-    ],
-    '의왕톨게이트': [
-      { busId: '3102', time: '12분', info: '5번째전·5석', direction: '에리카 방면' }
-    ]
-  };
+  // MOCK_ARRIVALS removed in favor of real-time API integration
 
   // Distance helper
   const getDistanceStr = (stopName) => {
@@ -745,20 +726,8 @@ export function ShuttleView({ isActive }) {
 
   const closestStopName = getClosestStopName();
 
-  // Get active stops based on selected buses
-  const activeStops = selectedBuses.length === 0
-    ? DEFAULT_PRIORITY
-    : Array.from(new Set(
-        BUSES.filter(b => selectedBuses.includes(b.id))
-             .flatMap(b => b.stops)
-      ));
-
-  // Auto clean selectedStops if they become inactive
-  useEffect(() => {
-    if (selectedBuses.length > 0) {
-      setSelectedStops(prev => prev.filter(s => activeStops.includes(s)));
-    }
-  }, [selectedBuses]);
+  // Get active stops (all priority stops are active by default since route filtering is removed)
+  const activeStops = DEFAULT_PRIORITY;
 
   // Determine stop display ordering
   const getSortedStops = () => {
@@ -823,17 +792,207 @@ export function ShuttleView({ isActive }) {
         setExpandedStops(next);
       }
     }
-  }, [viewMode, selectedStops, userCoords, favorites, selectedBuses]);
+  }, [viewMode, selectedStops, userCoords, favorites]);
 
-  // Sort stop chips: active ones at the front
-  const sortedStopChips = [...DEFAULT_PRIORITY].sort((a, b) => {
-    const aActive = activeStops.includes(a);
-    const bActive = activeStops.includes(b);
-    if (aActive !== bActive) {
-      return aActive ? -1 : 1;
+  // (sortedStopChips removed as chips were replaced with a dropdown)
+
+  const STATION_IDS = {
+    '셔틀콕': '216000379',
+    '기숙사': '216000383',
+    '융합교육관': '216000381',
+    '상록수역': '216000145',
+    '강남역우리은행': '121000974',
+    '의왕톨게이트': '226000038'
+  };
+
+  const ALLOWED_BUSES_BY_STOP = {
+    '셔틀콕': ['3102', '10-1'],
+    '기숙사': ['3102', '10-1'],
+    '융합교육관': ['3102', '10-1'],
+    '상록수역': ['3102', '10-1'],
+    '강남역우리은행': ['3102'],
+    '의왕톨게이트': ['3102', '3100', '3101']
+  };
+
+  const DEFAULT_DIRECTIONS = {
+    '3102': {
+      '셔틀콕': '강남역 방면',
+      '기숙사': '강남역 방면',
+      '융합교육관': '강남역 방면',
+      '상록수역': '에리카 방면',
+      '강남역우리은행': '에리카 방면',
+      '의왕톨게이트': '에리카 방면'
+    },
+    '10-1': {
+      '셔틀콕': '상록수역 방면',
+      '기숙사': '상록수역 방면',
+      '융합교육관': '상록수역 방면',
+      '상록수역': '에리카 방면'
+    },
+    '3100': {
+      '의왕톨게이트': '에리카 방면'
+    },
+    '3101': {
+      '의왕톨게이트': '에리카 방면'
     }
-    return DEFAULT_PRIORITY.indexOf(a) - DEFAULT_PRIORITY.indexOf(b);
-  });
+  };
+
+  const fetchBusArrivalsForStop = useCallback(async (stopName) => {
+    const stationId = STATION_IDS[stopName];
+    if (!stationId) return;
+
+    setIsBusLoading(prev => ({ ...prev, [stopName]: true }));
+    try {
+      const res = await fetch(`/api/bus?stationId=${stationId}`);
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      
+      let list = data.response?.msgBody?.busArrivalList || [];
+      if (!Array.isArray(list)) {
+        list = [list];
+      }
+
+      const parsed = [];
+      const allowed = ALLOWED_BUSES_BY_STOP[stopName] || [];
+      
+      // Get the existing arrivals for this stop to compare lastApiMinutes
+      const prevList = busArrivalsRef.current[stopName] || [];
+
+      const addArrival = (routeName, time, location, seatCount, crowded, dest, runIndex) => {
+        if (time === undefined || time === null || time === '') return;
+        
+        const apiMinutes = parseInt(time, 10);
+        if (isNaN(apiMinutes)) return;
+
+        let seatInfo = '';
+        if (seatCount !== undefined && seatCount !== -1 && seatCount !== '') {
+          const seatNum = parseInt(seatCount, 10);
+          if (!isNaN(seatNum) && seatNum > 0) seatInfo = `·${seatNum}석`;
+        }
+
+        let crowdedInfo = '';
+        if (!seatInfo && crowded) {
+          const crowdMap = { '1': '여유', '2': '보통', '3': '혼잡' };
+          const label = crowdMap[String(crowded)];
+          if (label) crowdedInfo = `·${label}`;
+        }
+
+        const locVal = parseInt(location, 10);
+        const locStr = !isNaN(locVal) ? `${locVal}번째전` : '';
+
+        // Match with previous arrival to apply smart sync
+        const key = `${routeName}_${runIndex}`;
+        const prevMatch = prevList.find(p => `${p.busId}_${p.runIndex}` === key);
+
+        let seconds;
+        if (prevMatch && prevMatch.lastApiMinutes === apiMinutes) {
+          // Smart sync: if the API minutes are the same, preserve the current ticking seconds!
+          seconds = prevMatch.seconds;
+        } else {
+          // Otherwise (first load or different minutes), initialize to minutes * 60 + 50 seconds
+          seconds = apiMinutes * 60 + 50;
+        }
+
+        parsed.push({
+          busId: routeName,
+          runIndex,
+          seconds,
+          lastApiMinutes: apiMinutes,
+          info: `${locStr}${seatInfo || crowdedInfo}`,
+          direction: `${dest} 방면`
+        });
+      };
+
+      for (const item of list) {
+        const routeName = String(item.routeName);
+        if (!allowed.includes(routeName)) continue;
+        
+        addArrival(routeName, item.predictTime1, item.locationNo1, item.remainSeatCnt1, item.crowded1, item.routeDestName, 0);
+        addArrival(routeName, item.predictTime2, item.locationNo2, item.remainSeatCnt2, item.crowded2, item.routeDestName, 1);
+      }
+
+      setBusArrivals(prev => ({ ...prev, [stopName]: parsed }));
+    } catch (e) {
+      console.error(`Failed to fetch arrivals for ${stopName}:`, e);
+    } finally {
+      setIsBusLoading(prev => ({ ...prev, [stopName]: false }));
+    }
+  }, []);
+
+  // Fetch immediately when stop becomes expanded
+  useEffect(() => {
+    if (viewMode === 'bus') {
+      const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
+      expandedList.forEach(stopName => {
+        fetchBusArrivalsForStop(stopName);
+      });
+    }
+  }, [viewMode, expandedStops, fetchBusArrivalsForStop]);
+
+  // Detect tab/page visibility to prevent background API polling
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const visible = document.visibilityState === 'visible';
+      setIsPageVisible(visible);
+      if (visible && viewMode === 'bus') {
+        // Fetch immediately when tab becomes visible again
+        const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
+        expandedList.forEach(stopName => {
+          fetchBusArrivalsForStop(stopName);
+        });
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [viewMode, expandedStops, fetchBusArrivalsForStop]);
+
+  // Periodic refresh (30s) - only active when page is visible
+  useEffect(() => {
+    if (viewMode !== 'bus' || !isPageVisible) return;
+
+    const intervalId = setInterval(() => {
+      const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
+      expandedList.forEach(stopName => {
+        fetchBusArrivalsForStop(stopName);
+      });
+    }, 30 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [viewMode, expandedStops, fetchBusArrivalsForStop, isPageVisible]);
+
+  // 1-second countdown timer for active arrivals
+  useEffect(() => {
+    if (viewMode !== 'bus' || !isPageVisible) return;
+
+    const timerId = setInterval(() => {
+      setBusArrivals(prev => {
+        const next = {};
+        let changed = false;
+        
+        Object.keys(prev).forEach(stopName => {
+          const list = prev[stopName];
+          if (!list || list.length === 0) {
+            next[stopName] = list;
+            return;
+          }
+
+          const updatedList = list.map(item => {
+            if (item.seconds > 0) {
+              changed = true;
+              return { ...item, seconds: item.seconds - 1 };
+            }
+            return item;
+          });
+
+          next[stopName] = updatedList;
+        });
+
+        return changed ? next : prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [viewMode, isPageVisible]);
 
   // 칩(출발지)을 바꿀 때마다 30분 이내의 다음 셔틀 자동 뒤집기 트리거 실행
   useEffect(() => {
@@ -1138,55 +1297,14 @@ export function ShuttleView({ isActive }) {
         <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
           {/* 고정 상단 필터 영역 */}
           <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
-            {/* 정류장 선택 필터 헤더 (오른쪽에 버스 노선 드롭다운) */}
-            <div className="flex items-center justify-between text-2xl font-extrabold text-text-main mb-3">
-              <span>정류소</span>
-              <BusDropdown selected={selectedBuses} onChange={setSelectedBuses} />
-            </div>
-            
-            {/* 정류장 선택 필터 칩 리스트 */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar py-3.5 -my-3.5 -mx-5 px-5">
-              {/* 전체 선택 칩 */}
-              <div className="flex-shrink-0">
-                <button
-                  onClick={() => setSelectedStops([])}
-                  className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
-                    selectedStops.length === 0
-                      ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                      : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                  }`}
-                >
-                  전체
-                </button>
-              </div>
-
-              {sortedStopChips.map(stopName => {
-                const isActive = activeStops.includes(stopName);
-                const isSelected = selectedStops.includes(stopName);
-                return (
-                  <div key={stopName} className="flex-shrink-0">
-                    <button
-                      disabled={!isActive}
-                      onClick={() => {
-                        setSelectedStops(prev => 
-                          prev.includes(stopName)
-                            ? prev.filter(s => s !== stopName)
-                            : [...prev, stopName]
-                        );
-                      }}
-                      className={`py-[7px] px-4 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
-                        !isActive
-                          ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
-                          : isSelected
-                            ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-                            : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                      }`}
-                    >
-                      {stopName}
-                    </button>
-                  </div>
-                );
-              })}
+            <div className="flex items-center justify-between gap-3 text-text-main">
+              <span className="text-2xl font-extrabold">실시간 버스</span>
+              <BusStopDropdown 
+                selected={selectedStops} 
+                onChange={setSelectedStops} 
+                activeStops={activeStops} 
+                stops={DEFAULT_PRIORITY} 
+              />
             </div>
           </div>
 
@@ -1201,7 +1319,7 @@ export function ShuttleView({ isActive }) {
               .map(stopName => {
                 const isExpanded = !!expandedStops[stopName];
                 const isFav = favorites.includes(stopName);
-                const arrivals = MOCK_ARRIVALS[stopName] || [];
+                const arrivals = busArrivals[stopName] || [];
                 const distanceStr = getDistanceStr(stopName);
                 
                 const filteredArrivals = arrivals;
@@ -1233,7 +1351,7 @@ export function ShuttleView({ isActive }) {
                             strokeWidth={2}
                           />
                         </button>
-                        <span className="font-extrabold text-[15px] text-text-main truncate">
+                        <span className="font-bold text-[17px] tracking-tight text-text-main truncate">
                           {(() => {
                             const descMap = {
                               '기숙사': '기숙사 (한양대기숙사앞)',
@@ -1241,6 +1359,19 @@ export function ShuttleView({ isActive }) {
                               '셔틀콕': '셔틀콕 (한양대ERICA컨벤션센터)'
                             };
                             return descMap[stopName] || stopName;
+                          })()}
+                        </span>
+                        <span className="text-[12px] font-medium text-text-sub ml-1 flex-shrink-0">
+                          {(() => {
+                            const dirMap = {
+                              '의왕톨게이트': '에리카 방향',
+                              '상록수역': '에리카 방향',
+                              '셔틀콕': '강남역 방향',
+                              '융합교육관': '강남역 방향',
+                              '기숙사': '강남역 방향',
+                              '강남역우리은행': '에리카 방향'
+                            };
+                            return dirMap[stopName] || '';
                           })()}
                         </span>
                         {closestStopName === stopName && (
@@ -1251,6 +1382,9 @@ export function ShuttleView({ isActive }) {
                       </div>
                       
                       <div className="flex items-center gap-2">
+                        {isBusLoading[stopName] && (
+                          <Loader2 size={14} className="text-text-hint animate-spin" />
+                        )}
                         <ChevronDown 
                           size={18} 
                           className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -1261,13 +1395,24 @@ export function ShuttleView({ isActive }) {
                       {/* 아코디언 내용 */}
                       {isExpanded && (
                         <div className="border-t border-[#f1f5f9] bg-white">
-                          {filteredArrivals.length > 0 ? (() => {
-                            const uniqueBusIds = Array.from(new Set(filteredArrivals.map(arr => arr.busId)));
-                            return uniqueBusIds.map(busId => {
+                          {(() => {
+                            const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
+                            
+                            if (targetBuses.length === 0) {
+                              return (
+                                <p className="text-center text-xs font-semibold text-text-hint py-4">
+                                  운행 정보가 없습니다.
+                                </p>
+                              );
+                            }
+
+                            return targetBuses.map(busId => {
                               const is3102 = busId === '3102';
                               const busArrivals = filteredArrivals.filter(arr => arr.busId === busId);
                               const firstArrival = busArrivals[0];
                               const secondArrival = busArrivals[1];
+                              const directionLabel = (firstArrival && firstArrival.direction) || DEFAULT_DIRECTIONS[busId]?.[stopName] || '';
+
                               return (
                                 <div key={busId} className="px-4 py-2 flex justify-between items-center">
                                   {/* 왼쪽 열: 버스번호 및 행선지 */}
@@ -1275,7 +1420,7 @@ export function ShuttleView({ isActive }) {
                                     <div className="flex items-center gap-1.5">
                                       <div 
                                         className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
-                                        style={{ backgroundColor: busId === '3102' ? '#EE2737' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
+                                        style={{ backgroundColor: (busId === '3102' || busId === '3100' || busId === '3101') ? '#EE2737' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
                                       >
                                         <BusFront 
                                           size={12} 
@@ -1289,7 +1434,7 @@ export function ShuttleView({ isActive }) {
                                       </span>
                                     </div>
                                     <span className="text-[12px] font-medium text-text-sub">
-                                      {firstArrival ? firstArrival.direction : ''}
+                                      {directionLabel}
                                     </span>
                                   </div>
                                   
@@ -1315,8 +1460,8 @@ export function ShuttleView({ isActive }) {
 
                                       return (
                                         <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[14px] font-black text-[#EE2737]">
-                                            {firstArrival.time}
+                                          <span className="text-[17px] font-bold tracking-tight text-[#EE2737]">
+                                            {firstArrival.seconds < 60 ? '잠시 후 도착' : `${Math.floor(firstArrival.seconds / 60)}분`}
                                           </span>
                                           {firstArrival.info && (
                                             <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1">
@@ -1334,7 +1479,7 @@ export function ShuttleView({ isActive }) {
                                         </div>
                                       );
                                     })() : (
-                                      <span className="text-[12px] font-semibold text-text-hint">정보 없음</span>
+                                      <span className="text-[11px] font-medium text-text-hint">도착정보 없음</span>
                                     )}
                                     
                                     {/* 두 번째 도착 */}
@@ -1357,8 +1502,8 @@ export function ShuttleView({ isActive }) {
 
                                       return (
                                         <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[14px] font-semibold text-[#EE2737]">
-                                            {secondArrival.time}
+                                          <span className="text-[17px] font-bold tracking-tight text-[#EE2737]">
+                                            {secondArrival.seconds < 60 ? '잠시 후 도착' : `${Math.floor(secondArrival.seconds / 60)}분`}
                                           </span>
                                           {secondArrival.info && (
                                             <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1">
@@ -1376,17 +1521,13 @@ export function ShuttleView({ isActive }) {
                                         </div>
                                       );
                                     })() : (
-                                      <span className="text-[11px] font-medium text-text-hint">-</span>
+                                      <span className="text-[11px] font-medium text-text-hint">도착정보 없음</span>
                                     )}
                                   </div>
                                 </div>
                               );
                             });
-                          })() : (
-                            <p className="text-center text-xs font-semibold text-text-hint py-4">
-                              운행 정보가 없습니다.
-                            </p>
-                          )}
+                          })()}
                         </div>
                     )}
                   </div>
