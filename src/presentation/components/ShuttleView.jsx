@@ -8,11 +8,11 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 
 const ROUTE_LABEL = {
-  '순환':     '순환',
-  '직행':     '직행',
+  '순환': '순환',
+  '직행': '직행',
   '예술인직행': '예술인\n직행',
-  '중앙역':   '중앙역',
-  '아침직행':  '직행',
+  '중앙역': '중앙역',
+  '아침직행': '직행',
   '아침예술인': '예술인\n직행',
 };
 
@@ -52,9 +52,8 @@ function BusStopDropdown({ selected, onChange, activeStops, stops }) {
   return (
     <div className="relative select-none text-[13px] font-semibold w-[115px]" ref={ref}>
       <div
-        className={`flex items-center justify-between gap-1 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${
-          open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.15)]' : 'border-[#e2e8f0]'
-        }`}
+        className={`flex items-center justify-between gap-1 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.15)]' : 'border-[#e2e8f0]'
+          }`}
         onClick={() => setOpen(p => !p)}
       >
         <span className="flex-1 text-center text-text-main truncate">
@@ -70,13 +69,12 @@ function BusStopDropdown({ selected, onChange, activeStops, stops }) {
             return (
               <div
                 key={o.id}
-                className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-center ${
-                  !isActive 
-                    ? 'text-slate-300 bg-slate-50 cursor-not-allowed'
-                    : (selected[0] || 'all') === o.id 
-                      ? 'bg-[rgba(14,74,132,0.04)] text-primary font-semibold' 
-                      : 'text-text-sub hover:bg-surface'
-                }`}
+                className={`px-3 py-2 cursor-pointer transition-colors duration-100 text-center ${!isActive
+                  ? 'text-slate-300 bg-slate-50 cursor-not-allowed'
+                  : (selected[0] || 'all') === o.id
+                    ? 'bg-[rgba(14,74,132,0.04)] text-primary font-semibold'
+                    : 'text-text-sub hover:bg-surface'
+                  }`}
                 onClick={() => {
                   if (!isActive) return;
                   onChange(o.id === 'all' ? [] : [o.id]);
@@ -176,9 +174,9 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
 
   const rLabel = ROUTE_LABEL[row.route] || row.route;
   const routeKey =
-    row.route === '순환'                              ? 'c'  :
-    row.route === '예술인직행' || row.route === '아침예술인' ? 'dy' :
-    row.route === '중앙역'                             ? 'ja' : 'd';
+    row.route === '순환' ? 'c' :
+      row.route === '예술인직행' || row.route === '아침예술인' ? 'dy' :
+        row.route === '중앙역' ? 'ja' : 'd';
 
   const tagBase = "absolute top-0 left-0 text-[10px] font-black text-white z-[10]";
 
@@ -701,21 +699,21 @@ export function ShuttleView({ isActive }) {
     if (!userCoords) return null;
     const coord = STOP_COORDS[stopName];
     if (!coord) return null;
-    
+
     const lat1 = userCoords.latitude;
     const lon1 = userCoords.longitude;
     const lat2 = coord.lat;
     const lon2 = coord.lon;
-    
+
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const dist = R * c; // in km
-    
+
     if (dist < 1) {
       return `${Math.round(dist * 1000)}m`;
     }
@@ -727,7 +725,7 @@ export function ShuttleView({ isActive }) {
     if (!userCoords) return null;
     let minDistance = 999999;
     let closestStop = null;
-    
+
     DEFAULT_PRIORITY.forEach(stopName => {
       const coord = STOP_COORDS[stopName];
       if (coord) {
@@ -738,10 +736,10 @@ export function ShuttleView({ isActive }) {
         const R = 6371; // km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const dist = R * calcC;
         if (dist < minDistance) {
           minDistance = dist;
@@ -749,7 +747,7 @@ export function ShuttleView({ isActive }) {
         }
       }
     });
-    
+
     return closestStop;
   };
 
@@ -761,11 +759,11 @@ export function ShuttleView({ isActive }) {
   // Determine stop display ordering
   const getSortedStops = () => {
     const stopsList = [...DEFAULT_PRIORITY];
-    
+
     const getStopScore = (stopName) => {
       const isFav = favorites.includes(stopName);
       const isActive = activeStops.includes(stopName);
-      
+
       let dist = 999999;
       if (userCoords && STOP_COORDS[stopName]) {
         const c = STOP_COORDS[stopName];
@@ -773,22 +771,22 @@ export function ShuttleView({ isActive }) {
         const lon1 = userCoords.longitude;
         const dLat = (c.lat - lat1) * Math.PI / 180;
         const dLon = (c.lon - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(c.lat * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(c.lat * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         dist = 6371 * calcC;
       } else {
         dist = DEFAULT_PRIORITY.indexOf(stopName);
       }
-      
+
       return { isFav, isActive, dist };
     };
 
     return stopsList.sort((a, b) => {
       const scoreA = getStopScore(a);
       const scoreB = getStopScore(b);
-      
+
       if (scoreA.isFav !== scoreB.isFav) {
         return scoreA.isFav ? -1 : 1;
       }
@@ -896,7 +894,7 @@ export function ShuttleView({ isActive }) {
       const res = await fetch(`/api/bus?stationId=${stationId}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
-      
+
       let list = data.response?.msgBody?.busArrivalList || [];
       if (!Array.isArray(list)) {
         list = [list];
@@ -904,13 +902,13 @@ export function ShuttleView({ isActive }) {
 
       const parsed = [];
       const allowed = ALLOWED_BUSES_BY_STOP[stopName] || [];
-      
+
       // Get the existing arrivals for this stop to compare lastApiMinutes
       const prevList = busArrivalsRef.current[stopName] || [];
 
       const addArrival = (routeName, time, location, seatCount, crowded, dest, runIndex) => {
         if (time === undefined || time === null || time === '') return;
-        
+
         const apiMinutes = parseInt(time, 10);
         if (isNaN(apiMinutes)) return;
 
@@ -956,7 +954,7 @@ export function ShuttleView({ isActive }) {
       for (const item of list) {
         const routeName = String(item.routeName);
         if (!allowed.includes(routeName)) continue;
-        
+
         addArrival(routeName, item.predictTime1, item.locationNo1, item.remainSeatCnt1, item.crowded1, item.routeDestName, 0);
         addArrival(routeName, item.predictTime2, item.locationNo2, item.remainSeatCnt2, item.crowded2, item.routeDestName, 1);
       }
@@ -1024,7 +1022,7 @@ export function ShuttleView({ isActive }) {
       setBusArrivals(prev => {
         const next = {};
         let changed = false;
-        
+
         Object.keys(prev).forEach(stopName => {
           const list = prev[stopName];
           if (!list || list.length === 0) {
@@ -1224,7 +1222,7 @@ export function ShuttleView({ isActive }) {
                 </div>
               </div>
 
-              <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8}}>
+              <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8 }}>
                 <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0">
                   출발 시간
                 </span>
@@ -1354,12 +1352,12 @@ export function ShuttleView({ isActive }) {
           {/* 고정 상단 필터 영역 */}
           <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
             <div className="flex items-center justify-between gap-3 text-text-main">
-              <span className="text-2xl font-extrabold">실시간 버스</span>
-              <BusStopDropdown 
-                selected={selectedStops} 
-                onChange={setSelectedStops} 
-                activeStops={activeStops} 
-                stops={DEFAULT_PRIORITY} 
+              <span className="text-2xl font-extrabold">실시간 버스 정보</span>
+              <BusStopDropdown
+                selected={selectedStops}
+                onChange={setSelectedStops}
+                activeStops={activeStops}
+                stops={DEFAULT_PRIORITY}
               />
             </div>
           </div>
@@ -1367,7 +1365,7 @@ export function ShuttleView({ isActive }) {
           {/* 절전 모드 알림 배너 */}
           {!isUserActive && (
             <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-4 py-2.5 rounded-card text-center mb-3">
-              🔋 데이터와 배터리 절약을 위해 실시간 업데이트를 일시 정지했습니다. 화면을 움직이거나 터치하면 재개합니다.
+              데이터와 배터리 절약을 위해 실시간 업데이트를 일시 정지했습니다. 화면을 움직이거나 터치하면 재개합니다.
             </div>
           )}
 
@@ -1384,13 +1382,13 @@ export function ShuttleView({ isActive }) {
                 const isFav = favorites.includes(stopName);
                 const arrivals = busArrivals[stopName] || [];
                 const distanceStr = getDistanceStr(stopName);
-                
+
                 const filteredArrivals = arrivals;
-                  
+
                 return (
                   <div key={stopName} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
                     {/* 아코디언 헤더 */}
-                    <div 
+                    <div
                       className="flex justify-between items-center px-4 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors duration-150 select-none"
                       onClick={() => setExpandedStops(prev => ({ ...prev, [stopName]: !prev[stopName] }))}
                     >
@@ -1399,7 +1397,7 @@ export function ShuttleView({ isActive }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setFavorites(prev => 
+                            setFavorites(prev =>
                               prev.includes(stopName)
                                 ? prev.filter(s => s !== stopName)
                                 : [...prev, stopName]
@@ -1407,10 +1405,10 @@ export function ShuttleView({ isActive }) {
                           }}
                           className="p-1 -ml-1 flex items-center justify-center cursor-pointer transition-transform duration-100 active:scale-75"
                         >
-                          <Star 
-                            size={18} 
-                            fill={isFav ? '#fbbf24' : 'none'} 
-                            stroke={isFav ? '#fbbf24' : '#cbd5e1'} 
+                          <Star
+                            size={18}
+                            fill={isFav ? '#fbbf24' : 'none'}
+                            stroke={isFav ? '#fbbf24' : '#cbd5e1'}
                             strokeWidth={2}
                           />
                         </button>
@@ -1443,178 +1441,192 @@ export function ShuttleView({ isActive }) {
                           </span>
                         )}
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         {isBusLoading[stopName] && (
                           <Loader2 size={14} className="text-text-hint animate-spin" />
                         )}
-                        <ChevronDown 
-                          size={18} 
+                        <ChevronDown
+                          size={18}
                           className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                         />
                       </div>
                     </div>
-                    
-                      {/* 아코디언 내용 */}
-                      {isExpanded && (
-                        <div className="border-t border-[#f1f5f9] bg-white">
-                          {(() => {
-                            const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
-                            
-                            if (targetBuses.length === 0) {
-                              return (
-                                <p className="text-center text-xs font-semibold text-text-hint py-4">
-                                  운행 정보가 없습니다.
-                                </p>
-                              );
-                            }
 
-                            return targetBuses.map((busId, idx) => {
-                              const is3102 = busId === '3102';
-                              const busArrivals = filteredArrivals.filter(arr => arr.busId === busId);
-                              const firstArrival = busArrivals[0];
-                              const secondArrival = busArrivals[1];
-                              const directionLabel = (firstArrival && firstArrival.direction) || DEFAULT_DIRECTIONS[busId]?.[stopName] || '';
+                    {/* 아코디언 내용 */}
+                    {isExpanded && (
+                      <div className="border-t border-[#f1f5f9] bg-white">
+                        {(() => {
+                          const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
 
-                              return (
-                                <div key={busId}>
-                                  <div className="px-4 py-2 flex justify-between items-center">
-                                    {/* 왼쪽 열: 버스번호 및 행선지 */}
-                                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                                      <div className="flex items-center gap-1.5">
-                                        <div 
-                                          className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
-                                          style={{ backgroundColor: (busId === '3102' || busId === '3100') ? '#EE2737' : busId === '8147' ? '#A2409F' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
-                                        >
-                                          <BusFront 
-                                            size={12} 
-                                            className="text-white"
-                                          />
-                                        </div>
-                                        <span 
-                                          className="text-[16px] font-bold text-[#334155]"
-                                        >
-                                          {busId}
-                                        </span>
+                          if (targetBuses.length === 0) {
+                            return (
+                              <p className="text-center text-xs font-semibold text-text-hint py-4">
+                                운행 정보가 없습니다.
+                              </p>
+                            );
+                          }
+
+                          return targetBuses.map((busId, idx) => {
+                            const is3102 = busId === '3102';
+                            const busArrivals = filteredArrivals.filter(arr => arr.busId === busId);
+                            const firstArrival = busArrivals[0];
+                            const secondArrival = busArrivals[1];
+                            const directionLabel = (firstArrival && firstArrival.direction) || DEFAULT_DIRECTIONS[busId]?.[stopName] || '';
+                            const isInitialLoading = isBusLoading[stopName] && (!busArrivals[stopName] || busArrivals[stopName].length === 0);
+
+                            return (
+                              <div key={busId}>
+                                <div className="px-4 py-2 flex justify-between items-center">
+                                  {/* 왼쪽 열: 버스번호 및 행선지 */}
+                                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5">
+                                      <div
+                                        className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
+                                        style={{ backgroundColor: (busId === '3102' || busId === '3100') ? '#EE2737' : busId === '8147' ? '#A2409F' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
+                                      >
+                                        <BusFront
+                                          size={12}
+                                          className="text-white"
+                                        />
                                       </div>
+                                      <span
+                                        className="text-[16px] font-bold text-[#334155]"
+                                      >
+                                        {busId}
+                                      </span>
+                                    </div>
+                                    {isInitialLoading ? (
+                                      <div className="w-24 h-3 bg-slate-100 rounded animate-pulse mt-1" />
+                                    ) : (
                                       <span className="text-[12px] font-medium text-text-sub truncate">
                                         {directionLabel}
                                       </span>
-                                    </div>
-                                    
-                                    {/* 오른쪽 열: 도착 정보 (첫 번째 & 두 번째) */}
-                                    <div className="flex flex-col items-end gap-1.5 w-[190px] flex-shrink-0">
-                                      {/* 첫 번째 도착 */}
-                                      {firstArrival ? (() => {
-                                        const parts = firstArrival.info ? firstArrival.info.split('·') : [];
-                                        const beforeStr = parts[0] || '';
-                                        const seatStr = parts[1] || '';
-                                        
-                                        // 10석 이하 또는 혼잡 여부 판단
-                                        let isAlert = false;
-                                        if (seatStr) {
-                                          const match = seatStr.match(/(\d+)석/);
-                                          if (match) {
-                                            const seatNum = parseInt(match[1], 10);
-                                            if (seatNum <= 10) {
-                                              isAlert = true;
-                                            }
-                                          } else if (seatStr.includes('혼잡')) {
-                                            isAlert = true;
-                                          }
-                                        }
-
-                                        const isArrivingSoon = firstArrival.seconds < 60;
-                                        const timeText = isArrivingSoon ? '잠시 후 도착' : `${Math.floor(firstArrival.seconds / 60)}분`;
-
-                                        return (
-                                          <div className="flex items-center justify-between w-full h-[26px]">
-                                            <span className={`font-bold tracking-tight text-[#DE5B5B] w-[94px] text-right truncate ${isArrivingSoon ? 'text-[15px]' : 'text-[17px]'}`}>
-                                              {timeText}
-                                            </span>
-                                            {firstArrival.info ? (
-                                              <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
-                                                <span>{beforeStr}</span>
-                                                {seatStr && (
-                                                  <span 
-                                                    className="font-extrabold"
-                                                    style={{ color: isAlert ? '#DE5B5B' : '#3b82f6' }}
-                                                  >
-                                                    {seatStr}
-                                                  </span>
-                                                )}
-                                              </span>
-                                            ) : (
-                                              <div className="w-[90px] shrink-0" />
-                                            )}
-                                          </div>
-                                        );
-                                      })() : (
-                                        <div className="flex items-center justify-end w-full h-[26px]">
-                                          <span className="text-[11px] font-medium text-text-hint pr-1">도착정보 없음</span>
-                                        </div>
-                                      )}
-                                      
-                                      {/* 두 번째 도착 */}
-                                      {secondArrival ? (() => {
-                                        const parts = secondArrival.info ? secondArrival.info.split('·') : [];
-                                        const beforeStr = parts[0] || '';
-                                        const seatStr = parts[1] || '';
-
-                                        // 10석 이하 또는 혼잡 여부 판단
-                                        let isAlert = false;
-                                        if (seatStr) {
-                                          const match = seatStr.match(/(\d+)석/);
-                                          if (match) {
-                                            const seatNum = parseInt(match[1], 10);
-                                            if (seatNum <= 10) {
-                                              isAlert = true;
-                                            }
-                                          } else if (seatStr.includes('혼잡')) {
-                                            isAlert = true;
-                                          }
-                                        }
-
-                                        const isArrivingSoon = secondArrival.seconds < 60;
-                                        const timeText = isArrivingSoon ? '잠시 후 도착' : `${Math.floor(secondArrival.seconds / 60)}분`;
-
-                                        return (
-                                          <div className="flex items-center justify-between w-full h-[26px]">
-                                            <span className={`font-bold tracking-tight text-[#DE5B5B] w-[94px] text-right truncate ${isArrivingSoon ? 'text-[15px]' : 'text-[17px]'}`}>
-                                              {timeText}
-                                            </span>
-                                            {secondArrival.info ? (
-                                              <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
-                                                <span>{beforeStr}</span>
-                                                {seatStr && (
-                                                  <span 
-                                                    className="font-extrabold"
-                                                    style={{ color: isAlert ? '#DE5B5B' : '#3b82f6' }}
-                                                  >
-                                                    {seatStr}
-                                                  </span>
-                                                )}
-                                              </span>
-                                            ) : (
-                                              <div className="w-[90px] shrink-0" />
-                                            )}
-                                          </div>
-                                        );
-                                      })() : (
-                                        <div className="flex items-center justify-end w-full h-[26px]">
-                                          <span className="text-[11px] font-medium text-text-hint pr-1">도착정보 없음</span>
-                                        </div>
-                                      )}
-                                    </div>
+                                    )}
                                   </div>
-                                  {idx < targetBuses.length - 1 && (
-                                    <div className="mx-5 border-b border-dashed border-slate-200" />
-                                  )}
+
+                                  {/* 오른쪽 열: 도착 정보 (첫 번째 & 두 번째) */}
+                                  <div className="flex flex-col items-end gap-1.5 w-[190px] flex-shrink-0">
+                                    {isInitialLoading ? (
+                                      <div className="flex items-center justify-between w-full h-[26px] animate-pulse">
+                                        <div className="w-[45px] h-[14px] bg-slate-200 rounded ml-auto mr-4" />
+                                        <div className="w-[90px] h-[22px] bg-slate-100 rounded" />
+                                      </div>
+                                    ) : (
+                                      <>
+                                        {/* 첫 번째 도착 */}
+                                        {firstArrival ? (() => {
+                                          const parts = firstArrival.info ? firstArrival.info.split('·') : [];
+                                          const beforeStr = parts[0] || '';
+                                          const seatStr = parts[1] || '';
+
+                                          // 10석 이하 또는 혼잡 여부 판단
+                                          let isAlert = false;
+                                          if (seatStr) {
+                                            const match = seatStr.match(/(\d+)석/);
+                                            if (match) {
+                                              const seatNum = parseInt(match[1], 10);
+                                              if (seatNum <= 10) {
+                                                isAlert = true;
+                                              }
+                                            } else if (seatStr.includes('혼잡')) {
+                                              isAlert = true;
+                                            }
+                                          }
+
+                                          const isArrivingSoon = firstArrival.seconds < 60;
+                                          const timeText = isArrivingSoon ? '잠시 후 도착' : `${Math.floor(firstArrival.seconds / 60)}분`;
+
+                                          return (
+                                            <div className="flex items-center justify-between w-full h-[26px]">
+                                              <span className={`font-bold tracking-tight text-[#DE5B5B] w-[94px] text-right truncate ${isArrivingSoon ? 'text-[15px]' : 'text-[17px]'}`}>
+                                                {timeText}
+                                              </span>
+                                              {firstArrival.info ? (
+                                                <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
+                                                  <span>{beforeStr}</span>
+                                                  {seatStr && (
+                                                    <span
+                                                      className="font-extrabold"
+                                                      style={{ color: isAlert ? '#DE5B5B' : '#3b82f6' }}
+                                                    >
+                                                      {seatStr}
+                                                    </span>
+                                                  )}
+                                                </span>
+                                              ) : (
+                                                <div className="w-[90px] shrink-0" />
+                                              )}
+                                            </div>
+                                          );
+                                        })() : (
+                                          <div className="flex items-center justify-end w-full h-[26px]">
+                                            <span className="text-[11px] font-medium text-text-hint pr-1">도착정보 없음</span>
+                                          </div>
+                                        )}
+
+                                        {/* 두 번째 도착 */}
+                                        {secondArrival ? (() => {
+                                          const parts = secondArrival.info ? secondArrival.info.split('·') : [];
+                                          const beforeStr = parts[0] || '';
+                                          const seatStr = parts[1] || '';
+
+                                          // 10석 이하 또는 혼잡 여부 판단
+                                          let isAlert = false;
+                                          if (seatStr) {
+                                            const match = seatStr.match(/(\d+)석/);
+                                            if (match) {
+                                              const seatNum = parseInt(match[1], 10);
+                                              if (seatNum <= 10) {
+                                                isAlert = true;
+                                              }
+                                            } else if (seatStr.includes('혼잡')) {
+                                              isAlert = true;
+                                            }
+                                          }
+
+                                          const isArrivingSoon = secondArrival.seconds < 60;
+                                          const timeText = isArrivingSoon ? '잠시 후 도착' : `${Math.floor(secondArrival.seconds / 60)}분`;
+
+                                          return (
+                                            <div className="flex items-center justify-between w-full h-[26px]">
+                                              <span className={`font-bold tracking-tight text-[#DE5B5B] w-[94px] text-right truncate ${isArrivingSoon ? 'text-[15px]' : 'text-[17px]'}`}>
+                                                {timeText}
+                                              </span>
+                                              {secondArrival.info ? (
+                                                <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
+                                                  <span>{beforeStr}</span>
+                                                  {seatStr && (
+                                                    <span
+                                                      className="font-extrabold"
+                                                      style={{ color: isAlert ? '#DE5B5B' : '#3b82f6' }}
+                                                    >
+                                                      {seatStr}
+                                                    </span>
+                                                  )}
+                                                </span>
+                                              ) : (
+                                                <div className="w-[90px] shrink-0" />
+                                              )}
+                                            </div>
+                                          );
+                                        })() : (
+                                          <div className="flex items-center justify-end w-full h-[26px]">
+                                            <span className="text-[11px] font-medium text-text-hint pr-1">도착정보 없음</span>
+                                          </div>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
-                              );
-                            });
-                          })()}
-                        </div>
+                                {idx < targetBuses.length - 1 && (
+                                  <div className="mx-5 border-b border-dashed border-slate-200" />
+                                )}
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
                     )}
                   </div>
                 );
@@ -1624,15 +1636,15 @@ export function ShuttleView({ isActive }) {
       )}
 
       {/* 셔틀 / 일반 전환 탭 (슬라이딩 글래스모피즘 적용) */}
-      <div 
+      <div
         className="fixed z-[999] flex bg-white/70 backdrop-blur-lg p-[2px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[100px]"
-        style={{ 
+        style={{
           bottom: 'calc(104px + env(safe-area-inset-bottom, 0px))',
           right: 'max(20px, calc(50% - 200px))'
         }}
       >
         {/* 슬라이딩 백그라운드 필 */}
-        <div 
+        <div
           className="absolute top-[2px] bottom-[2px] left-[2px] rounded-full bg-black/80 shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
           style={{
             width: 'calc(50% - 2px)',
@@ -1642,17 +1654,15 @@ export function ShuttleView({ isActive }) {
 
         <button
           onClick={() => setViewMode('shuttle')}
-          className={`flex-1 py-1 text-[11px] font-black rounded-full transition-colors duration-300 relative z-10 ${
-            viewMode === 'shuttle' ? 'text-white' : 'text-slate-700'
-          }`}
+          className={`flex-1 py-1 text-[11px] font-black rounded-full transition-colors duration-300 relative z-10 ${viewMode === 'shuttle' ? 'text-white' : 'text-slate-700'
+            }`}
         >
           셔틀
         </button>
         <button
           onClick={() => setViewMode('bus')}
-          className={`flex-1 py-1 text-[11px] font-black rounded-full transition-colors duration-300 relative z-10 ${
-            viewMode === 'bus' ? 'text-white' : 'text-slate-700'
-          }`}
+          className={`flex-1 py-1 text-[11px] font-black rounded-full transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-700'
+            }`}
         >
           일반
         </button>
