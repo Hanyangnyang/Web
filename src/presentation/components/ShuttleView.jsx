@@ -1645,10 +1645,11 @@ export function ShuttleView({ isActive }) {
       >
         {/* 슬라이딩 백그라운드 필 */}
         <div
-          className="absolute top-[2px] bottom-[2px] left-[2px] rounded-full bg-black/80 shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
+          className="absolute top-[2px] bottom-[2px] left-[2px] rounded-full shadow-sm transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
           style={{
             width: 'calc(50% - 2px)',
-            transform: viewMode === 'shuttle' ? 'translateX(0)' : 'translateX(100%)'
+            transform: viewMode === 'shuttle' ? 'translateX(0)' : 'translateX(100%)',
+            backgroundColor: viewMode === 'shuttle' ? '#0E4A84' : '#53B332'
           }}
         />
 
