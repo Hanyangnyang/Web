@@ -1510,15 +1510,17 @@ export function ShuttleView({ isActive }) {
                                         const beforeStr = parts[0] || '';
                                         const seatStr = parts[1] || '';
                                         
-                                        // 10석 이하 여부 판단
-                                        let isLowSeats = false;
+                                        // 10석 이하 또는 혼잡 여부 판단
+                                        let isAlert = false;
                                         if (seatStr) {
                                           const match = seatStr.match(/(\d+)석/);
                                           if (match) {
                                             const seatNum = parseInt(match[1], 10);
                                             if (seatNum <= 10) {
-                                              isLowSeats = true;
+                                              isAlert = true;
                                             }
+                                          } else if (seatStr.includes('혼잡')) {
+                                            isAlert = true;
                                           }
                                         }
 
@@ -1536,7 +1538,7 @@ export function ShuttleView({ isActive }) {
                                                 {seatStr && (
                                                   <span 
                                                     className="font-extrabold"
-                                                    style={{ color: isLowSeats ? '#DE5B5B' : '#3b82f6' }}
+                                                    style={{ color: isAlert ? '#DE5B5B' : '#3b82f6' }}
                                                   >
                                                     {seatStr}
                                                   </span>
@@ -1559,15 +1561,17 @@ export function ShuttleView({ isActive }) {
                                         const beforeStr = parts[0] || '';
                                         const seatStr = parts[1] || '';
 
-                                        // 10석 이하 여부 판단
-                                        let isLowSeats = false;
+                                        // 10석 이하 또는 혼잡 여부 판단
+                                        let isAlert = false;
                                         if (seatStr) {
                                           const match = seatStr.match(/(\d+)석/);
                                           if (match) {
                                             const seatNum = parseInt(match[1], 10);
                                             if (seatNum <= 10) {
-                                              isLowSeats = true;
+                                              isAlert = true;
                                             }
+                                          } else if (seatStr.includes('혼잡')) {
+                                            isAlert = true;
                                           }
                                         }
 
@@ -1585,7 +1589,7 @@ export function ShuttleView({ isActive }) {
                                                 {seatStr && (
                                                   <span 
                                                     className="font-extrabold"
-                                                    style={{ color: isLowSeats ? '#DE5B5B' : '#3b82f6' }}
+                                                    style={{ color: isAlert ? '#DE5B5B' : '#3b82f6' }}
                                                   >
                                                     {seatStr}
                                                   </span>
