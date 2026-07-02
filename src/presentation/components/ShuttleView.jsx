@@ -1148,6 +1148,33 @@ export function ShuttleView({ isActive }) {
 
   return (
     <div className="relative min-h-full">
+      {/* 셔틀 / 일반 세그먼트 컨트롤 */}
+      <div className="sticky top-0 z-[200] bg-[#F8F9FA]/95 backdrop-blur-xl -mx-5 px-5 pt-3 pb-3 border-b border-[#e2e8f0]/50">
+        <div className="text-[17px] font-bold text-text-main leading-tight mb-2">교통</div>
+        <div className="relative flex bg-[#e8ecf0] p-[2.5px] rounded-full">
+          <div
+            className="absolute top-[2.5px] bottom-[2.5px] left-[2.5px] rounded-full shadow-sm transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            style={{
+              width: 'calc(50% - 2.5px)',
+              transform: viewMode === 'shuttle' ? 'translateX(0)' : 'translateX(100%)',
+              backgroundColor: viewMode === 'shuttle' ? '#0E4A84' : '#53B332'
+            }}
+          />
+          <button
+            onClick={() => setViewMode('shuttle')}
+            className={`flex-1 py-2 text-[13px] font-black rounded-full transition-colors duration-300 relative z-10 ${viewMode === 'shuttle' ? 'text-white' : 'text-slate-500'}`}
+          >
+            학교 셔틀
+          </button>
+          <button
+            onClick={() => setViewMode('bus')}
+            className={`flex-1 py-2 text-[13px] font-black rounded-full transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-500'}`}
+          >
+            공공 버스
+          </button>
+        </div>
+      </div>
+
       {viewMode === 'shuttle' ? (
         loadErr ? (
           <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>
@@ -1156,40 +1183,32 @@ export function ShuttleView({ isActive }) {
         ) : (
           <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
             {/* 출발지 선택 (고정 상단) */}
-            <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
-              <div className="flex items-center text-2xl font-extrabold text-text-main mb-3">
+            <div className="sticky top-[94px] bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+              <div className="flex items-center text-[17px] font-bold text-text-main mb-3">
                 출발지
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {STOPS.map((s, idx) => (
+              <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {STOPS.map((s) => (
                   <div
                     key={s}
-                    className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${stop === s
+                    className={`flex-shrink-0 py-[7px] text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${stop === s
                       ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
                       : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
                       }`}
+                    style={{ width: '7rem' }}
                     onClick={() => handleStopClick(s)}
-                    style={{ position: 'relative' }}
                   >
-                    {tooltipStop === s && showTooltip && (() => {
-                      const isTop = idx < 3;
-                      const arrowClass = isTop ? 'top' : 'bottom';
-                      const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
-                      const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
-                      const fadeY = isTooltipFadingOut ? (isTop ? ' translateY(-0.5rem)' : ' translateY(0.5rem)') : '';
-                      const origin = isTop ? 'bottom center' : 'top center';
-                      return (
-                        <div
-                          className={`stt-tooltip ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
-                          style={{ transform: `translateX(-50%) scale(0.85)${fadeY}`, transformOrigin: origin, animation: `${anim} 0.4s cubic-bezier(0.175,0.885,0.32,1.275)` }}
-                        >
-                          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
-                            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                          </svg>
-                          잠깐! 이 출발지가 맞나요?
-                        </div>
-                      );
-                    })()}
+                    {tooltipStop === s && showTooltip && (
+                      <div
+                        className={`stt-tooltip top absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 bottom-[calc(100%+12px)] ${isTooltipFadingOut ? 'opacity-0' : ''}`}
+                        style={{ transform: `translateX(-50%) scale(0.85)${isTooltipFadingOut ? ' translateY(-0.5rem)' : ''}`, transformOrigin: 'bottom center', animation: 'tooltipPopSmall 0.4s cubic-bezier(0.175,0.885,0.32,1.275)' }}
+                      >
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+                          <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        잠깐! 이 출발지가 맞나요?
+                      </div>
+                    )}
                     {s}
                   </div>
                 ))}
@@ -1199,7 +1218,7 @@ export function ShuttleView({ isActive }) {
             {/* 시간표 */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-4">
-                <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
+                <div className="flex-shrink-0 whitespace-nowrap flex items-center text-[17px] font-bold text-text-main">시간표</div>
 
                 <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
                   <div className="shrink basis-[125px] min-w-0">
@@ -1350,9 +1369,9 @@ export function ShuttleView({ isActive }) {
       ) : (
         <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
           {/* 고정 상단 필터 영역 */}
-          <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+          <div className="sticky top-[94px] bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 pt-4 pb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
             <div className="flex items-center justify-between gap-3 text-text-main">
-              <span className="text-2xl font-extrabold">실시간 버스 정보</span>
+              <span className="text-[17px] font-bold text-text-main">실시간 버스 정보</span>
               <BusStopDropdown
                 selected={selectedStops}
                 onChange={setSelectedStops}
@@ -1635,39 +1654,6 @@ export function ShuttleView({ isActive }) {
         </div>
       )}
 
-      {/* 셔틀 / 일반 전환 탭 (슬라이딩 글래스모피즘 적용) */}
-      <div
-        className="fixed z-[999] flex bg-white/70 backdrop-blur-lg p-[2.5px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[150px]"
-        style={{
-          bottom: 'calc(104px + env(safe-area-inset-bottom, 0px))',
-          right: 'max(20px, calc(50% - 200px))'
-        }}
-      >
-        {/* 슬라이딩 백그라운드 필 */}
-        <div
-          className="absolute top-[2.5px] bottom-[2.5px] left-[2.5px] rounded-full shadow-sm transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
-          style={{
-            width: 'calc(50% - 2.5px)',
-            transform: viewMode === 'shuttle' ? 'translateX(0)' : 'translateX(100%)',
-            backgroundColor: viewMode === 'shuttle' ? '#0E4A84' : '#53B332'
-          }}
-        />
-
-        <button
-          onClick={() => setViewMode('shuttle')}
-          className={`flex-1 py-1.5 text-[12.5px] font-black rounded-full transition-colors duration-300 relative z-10 ${viewMode === 'shuttle' ? 'text-white' : 'text-slate-700'
-            }`}
-        >
-          셔틀
-        </button>
-        <button
-          onClick={() => setViewMode('bus')}
-          className={`flex-1 py-1.5 text-[12.5px] font-black rounded-full transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-700'
-            }`}
-        >
-          일반
-        </button>
-      </div>
     </div>
   );
 }
