@@ -1364,8 +1364,8 @@ export function ShuttleView({ isActive }) {
         <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
           {/* 고정 상단 필터 영역 */}
           <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-2xl font-extrabold text-text-main">정류소</div>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-extrabold text-text-main">정류소</span>
               <div className="relative flex bg-[#e8e8e8]/80 p-[2.5px] rounded-xl">
                 <div
                   className="absolute top-[2.5px] bottom-[2.5px] left-[2.5px] rounded-[9px] transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
@@ -1378,48 +1378,6 @@ export function ShuttleView({ isActive }) {
                 />
                 <button onClick={() => setViewMode('shuttle')} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'shuttle' ? 'text-white' : 'text-slate-500'}`}>학교 셔틀</button>
                 <button onClick={() => setViewMode('bus')} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-500'}`}>일반 버스</button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="grid grid-cols-4 gap-2">
-                {['__all__', '셔틀콕', '융합교육관', '기숙사'].map((key) => {
-                  const label = key === '__all__' ? '전체' : key;
-                  const isActive = key === '__all__' ? selectedStops.length === 0 : selectedStops.includes(key);
-                  return (
-                    <div
-                      key={key}
-                      className={`py-[7px] px-2 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
-                        isActive
-                          ? 'bg-[#53B332] text-white border-[#53B332] shadow-[0_4px_12px_rgba(83,179,50,0.22)]'
-                          : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                      }`}
-                      onClick={() => key === '__all__'
-                        ? setSelectedStops([])
-                        : setSelectedStops(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key])
-                      }
-                    >
-                      {label}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {['강남역우리은행', '의왕톨게이트', '상록수역'].map((key) => {
-                  const isActive = selectedStops.includes(key);
-                  return (
-                    <div
-                      key={key}
-                      className={`py-[7px] px-2 text-center flex items-center justify-center border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] ${
-                        isActive
-                          ? 'bg-[#53B332] text-white border-[#53B332] shadow-[0_4px_12px_rgba(83,179,50,0.22)]'
-                          : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
-                      }`}
-                      onClick={() => setSelectedStops(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key])}
-                    >
-                      {key}
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </div>
