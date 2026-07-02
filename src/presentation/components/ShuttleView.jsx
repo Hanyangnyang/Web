@@ -801,27 +801,48 @@ export function ShuttleView({ isActive }) {
 
   const sortedStops = getSortedStops();
 
+  const hasInitializedCoordsRef = useRef(false);
+  const prevViewModeRef = useRef(viewMode);
+  const prevSelectedStopsRef = useRef(selectedStops);
+
   // Initialize expandedStops: top 2 for 'all' mode, or all selected stops for filtered mode
   useEffect(() => {
     if (viewMode === 'bus') {
-      if (selectedStops.length === 0) {
-        // 전체 조회일 때: 가장 가까운 2개만 켬
-        const top2 = sortedStops.slice(0, 2);
-        const next = {};
-        top2.forEach(s => {
-          next[s] = true;
-        });
-        setExpandedStops(next);
-      } else {
-        // 특정 정류소 선택했을 때: 선택한 정류소들은 모두 펼침
-        const next = {};
-        selectedStops.forEach(s => {
-          next[s] = true;
-        });
-        setExpandedStops(next);
+      const viewModeChanged = prevViewModeRef.current !== viewMode;
+      const selectedStopsChanged = JSON.stringify(prevSelectedStopsRef.current) !== JSON.stringify(selectedStops);
+      const coordsJustLoaded = !hasInitializedCoordsRef.current && userCoords;
+
+      prevViewModeRef.current = viewMode;
+      prevSelectedStopsRef.current = selectedStops;
+
+      if (viewModeChanged || selectedStopsChanged || coordsJustLoaded) {
+        if (coordsJustLoaded) {
+          hasInitializedCoordsRef.current = true;
+        }
+
+        if (selectedStops.length === 0) {
+          // 전체 조회일 때: 가장 가까운 2개만 켬
+          const top2 = sortedStops.slice(0, 2);
+          const next = {};
+          top2.forEach(s => {
+            next[s] = true;
+          });
+          setExpandedStops(next);
+        } else {
+          // 특정 정류소 선택했을 때: 선택한 정류소들은 모두 펼침
+          const next = {};
+          selectedStops.forEach(s => {
+            next[s] = true;
+          });
+          setExpandedStops(next);
+        }
       }
+    } else {
+      // Reset flags when switching to shuttle view so it can re-initialize next time
+      hasInitializedCoordsRef.current = false;
+      prevViewModeRef.current = viewMode;
     }
-  }, [viewMode, selectedStops]);
+  }, [viewMode, selectedStops, userCoords, sortedStops]);
 
   // (sortedStopChips removed as chips were replaced with a dropdown)
 
