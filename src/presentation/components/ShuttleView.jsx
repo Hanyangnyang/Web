@@ -1185,7 +1185,7 @@ export function ShuttleView({ isActive }) {
                     style={{ position: 'relative' }}
                   >
                     {tooltipStop === s && showTooltip && (() => {
-                      const isTop = idx < 3;
+                      const isTop = idx < 3 && s !== '셔틀콕' && s !== '한대앞';
                       const arrowClass = isTop ? 'top' : 'bottom';
                       const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
                       const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
