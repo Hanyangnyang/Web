@@ -1625,8 +1625,11 @@ export function ShuttleView({ isActive }) {
 
       {/* 셔틀 / 일반 전환 탭 (슬라이딩 글래스모피즘 적용) */}
       <div 
-        className="fixed left-1/2 -translate-x-1/2 z-[999] flex bg-white/70 backdrop-blur-lg p-[2px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[100px]"
-        style={{ bottom: 'calc(104px + env(safe-area-inset-bottom, 0px))' }}
+        className="fixed z-[999] flex bg-white/70 backdrop-blur-lg p-[2px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[100px]"
+        style={{ 
+          bottom: 'calc(104px + env(safe-area-inset-bottom, 0px))',
+          right: 'max(20px, calc(50% - 200px))'
+        }}
       >
         {/* 슬라이딩 백그라운드 필 */}
         <div 
