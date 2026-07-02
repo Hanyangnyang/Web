@@ -50,7 +50,7 @@ function BusStopDropdown({ selected, onChange, activeStops, stops }) {
   const currentOpt = OPTIONS.find(o => o.id === (selected[0] || 'all')) || OPTIONS[0];
 
   return (
-    <div className="relative select-none text-[13px] font-extrabold w-[115px]" ref={ref}>
+    <div className="relative select-none text-[13px] font-semibold w-[115px]" ref={ref}>
       <div
         className={`flex items-center justify-between gap-1 px-3 py-[6px] bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_3px_rgba(0,0,0,0.04)] h-9 ${
           open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.15)]' : 'border-[#e2e8f0]'
@@ -74,7 +74,7 @@ function BusStopDropdown({ selected, onChange, activeStops, stops }) {
                   !isActive 
                     ? 'text-slate-300 bg-slate-50 cursor-not-allowed'
                     : (selected[0] || 'all') === o.id 
-                      ? 'bg-[rgba(14,74,132,0.04)] text-primary font-extrabold' 
+                      ? 'bg-[rgba(14,74,132,0.04)] text-primary font-semibold' 
                       : 'text-text-sub hover:bg-surface'
                 }`}
                 onClick={() => {
@@ -629,11 +629,40 @@ export function ShuttleView({ isActive }) {
   const [busArrivals, setBusArrivals] = useState({});
   const [isBusLoading, setIsBusLoading] = useState({});
   const [isPageVisible, setIsPageVisible] = useState(true);
+  const [isUserActive, setIsUserActive] = useState(true);
 
   const busArrivalsRef = useRef({});
   useEffect(() => {
     busArrivalsRef.current = busArrivals;
   }, [busArrivals]);
+
+  // 3분 미활동 사용자 감지 (절전 모드)
+  useEffect(() => {
+    if (viewMode !== 'bus') return;
+
+    let timeoutId;
+    const resetTimer = () => {
+      setIsUserActive(true);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsUserActive(false);
+      }, 3 * 60 * 1000); // 3 minutes
+    };
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(name => {
+      document.addEventListener(name, resetTimer);
+    });
+
+    resetTimer();
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach(name => {
+        document.removeEventListener(name, resetTimer);
+      });
+    };
+  }, [viewMode]);
 
 
 
@@ -792,7 +821,7 @@ export function ShuttleView({ isActive }) {
         setExpandedStops(next);
       }
     }
-  }, [viewMode, selectedStops, userCoords, favorites]);
+  }, [viewMode, selectedStops]);
 
   // (sortedStopChips removed as chips were replaced with a dropdown)
 
@@ -932,37 +961,34 @@ export function ShuttleView({ isActive }) {
   // Detect tab/page visibility to prevent background API polling
   useEffect(() => {
     const handleVisibilityChange = () => {
-      const visible = document.visibilityState === 'visible';
-      setIsPageVisible(visible);
-      if (visible && viewMode === 'bus') {
-        // Fetch immediately when tab becomes visible again
-        const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
-        expandedList.forEach(stopName => {
-          fetchBusArrivalsForStop(stopName);
-        });
-      }
+      setIsPageVisible(document.visibilityState === 'visible');
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [viewMode, expandedStops, fetchBusArrivalsForStop]);
+  }, []);
 
-  // Periodic refresh (30s) - only active when page is visible
+  // Periodic refresh (30s) - only active when page is visible and user is active
   useEffect(() => {
-    if (viewMode !== 'bus' || !isPageVisible) return;
+    if (viewMode !== 'bus' || !isPageVisible || !isUserActive) return;
 
-    const intervalId = setInterval(() => {
+    const fetchAll = () => {
       const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
       expandedList.forEach(stopName => {
         fetchBusArrivalsForStop(stopName);
       });
-    }, 30 * 1000);
+    };
+
+    // Fetch immediately on visibility / activity activation
+    fetchAll();
+
+    const intervalId = setInterval(fetchAll, 30 * 1000);
 
     return () => clearInterval(intervalId);
-  }, [viewMode, expandedStops, fetchBusArrivalsForStop, isPageVisible]);
+  }, [viewMode, expandedStops, fetchBusArrivalsForStop, isPageVisible, isUserActive]);
 
   // 1-second countdown timer for active arrivals
   useEffect(() => {
-    if (viewMode !== 'bus' || !isPageVisible) return;
+    if (viewMode !== 'bus' || !isPageVisible || !isUserActive) return;
 
     const timerId = setInterval(() => {
       setBusArrivals(prev => {
@@ -1308,6 +1334,13 @@ export function ShuttleView({ isActive }) {
             </div>
           </div>
 
+          {/* 절전 모드 알림 배너 */}
+          {!isUserActive && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-4 py-2.5 rounded-card text-center mb-3">
+              🔋 데이터와 배터리 절약을 위해 실시간 업데이트를 일시 정지했습니다. 화면을 움직이거나 터치하면 재개합니다.
+            </div>
+          )}
+
           {/* 정류장별 버스 도착 정보 목록 */}
           <div className="space-y-3">
             {sortedStops
@@ -1406,7 +1439,7 @@ export function ShuttleView({ isActive }) {
                               );
                             }
 
-                            return targetBuses.map(busId => {
+                            return targetBuses.map((busId, idx) => {
                               const is3102 = busId === '3102';
                               const busArrivals = filteredArrivals.filter(arr => arr.busId === busId);
                               const firstArrival = busArrivals[0];
@@ -1414,116 +1447,135 @@ export function ShuttleView({ isActive }) {
                               const directionLabel = (firstArrival && firstArrival.direction) || DEFAULT_DIRECTIONS[busId]?.[stopName] || '';
 
                               return (
-                                <div key={busId} className="px-4 py-2 flex justify-between items-center">
-                                  {/* 왼쪽 열: 버스번호 및 행선지 */}
-                                  <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <div 
-                                        className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
-                                        style={{ backgroundColor: (busId === '3102' || busId === '3100' || busId === '3101') ? '#EE2737' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
-                                      >
-                                        <BusFront 
-                                          size={12} 
-                                          className="text-white"
-                                        />
+                                <div key={busId}>
+                                  <div className="px-4 py-2 flex justify-between items-center">
+                                    {/* 왼쪽 열: 버스번호 및 행선지 */}
+                                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                                      <div className="flex items-center gap-1.5">
+                                        <div 
+                                          className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
+                                          style={{ backgroundColor: (busId === '3102' || busId === '3100' || busId === '3101') ? '#EE2737' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
+                                        >
+                                          <BusFront 
+                                            size={12} 
+                                            className="text-white"
+                                          />
+                                        </div>
+                                        <span 
+                                          className="text-[16px] font-bold text-[#334155]"
+                                        >
+                                          {busId}
+                                        </span>
                                       </div>
-                                      <span 
-                                        className="text-[16px] font-bold text-[#334155]"
-                                      >
-                                        {busId}
+                                      <span className="text-[12px] font-medium text-text-sub truncate">
+                                        {directionLabel}
                                       </span>
                                     </div>
-                                    <span className="text-[12px] font-medium text-text-sub">
-                                      {directionLabel}
-                                    </span>
-                                  </div>
-                                  
-                                  {/* 오른쪽 열: 도착 정보 (첫 번째 & 두 번째) */}
-                                  <div className="flex flex-col items-end gap-1.5">
-                                    {/* 첫 번째 도착 */}
-                                    {firstArrival ? (() => {
-                                      const parts = firstArrival.info ? firstArrival.info.split('·') : [];
-                                      const beforeStr = parts[0] || '';
-                                      const seatStr = parts[1] || '';
-                                      
-                                      // 10석 이하 여부 판단
-                                      let isLowSeats = false;
-                                      if (seatStr) {
-                                        const match = seatStr.match(/(\d+)석/);
-                                        if (match) {
-                                          const seatNum = parseInt(match[1], 10);
-                                          if (seatNum <= 10) {
-                                            isLowSeats = true;
-                                          }
-                                        }
-                                      }
-
-                                      return (
-                                        <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[17px] font-bold tracking-tight text-[#EE2737]">
-                                            {firstArrival.seconds < 60 ? '잠시 후 도착' : `${Math.floor(firstArrival.seconds / 60)}분`}
-                                          </span>
-                                          {firstArrival.info && (
-                                            <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1">
-                                              <span>{beforeStr}</span>
-                                              {seatStr && (
-                                                <span 
-                                                  className="font-extrabold"
-                                                  style={{ color: isLowSeats ? '#EE2737' : '#3b82f6' }}
-                                                >
-                                                  {seatStr}
-                                                </span>
-                                              )}
-                                            </span>
-                                          )}
-                                        </div>
-                                      );
-                                    })() : (
-                                      <span className="text-[11px] font-medium text-text-hint">도착정보 없음</span>
-                                    )}
                                     
-                                    {/* 두 번째 도착 */}
-                                    {secondArrival ? (() => {
-                                      const parts = secondArrival.info ? secondArrival.info.split('·') : [];
-                                      const beforeStr = parts[0] || '';
-                                      const seatStr = parts[1] || '';
-
-                                      // 10석 이하 여부 판단
-                                      let isLowSeats = false;
-                                      if (seatStr) {
-                                        const match = seatStr.match(/(\d+)석/);
-                                        if (match) {
-                                          const seatNum = parseInt(match[1], 10);
-                                          if (seatNum <= 10) {
-                                            isLowSeats = true;
+                                    {/* 오른쪽 열: 도착 정보 (첫 번째 & 두 번째) */}
+                                    <div className="flex flex-col items-end gap-1.5 w-[190px] flex-shrink-0">
+                                      {/* 첫 번째 도착 */}
+                                      {firstArrival ? (() => {
+                                        const parts = firstArrival.info ? firstArrival.info.split('·') : [];
+                                        const beforeStr = parts[0] || '';
+                                        const seatStr = parts[1] || '';
+                                        
+                                        // 10석 이하 여부 판단
+                                        let isLowSeats = false;
+                                        if (seatStr) {
+                                          const match = seatStr.match(/(\d+)석/);
+                                          if (match) {
+                                            const seatNum = parseInt(match[1], 10);
+                                            if (seatNum <= 10) {
+                                              isLowSeats = true;
+                                            }
                                           }
                                         }
-                                      }
 
-                                      return (
-                                        <div className="flex items-center gap-1.5 text-right">
-                                          <span className="text-[17px] font-bold tracking-tight text-[#EE2737]">
-                                            {secondArrival.seconds < 60 ? '잠시 후 도착' : `${Math.floor(secondArrival.seconds / 60)}분`}
-                                          </span>
-                                          {secondArrival.info && (
-                                            <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1">
-                                              <span>{beforeStr}</span>
-                                              {seatStr && (
-                                                <span 
-                                                  className="font-extrabold"
-                                                  style={{ color: isLowSeats ? '#EE2737' : '#3b82f6' }}
-                                                >
-                                                  {seatStr}
-                                                </span>
-                                              )}
+                                        const isArrivingSoon = firstArrival.seconds < 60;
+                                        const timeText = isArrivingSoon ? '잠시 후 도착' : `${Math.floor(firstArrival.seconds / 60)}분`;
+
+                                        return (
+                                          <div className="flex items-center justify-between w-full h-[26px]">
+                                            <span className={`font-bold tracking-tight text-[#DE5B5B] w-[94px] text-right truncate ${isArrivingSoon ? 'text-[15px]' : 'text-[17px]'}`}>
+                                              {timeText}
                                             </span>
-                                          )}
+                                            {firstArrival.info ? (
+                                              <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
+                                                <span>{beforeStr}</span>
+                                                {seatStr && (
+                                                  <span 
+                                                    className="font-extrabold"
+                                                    style={{ color: isLowSeats ? '#DE5B5B' : '#3b82f6' }}
+                                                  >
+                                                    {seatStr}
+                                                  </span>
+                                                )}
+                                              </span>
+                                            ) : (
+                                              <div className="w-[90px] shrink-0" />
+                                            )}
+                                          </div>
+                                        );
+                                      })() : (
+                                        <div className="flex items-center justify-end w-full h-[26px]">
+                                          <span className="text-[11px] font-medium text-text-hint pr-1">도착정보 없음</span>
                                         </div>
-                                      );
-                                    })() : (
-                                      <span className="text-[11px] font-medium text-text-hint">도착정보 없음</span>
-                                    )}
+                                      )}
+                                      
+                                      {/* 두 번째 도착 */}
+                                      {secondArrival ? (() => {
+                                        const parts = secondArrival.info ? secondArrival.info.split('·') : [];
+                                        const beforeStr = parts[0] || '';
+                                        const seatStr = parts[1] || '';
+
+                                        // 10석 이하 여부 판단
+                                        let isLowSeats = false;
+                                        if (seatStr) {
+                                          const match = seatStr.match(/(\d+)석/);
+                                          if (match) {
+                                            const seatNum = parseInt(match[1], 10);
+                                            if (seatNum <= 10) {
+                                              isLowSeats = true;
+                                            }
+                                          }
+                                        }
+
+                                        const isArrivingSoon = secondArrival.seconds < 60;
+                                        const timeText = isArrivingSoon ? '잠시 후 도착' : `${Math.floor(secondArrival.seconds / 60)}분`;
+
+                                        return (
+                                          <div className="flex items-center justify-between w-full h-[26px]">
+                                            <span className={`font-bold tracking-tight text-[#DE5B5B] w-[94px] text-right truncate ${isArrivingSoon ? 'text-[15px]' : 'text-[17px]'}`}>
+                                              {timeText}
+                                            </span>
+                                            {secondArrival.info ? (
+                                              <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
+                                                <span>{beforeStr}</span>
+                                                {seatStr && (
+                                                  <span 
+                                                    className="font-extrabold"
+                                                    style={{ color: isLowSeats ? '#DE5B5B' : '#3b82f6' }}
+                                                  >
+                                                    {seatStr}
+                                                  </span>
+                                                )}
+                                              </span>
+                                            ) : (
+                                              <div className="w-[90px] shrink-0" />
+                                            )}
+                                          </div>
+                                        );
+                                      })() : (
+                                        <div className="flex items-center justify-end w-full h-[26px]">
+                                          <span className="text-[11px] font-medium text-text-hint pr-1">도착정보 없음</span>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
+                                  {idx < targetBuses.length - 1 && (
+                                    <div className="mx-5 border-b border-dashed border-slate-200" />
+                                  )}
                                 </div>
                               );
                             });

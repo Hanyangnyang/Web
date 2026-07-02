@@ -3,13 +3,13 @@
 
 const cache = {};
 const activeFetches = {};
-const CACHE_TTL = 20 * 1000; // 20 seconds
+const CACHE_TTL = 40 * 1000; // 40 seconds
 
 async function getBusArrivals(stationId) {
   const now = Date.now();
   const cached = cache[stationId];
 
-  // 1. Check if valid cache exists and is fresh (within 20 seconds)
+  // 1. Check if valid cache exists and is fresh (within 40 seconds)
   if (cached && now - cached.timestamp < CACHE_TTL) {
     return cached.data;
   }
@@ -77,6 +77,22 @@ export default async function handler(req, res) {
 
   if (!stationId) {
     return res.status(400).json({ error: 'stationId is required' });
+  }
+
+  // 새벽 비운행 시간대 차단 (01:30 ~ 05:00 KST)
+  const now = new Date();
+  const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  const hours = kstDate.getUTCHours();
+  const minutes = kstDate.getUTCMinutes();
+  const totalMinutes = hours * 60 + minutes;
+
+  if (totalMinutes >= 90 && totalMinutes < 300) { // 1:30 = 90 mins, 5:00 = 300 mins
+    return res.status(200).json({
+      response: {
+        msgHeader: { resultCode: "0", resultMessage: "정상" },
+        msgBody: { busArrivalList: [] }
+      }
+    });
   }
 
   try {
