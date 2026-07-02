@@ -948,14 +948,23 @@ export function ShuttleView({ isActive }) {
     }
   }, []);
 
-  // Fetch immediately when stop becomes expanded
+  const prevExpandedStopsRef = useRef({});
+  // Fetch immediately when stop transitions to expanded
   useEffect(() => {
-    if (viewMode === 'bus') {
-      const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
-      expandedList.forEach(stopName => {
-        fetchBusArrivalsForStop(stopName);
-      });
+    if (viewMode !== 'bus') {
+      prevExpandedStopsRef.current = {};
+      return;
     }
+
+    const newlyExpandedStops = Object.keys(expandedStops).filter(
+      stopName => expandedStops[stopName] === true && !prevExpandedStopsRef.current[stopName]
+    );
+
+    newlyExpandedStops.forEach(stopName => {
+      fetchBusArrivalsForStop(stopName);
+    });
+
+    prevExpandedStopsRef.current = expandedStops;
   }, [viewMode, expandedStops, fetchBusArrivalsForStop]);
 
   // Detect tab/page visibility to prevent background API polling
