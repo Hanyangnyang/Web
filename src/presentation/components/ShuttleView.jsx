@@ -1625,21 +1625,21 @@ export function ShuttleView({ isActive }) {
 
       {/* 셔틀 / 일반 전환 탭 (슬라이딩 글래스모피즘 적용) */}
       <div 
-        className="fixed left-1/2 -translate-x-1/2 z-[999] flex bg-white/70 backdrop-blur-lg p-[3px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[160px]"
+        className="fixed left-1/2 -translate-x-1/2 z-[999] flex bg-white/70 backdrop-blur-lg p-[2px] rounded-full border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)] w-[100px]"
         style={{ bottom: 'calc(104px + env(safe-area-inset-bottom, 0px))' }}
       >
         {/* 슬라이딩 백그라운드 필 */}
         <div 
-          className="absolute top-[3px] bottom-[3px] left-[3px] rounded-full bg-black/80 shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
+          className="absolute top-[2px] bottom-[2px] left-[2px] rounded-full bg-black/80 shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]"
           style={{
-            width: 'calc(50% - 3px)',
+            width: 'calc(50% - 2px)',
             transform: viewMode === 'shuttle' ? 'translateX(0)' : 'translateX(100%)'
           }}
         />
 
         <button
           onClick={() => setViewMode('shuttle')}
-          className={`flex-1 py-1.5 text-[13px] font-black rounded-full transition-colors duration-300 relative z-10 ${
+          className={`flex-1 py-1 text-[11px] font-black rounded-full transition-colors duration-300 relative z-10 ${
             viewMode === 'shuttle' ? 'text-white' : 'text-slate-700'
           }`}
         >
@@ -1647,7 +1647,7 @@ export function ShuttleView({ isActive }) {
         </button>
         <button
           onClick={() => setViewMode('bus')}
-          className={`flex-1 py-1.5 text-[13px] font-black rounded-full transition-colors duration-300 relative z-10 ${
+          className={`flex-1 py-1 text-[11px] font-black rounded-full transition-colors duration-300 relative z-10 ${
             viewMode === 'bus' ? 'text-white' : 'text-slate-700'
           }`}
         >
