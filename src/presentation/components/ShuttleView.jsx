@@ -287,7 +287,7 @@ function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, sub
   return (
     <div
       ref={elementRef}
-      className={`flex items-stretch border-b border-[#f1f5f9] relative transition-all duration-300 select-none ${fullModeActiveStyle} ${!isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20] cursor-pointer active:bg-slate-100' :
+      className={`flex items-stretch relative transition-all duration-300 select-none ${fullModeActiveStyle || 'border-b border-[#f1f5f9]'} ${!isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20] cursor-pointer active:bg-slate-100' :
         !isFullMode && isPast ? 'opacity-55 bg-[#f8fafc] cursor-pointer active:bg-slate-100' :
           isFullMode ? 'bg-[#fafbfc]' : 'bg-[#fafbfc] cursor-pointer active:bg-slate-100'
         }`}
