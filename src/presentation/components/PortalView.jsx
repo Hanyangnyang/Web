@@ -373,10 +373,10 @@ export function PortalView({ isVisible = true }) {
       )}
 
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
-        {/* 1. 오늘의 날씨 & 소식 섹션 */}
+        {/* 1. 에리카 날씨 섹션 */}
         {(loading || weather) && (
           <section className="mb-4">
-            <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
+            <h3 className="text-xl font-bold text-text-main mb-4">에리카 날씨</h3>
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
                 <div className="flex flex-col gap-3">
@@ -431,44 +431,44 @@ export function PortalView({ isVisible = true }) {
                     ))}
                   </div>
                 )}
+
+                {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) — 날씨 카드 하단에 내장 */}
+                {renderedHourlyForecast.length > 0 && (
+                  <div
+                    ref={scrollContainerRef}
+                    className="relative z-10 mt-4 bg-white/95 backdrop-blur-sm rounded-2xl shadow-md overflow-x-auto no-scrollbar"
+                  >
+                    <div className="flex" style={{ minWidth: 'max-content', padding: '10px 6px' }}>
+                      {renderedHourlyForecast.map((h, idx) => {
+                        const isCurrent = h.isCurrent;
+                        const isPast = h.isPast;
+                        return (
+                          <div
+                            key={idx}
+                            data-current={isCurrent}
+                            className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl transition-all duration-300 ${
+                              isCurrent
+                                ? 'bg-blue-50/80 border border-blue-100/60 shadow-[0_1px_3px_rgba(37,99,235,0.06)]'
+                                : 'border border-transparent'
+                            } ${isPast ? 'opacity-55' : 'opacity-100'}`}
+                            style={{ minWidth: '50px' }}
+                          >
+                            <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600 font-extrabold' : 'text-text-sub'}`}>
+                              {isCurrent ? '지금' : `${h.hour}시`}
+                            </span>
+                            <span className="text-[20px] leading-none my-0.5">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
+                            <span className={`text-[13px] font-black ${isCurrent ? 'text-blue-700' : 'text-text-main'}`}>{h.temp}°</span>
+                            {h.precipProb > 20 && (
+                              <span className={`text-[10px] font-bold ${isCurrent ? 'text-blue-600' : 'text-blue-400'}`}>{h.precipProb}%</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : null}
-
-            {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
-            {renderedHourlyForecast.length > 0 && (
-              <div 
-                ref={scrollContainerRef}
-                className="mt-2 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
-              >
-                <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
-                  {renderedHourlyForecast.map((h, idx) => {
-                    const isCurrent = h.isCurrent;
-                    const isPast = h.isPast;
-                    return (
-                      <div
-                        key={idx}
-                        data-current={isCurrent}
-                        className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 ${
-                          isCurrent 
-                            ? 'bg-blue-50/80 border border-blue-100/60 shadow-[0_1px_3px_rgba(37,99,235,0.06)]' 
-                            : 'border border-transparent'
-                        } ${isPast ? 'opacity-55' : 'opacity-100'}`}
-                        style={{ minWidth: '54px' }}
-                      >
-                        <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600 font-extrabold' : 'text-text-sub'}`}>
-                          {isCurrent ? '지금' : `${h.hour}시`}
-                        </span>
-                        <span className="text-[22px] leading-none my-0.5">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
-                        <span className={`text-[13px] font-black ${isCurrent ? 'text-blue-700' : 'text-text-main'}`}>{h.temp}°</span>
-                        {h.precipProb > 20 && (
-                          <span className={`text-[10px] font-bold ${isCurrent ? 'text-blue-600' : 'text-blue-400'}`}>{h.precipProb}%</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </section>
         )}
 
