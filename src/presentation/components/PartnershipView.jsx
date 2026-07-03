@@ -264,13 +264,12 @@ export function PartnershipView({ isActive }) {
   }, []);
 
   const selectedCollegeName = COLLEGES.find(c => c.id === college)?.name;
+  const selectedCategoryLabel = CATEGORIES.find(c => c.key === category)?.label;
 
   return (
     <div ref={rootRef} className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 고정 헤더 */}
       <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-3 -mx-5 px-5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
-        <h2 className="text-2xl font-extrabold text-text-main mb-3">제휴 혜택</h2>
-
         {/* 검색 바 */}
         <div className="relative mb-3">
           <div className="flex items-center gap-2.5 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
@@ -324,7 +323,7 @@ export function PartnershipView({ isActive }) {
                     : 'bg-white text-[#334155] border-[#cbd5e1]'
                 }`}
               >
-                <span className="text-[11px] leading-none">{cat.emoji}</span>
+                {cat.key !== 'all' && <span className="text-[11px] leading-none">{cat.emoji}</span>}
                 {cat.label}
               </button>
             ))}
@@ -336,6 +335,7 @@ export function PartnershipView({ isActive }) {
           <span className="text-[11px] text-text-hint font-semibold">
             제휴업체 {filtered.length}개
             {college !== 'all' && <span className="text-primary"> · {selectedCollegeName}</span>}
+            {category !== 'all' && <span className="text-primary"> · {selectedCategoryLabel}</span>}
             {query && <span className="text-primary"> · "{query}"</span>}
           </span>
         </div>

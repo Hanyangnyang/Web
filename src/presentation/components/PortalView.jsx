@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart, Bell, ExternalLink } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ExternalLink, ChevronDown } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 import { supabase } from '../../lib/supabase.js';
@@ -24,15 +24,44 @@ function getEricaNewsDday(item, now) {
     return { label: `D-${daysToStart}`, tone: daysToStart <= 3 ? 'urgent' : 'default' };
   }
   const daysToEnd = Math.ceil((end - now) / dayMs);
-  if (daysToEnd <= 0) return { label: '오늘 마감', tone: 'urgent' };
-  if (daysToEnd <= 3) return { label: `마감 D-${daysToEnd}`, tone: 'urgent' };
+  if (daysToEnd <= 0) return { label: 'D-0', tone: 'urgent' };
+  if (daysToEnd <= 3) return { label: `D-${daysToEnd}`, tone: 'urgent' };
   return { label: '진행중', tone: 'active' };
 }
 
-// "07.06~07.08" 형태의 명시적 기간 텍스트
+// "6/20~6/22" 형태의 명시적 기간 텍스트
 function formatEricaNewsPeriod(item) {
-  const fmt = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-  return `${fmt(new Date(item.start_at))}~${fmt(new Date(item.end_at))}`;
+  const fmt = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
+  const start = new Date(item.start_at);
+  const end = new Date(item.end_at);
+  const startStr = fmt(start);
+  const endStr = fmt(end);
+  return startStr === endStr ? startStr : `${startStr}~${endStr}`;
+}
+
+// 모의수강신청/수강신청처럼 시간 단위 구분이 중요한 항목을 위한 "월/일 시:분~시:분" 포맷
+const ERICA_NEWS_DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+
+function formatEricaNewsPeriodWithTime(item) {
+  const dateFmt = (d) => `${d.getMonth() + 1}/${d.getDate()} (${ERICA_NEWS_DAY_NAMES[d.getDay()]})`;
+  const timeFmt = (d) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  const start = new Date(item.start_at);
+  const end = new Date(item.end_at);
+  const startDateStr = dateFmt(start);
+  const endDateStr = dateFmt(end);
+
+  // 종료 시각이 다음날 00:00이면 "24:00"으로 표기 (예: 15:00~24:00)
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  const isNextDayMidnight = end.getHours() === 0 && end.getMinutes() === 0 &&
+    (end.getTime() - start.getTime()) <= oneDayMs && endDateStr !== startDateStr;
+
+  if (startDateStr === endDateStr) {
+    return `${startDateStr} ${timeFmt(start)}~${timeFmt(end)}`;
+  }
+  if (isNextDayMidnight) {
+    return `${startDateStr} ${timeFmt(start)}~24:00`;
+  }
+  return `${startDateStr} ${timeFmt(start)}~${endDateStr} ${timeFmt(end)}`;
 }
 
 
@@ -129,7 +158,7 @@ function BannerCarousel({ banners }) {
   };
 
   return (
-    <div className="mb-6 mt-2">
+    <div className="mb-2">
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-xl"
@@ -226,22 +255,156 @@ export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
-  const scrollContainerRef = useRef(null);
   const [banners, setBanners] = useState([]);
+  const [showWeatherDetail, setShowWeatherDetail] = useState(false);
+  const [flippedNewsIds, setFlippedNewsIds] = useState(() => new Set());
+  const scrollContainerRef = useRef(null);
 
   const showToast = (msg) => {
     setAlarmPopup(msg);
     setTimeout(() => setAlarmPopup(''), 1500);
   };
 
-  // 종료된 항목은 숨기고, 마감이 임박한 순(end_at 오름차순)으로 정렬 후 최대 2건만 노출
-  const ericaNews = useMemo(() => {
+  const toggleNewsFlip = (id) => {
+    setFlippedNewsIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // 소식 카드 한 줄(제목+기준/출처 | 기간 플립 + 알림설정) — 단일 카드와 그룹 카드 내부 행에서 공용으로 사용
+  const renderNewsRow = (item, dday) => (
+    <div className="flex gap-3">
+      <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <p className="font-black text-[0.95rem] text-text-main leading-snug">
+          {item.title}
+          <span className="ml-1">{ERICA_NEWS_CATEGORY_EMOJI[item.category]}</span>
+        </p>
+
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-[10px] text-text-hint/75 font-medium">
+            {(() => {
+              const d = new Date(item.verified_at);
+              return `${d.getFullYear() % 100}/${d.getMonth() + 1}/${d.getDate()}`;
+            })()} 기준
+          </span>
+          <span className="text-[10px] text-text-hint/75">·</span>
+          <a
+            href={item.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-text-hint/75 hover:underline"
+          >
+            <ExternalLink size={9} />
+            출처
+          </a>
+        </div>
+      </div>
+
+      <div className="w-px self-stretch bg-slate-300" />
+
+      <div className="w-[35%] flex-shrink-0 flex flex-col items-center justify-center gap-2">
+        <div
+          className="w-full perspective-container cursor-pointer active:scale-95 transition-transform flex items-center justify-center"
+          style={{ height: 26 }}
+          onClick={() => toggleNewsFlip(item.id)}
+        >
+          <div className={`flip-card-inner ${flippedNewsIds.has(item.id) ? 'flipped' : ''}`}>
+            <div className="flip-card-front flex items-center justify-center">
+              <span className="text-[21px] font-black text-text-main leading-tight whitespace-nowrap">
+                {formatEricaNewsPeriod(item)}
+              </span>
+            </div>
+            <div className="flip-card-back flex items-center justify-center">
+              <span
+                className={`text-[21px] font-black leading-tight whitespace-nowrap ${
+                  dday.tone === 'urgent'
+                    ? 'text-red-600'
+                    : dday.tone === 'active'
+                      ? 'text-blue-600'
+                      : 'text-text-sub'
+                }`}
+              >
+                {dday.label}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          className="flex items-center justify-center gap-1 h-6 px-1.5 rounded-full bg-slate-50 border border-slate-200 text-text-sub text-[10px] font-bold hover:bg-slate-100 active:scale-95 transition-all"
+          onClick={() => showToast('알림 기능은 곧 추가돼요! 🐾')}
+          aria-label="알림 설정"
+        >
+          <Bell size={11} />
+          알림 설정
+        </button>
+      </div>
+    </div>
+  );
+
+  // 모의수강신청/수강신청 그룹 섹션 전용 행 — 이모지·기준정보·출처 없이, 기간에 시간까지 표시
+  // (박스 기준선 3.5:6.5, 시간 정보가 길어서 기간 쪽에 더 넓은 폭을 배정)
+  const renderGroupNewsRow = (item) => (
+    <div className="flex items-center gap-3">
+      <div className="flex-[3] min-w-0 flex flex-col justify-center">
+        <p className="font-black text-[0.95rem] text-text-main leading-snug">
+          {item.title}
+        </p>
+      </div>
+
+      <div className="flex-[6] min-w-0 flex items-center justify-start">
+        <span className="text-[13px] font-black text-text-main leading-tight whitespace-nowrap">
+          {formatEricaNewsPeriodWithTime(item)}
+        </span>
+      </div>
+
+      <div className="flex-[1] flex-shrink-0 flex items-center justify-end">
+        <button
+          className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-50 border border-slate-200 text-text-sub hover:bg-slate-100 active:scale-95 transition-all"
+          onClick={() => showToast('알림 기능은 곧 추가돼요! 🐾')}
+          aria-label="알림 설정"
+        >
+          <Bell size={12} />
+        </button>
+      </div>
+    </div>
+  );
+
+  // 종료된 항목은 숨기고, group_id가 없는 항목은 소식 캐러셀에, group_id가 같은 항목들은
+  // (모의수강신청처럼) 별도 섹션에 하나의 박스로 묶어서 노출. 각각 마감 임박한 순으로 정렬
+  const { ericaNewsSingles, ericaNewsGroups } = useMemo(() => {
     const now = Date.now();
-    return ericaNewsData
+    const entries = ericaNewsData
       .filter((item) => item.is_active && new Date(item.end_at).getTime() >= now)
-      .map((item) => ({ item, dday: getEricaNewsDday(item, now) }))
-      .sort((a, b) => new Date(a.item.end_at) - new Date(b.item.end_at))
-      .slice(0, 2);
+      .map((item) => ({ item, dday: getEricaNewsDday(item, now) }));
+
+    const singles = [];
+    const groupsMap = new Map();
+
+    entries.forEach((entry) => {
+      const groupId = entry.item.group_id;
+      if (!groupId) {
+        singles.push(entry);
+        return;
+      }
+      let group = groupsMap.get(groupId);
+      if (!group) {
+        group = { groupId, groupLabel: entry.item.group_label || entry.item.title, entries: [], sortKey: Infinity };
+        groupsMap.set(groupId, group);
+      }
+      group.entries.push(entry);
+      group.sortKey = Math.min(group.sortKey, new Date(entry.item.end_at).getTime());
+    });
+
+    singles.sort((a, b) => new Date(a.item.end_at) - new Date(b.item.end_at));
+
+    const groups = Array.from(groupsMap.values());
+    groups.forEach((g) => g.entries.sort((a, b) => new Date(a.item.end_at) - new Date(b.item.end_at)));
+    groups.sort((a, b) => a.sortKey - b.sortKey);
+
+    return { ericaNewsSingles: singles, ericaNewsGroups: groups };
   }, []);
 
   useEffect(() => {
@@ -263,7 +426,7 @@ export function PortalView({ isVisible = true }) {
       fetchBanners();
     }
   }, [isVisible]);
-  
+
   // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
   // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
   //           item.epoch + 브라우저 로컬 시각으로 모든 계산을 수행합니다.
@@ -319,9 +482,9 @@ export function PortalView({ isVisible = true }) {
     return filtered;
   }, [weather]);
 
-  // 날씨 탭에 진입하거나 날씨 데이터가 로드될 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
+  // 더보기로 예보 스트립이 펼쳐졌을 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
-    if (isVisible && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
+    if (showWeatherDetail && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
       const timer = setTimeout(() => {
         const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
         if (activeEl) {
@@ -333,7 +496,29 @@ export function PortalView({ isVisible = true }) {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [renderedHourlyForecast, isVisible]);
+  }, [renderedHourlyForecast, showWeatherDetail]);
+
+  // 시간별 예보 2D 아이콘 매핑
+  function getHourlyIcon(code, hour) {
+    const isNight = hour >= 20 || hour < 6;
+    if (code <= 0) return isNight ? Moon : Sun;
+    if (code <= 1) return isNight ? CloudMoon : CloudSun;
+    if (code <= 2) return CloudSun;
+    if (code <= 3) return Cloud;
+    if (code <= 48) return CloudFog;
+    if (code <= 67) return CloudRain;
+    if (code <= 77) return CloudSnow;
+    if (code <= 82) return CloudDrizzle;
+    return CloudLightning;
+  }
+
+  // 해는 주황색, 구름은 흰색, 비는 파란색으로 아이콘 내부를 채움
+  function getHourlyIconFill(Icon) {
+    if (Icon === Sun) return '#f97316';
+    if (Icon === Cloud || Icon === CloudSun || Icon === CloudMoon || Icon === CloudFog || Icon === CloudSnow) return '#ffffff';
+    if (Icon === CloudRain || Icon === CloudDrizzle || Icon === CloudLightning) return '#3b82f6';
+    return 'none';
+  }
 
   // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
   const weatherTheme = useMemo(() => {
@@ -379,20 +564,6 @@ export function PortalView({ isVisible = true }) {
     };
   }, [weather]);
 
-  // 시간별 예보 이모지 매핑
-  function getHourlyEmoji(code, hour) {
-    const isNight = hour >= 20 || hour < 6;
-    if (code <= 0) return isNight ? '🌙' : '☀️';
-    if (code <= 1) return isNight ? '🌙' : '🌤️';
-    if (code <= 2) return '⛅';
-    if (code <= 3) return '☁️';
-    if (code <= 48) return '🌫️';
-    if (code <= 67) return '🌧️';
-    if (code <= 77) return '❄️';
-    if (code <= 82) return '🌦️';
-    return '⛈️';
-  }
-
   return (
     <>
       <button
@@ -415,68 +586,9 @@ export function PortalView({ isVisible = true }) {
       )}
 
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
-        {/* 0. 에리카 소식 섹션 */}
-        {ericaNews.length > 0 && (
-          <section className="mb-6">
-            <h3 className="text-xl font-bold text-text-main mb-4">에리카 소식</h3>
-            <div className="flex flex-col gap-3">
-              {ericaNews.map(({ item, dday }) => (
-                <div key={item.id} className="bg-white rounded-card border border-[#e2e8f0] p-4 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] flex items-center gap-3">
-                  <div className="flex flex-col items-center justify-center flex-shrink-0 w-[76px] gap-1">
-                    <span className="text-2xl leading-none">{ERICA_NEWS_CATEGORY_EMOJI[item.category]}</span>
-                    <span className="text-[14px] font-black text-text-main leading-tight whitespace-nowrap">
-                      {formatEricaNewsPeriod(item)}
-                    </span>
-                    <span
-                      className={`text-[10px] font-black px-1.5 py-0.5 rounded-md whitespace-nowrap ${
-                        dday.tone === 'urgent'
-                          ? 'text-red-600 bg-red-50'
-                          : dday.tone === 'active'
-                            ? 'text-blue-600 bg-blue-50'
-                            : 'text-text-sub bg-slate-100'
-                      }`}
-                    >
-                      {dday.label}
-                    </span>
-                  </div>
-
-                  <div className="w-px self-stretch bg-slate-100" />
-
-                  <div className="flex-1 min-w-0 flex flex-col gap-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-black text-[0.95rem] text-text-main leading-snug flex-1 min-w-0">{item.title}</p>
-                      <button
-                        className="flex-shrink-0 w-8 h-8 -mt-1 -mr-1 rounded-full flex items-center justify-center text-text-hint hover:bg-slate-50 active:scale-90 transition-all"
-                        onClick={() => showToast('알림 기능은 곧 추가돼요! 🐾')}
-                        aria-label="알림 설정"
-                      >
-                        <Bell size={16} />
-                      </button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <a
-                        href={item.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[12px] font-bold text-blue-600"
-                      >
-                        자세히 보기 <ExternalLink size={12} />
-                      </a>
-                      <span className="text-[10px] text-text-hint font-medium">
-                        {new Date(item.verified_at).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} 기준 정보
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 1. 오늘의 날씨 & 소식 섹션 */}
+        {/* 1. 에리카 날씨 섹션 */}
         {(loading || weather) && (
-          <section className="mb-4">
-            <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
+          <section className="-mt-4 mb-2">
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
                 <div className="flex flex-col gap-3">
@@ -486,7 +598,7 @@ export function PortalView({ isVisible = true }) {
                 <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
               </div>
             ) : weather ? (
-              <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
+              <div className="rounded-card pt-6 px-6 pb-3 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
                 background: weatherTheme.bg
               }}>
                 <div className="relative z-10 w-full">
@@ -498,13 +610,88 @@ export function PortalView({ isVisible = true }) {
                     <p className="mt-2 text-sm font-semibold opacity-70 flex items-center gap-1">
                       안산시 상록구 사동
                     </p>
-                    
-                    <div className="mt-4 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
+
+                    <div className="mt-3 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
                       <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
                       <span className="break-all flex-1">
                         <TypewriterText text={weather.message} isVisible={isVisible} />
                       </span>
                     </div>
+
+                    <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showWeatherDetail ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                      <div className={`overflow-hidden transition-opacity duration-200 ${showWeatherDetail ? 'opacity-100 delay-100' : 'opacity-0'}`}>
+                        <div className="mt-3">
+                          {weather.airQuality && (
+                            <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
+                              {[
+                                { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
+                                { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
+                                { label: '자외선', data: weather.airQuality.uv, icon: Sun }
+                              ].map((item, idx) => (
+                                <div key={idx} className="bg-white/20 backdrop-blur-lg border border-white/10 rounded-xl py-3 px-2 flex flex-col items-center gap-1">
+                                  <div className="flex items-center gap-1">
+                                    <item.icon size={12} className="text-white" strokeWidth={2.5} />
+                                    <span className="text-[12px] text-white font-black uppercase tracking-widest">{item.label}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span
+                                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                      style={{ backgroundColor: item.data.color }}
+                                    />
+                                    <span className="text-[13px] font-black text-white whitespace-nowrap">{item.data.label}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
+                          {renderedHourlyForecast.length > 0 && (
+                            <div
+                              ref={scrollContainerRef}
+                              className="mt-3 bg-white/20 backdrop-blur-lg border border-white/10 rounded-xl overflow-x-auto no-scrollbar"
+                            >
+                              <div className="flex" style={{ minWidth: 'max-content', padding: '10px 6px' }}>
+                                {renderedHourlyForecast.map((h, idx) => {
+                                  const isCurrent = h.isCurrent;
+                                  const isPast = h.isPast;
+                                  const HourlyIcon = getHourlyIcon(h.weatherCode, h.hour);
+                                  return (
+                                    <div
+                                      key={idx}
+                                      data-current={isCurrent}
+                                      className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl transition-all duration-300 ${
+                                        isCurrent
+                                          ? 'bg-white/90 border border-slate-400 shadow-[0_1px_3px_rgba(0,0,0,0.15)]'
+                                          : ''
+                                      } ${isPast ? 'opacity-55' : 'opacity-100'}`}
+                                      style={{ minWidth: '50px' }}
+                                    >
+                                      <span className={`text-[13px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
+                                        {h.hour}시
+                                      </span>
+                                      <HourlyIcon size={20} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'}`} />
+                                      <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
+                                      {h.precipProb > 20 && (
+                                        <span className={`text-[10px] font-bold ${isCurrent ? 'text-slate-600' : 'text-blue-100'}`}>{h.precipProb}%</span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      className="mt-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/20 text-white/90 text-[11px] font-bold transition-all duration-200"
+                      onClick={() => setShowWeatherDetail((v) => !v)}
+                    >
+                      {showWeatherDetail ? '접기' : '더보기'}
+                      <ChevronDown size={14} className={`transition-transform duration-300 ${showWeatherDetail ? 'rotate-180' : ''}`} />
+                    </button>
                   </div>
                 </div>
                 <div className="absolute right-[-15px] top-[-15px] pointer-events-none transform rotate-12" style={{
@@ -513,70 +700,55 @@ export function PortalView({ isVisible = true }) {
                 }}>
                   {weatherTheme.icon && React.createElement(weatherTheme.icon, { size: 160 })}
                 </div>
-
-                {weather.airQuality && (
-                  <div className="grid gap-2 mt-4 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
-                    {[
-                      { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
-                      { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
-                      { label: '자외선', data: weather.airQuality.uv, icon: Sun }
-                    ].map((item, idx) => (
-                      <div key={idx} className="bg-white/95 backdrop-blur-sm rounded-2xl py-3.5 px-2 flex flex-col items-center gap-1.5 shadow-md">
-                        <span className="text-[10px] text-text-sub font-black uppercase tracking-widest opacity-80">{item.label}</span>
-                        <div className="flex items-center gap-1.5">
-                          <item.icon size={14} color={item.data.color} strokeWidth={3} />
-                          <span className="text-[14px] font-black whitespace-nowrap" style={{ color: item.data.color }}>{item.data.label}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             ) : null}
-
-            {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
-            {renderedHourlyForecast.length > 0 && (
-              <div
-                ref={scrollContainerRef}
-                className="mt-2 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
-              >
-                <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
-                  {renderedHourlyForecast.map((h, idx) => {
-                    const isCurrent = h.isCurrent;
-                    const isPast = h.isPast;
-                    return (
-                      <div
-                        key={idx}
-                        data-current={isCurrent}
-                        className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 ${
-                          isCurrent
-                            ? 'bg-blue-50/80 border border-blue-100/60 shadow-[0_1px_3px_rgba(37,99,235,0.06)]'
-                            : 'border border-transparent'
-                        } ${isPast ? 'opacity-55' : 'opacity-100'}`}
-                        style={{ minWidth: '54px' }}
-                      >
-                        <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600 font-extrabold' : 'text-text-sub'}`}>
-                          {isCurrent ? '지금' : `${h.hour}시`}
-                        </span>
-                        <span className="text-[22px] leading-none my-0.5">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
-                        <span className={`text-[13px] font-black ${isCurrent ? 'text-blue-700' : 'text-text-main'}`}>{h.temp}°</span>
-                        {h.precipProb > 20 && (
-                          <span className={`text-[10px] font-bold ${isCurrent ? 'text-blue-600' : 'text-blue-400'}`}>{h.precipProb}%</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </section>
         )}
 
       {banners.length > 0 && <BannerCarousel banners={banners} />}
 
-      {/* 2. 열람실 혼잡도 섹션 */}
-      <section className="mb-6">
-        <h3 className="text-xl font-bold text-text-main mb-4">열람실 혼잡도</h3>
+      {/* 2. 에리카 소식 섹션 */}
+      {ericaNewsSingles.length > 0 && (
+        <section className="mb-2">
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-1 -mx-5 px-5">
+            {ericaNewsSingles.map(({ item, dday }) => (
+              <div key={item.id} className="bg-white rounded-card border border-[#e2e8f0] px-4 py-6 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] flex-shrink-0 w-[88%] snap-center">
+                {renderNewsRow(item, dday)}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. 그룹 소식 섹션 (모의수강신청 등 group_id로 묶인 소식) */}
+      {ericaNewsGroups.map((group) => (
+        <section key={group.groupId} className="mb-2">
+          <div className="flex items-center gap-1.5 mb-3">
+            <h3 className="text-xl font-bold text-text-main">{group.groupLabel}</h3>
+            <a
+              href={group.entries[0].item.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-text-hint/75 hover:underline"
+            >
+              <ExternalLink size={9} />
+              출처
+            </a>
+          </div>
+          <div className="bg-white rounded-card border border-[#e2e8f0] px-4 py-6 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] flex flex-col gap-3">
+            {group.entries.map(({ item }, idx) => (
+              <React.Fragment key={item.id}>
+                {idx > 0 && <div className="border-b border-dashed border-slate-200" />}
+                {renderGroupNewsRow(item)}
+              </React.Fragment>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {/* 4. 열람실 혼잡도 섹션 */}
+      <section className="mb-2">
+        <h3 className="text-xl font-bold text-text-main mb-3">열람실 혼잡도</h3>
         <div className="grid grid-cols-2 gap-4">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
@@ -605,11 +777,11 @@ export function PortalView({ isVisible = true }) {
                       {room.emoji} {room.status}
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto">
                     <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ 
-                        width: `${room.ratio * 100}%`, 
+                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
+                        width: `${room.ratio * 100}%`,
                         backgroundColor: room.color
                       }} />
                     </div>
