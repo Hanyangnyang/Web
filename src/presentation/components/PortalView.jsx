@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart, Bell } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 import { supabase } from '../../lib/supabase.js';
@@ -196,8 +196,9 @@ export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
-  const scrollContainerRef = useRef(null);
   const [banners, setBanners] = useState([]);
+  const [showWeatherDetail, setShowWeatherDetail] = useState(false);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     async function fetchBanners() {
@@ -218,7 +219,7 @@ export function PortalView({ isVisible = true }) {
       fetchBanners();
     }
   }, [isVisible]);
-  
+
   // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
   // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
   //           item.epoch + 브라우저 로컬 시각으로 모든 계산을 수행합니다.
@@ -274,9 +275,9 @@ export function PortalView({ isVisible = true }) {
     return filtered;
   }, [weather]);
 
-  // 날씨 탭에 진입하거나 날씨 데이터가 로드될 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
+  // 더보기로 예보 스트립이 펼쳐졌을 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
-    if (isVisible && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
+    if (showWeatherDetail && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
       const timer = setTimeout(() => {
         const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
         if (activeEl) {
@@ -288,7 +289,29 @@ export function PortalView({ isVisible = true }) {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [renderedHourlyForecast, isVisible]);
+  }, [renderedHourlyForecast, showWeatherDetail]);
+
+  // 시간별 예보 2D 아이콘 매핑
+  function getHourlyIcon(code, hour) {
+    const isNight = hour >= 20 || hour < 6;
+    if (code <= 0) return isNight ? Moon : Sun;
+    if (code <= 1) return isNight ? CloudMoon : CloudSun;
+    if (code <= 2) return CloudSun;
+    if (code <= 3) return Cloud;
+    if (code <= 48) return CloudFog;
+    if (code <= 67) return CloudRain;
+    if (code <= 77) return CloudSnow;
+    if (code <= 82) return CloudDrizzle;
+    return CloudLightning;
+  }
+
+  // 해는 주황색, 구름은 흰색, 비는 파란색으로 아이콘 내부를 채움
+  function getHourlyIconFill(Icon) {
+    if (Icon === Sun) return '#f97316';
+    if (Icon === Cloud || Icon === CloudSun || Icon === CloudMoon || Icon === CloudFog || Icon === CloudSnow) return '#ffffff';
+    if (Icon === CloudRain || Icon === CloudDrizzle || Icon === CloudLightning) return '#3b82f6';
+    return 'none';
+  }
 
   // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
   const weatherTheme = useMemo(() => {
@@ -334,20 +357,6 @@ export function PortalView({ isVisible = true }) {
     };
   }, [weather]);
 
-  // 시간별 예보 이모지 매핑
-  function getHourlyEmoji(code, hour) {
-    const isNight = hour >= 20 || hour < 6;
-    if (code <= 0) return isNight ? '🌙' : '☀️';
-    if (code <= 1) return isNight ? '🌙' : '🌤️';
-    if (code <= 2) return '⛅';
-    if (code <= 3) return '☁️';
-    if (code <= 48) return '🌫️';
-    if (code <= 67) return '🌧️';
-    if (code <= 77) return '❄️';
-    if (code <= 82) return '🌦️';
-    return '⛈️';
-  }
-
   return (
     <>
       <button
@@ -375,8 +384,7 @@ export function PortalView({ isVisible = true }) {
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         {(loading || weather) && (
-          <section className="mb-4">
-            <h3 className="text-xl font-bold text-text-main mb-4">에리카 날씨</h3>
+          <section className="-mt-2 mb-4">
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
                 <div className="flex flex-col gap-3">
@@ -386,7 +394,7 @@ export function PortalView({ isVisible = true }) {
                 <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
               </div>
             ) : weather ? (
-              <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
+              <div className="rounded-card pt-6 px-6 pb-3 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
                 background: weatherTheme.bg
               }}>
                 <div className="relative z-10 w-full">
@@ -398,13 +406,88 @@ export function PortalView({ isVisible = true }) {
                     <p className="mt-2 text-sm font-semibold opacity-70 flex items-center gap-1">
                       안산시 상록구 사동
                     </p>
-                    
-                    <div className="mt-4 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
+
+                    <div className="mt-3 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
                       <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
                       <span className="break-all flex-1">
                         <TypewriterText text={weather.message} isVisible={isVisible} />
                       </span>
                     </div>
+
+                    <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showWeatherDetail ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                      <div className={`overflow-hidden transition-opacity duration-200 ${showWeatherDetail ? 'opacity-100 delay-100' : 'opacity-0'}`}>
+                        <div className="mt-3">
+                          {weather.airQuality && (
+                            <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
+                              {[
+                                { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
+                                { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
+                                { label: '자외선', data: weather.airQuality.uv, icon: Sun }
+                              ].map((item, idx) => (
+                                <div key={idx} className="bg-white/20 backdrop-blur-lg border border-white/10 rounded-xl py-3 px-2 flex flex-col items-center gap-1">
+                                  <div className="flex items-center gap-1">
+                                    <item.icon size={12} className="text-white" strokeWidth={2.5} />
+                                    <span className="text-[12px] text-white font-black uppercase tracking-widest">{item.label}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span
+                                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                      style={{ backgroundColor: item.data.color }}
+                                    />
+                                    <span className="text-[13px] font-black text-white whitespace-nowrap">{item.data.label}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
+                          {renderedHourlyForecast.length > 0 && (
+                            <div
+                              ref={scrollContainerRef}
+                              className="mt-3 bg-white/20 backdrop-blur-lg border border-white/10 rounded-xl overflow-x-auto no-scrollbar"
+                            >
+                              <div className="flex" style={{ minWidth: 'max-content', padding: '10px 6px' }}>
+                                {renderedHourlyForecast.map((h, idx) => {
+                                  const isCurrent = h.isCurrent;
+                                  const isPast = h.isPast;
+                                  const HourlyIcon = getHourlyIcon(h.weatherCode, h.hour);
+                                  return (
+                                    <div
+                                      key={idx}
+                                      data-current={isCurrent}
+                                      className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl transition-all duration-300 ${
+                                        isCurrent
+                                          ? 'bg-white/90 border border-slate-400 shadow-[0_1px_3px_rgba(0,0,0,0.15)]'
+                                          : ''
+                                      } ${isPast ? 'opacity-55' : 'opacity-100'}`}
+                                      style={{ minWidth: '50px' }}
+                                    >
+                                      <span className={`text-[13px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
+                                        {h.hour}시
+                                      </span>
+                                      <HourlyIcon size={20} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'}`} />
+                                      <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
+                                      {h.precipProb > 20 && (
+                                        <span className={`text-[10px] font-bold ${isCurrent ? 'text-slate-600' : 'text-blue-100'}`}>{h.precipProb}%</span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      className="mt-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/20 text-white/90 text-[11px] font-bold transition-all duration-200"
+                      onClick={() => setShowWeatherDetail((v) => !v)}
+                    >
+                      {showWeatherDetail ? '접기' : '더보기'}
+                      <ChevronDown size={14} className={`transition-transform duration-300 ${showWeatherDetail ? 'rotate-180' : ''}`} />
+                    </button>
                   </div>
                 </div>
                 <div className="absolute right-[-15px] top-[-15px] pointer-events-none transform rotate-12" style={{
@@ -413,60 +496,6 @@ export function PortalView({ isVisible = true }) {
                 }}>
                   {weatherTheme.icon && React.createElement(weatherTheme.icon, { size: 160 })}
                 </div>
-
-                {weather.airQuality && (
-                  <div className="grid gap-2 mt-4 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
-                    {[
-                      { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
-                      { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
-                      { label: '자외선', data: weather.airQuality.uv, icon: Sun }
-                    ].map((item, idx) => (
-                      <div key={idx} className="bg-white/95 backdrop-blur-sm rounded-2xl py-3.5 px-2 flex flex-col items-center gap-1.5 shadow-md">
-                        <span className="text-[10px] text-text-sub font-black uppercase tracking-widest opacity-80">{item.label}</span>
-                        <div className="flex items-center gap-1.5">
-                          <item.icon size={14} color={item.data.color} strokeWidth={3} />
-                          <span className="text-[14px] font-black whitespace-nowrap" style={{ color: item.data.color }}>{item.data.label}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) — 날씨 카드 하단에 내장 */}
-                {renderedHourlyForecast.length > 0 && (
-                  <div
-                    ref={scrollContainerRef}
-                    className="relative z-10 mt-4 bg-white/95 backdrop-blur-sm rounded-2xl shadow-md overflow-x-auto no-scrollbar"
-                  >
-                    <div className="flex" style={{ minWidth: 'max-content', padding: '10px 6px' }}>
-                      {renderedHourlyForecast.map((h, idx) => {
-                        const isCurrent = h.isCurrent;
-                        const isPast = h.isPast;
-                        return (
-                          <div
-                            key={idx}
-                            data-current={isCurrent}
-                            className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl transition-all duration-300 ${
-                              isCurrent
-                                ? 'bg-blue-50/80 border border-blue-100/60 shadow-[0_1px_3px_rgba(37,99,235,0.06)]'
-                                : 'border border-transparent'
-                            } ${isPast ? 'opacity-55' : 'opacity-100'}`}
-                            style={{ minWidth: '50px' }}
-                          >
-                            <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600 font-extrabold' : 'text-text-sub'}`}>
-                              {isCurrent ? '지금' : `${h.hour}시`}
-                            </span>
-                            <span className="text-[20px] leading-none my-0.5">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
-                            <span className={`text-[13px] font-black ${isCurrent ? 'text-blue-700' : 'text-text-main'}`}>{h.temp}°</span>
-                            {h.precipProb > 20 && (
-                              <span className={`text-[10px] font-bold ${isCurrent ? 'text-blue-600' : 'text-blue-400'}`}>{h.precipProb}%</span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
               </div>
             ) : null}
           </section>
@@ -505,11 +534,11 @@ export function PortalView({ isVisible = true }) {
                       {room.emoji} {room.status}
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto">
                     <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ 
-                        width: `${room.ratio * 100}%`, 
+                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
+                        width: `${room.ratio * 100}%`,
                         backgroundColor: room.color
                       }} />
                     </div>
