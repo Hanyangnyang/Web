@@ -1,0 +1,80 @@
+[
+  {
+    "id": "2026-scholarship-merit",
+    "category": "scholarship",
+    "title": "성적우수 장학금 신청",
+    "summary": "직전 학기 성적 우수자 대상 장학금 신청 기간입니다. 신청서 및 증빙서류 제출 필요.",
+    "start_at": "2026-06-20T09:00:00+09:00",
+    "end_at": "2026-07-05T18:00:00+09:00",
+    "source_url": "https://portal.hanyang.ac.kr/",
+    "notify_topic": "2026-scholarship-merit",
+    "is_active": true,
+    "priority": 1,
+    "verified_at": "2026-07-02T10:00:00+09:00"
+  },
+  {
+    "id": "2026-summer-grade-appeal",
+    "category": "academic",
+    "title": "하계 계절학기 성적 열람 및 이의신청 기간",
+    "summary": "계절학기 최종 성적 확인 및 이의신청은 이 기간 내에만 접수됩니다.",
+    "start_at": "2026-07-06T09:00:00+09:00",
+    "end_at": "2026-07-08T18:00:00+09:00",
+    "source_url": "https://portal.hanyang.ac.kr/",
+    "notify_topic": "2026-summer-grade-appeal",
+    "is_active": true,
+    "priority": 1,
+    "verified_at": "2026-07-02T10:00:00+09:00"
+  },
+  {
+    "id": "2026-2-national-scholarship-2nd",
+    "category": "scholarship",
+    "title": "2026-2학기 국가장학금 2차 신청",
+    "summary": "한국장학재단 홈페이지에서 가구원 동의 포함 신청 완료해야 지급 대상에 포함됩니다.",
+    "start_at": "2026-07-01T09:00:00+09:00",
+    "end_at": "2026-07-18T18:00:00+09:00",
+    "source_url": "https://www.kosaf.go.kr/",
+    "notify_topic": "2026-2-national-scholarship-2nd",
+    "is_active": true,
+    "priority": 2,
+    "verified_at": "2026-07-02T10:00:00+09:00"
+  },
+  {
+    "id": "2026-2-pre-course-registration",
+    "category": "academic",
+    "title": "2026-2학기 예비 수강신청",
+    "summary": "본신청 전 수요 조사 성격의 예비 수강신청 기간입니다. 실제 신청은 본신청 기간에 다시 진행해야 합니다.",
+    "start_at": "2026-07-20T09:00:00+09:00",
+    "end_at": "2026-07-22T18:00:00+09:00",
+    "source_url": "https://portal.hanyang.ac.kr/",
+    "notify_topic": "2026-2-pre-course-registration",
+    "is_active": true,
+    "priority": 1,
+    "verified_at": "2026-07-02T10:00:00+09:00"
+  },
+  {
+    "id": "2026-festival-artist-reveal",
+    "category": "culture",
+    "title": "2026 에리카 대동제 아티스트 라인업 공개",
+    "summary": "총학생회 공식 SNS를 통해 올해 대동제 초청 아티스트가 공개될 예정입니다.",
+    "start_at": "2026-08-25T00:00:00+09:00",
+    "end_at": "2026-08-25T23:59:00+09:00",
+    "source_url": "https://www.instagram.com/",
+    "notify_topic": "2026-festival-artist-reveal",
+    "is_active": true,
+    "priority": 2,
+    "verified_at": "2026-07-02T10:00:00+09:00"
+  },
+  {
+    "id": "2026-2-midterm-snack",
+    "category": "welfare",
+    "title": "2학기 중간고사 간식사업 신청",
+    "summary": "중간고사 기간 학생회관에서 진행되는 간식 지급 이벤트 신청을 받습니다.",
+    "start_at": "2026-09-01T09:00:00+09:00",
+    "end_at": "2026-09-05T18:00:00+09:00",
+    "source_url": "https://portal.hanyang.ac.kr/",
+    "notify_topic": "2026-2-midterm-snack",
+    "is_active": true,
+    "priority": 3,
+    "verified_at": "2026-07-02T10:00:00+09:00"
+  }
+]
