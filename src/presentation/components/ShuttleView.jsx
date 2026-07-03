@@ -858,7 +858,7 @@ export function ShuttleView({ isActive }) {
     '기숙사': ['3102', '10-1'],
     '융합교육관': ['3102', '10-1'],
     '상록수역': ['3102', '10-1'],
-    '강남역우리은행': ['3102'],
+    '강남역우리은행': ['3102', '3100', '3101'],
     '의왕톨게이트': ['3102', '3100', '8147']
   };
 
@@ -878,7 +878,11 @@ export function ShuttleView({ isActive }) {
       '상록수역': '에리카 방면'
     },
     '3100': {
-      '의왕톨게이트': '에리카 방면'
+      '의왕톨게이트': '에리카 방면',
+      '강남역우리은행': '에리카 방면'
+    },
+    '3101': {
+      '강남역우리은행': '에리카 방면'
     },
     '8147': {
       '의왕톨게이트': '상록수역 방면'
@@ -1503,7 +1507,7 @@ export function ShuttleView({ isActive }) {
                                     <div className="flex items-center gap-1.5">
                                       <div
                                         className="w-5 h-5 flex items-center justify-center rounded-[4px] flex-shrink-0"
-                                        style={{ backgroundColor: (busId === '3102' || busId === '3100') ? '#EE2737' : busId === '8147' ? '#A2409F' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
+                                        style={{ backgroundColor: (busId === '3102' || busId === '3100' || busId === '3101') ? '#EE2737' : busId === '8147' ? '#A2409F' : busId === '10-1' ? '#53B332' : '#94a3b8' }}
                                       >
                                         <BusFront
                                           size={12}
