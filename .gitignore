@@ -42,5 +42,10 @@ android/app/google-services.json
 # iOS Firebase config
 ios/App/App/GoogleService-Info.plist
 
+# Scratch directory
+scratch/
+
+# Claude Code local settings
+.claude/
 # Sentry Config File
 .env.sentry-build-plugin
