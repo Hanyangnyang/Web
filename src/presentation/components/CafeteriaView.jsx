@@ -361,7 +361,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
         <div
           ref={chipScrollRef}
-          className="flex gap-1.5 pt-1 overflow-x-auto no-scrollbar scroll-smooth"
+          className="flex gap-1.5 pt-2 overflow-x-auto no-scrollbar scroll-smooth"
           style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
         >
           {/* 전체 조회 탭 */}
@@ -393,7 +393,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
             >
               {cafe.name}
               {cafe.hasJeyuk && (
-                <span className="absolute top-[-8px] right-[-5px] bg-error text-white text-[0.65rem] px-1.5 py-0.5 rounded font-extrabold shadow-[0_2px_8px_rgba(239,68,68,0.4)]">
+                <span className="absolute top-[-5px] right-[-5px] bg-error text-white text-[0.65rem] px-1.5 py-0.5 rounded font-extrabold shadow-[0_2px_8px_rgba(239,68,68,0.4)]">
                   🔥 제육
                 </span>
               )}
