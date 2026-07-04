@@ -116,20 +116,20 @@ async function handleWeather(req, res) {
 
     const getAQILabel = (val, type) => {
       if (type === 'pm10') {
-        if (val <= 30) return { label: '좋음', color: '#2563eb', level: 1 };
-        if (val <= 80) return { label: '보통', color: '#4ade80', level: 2 };
-        if (val <= 150) return { label: '나쁨', color: '#ef4444', level: 3 };
-        return { label: '매우나쁨', color: '#991b1b', level: 4 };
+        if (val <= 30) return { label: '좋음', color: '#2563eb' };
+        if (val <= 80) return { label: '보통', color: '#4ade80' };
+        if (val <= 150) return { label: '나쁨', color: '#ef4444' };
+        return { label: '매우나쁨', color: '#991b1b' };
       } else if (type === 'pm25') {
-        if (val <= 15) return { label: '좋음', color: '#2563eb', level: 1 };
-        if (val <= 35) return { label: '보통', color: '#4ade80', level: 2 };
-        if (val <= 75) return { label: '나쁨', color: '#ef4444', level: 3 };
-        return { label: '매우나쁨', color: '#991b1b', level: 4 };
+        if (val <= 15) return { label: '좋음', color: '#2563eb' };
+        if (val <= 35) return { label: '보통', color: '#4ade80' };
+        if (val <= 75) return { label: '나쁨', color: '#ef4444' };
+        return { label: '매우나쁨', color: '#991b1b' };
       } else { // UV
-        if (val <= 2) return { label: '낮음', color: '#2563eb', level: 1 };
-        if (val <= 5) return { label: '보통', color: '#4ade80', level: 2 };
-        if (val <= 7) return { label: '높음', color: '#ef4444', level: 3 };
-        return { label: '매우높음', color: '#991b1b', level: 4 };
+        if (val <= 2) return { label: '낮음', color: '#2563eb' };
+        if (val <= 5) return { label: '보통', color: '#4ade80' };
+        if (val <= 7) return { label: '높음', color: '#ef4444' };
+        return { label: '매우높음', color: '#991b1b' };
       }
     };
 
