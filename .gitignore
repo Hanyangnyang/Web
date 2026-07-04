@@ -47,6 +47,5 @@ scratch/
 
 # Claude Code local settings
 .claude/
-
 # Sentry Config File
 .env.sentry-build-plugin
