@@ -363,6 +363,16 @@ body {
   margin-bottom: 20px;
 }
 
+.cafe-accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cafe-accordion-content.expanded {
+  grid-template-rows: 1fr;
+}
+
 .accordion-inner {
   overflow: hidden;
 }
