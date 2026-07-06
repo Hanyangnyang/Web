@@ -159,7 +159,7 @@ export function MiscView({ resetSignal }) {
 
   return (
     <div className="-mt-2 pb-20 [animation:slideUp_0.4s_ease-out]">
-      <h2 className="text-2xl font-extrabold text-text-main mb-1">기타</h2>
+      <h2 className="text-2xl font-extrabold text-text-main mb-1">기타 서비스</h2>
       <p className="text-base text-text-sub mb-4">학교 생활을 위한 유용한 기능 모음</p>
 
       <div className="grid grid-cols-2 gap-4">

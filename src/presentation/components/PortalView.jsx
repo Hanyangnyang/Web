@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 import { useBanners } from '../hooks/useBanners.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
@@ -99,7 +99,7 @@ function BannerCarousel({ banners }) {
   };
 
   return (
-    <div className="mb-6 mt-2 [animation:fadeIn_0.4s_ease-out]">
+    <div className="mb-3 mt-2 [animation:fadeIn_0.4s_ease-out]">
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-xl aspect-[10/3]"
@@ -398,7 +398,7 @@ export function PortalView({ isVisible = true }) {
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         {(loading || weather) && (
-          <section className="-mt-2 mb-4">
+          <section className="-mt-3 mb-3">
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
                 <div className="flex flex-col gap-3">
@@ -408,35 +408,39 @@ export function PortalView({ isVisible = true }) {
                 <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
               </div>
             ) : weather ? (
-              <div className="rounded-card pt-6 px-6 pb-3 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
+              <div className="rounded-card p-4 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
                 background: weatherTheme.bg
               }}>
                 <div className="relative z-10 w-full">
                   <div className="flex flex-col w-full">
-                    <p className="text-xs font-semibold opacity-75">
-                      안산시 상록구 사동
-                    </p>
-                    <div className="flex items-baseline gap-1.5 mt-0.5">
-                      <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
-                      <span className="text-xl font-bold opacity-90 leading-tight">{weather.description}</span>
-                    </div>
-                    {maxTemp !== null && minTemp !== null && (
-                      <p className="text-xs font-bold opacity-85 mt-1">
-                        최고:{maxTemp}° 최저:{minTemp}°
+                    <div className="pl-2">
+                      <p className="text-xs font-semibold opacity-75">
+                        안산시 상록구 사동
                       </p>
-                    )}
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
+                        <span className="text-xl font-bold opacity-90 leading-tight">{weather.description}</span>
+                      </div>
+                      {maxTemp !== null && minTemp !== null && (
+                        <p className="text-xs font-bold opacity-75 mt-1 flex items-center gap-1">
+                          <span className="flex items-center"><ArrowUp size={11} strokeWidth={3} />{maxTemp}°</span>
+                          <span className="opacity-60">/</span>
+                          <span className="flex items-center"><ArrowDown size={11} strokeWidth={3} />{minTemp}°</span>
+                        </p>
+                      )}
+                    </div>
 
                     {/* 날씨 변화 박스 (AI 요약 + 시간별 예보 통합 카드) */}
-                    <div className="mt-2 bg-white/15 backdrop-blur-md border border-white/10 rounded-xl py-1.5 px-3 flex flex-col">
+                    <div className="mt-2 bg-white/15 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
                       {weather.message && (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-3">
                           <div className="flex items-start text-xs font-bold leading-normal w-full opacity-90 px-0.5">
                             <Sparkles size={14} className="mr-1.5 mt-[2px] flex-shrink-0 text-white/80" />
                             <span className="break-all flex-1">
                               <TypewriterText text={weather.message} isVisible={isVisible} />
                             </span>
                           </div>
-                          <div className="border-t border-white/10 w-full mt-1 mb-0.5" />
+                          <div className="border-t border-white/10 w-full" />
                         </div>
                       )}
 
@@ -444,7 +448,7 @@ export function PortalView({ isVisible = true }) {
                       {renderedHourlyForecast.length > 0 && (
                         <div
                           ref={scrollContainerRef}
-                          className="w-full overflow-x-auto no-scrollbar mt-1"
+                          className="w-full overflow-x-auto no-scrollbar"
                         >
                           <div className="flex w-full" style={{ minWidth: 'max-content', padding: '1px 0' }}>
                             {renderedHourlyForecast.map((h, idx) => {
@@ -476,7 +480,7 @@ export function PortalView({ isVisible = true }) {
 
                       {/* 미세먼지 수평 한 줄 정보바 추가 */}
                       {weather.airQuality && (
-                        <div className="flex justify-around items-center text-[11px] font-bold text-white/90 pt-1.5 border-t border-white/10 mt-1.5 px-1">
+                        <div className="flex justify-around items-center text-[11px] font-bold text-white/90 pt-3 border-t border-white/10 px-1">
                           {[
                             { label: '미세', data: weather.airQuality.pm10, icon: Wind },
                             { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
@@ -486,7 +490,7 @@ export function PortalView({ isVisible = true }) {
                             return (
                               <div key={idx} className="flex items-center gap-1">
                                 <item.icon size={11} className="opacity-80 text-white flex-shrink-0" />
-                                <span className="opacity-75 mr-0.5">{item.label}</span>
+                                <span className="opacity-95 mr-0.5">{item.label}</span>
                                 <span className="font-black" style={{ color: dotColor }}>{item.data.label}</span>
                               </div>
                             );
@@ -508,7 +512,7 @@ export function PortalView({ isVisible = true }) {
         )}
 
       {bannersLoading ? (
-        <div className="mb-6 mt-2">
+        <div className="mb-3 mt-2">
           <div className="rounded-card aspect-[10/3] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
         </div>
       ) : banners.length > 0 ? (
@@ -517,11 +521,11 @@ export function PortalView({ isVisible = true }) {
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
-        <h3 className="text-xl font-bold text-text-main mb-4">열람실 혼잡도</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <h3 className="text-xl font-bold text-text-main mb-2">학정 혼잡도</h3>
+        <div className="grid grid-cols-2 gap-3">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-5 h-[140px] animate-pulse flex flex-col justify-between">
+              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-4 h-[140px] animate-pulse flex flex-col justify-between">
                 <div className="flex flex-col gap-2">
                   <div className="h-4 w-3/4 bg-slate-100 rounded-full" />
                   <div className="h-6 w-1/2 bg-slate-100 rounded-lg" />
@@ -533,7 +537,7 @@ export function PortalView({ isVisible = true }) {
             library.list.map((room) => {
               const emptySeats = Math.max(0, room.total - room.occupied);
               return (
-                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-3.5 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
                   <div className="flex items-center justify-between gap-2 min-w-0">
                     <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
                       {room.name.replace(' (2F)', '').replace(' (4F)', '')}
