@@ -634,6 +634,11 @@ export function ShuttleView({ isActive }) {
     busArrivalsRef.current = busArrivals;
   }, [busArrivals]);
 
+  const expandedStopsRef = useRef({});
+  useEffect(() => {
+    expandedStopsRef.current = expandedStops;
+  }, [expandedStops]);
+
   // 3분 미활동 사용자 감지 (절전 모드)
   useEffect(() => {
     if (viewMode !== 'bus') return;
@@ -1004,7 +1009,7 @@ export function ShuttleView({ isActive }) {
     if (viewMode !== 'bus' || !isPageVisible || !isUserActive) return;
 
     const fetchAll = () => {
-      const expandedList = Object.keys(expandedStops).filter(k => expandedStops[k] === true);
+      const expandedList = Object.keys(expandedStopsRef.current).filter(k => expandedStopsRef.current[k] === true);
       expandedList.forEach(stopName => {
         fetchBusArrivalsForStop(stopName);
       });
@@ -1016,7 +1021,7 @@ export function ShuttleView({ isActive }) {
     const intervalId = setInterval(fetchAll, 30 * 1000);
 
     return () => clearInterval(intervalId);
-  }, [viewMode, expandedStops, fetchBusArrivalsForStop, isPageVisible, isUserActive]);
+  }, [viewMode, fetchBusArrivalsForStop, isPageVisible, isUserActive]);
 
   // 1-second countdown timer for active arrivals
   useEffect(() => {
