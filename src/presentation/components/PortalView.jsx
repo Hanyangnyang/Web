@@ -2,8 +2,8 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 
 import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
+import { useBanners } from '../hooks/useBanners.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
-import { supabase } from '../../lib/supabase.js';
 
 
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
@@ -99,15 +99,15 @@ function BannerCarousel({ banners }) {
   };
 
   return (
-    <div className="mb-6 mt-2">
+    <div className="mb-6 mt-2 [animation:fadeIn_0.4s_ease-out]">
       <div
         ref={containerRef}
-        className="relative overflow-hidden rounded-xl"
+        className="relative overflow-hidden rounded-xl aspect-[10/3]"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
       >
         <div
-          className="flex transition-transform duration-300 ease-in-out"
+          className="flex h-full transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {banners.map((banner, i) => (
@@ -115,7 +115,7 @@ function BannerCarousel({ banners }) {
               key={banner.id || i}
               src={banner.image_url}
               alt={banner.alt_text || '배너'}
-              className={`w-full h-auto flex-shrink-0 ${banner.click_url ? 'cursor-pointer' : ''}`}
+              className={`w-full h-full object-cover flex-shrink-0 ${banner.click_url ? 'cursor-pointer' : ''}`}
               draggable={false}
               onClick={() => handleClick(banner)}
             />
@@ -196,29 +196,9 @@ export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
-  const [banners, setBanners] = useState([]);
+  const { banners, loading: bannersLoading } = useBanners(isVisible);
   const [showWeatherDetail, setShowWeatherDetail] = useState(false);
   const scrollContainerRef = useRef(null);
-
-  useEffect(() => {
-    async function fetchBanners() {
-      try {
-        const { data, error } = await supabase
-          .from('banners')
-          .select('*')
-          .eq('is_active', true)
-          .order('display_order', { ascending: true });
-        if (data && !error) {
-          setBanners(data);
-        }
-      } catch (err) {
-        console.error('Error fetching banners:', err);
-      }
-    }
-    if (isVisible) {
-      fetchBanners();
-    }
-  }, [isVisible]);
 
   // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
   // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
@@ -501,7 +481,13 @@ export function PortalView({ isVisible = true }) {
           </section>
         )}
 
-      {banners.length > 0 && <BannerCarousel banners={banners} />}
+      {bannersLoading ? (
+        <div className="mb-6 mt-2">
+          <div className="rounded-card aspect-[10/3] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
+        </div>
+      ) : banners.length > 0 ? (
+        <BannerCarousel banners={banners} />
+      ) : null}
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
