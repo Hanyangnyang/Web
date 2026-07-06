@@ -6,6 +6,7 @@ import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import { usePostHog } from 'posthog-js/react';
 
 const ROUTE_LABEL = {
   '순환': '순환',
@@ -584,6 +585,8 @@ export function ShuttleView({ isActive }) {
     appConfig,
   } = useShuttle(isActive);
 
+  const posthog = usePostHog();
+
   const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
   const [viewMode, setViewMode] = useState('shuttle'); // 'shuttle' | 'bus'
 
@@ -894,6 +897,7 @@ export function ShuttleView({ isActive }) {
     if (!stationId) return;
 
     setIsBusLoading(prev => ({ ...prev, [stopName]: true }));
+    posthog?.capture('bus_api_call', { stopName, stationId });
     try {
       const res = await fetch(`/api/bus?stationId=${stationId}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -969,7 +973,7 @@ export function ShuttleView({ isActive }) {
     } finally {
       setIsBusLoading(prev => ({ ...prev, [stopName]: false }));
     }
-  }, []);
+  }, [posthog]);
 
   const prevExpandedStopsRef = useRef({});
   // Fetch immediately when stop transitions to expanded
