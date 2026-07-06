@@ -486,7 +486,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                       return (
                                       <div
                                         key={group.cafeId}
-                                        className={`group py-3.5 px-5 flex flex-col gap-3 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
+                                        className={`group pt-4 pb-3 px-5 flex flex-col gap-1.5 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
                                         onClick={() => toggleCafeGroupExpand(type, group.cafeId)}
                                       >
                                         <div className="flex items-center justify-between">

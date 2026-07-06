@@ -431,7 +431,7 @@ export function PortalView({ isVisible = true }) {
                     </div>
 
                     {/* 날씨 변화 박스 (AI 요약 + 시간별 예보 통합 카드) */}
-                    <div className="mt-2 bg-white/15 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
+                    <div className="mt-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
                       {weather.message && (
                         <div className="flex flex-col gap-3">
                           <div className="flex items-start text-xs font-bold leading-normal w-full opacity-90 px-0.5">
@@ -559,11 +559,11 @@ export function PortalView({ isVisible = true }) {
                       }} />
                     </div>
                     <div className="flex justify-between items-center mt-2.5">
-                      <span className="text-[11px] text-text-sub font-bold">
-                        {room.occupied} / {room.total}
-                      </span>
                       <span className="text-[12px] text-text-main font-black">
                         {emptySeats}석 남음
+                      </span>
+                      <span className="text-[11px] text-text-sub font-bold">
+                        {room.occupied} / {room.total}
                       </span>
                     </div>
                   </div>

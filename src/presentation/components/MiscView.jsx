@@ -206,7 +206,7 @@ export function MiscView({ resetSignal }) {
         </div>
       </div>
 
-      <div className="mt-8 text-center">
+      <div className="mt-4 text-center">
         <a
           href="https://app.notion.com/p/361325c5461f80aa8463ee5ae404d4ba?source=copy_link"
           target="_blank"
