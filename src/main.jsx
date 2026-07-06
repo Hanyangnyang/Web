@@ -7,6 +7,7 @@ import { PostHogProvider } from 'posthog-js/react'
 import * as Sentry from '@sentry/capacitor'
 import * as SentryReact from '@sentry/react'
 
+// Sentry 초기화
 Sentry.init(
   {
     dsn: "https://bb060324beea4e9a9a8ebcb92d08c0f6@o4511642871267328.ingest.us.sentry.io/4511642938245120",
@@ -22,12 +23,14 @@ Sentry.init(
   SentryReact.init,
 )
 
+// PostHog 초기화
 if (import.meta.env.VITE_POSTHOG_KEY) {
   posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
     api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
   })
 }
 
+// Kakao SDK 초기화
 const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY;
 if (!kakaoKey) {
   console.warn('[Kakao] VITE_KAKAO_JS_KEY 없음 — 카카오톡 공유 비활성화');
@@ -48,6 +51,7 @@ if (!kakaoKey) {
   window.__kakaoStatus = 'OK';
 }
 
+// Service Worker 업데이트 감지 후 새로고침 
 if ('serviceWorker' in navigator) {
   let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -58,6 +62,7 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+// React 렌더링
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PostHogProvider client={posthog}>
