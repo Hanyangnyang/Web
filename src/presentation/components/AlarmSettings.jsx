@@ -637,7 +637,7 @@ export function AlarmSettings({ onClose }) {
       const isSubscribed = settings.jeyukAlert && (settings.mode === 'cafe' || settings.keywords.length > 0);
 
       if (isSubscribed) {
-        successMsg = '🔔 설정한 시간에 맞춰\n식단 알림을 보내드릴게요';
+        successMsg = '🔔 설정한 시간에 맞춰\n학식 알림을 보내드릴게요';
 
         (async () => {
           try {

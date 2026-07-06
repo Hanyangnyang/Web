@@ -159,8 +159,8 @@ export function MiscView({ resetSignal }) {
 
   return (
     <div className="-mt-2 pb-20 [animation:slideUp_0.4s_ease-out]">
-      <h2 className="text-2xl font-extrabold text-text-main mb-1">기타 서비스</h2>
-      <p className="text-base text-text-sub mb-4">학교 생활을 위한 기능 모음</p>
+      <h2 className="text-2xl font-extrabold text-text-main mb-1">기타</h2>
+      <p className="text-base text-text-sub mb-4">학교 생활을 위한 유용한 기능 모음</p>
 
       <div className="grid grid-cols-2 gap-4">
         <div className={cardClass} onClick={() => setSubView('gym')}>
@@ -201,6 +201,7 @@ export function MiscView({ resetSignal }) {
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">피드백 하기</span>
+            <span className="text-[0.8rem] text-text-sub">작은 의견도 큰 힘이 돼요 :)</span>
           </div>
         </div>
       </div>

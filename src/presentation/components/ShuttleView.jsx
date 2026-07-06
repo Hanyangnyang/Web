@@ -1197,7 +1197,7 @@ export function ShuttleView({ isActive }) {
         ) : (
           <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
             {/* 출발지 선택 (고정 상단) */}
-            <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+            <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-2xl font-extrabold text-text-main">출발지</div>
                 <div className="relative flex bg-[#e8e8e8]/80 p-[2.5px] rounded-xl">
@@ -1307,7 +1307,7 @@ export function ShuttleView({ isActive }) {
 
             {/* 시간표 */}
             <div className="mb-6">
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
 
                 <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
@@ -1332,9 +1332,6 @@ export function ShuttleView({ isActive }) {
               </div>
 
               <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8 }}>
-                <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0">
-                  출발 시간
-                </span>
                 {!hideSubwayCol && (
                   needsSubway ? (
                     <button
