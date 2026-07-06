@@ -427,14 +427,14 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
               .map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
                 return (
-                  <div key={type} className="mb-[0.4rem]" data-type={type} style={{ scrollMarginTop: '140px' }}>
+                  <div key={type} className="mb-3 bg-white rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)] overflow-hidden" data-type={type} style={{ scrollMarginTop: '140px' }}>
                     {(() => {
                       const mealKey = ['조식', '중식', '석식'].find(k => type.includes(k));
                       const hoursText = mealKey ? selectedCafe.hours?.[mealKey] : null;
                       return (
                         <>
                           <div
-                            className="flex justify-between items-center px-4 py-2 bg-white rounded-card border border-[#e2e8f0] cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-200 mb-[0.25rem] hover:bg-surface hover:border-[#cbd5e1]"
+                            className="flex justify-between items-center px-4 py-3 cursor-pointer transition-colors duration-150 hover:bg-slate-50 select-none"
                             onClick={() => toggleGroup(type)}
                           >
                             <div className="flex items-center gap-2 min-w-0">
@@ -456,9 +456,9 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                             </div>
                           </div>
                           <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-                            <div className="accordion-inner">
+                            <div className="accordion-inner border-t border-[#f1f5f9]">
                               {selectedCafeId === 'all' ? (
-                                <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)] text-left flex flex-col overflow-hidden w-full">
+                                <div className="text-left flex flex-col overflow-hidden w-full">
                                   {(() => {
                                     const cafeGroups = {};
                                     menus.forEach(m => {
@@ -604,38 +604,38 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                     : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
                                   const menuLines = m.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
                                   return (
-                                    <div
-                                      key={i}
-                                      className="menu-card bg-white rounded-card p-6 border border-[#e2e8f0] text-left transition-transform duration-200 relative active:scale-[0.98] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]"
-                                    >
-                                      <div className="relative">
-                                        {m.price && (
-                                          <div className="absolute top-0 right-0 text-primary font-bold text-[14px] bg-[rgba(14,74,132,0.06)] px-2 py-0.5 rounded z-[1]">
-                                            {isCheonwon ? `${m.price}💕` : m.price}
+                                    <React.Fragment key={i}>
+                                      {i > 0 && <div className="mx-5 border-b border-dashed border-slate-200" />}
+                                      <div className="px-5 py-3.5 text-left relative">
+                                        <div className="relative">
+                                          {m.price && (
+                                            <div className="absolute top-0 right-0 text-primary font-bold text-[14px] bg-[rgba(14,74,132,0.06)] px-2 py-0.5 rounded z-[1]">
+                                              {isCheonwon ? `${m.price}💕` : m.price}
+                                            </div>
+                                          )}
+                                          <div className="text-[14px] text-text-main pr-[6.5rem]" data-menu-content>
+                                            {menuLines.slice(0, -1).map((line, idx) => (
+                                              <MenuItemLine key={idx} html={line} />
+                                            ))}
+                                          </div>
+                                        </div>
+                                        {menuLines.length > 0 && (
+                                          <div className="flex items-center justify-between gap-2 text-[14px] text-text-main">
+                                            <div className="flex-1 min-w-0">
+                                              <MenuItemLine html={menuLines[menuLines.length - 1]} />
+                                            </div>
+                                            <button
+                                              className="flex-shrink-0 flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
+                                              onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel, cafeName: selectedCafe.name })}
+                                              aria-label="메뉴 공유"
+                                            >
+                                              <Share2 size={13} />
+                                              공유
+                                            </button>
                                           </div>
                                         )}
-                                        <div className="text-[14px] text-text-main pl-1 pr-[6.5rem]" data-menu-content>
-                                          {menuLines.slice(0, -1).map((line, idx) => (
-                                            <MenuItemLine key={idx} html={line} />
-                                          ))}
-                                        </div>
                                       </div>
-                                      {menuLines.length > 0 && (
-                                        <div className="flex items-center justify-between gap-2 pl-1 text-[14px] text-text-main">
-                                          <div className="flex-1 min-w-0">
-                                            <MenuItemLine html={menuLines[menuLines.length - 1]} />
-                                          </div>
-                                          <button
-                                            className="flex-shrink-0 flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
-                                            onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel, cafeName: selectedCafe.name })}
-                                            aria-label="메뉴 공유"
-                                          >
-                                            <Share2 size={13} />
-                                            공유
-                                          </button>
-                                        </div>
-                                      )}
-                                    </div>
+                                    </React.Fragment>
                                   );
                                 })
                               )}

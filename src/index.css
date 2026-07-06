@@ -360,7 +360,6 @@ body {
 
 .accordion-content.expanded {
   grid-template-rows: 1fr;
-  margin-bottom: 20px;
 }
 
 .cafe-accordion-content {
@@ -375,14 +374,6 @@ body {
 
 .accordion-inner {
   overflow: hidden;
-}
-
-.accordion-inner .menu-card {
-  margin-bottom: 0.4rem;
-}
-
-.accordion-inner .menu-card:last-child {
-  margin-bottom: 0;
 }
 
 /* ═══ 셀렉트 박스 화살표 (SVG 배경 이미지) ═══ */
