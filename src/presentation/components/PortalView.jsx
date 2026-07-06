@@ -197,8 +197,31 @@ export function PortalView({ isVisible = true }) {
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
   const [banners, setBanners] = useState([]);
-  const [showWeatherDetail, setShowWeatherDetail] = useState(false);
+  const showWeatherDetail = true;
   const scrollContainerRef = useRef(null);
+
+  const { maxTemp, minTemp } = useMemo(() => {
+    if (!weather?.hourlyForecast) return { maxTemp: null, minTemp: null };
+    const todayStr = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const todayTemps = weather.hourlyForecast
+      .filter(item => {
+        const itemDateStr = new Date(item.epoch + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+        return itemDateStr === todayStr;
+      })
+      .map(item => item.temp);
+    
+    if (todayTemps.length === 0) {
+      const allTemps = weather.hourlyForecast.map(item => item.temp);
+      return {
+        maxTemp: Math.max(...allTemps),
+        minTemp: Math.min(...allTemps)
+      };
+    }
+    return {
+      maxTemp: Math.max(...todayTemps),
+      minTemp: Math.min(...todayTemps)
+    };
+  }, [weather]);
 
   useEffect(() => {
     async function fetchBanners() {
@@ -308,8 +331,18 @@ export function PortalView({ isVisible = true }) {
   // 해는 주황색, 구름은 흰색, 비는 파란색으로 아이콘 내부를 채움
   function getHourlyIconFill(Icon) {
     if (Icon === Sun) return '#f97316';
-    if (Icon === Cloud || Icon === CloudSun || Icon === CloudMoon || Icon === CloudFog || Icon === CloudSnow) return '#ffffff';
-    if (Icon === CloudRain || Icon === CloudDrizzle || Icon === CloudLightning) return '#3b82f6';
+    if (
+      Icon === Cloud ||
+      Icon === CloudSun ||
+      Icon === CloudMoon ||
+      Icon === CloudFog ||
+      Icon === CloudSnow ||
+      Icon === CloudRain ||
+      Icon === CloudDrizzle ||
+      Icon === CloudLightning
+    ) {
+      return '#ffffff';
+    }
     return 'none';
   }
 
@@ -399,98 +432,90 @@ export function PortalView({ isVisible = true }) {
               }}>
                 <div className="relative z-10 w-full">
                   <div className="flex flex-col w-full">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
-                      <span className="text-xl font-bold opacity-90">{weather.description}</span>
-                    </div>
-                    <p className="mt-2 text-sm font-semibold opacity-70 flex items-center gap-1">
+                    <p className="text-xs font-semibold opacity-75">
                       안산시 상록구 사동
                     </p>
-
-                    <div className="mt-3 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
-                      <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
-                      <span className="break-all flex-1">
-                        <TypewriterText text={weather.message} isVisible={isVisible} />
-                      </span>
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
+                      <span className="text-xl font-bold opacity-90 leading-tight">{weather.description}</span>
                     </div>
+                    {maxTemp !== null && minTemp !== null && (
+                      <p className="text-xs font-bold opacity-85 mt-1">
+                        최고:{maxTemp}° 최저:{minTemp}°
+                      </p>
+                    )}
 
-                    <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showWeatherDetail ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                      <div className={`overflow-hidden transition-opacity duration-200 ${showWeatherDetail ? 'opacity-100 delay-100' : 'opacity-0'}`}>
-                        <div className="mt-3">
-                          {weather.airQuality && (
-                            <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
-                              {[
-                                { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
-                                { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
-                                { label: '자외선', data: weather.airQuality.uv, icon: Sun }
-                              ].map((item, idx) => (
-                                <div key={idx} className="bg-white/20 backdrop-blur-lg border border-white/10 rounded-xl py-3 px-2 flex flex-col items-center gap-1">
-                                  <div className="flex items-center gap-1">
-                                    <item.icon size={12} className="text-white" strokeWidth={2.5} />
-                                    <span className="text-[12px] text-white font-black uppercase tracking-widest">{item.label}</span>
-                                  </div>
-                                  <div className="flex items-center gap-1.5">
-                                    <span
-                                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                                      style={{ backgroundColor: item.data.color }}
-                                    />
-                                    <span className="text-[13px] font-black text-white whitespace-nowrap">{item.data.label}</span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
-                          {renderedHourlyForecast.length > 0 && (
-                            <div
-                              ref={scrollContainerRef}
-                              className="mt-3 bg-white/20 backdrop-blur-lg border border-white/10 rounded-xl overflow-x-auto no-scrollbar"
-                            >
-                              <div className="flex" style={{ minWidth: 'max-content', padding: '10px 6px' }}>
-                                {renderedHourlyForecast.map((h, idx) => {
-                                  const isCurrent = h.isCurrent;
-                                  const isPast = h.isPast;
-                                  const HourlyIcon = getHourlyIcon(h.weatherCode, h.hour);
-                                  return (
-                                    <div
-                                      key={idx}
-                                      data-current={isCurrent}
-                                      className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl transition-all duration-300 ${
-                                        isCurrent
-                                          ? 'bg-white/90 border border-slate-400 shadow-[0_1px_3px_rgba(0,0,0,0.15)]'
-                                          : ''
-                                      } ${isPast ? 'opacity-55' : 'opacity-100'}`}
-                                      style={{ minWidth: '50px' }}
-                                    >
-                                      <span className={`text-[13px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
-                                        {h.hour}시
-                                      </span>
-                                      <HourlyIcon size={20} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'}`} />
-                                      <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
-                                      {h.precipProb > 20 && (
-                                        <span className={`text-[10px] font-bold ${isCurrent ? 'text-slate-600' : 'text-blue-100'}`}>{h.precipProb}%</span>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
+                    {/* 날씨 변화 박스 (AI 요약 + 시간별 예보 통합 카드) */}
+                    <div className="mt-2 bg-white/15 backdrop-blur-md border border-white/10 rounded-xl py-1.5 px-3 flex flex-col">
+                      {weather.message && (
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-start text-xs font-bold leading-normal w-full opacity-90 px-0.5">
+                            <Sparkles size={14} className="mr-1.5 mt-[2px] flex-shrink-0 text-white/80" />
+                            <span className="break-all flex-1">
+                              <TypewriterText text={weather.message} isVisible={isVisible} />
+                            </span>
+                          </div>
+                          <div className="border-t border-white/10 w-full mt-1 mb-0.5" />
                         </div>
-                      </div>
-                    </div>
+                      )}
 
-                    <button
-                      className="mt-2 mx-auto flex items-center gap-1 px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/20 text-white/90 text-[11px] font-bold transition-all duration-200"
-                      onClick={() => setShowWeatherDetail((v) => !v)}
-                    >
-                      {showWeatherDetail ? '접기' : '더보기'}
-                      <ChevronDown size={14} className={`transition-transform duration-300 ${showWeatherDetail ? 'rotate-180' : ''}`} />
-                    </button>
+                      {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
+                      {renderedHourlyForecast.length > 0 && (
+                        <div
+                          ref={scrollContainerRef}
+                          className="w-full overflow-x-auto no-scrollbar mt-1"
+                        >
+                          <div className="flex w-full" style={{ minWidth: 'max-content', padding: '1px 0' }}>
+                            {renderedHourlyForecast.map((h, idx) => {
+                              const isCurrent = h.isCurrent;
+                              const isPast = h.isPast;
+                              const HourlyIcon = getHourlyIcon(h.weatherCode, h.hour);
+                              return (
+                                <div
+                                  key={idx}
+                                  data-current={isCurrent}
+                                  className={`flex flex-col items-center gap-0.5 px-2.5 py-0.5 rounded-xl transition-all duration-300 ${
+                                    isCurrent
+                                      ? 'bg-white/90 border border-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.15)]'
+                                      : ''
+                                  } ${isPast ? 'opacity-55' : 'opacity-100'}`}
+                                  style={{ minWidth: '46px' }}
+                                >
+                                  <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
+                                    {h.hour}시
+                                  </span>
+                                  <HourlyIcon size={16} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'} weather-rain-icon`} />
+                                  <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 미세먼지 수평 한 줄 정보바 추가 */}
+                      {weather.airQuality && (
+                        <div className="flex justify-around items-center text-[11px] font-bold text-white/90 pt-1.5 border-t border-white/10 mt-1.5 px-1">
+                          {[
+                            { label: '미세', data: weather.airQuality.pm10, icon: Wind },
+                            { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
+                            { label: '자외선', data: weather.airQuality.uv, icon: Sun }
+                          ].map((item, idx) => {
+                            const dotColor = item.data.color === '#2563eb' ? '#38bdf8' : item.data.color;
+                            return (
+                              <div key={idx} className="flex items-center gap-1">
+                                <item.icon size={11} className="opacity-80 text-white flex-shrink-0" />
+                                <span className="opacity-75 mr-0.5">{item.label}</span>
+                                <span className="font-black" style={{ color: dotColor }}>{item.data.label}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="absolute right-[-15px] top-[-15px] pointer-events-none transform rotate-12" style={{
+                <div className="absolute right-[-15px] top-[-15px] pointer-events-none transform rotate-12 weather-rain-icon" style={{
                   color: weatherTheme.iconColor || '#ffffff',
                   opacity: weatherTheme.iconColor ? 0.22 : 0.15
                 }}>
