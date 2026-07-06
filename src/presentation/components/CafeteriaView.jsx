@@ -509,7 +509,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                           {/* Collapsed State Accordion */}
                                           <div className={`cafe-accordion-content ${!isCafeExpanded ? 'expanded' : ''}`}>
                                             <div className="accordion-inner">
-                                              <div className="flex flex-col gap-2 pl-1 pr-1">
+                                              <div className={`flex flex-col gap-2 pl-1 pr-1 transition-opacity duration-75 ${isCafeExpanded ? 'opacity-0' : 'opacity-100'}`}>
                                                 {group.items.map((item, idx) => {
                                                   const menuLines = item.menu.split('\n')
                                                     .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
@@ -543,7 +543,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                           {/* Expanded State Accordion */}
                                           <div className={`cafe-accordion-content ${isCafeExpanded ? 'expanded' : ''}`}>
                                             <div className="accordion-inner">
-                                              <div className="flex flex-col pl-1 pr-1">
+                                              <div className={`flex flex-col pl-1 pr-1 transition-all duration-300 ${isCafeExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
                                                 {group.items.map((item, idx) => {
                                                   const menuLines = item.menu.split('\n')
                                                     .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
