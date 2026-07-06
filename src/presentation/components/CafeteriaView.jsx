@@ -336,7 +336,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
       {/* 고정 헤더 */}
       {/* 고정 헤더: 날짜 및 식당 선택 */}
-      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-5 px-5 mb-2.5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex justify-between items-center mb-2 bg-white px-5 py-2 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
           <button
             className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
@@ -434,14 +434,14 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                       return (
                         <>
                           <div
-                            className="flex justify-between items-center px-4 py-3 cursor-pointer transition-colors duration-150 hover:bg-slate-50 select-none"
+                            className="flex justify-between items-center px-4 py-2.5 cursor-pointer transition-colors duration-150 hover:bg-slate-50 select-none"
                             onClick={() => toggleGroup(type)}
                           >
                             <div className="flex items-center gap-2 min-w-0">
                                <span className="text-xl flex-shrink-0">{getMenuIcon(type)}</span>
-                               <span className="font-extrabold text-[16px] text-text-main flex-shrink-0">{type}</span>
+                               <span className="font-bold text-[16px] tracking-tight text-text-main flex-shrink-0">{type}</span>
                                {hoursText && (
-                                 <span className="text-[11px] text-text-hint truncate">{hoursText}</span>
+                                 <span className="text-[12px] text-text-hint truncate">{hoursText}</span>
                                )}
                             </div>
                             <div className="flex items-center gap-2">
@@ -489,9 +489,9 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                         className={`group py-3.5 px-5 flex flex-col gap-3 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
                                         onClick={() => toggleCafeGroupExpand(type, group.cafeId)}
                                       >
-                                        <div className="flex items-center justify-between pb-1">
+                                        <div className="flex items-center justify-between">
                                           <div className="flex items-center gap-2 min-w-0">
-                                            <span className="text-[17px] font-black text-primary flex-shrink-0">
+                                            <span className="text-[15px] font-black text-primary flex-shrink-0">
                                               {group.cafeName}
                                             </span>
                                             {groupHoursText && (

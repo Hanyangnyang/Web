@@ -1197,7 +1197,7 @@ export function ShuttleView({ isActive }) {
         ) : (
           <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
             {/* 출발지 선택 (고정 상단) */}
-            <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+            <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-2xl font-extrabold text-text-main">출발지</div>
                 <div className="relative flex bg-[#e8e8e8]/80 p-[2.5px] rounded-xl">
@@ -1459,7 +1459,7 @@ export function ShuttleView({ isActive }) {
       ) : (
         <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
           {/* 고정 상단 필터 영역 */}
-          <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-5 px-5 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-6">
+          <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
             <div className="flex items-center justify-between">
               <span className="text-2xl font-extrabold text-text-main">정류소</span>
               <div className="relative flex bg-[#e8e8e8]/80 p-[2.5px] rounded-xl">
@@ -1505,7 +1505,7 @@ export function ShuttleView({ isActive }) {
                   <div key={stopName} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
                     {/* 아코디언 헤더 */}
                     <div
-                      className="flex justify-between items-center px-4 py-3.5 cursor-pointer hover:bg-slate-50 transition-colors duration-150 select-none"
+                      className="flex justify-between items-center px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors duration-150 select-none"
                       onClick={() => setExpandedStops(prev => ({ ...prev, [stopName]: !prev[stopName] }))}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -1528,7 +1528,7 @@ export function ShuttleView({ isActive }) {
                             strokeWidth={2}
                           />
                         </button>
-                        <span className="font-bold text-[17px] tracking-tight text-text-main truncate">
+                        <span className="font-bold text-[16px] tracking-tight text-text-main truncate">
                           {(() => {
                             const descMap = {
                               '기숙사': '기숙사 (한양대기숙사앞)',
@@ -1563,15 +1563,15 @@ export function ShuttleView({ isActive }) {
                           <Loader2 size={14} className="text-text-hint animate-spin" />
                         )}
                         <ChevronDown
-                          size={18}
+                          size={16}
                           className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                         />
                       </div>
                     </div>
 
                     {/* 아코디언 내용 */}
-                    {isExpanded && (
-                      <div className="border-t border-[#f1f5f9] bg-white">
+                    <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
+                      <div className="accordion-inner border-t border-[#f1f5f9] bg-white">
                         {(() => {
                           const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
 
@@ -1743,7 +1743,7 @@ export function ShuttleView({ isActive }) {
                           });
                         })()}
                       </div>
-                    )}
+                    </div>
                   </div>
                 );
               })}

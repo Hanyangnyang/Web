@@ -180,7 +180,7 @@ function MainLayout() {
         } : {}}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden px-5 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
+        <div className={`flex-1 overflow-y-auto overflow-x-hidden px-4 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}

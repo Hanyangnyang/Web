@@ -269,7 +269,7 @@ export function PartnershipView({ isActive }) {
   return (
     <div ref={rootRef} className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 고정 헤더 */}
-      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-3 -mx-5 px-5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-3 -mx-4 px-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         {/* 검색 바 */}
         <div className="relative mb-3">
           <div className="flex items-center gap-2.5 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
