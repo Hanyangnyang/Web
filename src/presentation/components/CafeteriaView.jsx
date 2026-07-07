@@ -296,7 +296,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   };
 
   return (
-    <div ref={rootRef} className="pb-20 relative">
+    <div ref={rootRef} className="pb-28 relative">
       <button
         className="fixed bottom-[calc(20px+64px+12px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
         onClick={() => setShowAlarm(true)}
@@ -567,7 +567,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                                               <MenuItemLine html={menuLines[menuLines.length - 1]} />
                                                             </div>
                                                             <button
-                                                              className="flex-shrink-0 flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
+                                                              className="flex-shrink-0 min-w-[64px] flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
                                                               onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 setShareTarget({ type, menu: item, shareUrl: groupShareUrl, dateLabel, cafeName: group.cafeName });
@@ -625,7 +625,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                               <MenuItemLine html={menuLines[menuLines.length - 1]} />
                                             </div>
                                             <button
-                                              className="flex-shrink-0 flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
+                                              className="flex-shrink-0 min-w-[64px] flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
                                               onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel, cafeName: selectedCafe.name })}
                                               aria-label="메뉴 공유"
                                             >
