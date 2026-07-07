@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
 import { useBanners } from '../hooks/useBanners.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
@@ -423,9 +423,8 @@ export function PortalView({ isVisible = true }) {
                       </div>
                       {maxTemp !== null && minTemp !== null && (
                         <p className="text-xs font-bold opacity-75 mt-1 flex items-center gap-1">
-                          <span className="flex items-center"><ArrowUp size={11} strokeWidth={3} />{maxTemp}°</span>
-                          <span className="opacity-60">/</span>
-                          <span className="flex items-center"><ArrowDown size={11} strokeWidth={3} />{minTemp}°</span>
+                          <span>최고 {maxTemp}°</span>
+                          <span>최저 {minTemp}°</span>
                         </p>
                       )}
                     </div>
