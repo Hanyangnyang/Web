@@ -1595,7 +1595,7 @@ export function ShuttleView({ isActive }) {
                             const firstArrival = busArrivals[0];
                             const secondArrival = busArrivals[1];
                             const directionLabel = (firstArrival && firstArrival.direction) || DEFAULT_DIRECTIONS[busId]?.[stopName] || '';
-                            const isInitialLoading = isBusLoading[stopName] && (!busArrivals[stopName] || busArrivals[stopName].length === 0);
+                            const isInitialLoading = isBusLoading[stopName];
 
                             return (
                               <div key={busId}>
@@ -1630,10 +1630,16 @@ export function ShuttleView({ isActive }) {
                                   {/* 오른쪽 열: 도착 정보 (첫 번째 & 두 번째) */}
                                   <div className="flex flex-col items-end gap-1.5 w-[190px] flex-shrink-0">
                                     {isInitialLoading ? (
-                                      <div className="flex items-center justify-between w-full h-[26px] animate-pulse">
-                                        <div className="w-[45px] h-[14px] bg-slate-200 rounded ml-auto mr-4" />
-                                        <div className="w-[90px] h-[22px] bg-slate-100 rounded" />
-                                      </div>
+                                      <>
+                                        <div className="flex items-center justify-between w-full h-[26px] animate-pulse">
+                                          <div className="w-[45px] h-[14px] bg-slate-200 rounded ml-auto mr-4" />
+                                          <div className="w-[90px] h-[22px] bg-slate-100 rounded" />
+                                        </div>
+                                        <div className="flex items-center justify-between w-full h-[26px] animate-pulse">
+                                          <div className="w-[45px] h-[14px] bg-slate-200 rounded ml-auto mr-4" />
+                                          <div className="w-[90px] h-[22px] bg-slate-100 rounded" />
+                                        </div>
+                                      </>
                                     ) : (
                                       <>
                                         {/* 첫 번째 도착 */}
