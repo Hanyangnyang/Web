@@ -12,6 +12,7 @@ import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
+import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -71,6 +72,7 @@ function MainLayout() {
   // 앱 시작 시 소식 탭 데이터를 백그라운드에서 미리 로드
   useEffect(() => {
     prefetchPortalData();
+    prefetchBanners();
   }, []);
 
   // 카페 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거
@@ -178,7 +180,7 @@ function MainLayout() {
         } : {}}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden px-5 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
+        <div className={`flex-1 overflow-y-auto overflow-x-hidden px-4 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}

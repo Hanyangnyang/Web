@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Cloud, Loader2, Info, Users, Heart, Bell } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning, Loader2, Info, Users, Heart, Bell, ChevronDown } from 'lucide-react';
 import { usePortalData } from '../hooks/usePortalData.js';
+import { useBanners } from '../hooks/useBanners.js';
 import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
-import { supabase } from '../../lib/supabase.js';
 
 
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
@@ -99,15 +99,15 @@ function BannerCarousel({ banners }) {
   };
 
   return (
-    <div className="mb-6 mt-2">
+    <div className="mb-3 mt-2 [animation:fadeIn_0.4s_ease-out]">
       <div
         ref={containerRef}
-        className="relative overflow-hidden rounded-xl"
+        className="relative overflow-hidden rounded-xl aspect-[10/3]"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
       >
         <div
-          className="flex transition-transform duration-300 ease-in-out"
+          className="flex h-full transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {banners.map((banner, i) => (
@@ -115,7 +115,7 @@ function BannerCarousel({ banners }) {
               key={banner.id || i}
               src={banner.image_url}
               alt={banner.alt_text || '배너'}
-              className={`w-full h-auto flex-shrink-0 ${banner.click_url ? 'cursor-pointer' : ''}`}
+              className={`w-full h-full object-cover flex-shrink-0 ${banner.click_url ? 'cursor-pointer' : ''}`}
               draggable={false}
               onClick={() => handleClick(banner)}
             />
@@ -196,29 +196,34 @@ export function PortalView({ isVisible = true }) {
   const { weather, library, loading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
+  const { banners, loading: bannersLoading } = useBanners(isVisible);
+  const showWeatherDetail = true;
   const scrollContainerRef = useRef(null);
-  const [banners, setBanners] = useState([]);
 
-  useEffect(() => {
-    async function fetchBanners() {
-      try {
-        const { data, error } = await supabase
-          .from('banners')
-          .select('*')
-          .eq('is_active', true)
-          .order('display_order', { ascending: true });
-        if (data && !error) {
-          setBanners(data);
-        }
-      } catch (err) {
-        console.error('Error fetching banners:', err);
-      }
+  const { maxTemp, minTemp } = useMemo(() => {
+    if (!weather?.hourlyForecast) return { maxTemp: null, minTemp: null };
+    const todayStr = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const todayTemps = weather.hourlyForecast
+      .filter(item => {
+        const itemDateStr = new Date(item.epoch + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+        return itemDateStr === todayStr;
+      })
+      .map(item => item.temp);
+
+    if (todayTemps.length === 0) {
+      const allTemps = weather.hourlyForecast.map(item => item.temp);
+      return {
+        maxTemp: Math.max(...allTemps),
+        minTemp: Math.min(...allTemps)
+      };
     }
-    if (isVisible) {
-      fetchBanners();
-    }
-  }, [isVisible]);
-  
+    return {
+      maxTemp: Math.max(...todayTemps),
+      minTemp: Math.min(...todayTemps)
+    };
+  }, [weather]);
+
+
   // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
   // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
   //           item.epoch + 브라우저 로컬 시각으로 모든 계산을 수행합니다.
@@ -274,9 +279,9 @@ export function PortalView({ isVisible = true }) {
     return filtered;
   }, [weather]);
 
-  // 날씨 탭에 진입하거나 날씨 데이터가 로드될 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
+  // 더보기로 예보 스트립이 펼쳐졌을 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
-    if (isVisible && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
+    if (showWeatherDetail && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
       const timer = setTimeout(() => {
         const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
         if (activeEl) {
@@ -288,7 +293,39 @@ export function PortalView({ isVisible = true }) {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [renderedHourlyForecast, isVisible]);
+  }, [renderedHourlyForecast, showWeatherDetail]);
+
+  // 시간별 예보 2D 아이콘 매핑
+  function getHourlyIcon(code, hour) {
+    const isNight = hour >= 20 || hour < 6;
+    if (code <= 0) return isNight ? Moon : Sun;
+    if (code <= 1) return isNight ? CloudMoon : CloudSun;
+    if (code <= 2) return CloudSun;
+    if (code <= 3) return Cloud;
+    if (code <= 48) return CloudFog;
+    if (code <= 67) return CloudRain;
+    if (code <= 77) return CloudSnow;
+    if (code <= 82) return CloudDrizzle;
+    return CloudLightning;
+  }
+
+  // 해는 주황색, 구름은 흰색, 비는 파란색으로 아이콘 내부를 채움
+  function getHourlyIconFill(Icon) {
+    if (Icon === Sun) return '#f97316';
+    if (
+      Icon === Cloud ||
+      Icon === CloudSun ||
+      Icon === CloudMoon ||
+      Icon === CloudFog ||
+      Icon === CloudSnow ||
+      Icon === CloudRain ||
+      Icon === CloudDrizzle ||
+      Icon === CloudLightning
+    ) {
+      return '#ffffff';
+    }
+    return 'none';
+  }
 
   // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
   const weatherTheme = useMemo(() => {
@@ -334,20 +371,6 @@ export function PortalView({ isVisible = true }) {
     };
   }, [weather]);
 
-  // 시간별 예보 이모지 매핑
-  function getHourlyEmoji(code, hour) {
-    const isNight = hour >= 20 || hour < 6;
-    if (code <= 0) return isNight ? '🌙' : '☀️';
-    if (code <= 1) return isNight ? '🌙' : '🌤️';
-    if (code <= 2) return '⛅';
-    if (code <= 3) return '☁️';
-    if (code <= 48) return '🌫️';
-    if (code <= 67) return '🌧️';
-    if (code <= 77) return '❄️';
-    if (code <= 82) return '🌦️';
-    return '⛈️';
-  }
-
   return (
     <>
       <button
@@ -373,10 +396,9 @@ export function PortalView({ isVisible = true }) {
       )}
 
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
-        {/* 1. 오늘의 날씨 & 소식 섹션 */}
+        {/* 1. 에리카 날씨 섹션 */}
         {(loading || weather) && (
-          <section className="mb-4">
-            <h3 className="text-xl font-bold text-text-main mb-4">오늘의 날씨</h3>
+          <section className="-mt-3 mb-3">
             {loading ? (
               <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
                 <div className="flex flex-col gap-3">
@@ -386,101 +408,123 @@ export function PortalView({ isVisible = true }) {
                 <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
               </div>
             ) : weather ? (
-              <div className="rounded-card p-6 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-center shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{ 
+              <div className="rounded-card p-4 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
                 background: weatherTheme.bg
               }}>
                 <div className="relative z-10 w-full">
                   <div className="flex flex-col w-full">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
-                      <span className="text-xl font-bold opacity-90">{weather.description}</span>
+                    <div className="pl-2">
+                      <p className="text-xs font-semibold opacity-75">
+                        안산시 상록구 사동
+                      </p>
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
+                        <span className="text-xl font-bold opacity-90 leading-tight">{weather.description}</span>
+                      </div>
+                      {maxTemp !== null && minTemp !== null && (
+                        <p className="text-xs font-bold opacity-75 mt-1 flex items-center gap-1">
+                          <span>최고 {maxTemp}°</span>
+                          <span>최저 {minTemp}°</span>
+                        </p>
+                      )}
                     </div>
-                    <p className="mt-2 text-sm font-semibold opacity-70 flex items-center gap-1">
-                      안산시 상록구 사동
-                    </p>
-                    
-                    <div className="mt-4 bg-white/20 backdrop-blur-lg py-2.5 px-4 rounded-xl flex items-start text-sm font-bold leading-relaxed w-full border border-white/10">
-                      <Sparkles size={15} className="mr-2 mt-[6px] flex-shrink-0 text-white/70" />
-                      <span className="break-all flex-1">
-                        <TypewriterText text={weather.message} isVisible={isVisible} />
-                      </span>
+
+                    {/* 날씨 변화 박스 (AI 요약 + 시간별 예보 통합 카드) */}
+                    <div className="mt-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
+                      {weather.message && (
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-start text-xs font-bold leading-normal w-full opacity-90 px-0.5">
+                            <Sparkles size={14} className="mr-1.5 mt-[2px] flex-shrink-0 text-white/80" />
+                            <span className="break-all flex-1">
+                              <TypewriterText text={weather.message} isVisible={isVisible} />
+                            </span>
+                          </div>
+                          <div className="border-t border-white/10 w-full" />
+                        </div>
+                      )}
+
+                      {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
+                      {renderedHourlyForecast.length > 0 && (
+                        <div
+                          ref={scrollContainerRef}
+                          className="w-full overflow-x-auto no-scrollbar"
+                        >
+                          <div className="flex w-full" style={{ minWidth: 'max-content', padding: '1px 0' }}>
+                            {renderedHourlyForecast.map((h, idx) => {
+                              const isCurrent = h.isCurrent;
+                              const isPast = h.isPast;
+                              const HourlyIcon = getHourlyIcon(h.weatherCode, h.hour);
+                              return (
+                                <div
+                                  key={idx}
+                                  data-current={isCurrent}
+                                  className={`flex flex-col items-center gap-0.5 px-2.5 py-0.5 rounded-xl transition-all duration-300 ${
+                                    isCurrent
+                                      ? 'bg-white/90 border border-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.15)]'
+                                      : ''
+                                  } ${isPast ? 'opacity-55' : 'opacity-100'}`}
+                                  style={{ minWidth: '46px' }}
+                                >
+                                  <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
+                                    {h.hour}시
+                                  </span>
+                                  <HourlyIcon size={16} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'} weather-rain-icon`} />
+                                  <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 미세먼지 수평 한 줄 정보바 추가 */}
+                      {weather.airQuality && (
+                        <div className="flex justify-around items-center text-[11px] font-bold text-white/90 pt-3 border-t border-white/10 px-1">
+                          {[
+                            { label: '미세', data: weather.airQuality.pm10, icon: Wind },
+                            { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
+                            { label: '자외선', data: weather.airQuality.uv, icon: Sun }
+                          ].map((item, idx) => {
+                            const dotColor = item.data.color === '#2563eb' ? '#38bdf8' : item.data.color;
+                            return (
+                              <div key={idx} className="flex items-center gap-1">
+                                <item.icon size={11} className="opacity-80 text-white flex-shrink-0" />
+                                <span className="opacity-95 mr-0.5">{item.label}</span>
+                                <span className="font-black" style={{ color: dotColor }}>{item.data.label}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-                <div className="absolute right-[-15px] top-[-15px] pointer-events-none transform rotate-12" style={{
+                <div className="absolute right-[-15px] top-[-15px] pointer-events-none transform rotate-12 weather-rain-icon" style={{
                   color: weatherTheme.iconColor || '#ffffff',
                   opacity: weatherTheme.iconColor ? 0.22 : 0.15
                 }}>
                   {weatherTheme.icon && React.createElement(weatherTheme.icon, { size: 160 })}
                 </div>
-
-                {weather.airQuality && (
-                  <div className="grid gap-2 mt-4 relative z-10" style={{ gridTemplateColumns: 'repeat(3, minmax(min-content, 1fr))' }}>
-                    {[
-                      { label: '미세먼지', data: weather.airQuality.pm10, icon: Wind },
-                      { label: '초미세', data: weather.airQuality.pm25, icon: Wind },
-                      { label: '자외선', data: weather.airQuality.uv, icon: Sun }
-                    ].map((item, idx) => (
-                      <div key={idx} className="bg-white/95 backdrop-blur-sm rounded-2xl py-3.5 px-2 flex flex-col items-center gap-1.5 shadow-md">
-                        <span className="text-[10px] text-text-sub font-black uppercase tracking-widest opacity-80">{item.label}</span>
-                        <div className="flex items-center gap-1.5">
-                          <item.icon size={14} color={item.data.color} strokeWidth={3} />
-                          <span className="text-[14px] font-black whitespace-nowrap" style={{ color: item.data.color }}>{item.data.label}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             ) : null}
-
-            {/* 시간별 예보 스트립 (이전 12시간 ~ 이후 12시간 실시간 가로 윈도우 스크롤) */}
-            {renderedHourlyForecast.length > 0 && (
-              <div 
-                ref={scrollContainerRef}
-                className="mt-2 bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-x-auto no-scrollbar"
-              >
-                <div className="flex" style={{ minWidth: 'max-content', padding: '12px 8px' }}>
-                  {renderedHourlyForecast.map((h, idx) => {
-                    const isCurrent = h.isCurrent;
-                    const isPast = h.isPast;
-                    return (
-                      <div
-                        key={idx}
-                        data-current={isCurrent}
-                        className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 ${
-                          isCurrent 
-                            ? 'bg-blue-50/80 border border-blue-100/60 shadow-[0_1px_3px_rgba(37,99,235,0.06)]' 
-                            : 'border border-transparent'
-                        } ${isPast ? 'opacity-55' : 'opacity-100'}`}
-                        style={{ minWidth: '54px' }}
-                      >
-                        <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600 font-extrabold' : 'text-text-sub'}`}>
-                          {isCurrent ? '지금' : `${h.hour}시`}
-                        </span>
-                        <span className="text-[22px] leading-none my-0.5">{getHourlyEmoji(h.weatherCode, h.hour)}</span>
-                        <span className={`text-[13px] font-black ${isCurrent ? 'text-blue-700' : 'text-text-main'}`}>{h.temp}°</span>
-                        {h.precipProb > 20 && (
-                          <span className={`text-[10px] font-bold ${isCurrent ? 'text-blue-600' : 'text-blue-400'}`}>{h.precipProb}%</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </section>
         )}
 
-      {banners.length > 0 && <BannerCarousel banners={banners} />}
+      {bannersLoading ? (
+        <div className="mb-3 mt-2">
+          <div className="rounded-card aspect-[10/3] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
+        </div>
+      ) : banners.length > 0 ? (
+        <BannerCarousel banners={banners} />
+      ) : null}
 
       {/* 2. 열람실 혼잡도 섹션 */}
       <section className="mb-6">
-        <h3 className="text-xl font-bold text-text-main mb-4">열람실 혼잡도</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <h3 className="text-xl font-bold text-text-main mb-2">학정 혼잡도</h3>
+        <div className="grid grid-cols-2 gap-3">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-5 h-[140px] animate-pulse flex flex-col justify-between">
+              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-4 h-[140px] animate-pulse flex flex-col justify-between">
                 <div className="flex flex-col gap-2">
                   <div className="h-4 w-3/4 bg-slate-100 rounded-full" />
                   <div className="h-6 w-1/2 bg-slate-100 rounded-lg" />
@@ -492,7 +536,7 @@ export function PortalView({ isVisible = true }) {
             library.list.map((room) => {
               const emptySeats = Math.max(0, room.total - room.occupied);
               return (
-                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-3.5 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:shadow-md transition-all duration-200 active:scale-[0.98]">
+                <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
                   <div className="flex items-center justify-between gap-2 min-w-0">
                     <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
                       {room.name.replace(' (2F)', '').replace(' (4F)', '')}
@@ -505,20 +549,20 @@ export function PortalView({ isVisible = true }) {
                       {room.emoji} {room.status}
                     </div>
                   </div>
-                  
+
                   <div className="mt-auto">
                     <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ 
-                        width: `${room.ratio * 100}%`, 
+                      <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
+                        width: `${room.ratio * 100}%`,
                         backgroundColor: room.color
                       }} />
                     </div>
                     <div className="flex justify-between items-center mt-2.5">
-                      <span className="text-[11px] text-text-sub font-bold">
-                        {room.occupied} / {room.total}
-                      </span>
                       <span className="text-[12px] text-text-main font-black">
                         {emptySeats}석 남음
+                      </span>
+                      <span className="text-[11px] text-text-sub font-bold">
+                        {room.occupied} / {room.total}
                       </span>
                     </div>
                   </div>

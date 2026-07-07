@@ -1,7 +1,7 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 식단 목록 표시
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 
-import { ChevronLeft, ChevronRight, Clock, Bell, Share2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Share2 } from 'lucide-react';
 import { getKSTDate } from '../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
 import { ShareSheet } from './ShareSheet.jsx';
@@ -23,7 +23,6 @@ function MenuItemLine({ html }) {
   const [marquee, setMarquee] = useState(null);
 
   const hasBullet = html.startsWith('•');
-  const bullet  = hasBullet ? '•' : '';
   const content = hasBullet ? html.slice(1).trimStart() : html;
 
   useLayoutEffect(() => {
@@ -42,7 +41,6 @@ function MenuItemLine({ html }) {
 
   return (
     <div className="flex items-baseline whitespace-nowrap leading-[1.8]">
-      {bullet && <span className="flex-shrink-0 mr-[0.4rem]">{bullet}</span>}
       <div ref={scrollWrapRef} className="overflow-hidden flex-1 min-w-0">
         <span
           ref={spanRef}
@@ -129,13 +127,12 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
     scrollToTop();
   };
 
-  const handleCafeDetailNavigate = (cafeId, mealType) => {
-    urlTypeRef.current = mealType;
-    setSelectedCafeId(cafeId);
-    scrollToTop();
-  };
-
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [expandedCafeGroups, setExpandedCafeGroups] = useState({});
+  const toggleCafeGroupExpand = (type, cafeId) => {
+    const key = `${type}::${cafeId}`;
+    setExpandedCafeGroups(prev => ({ ...prev, [key]: !prev[key] }));
+  };
   const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
   const [showAlarm, setShowAlarm] = useState(false);
   const [shareTarget, setShareTarget] = useState(null);
@@ -316,7 +313,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
       }} />}
       {shareTarget && (
         <ShareSheet
-          cafeName={selectedCafe.name}
+          cafeName={shareTarget.cafeName}
           dateText={formatDate(date)}
           mealType={shareTarget.type}
           menuText={shareTarget.menu.menu}
@@ -339,8 +336,8 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
       {/* 고정 헤더 */}
       {/* 고정 헤더: 날짜 및 식당 선택 */}
-      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-5 px-5 mb-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
-        <div className="flex justify-between items-center mb-3 bg-white px-5 py-3 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+        <div className="flex justify-between items-center mb-2 bg-white px-5 py-2 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
           <button
             className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
             onClick={() => changeDate(-1)}
@@ -362,7 +359,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
         <div
           ref={chipScrollRef}
-          className="flex gap-1.5 pt-2.5 overflow-x-auto no-scrollbar scroll-smooth"
+          className="flex gap-1.5 pt-3 overflow-x-auto no-scrollbar scroll-smooth"
           style={{ opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
         >
           {/* 전체 조회 탭 */}
@@ -394,7 +391,7 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
             >
               {cafe.name}
               {cafe.hasJeyuk && (
-                <span className="absolute top-[-8px] right-[-5px] bg-error text-white text-[0.65rem] px-1.5 py-0.5 rounded font-extrabold shadow-[0_2px_8px_rgba(239,68,68,0.4)]">
+                <span className="absolute top-[-11px] right-[-8px] bg-error text-white text-[0.65rem] px-1.5 py-0.5 rounded font-extrabold shadow-[0_2px_8px_rgba(239,68,68,0.4)]">
                   🔥 제육
                 </span>
               )}
@@ -430,35 +427,38 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
               .map(([type, menus]) => {
                 const isExpanded = expandedGroups[type];
                 return (
-                  <div key={type} className="mb-[0.6rem]" data-type={type} style={{ scrollMarginTop: '140px' }}>
+                  <div key={type} className="mb-3 bg-white rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)] overflow-hidden" data-type={type} style={{ scrollMarginTop: '140px' }}>
                     {(() => {
                       const mealKey = ['조식', '중식', '석식'].find(k => type.includes(k));
                       const hoursText = mealKey ? selectedCafe.hours?.[mealKey] : null;
                       return (
                         <>
                           <div
-                            className="flex justify-between items-center px-5 py-4 bg-white rounded-card border border-[#e2e8f0] cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-200 mb-[0.4rem] hover:bg-surface hover:border-[#cbd5e1]"
+                            className="flex justify-between items-center px-4 py-2.5 cursor-pointer transition-colors duration-150 hover:bg-slate-50 select-none"
                             onClick={() => toggleGroup(type)}
                           >
-                            <div className="flex items-center gap-3">
-                               <span className="text-xl">{getMenuIcon(type)}</span>
-                               <span className="font-extrabold text-[1.05rem] text-text-main">{type}</span>
+                            <div className="flex items-center gap-2 min-w-0">
+                               <span className="text-xl flex-shrink-0">{getMenuIcon(type)}</span>
+                               <span className="font-bold text-[16px] tracking-tight text-text-main flex-shrink-0">{type}</span>
+                               {hoursText && (
+                                 <span className="text-[12px] text-text-hint truncate">{hoursText}</span>
+                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-white bg-hyu-blue-light px-2 py-0.5 rounded-card">
+                              <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
                                 {menus.length}개 메뉴
                               </span>
                               <ChevronRight
                                 style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
-                                size={20}
+                                size={16}
                                 color="#94a3b8"
                               />
                             </div>
                           </div>
                           <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-                            <div className="accordion-inner">
+                            <div className="accordion-inner border-t border-[#f1f5f9]">
                               {selectedCafeId === 'all' ? (
-                                <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)] text-left flex flex-col overflow-hidden w-full">
+                                <div className="text-left flex flex-col overflow-hidden w-full">
                                   {(() => {
                                     const cafeGroups = {};
                                     menus.forEach(m => {
@@ -471,58 +471,125 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                       }
                                       cafeGroups[m.cafeId].items.push(m);
                                     });
-                                    return Object.values(cafeGroups).map((group, groupIdx) => (
+                                    const nowKst = getKSTDate();
+                                    const targetStr = date.toISOString().split('T')[0];
+                                    const dateLabel = targetStr === nowKst.toISOString().split('T')[0] ? '오늘'
+                                      : targetStr === new Date(nowKst.getTime() + 86400000).toISOString().split('T')[0] ? '내일'
+                                      : targetStr === new Date(nowKst.getTime() - 86400000).toISOString().split('T')[0] ? '어제'
+                                      : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
+                                    return Object.values(cafeGroups).map((group, groupIdx) => {
+                                      const cafeGroupKey = `${type}::${group.cafeId}`;
+                                      const isCafeExpanded = expandedCafeGroups[cafeGroupKey];
+                                      const groupShareUrl = `${window.location.origin}/?date=${targetStr}&cafe=${group.cafeId}&type=${encodeURIComponent(type)}`;
+                                      const groupCafe = cafes.find(c => c.id === group.cafeId);
+                                      const groupHoursText = mealKey ? groupCafe?.hours?.[mealKey] : null;
+                                      return (
                                       <div
                                         key={group.cafeId}
-                                        className={`group p-5 flex flex-col gap-3 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
-                                        onClick={() => handleCafeDetailNavigate(group.cafeId, type)}
+                                        className={`group pt-4 pb-4 px-5 flex flex-col gap-1.5 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
+                                        onClick={() => toggleCafeGroupExpand(type, group.cafeId)}
                                       >
-                                        <div className="flex items-center justify-between pb-1">
-                                          <span className="text-[14px] font-black text-primary">
-                                            {group.cafeName}
-                                          </span>
-                                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center transition-colors duration-150 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
-                                            <ChevronRight size={13} strokeWidth={3} />
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <span className="text-[15px] font-black text-primary flex-shrink-0">
+                                              {group.cafeName}
+                                            </span>
+                                            {groupHoursText && (
+                                              <span className="text-[11px] text-text-hint truncate">{groupHoursText}</span>
+                                            )}
+                                          </div>
+                                          <ChevronRight
+                                            size={16}
+                                            color="#94a3b8"
+                                            style={{ transform: isCafeExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+                                            className="flex-shrink-0"
+                                          />
+                                        </div>
+                                        <div className="flex flex-col">
+                                          {/* Collapsed State Accordion */}
+                                          <div className={`cafe-accordion-content ${!isCafeExpanded ? 'expanded' : ''}`}>
+                                            <div className="accordion-inner">
+                                              <div className={`flex flex-col gap-2 pl-1 pr-1 transition-opacity duration-75 ${isCafeExpanded ? 'opacity-0' : 'opacity-100'}`}>
+                                                {group.items.map((item, idx) => {
+                                                  const menuLines = item.menu.split('\n')
+                                                    .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
+                                                  const processedLines = menuLines.map((line, lineIdx) => {
+                                                    let cleaned = line;
+                                                    if (lineIdx > 0) {
+                                                      cleaned = cleaned.replace(/<\/?b>/g, '');
+                                                    }
+                                                    if (cleaned.startsWith('•')) {
+                                                      cleaned = cleaned.slice(1).trimStart();
+                                                    }
+                                                    return cleaned;
+                                                  });
+                                                  const joinedMenu = processedLines.join(', ');
+                                                  return (
+                                                    <div key={idx} className="flex items-baseline justify-between text-[14px] text-text-main gap-3">
+                                                      <div className="flex-1 min-w-0 font-normal text-left truncate">
+                                                        {parseBoldText(joinedMenu)}
+                                                      </div>
+                                                      {item.price && (
+                                                        <span className="flex-shrink-0 text-[14px] font-bold text-text-sub">
+                                                          {item.price}
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          {/* Expanded State Accordion */}
+                                          <div className={`cafe-accordion-content ${isCafeExpanded ? 'expanded' : ''}`}>
+                                            <div className="accordion-inner">
+                                              <div className={`flex flex-col pl-1 pr-1 transition-all duration-300 ${isCafeExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+                                                {group.items.map((item, idx) => {
+                                                  const menuLines = item.menu.split('\n')
+                                                    .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
+                                                  return (
+                                                    <React.Fragment key={idx}>
+                                                      {idx > 0 && <div className="my-3 border-b border-dashed border-slate-200" />}
+                                                      <div className="relative">
+                                                        {item.price && (
+                                                          <div className="absolute top-0 right-0 text-primary font-bold text-[14px] bg-[rgba(14,74,132,0.06)] px-2 py-0.5 rounded z-[1]">
+                                                            {item.price}
+                                                          </div>
+                                                        )}
+                                                        <div className="text-[14px] text-text-main pr-20">
+                                                          {menuLines.slice(0, -1).map((line, lineIdx) => (
+                                                            <MenuItemLine key={lineIdx} html={line} />
+                                                          ))}
+                                                        </div>
+                                                        {menuLines.length > 0 && (
+                                                          <div className="flex items-center justify-between gap-2 text-[14px] text-text-main">
+                                                            <div className="flex-1 min-w-0">
+                                                              <MenuItemLine html={menuLines[menuLines.length - 1]} />
+                                                            </div>
+                                                            <button
+                                                              className="flex-shrink-0 flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
+                                                              onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setShareTarget({ type, menu: item, shareUrl: groupShareUrl, dateLabel, cafeName: group.cafeName });
+                                                              }}
+                                                              aria-label="메뉴 공유"
+                                                            >
+                                                              <Share2 size={13} />
+                                                              공유
+                                                            </button>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                    </React.Fragment>
+                                                  );
+                                                })}
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
-                                        <div className="flex flex-col gap-2 pl-1 pr-1">
-                                          {group.items.map((item, idx) => {
-                                            const menuLines = item.menu.split('\n')
-                                              .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
-                                            const processedLines = menuLines.map((line, lineIdx) => {
-                                              let cleaned = line;
-                                              if (lineIdx > 0) {
-                                                cleaned = cleaned.replace(/<\/?b>/g, '');
-                                                if (cleaned.startsWith('•')) {
-                                                  cleaned = cleaned.slice(1).trimStart();
-                                                }
-                                              }
-                                              return cleaned;
-                                            });
-                                            const joinedMenu = processedLines.join(', ');
-                                            return (
-                                              <div key={idx} className="flex items-baseline justify-between text-[0.93rem] text-text-main gap-3">
-                                                <div className="flex-1 min-w-0 font-normal text-left truncate">
-                                                  {joinedMenu.startsWith('•') ? (
-                                                    <>
-                                                      <span className="mr-[0.4rem]">•</span>
-                                                      {parseBoldText(joinedMenu.slice(1).trimStart())}
-                                                    </>
-                                                  ) : (
-                                                    parseBoldText(joinedMenu)
-                                                  )}
-                                                </div>
-                                                {item.price && (
-                                                  <span className="flex-shrink-0 text-[11px] font-bold text-text-sub">
-                                                    {item.price}
-                                                  </span>
-                                                )}
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
                                       </div>
-                                    ));
+                                      );
+                                    });
                                   })()}
                                 </div>
                               ) : (
@@ -537,36 +604,38 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                     : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
                                   const menuLines = m.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
                                   return (
-                                    <div
-                                      key={i}
-                                      className="menu-card bg-white rounded-card p-6 border border-[#e2e8f0] text-left transition-transform duration-200 relative active:scale-[0.98] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]"
-                                    >
-                                      {m.price && (
-                                        <div className="absolute top-5 right-5 text-primary font-bold text-[0.9rem] bg-[rgba(14,74,132,0.06)] px-2.5 py-1 rounded z-[1]">
-                                          {isCheonwon ? `${m.price}💕` : m.price}
-                                        </div>
-                                      )}
-                                      <div className="text-[0.95rem] text-text-main pl-1 pr-[6.5rem]" data-menu-content>
-                                        {menuLines.map((line, idx) => (
-                                          <MenuItemLine key={idx} html={line} />
-                                        ))}
-                                      </div>
-                                      <div className="flex justify-between items-center mt-[0.6rem] pt-[0.6rem] pl-[0.2rem] border-t border-[#e2e8f0]">
-                                        {hoursText ? (
-                                          <div className="flex items-center gap-1 text-xs text-text-hint">
-                                            <Clock size={12} />
-                                            <span>{hoursText}</span>
+                                    <React.Fragment key={i}>
+                                      {i > 0 && <div className="mx-5 border-b border-dashed border-slate-200" />}
+                                      <div className="px-5 py-3.5 text-left relative">
+                                        <div className="relative">
+                                          {m.price && (
+                                            <div className="absolute top-0 right-0 text-primary font-bold text-[14px] bg-[rgba(14,74,132,0.06)] px-2 py-0.5 rounded z-[1]">
+                                              {isCheonwon ? `${m.price}💕` : m.price}
+                                            </div>
+                                          )}
+                                          <div className="text-[14px] text-text-main pr-[6.5rem]" data-menu-content>
+                                            {menuLines.slice(0, -1).map((line, idx) => (
+                                              <MenuItemLine key={idx} html={line} />
+                                            ))}
                                           </div>
-                                        ) : <span />}
-                                        <button
-                                          className="flex items-center justify-center flex-shrink-0 w-9 h-9 border-none bg-[#f1f5f9] rounded-full text-text-sub cursor-pointer transition-all duration-150 hover:bg-[#e2e8f0] active:scale-90"
-                                          onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel })}
-                                          aria-label="메뉴 공유"
-                                        >
-                                          <Share2 size={14} />
-                                        </button>
+                                        </div>
+                                        {menuLines.length > 0 && (
+                                          <div className="flex items-center justify-between gap-2 text-[14px] text-text-main">
+                                            <div className="flex-1 min-w-0">
+                                              <MenuItemLine html={menuLines[menuLines.length - 1]} />
+                                            </div>
+                                            <button
+                                              className="flex-shrink-0 flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[11px] font-bold cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
+                                              onClick={() => setShareTarget({ type, menu: m, shareUrl, dateLabel, cafeName: selectedCafe.name })}
+                                              aria-label="메뉴 공유"
+                                            >
+                                              <Share2 size={13} />
+                                              공유
+                                            </button>
+                                          </div>
+                                        )}
                                       </div>
-                                    </div>
+                                    </React.Fragment>
                                   );
                                 })
                               )}

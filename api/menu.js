@@ -85,7 +85,7 @@ async function scrapeCafe(cafeId, dateStr) {
       const pattern = /(조식|중식|석식)[\s:]*(\d{1,2}:\d{2}\s*~\s*\d{1,2}:\d{2})/g;
       let m;
       while ((m = pattern.exec(hoursSection[0])) !== null) {
-        hours[m[1]] = m[2].replace(/\s+/g, ' ').trim();
+        hours[m[1]] = m[2].replace(/\s+/g, ' ').replace(/\s*~\s*/g, '~').trim();
       }
     }
 
