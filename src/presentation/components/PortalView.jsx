@@ -559,10 +559,10 @@ export function PortalView({ isVisible = true }) {
                       }} />
                     </div>
                     <div className="flex justify-between items-center mt-2.5">
-                      <span className="text-[12px] text-text-main font-black">
+                      <span className="text-[12px] text-[#334155] font-black">
                         {emptySeats}석 남음
                       </span>
-                      <span className="text-[11px] text-text-sub font-bold">
+                      <span className="text-[11px] text-[#475569] font-bold">
                         {room.occupied} / {room.total}
                       </span>
                     </div>
