@@ -1,6 +1,6 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus, BusFront } from 'lucide-react';
+import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus, BusFront, RefreshCw } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
 import { useShuttle } from '../hooks/useShuttle.js';
 import { Browser } from '@capacitor/browser';
@@ -632,6 +632,7 @@ export function ShuttleView({ isActive }) {
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [isUserActive, setIsUserActive] = useState(true);
   const pausedByTabLeaveRef = useRef(false);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   const busArrivalsRef = useRef({});
   useEffect(() => {
@@ -915,6 +916,7 @@ export function ShuttleView({ isActive }) {
     if (!stationId) return;
 
     setIsBusLoading(prev => ({ ...prev, [stopName]: true }));
+    const spinStartedAt = Date.now();
     posthog?.capture('bus_api_call', { stopName, stationId });
     try {
       const res = await fetch(`/api/bus?stationId=${stationId}`);
@@ -989,9 +991,29 @@ export function ShuttleView({ isActive }) {
     } catch (e) {
       console.error(`Failed to fetch arrivals for ${stopName}:`, e);
     } finally {
-      setIsBusLoading(prev => ({ ...prev, [stopName]: false }));
+      // 응답이 너무 빨라도 스피너를 최소 800ms 유지해 새로고침이 일어났음을 인지할 수 있게 한다
+      const remain = Math.max(0, 800 - (Date.now() - spinStartedAt));
+      setTimeout(() => {
+        setIsBusLoading(prev => ({ ...prev, [stopName]: false }));
+      }, remain);
     }
   }, [posthog]);
+
+  const handleManualRefresh = useCallback(() => {
+    if (isManualRefreshing) return;
+    setIsManualRefreshing(true);
+    posthog?.capture('bus_manual_refresh');
+
+    const expandedList = Object.keys(expandedStopsRef.current).filter(k => expandedStopsRef.current[k] === true);
+    const minSpin = new Promise(resolve => setTimeout(resolve, 500)); // 최소 스핀 시간 확보 (즉시 끝나도 피드백 인지 가능하도록)
+
+    Promise.all([
+      Promise.all(expandedList.map(stopName => fetchBusArrivalsForStop(stopName))),
+      minSpin
+    ]).finally(() => {
+      setIsManualRefreshing(false);
+    });
+  }, [isManualRefreshing, fetchBusArrivalsForStop, posthog]);
 
   const prevExpandedStopsRef = useRef({});
   // Fetch immediately when stop transitions to expanded
@@ -1072,7 +1094,7 @@ export function ShuttleView({ isActive }) {
     }, 1000);
 
     return () => clearInterval(timerId);
-  }, [viewMode, isPageVisible]);
+  }, [viewMode, isPageVisible, isUserActive]);
 
   // 칩(출발지)을 바꿀 때마다 30분 이내의 다음 셔틀 자동 뒤집기 트리거 실행
   useEffect(() => {
@@ -1497,12 +1519,14 @@ export function ShuttleView({ isActive }) {
             </div>
           </div>
 
-          {/* 절전 모드 알림 배너 */}
-          {!isUserActive && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-4 py-2.5 rounded-card text-center mb-3">
-              데이터와 배터리 절약을 위해 실시간 업데이트를 일시 정지했습니다. 화면을 움직이거나 터치하면 재개합니다.
+          {/* 절전 모드 알림 배너 (grid-rows 트랜지션으로 부드럽게 접히고 펼쳐짐) */}
+          <div className={`accordion-content ${!isUserActive ? 'expanded' : ''}`}>
+            <div className="accordion-inner">
+              <div className={`bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold px-4 py-2.5 rounded-card text-center mb-3 transition-opacity duration-300 ${!isUserActive ? 'opacity-100' : 'opacity-0'}`}>
+                데이터와 배터리 절약을 위해 실시간 업데이트를 일시 정지했습니다. 화면을 움직이거나 터치하면 재개합니다.
+              </div>
             </div>
-          )}
+          </div>
 
           {/* 정류장별 버스 도착 정보 목록 */}
           <div className="space-y-3">
@@ -1516,6 +1540,7 @@ export function ShuttleView({ isActive }) {
                 const isExpanded = !!expandedStops[stopName];
                 const isFav = favorites.includes(stopName);
                 const arrivals = busArrivals[stopName] || [];
+                const hasLoadedOnce = busArrivals[stopName] !== undefined; // 이번 세션에서 이 정류소의 응답을 한 번이라도 받았는지
                 const distanceStr = getDistanceStr(stopName);
 
                 const filteredArrivals = arrivals;
@@ -1614,7 +1639,7 @@ export function ShuttleView({ isActive }) {
                             const firstArrival = busArrivals[0];
                             const secondArrival = busArrivals[1];
                             const directionLabel = (firstArrival && firstArrival.direction) || DEFAULT_DIRECTIONS[busId]?.[stopName] || '';
-                            const isInitialLoading = isBusLoading[stopName];
+                            const isInitialLoading = isBusLoading[stopName] && !hasLoadedOnce;
 
                             return (
                               <div key={busId}>
@@ -1652,11 +1677,11 @@ export function ShuttleView({ isActive }) {
                                       <>
                                         <div className="flex items-center justify-between w-full h-[26px] animate-pulse">
                                           <div className="w-[45px] h-[14px] bg-slate-200 rounded ml-auto mr-4" />
-                                          <div className="w-[90px] h-[22px] bg-slate-100 rounded" />
+                                          <div className="w-[82px] h-[22px] bg-slate-100 rounded" />
                                         </div>
                                         <div className="flex items-center justify-between w-full h-[26px] animate-pulse">
                                           <div className="w-[45px] h-[14px] bg-slate-200 rounded ml-auto mr-4" />
-                                          <div className="w-[90px] h-[22px] bg-slate-100 rounded" />
+                                          <div className="w-[82px] h-[22px] bg-slate-100 rounded" />
                                         </div>
                                       </>
                                     ) : (
@@ -1690,7 +1715,7 @@ export function ShuttleView({ isActive }) {
                                                 {timeText}
                                               </span>
                                               {firstArrival.info ? (
-                                                <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
+                                                <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1 py-0.5 rounded flex gap-1 justify-center w-[82px] shrink-0 whitespace-nowrap">
                                                   <span>{beforeStr}</span>
                                                   {seatStr && (
                                                     <span
@@ -1702,7 +1727,7 @@ export function ShuttleView({ isActive }) {
                                                   )}
                                                 </span>
                                               ) : (
-                                                <div className="w-[90px] shrink-0" />
+                                                <div className="w-[82px] shrink-0" />
                                               )}
                                             </div>
                                           );
@@ -1741,7 +1766,7 @@ export function ShuttleView({ isActive }) {
                                                 {timeText}
                                               </span>
                                               {secondArrival.info ? (
-                                                <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1.5 py-0.5 rounded flex gap-1 justify-center w-[90px] shrink-0 whitespace-nowrap">
+                                                <span className="text-[10px] font-bold text-text-sub bg-slate-100 px-1 py-0.5 rounded flex gap-1 justify-center w-[82px] shrink-0 whitespace-nowrap">
                                                   <span>{beforeStr}</span>
                                                   {seatStr && (
                                                     <span
@@ -1753,7 +1778,7 @@ export function ShuttleView({ isActive }) {
                                                   )}
                                                 </span>
                                               ) : (
-                                                <div className="w-[90px] shrink-0" />
+                                                <div className="w-[82px] shrink-0" />
                                               )}
                                             </div>
                                           );
@@ -1779,6 +1804,16 @@ export function ShuttleView({ isActive }) {
                 );
               })}
           </div>
+
+          {/* 수동 새로고침 버튼 */}
+          <button
+            onClick={handleManualRefresh}
+            disabled={isManualRefreshing}
+            aria-label="버스 도착정보 새로고침"
+            className="fixed bottom-[calc(24px+64px+24px+env(safe-area-inset-bottom))] right-[max(2.75rem,calc(50%-168px))] w-12 h-12 rounded-full bg-white border-[1.5px] border-primary/40 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center z-[999] cursor-pointer transition-transform duration-150 active:scale-90 disabled:cursor-not-allowed"
+          >
+            <RefreshCw size={20} className={`text-primary ${isManualRefreshing ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       )}
 
