@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase.js';
 
 // ─── 모듈 레벨 공유 상태 ───────────────────────────────────────────
 // 컴포넌트가 언마운트/리마운트 되어도 배너 데이터가 유지됨
@@ -16,27 +15,26 @@ function notifyListeners(data) {
 
 // ─── 공개 Prefetch 함수 (App.jsx 에서 앱 시작 시 호출) ─────────────
 export async function prefetchBanners() {
-  // 유효한 메모리 캐시가 있으면 네트워크 요청 생략
-  if (memoryCache && Date.now() - memoryCache.timestamp < CACHE_TTL) return;
   // 이미 진행 중이면 중복 실행 방지
   if (isFetching) return;
 
   isFetching = true;
   try {
-    const { data, error } = await supabase
-      .from('banners')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
+    // 캐시 유무와 무관하게 항상 갱신 — /api/banners 는 Vercel CDN 캐시(s-maxage)라
+    // 비용이 낮고, 앱 실행마다 재검증해서 새 배너가 다음 실행 때 바로 반영됨
+    const res = await fetch('/api/banners');
+    const json = await res.json();
+    if (!res.ok || !Array.isArray(json.banners)) throw new Error(`HTTP ${res.status}`);
 
-    if (data && !error) {
-      const newData = { banners: data, timestamp: Date.now() };
-      memoryCache = newData;
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch { /* ignore */ }
-      notifyListeners(newData);
-    }
+    const newData = { banners: json.banners, timestamp: Date.now() };
+    memoryCache = newData;
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(newData)); } catch { /* ignore */ }
+    notifyListeners(newData);
   } catch (err) {
     console.warn('[Banners] prefetch failed:', err);
+    // 실패 시에도 통지해서 스켈레톤이 무한 노출되지 않도록 함
+    // 캐시가 있으면 화면 유지, 없으면 빈 목록(timestamp 0 → 다음 탭 방문 때 재시도)
+    notifyListeners(memoryCache ?? { banners: [], timestamp: 0 });
   } finally {
     isFetching = false;
   }
