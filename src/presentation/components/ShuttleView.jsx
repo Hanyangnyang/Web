@@ -631,6 +631,7 @@ export function ShuttleView({ isActive }) {
   const [isBusLoading, setIsBusLoading] = useState({});
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [isUserActive, setIsUserActive] = useState(true);
+  const pausedByTabLeaveRef = useRef(false);
 
   const busArrivalsRef = useRef({});
   useEffect(() => {
@@ -642,9 +643,16 @@ export function ShuttleView({ isActive }) {
     expandedStopsRef.current = expandedStops;
   }, [expandedStops]);
 
-  // 3분 미활동 사용자 감지 (절전 모드)
+  // 3분 미활동 사용자 감지 (절전 모드) + 탭 이탈 시 즉시 절전 모드 진입
   useEffect(() => {
-    if (viewMode !== 'bus') return;
+    if (viewMode !== 'bus' || !isActive) {
+      // 셔틀/지하철 탭을 벗어나면 폴링을 즉시 멈추고, 돌아왔을 때 터치로 재개하도록 안내문을 띄운다
+      if (viewMode === 'bus') {
+        pausedByTabLeaveRef.current = true;
+      }
+      setIsUserActive(false);
+      return;
+    }
 
     let timeoutId;
     const resetTimer = () => {
@@ -660,7 +668,12 @@ export function ShuttleView({ isActive }) {
       document.addEventListener(name, resetTimer);
     });
 
-    resetTimer();
+    if (pausedByTabLeaveRef.current) {
+      // 탭을 벗어났다 돌아온 경우: 자동 재개하지 않고 사용자의 터치를 기다린다
+      pausedByTabLeaveRef.current = false;
+    } else {
+      resetTimer();
+    }
 
     return () => {
       clearTimeout(timeoutId);
@@ -668,7 +681,7 @@ export function ShuttleView({ isActive }) {
         document.removeEventListener(name, resetTimer);
       });
     };
-  }, [viewMode]);
+  }, [viewMode, isActive]);
 
 
 
@@ -1512,7 +1525,13 @@ export function ShuttleView({ isActive }) {
                     {/* 아코디언 헤더 */}
                     <div
                       className="flex justify-between items-center px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors duration-150 select-none"
-                      onClick={() => setExpandedStops(prev => ({ ...prev, [stopName]: !prev[stopName] }))}
+                      onClick={() => {
+                        const willExpand = !expandedStops[stopName];
+                        if (willExpand) {
+                          setIsBusLoading(prev => ({ ...prev, [stopName]: true }));
+                        }
+                        setExpandedStops(prev => ({ ...prev, [stopName]: willExpand }));
+                      }}
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         {/* 즐겨찾기 별 */}
