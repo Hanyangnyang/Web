@@ -647,11 +647,12 @@ export function ShuttleView({ isActive }) {
   // 3분 미활동 사용자 감지 (절전 모드) + 탭 이탈 시 즉시 절전 모드 진입
   useEffect(() => {
     if (viewMode !== 'bus' || !isActive) {
-      // 셔틀/지하철 탭을 벗어나면 폴링을 즉시 멈추고, 돌아왔을 때 터치로 재개하도록 안내문을 띄운다
-      if (viewMode === 'bus') {
+      // 일반버스 화면을 보던 중 앱의 다른 탭으로 이동한 경우에만 절전 모드 진입
+      // (학교셔틀 화면 전환은 viewMode 가드만으로 폴링이 멈추므로 절전 처리 불필요)
+      if (viewMode === 'bus' && !isActive) {
         pausedByTabLeaveRef.current = true;
+        setIsUserActive(false);
       }
-      setIsUserActive(false);
       return;
     }
 
