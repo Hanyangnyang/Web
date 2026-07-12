@@ -13,6 +13,7 @@ import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
+import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -92,6 +93,7 @@ function MainLayout() {
   useEffect(() => {
     prefetchPortalData();
     prefetchBanners();
+    prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
 
   // 카페 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거

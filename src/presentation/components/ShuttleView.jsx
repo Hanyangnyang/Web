@@ -2,11 +2,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus, BusFront, RefreshCw } from 'lucide-react';
 import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
+import { getDistanceKm } from '../../domain/utils/geo.js';
 import { useShuttle } from '../hooks/useShuttle.js';
+import { useLocation } from '../hooks/useLocation.js';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
-import { usePostHog } from 'posthog-js/react';
 
 const ROUTE_LABEL = {
   '순환': '순환',
@@ -585,30 +586,11 @@ export function ShuttleView({ isActive }) {
     appConfig,
   } = useShuttle(isActive);
 
-  const posthog = usePostHog();
-
   const [triggerAutoFlip, setTriggerAutoFlip] = useState(false);
   const [viewMode, setViewMode] = useState('shuttle'); // 'shuttle' | 'bus'
 
-  // Geolocation & GPS
-  const [userCoords, setUserCoords] = useState(null);
-
-  useEffect(() => {
-    if (viewMode === 'bus') {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            setUserCoords({
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude
-            });
-          },
-          (err) => console.log("GPS Error:", err),
-          { enableHighAccuracy: true, timeout: 5000 }
-        );
-      }
-    }
-  }, [viewMode]);
+  // Geolocation & GPS — useLocation 모듈 캐시로 셔틀 탭과 좌표를 공유 (측위 경로 단일화)
+  const { coords: userCoords } = useLocation(isActive && viewMode === 'bus');
 
 
 
@@ -723,19 +705,7 @@ export function ShuttleView({ isActive }) {
     const coord = STOP_COORDS[stopName];
     if (!coord) return null;
 
-    const lat1 = userCoords.latitude;
-    const lon1 = userCoords.longitude;
-    const lat2 = coord.lat;
-    const lon2 = coord.lon;
-
-    const R = 6371; // km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const dist = R * c; // in km
+    const dist = getDistanceKm(userCoords.latitude, userCoords.longitude, coord.lat, coord.lon);
 
     if (dist < 1) {
       return `${Math.round(dist * 1000)}m`;
@@ -746,24 +716,13 @@ export function ShuttleView({ isActive }) {
   // Get closest stop name for badge
   const getClosestStopName = () => {
     if (!userCoords) return null;
-    let minDistance = 999999;
+    let minDistance = Infinity;
     let closestStop = null;
 
     DEFAULT_PRIORITY.forEach(stopName => {
       const coord = STOP_COORDS[stopName];
       if (coord) {
-        const lat1 = userCoords.latitude;
-        const lon1 = userCoords.longitude;
-        const lat2 = coord.lat;
-        const lon2 = coord.lon;
-        const R = 6371; // km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const dist = R * calcC;
+        const dist = getDistanceKm(userCoords.latitude, userCoords.longitude, coord.lat, coord.lon);
         if (dist < minDistance) {
           minDistance = dist;
           closestStop = stopName;
@@ -787,18 +746,10 @@ export function ShuttleView({ isActive }) {
       const isFav = favorites.includes(stopName);
       const isActive = activeStops.includes(stopName);
 
-      let dist = 999999;
+      let dist;
       if (userCoords && STOP_COORDS[stopName]) {
         const c = STOP_COORDS[stopName];
-        const lat1 = userCoords.latitude;
-        const lon1 = userCoords.longitude;
-        const dLat = (c.lat - lat1) * Math.PI / 180;
-        const dLon = (c.lon - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(lat1 * Math.PI / 180) * Math.cos(c.lat * Math.PI / 180) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const calcC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        dist = 6371 * calcC;
+        dist = getDistanceKm(userCoords.latitude, userCoords.longitude, c.lat, c.lon);
       } else {
         dist = DEFAULT_PRIORITY.indexOf(stopName);
       }
@@ -918,7 +869,6 @@ export function ShuttleView({ isActive }) {
 
     setIsBusLoading(prev => ({ ...prev, [stopName]: true }));
     const spinStartedAt = Date.now();
-    posthog?.capture('bus_api_call', { stopName, stationId });
     try {
       const res = await fetch(`/api/bus?stationId=${stationId}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -998,12 +948,11 @@ export function ShuttleView({ isActive }) {
         setIsBusLoading(prev => ({ ...prev, [stopName]: false }));
       }, remain);
     }
-  }, [posthog]);
+  }, []);
 
   const handleManualRefresh = useCallback(() => {
     if (isManualRefreshing) return;
     setIsManualRefreshing(true);
-    posthog?.capture('bus_manual_refresh');
 
     const expandedList = Object.keys(expandedStopsRef.current).filter(k => expandedStopsRef.current[k] === true);
     const minSpin = new Promise(resolve => setTimeout(resolve, 500)); // 최소 스핀 시간 확보 (즉시 끝나도 피드백 인지 가능하도록)
@@ -1014,7 +963,7 @@ export function ShuttleView({ isActive }) {
     ]).finally(() => {
       setIsManualRefreshing(false);
     });
-  }, [isManualRefreshing, fetchBusArrivalsForStop, posthog]);
+  }, [isManualRefreshing, fetchBusArrivalsForStop]);
 
   const prevExpandedStopsRef = useRef({});
   // Fetch immediately when stop transitions to expanded
@@ -1204,12 +1153,15 @@ export function ShuttleView({ isActive }) {
   }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
 
   useEffect(() => {
-    if (isGpsLoading) return;
+    // 컴포넌트는 앱 부팅 시 mount되므로(탭 전환은 display 토글) isActive 없이는
+    // 타이머가 부팅 순간부터 돌아 사용자가 보기 전에 툴팁 일생이 끝나버린다
+    if (!isActive || isGpsLoading) return;
 
-    // 탭 전환 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
+    // 탭 진입 2초 후 띄우고, 8초 동안 유지 (총 10초 후 사라짐)
     const showTimer = setTimeout(() => {
       if (!hasInteractedRef.current) {
         setTooltipStop(stop); // 2초 뒤 툴팁 생성되는 찰나에 결정된 최신 자동선택 정류장으로 조립!
+        setIsTooltipFadingOut(false); // 이전 사이클이 남긴 페이드아웃 상태 리셋 (안 하면 opacity-0으로 떠서 안 보임)
         setShowTooltip(true);
       }
     }, 2000);
@@ -1221,7 +1173,7 @@ export function ShuttleView({ isActive }) {
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
-  }, [stop, isGpsLoading]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
+  }, [isActive, stop, isGpsLoading]); // stop 이 비동기로 변할 때 타이머가 돌고 있다면 최신값을 잡을 수 있게 반영
 
   const handleStopClick = (s) => {
     setStop(s);
