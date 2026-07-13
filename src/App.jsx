@@ -1,6 +1,6 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
 // Triggering redeploy
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import './index.css';
 import { useMenu } from './presentation/hooks/useMenu.js';
 import { CafeteriaView } from './presentation/components/CafeteriaView.jsx';
@@ -13,6 +13,7 @@ import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
+import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -67,12 +68,32 @@ function MainLayout() {
   const posthog = usePostHog();
   const tabStartTime = useRef(Date.now());
 
+  // 탭별 스크롤 위치 저장/복원 — 탭들이 스크롤 컨테이너 하나를 공유하므로
+  // 전환 시 떠나는 탭의 scrollTop을 기록해두고 돌아올 때 되돌린다
+  const scrollContainerRef = useRef(null);
+  const scrollPositions = useRef({});
+  const activeTabRef = useRef(activeTab);
+  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
+
+  // deps 없는 콜백(routeFromParams)에서도 호출되므로 activeTab을 ref로 읽는다
+  const saveScrollPosition = useCallback(() => {
+    scrollPositions.current[activeTabRef.current] = scrollContainerRef.current?.scrollTop ?? 0;
+  }, []);
+
+  // 페인트 전에 복원해 이전 탭 위치가 한 프레임 보이는 깜빡임을 방지
+  useLayoutEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollPositions.current[activeTab] ?? 0;
+    }
+  }, [activeTab]);
+
   const { menuDate, cafes, cafesDate, menuLoading, changeDate } = useMenu();
 
   // 앱 시작 시 소식 탭 데이터를 백그라운드에서 미리 로드
   useEffect(() => {
     prefetchPortalData();
     prefetchBanners();
+    prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
 
   // 카페 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거
@@ -85,6 +106,7 @@ function MainLayout() {
 
   // 탭 라우팅 공통 함수 - Kakao 딥링크 / 푸시 알림 양쪽에서 재사용
   const routeFromParams = useCallback((paramString) => {
+    saveScrollPosition();
     const params = new URLSearchParams(paramString);
     const tab = params.get('tab');
     if (tab === 'weather') {
@@ -102,7 +124,7 @@ function MainLayout() {
       });
       setShowCafeDeepLinkLoader(true);
     }
-  }, []);
+  }, [saveScrollPosition]);
 
   // Android Kakao 딥링크 처리 (MainActivity.java가 evaluateJavascript로 주입)
   // window.__pendingDeepLinkParams: 초기 실행 시 React 마운트 전에 도착한 파라미터
@@ -152,9 +174,10 @@ function MainLayout() {
     const newIdx = TAB_ORDER.indexOf(tab);
     const curIdx = TAB_ORDER.indexOf(activeTab);
     setSlideDir(newIdx >= curIdx ? 'right' : 'left');
+    saveScrollPosition();
     setActiveTab(tab);
     localStorage.setItem('lastActiveTab', tab);
-  }, [activeTab, posthog]);
+  }, [activeTab, posthog, saveScrollPosition]);
 
   return (
     <>
@@ -180,7 +203,7 @@ function MainLayout() {
         } : {}}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden px-4 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
+        <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto overflow-x-hidden px-4 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}

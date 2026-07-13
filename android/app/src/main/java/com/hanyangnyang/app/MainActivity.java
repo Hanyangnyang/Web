@@ -36,8 +36,12 @@ public class MainActivity extends BridgeActivity {
             if (fcmLink != null && !fcmLink.isEmpty()) {
                 try {
                     android.net.Uri fcmUri = android.net.Uri.parse(fcmLink);
-                    String query = fcmUri.getEncodedQuery();
-                    if (query != null && !query.isEmpty()) pendingDeepLinkParams = query;
+                    String host = fcmUri.getHost();
+                    // FCM 링크는 반드시 자체 도메인에서 온 것만 허용
+                    if (host != null && (host.equals("www.hanyang.life") || host.equals("hanyang.life"))) {
+                        String query = fcmUri.getEncodedQuery();
+                        if (query != null && !query.isEmpty()) pendingDeepLinkParams = query;
+                    }
                 } catch (Exception ignored) {}
             }
         }
@@ -76,7 +80,19 @@ public class MainActivity extends BridgeActivity {
                     if ("intent".equals(scheme)) {
                         try {
                             Intent intent = Intent.parseUri(uri.toString(), Intent.URI_INTENT_SCHEME);
-                            startActivity(intent);
+                            // WebView發 intent의 컴포넌트 직접 지정 공격 무력화
+                            intent.setComponent(null);
+                            intent.setSelector(null);
+                            // 카카오 관련 패키지 또는 kakao* 스킴만 실행 허용 (임의 앱 실행 방지)
+                            // package= 파라미터는 SDK 버전에 따라 없을 수 있으므로 데이터 스킴도 함께 검사
+                            String pkg = intent.getPackage();
+                            Uri data = intent.getData();
+                            String dataScheme = data != null ? data.getScheme() : null;
+                            boolean kakaoPkg = pkg != null && (pkg.startsWith("com.kakao") || pkg.startsWith("kakao"));
+                            boolean kakaoScheme = dataScheme != null && dataScheme.startsWith("kakao");
+                            if (kakaoPkg || kakaoScheme) {
+                                startActivity(intent);
+                            }
                         } catch (Exception ignored) {}
                         return true;
                     }

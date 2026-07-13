@@ -400,12 +400,38 @@ export function PortalView({ isVisible = true }) {
         {(loading || weather) && (
           <section className="-mt-3 mb-3">
             {loading ? (
-              <div className="rounded-card min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-between p-6">
-                <div className="flex flex-col gap-3">
-                  <div className="h-12 w-36 bg-slate-200 rounded-xl" />
-                  <div className="h-4 w-28 bg-slate-200 rounded-full" />
+              <div className="rounded-card p-4 min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-start">
+                <div className="pl-2">
+                  <div className="h-3 w-20 bg-slate-200 rounded-full" />
+                  <div className="flex items-baseline gap-1.5 mt-1.5">
+                    <div className="h-12 w-24 bg-slate-200 rounded-xl" />
+                    <div className="h-5 w-14 bg-slate-200 rounded-lg" />
+                  </div>
+                  <div className="h-3 w-24 bg-slate-200 rounded-full mt-2" />
                 </div>
-                <div className="h-10 w-full bg-slate-200 rounded-xl mt-6" />
+                <div className="mt-2 bg-slate-200/60 rounded-xl p-3 flex flex-col gap-2">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="h-3 w-full bg-slate-200 rounded-full" />
+                    <div className="h-3 w-2/3 bg-slate-200 rounded-full" />
+                  </div>
+                  <div className="border-t border-slate-200/60 w-full" />
+                  <div className="flex gap-2 overflow-hidden">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="flex flex-col items-center gap-0.5 py-0.5 flex-shrink-0" style={{ minWidth: '46px' }}>
+                        <div className="h-[11px] w-5 bg-slate-200 rounded-full" />
+                        <div className="h-4 w-4 bg-slate-200 rounded-full my-0.5" />
+                        <div className="h-[13px] w-5 bg-slate-200 rounded-full" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t border-slate-200/60 w-full pt-3">
+                    <div className="flex justify-around items-center">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-3 w-10 bg-slate-200 rounded-full" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : weather ? (
               <div className="rounded-card p-4 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
@@ -510,7 +536,7 @@ export function PortalView({ isVisible = true }) {
           </section>
         )}
 
-      {bannersLoading ? (
+      {(loading || bannersLoading) ? (
         <div className="mb-3 mt-2">
           <div className="rounded-card aspect-[10/3] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
         </div>
@@ -524,12 +550,18 @@ export function PortalView({ isVisible = true }) {
         <div className="grid grid-cols-2 gap-3">
           {loading ? (
             [1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-4 h-[140px] animate-pulse flex flex-col justify-between">
-                <div className="flex flex-col gap-2">
-                  <div className="h-4 w-3/4 bg-slate-100 rounded-full" />
-                  <div className="h-6 w-1/2 bg-slate-100 rounded-lg" />
+              <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-4 flex flex-col gap-3 animate-pulse">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="h-4 w-2/3 bg-slate-100 rounded-full" />
+                  <div className="h-4 w-10 bg-slate-100 rounded-md flex-shrink-0" />
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full" />
+                <div className="mt-auto">
+                  <div className="w-full h-2 bg-slate-100 rounded-full" />
+                  <div className="flex justify-between items-center mt-2.5">
+                    <div className="h-3 w-16 bg-slate-100 rounded-full" />
+                    <div className="h-3 w-12 bg-slate-100 rounded-full" />
+                  </div>
+                </div>
               </div>
             ))
           ) : library?.list ? (
@@ -558,10 +590,10 @@ export function PortalView({ isVisible = true }) {
                       }} />
                     </div>
                     <div className="flex justify-between items-center mt-2.5">
-                      <span className="text-[12px] text-text-main font-black">
+                      <span className="text-[12px] text-[#334155] font-black">
                         {emptySeats}석 남음
                       </span>
-                      <span className="text-[11px] text-text-sub font-bold">
+                      <span className="text-[11px] text-[#475569] font-bold">
                         {room.occupied} / {room.total}
                       </span>
                     </div>
