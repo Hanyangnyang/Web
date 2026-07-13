@@ -201,7 +201,7 @@ export function MiscView({ resetSignal }) {
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">피드백 하기</span>
-            <span className="text-[0.8rem] text-text-sub">작은 의견도 큰 힘이 돼요 :)</span>
+            <span className="text-[0.8rem] text-text-sub">작은 의견도 큰 힘이 돼요:)</span>
           </div>
         </div>
       </div>

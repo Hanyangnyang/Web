@@ -1,6 +1,6 @@
 // 컴포넌트: 한양대 ERICA 공식 인스타그램 계정 목록 및 프로필 이미지 표시
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { INSTA_ACCOUNTS } from '../../domain/entities/InstagramAccount.js';
 import { useInstagram } from '../hooks/useInstagram.js';
 
@@ -74,13 +74,15 @@ export function InstagramListView({ onBack }) {
           onClick={() => toggle('erica')}
         >
           <span className="text-base font-bold text-text-main">에리카</span>
-          {expanded.erica ? <ChevronUp size={20} color="#94a3b8" /> : <ChevronDown size={20} color="#94a3b8" />}
+          <ChevronDown size={20} color="#94a3b8" className={`transition-transform duration-300 ${expanded.erica ? 'rotate-180' : ''}`} />
         </div>
-        {expanded.erica && (
-          <div className="flex flex-col">
-            {INSTA_ACCOUNTS.erica.map(renderItem)}
+        <div className={`accordion-content ${expanded.erica ? 'expanded' : ''}`}>
+          <div className="accordion-inner">
+            <div className="flex flex-col">
+              {INSTA_ACCOUNTS.erica.map(renderItem)}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div className="mb-6">
@@ -89,13 +91,15 @@ export function InstagramListView({ onBack }) {
           onClick={() => toggle('college')}
         >
           <span className="text-base font-bold text-text-main">단과 대학</span>
-          {expanded.college ? <ChevronUp size={20} color="#94a3b8" /> : <ChevronDown size={20} color="#94a3b8" />}
+          <ChevronDown size={20} color="#94a3b8" className={`transition-transform duration-300 ${expanded.college ? 'rotate-180' : ''}`} />
         </div>
-        {expanded.college && (
-          <div className="flex flex-col">
-            {INSTA_ACCOUNTS.college.map(renderItem)}
+        <div className={`accordion-content ${expanded.college ? 'expanded' : ''}`}>
+          <div className="accordion-inner">
+            <div className="flex flex-col">
+              {INSTA_ACCOUNTS.college.map(renderItem)}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
