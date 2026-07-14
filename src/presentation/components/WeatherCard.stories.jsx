@@ -44,6 +44,7 @@ function makeWeather({ weatherCode, temp, description, grade = AQ_GRADES.보통 
 }
 
 // WeatherCard.jsx weatherTheme 분기와 1:1 대응하는 배경 6종
+// (한파는 별도 배경/아이콘 없이 기온(-10°↓)에 따라 기존 카드 위에 "한파" 뱃지만 얹는 방식 — WeatherCard.jsx L299 근처)
 const BACKGROUNDS = [
   { name: '폭염 맑음 (28°↑ 골드오렌지)', weatherCode: 0, temp: 31, description: '맑음' },
   { name: '선선한 맑음 (스카이블루)', weatherCode: 0, temp: 21, description: '맑음' },
@@ -74,10 +75,15 @@ const mobileFrame = (Story) => (
 // Storybook 사이드바는 기본적으로 export 순서를 그대로 따른다.
 // 전체 조합 검수(전체매트릭스) → 아이콘 전수 비교(아이콘모음) → 개별 상태 순으로 배치.
 
-// ── 전체 매트릭스: 배경 6종(행) × 미세먼지 등급 5종(열) = 30조합 표 형태 ─────
-// 열 개수(라벨 1 + 등급 5 = 6)와 gridTemplateColumns 칸 수를 맞춰뒀기 때문에,
+// ── 전체 매트릭스: 배경 6종(행) × [미세먼지 등급 5종 + 한파] 6열 = 36조합 표 형태 ─────
+// 열 개수(라벨 1 + 6 = 7)와 gridTemplateColumns 칸 수를 맞춰뒀기 때문에,
 // 아래 flatMap이 만드는 평평한 배열이 자동으로 "배경별 한 줄"로 줄바꿈된다.
-const GRADE_LIST = Object.values(AQ_GRADES);
+// 마지막 "한파" 열은 WeatherCard.jsx의 COLD_SNAP_TEMP(-10°)보다 낮은 기온으로 덮어써서
+// 별도 배경 없이 각 날씨 카드 위에 "한파" 뱃지만 얹히는지 한 번에 검수한다.
+const MATRIX_COLUMNS = [
+  ...Object.values(AQ_GRADES).map((grade) => ({ key: grade.label, label: grade.label, grade })),
+  { key: '한파', label: '한파', grade: AQ_GRADES.보통, coldSnapTemp: -13 },
+];
 
 export const 전체매트릭스 = {
   render: () => (
@@ -85,26 +91,34 @@ export const 전체매트릭스 = {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: `120px repeat(${GRADE_LIST.length}, ${CARD_WIDTH}px)`,
+          gridTemplateColumns: `120px repeat(${MATRIX_COLUMNS.length}, ${CARD_WIDTH}px)`,
           gap: '10px 12px',
           alignItems: 'center',
         }}
       >
-        {/* 헤더 행: 등급 이름 */}
+        {/* 헤더 행: 등급 이름 + 한파 */}
         <div />
-        {GRADE_LIST.map((grade) => (
-          <div key={`head-${grade.label}`} style={{ fontSize: '13px', fontWeight: 800, textAlign: 'center', color: '#334155' }}>
-            {grade.label}
+        {MATRIX_COLUMNS.map((col) => (
+          <div key={`head-${col.key}`} style={{ fontSize: '13px', fontWeight: 800, textAlign: 'center', color: '#334155' }}>
+            {col.label}
           </div>
         ))}
 
-        {/* 배경별 한 줄: 라벨 + 등급 5개 카드 */}
+        {/* 배경별 한 줄: 라벨 + 등급 5개 + 한파 1개 카드 */}
         {BACKGROUNDS.flatMap((bg) => [
           <div key={`${bg.name}-label`} style={{ fontSize: '12px', fontWeight: 700, color: '#475569' }}>
             {bg.name}
           </div>,
-          ...GRADE_LIST.map((grade) => (
-            <WeatherCard key={`${bg.name}-${grade.label}`} weather={makeWeather({ ...bg, grade })} loading={false} />
+          ...MATRIX_COLUMNS.map((col) => (
+            <WeatherCard
+              key={`${bg.name}-${col.key}`}
+              weather={makeWeather({
+                ...bg,
+                grade: col.grade,
+                temp: col.coldSnapTemp !== undefined ? col.coldSnapTemp : bg.temp,
+              })}
+              loading={false}
+            />
           )),
         ])}
       </div>
@@ -135,11 +149,11 @@ function HourlyPill({ Icon, fill, isCurrent }) {
       className={`flex flex-col items-center gap-0.5 px-2.5 py-0.5 rounded-xl transition-all duration-300 ${
         isCurrent ? 'bg-white/90 border border-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.15)]' : ''
       }`}
-      style={{ minWidth: '46px' }}
+      style={{ minWidth: '48px' }}
     >
       <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>3시</span>
-      <Icon size={16} strokeWidth={2} fill={fill} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
-      <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>21°</span>
+      <Icon size={18} strokeWidth={2} fill={fill} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
+      <span className={`text-[14px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>21°</span>
     </div>
   );
 }

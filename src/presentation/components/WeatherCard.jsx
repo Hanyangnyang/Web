@@ -1,6 +1,11 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudLightning } from 'lucide-react';
 
+// 한파 판단 기준 기온(℃): 기상청 한파특보 절대기준(-12~-15도)보다 약간 낮춰
+// 좀 더 자주 체감할 수 있도록 설정. 날씨 상태(맑음/흐림/비/눈)와 무관하게
+// 기온만으로 판단해 기존 카드 위에 "한파" 뱃지만 얹는다.
+const COLD_SNAP_TEMP = -10;
+
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
@@ -264,10 +269,10 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
             <div className="border-t border-slate-200/60 w-full" />
             <div className="flex gap-2 overflow-hidden">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="flex flex-col items-center gap-0.5 py-0.5 flex-shrink-0" style={{ minWidth: '46px' }}>
+                <div key={i} className="flex flex-col items-center gap-0.5 py-0.5 flex-shrink-0" style={{ minWidth: '48px' }}>
                   <div className="h-[11px] w-5 bg-slate-200 rounded-full" />
-                  <div className="h-4 w-4 bg-slate-200 rounded-full my-0.5" />
-                  <div className="h-[13px] w-5 bg-slate-200 rounded-full" />
+                  <div className="h-[18px] w-[18px] bg-slate-200 rounded-full my-0.5" />
+                  <div className="h-[14px] w-5 bg-slate-200 rounded-full" />
                 </div>
               ))}
             </div>
@@ -286,24 +291,36 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
         }}>
           <div className="relative z-10 w-full">
             <div className="flex flex-col w-full">
-              <div className="pl-2">
-                <p className="text-xs font-semibold opacity-75">
+              {/* 배경 그라데이션 밝기와 무관하게 항상 읽히도록 은은한 텍스트 그림자 사용
+                  (아래 날씨 변화 박스의 "그림자로 지지되는 흰 텍스트"와 동일한 톤) */}
+              <div className="pl-2 [text-shadow:0_1px_1px_rgba(0,0,0,0.3)]">
+                <p className="text-xs font-semibold opacity-85 leading-tight">
                   안산시 상록구 사동
                 </p>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
+                <div className="flex items-baseline gap-1.5">
                   <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
-                  <span className="text-xl font-bold opacity-90 leading-tight">{weather.description}</span>
+                  {/* 설명 텍스트와 한파 뱃지는 기준선이 아닌 수평 중앙선을 기준으로 나란히 정렬 */}
+                  <span className="inline-flex items-center gap-1">
+                    <span className="text-lg font-bold opacity-90 leading-tight">{weather.description}</span>
+                    {weather.temp <= COLD_SNAP_TEMP && (
+                      <span className="px-1 py-0.5 rounded-full bg-white/25 text-white/80 text-[10px] font-bold tracking-tight">
+                        한파
+                      </span>
+                    )}
+                  </span>
                 </div>
                 {maxTemp !== null && minTemp !== null && (
-                  <p className="text-xs font-bold opacity-75 mt-1 flex items-center gap-1">
+                  <p className="text-xs font-bold opacity-85 leading-tight mt-0.5 flex items-center gap-1">
                     <span>최고 {maxTemp}°</span>
                     <span>최저 {minTemp}°</span>
                   </p>
                 )}
               </div>
 
-              {/* 날씨 변화 박스 (AI 요약 + 시간별 예보 통합 카드) */}
-              <div className="mt-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
+              {/* 날씨 변화 박스 (AI 요약 + 시간별 예보 통합 카드): 배경 그라데이션 밝기와 무관하게
+                  흰 텍스트 대비를 확보하기 위해 반투명 검정 오버레이 사용 (기존 bg-white/10은
+                  밝은 배경일수록 대비가 무너졌음). 자세히 들여다보지 않는 보조 정보라 /28 정도로만 살짝. */}
+              <div className="mt-2 bg-slate-900/28 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
                 {weather.message && (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-start text-xs font-bold leading-normal w-full opacity-90 px-0.5">
@@ -336,13 +353,13 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
                                 ? 'bg-white/90 border border-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.15)]'
                                 : ''
                             } ${isPast ? 'opacity-55' : 'opacity-100'}`}
-                            style={{ minWidth: '46px' }}
+                            style={{ minWidth: '48px' }}
                           >
                             <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
                               {h.hour}시
                             </span>
-                            <HourlyIcon size={16} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
-                            <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
+                            <HourlyIcon size={18} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
+                            <span className={`text-[14px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
                           </div>
                         );
                       })}
