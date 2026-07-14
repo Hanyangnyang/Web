@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
         manifest: {
           name: '하냥냥',
           short_name: '하냥냥',
-          description: '빠른 한양대 도서관 입장을 위한 QR 패스',
+          description: '한양대학교 에리카 학생을 위한 서비스',
           theme_color: '#0e4a84',
           background_color: '#ffffff',
           display: 'standalone',
