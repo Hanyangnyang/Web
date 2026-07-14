@@ -45,6 +45,10 @@ ios/App/App/GoogleService-Info.plist
 # Scratch directory
 scratch/
 
+# Playwright 실행 산출물 (실패 trace·리포트 — 매번 재생성되는 로컬 파일)
+test-results/
+playwright-report/
+
 # Claude Code local settings
 .claude/
 
