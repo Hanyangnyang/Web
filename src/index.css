@@ -616,9 +616,11 @@ body {
 
 }
 
-/* ═══ 날씨 비구름 아이콘의 빗방울/번개 부분 개별 색상 지정 ═══ */
-.weather-rain-icon path:not(:first-child),
-.weather-rain-icon line {
+/* ═══ 비/소나기 아이콘의 빗방울 부분만 개별 색상 지정 (다른 아이콘의 테두리는 흰/검정 유지) ═══ */
+.lucide-cloud-rain path:not(:first-child),
+.lucide-cloud-rain line,
+.lucide-cloud-drizzle path:not(:first-child),
+.lucide-cloud-drizzle line {
   stroke: #38bdf8 !important; /* 영롱한 하늘색/파란색 빗방울 */
 }
 

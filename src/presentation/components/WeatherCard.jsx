@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudSnow, CloudLightning } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudLightning } from 'lucide-react';
 
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
@@ -78,20 +78,18 @@ function getHourlyIcon(code, hour) {
   if (code <= 3) return Cloud;
   if (code <= 48) return CloudFog;
   if (code <= 67) return CloudRain;
-  if (code <= 77) return CloudSnow;
+  if (code <= 77) return Snowflake; // 비 아이콘(CloudRain)과 구분되도록 구름 없는 눈송이 아이콘 사용
   if (code <= 82) return CloudDrizzle;
   return CloudLightning;
 }
 
-// 해는 주황색, 구름은 흰색, 비는 파란색으로 아이콘 내부를 채움
+// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만(무채움) 표시
 function getHourlyIconFill(Icon) {
-  if (Icon === Sun) return '#f97316';
   if (
     Icon === Cloud ||
     Icon === CloudSun ||
     Icon === CloudMoon ||
     Icon === CloudFog ||
-    Icon === CloudSnow ||
     Icon === CloudRain ||
     Icon === CloudDrizzle ||
     Icon === CloudLightning
@@ -343,7 +341,7 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
                             <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>
                               {h.hour}시
                             </span>
-                            <HourlyIcon size={16} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'} weather-rain-icon`} />
+                            <HourlyIcon size={16} strokeWidth={2} fill={getHourlyIconFill(HourlyIcon)} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
                             <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>{h.temp}°</span>
                           </div>
                         );

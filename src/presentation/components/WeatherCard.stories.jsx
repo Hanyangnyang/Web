@@ -1,5 +1,5 @@
 import { WeatherCard } from './WeatherCard.jsx';
-import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudRain, CloudSnow, CloudDrizzle, CloudLightning } from 'lucide-react';
+import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudRain, Snowflake, CloudDrizzle, CloudLightning } from 'lucide-react';
 
 // ── mock 데이터 생성기 ─────────────────────────────────────────────
 // 시간별 예보는 현재 시각 기준 ±12시간으로 생성 — 고정 epoch를 쓰면
@@ -115,20 +115,20 @@ export const 전체매트릭스 = {
 // ── 시간별 예보 아이콘 모음: getHourlyIcon/getHourlyIconFill 분기 전수 나열 ─────
 const HOURLY_ICONS = [
   { Icon: Moon, name: 'Moon', fill: 'none', when: 'code ≤0 · 야간(20~06시)' },
-  { Icon: Sun, name: 'Sun', fill: '#f97316', when: 'code ≤0 · 주간' },
+  { Icon: Sun, name: 'Sun', fill: 'none', when: 'code ≤0 · 주간' },
   { Icon: CloudMoon, name: 'CloudMoon', fill: '#ffffff', when: 'code ≤1 · 야간' },
   { Icon: CloudSun, name: 'CloudSun', fill: '#ffffff', when: 'code ≤1(주간) 또는 code=2' },
   { Icon: Cloud, name: 'Cloud', fill: '#ffffff', when: 'code ≤3' },
   { Icon: CloudFog, name: 'CloudFog', fill: '#ffffff', when: 'code ≤48 (안개)' },
   { Icon: CloudRain, name: 'CloudRain', fill: '#ffffff', when: 'code ≤67 (비)' },
-  { Icon: CloudSnow, name: 'CloudSnow', fill: '#ffffff', when: 'code ≤77 (눈)' },
+  { Icon: Snowflake, name: 'Snowflake', fill: 'none', when: 'code ≤77 (눈) — CloudRain과 구분되는 구름 없는 눈송이' },
   { Icon: CloudDrizzle, name: 'CloudDrizzle', fill: '#ffffff', when: 'code ≤82 (소나기)' },
   { Icon: CloudLightning, name: 'CloudLightning', fill: '#ffffff', when: 'code >82 (뇌우)' },
 ];
 
 // 실제 카드의 시간별 예보 칸(WeatherCard.jsx L333-347)과 동일한 마크업 재현.
-// isCurrent(지금 칸)일 때만 배경이 bg-white/90 필로 바뀌고, 아이콘/글자 색이
-// text-white → text-slate-700으로 반전된다 — fill(내부 채움색)은 두 상태에서 동일하다.
+// isCurrent(지금 칸)일 때만 배경이 bg-white/90 필로 바뀌고, 아이콘 테두리 색이
+// text-white → text-black으로 반전된다 — fill(내부 채움색)은 두 상태에서 동일하다.
 function HourlyPill({ Icon, fill, isCurrent }) {
   return (
     <div
@@ -138,7 +138,7 @@ function HourlyPill({ Icon, fill, isCurrent }) {
       style={{ minWidth: '46px' }}
     >
       <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>3시</span>
-      <Icon size={16} strokeWidth={2} fill={fill} className={`my-0.5 ${isCurrent ? 'text-slate-700' : 'text-white'} weather-rain-icon`} />
+      <Icon size={16} strokeWidth={2} fill={fill} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
       <span className={`text-[13px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>21°</span>
     </div>
   );
@@ -174,7 +174,7 @@ export const 아이콘모음 = {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <HourlyPill Icon={Icon} fill={fill} isCurrent={true} />
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)' }}>활성 · 지금 (text-slate-700)</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)' }}>활성 · 지금 (text-black)</span>
             </div>
           </div>
         </div>
