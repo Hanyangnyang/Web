@@ -12,13 +12,19 @@ let inflight = null; // 진행 중인 측위 Promise — 중복 요청을 하나
 
 const isFresh = (c) => c && Date.now() - c.timestamp < MAX_AGE_MS;
 
-function measure() {
-  if (inflight) return inflight;
-  inflight = Geolocation.getCurrentPosition({
+function getCurrentPosition() {
+  return Geolocation.getCurrentPosition({
     enableHighAccuracy: true,
     timeout: 5000,
     maximumAge: MAX_AGE_MS,
-  })
+  });
+}
+
+function measure() {
+  if (inflight) return inflight;
+  // 콜드부팅 직후 GPS 콜드픽스로 최초 시도가 5초 안에 실패할 수 있어 1회 재시도한다.
+  inflight = getCurrentPosition()
+    .catch(() => getCurrentPosition())
     .then((pos) => {
       cache = {
         latitude: pos.coords.latitude,
