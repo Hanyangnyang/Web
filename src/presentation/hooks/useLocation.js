@@ -3,6 +3,7 @@
 // 동시에 요청해도 실제 측위는 한 번만 일어난다.
 import { useState, useEffect } from 'react';
 import { Geolocation } from '@capacitor/geolocation';
+import * as Sentry from '@sentry/capacitor';
 
 // 캐시 신선도 허용치: 도보 이동으로 최근접 정류장이 바뀌기 어려운 시간
 const MAX_AGE_MS = 2 * 60 * 1000;
@@ -46,6 +47,8 @@ async function measureWithRetry(attempt = 1) {
 
 function measure() {
   if (inflight) return inflight;
+  // 프리페치·온디맨드 양쪽이 이 Promise를 공유하므로, 실패 리포팅은 호출부가 아닌
+  // 여기 한 곳에서만 해야 같은 실패가 두 건으로 중복 집계되지 않는다.
   inflight = measureWithRetry()
     .then((pos) => {
       cache = {
@@ -54,6 +57,10 @@ function measure() {
         timestamp: Date.now(),
       };
       return cache;
+    })
+    .catch((error) => {
+      Sentry.captureMessage('Shuttle geolocation failed', { level: 'warning', extra: { error } });
+      throw error; // 호출부가 각자 폴백을 처리할 수 있게 그대로 전파
     })
     .finally(() => { inflight = null; });
   return inflight;
