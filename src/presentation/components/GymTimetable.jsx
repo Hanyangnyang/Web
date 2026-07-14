@@ -113,7 +113,7 @@ export function GymTimetable({ onBack }) {
 
   const renderCell = (cell, span, startHour) => {
     if (cell === null) return null;
-    if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-surface p-0.5 relative" />;
+    if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-[#e2e8f0] p-0.5 relative" />;
     const s = COLORS[cell.type];
     let innerH = '100%';
     let alignTop = false;
@@ -123,7 +123,7 @@ export function GymTimetable({ onBack }) {
       alignTop = true;
     }
     return (
-      <td rowSpan={span} className={`h-10 border-b border-r border-surface p-0.5 relative${alignTop ? ' align-top' : ''}`}>
+      <td rowSpan={span} className={`h-10 border-b border-r border-[#e2e8f0] p-0.5 relative${alignTop ? ' align-top' : ''}`}>
         <div
           className="rounded border flex flex-col justify-center items-center gap-px"
           style={{ backgroundColor: s.bg, color: s.text, borderColor: s.border, height: innerH, flexShrink: 0 }}
@@ -136,7 +136,7 @@ export function GymTimetable({ onBack }) {
 
   return (
     <div className="pb-20 font-['Pretendard',-apple-system,sans-serif] [animation:slideUp_0.4s_ease-out]">
-      <header className="flex items-center gap-4 mb-6">
+      <header className="flex items-center gap-4 mb-3">
         <button
           className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
           onClick={onBack}
@@ -212,9 +212,9 @@ export function GymTimetable({ onBack }) {
           <table className="w-full border-collapse table-fixed">
             <thead>
               <tr>
-                <th className="py-3 px-1 text-[0.7rem] font-bold text-text-hint border-b border-[#f1f5f9] text-center" style={{ width: '12%' }} />
+                <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-[#e2e8f0] text-center" style={{ width: '12%' }} />
                 {['월', '화', '수', '목', '금'].map(d => (
-                  <th key={d} className="py-3 px-1 text-[0.7rem] font-bold text-text-hint border-b border-[#f1f5f9] text-center" style={{ width: '17.6%' }}>{d}</th>
+                  <th key={d} className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-[#e2e8f0] text-center" style={{ width: '17.6%' }}>{d}</th>
                 ))}
               </tr>
             </thead>
@@ -223,9 +223,9 @@ export function GymTimetable({ onBack }) {
                 const isClosedRow = closingHour !== null && row.hour >= closingHour;
                 return (
                   <tr key={i}>
-                    <td className="py-2 px-1 text-[0.65rem] font-bold text-[#cbd5e1] text-center border-r border-surface">{row.label}</td>
+                    <td className="py-2 px-1 text-[0.65rem] font-bold text-text-sub text-center border-r border-[#e2e8f0]">{row.label}</td>
                     {isClosedRow ? (
-                      <td colSpan={5} className="bg-slate-50 text-[#cbd5e1] text-[0.65rem] font-bold text-center py-2 h-10 border-b border-surface">
+                      <td colSpan={5} className="bg-slate-50 text-text-hint text-[0.65rem] font-bold text-center py-2 h-10 border-b border-[#e2e8f0]">
                         운영 종료
                       </td>
                     ) : (
