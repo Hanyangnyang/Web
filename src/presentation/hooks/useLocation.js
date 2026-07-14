@@ -12,19 +12,41 @@ let inflight = null; // 진행 중인 측위 Promise — 중복 요청을 하나
 
 const isFresh = (c) => c && Date.now() - c.timestamp < MAX_AGE_MS;
 
+// 네이티브(Android/iOS) 타임아웃 에러 코드와 웹(navigator.geolocation) 타임아웃 코드.
+// 권한 거부(OS-PLUG-GLOC-0003 등)는 재시도해도 결과가 같으므로 재시도 대상에서 제외한다.
+const NATIVE_TIMEOUT_CODE = 'OS-PLUG-GLOC-0010';
+const WEB_TIMEOUT_CODE = 3; // GeolocationPositionError.TIMEOUT
+const MAX_ATTEMPTS = 3;
+
+const isTimeoutError = (error) =>
+  error?.code === NATIVE_TIMEOUT_CODE || error?.code === WEB_TIMEOUT_CODE;
+
 function getCurrentPosition() {
   return Geolocation.getCurrentPosition({
-    enableHighAccuracy: true,
+    // 정류장 간 거리가 수백m~1km 이상이라 COARSE 정확도로 충분하다.
+    // Android 12+에서 enableHighAccuracy:true는 FINE 권한을 요구해, "대략적 위치만" 허용한
+    // 사용자에게 프리페치 게이트(coarseLocation granted 통과)와 무관하게 팝업이 다시 뜨는 문제가 있었다.
+    enableHighAccuracy: false,
     timeout: 5000,
     maximumAge: MAX_AGE_MS,
   });
 }
 
+// 콜드부팅 직후 GPS 콜드픽스로 타임아웃될 수 있어 타임아웃에 한해 최대 3회까지 시도한다.
+async function measureWithRetry(attempt = 1) {
+  try {
+    return await getCurrentPosition();
+  } catch (error) {
+    if (attempt < MAX_ATTEMPTS && isTimeoutError(error)) {
+      return measureWithRetry(attempt + 1);
+    }
+    throw error;
+  }
+}
+
 function measure() {
   if (inflight) return inflight;
-  // 콜드부팅 직후 GPS 콜드픽스로 최초 시도가 5초 안에 실패할 수 있어 1회 재시도한다.
-  inflight = getCurrentPosition()
-    .catch(() => getCurrentPosition())
+  inflight = measureWithRetry()
     .then((pos) => {
       cache = {
         latitude: pos.coords.latitude,
@@ -44,7 +66,9 @@ export async function prefetchLocation() {
   try {
     const status = await Geolocation.checkPermissions();
     if (status.location === 'granted' || status.coarseLocation === 'granted') {
-      measure().catch(() => {});
+      measure().catch((error) => {
+        console.warn('Prefetch geolocation failed.', error);
+      });
     }
   } catch {
     // 권한 조회를 지원하지 않는 환경(일부 브라우저)에서는 프리페치를 건너뛴다
