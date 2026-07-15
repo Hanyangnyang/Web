@@ -1,6 +1,6 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, CalendarDays, ArrowUpRight, Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
+import { Dumbbell, CalendarDays, ExternalLink, Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
 import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
@@ -84,23 +84,23 @@ function FeedbackSection({ onBack }) {
 
   return (
     <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-5">
         <button
           className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center cursor-pointer text-text-main transition-all duration-200 hover:bg-surface"
           onClick={onBack}
         >
           <ArrowLeft size={20} />
         </button>
-        <h2 className="text-2xl font-extrabold text-text-main mb-0">피드백 보내기</h2>
+        <h2 className="text-xl font-bold text-text-main mb-0">피드백 보내기</h2>
       </div>
 
       <div className="bg-white border border-[#e2e8f0] rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2">
           <Laugh size={18} className="text-hyu-blue-light" />
           <span className="font-extrabold text-[15px] text-text-main">하냥냥에게 피드백 보내기</span>
         </div>
 
-        <p className="text-[#64748b] text-[11px] font-medium leading-relaxed mb-4">
+        <p className="text-[#64748b] text-[11px] font-medium leading-relaxed mb-2">
           하냥냥은 여러분들의 소중한 의견을 듣고 싶어요<br />
           기능 제안, 오류 제보, 칭찬의 말 등 무엇이든 알려주세요!
         </p>
@@ -188,8 +188,9 @@ export function MiscView({ resetSignal }) {
             <CalendarDays size={28} color="#0E4A84" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[0.95rem] font-extrabold text-text-main">
-              학사 일정 <ArrowUpRight size={14} style={{ display: 'inline', marginLeft: '2px', verticalAlign: 'middle', opacity: 0.8 }} />
+            <span className="text-[0.95rem] font-extrabold text-text-main inline-flex items-center justify-center gap-0.5">
+              학사 일정
+              <ExternalLink size={14} strokeWidth={2.75} style={{ opacity: 0.8 }} />
             </span>
             <span className="text-[0.8rem] text-text-sub">에리카 학사 캘린더</span>
           </div>
