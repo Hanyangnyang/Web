@@ -49,7 +49,7 @@ function AccountItem({ acc, isFirst, profile, getProxiedUrl }) {
             className="flex-shrink-0 min-w-[64px] flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[12px] cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
             onClick={() => openInsta(acc.username)}
           >
-            구경가기
+            이동하기
           </button>
         </div>
       )}
@@ -67,9 +67,6 @@ function AccountGroup({ groupKey, title, accounts, expanded, onToggle, profiles,
       >
         <span className="font-bold text-[16px] tracking-tight text-text-main">{title}</span>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
-            {accounts.length}개 계정
-          </span>
           <ChevronDown
             size={16}
             className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
