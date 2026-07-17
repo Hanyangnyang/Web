@@ -20,8 +20,8 @@ const JSON_PATH = path.resolve('src/data/partnerships.json');
 const ERICA = { lng: 126.8388, lat: 37.2983 };
 const SEARCH_RADIUS_M = 3000;
 
-// 폐업 확인된 매장 — is_active만 끄고 location은 null 유지
-const CLOSED = ['양식당', '헤브론', '오토르테'];
+// 폐업 확인된 매장 — is_active만 끄고 location은 건드리지 않음
+const CLOSED = ['양식당', '헤브론', '오토르테', '큰맘할매순대국'];
 
 // 자동 검색이 실패/오매칭됐던 매장 → 검수 완료된 카카오맵 place ID
 const OVERRIDES = {

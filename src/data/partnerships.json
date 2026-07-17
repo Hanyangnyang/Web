@@ -5167,7 +5167,7 @@
     "id": "76",
     "name": "큰맘할매순대국",
     "category": "food",
-    "is_active": true,
+    "is_active": false,
     "summary_benefit": "500원 즉시 할인",
     "location": {
       "latitude": 37.3099017501693,
