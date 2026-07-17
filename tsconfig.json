@@ -21,7 +21,7 @@
     "checkJs": false,
 
     "skipLibCheck": true,
-    "types": ["vite/client"]
+    "types": ["vite/client", "kakao.maps.d.ts"]
   },
   "include": ["src"]
 }

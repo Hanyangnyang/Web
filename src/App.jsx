@@ -1,13 +1,14 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
 // Triggering redeploy
-import React, { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect, useRef, Suspense, lazy } from 'react';
 import './index.css';
 import { useMenu } from './presentation/hooks/useMenu.js';
 import { CafeteriaView } from './presentation/components/CafeteriaView.jsx';
 import { ShuttleView }   from './presentation/components/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/PortalView.jsx';
 import { MiscView }      from './presentation/components/MiscView.jsx';
-import { PartnershipView } from './presentation/components/PartnershipView.jsx';
+// 지도 SDK가 무거워서 제휴탭 최초 진입 시에만 청크를 로드한다
+const PartnershipMapView = lazy(() => import('./presentation/components/partnership/PartnershipMapView.tsx'));
 import { BottomNav }     from './presentation/components/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
@@ -63,6 +64,8 @@ function MainLayout() {
     return false;
   });
   const [slideDir, setSlideDir] = useState('right');
+  // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
+  const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const posthog = usePostHog();
@@ -171,6 +174,7 @@ function MainLayout() {
     posthog?.capture('tab_clicked', { tab, previous_tab: activeTab });
     tabStartTime.current = Date.now();
 
+    if (tab === 'partner') setPartnerVisited(true);
     const newIdx = TAB_ORDER.indexOf(tab);
     const curIdx = TAB_ORDER.indexOf(activeTab);
     setSlideDir(newIdx >= curIdx ? 'right' : 'left');
@@ -203,7 +207,7 @@ function MainLayout() {
         } : {}}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto overflow-x-hidden px-4 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
+        <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto overflow-x-hidden px-4 tab-slide-${slideDir} ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}
@@ -224,8 +228,13 @@ function MainLayout() {
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView resetSignal={miscResetSignal} />
           </div>
-          <div style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
-            <PartnershipView isActive={activeTab === 'partner'} />
+          {/* 지도는 px-4 패딩을 -mx-4로 상쇄해 전체 폭을 사용 */}
+          <div className="-mx-4 h-full" style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
+            {partnerVisited && (
+              <Suspense fallback={<div className="h-full flex items-center justify-center"><span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span></div>}>
+                <PartnershipMapView />
+              </Suspense>
+            )}
           </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />

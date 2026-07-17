@@ -37,7 +37,8 @@
     "posthog-js": "^1.372.10",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "react-kakao-maps-sdk": "^1.2.1"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
@@ -60,6 +61,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-storybook": "^10.5.0",
     "globals": "^17.5.0",
+    "kakao.maps.d.ts": "^0.1.40",
     "playwright": "^1.61.1",
     "postcss": "^8.5.14",
     "prop-types": "^15.8.1",
