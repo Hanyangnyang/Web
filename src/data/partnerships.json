@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "id": "1",
     "name": "기찬고기",
@@ -6,10 +6,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019593664691,
+      "longitude": 126.838359511383,
+      "address": "경기 안산시 상록구 성안2길 12",
+      "full_address": "경기 안산시 상록구 사동 1564-2"
     },
     "emoji": "🥓",
     "partnerships": [
@@ -82,10 +82,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300318705131026,
+      "longitude": 126.83977627924395,
+      "address": "경기 안산시 상록구 학사2길 15",
+      "full_address": "경기 안산시 상록구 사동 1151-5"
     },
     "emoji": "🍖",
     "partnerships": [
@@ -146,10 +146,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001835430023,
+      "longitude": 126.83844564823,
+      "address": "경기 안산시 상록구 한양대학로 49",
+      "full_address": "경기 안산시 상록구 사동 1149-3"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -219,7 +219,7 @@
     "id": "4",
     "name": "양식당",
     "category": "food",
-    "is_active": true,
+    "is_active": false,
     "summary_benefit": null,
     "location": {
       "latitude": null,
@@ -298,10 +298,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3010937966799,
+      "longitude": 126.838597886538,
+      "address": "경기 안산시 상록구 성안길 84-1",
+      "full_address": "경기 안산시 상록구 사동 1570"
     },
     "emoji": "🍝",
     "partnerships": [
@@ -410,10 +410,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2997310165951,
+      "longitude": 126.838955294347,
+      "address": "경기 안산시 상록구 학사2길 6-1",
+      "full_address": "경기 안산시 상록구 사동 1154-4"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -474,10 +474,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30089518815284,
+      "longitude": 126.83897988189217,
+      "address": "경기 안산시 상록구 한양대학로 40",
+      "full_address": "경기 안산시 상록구 사동 1570-4"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -538,10 +538,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299995537879,
+      "longitude": 126.840001415595,
+      "address": "경기 안산시 상록구 학사4길 15-1",
+      "full_address": "경기 안산시 상록구 사동 1155-14"
     },
     "emoji": "🐷",
     "partnerships": [
@@ -626,10 +626,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2995158636113,
+      "longitude": 126.838436925329,
+      "address": "경기 안산시 상록구 학사2길 2",
+      "full_address": "경기 안산시 상록구 사동 1154"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -714,10 +714,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300966702986,
+      "longitude": 126.837903705135,
+      "address": "경기 안산시 상록구 성안길 78-3",
+      "full_address": "경기 안산시 상록구 사동 1569-5"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -778,10 +778,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.301584628564,
+      "longitude": 126.837112836865,
+      "address": "경기 안산시 상록구 한양대학로 70-1",
+      "full_address": "경기 안산시 상록구 사동 1562-1"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -866,10 +866,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002237772971,
+      "longitude": 126.8395407501421,
+      "address": "경기 안산시 상록구 학사2길 13",
+      "full_address": "경기 안산시 상록구 사동 1151-3"
     },
     "emoji": "🍚",
     "partnerships": [
@@ -942,10 +942,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011267320011,
+      "longitude": 126.838302641989,
+      "address": "경기 안산시 상록구 성안길 84-2",
+      "full_address": "경기 안산시 상록구 사동 1569"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -1042,10 +1042,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299837165756,
+      "longitude": 126.839225649126,
+      "address": "경기 안산시 상록구 학사2길 10",
+      "full_address": "경기 안산시 상록구 사동 1154-6"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -1154,10 +1154,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2998582438848,
+      "longitude": 126.838427169851,
+      "address": "경기 안산시 상록구 학사2길 3-3",
+      "full_address": "경기 안산시 상록구 사동 1149-23"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -1254,10 +1254,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300559789252915,
+      "longitude": 126.84082020509977,
+      "address": "경기 안산시 상록구 학사3길 3",
+      "full_address": "경기 안산시 상록구 사동 1169-17"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1378,10 +1378,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2995755026345,
+      "longitude": 126.838561993252,
+      "address": "경기 안산시 상록구 학사2길 2-1",
+      "full_address": "경기 안산시 상록구 사동 1154-1"
     },
     "emoji": "🍻",
     "partnerships": [
@@ -1478,10 +1478,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300966702996,
+      "longitude": 126.837903705134,
+      "address": "경기 안산시 상록구 성안길 78-3",
+      "full_address": "경기 안산시 상록구 사동 1569-5"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1554,10 +1554,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011644618969,
+      "longitude": 126.839543263345,
+      "address": "경기 안산시 상록구 한양대학로 36",
+      "full_address": "경기 안산시 상록구 사동 1570-7"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1618,10 +1618,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011635608639,
+      "longitude": 126.839543265259,
+      "address": "경기 안산시 상록구 한양대학로 36",
+      "full_address": "경기 안산시 상록구 사동 1570-7"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1730,10 +1730,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011825303111,
+      "longitude": 126.837596450069,
+      "address": "경기 안산시 상록구 성안길 78-4",
+      "full_address": "경기 안산시 상록구 사동 1562-6"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1842,10 +1842,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2999695897988,
+      "longitude": 126.83814721416094,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "☕",
     "partnerships": [
@@ -1918,10 +1918,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30150904113677,
+      "longitude": 126.83718518651446,
+      "address": "경기 안산시 상록구 한양대학로 70",
+      "full_address": "경기 안산시 상록구 사동 1562-2"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -2006,10 +2006,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3000538748039,
+      "longitude": 126.839166650125,
+      "address": "경기 안산시 상록구 학사2길 9",
+      "full_address": "경기 안산시 상록구 사동 1149-13"
     },
     "emoji": "☕",
     "partnerships": [
@@ -2106,10 +2106,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2999732001007,
+      "longitude": 126.838151717998,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "💻",
     "partnerships": [
@@ -2158,10 +2158,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51 3층",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "🎤",
     "partnerships": [
@@ -2258,10 +2258,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51 현서빌딩 1층",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "🖨️",
     "partnerships": [
@@ -2310,10 +2310,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3101706483699,
+      "longitude": 126.830734395433,
+      "address": "경기 안산시 단원구 광덕대로 154",
+      "full_address": "경기 안산시 단원구 고잔동 771-3"
     },
     "emoji": "🎮",
     "partnerships": [
@@ -2374,10 +2374,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006797826753,
+      "longitude": 126.838276529147,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🍞",
     "partnerships": [
@@ -2474,10 +2474,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3018858450208,
+      "longitude": 126.838625858276,
+      "address": "경기 안산시 상록구 성안2길 16",
+      "full_address": "경기 안산시 상록구 사동 1567"
     },
     "emoji": "🍣",
     "partnerships": [
@@ -2562,10 +2562,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3018150347893,
+      "longitude": 126.838238004838,
+      "address": "경기 안산시 상록구 성안1길 17",
+      "full_address": "경기 안산시 상록구 사동 1564-3"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -2638,10 +2638,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30110749181667,
+      "longitude": 126.83939224440965,
+      "address": "경기 안산시 상록구 한양대학로 38",
+      "full_address": "경기 안산시 상록구 사동 1570-6"
     },
     "emoji": "☕",
     "partnerships": [
@@ -2714,10 +2714,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30071998525458,
+      "longitude": 126.84001228792846,
+      "address": "경기 안산시 상록구 한양대학로 35",
+      "full_address": "경기 안산시 상록구 사동 1152"
     },
     "emoji": "☕",
     "partnerships": [
@@ -2802,10 +2802,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3009374426497,
+      "longitude": 126.838250035572,
+      "address": "경기 안산시 상록구 성안길 82-3",
+      "full_address": "경기 안산시 상록구 사동 1569-1"
     },
     "emoji": "🍕",
     "partnerships": [
@@ -2890,10 +2890,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012625027017,
+      "longitude": 126.838093687512,
+      "address": "경기 안산시 상록구 성안길 78-1",
+      "full_address": "경기 안산시 상록구 사동 1569-6"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -2918,10 +2918,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006582873079,
+      "longitude": 126.838371319063,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -2970,10 +2970,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.301220063102,
+      "longitude": 126.838027231688,
+      "address": "경기 안산시 상록구 성안길 78-1",
+      "full_address": "경기 안산시 상록구 사동 1569-6"
     },
     "emoji": "🥓",
     "partnerships": [
@@ -3046,10 +3046,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012165727823,
+      "longitude": 126.837584308215,
+      "address": "경기 안산시 상록구 성안길 78-4 1층",
+      "full_address": "경기 안산시 상록구 사동 1562-6"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -3134,10 +3134,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3015680022793,
+      "longitude": 126.839452172672,
+      "address": "경기 안산시 상록구 성안1길 30",
+      "full_address": "경기 안산시 상록구 사동 1568-5"
     },
     "emoji": "📚",
     "partnerships": [
@@ -3162,10 +3162,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012155370698,
+      "longitude": 126.837355005978,
+      "address": "경기 안산시 상록구 한양대학로 66",
+      "full_address": "경기 안산시 상록구 사동 1562-7"
     },
     "emoji": "🦆",
     "partnerships": [
@@ -3214,10 +3214,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3023212581966,
+      "longitude": 126.837727322607,
+      "address": "경기 안산시 상록구 성안2길 6 1층",
+      "full_address": "경기 안산시 상록구 사동 1559-3"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -3290,10 +3290,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3015318818083,
+      "longitude": 126.838467014378,
+      "address": "경기 안산시 상록구 성안1길 20",
+      "full_address": "경기 안산시 상록구 사동 1568"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -3354,10 +3354,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300966252624,
+      "longitude": 126.837903818893,
+      "address": "경기 안산시 상록구 성안길 78-3 라라캠퍼스 1층 101~103호",
+      "full_address": "경기 안산시 상록구 사동 1569-5"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -3406,10 +3406,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012537501549,
+      "longitude": 126.838943024278,
+      "address": "경기 안산시 상록구 성안길 87",
+      "full_address": "경기 안산시 상록구 사동 1568-9"
     },
     "emoji": "🍕",
     "partnerships": [
@@ -3506,10 +3506,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013559989697,
+      "longitude": 126.837282517016,
+      "address": "경기 안산시 상록구 한양대학로 68",
+      "full_address": "경기 안산시 상록구 사동 1562-3"
     },
     "emoji": "🍖",
     "partnerships": [
@@ -3594,10 +3594,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30169641193774,
+      "longitude": 126.83912931488692,
+      "address": "경기 안산시 상록구 성안1길 25",
+      "full_address": "경기 안산시 상록구 사동 1567-5"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -3682,10 +3682,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3020895522505,
+      "longitude": 126.83867956341487,
+      "address": "경기 안산시 상록구 성안2길 15",
+      "full_address": "경기 안산시 상록구 사동 1566-4"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -3746,10 +3746,10 @@
     "is_active": true,
     "summary_benefit": null,
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3016659616479,
+      "longitude": 126.837943937388,
+      "address": "경기 안산시 상록구 성안1길 16",
+      "full_address": "경기 안산시 상록구 사동 1563-3"
     },
     "emoji": "🍩",
     "partnerships": [
@@ -3834,10 +3834,10 @@
     "is_active": true,
     "summary_benefit": "사이드 메뉴 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006844172544,
+      "longitude": 126.838371263148,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🍚",
     "partnerships": [
@@ -3886,10 +3886,10 @@
     "is_active": true,
     "summary_benefit": "할인 또는 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2997049481218,
+      "longitude": 126.838339522408,
+      "address": "경기 안산시 상록구 학사2길 1",
+      "full_address": "경기 안산시 상록구 사동 1149-21"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -3998,10 +3998,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011029958353,
+      "longitude": 126.839399021431,
+      "address": "경기 안산시 상록구 한양대학로 38",
+      "full_address": "경기 안산시 상록구 사동 1570-6"
     },
     "emoji": "🍘",
     "partnerships": [
@@ -4026,10 +4026,10 @@
     "is_active": true,
     "summary_benefit": "음료 또는 감자튀김",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3017321803099,
+      "longitude": 126.840927142419,
+      "address": "경기 안산시 상록구 한양대학로 22",
+      "full_address": "경기 안산시 상록구 사동 1581-1"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -4054,10 +4054,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002305567804,
+      "longitude": 126.838562848968,
+      "address": "경기 안산시 상록구 한양대학로 47",
+      "full_address": "경기 안산시 상록구 사동 1149-4"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -4094,10 +4094,10 @@
     "is_active": true,
     "summary_benefit": "할인 또는 붕어빵 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013340456756,
+      "longitude": 126.843043946873,
+      "address": "경기 안산시 상록구 항가울로 233",
+      "full_address": "경기 안산시 상록구 사동 1176-11"
     },
     "emoji": "🍘",
     "partnerships": [
@@ -4122,10 +4122,10 @@
     "is_active": true,
     "summary_benefit": "할인 또는 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30209420602,
+      "longitude": 126.836816221548,
+      "address": "경기 안산시 상록구 한양대학로 76",
+      "full_address": "경기 안산시 상록구 사동 1561-5"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -4198,10 +4198,10 @@
     "is_active": true,
     "summary_benefit": "튀김 또는 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3020380579812,
+      "longitude": 126.840574585866,
+      "address": "경기 안산시 상록구 성안1길 40",
+      "full_address": "경기 안산시 상록구 사동 1580"
     },
     "emoji": "🌶️",
     "partnerships": [
@@ -4238,10 +4238,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3024243613692,
+      "longitude": 126.837942648471,
+      "address": "경기 안산시 상록구 성안2길 5 1층",
+      "full_address": "경기 안산시 상록구 사동 1558-3"
     },
     "emoji": "🍖",
     "partnerships": [
@@ -4278,10 +4278,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30142215731728,
+      "longitude": 126.8395427158819,
+      "address": "경기 안산시 상록구 성안길 93",
+      "full_address": "경기 안산시 상록구 사동 1568-6"
     },
     "emoji": "🍣",
     "partnerships": [
@@ -4330,10 +4330,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3017575638073,
+      "longitude": 126.841042136789,
+      "address": "경기 안산시 상록구 한양대학로 20",
+      "full_address": "경기 안산시 상록구 사동 1581-2"
     },
     "emoji": "🍕",
     "partnerships": [
@@ -4358,10 +4358,10 @@
     "is_active": true,
     "summary_benefit": "음료 또는 사리 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2998178596974,
+      "longitude": 126.838282209468,
+      "address": "경기 안산시 상록구 한양대학1길 3",
+      "full_address": "경기 안산시 상록구 사동 1149-20"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -4386,10 +4386,10 @@
     "is_active": true,
     "summary_benefit": "추가메뉴 또는 음료",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3027189652105,
+      "longitude": 126.836411071212,
+      "address": "경기 안산시 상록구 한양대학로 86",
+      "full_address": "경기 안산시 상록구 사동 1561"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -4462,10 +4462,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011579066044,
+      "longitude": 126.837381072032,
+      "address": "경기 안산시 상록구 한양대학로 66",
+      "full_address": "경기 안산시 상록구 사동 1562-7"
     },
     "emoji": "🥡",
     "partnerships": [
@@ -4502,10 +4502,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3014116111121,
+      "longitude": 126.840138954016,
+      "address": "경기 안산시 상록구 한양대학로 30",
+      "full_address": "경기 안산시 상록구 사동 1571-1"
     },
     "emoji": "🥓",
     "partnerships": [
@@ -4542,10 +4542,10 @@
     "is_active": true,
     "summary_benefit": "사리 또는 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019142863615,
+      "longitude": 126.839663485957,
+      "address": "경기 안산시 상록구 성안1길 31",
+      "full_address": "경기 안산시 상록구 사동 1573-9"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -4570,10 +4570,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011465500921,
+      "longitude": 126.83829921583,
+      "address": "경기 안산시 상록구 성안길 84-2",
+      "full_address": "경기 안산시 상록구 사동 1569"
     },
     "emoji": "🌮",
     "partnerships": [
@@ -4622,10 +4622,10 @@
     "is_active": true,
     "summary_benefit": "음료 또는 샐러드",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002817116484,
+      "longitude": 126.838677446844,
+      "address": "경기 안산시 상록구 한양대학로 45-1 2층",
+      "full_address": "경기 안산시 상록구 사동 1149-5"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -4674,10 +4674,10 @@
     "is_active": true,
     "summary_benefit": "탄산음료 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012866044311,
+      "longitude": 126.839249746516,
+      "address": "경기 안산시 상록구 성안길 89",
+      "full_address": "경기 안산시 상록구 사동 1568-8"
     },
     "emoji": "🥪",
     "partnerships": [
@@ -4714,10 +4714,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300933803061106,
+      "longitude": 126.83822410149197,
+      "address": "경기 안산시 상록구 성안길 82-3",
+      "full_address": "경기 안산시 상록구 사동 1569-1"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -4802,10 +4802,10 @@
     "is_active": true,
     "summary_benefit": "음료 또는 메뉴 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51 1층",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "🍣",
     "partnerships": [
@@ -4878,10 +4878,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30163000569942,
+      "longitude": 126.8399934415089,
+      "address": "경기 안산시 상록구 성안길 97-1",
+      "full_address": "경기 안산시 상록구 사동 1572-8"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -4954,10 +4954,10 @@
     "is_active": true,
     "summary_benefit": "10% 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3021009419556,
+      "longitude": 126.839103638892,
+      "address": "경기 안산시 상록구 성안2길 19",
+      "full_address": "경기 안산시 상록구 사동 1566-2"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -5018,10 +5018,10 @@
     "is_active": true,
     "summary_benefit": "서비스 메뉴 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013812402941,
+      "longitude": 126.83729148595,
+      "address": "경기 안산시 상록구 한양대학로 68",
+      "full_address": "경기 안산시 상록구 사동 1562-3"
     },
     "emoji": "🍔",
     "partnerships": [
@@ -5094,10 +5094,10 @@
     "is_active": true,
     "summary_benefit": "사리 또는 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30068171416543,
+      "longitude": 126.83837126893098,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🌶️",
     "partnerships": [
@@ -5170,10 +5170,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3099017501693,
+      "longitude": 126.832359377896,
+      "address": "경기 안산시 단원구 광덕동로 61",
+      "full_address": "경기 안산시 단원구 고잔동 769-4"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -5198,10 +5198,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30131276813392,
+      "longitude": 126.83861241984928,
+      "address": "경기 안산시 상록구 성안길 83",
+      "full_address": "경기 안산시 상록구 사동 1568-11"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -5262,10 +5262,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019116482386,
+      "longitude": 126.843073200436,
+      "address": "경기 안산시 상록구 항가울로 241",
+      "full_address": "경기 안산시 상록구 사동 1172-14"
     },
     "emoji": "🍚",
     "partnerships": [
@@ -5290,10 +5290,10 @@
     "is_active": true,
     "summary_benefit": "감자튀김 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002761946627,
+      "longitude": 126.839656812257,
+      "address": "경기 안산시 상록구 학사2길 13-1",
+      "full_address": "경기 안산시 상록구 사동 1151-4"
     },
     "emoji": "🍔",
     "partnerships": [
@@ -5354,10 +5354,10 @@
     "is_active": true,
     "summary_benefit": "음료수 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006844172544,
+      "longitude": 126.838371263148,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🥤",
     "partnerships": [
@@ -5394,10 +5394,10 @@
     "is_active": true,
     "summary_benefit": "음료 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2989363973734,
+      "longitude": 126.8390246612,
+      "address": "경기 안산시 상록구 학사6길 4",
+      "full_address": "경기 안산시 상록구 사동 1160-1"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -5434,10 +5434,10 @@
     "is_active": true,
     "summary_benefit": "10% 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.302342597258,
+      "longitude": 126.836668039013,
+      "address": "경기 안산시 상록구 한양대학로 80 1층 103호",
+      "full_address": "경기 안산시 상록구 사동 1561-3"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5462,10 +5462,10 @@
     "is_active": true,
     "summary_benefit": "최대 1,500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3018560141034,
+      "longitude": 126.841219013243,
+      "address": "경기 안산시 상록구 한양대학로 18",
+      "full_address": "경기 안산시 상록구 사동 1581-3"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5502,10 +5502,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3010992788696,
+      "longitude": 126.840648753693,
+      "address": "경기 안산시 상록구 한양대학로 27",
+      "full_address": "경기 안산시 상록구 사동 1171-2"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5554,10 +5554,10 @@
     "is_active": true,
     "summary_benefit": "아메리카노 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013624474011,
+      "longitude": 126.839364632323,
+      "address": "경기 안산시 상록구 성안길 91",
+      "full_address": "경기 안산시 상록구 사동 1568-7"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5618,10 +5618,10 @@
     "is_active": true,
     "summary_benefit": "최대 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3029663496088,
+      "longitude": 126.836773731369,
+      "address": "경기 안산시 상록구 용신로 132",
+      "full_address": "경기 안산시 상록구 사동 1555-2"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5658,10 +5658,10 @@
     "is_active": true,
     "summary_benefit": "5% 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30179544656413,
+      "longitude": 126.84107138299261,
+      "address": "경기 안산시 상록구 한양대학로 20",
+      "full_address": "경기 안산시 상록구 사동 1581-2"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5686,10 +5686,10 @@
     "is_active": true,
     "summary_benefit": "음료 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299564664081295,
+      "longitude": 126.83854284233648,
+      "address": "경기 안산시 상록구 학사2길 2-1",
+      "full_address": "경기 안산시 상록구 사동 1154-1"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5762,10 +5762,10 @@
     "is_active": true,
     "summary_benefit": "10% 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.302958494831394,
+      "longitude": 126.83630565416519,
+      "address": "경기 안산시 상록구 용신로 128",
+      "full_address": "경기 안산시 상록구 사동 1555"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5787,7 +5787,7 @@
     "id": "90",
     "name": "헤브론",
     "category": "cafe",
-    "is_active": true,
+    "is_active": false,
     "summary_benefit": "최대 1,000원 할인",
     "location": {
       "latitude": null,
@@ -5830,10 +5830,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3020404141474,
+      "longitude": 126.841658515994,
+      "address": "경기 안산시 상록구 한양대학로 14",
+      "full_address": "경기 안산시 상록구 사동 1581-6"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5855,7 +5855,7 @@
     "id": "92",
     "name": "오토르테",
     "category": "cafe",
-    "is_active": true,
+    "is_active": false,
     "summary_benefit": "음료 잔당 300원 할인",
     "location": {
       "latitude": null,
@@ -5886,10 +5886,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2993702842883,
+      "longitude": 126.838523519861,
+      "address": "경기 안산시 상록구 학사4길 1 1층",
+      "full_address": "경기 안산시 상록구 사동 1154-15"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5938,10 +5938,10 @@
     "is_active": true,
     "summary_benefit": "음료수 제공 및 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3007133795491,
+      "longitude": 126.839858230192,
+      "address": "경기 안산시 상록구 한양대학로 35",
+      "full_address": "경기 안산시 상록구 사동 1152"
     },
     "emoji": "🍻",
     "partnerships": [
@@ -6014,10 +6014,10 @@
     "is_active": true,
     "summary_benefit": "소주 무제한 4천원",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3010399357363,
+      "longitude": 126.838811627632,
+      "address": "경기 안산시 상록구 성안길 86",
+      "full_address": "경기 안산시 상록구 사동 1570-2"
     },
     "emoji": "🍷",
     "partnerships": [
@@ -6066,10 +6066,10 @@
     "is_active": true,
     "summary_benefit": "서비스 메뉴 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002782923349,
+      "longitude": 126.83868083784,
+      "address": "경기 안산시 상록구 한양대학로 45-1",
+      "full_address": "경기 안산시 상록구 사동 1149-5"
     },
     "emoji": "🍾",
     "partnerships": [
@@ -6094,10 +6094,10 @@
     "is_active": true,
     "summary_benefit": "최대 4만원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "💪",
     "partnerships": [
@@ -6146,10 +6146,10 @@
     "is_active": true,
     "summary_benefit": "생수 1병 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300425820519905,
+      "longitude": 126.839032765918,
+      "address": "경기 안산시 상록구 한양대학로 43",
+      "full_address": "경기 안산시 상록구 사동 1149-8"
     },
     "emoji": "🎤",
     "partnerships": [
@@ -6198,10 +6198,10 @@
     "is_active": true,
     "summary_benefit": "등록 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3022783151577,
+      "longitude": 126.837228870856,
+      "address": "경기 안산시 상록구 성안1길 6-1 1층 101호",
+      "full_address": "경기 안산시 상록구 사동 1560-4"
     },
     "emoji": "💪",
     "partnerships": [
@@ -6226,10 +6226,10 @@
     "is_active": true,
     "summary_benefit": "5% 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299972297525244,
+      "longitude": 126.83815059203837,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "🎳",
     "partnerships": [
@@ -6266,10 +6266,10 @@
     "is_active": true,
     "summary_benefit": "10분당 100원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012200507528,
+      "longitude": 126.83801820842,
+      "address": "경기 안산시 상록구 성안길 78-1",
+      "full_address": "경기 안산시 상록구 사동 1569-6"
     },
     "emoji": "🎳",
     "partnerships": [
@@ -6294,10 +6294,10 @@
     "is_active": true,
     "summary_benefit": "음료 또는 만두 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013597080198,
+      "longitude": 126.840003037448,
+      "address": "경기 안산시 상록구 한양대학로 32",
+      "full_address": "경기 안산시 상록구 사동 1571"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -6334,10 +6334,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2992496407041,
+      "longitude": 126.838791649849,
+      "address": "경기 안산시 상록구 학사4길 4",
+      "full_address": "경기 안산시 상록구 사동 1157-1"
     },
     "emoji": "🍩",
     "partnerships": [
@@ -6374,10 +6374,10 @@
     "is_active": true,
     "summary_benefit": "500원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3036106255795,
+      "longitude": 126.845527468118,
+      "address": "경기 안산시 상록구 용신로 209",
+      "full_address": "경기 안산시 상록구 사동 1544-3"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -6402,10 +6402,10 @@
     "is_active": true,
     "summary_benefit": "1,000원 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.29993356389921,
+      "longitude": 126.83815857028479,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "📚",
     "partnerships": [
@@ -6454,10 +6454,10 @@
     "is_active": true,
     "summary_benefit": "가입/등록 비용 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3007133795491,
+      "longitude": 126.839858230192,
+      "address": "경기 안산시 상록구 한양대학로 35 지하1층",
+      "full_address": "경기 안산시 상록구 사동 1152"
     },
     "emoji": "🏋️",
     "partnerships": [
@@ -6482,10 +6482,10 @@
     "is_active": true,
     "summary_benefit": "5% 즉시 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019520472652,
+      "longitude": 126.838278316607,
+      "address": "경기 안산시 상록구 성안2길 12",
+      "full_address": "경기 안산시 상록구 사동 1564-2"
     },
     "emoji": "🥗",
     "partnerships": [
@@ -6510,10 +6510,10 @@
     "is_active": true,
     "summary_benefit": "30분 추가 지급",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3009491514433,
+      "longitude": 126.838246626774,
+      "address": "경기 안산시 상록구 성안길 82-3",
+      "full_address": "경기 안산시 상록구 사동 1569-1"
     },
     "emoji": "🔍",
     "partnerships": [
@@ -6538,10 +6538,10 @@
     "is_active": true,
     "summary_benefit": "할인 혜택 및 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3024243613692,
+      "longitude": 126.837942648471,
+      "address": "경기 안산시 상록구 성안2길 5",
+      "full_address": "경기 안산시 상록구 사동 1558-3"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -6566,10 +6566,10 @@
     "is_active": true,
     "summary_benefit": "음료수 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2911378653647,
+      "longitude": 126.859494359916,
+      "address": "경기 안산시 상록구 충장로2길 12-1",
+      "full_address": "경기 안산시 상록구 본오동 896-6"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -6595,10 +6595,10 @@
     "emoji": "🍺",
     "summary_benefit": "나쵸 서비스 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300087778447,
+      "longitude": 126.840249357095,
+      "address": "경기 안산시 상록구 학사4길 17-1",
+      "full_address": "경기 안산시 상록구 사동 1155-12"
     },
     "partnerships": [
       {
@@ -6623,10 +6623,10 @@
     "emoji": "🥟",
     "summary_benefit": "음료 서비스 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3031648962112,
+      "longitude": 126.846854612839,
+      "address": "경기 안산시 상록구 용신로 222 1층",
+      "full_address": "경기 안산시 상록구 사동 1182-5"
     },
     "partnerships": [
       {
