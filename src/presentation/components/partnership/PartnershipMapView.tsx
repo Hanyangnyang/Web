@@ -47,6 +47,7 @@ export default function PartnershipMapView() {
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
+  const [rolling, setRolling] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   // 토스트 자동 숨김
@@ -86,7 +87,7 @@ export default function PartnershipMapView() {
     posthog?.capture('partner_map_category_selected', { category: next });
   }, [posthog]);
 
-  const selectStore = useCallback((store: PartnerStore, source: 'marker' | 'list' | 'search') => {
+  const selectStore = useCallback((store: PartnerStore, source: 'marker' | 'list' | 'search' | 'random') => {
     setSelectedId(store.id);
     setClusterFocus(null);
     setSearchOpen(false);
@@ -127,6 +128,21 @@ export default function PartnershipMapView() {
       setLocating(false);
     }
   }, [locating, map, posthog]);
+
+  // 점메추 🎲: 현재 칩 기준 랜덤 매장 추천 (직전 선택은 제외해 연속 중복 방지)
+  const rollRandom = useCallback(() => {
+    if (rolling) return;
+    const pool = visibleStores(category).filter((s) => s.id !== selectedId);
+    if (pool.length === 0) return;
+    setRolling(true);
+    posthog?.capture('partner_map_random_clicked', { category });
+    // 주사위가 잠깐 굴러가는 연출 후 결과 공개
+    setTimeout(() => {
+      const store = pool[Math.floor(Math.random() * pool.length)];
+      selectStore(store, 'random');
+      setRolling(false);
+    }, 500);
+  }, [rolling, category, selectedId, selectStore, posthog]);
 
   const openSearch = useCallback(() => {
     setSearchOpen(true);
@@ -179,6 +195,22 @@ export default function PartnershipMapView() {
           </CustomOverlayMap>
         )}
       </KakaoMap>
+
+      {/* 점메추 🎲 — 내 위치 버튼 위에 스택, 같이 시트를 따라다닌다 */}
+      <button
+        onClick={rollRandom}
+        disabled={rolling}
+        aria-label="랜덤 매장 추천"
+        className={`absolute right-3 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-[bottom,transform] duration-300 ease-out ${
+          selected
+            ? 'bottom-[calc(60%+68px)]'
+            : sheetExpanded
+              ? 'bottom-[calc(64%+68px)]'
+              : 'bottom-[calc(236px+env(safe-area-inset-bottom,0px))]'
+        }`}
+      >
+        <span className={`text-[20px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>🎲</span>
+      </button>
 
       {/* 내 위치 버튼 — 시트 높이를 따라 항상 시트 가장자리 위에 떠 있는다 */}
       <button
