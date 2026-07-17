@@ -6560,34 +6560,6 @@
     ]
   },
   {
-    "id": "111",
-    "name": "오빈라멘",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "음료수 1개 제공",
-    "location": {
-      "latitude": 37.2911378653647,
-      "longitude": 126.859494359916,
-      "address": "경기 안산시 상록구 충장로2길 12-1",
-      "full_address": "경기 안산시 상록구 본오동 896-6"
-    },
-    "emoji": "🍜",
-    "partnerships": [
-      {
-        "college_id": "8",
-        "college_name": "소프트웨어융합대학",
-        "benefit": "3인 이상 방문 시 음료 1개",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-21",
-          "is_active": true
-        },
-        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
-        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
-      }
-    ]
-  },
-  {
     "id": "112",
     "name": "허구헌날",
     "category": "pub",
