@@ -18,7 +18,7 @@ function metersPerPixel(level: number): number {
 }
 
 // 캠퍼스 반경 수준의 근거리라 평면 근사로 충분 (위도 1도≈111km, 경도는 위도 37° 기준 ≈88km)
-function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+export function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const dy = (lat1 - lat2) * 111_000;
   const dx = (lng1 - lng2) * 88_000;
   return Math.hypot(dx, dy);

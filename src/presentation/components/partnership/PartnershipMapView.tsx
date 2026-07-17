@@ -1,14 +1,15 @@
 // 제휴탭 지도 화면: 카카오맵 + 카테고리 칩 + 통합 검색 + 바텀시트 + 클러스터링
 // SDK 스크립트는 이 컴포넌트가 처음 마운트될 때(제휴탭 최초 진입 시) 로드된다
-import { useMemo, useState, useCallback } from 'react';
-import { Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
-import { Search } from 'lucide-react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
+import { LocateFixed, Search } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
+import { measureLocation } from '../../hooks/useLocation.js';
 import { CategoryChips } from './CategoryChips';
 import { StoreMarkers } from './StoreMarkers';
 import { SearchOverlay } from './SearchOverlay';
 import { StoreSheet } from './StoreSheet';
-import { clusterStores, type StoreCluster } from './clustering';
+import { clusterStores, distanceMeters, type StoreCluster } from './clustering';
 import {
   ERICA_MAIN_GATE, STORES, visibleStores,
   type CategoryFilter, type PartnerStore,
@@ -21,6 +22,8 @@ const FOCUS_LEVEL = 1;
 // 바텀시트(하단 ~60%)에 마커가 가리지 않게 지도 중심을 남쪽으로 내려
 // 마커가 가시 영역(상단 40%)의 가운데쯤 오도록 하는 위도 오프셋 (FOCUS_LEVEL 기준)
 const FOCUS_CENTER_LAT_OFFSET = 0.0006;
+// 이 거리 밖이면 '학교 근처가 아님'으로 보고 현위치로 센터를 옮기지 않는다
+const ERICA_NEARBY_RADIUS_M = 2000;
 
 export default function PartnershipMapView() {
   const [loading, error] = useKakaoLoader({
@@ -42,6 +45,16 @@ export default function PartnershipMapView() {
   const [clusterFocus, setClusterFocus] = useState<PartnerStore[] | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [sheetExpanded, setSheetExpanded] = useState(false);
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  // 토스트 자동 숨김
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2500);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const selected = useMemo(
     () => STORES.find((s) => s.id === selectedId) ?? null,
@@ -94,6 +107,27 @@ export default function PartnershipMapView() {
     focusMap(cluster.lat, cluster.lng);
   }, [focusMap]);
 
+  // 내 위치 버튼: 이 시점에 최초 권한 요청이 일어난다 (진입 즉시 팝업을 띄우지 않기 위함)
+  const locateMe = useCallback(async () => {
+    if (locating) return;
+    setLocating(true);
+    posthog?.capture('partner_map_locate_clicked');
+    try {
+      const pos = await measureLocation();
+      setUserPos({ lat: pos.latitude, lng: pos.longitude });
+      const distFromCampus = distanceMeters(pos.latitude, pos.longitude, ERICA_MAIN_GATE.lat, ERICA_MAIN_GATE.lng);
+      if (distFromCampus <= ERICA_NEARBY_RADIUS_M) {
+        map?.panTo(new kakao.maps.LatLng(pos.latitude, pos.longitude));
+      } else {
+        setToast('학교 근처가 아니라 지도를 이동하지 않았어요');
+      }
+    } catch {
+      setToast('위치를 가져오지 못했어요. 위치 권한을 확인해주세요');
+    } finally {
+      setLocating(false);
+    }
+  }, [locating, map, posthog]);
+
   const openSearch = useCallback(() => {
     setSearchOpen(true);
     posthog?.capture('partner_map_search_opened');
@@ -134,7 +168,42 @@ export default function PartnershipMapView() {
           onSelectStore={(store) => selectStore(store, 'marker')}
           onSelectCluster={handleClusterClick}
         />
+
+        {/* 현재 위치 파란 점 (+ 펄스) */}
+        {userPos && (
+          <CustomOverlayMap position={userPos} yAnchor={0.5} zIndex={30}>
+            <div className="relative pointer-events-none" aria-label="내 위치">
+              <span className="absolute inset-0 rounded-full bg-[#3B82F6]/40 animate-ping" />
+              <span className="relative block w-4 h-4 rounded-full bg-[#3B82F6] border-2 border-white shadow-[0_1px_4px_rgba(0,0,0,0.3)]" />
+            </div>
+          </CustomOverlayMap>
+        )}
       </KakaoMap>
+
+      {/* 내 위치 버튼 — 시트 높이를 따라 항상 시트 가장자리 위에 떠 있는다 */}
+      <button
+        onClick={locateMe}
+        disabled={locating}
+        aria-label="내 위치로 이동"
+        className={`absolute right-3 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-[bottom,transform] duration-300 ease-out disabled:opacity-60 ${
+          selected
+            ? 'bottom-[calc(60%+12px)]'
+            : sheetExpanded
+              ? 'bottom-[calc(64%+12px)]'
+              : 'bottom-[calc(180px+env(safe-area-inset-bottom,0px))]'
+        }`}
+      >
+        <LocateFixed size={19} className={locating ? 'text-text-hint animate-pulse' : 'text-[#334155]'} />
+      </button>
+
+      {/* 토스트 */}
+      {toast && (
+        <div className="absolute top-[120px] inset-x-0 z-40 flex justify-center pointer-events-none">
+          <span className="px-4 py-2 rounded-full bg-[rgba(15,23,42,0.85)] text-white text-[12px] font-bold shadow-lg">
+            {toast}
+          </span>
+        </div>
+      )}
 
       {/* 상단: 검색바 + 카테고리 칩 (선택 중엔 칩 숨김 — 단독 마커 상태라 필터가 무의미하고 카테고리 혼동 방지) */}
       <div className="absolute top-0 inset-x-0 z-10 p-3 space-y-2 pointer-events-none">
