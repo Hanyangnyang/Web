@@ -10,7 +10,8 @@ import {
 } from './storeData';
 
 interface Props {
-  stores: PartnerStore[];          // 현재 칩 필터 기준 리스트
+  stores: PartnerStore[];          // 리스트에 표시할 매장들 (칩 필터 또는 클러스터 묶음)
+  title: string;                   // 리스트 타이틀 (예: '제휴 매장' | '이 위치 제휴 매장')
   selected: PartnerStore | null;
   expanded: boolean;
   onToggleExpand: (expanded: boolean) => void;
@@ -32,7 +33,7 @@ function SheetFrame({ heightClass, children }: { heightClass: string; children: 
   );
 }
 
-export function StoreSheet({ stores, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
+export function StoreSheet({ stores, title, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
   const touchStartY = useRef<number | null>(null);
 
   // 핸들 스와이프로 접힘/펼침 전환
@@ -154,7 +155,7 @@ export function StoreSheet({ stores, selected, expanded, onToggleExpand, onSelec
       >
         <span className="w-9 h-1 rounded-full bg-slate-200" />
         <span className="mt-2 text-[13px] font-extrabold text-text-main">
-          제휴 매장 <span className="text-[#0E4A84]">{stores.length}</span>곳
+          {title} <span className="text-[#0E4A84]">{stores.length}</span>곳
         </span>
       </button>
 
