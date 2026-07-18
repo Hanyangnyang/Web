@@ -15,8 +15,11 @@ import {
   type CategoryFilter, type PartnerStore,
 } from './storeData';
 
-// 학교 앞 상권이 한눈에 들어오는 기본 확대 수준 (1=최대 확대)
-const DEFAULT_LEVEL = 4;
+// 학교 앞 상권이 화면에 꽉 차는 기본 확대 수준 (1=최대 확대)
+const DEFAULT_LEVEL = 3;
+// 초기 지도 중심: 정문(ERICA_MAIN_GATE)이 아니라 제휴 매장이 밀집한 상권 한가운데.
+// 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고, 첫 화면은 매장이 보이는 곳에서 시작한다.
+const INITIAL_CENTER = { lat: 37.3008, lng: 126.8385 } as const;
 // 매장/클러스터 포커스 시 당겨지는 확대 수준 (최대 확대 = 모든 마커 개별 표시)
 const FOCUS_LEVEL = 1;
 // 바텀시트(하단 ~60%)에 마커가 가리지 않게 지도 중심을 남쪽으로 내려
@@ -170,7 +173,7 @@ export default function PartnershipMapView() {
   return (
     <div className="relative h-full overflow-hidden">
       <KakaoMap
-        center={ERICA_MAIN_GATE}
+        center={INITIAL_CENTER}
         level={DEFAULT_LEVEL}
         onCreate={setMap}
         onZoomChanged={(m) => setLevel(m.getLevel())}
