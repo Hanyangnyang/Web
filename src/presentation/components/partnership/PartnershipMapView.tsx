@@ -93,10 +93,10 @@ export default function PartnershipMapView() {
     posthog?.capture('partner_map_category_selected', { category: next });
   }, [posthog]);
 
+  // 상세 시트에서도 같은 드롭다운을 쓰므로 선택은 유지한다 (상세 혜택 필터링과 지도 필터가 함께 바뀜)
   const handleCollegeChange = useCallback((next: string) => {
     setCollege(next);
     localStorage.setItem('partnerCollegeFilter', next);
-    setSelectedId(null);
     setClusterFocus(null);
     posthog?.capture('partner_map_college_selected', { college: next });
   }, [posthog]);
