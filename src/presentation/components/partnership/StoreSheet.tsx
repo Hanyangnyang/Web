@@ -2,7 +2,7 @@
 // - 매장 미선택: 현재 칩 기준 매장 리스트 (접힘 ↔ 펼침, 핸들 탭/스와이프)
 // - 매장 선택: 혜택 상세 카드
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
-import { X, Info, Clock, ExternalLink, MapPin } from 'lucide-react';
+import { X, Info, Clock, ExternalLink, ChevronRight } from 'lucide-react';
 import {
   activePartnerships, CATEGORY_META, COLLEGES,
   COLLEGE_EMOJI, COLLEGE_STYLE, COLLEGE_DISPLAY_NAME,
@@ -68,7 +68,11 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
 
   // ── 상세 모드 ──
   if (selected) {
-    const partnerships = activePartnerships(selected);
+    // 단과대 필터가 걸려 있으면 해당 단과대 혜택만 표시
+    const allPartnerships = activePartnerships(selected);
+    const partnerships = college === 'all'
+      ? allPartnerships
+      : allPartnerships.filter((p) => p.college_id === college);
     const { latitude, longitude } = selected.location;
     // 카카오맵 place ID가 있으면 업체 상세 페이지로, 없으면(미등록 매장) 좌표 핀 지도로 폴백
     const kakaoMapUrl = selected.kakao_place_id
@@ -81,20 +85,25 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
       // 단과대 카드 1개 + 다음 카드 절반쯤 보이는 높이 — 지도가 주인공으로 남는다
       <SheetFrame heightClass="h-[45%]">
         {/* 헤더 */}
-        <div className="flex items-start gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
-          <span className="text-2xl flex-shrink-0 mt-0.5">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
+        <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
+          <span className="text-2xl flex-shrink-0">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-[16px] font-extrabold text-text-main truncate">{selected.name}</span>
               <span className="text-[11px] font-bold text-text-hint flex-shrink-0">{CATEGORY_META[selected.category].label}</span>
             </div>
-            {selected.location.address && (
-              <p className="flex items-center gap-1 text-[11px] text-text-hint font-medium mt-0.5 truncate">
-                <MapPin size={10} className="flex-shrink-0" />
-                {selected.location.address}
-              </p>
-            )}
           </div>
+          <select
+            value={college}
+            onChange={(e) => onCollegeChange(e.target.value)}
+            aria-label="단과대 필터"
+            className="flex-shrink-0 max-w-[110px] truncate text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-1.5 pr-1 py-1.5 outline-none"
+          >
+            <option value="all">전체 단과대</option>
+            {COLLEGES.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
           <button
             onClick={onClose}
             className="p-1 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
@@ -107,7 +116,11 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
         {/* 혜택 리스트 — key: 모드/매장 전환 시 스크롤 컨테이너를 리마운트해 scrollTop 잔존 방지 */}
         <div key={`detail-${selected.id}`} className={`flex-1 overflow-y-auto px-4 py-3 space-y-2.5 ${NAV_CLEARANCE}`}>
           {partnerships.length === 0 && (
-            <p className="text-center text-[12px] text-text-hint font-medium pt-6">현재 진행 중인 제휴 혜택이 없어요</p>
+            <p className="text-center text-[12px] text-text-hint font-medium pt-6">
+              {college !== 'all' && allPartnerships.length > 0
+                ? '선택한 단과대의 제휴 혜택이 없어요'
+                : '현재 진행 중인 제휴 혜택이 없어요'}
+            </p>
           )}
           {partnerships.map((p, idx) => (
             <div key={`${p.college_id}-${idx}`} className="flex items-center gap-3 bg-surface rounded-xl p-4">
@@ -190,7 +203,7 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
             value={college}
             onChange={(e) => onCollegeChange(e.target.value)}
             aria-label="단과대 필터"
-            className="flex-shrink-0 max-w-[150px] text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg px-2 py-1.5 outline-none"
+            className="flex-shrink-0 max-w-[150px] truncate text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1 py-1.5 outline-none"
           >
             <option value="all">전체 단과대</option>
             {COLLEGES.map((c) => (
@@ -207,13 +220,18 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
         onScroll={(e) => { listScrollTop.current = e.currentTarget.scrollTop; }}
         className={`flex-1 overflow-y-auto ${expanded ? NAV_CLEARANCE : ''}`}
       >
-        {expanded && stores.map((store) => {
+        {expanded && stores.map((store, idx) => {
           const colleges = activePartnerships(store);
+          // 단과대 필터가 걸려 있으면 이미 그 단과대 제휴로 좁혀진 목록이라
+          // 전체 단과대 수 배지는 정보가 아니라 혼동을 준다 — '전체'일 때만 표시
+          const showCollegeBadge = college === 'all' && colleges.length > 0;
           return (
             <button
               key={store.id}
               onClick={() => onSelect(store)}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left active:bg-slate-50 [-webkit-tap-highlight-color:transparent]"
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left active:bg-slate-50 [-webkit-tap-highlight-color:transparent] ${
+                idx > 0 ? 'border-t border-[#f1f5f9]' : ''
+              }`}
             >
               <span className="text-xl flex-shrink-0">{store.emoji || CATEGORY_META[store.category].emoji}</span>
               <div className="flex-1 min-w-0">
@@ -221,15 +239,19 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
                   <span className="text-[14px] font-extrabold text-text-main truncate">{store.name}</span>
                   <span className="text-[10px] font-bold text-text-hint flex-shrink-0">{CATEGORY_META[store.category].label}</span>
                 </div>
-                {store.location.address && (
-                  <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">{store.location.address}</p>
+                {/* 주소 대신 혜택 요약 — 리스트에서 바로 "뭘 주는지"가 보이게 */}
+                {(store.summary_benefit || store.location.address) && (
+                  <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
+                    {store.summary_benefit ?? store.location.address}
+                  </p>
                 )}
               </div>
-              {colleges.length > 0 && (
+              {showCollegeBadge && (
                 <span className="flex-shrink-0 text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
                   {colleges.length === 1 ? colleges[0].college_name.replace(/\n/g, '') : `${colleges.length}개 단과대`}
                 </span>
               )}
+              <ChevronRight size={16} className="flex-shrink-0 text-text-hint" />
             </button>
           );
         })}
