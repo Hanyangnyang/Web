@@ -34,6 +34,8 @@ export interface PartnerStore {
   summary_benefit?: string | null;
   location: StoreLocation;
   emoji?: string;
+  /** 카카오맵 상세 페이지 ID (place.map.kakao.com/{id}) — 미등록 매장은 null */
+  kakao_place_id?: string | null;
   partnerships: Partnership[];
 }
 

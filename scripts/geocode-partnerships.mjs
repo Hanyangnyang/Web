@@ -129,6 +129,17 @@ for (const store of stores) {
 
   // 이미 좌표가 있으면 유지 (수동 보정분 보호) — 단, OVERRIDES에 오른 매장은 재확정
   if (store.location?.latitude != null && !OVERRIDES[store.name]) {
+    // 좌표는 있는데 place ID가 없으면 백필: 저장된 좌표 반경에서 재검색해 ID만 채운다
+    if (store.kakao_place_id === undefined) {
+      const body = await kakaoGet('search/keyword.json', {
+        query: store.name,
+        x: store.location.longitude, y: store.location.latitude,
+        radius: 100, sort: 'distance',
+      });
+      await sleep(120);
+      store.kakao_place_id = body.documents[0]?.id ?? null;
+      console.log(`  ⨁ ${store.name} — place ID 백필: ${store.kakao_place_id ?? '못 찾음'}`);
+    }
     report.skipped.push(store.name);
     continue;
   }
@@ -174,6 +185,8 @@ for (const store of stores) {
     address: resolved.address,
     full_address: resolved.full_address,
   };
+  // 카카오맵 상세 페이지 링크용 (없으면 null → 좌표 링크로 폴백)
+  store.kakao_place_id = resolved.placeId ?? OVERRIDES[store.name] ?? null;
   report.filled.push({
     store: store.name,
     matched: resolved.matchedName,

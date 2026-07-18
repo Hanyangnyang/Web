@@ -52,8 +52,10 @@ export function StoreSheet({ stores, title, selected, expanded, onToggleExpand, 
   if (selected) {
     const partnerships = activePartnerships(selected);
     const { latitude, longitude } = selected.location;
-    const kakaoMapUrl =
-      latitude != null && longitude != null
+    // 카카오맵 place ID가 있으면 업체 상세 페이지로, 없으면(미등록 매장) 좌표 핀 지도로 폴백
+    const kakaoMapUrl = selected.kakao_place_id
+      ? `https://place.map.kakao.com/${selected.kakao_place_id}`
+      : latitude != null && longitude != null
         ? `https://map.kakao.com/link/map/${encodeURIComponent(selected.name)},${latitude},${longitude}`
         : null;
 
