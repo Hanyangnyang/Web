@@ -4,7 +4,7 @@
     "name": "기찬고기",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인 이상 방문 시 찌개·버섯·냉국수 중 택1 제공",
     "location": {
       "latitude": 37.3019593664691,
       "longitude": 126.838359511383,
@@ -81,7 +81,7 @@
     "name": "젤리팩토리",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이블당 음료 제공 (인원에 따라 1~2개)",
     "location": {
       "latitude": 37.300318705131026,
       "longitude": 126.83977627924395,
@@ -146,7 +146,7 @@
     "name": "핵밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "1인 1메뉴 주문 시 음료 제공",
     "location": {
       "latitude": 37.3001835430023,
       "longitude": 126.83844564823,
@@ -223,7 +223,7 @@
     "name": "양식당",
     "category": "food",
     "is_active": false,
-    "summary_benefit": null,
+    "summary_benefit": "2인 이상 방문 시 갈릭바게트 또는 음료 제공",
     "location": {
       "latitude": null,
       "longitude": null,
@@ -299,7 +299,7 @@
     "name": "앤의 식탁",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2인 이상 방문 시 음료 1개 제공",
     "location": {
       "latitude": 37.3010937966799,
       "longitude": 126.838597886538,
@@ -412,7 +412,7 @@
     "name": "원조 감자탕 일미집",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 제공 · 감자탕(중) 이상 주문 시 볶음밥/사리 택1",
     "location": {
       "latitude": 37.2997310165951,
       "longitude": 126.838955294347,
@@ -477,7 +477,7 @@
     "name": "토마토 도시락",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "세트메뉴 주문 시 500원 할인",
     "location": {
       "latitude": 37.30089518815284,
       "longitude": 126.83897988189217,
@@ -542,7 +542,7 @@
     "name": "91콩삼",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인 테이블당 우동·당면사리 중 택1 제공",
     "location": {
       "latitude": 37.299995537879,
       "longitude": 126.840001415595,
@@ -631,7 +631,7 @@
     "name": "일미 닭갈비 파전",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인분 이상 주문 시 볶음밥 1인분 제공",
     "location": {
       "latitude": 37.2995158636113,
       "longitude": 126.838436925329,
@@ -720,7 +720,7 @@
     "name": "탕화쿵푸 마라탕",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 제공 또는 주류 할인 · 12,000원 이상 주문 시 꼬치 제공",
     "location": {
       "latitude": 37.300966702986,
       "longitude": 126.837903705135,
@@ -785,7 +785,7 @@
     "name": "도야짬뽕",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "인원수만큼 군만두 제공",
     "location": {
       "latitude": 37.301584628564,
       "longitude": 126.837112836865,
@@ -874,7 +874,7 @@
     "name": "동아리식당",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 된장·순두부찌개 제공",
     "location": {
       "latitude": 37.3002237772971,
       "longitude": 126.8395407501421,
@@ -951,7 +951,7 @@
     "name": "육앤샤",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인분 이상 주문 시 육회비빔밥/샤브 제공 · 18시 이후 소주 3,000원",
     "location": {
       "latitude": 37.3011267320011,
       "longitude": 126.838302641989,
@@ -1052,7 +1052,7 @@
     "name": "더치킨",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "사계천왕·치뽀끼 주문 시 감자튀김 제공",
     "location": {
       "latitude": 37.299837165756,
       "longitude": 126.839225649126,
@@ -1165,7 +1165,7 @@
     "name": "미쳐버린파닭",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이블당 1천원 상당 서비스 · 7만원 이상 주문 시 떡볶이 제공",
     "location": {
       "latitude": 37.2998582438848,
       "longitude": 126.838427169851,
@@ -1266,7 +1266,7 @@
     "name": "더술",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "인원별 음료·서비스 메뉴 제공 · 현금/계좌이체 시 10% 할인",
     "location": {
       "latitude": 37.300559789252915,
       "longitude": 126.84082020509977,
@@ -1391,7 +1391,7 @@
     "name": "달달포차",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "계좌이체 시 소주·맥주 병당 500원 할인",
     "location": {
       "latitude": 37.2995755026345,
       "longitude": 126.838561993252,
@@ -1492,7 +1492,7 @@
     "name": "로드락비어",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "세트 주문·단체 방문 시 음료 또는 주류 제공",
     "location": {
       "latitude": 37.300966702996,
       "longitude": 126.837903705134,
@@ -1569,7 +1569,7 @@
     "name": "역전할머니맥주",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 음료 1개 제공",
     "location": {
       "latitude": 37.3011644618969,
       "longitude": 126.839543263345,
@@ -1634,7 +1634,7 @@
     "name": "만취",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인 이상 방문 시 샤베트 제공 등 테이블 서비스",
     "location": {
       "latitude": 37.3011635608639,
       "longitude": 126.839543265259,
@@ -1747,7 +1747,7 @@
     "name": "에이플러스",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "찌개 주문 시 라면사리 제공 등 시간대별 서비스",
     "location": {
       "latitude": 37.3011825303111,
       "longitude": 126.837596450069,
@@ -1860,7 +1860,7 @@
     "name": "모모커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 5잔 이상 구매 시 아메리카노 1잔 증정",
     "location": {
       "latitude": 37.2999695897988,
       "longitude": 126.83814721416094,
@@ -1937,7 +1937,7 @@
     "name": "오얏리커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "전 음료 500원 할인",
     "location": {
       "latitude": 37.30150904113677,
       "longitude": 126.83718518651446,
@@ -2026,7 +2026,7 @@
     "name": "어반플레이스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이크아웃 전 음료 500원 할인 · 매장 아메리카노 500원 할인",
     "location": {
       "latitude": 37.3000538748039,
       "longitude": 126.839166650125,
@@ -2127,7 +2127,7 @@
     "name": "포세이돈 PC",
     "category": "play",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "1만원 이상 충전 시 음료 제공",
     "location": {
       "latitude": 37.2999732001007,
       "longitude": 126.838151717998,
@@ -2180,7 +2180,7 @@
     "name": "슈퍼스타 코인노래방",
     "category": "play",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "9곡 결제 시 2곡 또는 30분 결제 시 10분 추가",
     "location": {
       "latitude": 37.3001153487639,
       "longitude": 126.838258112305,
@@ -2281,7 +2281,7 @@
     "name": "한양사 인쇄복사제본",
     "category": "life",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "5천원 이상 현금 결제 시 10% 할인",
     "location": {
       "latitude": 37.3001153487639,
       "longitude": 126.838258112305,
@@ -2334,7 +2334,7 @@
     "name": "레드버튼 안산고잔점",
     "category": "play",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "식음료 10% 할인",
     "location": {
       "latitude": 37.3101706483699,
       "longitude": 126.830734395433,
@@ -2399,7 +2399,7 @@
     "name": "이삭토스트",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "토스트+음료 세트 구매 시 1,000원 할인",
     "location": {
       "latitude": 37.3006797826753,
       "longitude": 126.838276529147,
@@ -2500,7 +2500,7 @@
     "name": "코운즈",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2~3인 이상 방문 시 음료 제공",
     "location": {
       "latitude": 37.3018858450208,
       "longitude": 126.838625858276,
@@ -2589,7 +2589,7 @@
     "name": "떼드떼",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "인원수별 음료 할인 또는 아메리카노 사이즈업",
     "location": {
       "latitude": 37.3018150347893,
       "longitude": 126.838238004838,
@@ -2666,7 +2666,7 @@
     "name": "시저커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 500원 할인",
     "location": {
       "latitude": 37.30110749181667,
       "longitude": 126.83939224440965,
@@ -2743,7 +2743,7 @@
     "name": "이스턴문",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "12~17시 음료 500원 할인 · 저녁 주류 주문 시 감자칩 제공",
     "location": {
       "latitude": 37.30071998525458,
       "longitude": 126.84001228792846,
@@ -2832,7 +2832,7 @@
     "name": "페퍼로니버튼",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "피자 1판당 음료 1캔 제공",
     "location": {
       "latitude": 37.3009374426497,
       "longitude": 126.838250035572,
@@ -2921,7 +2921,7 @@
     "name": "두루정",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2인당 음료 1캔 제공",
     "location": {
       "latitude": 37.3012625027017,
       "longitude": 126.838093687512,
@@ -2950,7 +2950,7 @@
     "name": "홍당무",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 음료 1개 제공",
     "location": {
       "latitude": 37.3006582873079,
       "longitude": 126.838371319063,
@@ -3003,7 +3003,7 @@
     "name": "돼지우리",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "현금/계좌이체 시 5% 할인 · 냉면 500원 할인",
     "location": {
       "latitude": 37.301220063102,
       "longitude": 126.838027231688,
@@ -3080,7 +3080,7 @@
     "name": "교반육회비빔밥",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "식사 4인 이상 음료 2개 · 포차 3만원 이상 육회 제공",
     "location": {
       "latitude": 37.3012165727823,
       "longitude": 126.837584308215,
@@ -3169,7 +3169,7 @@
     "name": "어반스터디카페",
     "category": "life",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "기간권·정액권 10% 할인 · 사물함 무료",
     "location": {
       "latitude": 37.3015680022793,
       "longitude": 126.839452172672,
@@ -3198,7 +3198,7 @@
     "name": "소담골",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2~3인 이상 방문 시 음료 제공",
     "location": {
       "latitude": 37.3012155370698,
       "longitude": 126.837355005978,
@@ -3251,7 +3251,7 @@
     "name": "계림원 누룽지 통닭",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 음료 제공 등 금액대별 서비스",
     "location": {
       "latitude": 37.3023212581966,
       "longitude": 126.837727322607,
@@ -3328,7 +3328,7 @@
     "name": "신선샤브앤칼국수",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이블당 사리·볶음밥·음료 중 택1 제공",
     "location": {
       "latitude": 37.3015318818083,
       "longitude": 126.838467014378,
@@ -3393,7 +3393,7 @@
     "name": "인더비엣",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3~4인 이상 방문 시 음료 또는 튀김 제공",
     "location": {
       "latitude": 37.300966252624,
       "longitude": 126.837903818893,
@@ -3446,7 +3446,7 @@
     "name": "언니네 화덕핏짜",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 음료 제공 · 현금/계좌이체 시 메뉴당 1천원 할인",
     "location": {
       "latitude": 37.3012537501549,
       "longitude": 126.838943024278,
@@ -3547,7 +3547,7 @@
     "name": "이서식당",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2인 음료 1개 · 4인 음료 2개 또는 주류 1병 제공",
     "location": {
       "latitude": 37.3013559989697,
       "longitude": 126.837282517016,
@@ -3636,7 +3636,7 @@
     "name": "묵커피바",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "15,000원 이상 결제 시 10% 할인 · 주문제작 케이크 2천원 할인",
     "location": {
       "latitude": 37.30169641193774,
       "longitude": 126.83912931488692,
@@ -3725,7 +3725,7 @@
     "name": "코이노커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "학생증 제시 시 인당 500원 할인",
     "location": {
       "latitude": 37.3020895522505,
       "longitude": 126.83867956341487,
@@ -3790,7 +3790,7 @@
     "name": "신디도넛",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료+도넛 1만원 이상 구매 시 5% 할인",
     "location": {
       "latitude": 37.3016659616479,
       "longitude": 126.837943937388,
@@ -3879,7 +3879,7 @@
     "name": "동양솥밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "사이드 메뉴 제공",
+    "summary_benefit": "4인 이상 방문 시 사이드 메뉴 제공",
     "location": {
       "latitude": 37.3006844172544,
       "longitude": 126.838371263148,
@@ -3932,7 +3932,7 @@
     "name": "마라미방",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 또는 음료 제공",
+    "summary_benefit": "3인 이상 음료 제공 · 1만원 이상 현금 결제 시 500원 할인",
     "location": {
       "latitude": 37.2997049481218,
       "longitude": 126.838339522408,
@@ -4045,7 +4045,7 @@
     "name": "김밥큐",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "3인 이상 방문 시 음료 1개 제공",
     "location": {
       "latitude": 37.3011029958353,
       "longitude": 126.839399021431,
@@ -4074,7 +4074,7 @@
     "name": "대학통닭",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 감자튀김",
+    "summary_benefit": "3인 이상 음료 제공 · 4만원 이상 주문 시 감자튀김 제공",
     "location": {
       "latitude": 37.3017321803099,
       "longitude": 126.840927142419,
@@ -4103,7 +4103,7 @@
     "name": "대홍훠궈 샤브샤브",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2인 이상 무한리필 주문 시 음료 제공",
     "location": {
       "latitude": 37.3002305567804,
       "longitude": 126.838562848968,
@@ -4144,7 +4144,7 @@
     "name": "마티아스김밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 또는 붕어빵 제공",
+    "summary_benefit": "현금/계좌이체 시 500원 할인",
     "location": {
       "latitude": 37.3013340456756,
       "longitude": 126.843043946873,
@@ -4173,7 +4173,7 @@
     "name": "밀숲",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 또는 음료 제공",
+    "summary_benefit": "3인 이상 음료 제공 또는 만두 1천원 할인",
     "location": {
       "latitude": 37.30209420602,
       "longitude": 126.836816221548,
@@ -4250,7 +4250,7 @@
     "name": "신전떡볶이",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "튀김 또는 음료 제공",
+    "summary_benefit": "15,000원 이상 주문 시 튀김 또는 쿨피스 제공",
     "location": {
       "latitude": 37.3020380579812,
       "longitude": 126.840574585866,
@@ -4291,7 +4291,7 @@
     "name": "쌈&쌈",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "4인 이상 음료 제공 · 현금/계좌이체 시 10% 할인",
     "location": {
       "latitude": 37.3024243613692,
       "longitude": 126.837942648471,
@@ -4332,7 +4332,7 @@
     "name": "에비수",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2~3인 이상 방문 시 음료 제공",
     "location": {
       "latitude": 37.30142215731728,
       "longitude": 126.8395427158819,
@@ -4385,7 +4385,7 @@
     "name": "소확행피자",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "전화 포장 주문 시 피자 한 판당 음료 제공",
     "location": {
       "latitude": 37.3017575638073,
       "longitude": 126.841042136789,
@@ -4414,7 +4414,7 @@
     "name": "순뼈감",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 사리 제공",
+    "summary_benefit": "음료 제공 또는 전골 주문 시 사리 제공",
     "location": {
       "latitude": 37.2998178596974,
       "longitude": 126.838282209468,
@@ -4443,7 +4443,7 @@
     "name": "버텍스",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "추가메뉴 또는 음료",
+    "summary_benefit": "추가 메뉴 1회 무료 · 4인 이상 음료 제공",
     "location": {
       "latitude": 37.3027189652105,
       "longitude": 126.836411071212,
@@ -4520,7 +4520,7 @@
     "name": "보배반점",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "3인 이상 음료 제공 · 4인 이상 만두 제공",
     "location": {
       "latitude": 37.3011579066044,
       "longitude": 126.837381072032,
@@ -4561,7 +4561,7 @@
     "name": "예산 닭갈비감자탕",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "테이블당 음료 1개 제공",
     "location": {
       "latitude": 37.3014116111121,
       "longitude": 126.840138954016,
@@ -4602,7 +4602,7 @@
     "name": "오늘도 부찌",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "사리 또는 음료 제공",
+    "summary_benefit": "3인 이상 방문 시 음료·사리 중 택1 제공",
     "location": {
       "latitude": 37.3019142863615,
       "longitude": 126.839663485957,
@@ -4631,7 +4631,7 @@
     "name": "오타코",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2인당 음료 1개 제공",
     "location": {
       "latitude": 37.3011465500921,
       "longitude": 126.83829921583,
@@ -4684,7 +4684,7 @@
     "name": "자이카 인도요리",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 샐러드",
+    "summary_benefit": "테이블당 음료 제공 · 5인 이상 샐러드 제공",
     "location": {
       "latitude": 37.3002817116484,
       "longitude": 126.838677446844,
@@ -4737,7 +4737,7 @@
     "name": "올리바샌드위치",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "탄산음료 서비스",
+    "summary_benefit": "8천원 이상 구매 시 탄산음료 제공",
     "location": {
       "latitude": 37.3012866044311,
       "longitude": 126.839249746516,
@@ -4778,7 +4778,7 @@
     "name": "유가네닭갈비",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "고기 단품 주문 시 음료 1캔 제공",
     "location": {
       "latitude": 37.300933803061106,
       "longitude": 126.83822410149197,
@@ -4867,7 +4867,7 @@
     "name": "정직유부초밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 메뉴 제공",
+    "summary_benefit": "1인 1메뉴 주문 시 음료/소스 제공 등 금액대별 서비스",
     "location": {
       "latitude": 37.3001153487639,
       "longitude": 126.838258112305,
@@ -4944,7 +4944,7 @@
     "name": "조박사부대찌개",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "테이블당 음료 제공",
     "location": {
       "latitude": 37.30163000569942,
       "longitude": 126.8399934415089,
@@ -5021,7 +5021,7 @@
     "name": "탐나는 바지락 손칼국수",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 10% 할인",
     "location": {
       "latitude": 37.3021009419556,
       "longitude": 126.839103638892,
@@ -5086,7 +5086,7 @@
     "name": "텐버거",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "서비스 메뉴 제공",
+    "summary_benefit": "15,000원 이상 주문 시 사이드 메뉴 택1 제공",
     "location": {
       "latitude": 37.3013812402941,
       "longitude": 126.83729148595,
@@ -5163,7 +5163,7 @@
     "name": "참새방앗간",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "사리 또는 음료 제공",
+    "summary_benefit": "3인 이상 방문 시 사리 또는 음료 제공",
     "location": {
       "latitude": 37.30068171416543,
       "longitude": 126.83837126893098,
@@ -5240,7 +5240,7 @@
     "name": "큰맘할매순대국",
     "category": "food",
     "is_active": false,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 500원 할인",
     "location": {
       "latitude": 37.3099017501693,
       "longitude": 126.832359377896,
@@ -5268,7 +5268,7 @@
     "name": "행컵",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 할인·토핑 제공 · 단체주문 할인",
     "location": {
       "latitude": 37.30131276813392,
       "longitude": 126.83861241984928,
@@ -5333,7 +5333,7 @@
     "name": "한양솥밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2인 이상 방문 시 음료 제공",
     "location": {
       "latitude": 37.3019116482386,
       "longitude": 126.843073200436,
@@ -5362,7 +5362,7 @@
     "name": "토핑스온패티스",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "감자튀김 서비스",
+    "summary_benefit": "2인 이상 방문 시 감자튀김 제공",
     "location": {
       "latitude": 37.3002761946627,
       "longitude": 126.839656812257,
@@ -5427,7 +5427,7 @@
     "name": "파익스피크소다",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "4인 이상 방문 시 음료 제공",
     "location": {
       "latitude": 37.3006844172544,
       "longitude": 126.838371263148,
@@ -5468,7 +5468,7 @@
     "name": "삐노누아",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "음료 10% 할인",
+    "summary_benefit": "테이크아웃 음료 10% 할인",
     "location": {
       "latitude": 37.2989363973734,
       "longitude": 126.8390246612,
@@ -5509,7 +5509,7 @@
     "name": "사리(디저트카페)",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
+    "summary_benefit": "전 메뉴 10% 할인",
     "location": {
       "latitude": 37.302342597258,
       "longitude": 126.836668039013,
@@ -5538,7 +5538,7 @@
     "name": "오멜트",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "최대 1,500원 할인",
+    "summary_benefit": "음료·디저트 500~1,500원 할인",
     "location": {
       "latitude": 37.3018560141034,
       "longitude": 126.841219013243,
@@ -5579,7 +5579,7 @@
     "name": "오쏘커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "테이크아웃 시 500원 할인",
     "location": {
       "latitude": 37.3010992788696,
       "longitude": 126.840648753693,
@@ -5632,7 +5632,7 @@
     "name": "썬더커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "아메리카노 서비스",
+    "summary_benefit": "음료 4잔 주문 시 아메리카노 1잔 증정",
     "location": {
       "latitude": 37.3013624474011,
       "longitude": 126.839364632323,
@@ -5697,7 +5697,7 @@
     "name": "아로하",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "최대 10% 할인",
+    "summary_benefit": "커피 10% 할인 · 기타 음료 5% 할인",
     "location": {
       "latitude": 37.3029663496088,
       "longitude": 126.836773731369,
@@ -5738,7 +5738,7 @@
     "name": "후식집",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "5% 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 5% 할인",
     "location": {
       "latitude": 37.30179544656413,
       "longitude": 126.84107138299261,
@@ -5767,7 +5767,7 @@
     "name": "코지홀리데이",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "음료 10% 할인",
+    "summary_benefit": "현금/계좌 결제 시 10% 할인 · 4잔 이상 테이크아웃 1천원 할인",
     "location": {
       "latitude": 37.299564664081295,
       "longitude": 126.83854284233648,
@@ -5844,7 +5844,7 @@
     "name": "투썸플레이스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
+    "summary_benefit": "15,000원 이상 주문 시 10% 할인",
     "location": {
       "latitude": 37.302958494831394,
       "longitude": 126.83630565416519,
@@ -5873,7 +5873,7 @@
     "name": "헤브론",
     "category": "cafe",
     "is_active": false,
-    "summary_benefit": "최대 1,000원 할인",
+    "summary_benefit": "음료 500원 할인",
     "location": {
       "latitude": null,
       "longitude": null,
@@ -5913,7 +5913,7 @@
     "name": "카페미올루",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "음료 전 메뉴 500원 할인",
     "location": {
       "latitude": 37.3020404141474,
       "longitude": 126.841658515994,
@@ -5942,7 +5942,7 @@
     "name": "오토르테",
     "category": "cafe",
     "is_active": false,
-    "summary_benefit": "음료 잔당 300원 할인",
+    "summary_benefit": "단체석 이용 시 음료 300원 할인",
     "location": {
       "latitude": null,
       "longitude": null,
@@ -5970,7 +5970,7 @@
     "name": "워터킹 커피 로스터스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "음료 500원 할인 (평일 12~14시 제외)",
     "location": {
       "latitude": 37.2993702842883,
       "longitude": 126.838523519861,
@@ -6023,7 +6023,7 @@
     "name": "동그라미(써클)",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": "음료수 제공 및 할인",
+    "summary_benefit": "4인 이상 음료 제공 · 현금/계좌이체 시 5% 할인",
     "location": {
       "latitude": 37.3007133795491,
       "longitude": 126.839858230192,
@@ -6100,7 +6100,7 @@
     "name": "락",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": "소주 무제한 4천원",
+    "summary_benefit": "21시 이전 소주 할인",
     "location": {
       "latitude": 37.3010399357363,
       "longitude": 126.838811627632,
@@ -6153,7 +6153,7 @@
     "name": "밤새",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": "서비스 메뉴 제공",
+    "summary_benefit": "인원별 사리·음료·안주 서비스 제공",
     "location": {
       "latitude": 37.3002782923349,
       "longitude": 126.83868083784,
@@ -6182,7 +6182,7 @@
     "name": "브리드 복싱앤 크로스핏",
     "category": "life",
     "is_active": true,
-    "summary_benefit": "최대 4만원 할인",
+    "summary_benefit": "3개월 이상 등록 시 2만원 할인 + 사물함·티셔츠 무료",
     "location": {
       "latitude": 37.3001153487639,
       "longitude": 126.838258112305,
@@ -6235,7 +6235,7 @@
     "name": "샛별 코인노래연습장",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "생수 1병 제공",
+    "summary_benefit": "3천원 이상 결제 시 물 제공",
     "location": {
       "latitude": 37.300425820519905,
       "longitude": 126.839032765918,
@@ -6288,7 +6288,7 @@
     "name": "스튜디오 나우 필라테스",
     "category": "life",
     "is_active": true,
-    "summary_benefit": "등록 5% 할인",
+    "summary_benefit": "등록 시 5% 할인 (재등록 2회까지)",
     "location": {
       "latitude": 37.3022783151577,
       "longitude": 126.837228870856,
@@ -6317,7 +6317,7 @@
     "name": "큐 당구장",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "5% 즉시 할인",
+    "summary_benefit": "1만원 이상 이용 시 5% 할인",
     "location": {
       "latitude": 37.299972297525244,
       "longitude": 126.83815059203837,
@@ -6358,7 +6358,7 @@
     "name": "트윈스 당구클럽",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "10분당 100원 할인",
+    "summary_benefit": "기본 시간 초과 시 10분당 100원 할인",
     "location": {
       "latitude": 37.3012200507528,
       "longitude": 126.83801820842,
@@ -6387,7 +6387,7 @@
     "name": "청학칡냉면",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 만두 제공",
+    "summary_benefit": "금액대별 음료·만두 서비스 제공",
     "location": {
       "latitude": 37.3013597080198,
       "longitude": 126.840003037448,
@@ -6428,7 +6428,7 @@
     "name": "트라이뽀티",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "8천원 이상 구매 시 500원 할인",
     "location": {
       "latitude": 37.2992496407041,
       "longitude": 126.838791649849,
@@ -6469,7 +6469,7 @@
     "name": "카페 디캔바스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "아메리카노 500원 할인",
     "location": {
       "latitude": 37.3036106255795,
       "longitude": 126.845527468118,
@@ -6498,7 +6498,7 @@
     "name": "레이지그라운드",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "1,000원 즉시 할인",
+    "summary_benefit": "식사류 주문 시 500~1,000원 할인",
     "location": {
       "latitude": 37.29993356389921,
       "longitude": 126.83815857028479,
@@ -6551,7 +6551,7 @@
     "name": "벗히얼 크로스핏",
     "category": "life",
     "is_active": true,
-    "summary_benefit": "가입/등록 비용 할인",
+    "summary_benefit": "친구와 동시 등록 시 1~2만원 할인",
     "location": {
       "latitude": 37.3007133795491,
       "longitude": 126.839858230192,
@@ -6580,7 +6580,7 @@
     "name": "R샐러드카페",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "5% 즉시 할인",
+    "summary_benefit": "샐러드+음료 주문 시 5% 할인",
     "location": {
       "latitude": 37.3019520472652,
       "longitude": 126.838278316607,
@@ -6609,7 +6609,7 @@
     "name": "홈즈앤루팡",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "30분 추가 지급",
+    "summary_benefit": "학생증 인증 시 이용시간 30분 추가",
     "location": {
       "latitude": 37.3009491514433,
       "longitude": 126.838246626774,
@@ -6638,7 +6638,7 @@
     "name": "풍차이야기",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 혜택 및 음료 제공",
+    "summary_benefit": "현금/계좌이체 시 10% 할인 · 4인 이상 음료 제공",
     "location": {
       "latitude": 37.3024243613692,
       "longitude": 126.837942648471,
@@ -6668,7 +6668,7 @@
     "category": "pub",
     "is_active": true,
     "emoji": "🍺",
-    "summary_benefit": "나쵸 서비스 제공",
+    "summary_benefit": "주류 15,000원 이상 결제 시 나쵸 제공",
     "location": {
       "latitude": 37.300087778447,
       "longitude": 126.840249357095,
@@ -6697,7 +6697,7 @@
     "category": "food",
     "is_active": true,
     "emoji": "🥟",
-    "summary_benefit": "음료 서비스 제공",
+    "summary_benefit": "테이블당 음료 1캔 제공",
     "location": {
       "latitude": 37.3031648962112,
       "longitude": 126.846854612839,
