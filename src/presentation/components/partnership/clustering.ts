@@ -27,44 +27,63 @@ export function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: n
 // 이 레벨 이하(최대 확대)에서는 클러스터링하지 않고 전부 개별 마커로 보여준다
 const NO_CLUSTER_LEVEL = 1;
 
-// 같은 건물(동일 좌표) 매장들을 겹치지 않게 부채꼴로 펼치는 반경(m)
-// 최대 확대(0.25m/px)에서 마커(32px≈8m)끼리 떨어져 보이는 최소 거리
-const FAN_OUT_RADIUS_M = 10;
+// 마커 원의 화면상 최대 지름(선택 시 40px) + 최소 여백 — 이보다 가까우면 겹친 것으로 보고 밀어낸다.
+// 정확히 동일한 좌표든 몇 미터 떨어진 다른 좌표든, 화면 거리 기준이라 두 경우 모두 처리된다.
+const MIN_SEPARATION_PX = 44;
+const RESOLVE_ITERATIONS = 8;
 
-/** 동일/근접 좌표 매장들을 작은 원형으로 펼쳐 개별 클러스터로 반환 */
-function fanOutOverlapping(stores: PartnerStore[]): StoreCluster[] {
-  const byCoord = new Map<string, PartnerStore[]>();
-  for (const store of stores) {
-    const { latitude, longitude } = store.location;
-    if (latitude == null || longitude == null) continue;
-    const key = `${latitude.toFixed(5)},${longitude.toFixed(5)}`; // ≈1m 단위로 동일 좌표 판정
-    byCoord.set(key, [...(byCoord.get(key) ?? []), store]);
-  }
+/**
+ * 화면 픽셀 거리 기준으로 겹치는 마커들을 서로 밀어낸다 (물리 시뮬레이션 없는 단순 반발 이완법).
+ * 위경도를 캠퍼스 인근에서만 유효한 평면 좌표(m)로 변환해 계산한 뒤 다시 위경도로 되돌린다.
+ */
+function resolveOverlaps(stores: PartnerStore[], level: number): StoreCluster[] {
+  const withCoords = stores.filter(
+    (s): s is PartnerStore & { location: { latitude: number; longitude: number } } =>
+      s.location.latitude != null && s.location.longitude != null
+  );
+  if (withCoords.length === 0) return [];
 
-  const result: StoreCluster[] = [];
-  for (const group of byCoord.values()) {
-    if (group.length === 1) {
-      const s = group[0];
-      result.push({ lat: s.location.latitude as number, lng: s.location.longitude as number, stores: [s] });
-      continue;
+  const originLat = withCoords[0].location.latitude;
+  const originLng = withCoords[0].location.longitude;
+  const points = withCoords.map((s) => ({
+    store: s,
+    x: (s.location.longitude - originLng) * 88_000,
+    y: (s.location.latitude - originLat) * 111_000,
+  }));
+
+  const minSepM = MIN_SEPARATION_PX * metersPerPixel(level);
+
+  for (let iter = 0; iter < RESOLVE_ITERATIONS; iter++) {
+    let moved = false;
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
+        const dx = points[j].x - points[i].x;
+        const dy = points[j].y - points[i].y;
+        const dist = Math.hypot(dx, dy);
+        if (dist >= minSepM) continue;
+        moved = true;
+        // 완전히 겹쳐 거리가 0이면 인덱스 기반 고정 각도로 방향을 정해 결정적으로 밀어낸다
+        const angle = dist > 0.01 ? Math.atan2(dy, dx) : (2 * Math.PI * (i + j)) / points.length;
+        const push = (minSepM - dist) / 2;
+        points[i].x -= Math.cos(angle) * push;
+        points[i].y -= Math.sin(angle) * push;
+        points[j].x += Math.cos(angle) * push;
+        points[j].y += Math.sin(angle) * push;
+      }
     }
-    // 원 둘레에 균등 배치 (매장 수가 많으면 반경을 키워 겹침 방지)
-    const radius = FAN_OUT_RADIUS_M * Math.max(1, group.length / 4);
-    group.forEach((s, i) => {
-      const angle = (2 * Math.PI * i) / group.length;
-      result.push({
-        lat: (s.location.latitude as number) + (radius * Math.cos(angle)) / 111_000,
-        lng: (s.location.longitude as number) + (radius * Math.sin(angle)) / 88_000,
-        stores: [s],
-      });
-    });
+    if (!moved) break;
   }
-  return result;
+
+  return points.map((p) => ({
+    lat: originLat + p.y / 111_000,
+    lng: originLng + p.x / 88_000,
+    stores: [p.store],
+  }));
 }
 
 export function clusterStores(stores: PartnerStore[], level: number): StoreCluster[] {
-  // 최대 확대: 전부 개별 표시 (동일 좌표 매장은 부채꼴로 펼침)
-  if (level <= NO_CLUSTER_LEVEL) return fanOutOverlapping(stores);
+  // 최대 확대: 전부 개별 표시, 겹치는 마커는 화면 거리 기준으로 서로 밀어낸다
+  if (level <= NO_CLUSTER_LEVEL) return resolveOverlaps(stores, level);
 
   const threshold = CLUSTER_RADIUS_PX * metersPerPixel(level);
   const clusters: StoreCluster[] = [];

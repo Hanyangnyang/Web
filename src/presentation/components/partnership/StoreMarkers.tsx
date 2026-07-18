@@ -7,7 +7,7 @@ import type { StoreCluster } from './clustering';
 
 interface Props {
   clusters: StoreCluster[];
-  level: number;                   // 현재 줌 레벨 — 원형/개별 마커 전환 기준
+  level: number;                   // 현재 줌 레벨 — 원형/개별 마커 전환, 이름표 상시 표시 기준
   selectedId: string | null;
   onSelectStore: (store: PartnerStore) => void;
   onSelectCluster: (cluster: StoreCluster) => void;
@@ -16,6 +16,10 @@ interface Props {
 // 이 레벨 이하(충분히 가까움)일 때만 이모지 개별 마커를 보여주고,
 // 그보다 멀면 단독 매장도 "1" 원으로 표시한다
 const INDIVIDUAL_MARKER_MAX_LEVEL = 2;
+
+// 이 레벨 이하(최대 확대)에서는 선택 여부와 무관하게 이름을 상시 표시한다.
+// clustering.ts의 NO_CLUSTER_LEVEL과 값을 맞춘다 — 마커가 겹침 없이 펼쳐진 상태라야 이름표도 안 겹친다.
+const LABEL_VISIBLE_MAX_LEVEL = 1;
 
 function clusterSizeClass(count: number): string {
   if (count >= 20) return 'w-12 h-12 text-[15px]';
@@ -41,12 +45,17 @@ export function StoreMarkers({ clusters, level, selectedId, onSelectStore, onSel
               yAnchor={0.5}
               zIndex={5}
             >
+              {/* 바깥 버튼에 여백을 줘 시각 크기보다 넓은 히트 영역을 확보 (여백이 대칭이라 앵커는 그대로 원 중심) */}
               <button
                 onClick={() => (single ? onSelectStore(cluster.stores[0]) : onSelectCluster(cluster))}
                 aria-label={single ? cluster.stores[0].name : `매장 ${cluster.stores.length}곳 묶음`}
-                className={`flex items-center justify-center rounded-full bg-[#F1F5F9]/95 text-[#0E4A84] font-extrabold shadow-[0_3px_10px_rgba(0,0,0,0.22)] border border-[#CBD5E1] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform ${clusterSizeClass(cluster.stores.length)}`}
+                className="flex items-center justify-center p-2 [-webkit-tap-highlight-color:transparent]"
               >
-                {cluster.stores.length}
+                <span
+                  className={`flex items-center justify-center rounded-full bg-[#F1F5F9]/95 text-[#0E4A84] font-extrabold shadow-[0_3px_10px_rgba(0,0,0,0.22)] border border-[#CBD5E1] transition-transform active:scale-95 ${clusterSizeClass(cluster.stores.length)}`}
+                >
+                  {cluster.stores.length}
+                </span>
               </button>
             </CustomOverlayMap>
           );
@@ -58,34 +67,59 @@ export function StoreMarkers({ clusters, level, selectedId, onSelectStore, onSel
         const selected = store.id === selectedId;
 
         return (
-          <CustomOverlayMap
-            key={store.id}
-            position={{ lat: cluster.lat, lng: cluster.lng }}
-            yAnchor={0.5}
-            zIndex={selected ? 20 : 1}
-          >
-            <button
-              onClick={() => onSelectStore(store)}
-              className="flex flex-col items-center [-webkit-tap-highlight-color:transparent]"
-              aria-label={store.name}
+          <>
+            {/* 원(클릭 대상): 내용이 원 하나뿐이라 yAnchor 0.5가 항상 원의 중심 = 좌표를 가리킨다.
+                라벨을 이 안에 같이 넣으면(선택 시 높이가 늘어나) 박스 전체 중심이 기준이 되면서
+                원이 좌표에서 벗어나 보이므로, 라벨은 아래에 별도 오버레이로 분리한다. */}
+            <CustomOverlayMap
+              key={store.id}
+              position={{ lat: cluster.lat, lng: cluster.lng }}
+              yAnchor={0.5}
+              zIndex={selected ? 20 : 1}
             >
-              {/* 카테고리 구분은 이모지가 담당 — 테두리는 중립색으로 시각 소음 최소화, 브랜드색은 선택 상태에만 */}
-              <span
-                className={`flex items-center justify-center rounded-full bg-white transition-transform ${
-                  selected
-                    ? 'w-10 h-10 text-[19px] scale-110 border-2 border-[#0E4A84] shadow-[0_3px_10px_rgba(14,74,132,0.35)]'
-                    : 'w-8 h-8 text-[15px] border border-[#CBD5E1] shadow-[0_2px_6px_rgba(0,0,0,0.18)]'
-                }`}
+              {/* 바깥 버튼에 여백을 줘 시각 크기보다 넓은 히트 영역을 확보 (여백이 대칭이라 앵커는 그대로 원 중심) */}
+              <button
+                onClick={() => onSelectStore(store)}
+                aria-label={store.name}
+                className="flex items-center justify-center p-2 [-webkit-tap-highlight-color:transparent]"
               >
-                {store.emoji || CATEGORY_META[store.category].emoji}
-              </span>
-              {selected && (
-                <span className="mt-1 px-2 py-0.5 rounded-full bg-[#0E4A84] text-white text-[11px] font-bold whitespace-nowrap shadow">
-                  {store.name}
+                <span
+                  className={`flex items-center justify-center rounded-full bg-white transition-transform ${
+                    selected
+                      ? 'w-10 h-10 text-[19px] scale-110 border-2 border-[#0E4A84] shadow-[0_3px_10px_rgba(14,74,132,0.35)]'
+                      : 'w-8 h-8 text-[15px] border border-[#CBD5E1] shadow-[0_2px_6px_rgba(0,0,0,0.18)]'
+                  }`}
+                >
+                  {store.emoji || CATEGORY_META[store.category].emoji}
                 </span>
-              )}
-            </button>
-          </CustomOverlayMap>
+              </button>
+            </CustomOverlayMap>
+
+            {/* 이름 라벨: 같은 좌표에 별도 오버레이로 얹어 원의 앵커에는 영향을 주지 않는다.
+                선택 시엔 강조색 반투명 알약, 최대 확대 시엔 선택 여부와 무관하게 보조 알약을 보여준다. */}
+            {(selected || level <= LABEL_VISIBLE_MAX_LEVEL) && (
+              <CustomOverlayMap
+                key={`${store.id}-label`}
+                position={{ lat: cluster.lat, lng: cluster.lng }}
+                xAnchor={0.5}
+                yAnchor={0}
+                zIndex={selected ? 21 : 4}
+              >
+                {/* margin-top = 원 반지름 그대로 — 원 아래 테두리에 알약 윗변이 딱 맞닿는다 (선택 시 40px/평소 32px) */}
+                <div className={`pointer-events-none flex justify-center ${selected ? 'mt-5' : 'mt-4'}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap shadow-sm backdrop-blur-[2px] ${
+                      selected
+                        ? 'bg-[#0E4A84]/75 text-white'
+                        : 'bg-white/70 text-[#334155] border border-[#e2e8f0]/70'
+                    }`}
+                  >
+                    {store.name}
+                  </span>
+                </div>
+              </CustomOverlayMap>
+            )}
+          </>
         );
       })}
     </>
