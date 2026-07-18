@@ -86,10 +86,29 @@ export function hasCoords(store: PartnerStore): boolean {
   return store.location?.latitude != null && store.location?.longitude != null;
 }
 
-/** 지도에 마커로 표시할 매장: 영업 중 + 좌표 보유 + 카테고리 일치 */
-export function visibleStores(category: CategoryFilter): PartnerStore[] {
+// 단과대 필터 드롭다운용 (총학생회는 별도 제휴 주체가 아니라 제외)
+export const COLLEGES: { id: string; name: string }[] = [
+  { id: '1', name: 'LIONS 칼리지' },
+  { id: '2', name: '커뮤니케이션&컬쳐대학' },
+  { id: '3', name: '공학대학' },
+  { id: '4', name: '약학대학' },
+  { id: '5', name: '디자인대학' },
+  { id: '6', name: '글로벌문화통상대학' },
+  { id: '7', name: '경상대학' },
+  { id: '8', name: '소프트웨어융합대학' },
+  { id: '9', name: '예체능대학' },
+  { id: '10', name: '첨단융합대학' },
+];
+
+/** 지도에 마커로 표시할 매장: 영업 중 + 좌표 보유 + 카테고리·단과대 필터 일치 */
+export function visibleStores(category: CategoryFilter, collegeId: string = 'all'): PartnerStore[] {
   return STORES.filter(
-    (s) => s.is_active && hasCoords(s) && (category === 'all' || s.category === category)
+    (s) =>
+      s.is_active &&
+      hasCoords(s) &&
+      (category === 'all' || s.category === category) &&
+      (collegeId === 'all' ||
+        s.partnerships.some((p) => p.college_id === collegeId && p.period?.is_active))
   );
 }
 

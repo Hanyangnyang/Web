@@ -1,17 +1,20 @@
 // 지도 하단 바텀시트
 // - 매장 미선택: 현재 칩 기준 매장 리스트 (접힘 ↔ 펼침, 핸들 탭/스와이프)
 // - 매장 선택: 혜택 상세 카드
-import { useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { X, Info, Clock, ExternalLink, MapPin } from 'lucide-react';
 import {
-  activePartnerships, CATEGORY_META,
+  activePartnerships, CATEGORY_META, COLLEGES,
   COLLEGE_EMOJI, COLLEGE_STYLE, COLLEGE_DISPLAY_NAME,
   type PartnerStore,
 } from './storeData';
 
 interface Props {
   stores: PartnerStore[];          // 리스트에 표시할 매장들 (칩 필터 또는 클러스터 묶음)
-  title: string;                   // 리스트 타이틀 (예: '제휴 매장' | '이 위치 제휴 매장')
+  title: string;                   // 리스트 타이틀 (예: '제휴 식당' | '이 위치 제휴 매장')
+  college: string;                 // 단과대 필터 ('all' | college_id)
+  onCollegeChange: (id: string) => void;
+  resetSignal: string;             // 값이 바뀌면 리스트 스크롤을 맨 위로 (칩·단과대 변경 시)
   selected: PartnerStore | null;
   expanded: boolean;
   onToggleExpand: (expanded: boolean) => void;
@@ -33,8 +36,23 @@ function SheetFrame({ heightClass, children }: { heightClass: string; children: 
   );
 }
 
-export function StoreSheet({ stores, title, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
+export function StoreSheet({ stores, title, college, onCollegeChange, resetSignal, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
   const touchStartY = useRef<number | null>(null);
+
+  // 목록 스크롤 위치 보존: 상세 진입 시 리마운트(key)로 컨테이너가 사라지므로
+  // 스크롤 값을 ref에 기록해뒀다가, 목록이 다시 마운트될 때 복원한다 (X 복귀 시 이어보기)
+  const listScrollTop = useRef(0);
+  const listEl = useRef<HTMLDivElement | null>(null);
+  const attachListRef = useCallback((el: HTMLDivElement | null) => {
+    listEl.current = el;
+    if (el) el.scrollTop = listScrollTop.current;
+  }, []);
+
+  // 칩·단과대 필터가 바뀌면 목록은 새 컨텍스트 → 스크롤 맨 위로
+  useEffect(() => {
+    listScrollTop.current = 0;
+    if (listEl.current) listEl.current.scrollTop = 0;
+  }, [resetSignal]);
 
   // 핸들 스와이프로 접힘/펼침 전환
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -60,7 +78,8 @@ export function StoreSheet({ stores, title, selected, expanded, onToggleExpand, 
         : null;
 
     return (
-      <SheetFrame heightClass="h-[60%]">
+      // 단과대 카드 1개 + 다음 카드 절반쯤 보이는 높이 — 지도가 주인공으로 남는다
+      <SheetFrame heightClass="h-[45%]">
         {/* 헤더 */}
         <div className="flex items-start gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0 mt-0.5">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
@@ -146,23 +165,48 @@ export function StoreSheet({ stores, title, selected, expanded, onToggleExpand, 
 
   // ── 리스트 모드 ──
   return (
-    <SheetFrame heightClass={expanded ? 'h-[64%]' : 'h-[calc(72px+96px+env(safe-area-inset-bottom,0px))]'}>
-      {/* 핸들 + 타이틀 (탭/스와이프로 전환) */}
-      <button
-        className="flex flex-col items-center pt-2.5 pb-2 px-4 flex-shrink-0 [-webkit-tap-highlight-color:transparent]"
-        onClick={() => onToggleExpand(!expanded)}
+    <SheetFrame heightClass={expanded ? 'h-[52%]' : 'h-[calc(72px+96px+env(safe-area-inset-bottom,0px))]'}>
+      {/* 핸들 + 타이틀(좌) + 단과대 드롭다운(우) */}
+      <div
+        className="flex flex-col flex-shrink-0 px-4 pt-2.5 pb-2"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        aria-label={expanded ? '리스트 접기' : '리스트 펼치기'}
       >
-        <span className="w-9 h-1 rounded-full bg-slate-200" />
-        <span className="mt-2 text-[13px] font-extrabold text-text-main">
-          {title} <span className="text-[#0E4A84]">{stores.length}</span>곳
-        </span>
-      </button>
+        <button
+          className="self-center p-1 [-webkit-tap-highlight-color:transparent]"
+          onClick={() => onToggleExpand(!expanded)}
+          aria-label={expanded ? '리스트 접기' : '리스트 펼치기'}
+        >
+          <span className="block w-9 h-1 rounded-full bg-slate-200" />
+        </button>
+        <div className="mt-1 flex items-center justify-between gap-2">
+          <button
+            className="text-left text-[13px] font-extrabold text-text-main [-webkit-tap-highlight-color:transparent]"
+            onClick={() => onToggleExpand(!expanded)}
+          >
+            {title} <span className="text-[#0E4A84]">{stores.length}</span>곳
+          </button>
+          <select
+            value={college}
+            onChange={(e) => onCollegeChange(e.target.value)}
+            aria-label="단과대 필터"
+            className="flex-shrink-0 max-w-[150px] text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg px-2 py-1.5 outline-none"
+          >
+            <option value="all">전체 단과대</option>
+            {COLLEGES.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {/* 매장 리스트 (펼침 시) — key: 상세 모드와 스크롤 컨테이너 재사용 방지 */}
-      <div key="list" className={`flex-1 overflow-y-auto ${expanded ? NAV_CLEARANCE : ''}`}>
+      <div
+        key="list"
+        ref={attachListRef}
+        onScroll={(e) => { listScrollTop.current = e.currentTarget.scrollTop; }}
+        className={`flex-1 overflow-y-auto ${expanded ? NAV_CLEARANCE : ''}`}
+      >
         {expanded && stores.map((store) => {
           const colleges = activePartnerships(store);
           return (
