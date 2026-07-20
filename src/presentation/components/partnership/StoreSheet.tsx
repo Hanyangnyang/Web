@@ -8,6 +8,13 @@ import {
   COLLEGE_EMOJI, COLLEGE_STYLE, COLLEGE_DISPLAY_NAME,
   type PartnerStore,
 } from './storeData';
+import { CollegeWheelPicker } from './CollegeWheelPicker';
+
+// 휠피커 옵션 — '전체' 항목 + 단과대 목록. 컴포넌트 바깥에 둬 매 렌더마다 새 배열이 생기지 않게 한다.
+const COLLEGE_OPTIONS = [
+  { id: 'all', label: '전체 단과대' },
+  ...COLLEGES.map((c) => ({ id: c.id, label: c.name })),
+];
 
 interface Props {
   stores: PartnerStore[];          // 리스트에 표시할 매장들 (칩 필터 또는 클러스터 묶음)
@@ -93,17 +100,12 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
               <span className="text-[11px] font-bold text-text-hint flex-shrink-0">{CATEGORY_META[selected.category].label}</span>
             </div>
           </div>
-          <select
+          <CollegeWheelPicker
+            options={COLLEGE_OPTIONS}
             value={college}
-            onChange={(e) => onCollegeChange(e.target.value)}
-            aria-label="단과대 필터"
-            className="flex-shrink-0 max-w-[110px] truncate text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-1.5 pr-1 py-1.5 outline-none"
-          >
-            <option value="all">전체 단과대</option>
-            {COLLEGES.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            onChange={onCollegeChange}
+            triggerClassName="flex-shrink-0 flex items-center gap-1 max-w-[110px] text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1.5 py-1.5"
+          />
           <button
             onClick={onClose}
             className="p-1 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
@@ -199,17 +201,13 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
           >
             {title} <span className="text-[#0E4A84]">{stores.length}</span>곳
           </button>
-          <select
+          <CollegeWheelPicker
+            options={COLLEGE_OPTIONS}
             value={college}
-            onChange={(e) => onCollegeChange(e.target.value)}
-            aria-label="단과대 필터"
-            className="flex-shrink-0 max-w-[150px] truncate text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1 py-1.5 outline-none"
-          >
-            <option value="all">전체 단과대</option>
-            {COLLEGES.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            onChange={onCollegeChange}
+            onOpen={() => onToggleExpand(true)}
+            triggerClassName="flex-shrink-0 flex items-center gap-1 max-w-[150px] text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1.5 py-1.5"
+          />
         </div>
       </div>
 
