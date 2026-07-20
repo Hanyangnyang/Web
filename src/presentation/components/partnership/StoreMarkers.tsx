@@ -45,18 +45,21 @@ export function StoreMarkers({ clusters, level, selectedId, onSelectStore, onSel
               yAnchor={0.5}
               zIndex={5}
             >
-              {/* 바깥 버튼에 여백을 줘 시각 크기보다 넓은 히트 영역을 확보 (여백이 대칭이라 앵커는 그대로 원 중심) */}
-              <button
-                onClick={() => (single ? onSelectStore(cluster.stores[0]) : onSelectCluster(cluster))}
-                aria-label={single ? cluster.stores[0].name : `매장 ${cluster.stores.length}곳 묶음`}
-                className="flex items-center justify-center p-2 [-webkit-tap-highlight-color:transparent]"
-              >
-                <span
-                  className={`flex items-center justify-center rounded-full bg-[#F1F5F9]/95 text-[#0E4A84] font-extrabold shadow-[0_3px_10px_rgba(0,0,0,0.22)] border border-[#CBD5E1] transition-transform active:scale-95 ${clusterSizeClass(cluster.stores.length)}`}
+              {/* 너비 0 컨테이너 + flex 중앙정렬: 내용 크기가 몇 px든 항상 이 지점(zero-width center)을 기준으로
+                  좌우 대칭 렌더링되므로, Kakao의 앵커 계산 방식과 무관하게 시각적 중심이 좌표에 고정된다 */}
+              <div style={{ width: 0 }} className="flex justify-center">
+                <button
+                  onClick={() => (single ? onSelectStore(cluster.stores[0]) : onSelectCluster(cluster))}
+                  aria-label={single ? cluster.stores[0].name : `매장 ${cluster.stores.length}곳 묶음`}
+                  className="flex items-center justify-center p-2 [-webkit-tap-highlight-color:transparent]"
                 >
-                  {cluster.stores.length}
-                </span>
-              </button>
+                  <span
+                    className={`flex items-center justify-center rounded-full bg-[#F1F5F9]/95 text-[#0E4A84] font-extrabold shadow-[0_3px_10px_rgba(0,0,0,0.22)] border border-[#CBD5E1] transition-transform active:scale-95 ${clusterSizeClass(cluster.stores.length)}`}
+                  >
+                    {cluster.stores.length}
+                  </span>
+                </button>
+              </div>
             </CustomOverlayMap>
           );
         }
@@ -68,7 +71,8 @@ export function StoreMarkers({ clusters, level, selectedId, onSelectStore, onSel
 
         return (
           <>
-            {/* 원(클릭 대상): 내용이 원 하나뿐이라 yAnchor 0.5가 항상 원의 중심 = 좌표를 가리킨다.
+            {/* 원(클릭 대상): 너비 0 컨테이너 + flex 중앙정렬로 선택 시 원 크기가 32→40px로 커져도
+                항상 좌표 지점을 기준으로 좌우 대칭 렌더링되어 시각적 중심이 흔들리지 않는다.
                 라벨을 이 안에 같이 넣으면(선택 시 높이가 늘어나) 박스 전체 중심이 기준이 되면서
                 원이 좌표에서 벗어나 보이므로, 라벨은 아래에 별도 오버레이로 분리한다. */}
             <CustomOverlayMap
@@ -77,22 +81,24 @@ export function StoreMarkers({ clusters, level, selectedId, onSelectStore, onSel
               yAnchor={0.5}
               zIndex={selected ? 20 : 1}
             >
-              {/* 바깥 버튼에 여백을 줘 시각 크기보다 넓은 히트 영역을 확보 (여백이 대칭이라 앵커는 그대로 원 중심) */}
-              <button
-                onClick={() => onSelectStore(store)}
-                aria-label={store.name}
-                className="flex items-center justify-center p-2 [-webkit-tap-highlight-color:transparent]"
-              >
-                <span
-                  className={`flex items-center justify-center rounded-full bg-white transition-transform ${
-                    selected
-                      ? 'w-10 h-10 text-[19px] scale-110 border-2 border-[#0E4A84] shadow-[0_3px_10px_rgba(14,74,132,0.35)]'
-                      : 'w-8 h-8 text-[15px] border border-[#CBD5E1] shadow-[0_2px_6px_rgba(0,0,0,0.18)]'
-                  }`}
+              <div style={{ width: 0 }} className="flex justify-center">
+                {/* 바깥 버튼에 여백을 줘 시각 크기보다 넓은 히트 영역을 확보 (여백이 대칭이라 앵커는 그대로 원 중심) */}
+                <button
+                  onClick={() => onSelectStore(store)}
+                  aria-label={store.name}
+                  className="flex items-center justify-center p-2 [-webkit-tap-highlight-color:transparent]"
                 >
-                  {store.emoji || CATEGORY_META[store.category].emoji}
-                </span>
-              </button>
+                  <span
+                    className={`flex items-center justify-center rounded-full bg-white transition-transform ${
+                      selected
+                        ? 'w-10 h-10 text-[19px] scale-110 border-2 border-[#0E4A84] shadow-[0_3px_10px_rgba(14,74,132,0.35)]'
+                        : 'w-8 h-8 text-[15px] border border-[#CBD5E1] shadow-[0_2px_6px_rgba(0,0,0,0.18)]'
+                    }`}
+                  >
+                    {store.emoji || CATEGORY_META[store.category].emoji}
+                  </span>
+                </button>
+              </div>
             </CustomOverlayMap>
 
             {/* 이름 라벨: 같은 좌표에 별도 오버레이로 얹어 원의 앵커에는 영향을 주지 않는다.
@@ -105,17 +111,22 @@ export function StoreMarkers({ clusters, level, selectedId, onSelectStore, onSel
                 yAnchor={0}
                 zIndex={selected ? 21 : 4}
               >
-                {/* margin-top = 원 반지름 그대로 — 원 아래 테두리에 알약 윗변이 딱 맞닿는다 (선택 시 40px/평소 32px) */}
-                <div className={`pointer-events-none flex justify-center ${selected ? 'mt-5' : 'mt-4'}`}>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap shadow-sm backdrop-blur-[2px] ${
+                {/* margin-top = 원 반지름 그대로 — 원 아래 테두리에 알약 윗변이 딱 맞닿는다 (선택 시 40px/평소 32px)
+                    이름 라벨도 원과 별개의 클릭 영역으로 — 매장명을 눌러도 선택되게 한다.
+                    너비 0 컨테이너 + flex 중앙정렬: 매장명 글자 수가 제각각이라도 항상 좌표 지점을 기준으로
+                    좌우 대칭 렌더링되어 원과 정확히 같은 수직선에 정렬된다 */}
+                <div style={{ width: 0 }} className={`flex justify-center ${selected ? 'mt-5' : 'mt-4'}`}>
+                  <button
+                    onClick={() => onSelectStore(store)}
+                    aria-label={store.name}
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap shadow-sm backdrop-blur-[2px] active:scale-95 transition-transform [-webkit-tap-highlight-color:transparent] ${
                       selected
                         ? 'bg-[#0E4A84]/75 text-white'
                         : 'bg-white/70 text-[#334155] border border-[#e2e8f0]/70'
                     }`}
                   >
                     {store.name}
-                  </span>
+                  </button>
                 </div>
               </CustomOverlayMap>
             )}
