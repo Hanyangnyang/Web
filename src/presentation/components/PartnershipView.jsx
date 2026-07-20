@@ -1,6 +1,7 @@
 // 컴포넌트: 단과대 제휴 업체 검색 및 혜택 조회
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown, ChevronUp, ExternalLink, Info, Clock } from 'lucide-react';
+import { usePostHog } from 'posthog-js/react';
 import partnershipsData from '../../data/partnerships.json';
 
 // ─── 카테고리 enum (데이터 스키마 기준) ───
@@ -185,6 +186,7 @@ function StoreCard({ store, collegeFilter }) {
 }
 
 export function PartnershipView({ isActive }) {
+  const posthog = usePostHog();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [college, setCollege] = useState(() => localStorage.getItem('partnerCollegeFilter') || 'all');
@@ -211,15 +213,17 @@ export function PartnershipView({ isActive }) {
   }, []);
 
   const handleCollegeChange = useCallback((id) => {
+    posthog?.capture('partnership_college_chip_clicked', { collegeId: id });
     setCollege(id);
     localStorage.setItem('partnerCollegeFilter', id);
     scrollToTop();
-  }, [scrollToTop]);
+  }, [scrollToTop, posthog]);
 
   const handleCategoryChange = useCallback((key) => {
+    posthog?.capture('partnership_category_chip_clicked', { category: key });
     setCategory(key);
     scrollToTop();
-  }, [scrollToTop]);
+  }, [scrollToTop, posthog]);
 
   // 검색 + 카테고리 + 단과대 필터링
   const filtered = useMemo(() => {
