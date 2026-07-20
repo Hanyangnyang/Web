@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 
 import { ChevronLeft, ChevronRight, Bell, Share2 } from 'lucide-react';
+import { usePostHog } from 'posthog-js/react';
 import { getKSTDate } from '../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
 import { ShareSheet } from './ShareSheet.jsx';
@@ -122,7 +123,10 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
       }
     : (cafes.find(c => c.id === selectedCafeId) || { menus: [] });
 
+  const posthog = usePostHog();
+
   const handleCafeSelect = (id) => {
+    posthog?.capture('cafeteria_chip_clicked', { cafeId: id });
     setSelectedCafeId(id);
     scrollToTop();
   };

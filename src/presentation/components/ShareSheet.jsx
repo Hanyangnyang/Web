@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
+import { usePostHog } from 'posthog-js/react';
 
 const KakaoIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -12,6 +13,7 @@ const KakaoIcon = () => (
 
 
 export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }) {
+  const posthog = usePostHog();
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
   const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
 
@@ -29,6 +31,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   }, [onClose]);
 
   const handleKakao = () => {
+    posthog?.capture('cafeteria_share_clicked', { method: 'kakao', cafeName, mealType });
     if (!window.Kakao) {
       alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]');
       return;
@@ -69,6 +72,7 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
   };
 
   const handleShare = async () => {
+    posthog?.capture('cafeteria_share_clicked', { method: 'native', cafeName, mealType });
     const shareText = `하냥냥 - 학식 정보\n${kakaoTitle}\n\n더 자세히 보기\n${shareUrl}`;
 
     const nativeShare = window.Capacitor?.Plugins?.Share;

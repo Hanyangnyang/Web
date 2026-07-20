@@ -1212,7 +1212,7 @@ export function ShuttleView({ isActive }) {
                     }}
                   />
                   <button onClick={() => setViewMode('shuttle')} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'shuttle' ? 'text-white' : 'text-slate-500'}`}>학교 셔틀</button>
-                  <button onClick={() => setViewMode('bus')} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-500'}`}>일반 버스</button>
+                  <button onClick={() => { posthog?.capture('shuttle_view_mode_changed', { viewMode: 'bus' }); setViewMode('bus'); }} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-500'}`}>일반 버스</button>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -1471,7 +1471,7 @@ export function ShuttleView({ isActive }) {
                   }}
                 />
                 <button onClick={() => setViewMode('shuttle')} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'shuttle' ? 'text-white' : 'text-slate-500'}`}>학교 셔틀</button>
-                <button onClick={() => setViewMode('bus')} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-500'}`}>일반 버스</button>
+                <button onClick={() => { posthog?.capture('shuttle_view_mode_changed', { viewMode: 'bus' }); setViewMode('bus'); }} className={`px-4 py-[4px] text-[11.5px] font-black rounded-[9px] transition-colors duration-300 relative z-10 ${viewMode === 'bus' ? 'text-white' : 'text-slate-500'}`}>일반 버스</button>
               </div>
             </div>
           </div>
