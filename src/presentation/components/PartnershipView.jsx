@@ -213,14 +213,16 @@ export function PartnershipView({ isActive }) {
   }, []);
 
   const handleCollegeChange = useCallback((id) => {
-    posthog?.capture('partnership_college_chip_clicked', { collegeId: id });
+    const collegeName = COLLEGES.find(c => c.id === id)?.name || id;
+    posthog?.capture('partnership_college_chip_clicked', { collegeId: id, collegeName });
     setCollege(id);
     localStorage.setItem('partnerCollegeFilter', id);
     scrollToTop();
   }, [scrollToTop, posthog]);
 
   const handleCategoryChange = useCallback((key) => {
-    posthog?.capture('partnership_category_chip_clicked', { category: key });
+    const categoryLabel = CATEGORIES.find(c => c.key === key)?.label || key;
+    posthog?.capture('partnership_category_chip_clicked', { category: key, categoryLabel });
     setCategory(key);
     scrollToTop();
   }, [scrollToTop, posthog]);

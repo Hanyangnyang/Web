@@ -126,7 +126,8 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
   const posthog = usePostHog();
 
   const handleCafeSelect = (id) => {
-    posthog?.capture('cafeteria_chip_clicked', { cafeId: id });
+    const cafeName = id === 'all' ? '전체' : (cafes.find(c => c.id === id)?.name || id);
+    posthog?.capture('cafeteria_chip_clicked', { cafeId: id, cafeName });
     setSelectedCafeId(id);
     scrollToTop();
   };
