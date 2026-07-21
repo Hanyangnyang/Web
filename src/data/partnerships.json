@@ -1,15 +1,15 @@
-﻿[
+[
   {
     "id": "1",
     "name": "기찬고기",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인 이상 방문 시 찌개·버섯·냉국수 중 택1 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019593664691,
+      "longitude": 126.838359511383,
+      "address": "경기 안산시 상록구 성안2길 12",
+      "full_address": "경기 안산시 상록구 사동 1564-2"
     },
     "emoji": "🥓",
     "partnerships": [
@@ -73,19 +73,20 @@
         "conditions": "4인 이상 테이블 기준, 혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "639405321"
   },
   {
     "id": "2",
     "name": "젤리팩토리",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이블당 음료 제공 (인원에 따라 1~2개)",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300318705131026,
+      "longitude": 126.83977627924395,
+      "address": "경기 안산시 상록구 학사2길 15",
+      "full_address": "경기 안산시 상록구 사동 1151-5"
     },
     "emoji": "🍖",
     "partnerships": [
@@ -137,19 +138,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "21360935"
   },
   {
     "id": "3",
     "name": "핵밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "1인 1메뉴 주문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001835430023,
+      "longitude": 126.83844564823,
+      "address": "경기 안산시 상록구 한양대학로 49",
+      "full_address": "경기 안산시 상록구 사동 1149-3"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -213,14 +215,15 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "97433730"
   },
   {
     "id": "4",
     "name": "양식당",
     "category": "food",
-    "is_active": true,
-    "summary_benefit": null,
+    "is_active": false,
+    "summary_benefit": "2인 이상 방문 시 갈릭바게트 또는 음료 제공",
     "location": {
       "latitude": null,
       "longitude": null,
@@ -296,12 +299,12 @@
     "name": "앤의 식탁",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2인 이상 방문 시 음료 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3010937966799,
+      "longitude": 126.838597886538,
+      "address": "경기 안산시 상록구 성안길 84-1",
+      "full_address": "경기 안산시 상록구 사동 1570"
     },
     "emoji": "🍝",
     "partnerships": [
@@ -401,19 +404,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1658098449"
   },
   {
     "id": "6",
     "name": "원조 감자탕 일미집",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 제공 · 감자탕(중) 이상 주문 시 볶음밥/사리 택1",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2997310165951,
+      "longitude": 126.838955294347,
+      "address": "경기 안산시 상록구 학사2길 6-1",
+      "full_address": "경기 안산시 상록구 사동 1154-4"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -465,19 +469,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "627716229"
   },
   {
     "id": "7",
     "name": "토마토 도시락",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "세트메뉴 주문 시 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30089518815284,
+      "longitude": 126.83897988189217,
+      "address": "경기 안산시 상록구 한양대학로 40",
+      "full_address": "경기 안산시 상록구 사동 1570-4"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -529,19 +534,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "11397991"
   },
   {
     "id": "8",
     "name": "91콩삼",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인 테이블당 우동·당면사리 중 택1 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299995537879,
+      "longitude": 126.840001415595,
+      "address": "경기 안산시 상록구 학사4길 15-1",
+      "full_address": "경기 안산시 상록구 사동 1155-14"
     },
     "emoji": "🐷",
     "partnerships": [
@@ -617,19 +623,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1876441949"
   },
   {
     "id": "9",
     "name": "일미 닭갈비 파전",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인분 이상 주문 시 볶음밥 1인분 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2995158636113,
+      "longitude": 126.838436925329,
+      "address": "경기 안산시 상록구 학사2길 2",
+      "full_address": "경기 안산시 상록구 사동 1154"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -705,19 +712,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "547233741"
   },
   {
     "id": "10",
     "name": "탕화쿵푸 마라탕",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 제공 또는 주류 할인 · 12,000원 이상 주문 시 꼬치 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300966702986,
+      "longitude": 126.837903705135,
+      "address": "경기 안산시 상록구 성안길 78-3",
+      "full_address": "경기 안산시 상록구 사동 1569-5"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -769,19 +777,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "2083515493"
   },
   {
     "id": "11",
     "name": "도야짬뽕",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "인원수만큼 군만두 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.301584628564,
+      "longitude": 126.837112836865,
+      "address": "경기 안산시 상록구 한양대학로 70-1",
+      "full_address": "경기 안산시 상록구 사동 1562-1"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -857,19 +866,20 @@
         "conditions": "방문 인원 전원 대상 제공, 혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "664483167"
   },
   {
     "id": "12",
     "name": "동아리식당",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 된장·순두부찌개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002237772971,
+      "longitude": 126.8395407501421,
+      "address": "경기 안산시 상록구 학사2길 13",
+      "full_address": "경기 안산시 상록구 사동 1151-3"
     },
     "emoji": "🍚",
     "partnerships": [
@@ -933,19 +943,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "21247560"
   },
   {
     "id": "13",
     "name": "육앤샤",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인분 이상 주문 시 육회비빔밥/샤브 제공 · 18시 이후 소주 3,000원",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011267320011,
+      "longitude": 126.838302641989,
+      "address": "경기 안산시 상록구 성안길 84-2",
+      "full_address": "경기 안산시 상록구 사동 1569"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -1033,19 +1044,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "27155005"
   },
   {
     "id": "14",
     "name": "더치킨",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "사계천왕·치뽀끼 주문 시 감자튀김 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299837165756,
+      "longitude": 126.839225649126,
+      "address": "경기 안산시 상록구 학사2길 10",
+      "full_address": "경기 안산시 상록구 사동 1154-6"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -1145,19 +1157,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "1382180055"
   },
   {
     "id": "15",
     "name": "미쳐버린파닭",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이블당 1천원 상당 서비스 · 7만원 이상 주문 시 떡볶이 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2998582438848,
+      "longitude": 126.838427169851,
+      "address": "경기 안산시 상록구 학사2길 3-3",
+      "full_address": "경기 안산시 상록구 사동 1149-23"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -1245,19 +1258,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "13491022"
   },
   {
     "id": "16",
     "name": "더술",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "인원별 음료·서비스 메뉴 제공 · 현금/계좌이체 시 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300559789252915,
+      "longitude": 126.84082020509977,
+      "address": "경기 안산시 상록구 학사3길 3",
+      "full_address": "경기 안산시 상록구 사동 1169-17"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1369,19 +1383,20 @@
         "conditions": "이체 현금 할인은 인원 제휴와 중복 가능. 인원 제휴는 그 자체로 중복 불가하나 인스타 업로드 시 중복 가능. 혜택을 받는 인원이 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "557910532"
   },
   {
     "id": "17",
     "name": "달달포차",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "계좌이체 시 소주·맥주 병당 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2995755026345,
+      "longitude": 126.838561993252,
+      "address": "경기 안산시 상록구 학사2길 2-1",
+      "full_address": "경기 안산시 상록구 사동 1154-1"
     },
     "emoji": "🍻",
     "partnerships": [
@@ -1469,19 +1484,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "920644387"
   },
   {
     "id": "18",
     "name": "로드락비어",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "세트 주문·단체 방문 시 음료 또는 주류 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300966702996,
+      "longitude": 126.837903705134,
+      "address": "경기 안산시 상록구 성안길 78-3",
+      "full_address": "경기 안산시 상록구 사동 1569-5"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1545,19 +1561,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "139121162"
   },
   {
     "id": "19",
     "name": "역전할머니맥주",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 음료 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011644618969,
+      "longitude": 126.839543263345,
+      "address": "경기 안산시 상록구 한양대학로 36",
+      "full_address": "경기 안산시 상록구 사동 1570-7"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1609,19 +1626,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "250292134"
   },
   {
     "id": "20",
     "name": "만취",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "4인 이상 방문 시 샤베트 제공 등 테이블 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011635608639,
+      "longitude": 126.839543265259,
+      "address": "경기 안산시 상록구 한양대학로 36",
+      "full_address": "경기 안산시 상록구 사동 1570-7"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1721,19 +1739,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "273096066"
   },
   {
     "id": "21",
     "name": "에이플러스",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "찌개 주문 시 라면사리 제공 등 시간대별 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011825303111,
+      "longitude": 126.837596450069,
+      "address": "경기 안산시 상록구 성안길 78-4",
+      "full_address": "경기 안산시 상록구 사동 1562-6"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -1833,19 +1852,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1347602762"
   },
   {
     "id": "22",
     "name": "모모커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 5잔 이상 구매 시 아메리카노 1잔 증정",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2999695897988,
+      "longitude": 126.83814721416094,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "☕",
     "partnerships": [
@@ -1909,19 +1929,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "991931807"
   },
   {
     "id": "23",
     "name": "오얏리커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "전 음료 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30150904113677,
+      "longitude": 126.83718518651446,
+      "address": "경기 안산시 상록구 한양대학로 70",
+      "full_address": "경기 안산시 상록구 사동 1562-2"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -1997,19 +2018,20 @@
         "conditions": "학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "958212341"
   },
   {
     "id": "24",
     "name": "어반플레이스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이크아웃 전 음료 500원 할인 · 매장 아메리카노 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3000538748039,
+      "longitude": 126.839166650125,
+      "address": "경기 안산시 상록구 학사2길 9",
+      "full_address": "경기 안산시 상록구 사동 1149-13"
     },
     "emoji": "☕",
     "partnerships": [
@@ -2097,19 +2119,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1947267632"
   },
   {
     "id": "25",
     "name": "포세이돈 PC",
     "category": "play",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "1만원 이상 충전 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2999732001007,
+      "longitude": 126.838151717998,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "💻",
     "partnerships": [
@@ -2149,19 +2172,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ]
+    ],
+    "kakao_place_id": "922195904"
   },
   {
     "id": "26",
     "name": "슈퍼스타 코인노래방",
     "category": "play",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "9곡 결제 시 2곡 또는 30분 결제 시 10분 추가",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51 3층",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "🎤",
     "partnerships": [
@@ -2249,19 +2273,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "1761560935"
   },
   {
     "id": "27",
     "name": "한양사 인쇄복사제본",
     "category": "life",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "5천원 이상 현금 결제 시 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51 현서빌딩 1층",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "🖨️",
     "partnerships": [
@@ -2301,19 +2326,20 @@
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhCtxCQFv/"
       }
-    ]
+    ],
+    "kakao_place_id": "16098495"
   },
   {
     "id": "28",
     "name": "레드버튼 안산고잔점",
     "category": "play",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "식음료 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3101706483699,
+      "longitude": 126.830734395433,
+      "address": "경기 안산시 단원구 광덕대로 154",
+      "full_address": "경기 안산시 단원구 고잔동 771-3"
     },
     "emoji": "🎮",
     "partnerships": [
@@ -2365,19 +2391,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1922333685"
   },
   {
     "id": "29",
     "name": "이삭토스트",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "토스트+음료 세트 구매 시 1,000원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006797826753,
+      "longitude": 126.838276529147,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🍞",
     "partnerships": [
@@ -2465,19 +2492,20 @@
         "conditions": "학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "21689869"
   },
   {
     "id": "30",
     "name": "코운즈",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2~3인 이상 방문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3018858450208,
+      "longitude": 126.838625858276,
+      "address": "경기 안산시 상록구 성안2길 16",
+      "full_address": "경기 안산시 상록구 사동 1567"
     },
     "emoji": "🍣",
     "partnerships": [
@@ -2553,19 +2581,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1398284421"
   },
   {
     "id": "31",
     "name": "떼드떼",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "인원수별 음료 할인 또는 아메리카노 사이즈업",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3018150347893,
+      "longitude": 126.838238004838,
+      "address": "경기 안산시 상록구 성안1길 17",
+      "full_address": "경기 안산시 상록구 사동 1564-3"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -2629,19 +2658,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "22577962"
   },
   {
     "id": "32",
     "name": "시저커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30110749181667,
+      "longitude": 126.83939224440965,
+      "address": "경기 안산시 상록구 한양대학로 38",
+      "full_address": "경기 안산시 상록구 사동 1570-6"
     },
     "emoji": "☕",
     "partnerships": [
@@ -2705,19 +2735,20 @@
         "conditions": "학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "102580035"
   },
   {
     "id": "34",
     "name": "이스턴문",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "12~17시 음료 500원 할인 · 저녁 주류 주문 시 감자칩 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30071998525458,
+      "longitude": 126.84001228792846,
+      "address": "경기 안산시 상록구 한양대학로 35",
+      "full_address": "경기 안산시 상록구 사동 1152"
     },
     "emoji": "☕",
     "partnerships": [
@@ -2793,19 +2824,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "989061065"
   },
   {
     "id": "35",
     "name": "페퍼로니버튼",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "피자 1판당 음료 1캔 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3009374426497,
+      "longitude": 126.838250035572,
+      "address": "경기 안산시 상록구 성안길 82-3",
+      "full_address": "경기 안산시 상록구 사동 1569-1"
     },
     "emoji": "🍕",
     "partnerships": [
@@ -2881,19 +2913,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "1014403424"
   },
   {
     "id": "36",
     "name": "두루정",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2인당 음료 1캔 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012625027017,
+      "longitude": 126.838093687512,
+      "address": "경기 안산시 상록구 성안길 78-1",
+      "full_address": "경기 안산시 상록구 사동 1569-6"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -2909,19 +2942,20 @@
         "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       }
-    ]
+    ],
+    "kakao_place_id": "1614223162"
   },
   {
     "id": "37",
     "name": "홍당무",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 음료 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006582873079,
+      "longitude": 126.838371319063,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -2961,19 +2995,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "21357762"
   },
   {
     "id": "38",
     "name": "돼지우리",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "현금/계좌이체 시 5% 할인 · 냉면 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.301220063102,
+      "longitude": 126.838027231688,
+      "address": "경기 안산시 상록구 성안길 78-1",
+      "full_address": "경기 안산시 상록구 사동 1569-6"
     },
     "emoji": "🥓",
     "partnerships": [
@@ -3037,19 +3072,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "19011583"
   },
   {
     "id": "39",
     "name": "교반육회비빔밥",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "식사 4인 이상 음료 2개 · 포차 3만원 이상 육회 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012165727823,
+      "longitude": 126.837584308215,
+      "address": "경기 안산시 상록구 성안길 78-4 1층",
+      "full_address": "경기 안산시 상록구 사동 1562-6"
     },
     "emoji": "🍺",
     "partnerships": [
@@ -3125,19 +3161,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1242036074"
   },
   {
     "id": "40",
     "name": "어반스터디카페",
     "category": "life",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "기간권·정액권 10% 할인 · 사물함 무료",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3015680022793,
+      "longitude": 126.839452172672,
+      "address": "경기 안산시 상록구 성안1길 30",
+      "full_address": "경기 안산시 상록구 사동 1568-5"
     },
     "emoji": "📚",
     "partnerships": [
@@ -3153,19 +3190,20 @@
         "conditions": "혜택을 제공받는 전원이 한양대학교 약학대학 소속일 때, 학생증 제시 필수",
         "source_url": "https://www.instagram.com/p/DVaMCHID-dy"
       }
-    ]
+    ],
+    "kakao_place_id": "1256701263"
   },
   {
     "id": "41",
     "name": "소담골",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2~3인 이상 방문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012155370698,
+      "longitude": 126.837355005978,
+      "address": "경기 안산시 상록구 한양대학로 66",
+      "full_address": "경기 안산시 상록구 사동 1562-7"
     },
     "emoji": "🦆",
     "partnerships": [
@@ -3205,19 +3243,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "12578258"
   },
   {
     "id": "42",
     "name": "계림원 누룽지 통닭",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 방문 시 음료 제공 등 금액대별 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3023212581966,
+      "longitude": 126.837727322607,
+      "address": "경기 안산시 상록구 성안2길 6 1층",
+      "full_address": "경기 안산시 상록구 사동 1559-3"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -3281,19 +3320,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1796566911"
   },
   {
     "id": "43",
     "name": "신선샤브앤칼국수",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "테이블당 사리·볶음밥·음료 중 택1 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3015318818083,
+      "longitude": 126.838467014378,
+      "address": "경기 안산시 상록구 성안1길 20",
+      "full_address": "경기 안산시 상록구 사동 1568"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -3345,19 +3385,20 @@
         "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 음료 1캔 or 사리중류 제공"
       }
-    ]
+    ],
+    "kakao_place_id": "798858902"
   },
   {
     "id": "44",
     "name": "인더비엣",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3~4인 이상 방문 시 음료 또는 튀김 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300966252624,
+      "longitude": 126.837903818893,
+      "address": "경기 안산시 상록구 성안길 78-3 라라캠퍼스 1층 101~103호",
+      "full_address": "경기 안산시 상록구 사동 1569-5"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -3397,19 +3438,20 @@
         "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       }
-    ]
+    ],
+    "kakao_place_id": "947005689"
   },
   {
     "id": "45",
     "name": "언니네 화덕핏짜",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "3인 이상 음료 제공 · 현금/계좌이체 시 메뉴당 1천원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012537501549,
+      "longitude": 126.838943024278,
+      "address": "경기 안산시 상록구 성안길 87",
+      "full_address": "경기 안산시 상록구 사동 1568-9"
     },
     "emoji": "🍕",
     "partnerships": [
@@ -3497,19 +3539,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "23301144"
   },
   {
     "id": "46",
     "name": "이서식당",
     "category": "food",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "2인 음료 1개 · 4인 음료 2개 또는 주류 1병 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013559989697,
+      "longitude": 126.837282517016,
+      "address": "경기 안산시 상록구 한양대학로 68",
+      "full_address": "경기 안산시 상록구 사동 1562-3"
     },
     "emoji": "🍖",
     "partnerships": [
@@ -3585,19 +3628,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "601566374"
   },
   {
     "id": "47",
     "name": "묵커피바",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "15,000원 이상 결제 시 10% 할인 · 주문제작 케이크 2천원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30169641193774,
+      "longitude": 126.83912931488692,
+      "address": "경기 안산시 상록구 성안1길 25",
+      "full_address": "경기 안산시 상록구 사동 1567-5"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -3673,19 +3717,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "32050737"
   },
   {
     "id": "49",
     "name": "코이노커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "학생증 제시 시 인당 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3020895522505,
+      "longitude": 126.83867956341487,
+      "address": "경기 안산시 상록구 성안2길 15",
+      "full_address": "경기 안산시 상록구 사동 1566-4"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -3737,19 +3782,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "243846109"
   },
   {
     "id": "50",
     "name": "신디도넛",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": null,
+    "summary_benefit": "음료+도넛 1만원 이상 구매 시 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3016659616479,
+      "longitude": 126.837943937388,
+      "address": "경기 안산시 상록구 성안1길 16",
+      "full_address": "경기 안산시 상록구 사동 1563-3"
     },
     "emoji": "🍩",
     "partnerships": [
@@ -3825,19 +3871,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "258785558"
   },
   {
     "id": "51",
     "name": "동양솥밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "사이드 메뉴 제공",
+    "summary_benefit": "4인 이상 방문 시 사이드 메뉴 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006844172544,
+      "longitude": 126.838371263148,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🍚",
     "partnerships": [
@@ -3877,19 +3924,20 @@
         "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvU8bMk_lx/"
       }
-    ]
+    ],
+    "kakao_place_id": "278534561"
   },
   {
     "id": "52",
     "name": "마라미방",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 또는 음료 제공",
+    "summary_benefit": "3인 이상 음료 제공 · 1만원 이상 현금 결제 시 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2997049481218,
+      "longitude": 126.838339522408,
+      "address": "경기 안산시 상록구 학사2길 1",
+      "full_address": "경기 안산시 상록구 사동 1149-21"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -3989,19 +4037,20 @@
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DVfqLWYkmMX"
       }
-    ]
+    ],
+    "kakao_place_id": "1182133521"
   },
   {
     "id": "53",
     "name": "김밥큐",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "3인 이상 방문 시 음료 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011029958353,
+      "longitude": 126.839399021431,
+      "address": "경기 안산시 상록구 한양대학로 38",
+      "full_address": "경기 안산시 상록구 사동 1570-6"
     },
     "emoji": "🍘",
     "partnerships": [
@@ -4017,19 +4066,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ]
+    ],
+    "kakao_place_id": "16163863"
   },
   {
     "id": "54",
     "name": "대학통닭",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 감자튀김",
+    "summary_benefit": "3인 이상 음료 제공 · 4만원 이상 주문 시 감자튀김 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3017321803099,
+      "longitude": 126.840927142419,
+      "address": "경기 안산시 상록구 한양대학로 22",
+      "full_address": "경기 안산시 상록구 사동 1581-1"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -4045,19 +4095,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ]
+    ],
+    "kakao_place_id": "1918231012"
   },
   {
     "id": "55",
     "name": "대홍훠궈 샤브샤브",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2인 이상 무한리필 주문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002305567804,
+      "longitude": 126.838562848968,
+      "address": "경기 안산시 상록구 한양대학로 47",
+      "full_address": "경기 안산시 상록구 사동 1149-4"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -4085,19 +4136,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1674755086"
   },
   {
     "id": "56",
     "name": "마티아스김밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 또는 붕어빵 제공",
+    "summary_benefit": "현금/계좌이체 시 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013340456756,
+      "longitude": 126.843043946873,
+      "address": "경기 안산시 상록구 항가울로 233",
+      "full_address": "경기 안산시 상록구 사동 1176-11"
     },
     "emoji": "🍘",
     "partnerships": [
@@ -4113,19 +4165,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ]
+    ],
+    "kakao_place_id": "1525114537"
   },
   {
     "id": "57",
     "name": "밀숲",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 또는 음료 제공",
+    "summary_benefit": "3인 이상 음료 제공 또는 만두 1천원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30209420602,
+      "longitude": 126.836816221548,
+      "address": "경기 안산시 상록구 한양대학로 76",
+      "full_address": "경기 안산시 상록구 사동 1561-5"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -4189,19 +4242,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "27269174"
   },
   {
     "id": "58",
     "name": "신전떡볶이",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "튀김 또는 음료 제공",
+    "summary_benefit": "15,000원 이상 주문 시 튀김 또는 쿨피스 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3020380579812,
+      "longitude": 126.840574585866,
+      "address": "경기 안산시 상록구 성안1길 40",
+      "full_address": "경기 안산시 상록구 사동 1580"
     },
     "emoji": "🌶️",
     "partnerships": [
@@ -4229,19 +4283,20 @@
         "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 15000원 주문 시 기본 튀김 4종 중 택1 or 쿨피스 한개"
       }
-    ]
+    ],
+    "kakao_place_id": "2107152038"
   },
   {
     "id": "59",
     "name": "쌈&쌈",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "4인 이상 음료 제공 · 현금/계좌이체 시 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3024243613692,
+      "longitude": 126.837942648471,
+      "address": "경기 안산시 상록구 성안2길 5 1층",
+      "full_address": "경기 안산시 상록구 사동 1558-3"
     },
     "emoji": "🍖",
     "partnerships": [
@@ -4269,19 +4324,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1310936788"
   },
   {
     "id": "60",
     "name": "에비수",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2~3인 이상 방문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30142215731728,
+      "longitude": 126.8395427158819,
+      "address": "경기 안산시 상록구 성안길 93",
+      "full_address": "경기 안산시 상록구 사동 1568-6"
     },
     "emoji": "🍣",
     "partnerships": [
@@ -4321,19 +4377,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "12559465"
   },
   {
     "id": "61",
     "name": "소확행피자",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "전화 포장 주문 시 피자 한 판당 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3017575638073,
+      "longitude": 126.841042136789,
+      "address": "경기 안산시 상록구 한양대학로 20",
+      "full_address": "경기 안산시 상록구 사동 1581-2"
     },
     "emoji": "🍕",
     "partnerships": [
@@ -4349,19 +4406,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ]
+    ],
+    "kakao_place_id": "1258647083"
   },
   {
     "id": "62",
     "name": "순뼈감",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 사리 제공",
+    "summary_benefit": "음료 제공 또는 전골 주문 시 사리 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2998178596974,
+      "longitude": 126.838282209468,
+      "address": "경기 안산시 상록구 한양대학1길 3",
+      "full_address": "경기 안산시 상록구 사동 1149-20"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -4377,19 +4435,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ]
+    ],
+    "kakao_place_id": "416148723"
   },
   {
     "id": "63",
     "name": "버텍스",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "추가메뉴 또는 음료",
+    "summary_benefit": "추가 메뉴 1회 무료 · 4인 이상 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3027189652105,
+      "longitude": 126.836411071212,
+      "address": "경기 안산시 상록구 한양대학로 86",
+      "full_address": "경기 안산시 상록구 사동 1561"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -4453,19 +4512,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "2121766306"
   },
   {
     "id": "64",
     "name": "보배반점",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "3인 이상 음료 제공 · 4인 이상 만두 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011579066044,
+      "longitude": 126.837381072032,
+      "address": "경기 안산시 상록구 한양대학로 66",
+      "full_address": "경기 안산시 상록구 사동 1562-7"
     },
     "emoji": "🥡",
     "partnerships": [
@@ -4493,19 +4553,20 @@
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ]
+    ],
+    "kakao_place_id": "1408136173"
   },
   {
     "id": "65",
     "name": "예산 닭갈비감자탕",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "테이블당 음료 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3014116111121,
+      "longitude": 126.840138954016,
+      "address": "경기 안산시 상록구 한양대학로 30",
+      "full_address": "경기 안산시 상록구 사동 1571-1"
     },
     "emoji": "🥓",
     "partnerships": [
@@ -4533,19 +4594,20 @@
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAg3DXic2y/"
       }
-    ]
+    ],
+    "kakao_place_id": "16631180"
   },
   {
     "id": "66",
     "name": "오늘도 부찌",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "사리 또는 음료 제공",
+    "summary_benefit": "3인 이상 방문 시 음료·사리 중 택1 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019142863615,
+      "longitude": 126.839663485957,
+      "address": "경기 안산시 상록구 성안1길 31",
+      "full_address": "경기 안산시 상록구 사동 1573-9"
     },
     "emoji": "🍛",
     "partnerships": [
@@ -4561,19 +4623,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYePuXkVl1/"
       }
-    ]
+    ],
+    "kakao_place_id": "966378850"
   },
   {
     "id": "67",
     "name": "오타코",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2인당 음료 1개 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3011465500921,
+      "longitude": 126.83829921583,
+      "address": "경기 안산시 상록구 성안길 84-2",
+      "full_address": "경기 안산시 상록구 사동 1569"
     },
     "emoji": "🌮",
     "partnerships": [
@@ -4613,19 +4676,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1064616164"
   },
   {
     "id": "68",
     "name": "자이카 인도요리",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 샐러드",
+    "summary_benefit": "테이블당 음료 제공 · 5인 이상 샐러드 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002817116484,
+      "longitude": 126.838677446844,
+      "address": "경기 안산시 상록구 한양대학로 45-1 2층",
+      "full_address": "경기 안산시 상록구 사동 1149-5"
     },
     "emoji": "🥘",
     "partnerships": [
@@ -4665,19 +4729,20 @@
           "end_date": "2026-12-21"
         }
       }
-    ]
+    ],
+    "kakao_place_id": "369489855"
   },
   {
     "id": "69",
     "name": "올리바샌드위치",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "탄산음료 서비스",
+    "summary_benefit": "8천원 이상 구매 시 탄산음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012866044311,
+      "longitude": 126.839249746516,
+      "address": "경기 안산시 상록구 성안길 89",
+      "full_address": "경기 안산시 상록구 사동 1568-8"
     },
     "emoji": "🥪",
     "partnerships": [
@@ -4705,19 +4770,20 @@
         "conditions": "혜택을 받는 인원이 모두 글로벌문화통상대학 학생일 경우에만 혜택 적용",
         "benefit": "테이블 당 구매금액 8000원 단위마다 탄산음료 1잔씩 제공"
       }
-    ]
+    ],
+    "kakao_place_id": "951379154"
   },
   {
     "id": "70",
     "name": "유가네닭갈비",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "고기 단품 주문 시 음료 1캔 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300933803061106,
+      "longitude": 126.83822410149197,
+      "address": "경기 안산시 상록구 성안길 82-3",
+      "full_address": "경기 안산시 상록구 사동 1569-1"
     },
     "emoji": "🍗",
     "partnerships": [
@@ -4793,19 +4859,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "27423369"
   },
   {
     "id": "71",
     "name": "정직유부초밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 메뉴 제공",
+    "summary_benefit": "1인 1메뉴 주문 시 음료/소스 제공 등 금액대별 서비스",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51 1층",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "🍣",
     "partnerships": [
@@ -4869,19 +4936,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "194041906"
   },
   {
     "id": "72",
     "name": "조박사부대찌개",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "테이블당 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30163000569942,
+      "longitude": 126.8399934415089,
+      "address": "경기 안산시 상록구 성안길 97-1",
+      "full_address": "경기 안산시 상록구 사동 1572-8"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -4945,19 +5013,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "16888058"
   },
   {
     "id": "73",
     "name": "탐나는 바지락 손칼국수",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3021009419556,
+      "longitude": 126.839103638892,
+      "address": "경기 안산시 상록구 성안2길 19",
+      "full_address": "경기 안산시 상록구 사동 1566-2"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -5009,19 +5078,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1850172298"
   },
   {
     "id": "74",
     "name": "텐버거",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "서비스 메뉴 제공",
+    "summary_benefit": "15,000원 이상 주문 시 사이드 메뉴 택1 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013812402941,
+      "longitude": 126.83729148595,
+      "address": "경기 안산시 상록구 한양대학로 68",
+      "full_address": "경기 안산시 상록구 사동 1562-3"
     },
     "emoji": "🍔",
     "partnerships": [
@@ -5085,19 +5155,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "52714438"
   },
   {
     "id": "75",
     "name": "참새방앗간",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "사리 또는 음료 제공",
+    "summary_benefit": "3인 이상 방문 시 사리 또는 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30068171416543,
+      "longitude": 126.83837126893098,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🌶️",
     "partnerships": [
@@ -5161,19 +5232,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "16631050"
   },
   {
     "id": "76",
     "name": "큰맘할매순대국",
     "category": "food",
-    "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "is_active": false,
+    "summary_benefit": "현금/계좌이체 시 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3099017501693,
+      "longitude": 126.832359377896,
+      "address": "경기 안산시 단원구 광덕동로 61",
+      "full_address": "경기 안산시 단원구 고잔동 769-4"
     },
     "emoji": "🍲",
     "partnerships": [
@@ -5196,12 +5268,12 @@
     "name": "행컵",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 할인·토핑 제공 · 단체주문 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30131276813392,
+      "longitude": 126.83861241984928,
+      "address": "경기 안산시 상록구 성안길 83",
+      "full_address": "경기 안산시 상록구 사동 1568-11"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -5253,19 +5325,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1316215778"
   },
   {
     "id": "78",
     "name": "한양솥밥",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "2인 이상 방문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019116482386,
+      "longitude": 126.843073200436,
+      "address": "경기 안산시 상록구 항가울로 241",
+      "full_address": "경기 안산시 상록구 사동 1172-14"
     },
     "emoji": "🍚",
     "partnerships": [
@@ -5281,19 +5354,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeVNfkVWv/"
       }
-    ]
+    ],
+    "kakao_place_id": "1519785426"
   },
   {
     "id": "79",
     "name": "토핑스온패티스",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "감자튀김 서비스",
+    "summary_benefit": "2인 이상 방문 시 감자튀김 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002761946627,
+      "longitude": 126.839656812257,
+      "address": "경기 안산시 상록구 학사2길 13-1",
+      "full_address": "경기 안산시 상록구 사동 1151-4"
     },
     "emoji": "🍔",
     "partnerships": [
@@ -5345,19 +5419,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1566358833"
   },
   {
     "id": "80",
     "name": "파익스피크소다",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료수 서비스",
+    "summary_benefit": "4인 이상 방문 시 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3006844172544,
+      "longitude": 126.838371263148,
+      "address": "경기 안산시 상록구 한양대학로 48",
+      "full_address": "경기 안산시 상록구 사동 1569-2"
     },
     "emoji": "🥤",
     "partnerships": [
@@ -5385,19 +5460,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1103950178"
   },
   {
     "id": "81",
     "name": "삐노누아",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "음료 10% 할인",
+    "summary_benefit": "테이크아웃 음료 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2989363973734,
+      "longitude": 126.8390246612,
+      "address": "경기 안산시 상록구 학사6길 4",
+      "full_address": "경기 안산시 상록구 사동 1160-1"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -5425,19 +5501,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "21056853"
   },
   {
     "id": "82",
     "name": "사리(디저트카페)",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
+    "summary_benefit": "전 메뉴 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.302342597258,
+      "longitude": 126.836668039013,
+      "address": "경기 안산시 상록구 한양대학로 80 1층 103호",
+      "full_address": "경기 안산시 상록구 사동 1561-3"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5453,19 +5530,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ]
+    ],
+    "kakao_place_id": "1533399243"
   },
   {
     "id": "83",
     "name": "오멜트",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "최대 1,500원 할인",
+    "summary_benefit": "음료·디저트 500~1,500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3018560141034,
+      "longitude": 126.841219013243,
+      "address": "경기 안산시 상록구 한양대학로 18",
+      "full_address": "경기 안산시 상록구 사동 1581-3"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5493,19 +5571,20 @@
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ]
+    ],
+    "kakao_place_id": "186255250"
   },
   {
     "id": "84",
     "name": "오쏘커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "테이크아웃 시 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3010992788696,
+      "longitude": 126.840648753693,
+      "address": "경기 안산시 상록구 한양대학로 27",
+      "full_address": "경기 안산시 상록구 사동 1171-2"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5545,19 +5624,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1466443803"
   },
   {
     "id": "85",
     "name": "썬더커피",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "아메리카노 서비스",
+    "summary_benefit": "음료 4잔 주문 시 아메리카노 1잔 증정",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013624474011,
+      "longitude": 126.839364632323,
+      "address": "경기 안산시 상록구 성안길 91",
+      "full_address": "경기 안산시 상록구 사동 1568-7"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5609,19 +5689,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1428652515"
   },
   {
     "id": "86",
     "name": "아로하",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "최대 10% 할인",
+    "summary_benefit": "커피 10% 할인 · 기타 음료 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3029663496088,
+      "longitude": 126.836773731369,
+      "address": "경기 안산시 상록구 용신로 132",
+      "full_address": "경기 안산시 상록구 사동 1555-2"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5649,19 +5730,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "27506885"
   },
   {
     "id": "87",
     "name": "후식집",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "5% 즉시 할인",
+    "summary_benefit": "현금/계좌이체 시 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.30179544656413,
+      "longitude": 126.84107138299261,
+      "address": "경기 안산시 상록구 한양대학로 20",
+      "full_address": "경기 안산시 상록구 사동 1581-2"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5677,19 +5759,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ]
+    ],
+    "kakao_place_id": "623268174"
   },
   {
     "id": "88",
     "name": "코지홀리데이",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "음료 10% 할인",
+    "summary_benefit": "현금/계좌 결제 시 10% 할인 · 4잔 이상 테이크아웃 1천원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299564664081295,
+      "longitude": 126.83854284233648,
+      "address": "경기 안산시 상록구 학사2길 2-1",
+      "full_address": "경기 안산시 상록구 사동 1154-1"
     },
     "emoji": "🍰",
     "partnerships": [
@@ -5753,19 +5836,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "223521327"
   },
   {
     "id": "89",
     "name": "투썸플레이스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "10% 즉시 할인",
+    "summary_benefit": "15,000원 이상 주문 시 10% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.302958494831394,
+      "longitude": 126.83630565416519,
+      "address": "경기 안산시 상록구 용신로 128",
+      "full_address": "경기 안산시 상록구 사동 1555"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5781,14 +5865,15 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ]
+    ],
+    "kakao_place_id": "21249038"
   },
   {
     "id": "90",
     "name": "헤브론",
     "category": "cafe",
-    "is_active": true,
-    "summary_benefit": "최대 1,000원 할인",
+    "is_active": false,
+    "summary_benefit": "음료 500원 할인",
     "location": {
       "latitude": null,
       "longitude": null,
@@ -5828,12 +5913,12 @@
     "name": "카페미올루",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "음료 전 메뉴 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3020404141474,
+      "longitude": 126.841658515994,
+      "address": "경기 안산시 상록구 한양대학로 14",
+      "full_address": "경기 안산시 상록구 사동 1581-6"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5849,14 +5934,15 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYeYXPEXAB/"
       }
-    ]
+    ],
+    "kakao_place_id": "1718315632"
   },
   {
     "id": "92",
     "name": "오토르테",
     "category": "cafe",
-    "is_active": true,
-    "summary_benefit": "음료 잔당 300원 할인",
+    "is_active": false,
+    "summary_benefit": "단체석 이용 시 음료 300원 할인",
     "location": {
       "latitude": null,
       "longitude": null,
@@ -5884,12 +5970,12 @@
     "name": "워터킹 커피 로스터스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "음료 500원 할인 (평일 12~14시 제외)",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2993702842883,
+      "longitude": 126.838523519861,
+      "address": "경기 안산시 상록구 학사4길 1 1층",
+      "full_address": "경기 안산시 상록구 사동 1154-15"
     },
     "emoji": "☕",
     "partnerships": [
@@ -5929,19 +6015,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "132825198"
   },
   {
     "id": "94",
     "name": "동그라미(써클)",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": "음료수 제공 및 할인",
+    "summary_benefit": "4인 이상 음료 제공 · 현금/계좌이체 시 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3007133795491,
+      "longitude": 126.839858230192,
+      "address": "경기 안산시 상록구 한양대학로 35",
+      "full_address": "경기 안산시 상록구 사동 1152"
     },
     "emoji": "🍻",
     "partnerships": [
@@ -6005,19 +6092,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "852352148"
   },
   {
     "id": "95",
     "name": "락",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": "소주 무제한 4천원",
+    "summary_benefit": "21시 이전 소주 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3010399357363,
+      "longitude": 126.838811627632,
+      "address": "경기 안산시 상록구 성안길 86",
+      "full_address": "경기 안산시 상록구 사동 1570-2"
     },
     "emoji": "🍷",
     "partnerships": [
@@ -6057,19 +6145,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "18554087"
   },
   {
     "id": "96",
     "name": "밤새",
     "category": "pub",
     "is_active": true,
-    "summary_benefit": "서비스 메뉴 제공",
+    "summary_benefit": "인원별 사리·음료·안주 서비스 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3002782923349,
+      "longitude": 126.83868083784,
+      "address": "경기 안산시 상록구 한양대학로 45-1",
+      "full_address": "경기 안산시 상록구 사동 1149-5"
     },
     "emoji": "🍾",
     "partnerships": [
@@ -6085,19 +6174,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DXLoP3QkdYS/"
       }
-    ]
+    ],
+    "kakao_place_id": null
   },
   {
     "id": "97",
     "name": "브리드 복싱앤 크로스핏",
     "category": "life",
     "is_active": true,
-    "summary_benefit": "최대 4만원 할인",
+    "summary_benefit": "3개월 이상 등록 시 2만원 할인 + 사물함·티셔츠 무료",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3001153487639,
+      "longitude": 126.838258112305,
+      "address": "경기 안산시 상록구 한양대학로 51",
+      "full_address": "경기 안산시 상록구 사동 1149-1"
     },
     "emoji": "💪",
     "partnerships": [
@@ -6137,19 +6227,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1868062536"
   },
   {
     "id": "98",
     "name": "샛별 코인노래연습장",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "생수 1병 제공",
+    "summary_benefit": "3천원 이상 결제 시 물 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300425820519905,
+      "longitude": 126.839032765918,
+      "address": "경기 안산시 상록구 한양대학로 43",
+      "full_address": "경기 안산시 상록구 사동 1149-8"
     },
     "emoji": "🎤",
     "partnerships": [
@@ -6189,19 +6280,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "203637760"
   },
   {
     "id": "99",
     "name": "스튜디오 나우 필라테스",
     "category": "life",
     "is_active": true,
-    "summary_benefit": "등록 5% 할인",
+    "summary_benefit": "등록 시 5% 할인 (재등록 2회까지)",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3022783151577,
+      "longitude": 126.837228870856,
+      "address": "경기 안산시 상록구 성안1길 6-1 1층 101호",
+      "full_address": "경기 안산시 상록구 사동 1560-4"
     },
     "emoji": "💪",
     "partnerships": [
@@ -6217,19 +6309,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ]
+    ],
+    "kakao_place_id": "1302396856"
   },
   {
     "id": "100",
     "name": "큐 당구장",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "5% 즉시 할인",
+    "summary_benefit": "1만원 이상 이용 시 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.299972297525244,
+      "longitude": 126.83815059203837,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "🎳",
     "partnerships": [
@@ -6257,19 +6350,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1241826757"
   },
   {
     "id": "101",
     "name": "트윈스 당구클럽",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "10분당 100원 할인",
+    "summary_benefit": "기본 시간 초과 시 10분당 100원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3012200507528,
+      "longitude": 126.83801820842,
+      "address": "경기 안산시 상록구 성안길 78-1",
+      "full_address": "경기 안산시 상록구 사동 1569-6"
     },
     "emoji": "🎳",
     "partnerships": [
@@ -6285,19 +6379,20 @@
         "conditions": "본 제휴 혜택은 모든 학생이 공학대학 학생일시 학생증을 제시하여 받을 수 있음",
         "source_url": "https://www.instagram.com/p/DVYefWoEaUT/"
       }
-    ]
+    ],
+    "kakao_place_id": "382412695"
   },
   {
     "id": "102",
     "name": "청학칡냉면",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "음료 또는 만두 제공",
+    "summary_benefit": "금액대별 음료·만두 서비스 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3013597080198,
+      "longitude": 126.840003037448,
+      "address": "경기 안산시 상록구 한양대학로 32",
+      "full_address": "경기 안산시 상록구 사동 1571"
     },
     "emoji": "🍜",
     "partnerships": [
@@ -6325,19 +6420,20 @@
         "conditions": "혜택을 받는 인원이 ‘모두’ 커뮤니케이션&컬처대학 학생일 경우에만, 학생증 제시 후 제휴 혜택 적용이 가능",
         "source_url": "https://www.instagram.com/p/DV5O3yPkhtg/"
       }
-    ]
+    ],
+    "kakao_place_id": "16529922"
   },
   {
     "id": "103",
     "name": "트라이뽀티",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "8천원 이상 구매 시 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.2992496407041,
+      "longitude": 126.838791649849,
+      "address": "경기 안산시 상록구 학사4길 4",
+      "full_address": "경기 안산시 상록구 사동 1157-1"
     },
     "emoji": "🍩",
     "partnerships": [
@@ -6365,19 +6461,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "1456083415"
   },
   {
     "id": "104",
     "name": "카페 디캔바스",
     "category": "cafe",
     "is_active": true,
-    "summary_benefit": "500원 즉시 할인",
+    "summary_benefit": "아메리카노 500원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3036106255795,
+      "longitude": 126.845527468118,
+      "address": "경기 안산시 상록구 용신로 209",
+      "full_address": "경기 안산시 상록구 사동 1544-3"
     },
     "emoji": "🍹",
     "partnerships": [
@@ -6393,19 +6490,20 @@
         "conditions": null,
         "source_url": "https://www.instagram.com/p/DWAhBK0Cal0/"
       }
-    ]
+    ],
+    "kakao_place_id": "749127105"
   },
   {
     "id": "105",
     "name": "레이지그라운드",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "1,000원 즉시 할인",
+    "summary_benefit": "식사류 주문 시 500~1,000원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.29993356389921,
+      "longitude": 126.83815857028479,
+      "address": "경기 안산시 상록구 한양대학1길 1",
+      "full_address": "경기 안산시 상록구 사동 1149"
     },
     "emoji": "📚",
     "partnerships": [
@@ -6445,19 +6543,20 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "815896539"
   },
   {
     "id": "106",
     "name": "벗히얼 크로스핏",
     "category": "life",
     "is_active": true,
-    "summary_benefit": "가입/등록 비용 할인",
+    "summary_benefit": "친구와 동시 등록 시 1~2만원 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3007133795491,
+      "longitude": 126.839858230192,
+      "address": "경기 안산시 상록구 한양대학로 35 지하1층",
+      "full_address": "경기 안산시 상록구 사동 1152"
     },
     "emoji": "🏋️",
     "partnerships": [
@@ -6473,19 +6572,20 @@
         "conditions": "경상대학 소속 재학생 누구나",
         "source_url": "https://www.instagram.com/p/DVvVSgfE0Eo/"
       }
-    ]
+    ],
+    "kakao_place_id": "251157274"
   },
   {
     "id": "108",
     "name": "R샐러드카페",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "5% 즉시 할인",
+    "summary_benefit": "샐러드+음료 주문 시 5% 할인",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3019520472652,
+      "longitude": 126.838278316607,
+      "address": "경기 안산시 상록구 성안2길 12",
+      "full_address": "경기 안산시 상록구 사동 1564-2"
     },
     "emoji": "🥗",
     "partnerships": [
@@ -6501,19 +6601,20 @@
           "end_date": "2026-12-21"
         }
       }
-    ]
+    ],
+    "kakao_place_id": "1409551883"
   },
   {
     "id": "109",
     "name": "홈즈앤루팡",
     "category": "play",
     "is_active": true,
-    "summary_benefit": "30분 추가 지급",
+    "summary_benefit": "학생증 인증 시 이용시간 30분 추가",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3009491514433,
+      "longitude": 126.838246626774,
+      "address": "경기 안산시 상록구 성안길 82-3",
+      "full_address": "경기 안산시 상록구 사동 1569-1"
     },
     "emoji": "🔍",
     "partnerships": [
@@ -6529,19 +6630,20 @@
           "end_date": "2026-12-21"
         }
       }
-    ]
+    ],
+    "kakao_place_id": "1564809777"
   },
   {
     "id": "110",
     "name": "풍차이야기",
     "category": "food",
     "is_active": true,
-    "summary_benefit": "할인 혜택 및 음료 제공",
+    "summary_benefit": "현금/계좌이체 시 10% 할인 · 4인 이상 음료 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3024243613692,
+      "longitude": 126.837942648471,
+      "address": "경기 안산시 상록구 성안2길 5",
+      "full_address": "경기 안산시 상록구 사동 1558-3"
     },
     "emoji": "🍱",
     "partnerships": [
@@ -6557,35 +6659,8 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
-  },
-  {
-    "id": "111",
-    "name": "오빈라멘",
-    "category": "food",
-    "is_active": true,
-    "summary_benefit": "음료수 1개 제공",
-    "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
-    },
-    "emoji": "🍜",
-    "partnerships": [
-      {
-        "college_id": "8",
-        "college_name": "소프트웨어융합대학",
-        "benefit": "3인 이상 방문 시 음료 1개",
-        "period": {
-          "start_date": "2026-03-02",
-          "end_date": "2026-12-21",
-          "is_active": true
-        },
-        "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
-        "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
-      }
-    ]
+    ],
+    "kakao_place_id": null
   },
   {
     "id": "112",
@@ -6593,12 +6668,12 @@
     "category": "pub",
     "is_active": true,
     "emoji": "🍺",
-    "summary_benefit": "나쵸 서비스 제공",
+    "summary_benefit": "주류 15,000원 이상 결제 시 나쵸 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.300087778447,
+      "longitude": 126.840249357095,
+      "address": "경기 안산시 상록구 학사4길 17-1",
+      "full_address": "경기 안산시 상록구 사동 1155-12"
     },
     "partnerships": [
       {
@@ -6613,7 +6688,8 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "16484075"
   },
   {
     "id": "113",
@@ -6621,12 +6697,12 @@
     "category": "food",
     "is_active": true,
     "emoji": "🥟",
-    "summary_benefit": "음료 서비스 제공",
+    "summary_benefit": "테이블당 음료 1캔 제공",
     "location": {
-      "latitude": null,
-      "longitude": null,
-      "address": null,
-      "full_address": null
+      "latitude": 37.3031648962112,
+      "longitude": 126.846854612839,
+      "address": "경기 안산시 상록구 용신로 222 1층",
+      "full_address": "경기 안산시 상록구 사동 1182-5"
     },
     "partnerships": [
       {
@@ -6641,6 +6717,7 @@
         "conditions": "제휴 혜택을 받으려면 학생증을 반드시 지참해주세요!",
         "source_url": "https://www.notion.so/2026-2feafc7e0f1880818885e3a0fbd85aab"
       }
-    ]
+    ],
+    "kakao_place_id": "117810106"
   }
 ]

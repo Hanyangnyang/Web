@@ -1,6 +1,6 @@
 // 컴포넌트: QR·식단·셔틀·기타 탭 하단 내비게이션 바
 import React from 'react';
-import { BookOpen, Utensils, LayoutGrid, Megaphone, Handshake } from 'lucide-react';
+import { BookOpen, Utensils, LayoutGrid, Megaphone, Map } from 'lucide-react';
 
 const BusIcon = () => (
   <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -37,8 +37,8 @@ export function BottomNav({ activeTab, setActiveTab }) {
         <span className="text-[0.7rem] font-semibold">소식</span>
       </div>
       <div className={itemClass('partner')} onClick={() => setActiveTab('partner')}>
-        <Handshake size={24} />
-        <span className="text-[0.7rem] font-semibold">제휴</span>
+        <Map size={24} />
+        <span className="text-[0.7rem] font-semibold">캠퍼스맵</span>
       </div>
       <div className={itemClass('misc')} onClick={() => setActiveTab('misc')}>
         <LayoutGrid size={24} />
