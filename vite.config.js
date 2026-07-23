@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
@@ -92,6 +93,13 @@ export default defineConfig(({ mode }) => {
         org: "hanyangnyang",
         project: "capacitor",
       }),
-    ]
+      // ANALYZE=true npm run build 로만 실행 — 매 빌드마다 분석 리포트를 만들 필요는 없음
+      process.env.ANALYZE && visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    ].filter(Boolean)
   }
 })

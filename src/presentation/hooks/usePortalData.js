@@ -34,11 +34,19 @@ export async function prefetchPortalData() {
     retryTimer = null;
   }
 
+  const weatherPromise = fetch('/api/portal?type=weather').then(r => r.ok ? r.json() : null).catch(() => null);
+  const libraryPromise = getLibraryData();
+
+  // 도착하는 즉시 각 섹션에 개별 반영 (로딩 분리 핵심 — Promise.all을 기다리지 않음)
+  weatherPromise.then((weatherData) => {
+    if (weatherData) applyPartialUpdate({ weather: weatherData });
+  });
+  libraryPromise.then((libData) => {
+    if (libData) applyPartialUpdate({ library: libData });
+  });
+
   try {
-    const [weatherData, libData] = await Promise.all([
-      fetch('/api/portal?type=weather').then(r => r.ok ? r.json() : null).catch(() => null),
-      getLibraryData()
-    ]);
+    const [weatherData, libData] = await Promise.all([weatherPromise, libraryPromise]);
 
     if (weatherData && libData) {
       const newData = {
@@ -70,6 +78,16 @@ export async function prefetchPortalData() {
   } finally {
     isFetching = false;
   }
+}
+
+// 개별 결과가 도착하는 대로 memoryCache에 병합 후 즉시 구독자에게 알림
+function applyPartialUpdate(patch) {
+  memoryCache = {
+    weather: patch.weather !== undefined ? patch.weather : (memoryCache?.weather ?? null),
+    library: patch.library !== undefined ? patch.library : (memoryCache?.library ?? null),
+    timestamp: memoryCache?.timestamp ?? Date.now()
+  };
+  notifyListeners(memoryCache);
 }
 
 // 지수 백오프 재시도 트리거 함수
@@ -119,14 +137,10 @@ export function usePortalData(isVisible = true) {
     return null;
   });
 
-  // 캐시가 있으면 로딩 스피너 없이 즉시 렌더링
-  const [loading, setLoading] = useState(!data);
-
   useEffect(() => {
-    // prefetch 완료 시 이 컴포넌트도 갱신받도록 구독
+    // prefetch 완료 시 이 컴포넌트도 갱신받도록 구독 (weather/library 중 하나만 와도 즉시 반영됨)
     const handler = (newData) => {
       setData(newData);
-      setLoading(false);
     };
     listeners.push(handler);
 
@@ -154,7 +168,6 @@ export function usePortalData(isVisible = true) {
 
     if (!memoryCache || isPartialCache || isStaleTimeline || Date.now() - memoryCache.timestamp >= CACHE_TTL) {
       setTimeout(() => {
-        setLoading(true);
         prefetchPortalData();
       }, 0);
     }
@@ -181,7 +194,9 @@ export function usePortalData(isVisible = true) {
   return {
     weather: data?.weather || null,
     library: data?.library || null,
-    loading,
+    // 데이터 유무로 판단 → weather/library가 각각 도착하는 즉시 그 섹션만 로딩 해제됨
+    weatherLoading: !data?.weather,
+    libraryLoading: !data?.library,
     error: null
   };
 }
