@@ -1,8 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import React from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor, act } from '@testing-library/react';
+import { queryClient } from '../../lib/queryClient.js';
+import { useBanners, prefetchBanners } from './useBanners.js';
 
-// useBanners.js가 관리하는 localStorage 키 (파일 내부 CACHE_KEY, export 안 되어 있어 리터럴로 동기화)
-const CACHE_KEY = 'hyu_banners_cache_v1';
+function wrapper({ children }) {
+  return React.createElement(QueryClientProvider, { client: queryClient }, children);
+}
 
 function jsonResponse(ok, data) {
   return { ok, json: async () => data };
@@ -15,106 +20,85 @@ function makeBanners() {
   ];
 }
 
-// 모듈 스코프 변수(memoryCache, listeners 등)가 테스트 간에 새는 걸 막기 위해
-// 매 테스트마다 모듈을 새로 import한다.
-async function loadFreshModule() {
-  vi.resetModules();
-  return import('./useBanners.js');
-}
-
-describe('useBanners', () => {
+describe('useBanners (React Query)', () => {
   beforeEach(() => {
-    localStorage.clear();
+    queryClient.clear();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('캐시가 없으면 loading=true, banners=[]로 시작한다', async () => {
+  it('캐시가 없으면 loading=true, banners=[]로 시작한다', () => {
     global.fetch = vi.fn(() => new Promise(() => {})); // 응답 없이 계속 대기
-    const { useBanners } = await loadFreshModule();
 
-    const { result } = renderHook(() => useBanners(true));
+    const { result } = renderHook(() => useBanners(true), { wrapper });
 
     expect(result.current.banners).toEqual([]);
     expect(result.current.loading).toBe(true);
   });
 
-  it('fetch 성공 시 배너가 반영되고 localStorage에 저장된다', async () => {
+  it('fetch 성공 시 배너가 반영된다', async () => {
     global.fetch = vi.fn(() => Promise.resolve(jsonResponse(true, { banners: makeBanners() })));
-    const { useBanners } = await loadFreshModule();
 
-    const { result } = renderHook(() => useBanners(true));
+    const { result } = renderHook(() => useBanners(true), { wrapper });
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.banners).toHaveLength(2);
-
-    const saved = JSON.parse(localStorage.getItem(CACHE_KEY));
-    expect(saved.banners).toHaveLength(2);
-    expect(saved.timestamp).toBeGreaterThan(0);
   });
 
-  it('유효한 localStorage 캐시가 있으면 즉시 그 데이터로 렌더되고 fetch를 하지 않는다', async () => {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ banners: makeBanners(), timestamp: Date.now() }));
+  it('쿼리 캐시에 이미 신선한 데이터가 있으면 즉시 그 데이터로 렌더되고 fetch를 하지 않는다', () => {
+    queryClient.setQueryData(['banners'], makeBanners());
 
     const fetchSpy = vi.fn(() => new Promise(() => {}));
     global.fetch = fetchSpy;
 
-    const { useBanners } = await loadFreshModule();
-    const { result } = renderHook(() => useBanners(true));
+    const { result } = renderHook(() => useBanners(true), { wrapper });
 
     expect(result.current.loading).toBe(false);
     expect(result.current.banners).toHaveLength(2);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('fetch가 실패해도 loading은 false로 풀리고, 기존 캐시가 있으면 화면에 유지된다', async () => {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ banners: makeBanners(), timestamp: Date.now() - 25 * 60 * 60 * 1000 })); // TTL(24시간) 초과 → 재검증 대상
+  it('재요청이 실패해도 loading은 false로 풀리고, 기존 캐시가 화면에 유지된다', async () => {
+    queryClient.setQueryData(['banners'], makeBanners());
 
     global.fetch = vi.fn(() => Promise.resolve(jsonResponse(false, null)));
-    const { useBanners } = await loadFreshModule();
 
-    const { result } = renderHook(() => useBanners(true));
+    const { result } = renderHook(() => useBanners(true), { wrapper });
 
-    // 재검증 도중엔 기존 캐시가 그대로 화면에 남아있어야 함 (loading=false 유지)
-    expect(result.current.loading).toBe(false);
+    // 캐시가 있어 처음엔 재요청을 안 하므로, 명시적으로 무효화해 재검증을 유도
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['banners'] });
+    });
+
+    // 재요청이 실패하면 react-query 기본 재시도(최대 3회, ~7초 지수 백오프)를 실제로 거치므로 여유 있게 대기
+    await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 10000 });
+    // 실패했으니 기존 캐시 배너가 그대로 유지됨 (무한 스켈레톤도 방지됨)
     expect(result.current.banners).toHaveLength(2);
-
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
-    // 실패 후에도 loading이 계속 false여야 함 (무한 스켈레톤 방지)
-    expect(result.current.loading).toBe(false);
-    // 실패했으니 기존 캐시 배너가 그대로 유지됨
-    expect(result.current.banners).toHaveLength(2);
-  });
+  }, 15000);
 
   it('캐시도 없는데 fetch까지 실패하면 banners=[]로 정리되고 loading은 false로 풀린다', async () => {
     global.fetch = vi.fn(() => Promise.resolve(jsonResponse(false, null)));
-    const { useBanners } = await loadFreshModule();
 
-    const { result } = renderHook(() => useBanners(true));
+    const { result } = renderHook(() => useBanners(true), { wrapper });
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 10000 });
     expect(result.current.banners).toEqual([]);
-  });
+  }, 15000);
 
-  it('isVisible=false면 캐시가 만료돼도 재요청하지 않는다', async () => {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ banners: makeBanners(), timestamp: Date.now() - 25 * 60 * 60 * 1000 }));
-
+  it('isVisible=false면 쿼리가 비활성화되어 fetch가 나가지 않는다', () => {
     const fetchSpy = vi.fn(() => new Promise(() => {}));
     global.fetch = fetchSpy;
 
-    const { useBanners } = await loadFreshModule();
-    renderHook(() => useBanners(false));
+    renderHook(() => useBanners(false), { wrapper });
 
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('prefetchBanners()를 동시에 두 번 호출해도 실제 fetch는 한 번만 나간다 (isFetching 중복요청 방지)', async () => {
+  it('prefetchBanners()를 동시에 두 번 호출해도 실제 fetch는 한 번만 나간다 (react-query 요청 dedup)', async () => {
     global.fetch = vi.fn(() => Promise.resolve(jsonResponse(true, { banners: makeBanners() })));
-    const { prefetchBanners } = await loadFreshModule();
 
-    // 동시에 두 번 호출 — 두 번째 호출은 isFetching 플래그에 막혀 아무것도 안 해야 함
     await Promise.all([prefetchBanners(), prefetchBanners()]);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);

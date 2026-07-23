@@ -6,6 +6,8 @@ import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import * as Sentry from '@sentry/capacitor'
 import * as SentryReact from '@sentry/react'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/queryClient.js'
 
 // Sentry 초기화
 Sentry.init(
@@ -66,7 +68,9 @@ if ('serviceWorker' in navigator) {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PostHogProvider client={posthog}>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     </PostHogProvider>
   </StrictMode>,
 )
