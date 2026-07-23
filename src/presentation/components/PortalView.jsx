@@ -125,7 +125,7 @@ function BannerCarousel({ banners }) {
 }
 
 export function PortalView({ isVisible = true }) {
-  const { weather, library, loading } = usePortalData(isVisible);
+  const { weather, library, weatherLoading, libraryLoading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
   const { banners, loading: bannersLoading } = useBanners(isVisible);
@@ -156,9 +156,9 @@ export function PortalView({ isVisible = true }) {
 
       <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
-        <WeatherCard weather={weather} loading={loading} isVisible={isVisible} />
+        <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} />
 
-      {(loading || bannersLoading) ? (
+      {bannersLoading ? (
         <div className="mb-3 mt-2">
           <div className="rounded-card aspect-[10/3] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
         </div>
@@ -170,7 +170,7 @@ export function PortalView({ isVisible = true }) {
       <section className="mb-6">
         <h3 className="text-xl font-bold text-text-main mb-2">학정 혼잡도</h3>
         <div className="grid grid-cols-2 gap-3">
-          {loading ? (
+          {libraryLoading ? (
             [1, 2, 3, 4].map((i) => (
               <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-4 flex flex-col gap-3 animate-pulse">
                 <div className="flex items-center justify-between gap-2">
