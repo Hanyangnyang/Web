@@ -1,6 +1,12 @@
 import { Info } from 'lucide-react';
+import type { LibraryStatus } from '../../../data/repositories/PortalRepository.js';
 
-export function LibraryStatusCard({ library, loading }) {
+interface LibraryStatusCardProps {
+  library: LibraryStatus | null;
+  loading: boolean;
+}
+
+export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) {
   return (
     <section className="mb-6">
       <h3 className="text-xl font-bold text-text-main mb-2">학정 혼잡도</h3>

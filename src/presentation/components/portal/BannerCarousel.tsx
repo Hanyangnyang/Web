@@ -1,17 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
+import type { Banner } from '../../../domain/entities/Banner.js';
 
-export function BannerCarousel({ banners, loading }) {
+interface BannerCarouselProps {
+  banners: Banner[];
+  loading: boolean;
+}
+
+export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
   const [current, setCurrent] = useState(0);
-  const containerRef = useRef(null);
-  const timerRef = useRef(null);
-  const touchStartXRef = useRef(null);
-  const touchStartYRef = useRef(null);
-  const axisLockedRef = useRef(null); // 'h' | 'v' | null
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const axisLockedRef = useRef<'h' | 'v' | null>(null);
   const isSwiping = useRef(false);
-  const mouseStartXRef = useRef(null);
+  const mouseStartXRef = useRef<number | null>(null);
 
   const resetTimer = () => {
-    clearInterval(timerRef.current);
+    if (timerRef.current) clearInterval(timerRef.current);
     if (!banners.length) return; // 배너 도착 전(0개)이면 타이머를 돌리지 않음 — %0으로 인한 NaN 방지
     timerRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
@@ -20,24 +26,24 @@ export function BannerCarousel({ banners, loading }) {
 
   useEffect(() => {
     resetTimer();
-    return () => clearInterval(timerRef.current);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [banners.length]);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    const onTouchStart = (e) => {
+    const onTouchStart = (e: TouchEvent) => {
       touchStartXRef.current = e.touches[0].clientX;
       touchStartYRef.current = e.touches[0].clientY;
       axisLockedRef.current = null;
       isSwiping.current = false;
     };
 
-    const onTouchMove = (e) => {
+    const onTouchMove = (e: TouchEvent) => {
       if (touchStartXRef.current === null) return;
       const dx = Math.abs(e.touches[0].clientX - touchStartXRef.current);
-      const dy = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+      const dy = Math.abs(e.touches[0].clientY - (touchStartYRef.current ?? 0));
       if (!axisLockedRef.current) {
         axisLockedRef.current = dx > dy ? 'h' : 'v';
       }
@@ -46,7 +52,7 @@ export function BannerCarousel({ banners, loading }) {
       }
     };
 
-    const onTouchEnd = (e) => {
+    const onTouchEnd = (e: TouchEvent) => {
       if (touchStartXRef.current === null) return;
       const delta = e.changedTouches[0].clientX - touchStartXRef.current;
       if (axisLockedRef.current === 'h' && Math.abs(delta) > 40) {
@@ -68,8 +74,8 @@ export function BannerCarousel({ banners, loading }) {
     };
   }, [banners.length]);
 
-  const handleMouseDown = (e) => { mouseStartXRef.current = e.clientX; };
-  const handleMouseUp = (e) => {
+  const handleMouseDown = (e: React.MouseEvent) => { mouseStartXRef.current = e.clientX; };
+  const handleMouseUp = (e: React.MouseEvent) => {
     if (mouseStartXRef.current === null) return;
     const delta = e.clientX - mouseStartXRef.current;
     if (Math.abs(delta) > 40) {
@@ -81,7 +87,7 @@ export function BannerCarousel({ banners, loading }) {
     mouseStartXRef.current = null;
   };
 
-  const handleClick = (banner) => {
+  const handleClick = (banner: Banner) => {
     if (isSwiping.current) return;
     if (banner.clickUrl) {
       window.open(banner.clickUrl, '_blank');

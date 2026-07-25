@@ -8,7 +8,11 @@ import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
 
-export function PortalView({ isVisible = true }) {
+interface PortalViewProps {
+  isVisible?: boolean;
+}
+
+export function PortalView({ isVisible = true }: PortalViewProps) {
   const { weather, library, weatherLoading, libraryLoading } = usePortalData(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
@@ -24,7 +28,7 @@ export function PortalView({ isVisible = true }) {
         날씨 알림 받기
       </button>
       {showWeatherAlarm && (
-        <WeatherAlarmSettings onClose={(msg) => {
+        <WeatherAlarmSettings onClose={(msg?: string) => {
           setShowWeatherAlarm(false);
           if (msg) {
             setAlarmPopup(msg);

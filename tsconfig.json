@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+
+    // JS 파일과 공존하며 파일 단위로 점진 전환 — .js는 그대로 두고, .ts/.tsx만 타입 체크 대상
+    "allowJs": true,
+    "checkJs": false,
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
+}

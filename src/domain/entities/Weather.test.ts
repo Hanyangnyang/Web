@@ -11,8 +11,12 @@ describe('createWeather', () => {
       message: '오늘 날씨 좋아요',
       isAiMessage: true,
       hasPrecipitation: false,
-      hourlyForecast: [{ epoch: 1721000000000, temp: 24 }],
-      airQuality: { pm10: { label: '좋음' }, pm25: { label: '좋음' }, uv: { label: '보통' } },
+      hourlyForecast: [{ time: '2026-07-25T12:00', epoch: 1721000000000, hour: 12, temp: 24, weatherCode: 1, precipProb: 0 }],
+      airQuality: {
+        pm10: { label: '좋음', color: '#2563eb', level: 1 },
+        pm25: { label: '좋음', color: '#2563eb', level: 1 },
+        uv: { label: '보통', color: '#4ade80', level: 2 },
+      },
     };
     expect(createWeather(raw)).toEqual(raw);
   });
