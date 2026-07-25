@@ -1,7 +1,7 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
-import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
-import { supabase } from '../../lib/supabase';
-import { getPlatform } from '../../lib/platform';
+import { requestNotificationPermission, checkNotificationPermission } from '../../../lib/firebase';
+import { supabase } from '../../../lib/supabase';
+import { getPlatform } from '../../../lib/platform';
 
 // 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
 const josa = (word, type) => {

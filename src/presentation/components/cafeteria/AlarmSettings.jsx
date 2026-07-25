@@ -1,8 +1,8 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
-import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
-import { supabase } from '../../lib/supabase';
-import { getPlatform } from '../../lib/platform';
+import { requestNotificationPermission, checkNotificationPermission } from '../../../lib/firebase';
+import { supabase } from '../../../lib/supabase';
+import { getPlatform } from '../../../lib/platform';
 
 const ITEM_H = 36;
 const VISIBLE = 3;

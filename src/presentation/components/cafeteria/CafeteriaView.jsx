@@ -3,7 +3,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from
 
 import { ChevronLeft, ChevronRight, Bell, Share2 } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { getKSTDate } from '../../utils/time.js';
+import { getKSTDate } from '../../../utils/time.js';
 import { AlarmSettings } from './AlarmSettings.jsx';
 import { ShareSheet } from './ShareSheet.jsx';
 

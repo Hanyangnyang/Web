@@ -1,7 +1,7 @@
 // 컴포넌트: 체대 헬스장 수업 시간표 캘린더 (현재 시간 인디케이터 포함)
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import gymData from '../../assets/gymSchedule.json';
+import gymData from '../../../assets/gymSchedule.json';
 
 const COLORS = {
   orange: { bg: '#FFF7ED', text: '#C2410C', border: '#FFEDD5' },
