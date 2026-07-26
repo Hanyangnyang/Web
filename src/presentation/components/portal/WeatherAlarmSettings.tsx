@@ -1,33 +1,49 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { requestNotificationPermission, checkNotificationPermission } from '../../../lib/firebase';
-import { supabase } from '../../../lib/supabase';
-import { getPlatform } from '../../../lib/platform';
+import type { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from 'react';
+import { requestNotificationPermission, checkNotificationPermission } from '../../../lib/firebase.js';
+import { supabase } from '../../../lib/supabase.js';
+import { getPlatform } from '../../../lib/platform.js';
 import { TimeDayWheelPicker, DAY_LIST } from '../ui/TimeDayWheelPicker.js';
 
-const DEFAULT_SETTINGS = {
+interface WeatherConditions {
+  daily: boolean;
+  weekday: boolean;
+  rainSnow: boolean;
+  dust: boolean;
+  uv: boolean;
+}
+
+interface AlarmSettingsState {
+  weatherAlert: boolean;
+  conditions: WeatherConditions;
+  notifyTime: string;
+  notifyDay: string;
+}
+
+const DEFAULT_SETTINGS: AlarmSettingsState = {
   weatherAlert: false,
   conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
   notifyTime: '08:00',
   notifyDay: '당일'
 };
 
-const cloneDefaultSettings = () => ({
+const cloneDefaultSettings = (): AlarmSettingsState => ({
   ...DEFAULT_SETTINGS,
   conditions: { ...DEFAULT_SETTINGS.conditions },
 });
 
-const loadSettings = () => {
+const loadSettings = (): AlarmSettingsState => {
   try {
     const saved = localStorage.getItem('weather_alarm_settings');
     if (!saved) return cloneDefaultSettings();
-    const parsed = JSON.parse(saved);
+    const parsed = JSON.parse(saved) as Partial<AlarmSettingsState>;
 
     // 시간 검증
     if (parsed.notifyTime) {
       const h = parseInt(parsed.notifyTime.split(':')[0]);
       if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
     }
-    if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
+    if (!parsed.notifyDay || !DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
 
     // 조건 칩 기본 값 구조 유지 검증
     parsed.conditions = { ...DEFAULT_SETTINGS.conditions, ...parsed.conditions };
@@ -38,25 +54,26 @@ const loadSettings = () => {
   }
 };
 
-const settingsEqual = (a, b) =>
+const settingsEqual = (a: AlarmSettingsState, b: AlarmSettingsState) =>
   a.weatherAlert === b.weatherAlert &&
   a.notifyTime === b.notifyTime &&
   a.notifyDay === b.notifyDay &&
   JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
 
-async function getOrCreateSecureDeviceId() {
+async function getOrCreateSecureDeviceId(): Promise<string> {
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.user?.id) {
     return session.user.id;
   }
   const { data, error } = await supabase.auth.signInAnonymously();
   if (error) throw error;
+  if (!data.session) throw new Error('Failed to create anonymous session');
   return data.session.user.id;
 }
 
 // 조건 칩: group A(매일/평일)와 group B(비눈/미세먼지/자외선)는 서로 배타적이라
 // 한쪽이 켜지면 반대쪽 그룹 칩은 흐리게(dimmed) 표시
-const CONDITION_CHIPS = [
+const CONDITION_CHIPS: { key: keyof WeatherConditions; label: string; group: 'A' | 'B' }[] = [
   { key: 'daily', label: '매일', group: 'A' },
   { key: 'weekday', label: '평일', group: 'A' },
   { key: 'rainSnow', label: '비/눈', group: 'B' },
@@ -64,15 +81,19 @@ const CONDITION_CHIPS = [
   { key: 'uv', label: '자외선', group: 'B' },
 ];
 
-export function WeatherAlarmSettings({ onClose }) {
-  const savedRef = useRef(loadSettings());
-  const [settings, setSettings] = useState(() => ({ ...savedRef.current }));
+export interface WeatherAlarmSettingsProps {
+  onClose: (message?: string) => void;
+}
+
+export function WeatherAlarmSettings({ onClose }: WeatherAlarmSettingsProps) {
+  const savedRef = useRef<AlarmSettingsState>(loadSettings());
+  const [settings, setSettings] = useState<AlarmSettingsState>(() => ({ ...savedRef.current }));
   const [closing, setClosing] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
-  const backdropRef = useRef(null);
-  const sheetRef = useRef(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   const isDirty = !settingsEqual(settings, savedRef.current);
 
@@ -104,12 +125,12 @@ export function WeatherAlarmSettings({ onClose }) {
         </span>
       );
     }
-    
-    const activeConditions = [];
+
+    const activeConditions: string[] = [];
     if (settings.conditions.rainSnow) activeConditions.push('비/눈이 오는 날');
     if (settings.conditions.dust) activeConditions.push('미세먼지가 나쁜 날');
     if (settings.conditions.uv) activeConditions.push('자외선 지수가 높은 날');
-    
+
     if (activeConditions.length > 0) {
       return (
         <span>
@@ -123,7 +144,7 @@ export function WeatherAlarmSettings({ onClose }) {
         </span>
       );
     }
-    
+
     return null;
   }, [settings.conditions]);
 
@@ -140,8 +161,8 @@ export function WeatherAlarmSettings({ onClose }) {
   useEffect(() => {
     const el = backdropRef.current;
     if (!el) return;
-    const prevent = (e) => {
-      if (!e.target.closest('.alarm-picker-scroll')) e.preventDefault();
+    const prevent = (e: TouchEvent) => {
+      if (!(e.target as HTMLElement).closest('.alarm-picker-scroll')) e.preventDefault();
     };
     el.addEventListener('touchmove', prevent, { passive: false });
     return () => el.removeEventListener('touchmove', prevent);
@@ -156,9 +177,9 @@ export function WeatherAlarmSettings({ onClose }) {
           p_topic: 'WEATHER_ALERT'
         });
         if (data && !error) {
-          const newSettings = {
+          const newSettings: AlarmSettingsState = {
             weatherAlert: data.is_active,
-            conditions: data.params?.conditions || { daily: false, rainSnow: false, dust: false, uv: false },
+            conditions: data.params?.conditions || { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
             notifyTime: data.params?.notifyTime || '08:00',
             notifyDay: data.params?.notifyDay || '당일',
           };
@@ -173,15 +194,15 @@ export function WeatherAlarmSettings({ onClose }) {
     syncWithServer();
   }, []);
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: ReactTouchEvent<HTMLDivElement> | ReactMouseEvent<HTMLDivElement>) => {
     if (sheetRef.current && sheetRef.current.scrollTop > 0) return;
-    startY.current = e.touches ? e.touches[0].clientY : e.clientY;
+    startY.current = 'touches' in e ? e.touches[0].clientY : e.clientY;
     setIsDragging(true);
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: ReactTouchEvent<HTMLDivElement> | ReactMouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+    const currentY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     const deltaY = currentY - startY.current;
     if (deltaY > 0) {
       if (e.cancelable) e.preventDefault();
@@ -226,13 +247,13 @@ export function WeatherAlarmSettings({ onClose }) {
     }
   };
 
-  const triggerClose = (msg) => {
+  const triggerClose = (msg?: string) => {
     setClosing(true);
     setTimeout(() => onClose(msg), 250);
   };
 
   const handleClose = () => {
-    let successMsg;
+    let successMsg: string | undefined;
     if (isDirty) {
       localStorage.setItem('weather_alarm_settings', JSON.stringify(settings));
 
@@ -283,7 +304,7 @@ export function WeatherAlarmSettings({ onClose }) {
   };
 
   // 조건 칩 클릭 제약 처리
-  const handleConditionToggle = async (key) => {
+  const handleConditionToggle = async (key: keyof WeatherConditions) => {
     const ok = await ensureWeatherAlertOn();
     if (!ok) return;
 
@@ -332,8 +353,6 @@ export function WeatherAlarmSettings({ onClose }) {
     });
   };
 
-
-
   return (
     <div
       ref={backdropRef}
@@ -376,7 +395,7 @@ export function WeatherAlarmSettings({ onClose }) {
           opacity: settings.weatherAlert ? 1 : 0.35,
           transition: 'opacity 0.2s',
         }}>
-          
+
           {/* 2단계: 이럴 때 알림을 보내주세요 */}
           <div className="mb-5">
             <div className="text-[14px] font-extrabold text-text-main mb-2.5">이럴 때 알림을 보내주세요</div>
