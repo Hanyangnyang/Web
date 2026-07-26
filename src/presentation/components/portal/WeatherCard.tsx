@@ -96,7 +96,7 @@ function getHourlyIcon(code: number, hour: number): LucideIcon {
   return CloudLightning;
 }
 
-// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만(무채움) 표시
+// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만 표시
 function getHourlyIconFill(Icon: LucideIcon): string {
   if (
     Icon === Cloud ||

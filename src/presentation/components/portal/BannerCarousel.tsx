@@ -86,7 +86,6 @@ export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
     }
     mouseStartXRef.current = null;
   };
-
   const handleClick = (banner: Banner) => {
     if (isSwiping.current) return;
     if (banner.clickUrl) {
@@ -94,6 +93,7 @@ export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
     }
   };
 
+  // 스켈레톤 
   if (loading) {
     return (
       <div className="mb-3 mt-2">
@@ -102,8 +102,10 @@ export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
     );
   }
 
+  // 배너 0개일때 
   if (!banners.length) return null;
 
+  // 배너 1개 이상일때
   return (
     <div className="mb-3 mt-2 [animation:fadeIn_0.4s_ease-out]">
       <div

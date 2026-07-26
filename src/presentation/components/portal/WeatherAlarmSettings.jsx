@@ -3,19 +3,6 @@ import { requestNotificationPermission, checkNotificationPermission } from '../.
 import { supabase } from '../../../lib/supabase';
 import { getPlatform } from '../../../lib/platform';
 
-// 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
-const josa = (word, type) => {
-  if (!word) return '';
-  const lastChar = word.charCodeAt(word.length - 1);
-  if (lastChar < 0xAC00 || lastChar > 0xD7A3) return word;
-  const hasBatchim = (lastChar - 0xAC00) % 28 !== 0;
-  
-  if (type === '이/가') return hasBatchim ? `${word}이` : `${word}가`;
-  if (type === '을/를') return hasBatchim ? `${word}을` : `${word}를`;
-  if (type === '와/과') return hasBatchim ? `${word}과` : `${word}와`;
-  return word;
-};
-
 const ITEM_H = 36;
 const VISIBLE = 3;
 
@@ -436,36 +423,37 @@ function TimePicker({ value, onChange, day, onDayChange }) {
   );
 }
 
+const DEFAULT_SETTINGS = {
+  weatherAlert: false,
+  conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
+  notifyTime: '08:00',
+  notifyDay: '당일'
+};
+
+const cloneDefaultSettings = () => ({
+  ...DEFAULT_SETTINGS,
+  conditions: { ...DEFAULT_SETTINGS.conditions },
+});
+
 const loadSettings = () => {
   try {
     const saved = localStorage.getItem('weather_alarm_settings');
-    const defaultVal = {
-      weatherAlert: false,
-      conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
-      notifyTime: '08:00',
-      notifyDay: '당일'
-    };
-    if (!saved) return defaultVal;
+    if (!saved) return cloneDefaultSettings();
     const parsed = JSON.parse(saved);
-    
+
     // 시간 검증
     if (parsed.notifyTime) {
       const h = parseInt(parsed.notifyTime.split(':')[0]);
       if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
     }
     if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
-    
+
     // 조건 칩 기본 값 구조 유지 검증
-    parsed.conditions = { ...defaultVal.conditions, ...parsed.conditions };
-    
-    return { ...defaultVal, ...parsed };
+    parsed.conditions = { ...DEFAULT_SETTINGS.conditions, ...parsed.conditions };
+
+    return { ...DEFAULT_SETTINGS, ...parsed };
   } catch {
-    return {
-      weatherAlert: false,
-      conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
-      notifyTime: '08:00',
-      notifyDay: '당일'
-    };
+    return cloneDefaultSettings();
   }
 };
 
@@ -484,6 +472,16 @@ async function getOrCreateSecureDeviceId() {
   if (error) throw error;
   return data.session.user.id;
 }
+
+// 조건 칩: group A(매일/평일)와 group B(비눈/미세먼지/자외선)는 서로 배타적이라
+// 한쪽이 켜지면 반대쪽 그룹 칩은 흐리게(dimmed) 표시
+const CONDITION_CHIPS = [
+  { key: 'daily', label: '매일', group: 'A' },
+  { key: 'weekday', label: '평일', group: 'A' },
+  { key: 'rainSnow', label: '비/눈', group: 'B' },
+  { key: 'dust', label: '미세먼지', group: 'B' },
+  { key: 'uv', label: '자외선', group: 'B' },
+];
 
 export function WeatherAlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
@@ -658,30 +656,7 @@ export function WeatherAlarmSettings({ onClose }) {
       localStorage.setItem('weather_alarm_settings', JSON.stringify(settings));
 
       if (settings.weatherAlert) {
-        // 동적 완성형 팝업 완료 메시지 조립
-        if (settings.conditions.daily || settings.conditions.weekday) {
-          successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
-        } else {
-          const activeKeywords = [];
-          if (settings.conditions.rainSnow) activeKeywords.push('비/눈 소식');
-          if (settings.conditions.dust) activeKeywords.push('탁한 공기');
-          if (settings.conditions.uv) activeKeywords.push('강한 자외선 소식');
-
-          if (activeKeywords.length > 0) {
-            let joined = '';
-            if (activeKeywords.length === 3) {
-              joined = `${activeKeywords[0]}, ${activeKeywords[1]}, 그리고 ${activeKeywords[2]}`;
-            } else if (activeKeywords.length === 2) {
-              // 한글 '비/눈 소식'은 받침이 없으므로 '과' 조사로 유기적 매치
-              joined = `${activeKeywords[0]}과 ${activeKeywords[1]}`;
-            } else {
-              joined = activeKeywords[0];
-            }
-            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
-          } else {
-            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
-          }
-        }
+        successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
 
         (async () => {
           try {
@@ -825,70 +800,25 @@ export function WeatherAlarmSettings({ onClose }) {
           <div className="mb-5">
             <div className="text-[14px] font-extrabold text-text-main mb-2.5">이럴 때 알림을 보내주세요</div>
             <div className="flex flex-wrap gap-2 items-center">
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.daily
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupBActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('daily')}
-              >
-                매일
-              </button>
-
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.weekday
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupBActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('weekday')}
-              >
-                평일
-              </button>
-              
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.rainSnow
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupAActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('rainSnow')}
-              >
-                비/눈
-              </button>
-
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.dust
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupAActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('dust')}
-              >
-                미세먼지
-              </button>
-
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.uv
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupAActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('uv')}
-              >
-                자외선
-              </button>
+              {CONDITION_CHIPS.map(({ key, label, group }) => {
+                const isActive = settings.conditions[key];
+                const isDimmed = group === 'A' ? isGroupBActive : isGroupAActive;
+                return (
+                  <button
+                    key={key}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                      isActive
+                        ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                        : isDimmed
+                          ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
+                          : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                    }`}
+                    onClick={() => handleConditionToggle(key)}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             {guideElement && (
               <div className="mt-3 px-1 text-[12px] font-medium text-text-sub leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]">
