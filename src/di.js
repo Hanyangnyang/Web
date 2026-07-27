@@ -6,11 +6,13 @@ import { createMenuApiDataSource } from './data/datasources/MenuApiDataSource.js
 import { createInstagramApiDataSource } from './data/datasources/InstagramApiDataSource.js';
 import { createPortalApiDataSource } from './data/datasources/PortalApiDataSource.js';
 import { createBannerApiDataSource } from './data/datasources/BannerApiDataSource.js';
+import { createBusApiDataSource } from './data/datasources/BusApiDataSource.js';
 
 import { createMenuRepository } from './data/repositories/MenuRepository.js';
 import { createInstagramRepository } from './data/repositories/InstagramRepository.js';
 import { createPortalRepository } from './data/repositories/PortalRepository.js';
 import { createBannerRepository } from './data/repositories/BannerRepository.js';
+import { createBusRepository } from './data/repositories/BusRepository.js';
 
 import { createGetMenuUseCase } from './domain/usecases/GetMenuUseCase.js';
 import { createGetInstagramProfileUseCase } from './domain/usecases/GetInstagramProfileUseCase.js';
@@ -19,6 +21,7 @@ import { createGetSubwayArrivalsUseCase } from './domain/usecases/GetSubwayArriv
 import { createGetWeatherUseCase } from './domain/usecases/GetWeatherUseCase.js';
 import { createGetLibraryStatusUseCase } from './domain/usecases/GetLibraryStatusUseCase.js';
 import { createGetBannersUseCase } from './domain/usecases/GetBannersUseCase.js';
+import { createGetBusArrivalsUseCase } from './domain/usecases/GetBusArrivalsUseCase.js';
 
 import { createShuttleDataSource } from './data/datasources/ShuttleDataSource.js';
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
@@ -33,6 +36,7 @@ const instagramApiDataSource = createInstagramApiDataSource({ httpClient });
 const shuttleDataSource = createShuttleDataSource({ httpClient });
 const portalApiDataSource = createPortalApiDataSource({ httpClient });
 const bannerApiDataSource = createBannerApiDataSource({ httpClient });
+const busApiDataSource = createBusApiDataSource({ httpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
@@ -40,6 +44,7 @@ export const instagramRepository = createInstagramRepository({ instagramApiDataS
 export const shuttleRepository = createShuttleRepository({ shuttleDataSource });
 export const portalRepository = createPortalRepository({ portalApiDataSource });
 export const bannerRepository = createBannerRepository({ bannerApiDataSource });
+export const busRepository = createBusRepository({ busApiDataSource });
 
 // Use Cases
 export const getMenuUseCase = createGetMenuUseCase({ menuRepository });
@@ -49,3 +54,4 @@ export const getSubwayArrivalsUseCase = createGetSubwayArrivalsUseCase({ shuttle
 export const getWeatherUseCase = createGetWeatherUseCase({ portalRepository });
 export const getLibraryStatusUseCase = createGetLibraryStatusUseCase({ portalRepository });
 export const getBannersUseCase = createGetBannersUseCase({ bannerRepository });
+export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository });

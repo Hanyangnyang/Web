@@ -1,5 +1,64 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
 
+export interface RouteStopDef {
+  name: string;
+  off: number;
+  arrLabel: string;
+  arrOff: number;
+  subway: boolean;
+}
+
+export interface RouteDef {
+  stops: RouteStopDef[];
+}
+
+export interface SubwayOpt {
+  id: string;
+  line: string;
+  color: string;
+  dest: string;
+  dir: string;
+  shortDest: string;
+  subwayId: string;
+  updnLine: string;
+}
+
+// shuttle.json 원본 행 (ShuttleDataSource가 그대로 통과시키는 로컬 정적 데이터)
+export interface ShuttleRow {
+  route: string;
+  period: string;
+  dayType: string;
+  dep: string;
+}
+
+export interface ScheduleItem {
+  depMin: number;
+  dep: string;
+  arr: string;
+  arrLabel: string;
+  subway: boolean;
+  route: string;
+}
+
+export interface FullScheduleItem extends ScheduleItem {
+  isLast: boolean;
+}
+
+export interface ShuttleAppConfig {
+  current_period?: string;
+  custom_holidays?: string[];
+  force_weekend?: boolean;
+  no_operation_days?: string[];
+  force_no_operation?: boolean;
+}
+
+// connectingTrains가 필요로 하는 최소 구조 (실제 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
+export interface SubwayArrivalLike {
+  subwayId: string;
+  updnLine: string;
+  arrTime: string;
+}
+
 // 화면에 표시되는 정류장 목록
 export const STOPS = ['기숙사', '셔틀콕', '한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
 
@@ -9,7 +68,7 @@ export const STOPS = ['기숙사', '셔틀콕', '한대앞', '셔틀콕 건너�
 // arrLabel: 이 정류장에서 표시할 '다음 목적지' 이름
 // arrOff:   이 정류장 출발 → arrLabel 도착까지 분
 // subway:   arrLabel이 지하철 연결 가능한 정류장이면 true
-export const ROUTE_DEFS = {
+export const ROUTE_DEFS: Record<string, RouteDef> = {
   '순환': {
     stops: [
       { name: '기숙사',      off: 0,  arrLabel: '한대앞역',      arrOff: 15, subway: true  },
@@ -60,7 +119,7 @@ export const ROUTE_DEFS = {
   },
 };
 
-export const SUBWAY_OPTS = [
+export const SUBWAY_OPTS: SubwayOpt[] = [
   { id: 'line4-bulam', line: '4호선',    color: '#33AADF', dest: '불암산행', dir: '상행', shortDest: '불암산', subwayId: '1004', updnLine: '상행' },
   { id: 'line4-oido',  line: '4호선',    color: '#33AADF', dest: '오이도행', dir: '하행', shortDest: '오이도', subwayId: '1004', updnLine: '하행' },
   { id: 'sb-wang',     line: '수인분당선', color: '#F5A623', dest: '왕십리행', dir: '상행', shortDest: '왕십리', subwayId: '1075', updnLine: '상행' },
@@ -68,10 +127,10 @@ export const SUBWAY_OPTS = [
 ];
 
 // ── 순수 헬퍼 함수 ──
-export const toMin  = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 export const curMin = ()  => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
 
-export const dayType = (isHolidayServer, customHolidays = [], forceWeekend = false) => {
+export const dayType = (isHolidayServer: boolean | null, customHolidays: string[] = [], forceWeekend = false) => {
   if (forceWeekend) return '주말';
   if (isHolidayServer === true) return '주말';
 
@@ -83,8 +142,8 @@ export const dayType = (isHolidayServer, customHolidays = [], forceWeekend = fal
   return (d === 0 || d === 6) ? '주말' : '평일';
 };
 
-const pad2      = (n) => String(n).padStart(2, '0');
-const intToHHMM = (h, m) => `${pad2(h)}:${pad2(m)}`;
+const pad2      = (n: number) => String(n).padStart(2, '0');
+const intToHHMM = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`;
 
 // 현재 날짜 문자열 (YYYY-MM-DD)
 const getYYYYMMDD = () => {
@@ -93,8 +152,8 @@ const getYYYYMMDD = () => {
 };
 
 // ── 공통: allData를 displayStop 기준 시간 목록으로 매핑 ──
-function mapToScheduleItems(rows, displayStop) {
-  const items = [];
+function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleItem[] {
+  const items: ScheduleItem[] = [];
   for (const row of rows) {
     const routeDef = ROUTE_DEFS[row.route];
     if (!routeDef) continue;
@@ -118,7 +177,14 @@ function mapToScheduleItems(rows, displayStop) {
 }
 
 // 현재 시각 근처의 셔틀 계산 (순수 함수)
-export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServer, lookbackMinutes = 0, appConfig = {}) {
+export function computeSchedule(
+  allData: ShuttleRow[],
+  displayStop: string,
+  nowMinutes: number,
+  isHolidayServer: boolean | null,
+  lookbackMinutes = 0,
+  appConfig: ShuttleAppConfig = {},
+): ScheduleItem[] {
   const noOpDays = appConfig.no_operation_days || [];
   if (appConfig.force_no_operation || noOpDays.includes(getYYYYMMDD())) return [];
 
@@ -153,7 +219,13 @@ export function computeSchedule(allData, displayStop, nowMinutes, isHolidayServe
 }
 
 // 전체 시간표 계산 (순수 함수)
-export function computeFullSchedule(allData, displayStop, dayTypeStr, appConfig = {}, overridePeriod = null) {
+export function computeFullSchedule(
+  allData: ShuttleRow[],
+  displayStop: string,
+  dayTypeStr: string,
+  appConfig: ShuttleAppConfig = {},
+  overridePeriod: string | null = null,
+): FullScheduleItem[] {
   const period           = overridePeriod || appConfig.current_period || '학기중';
   const normalizedDayType = dayTypeStr === '주말/공휴일' ? '주말' : dayTypeStr;
 
@@ -165,7 +237,7 @@ export function computeFullSchedule(allData, displayStop, dayTypeStr, appConfig 
 }
 
 // 셔틀 도착 이후 연결 가능한 지하철 편 필터 (순수 함수)
-export function connectingTrains(subwayArrivals, shuttleArrTime, lineId) {
+export function connectingTrains<T extends SubwayArrivalLike>(subwayArrivals: T[], shuttleArrTime: string, lineId: string): T[] {
   if (!subwayArrivals?.length) return [];
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
   if (!opt) return [];
