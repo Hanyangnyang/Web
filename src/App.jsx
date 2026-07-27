@@ -13,6 +13,7 @@ import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
+import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
@@ -93,6 +94,7 @@ function MainLayout() {
   useEffect(() => {
     prefetchPortalData();
     prefetchBanners();
+    prefetchShuttleSchedule();
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
 
