@@ -1,10 +1,10 @@
 // 컴포넌트: 셔틀버스 시간표 및 한대앞역 실시간 지하철 연결 정보 표시
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, ChevronDown, ArrowUpRight, X, Star, MapPin, Bus, BusFront, RefreshCw } from 'lucide-react';
-import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../domain/entities/Shuttle.js';
-import { getDistanceKm } from '../../domain/utils/geo.js';
-import { useShuttle } from '../hooks/useShuttle.js';
-import { useLocation } from '../hooks/useLocation.js';
+import { STOPS, SUBWAY_OPTS, connectingTrains, toMin } from '../../../domain/entities/Shuttle.js';
+import { getDistanceKm } from '../../../domain/utils/geo.js';
+import { useShuttle } from '../../hooks/useShuttle.js';
+import { useLocation } from '../../hooks/useLocation.js';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';

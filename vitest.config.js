@@ -9,6 +9,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',        // localStorage·DOM API를 Node에서 흉내
     setupFiles: ['./src/test/setup.js'],
-    include: ['src/**/*.test.{js,jsx}'],
+    include: ['src/**/*.test.{js,jsx,ts,tsx}'],
   },
 });

@@ -1,11 +1,13 @@
+import type { ComponentType } from 'react';
 import { WeatherCard } from './WeatherCard.jsx';
-import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudRain, Snowflake, CloudDrizzle, CloudLightning } from 'lucide-react';
+import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudRain, Snowflake, CloudDrizzle, CloudLightning, type LucideIcon } from 'lucide-react';
+import type { Weather, HourlyForecastItem, AirQualityLevel } from '../../../domain/entities/Weather.js';
 
 // ── mock 데이터 생성기 ─────────────────────────────────────────────
 // 시간별 예보는 현재 시각 기준 ±12시간으로 생성 — 고정 epoch를 쓰면
 // 시간이 지날수록 렌더 창(±12h) 밖으로 벗어나 스트립이 비어버린다.
 
-function makeHourlyForecast(weatherCode, baseTemp) {
+function makeHourlyForecast(weatherCode: number, baseTemp: number): HourlyForecastItem[] {
   const now = Date.now();
   const currentHourEpoch = Math.floor(now / 3600000) * 3600000;
   return Array.from({ length: 24 }, (_, i) => {
@@ -22,7 +24,7 @@ function makeHourlyForecast(weatherCode, baseTemp) {
 }
 
 // api/portal.js getAQILabel과 동일한 등급 체계
-const AQ_GRADES = {
+const AQ_GRADES: Record<string, AirQualityLevel> = {
   좋음: { label: '좋음', color: '#2563eb', level: 1 },
   보통: { label: '보통', color: '#4ade80', level: 2 },
   나쁨: { label: '나쁨', color: '#ef4444', level: 3 },
@@ -30,10 +32,18 @@ const AQ_GRADES = {
   점검중: { label: '점검중', color: '#94a3b8', level: 1 },
 };
 
-function makeWeather({ weatherCode, temp, description, grade = AQ_GRADES.보통 }) {
+interface MakeWeatherArgs {
+  weatherCode: number;
+  temp: number;
+  description: string;
+  grade?: AirQualityLevel;
+}
+
+function makeWeather({ weatherCode, temp, description, grade = AQ_GRADES.보통 }: MakeWeatherArgs): Weather {
   return {
     temp,
     description,
+    emoji: '',
     weatherCode,
     message: '오늘도 좋은 하루 보내세요! 산책하기 좋은 날씨예요.',
     isAiMessage: true,
@@ -66,7 +76,7 @@ export default {
 const CARD_WIDTH = 375;
 
 // 실제 앱과 동일한 모바일 폭에서 검수하기 위한 개별 스토리용 decorator
-const mobileFrame = (Story) => (
+const mobileFrame = (Story: ComponentType) => (
   <div style={{ maxWidth: `${CARD_WIDTH}px`, margin: '0 auto', paddingTop: '16px' }}>
     <Story />
   </div>
@@ -80,7 +90,14 @@ const mobileFrame = (Story) => (
 // 아래 flatMap이 만드는 평평한 배열이 자동으로 "배경별 한 줄"로 줄바꿈된다.
 // 마지막 "한파" 열은 WeatherCard.jsx의 COLD_SNAP_TEMP(-10°)보다 낮은 기온으로 덮어써서
 // 별도 배경 없이 각 날씨 카드 위에 "한파" 뱃지만 얹히는지 한 번에 검수한다.
-const MATRIX_COLUMNS = [
+interface MatrixColumn {
+  key: string;
+  label: string;
+  grade: AirQualityLevel;
+  coldSnapTemp?: number;
+}
+
+const MATRIX_COLUMNS: MatrixColumn[] = [
   ...Object.values(AQ_GRADES).map((grade) => ({ key: grade.label, label: grade.label, grade })),
   { key: '한파', label: '한파', grade: AQ_GRADES.보통, coldSnapTemp: -13 },
 ];
@@ -143,7 +160,13 @@ const HOURLY_ICONS = [
 // 실제 카드의 시간별 예보 칸(WeatherCard.jsx L333-347)과 동일한 마크업 재현.
 // isCurrent(지금 칸)일 때만 배경이 bg-white/90 필로 바뀌고, 아이콘 테두리 색이
 // text-white → text-black으로 반전된다 — fill(내부 채움색)은 두 상태에서 동일하다.
-function HourlyPill({ Icon, fill, isCurrent }) {
+interface HourlyPillProps {
+  Icon: LucideIcon;
+  fill: string;
+  isCurrent: boolean;
+}
+
+function HourlyPill({ Icon, fill, isCurrent }: HourlyPillProps) {
   return (
     <div
       className={`flex flex-col items-center gap-0.5 px-2.5 py-0.5 rounded-xl transition-all duration-300 ${

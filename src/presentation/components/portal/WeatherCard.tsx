@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudLightning } from 'lucide-react';
+import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudLightning, type LucideIcon } from 'lucide-react';
+import type { Weather, HourlyForecastItem } from '../../../domain/entities/Weather.js';
 
 // 한파 판단 기준 기온(℃): 기상청 한파특보 절대기준(-12~-15도)보다 약간 낮춰
 // 좀 더 자주 체감할 수 있도록 설정. 날씨 상태(맑음/흐림/비/눈)와 무관하게
@@ -9,7 +10,14 @@ const COLD_SNAP_TEMP = -10;
 // 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
 let hasAnimatedThisSession = false;
 
-function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
+interface TypewriterTextProps {
+  text: string;
+  speed?: number;
+  delay?: number;
+  isVisible?: boolean;
+}
+
+function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }: TypewriterTextProps) {
   const [displayed, setDisplayed] = useState(() => {
     return hasAnimatedThisSession ? text : '';
   });
@@ -34,7 +42,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
     setWaiting(true); // 커서 깜빡임 시작
 
     let i = 0;
-    let typingTimer = null;
+    let typingTimer: ReturnType<typeof setInterval> | null = null;
 
     const startTyping = () => {
       setWaiting(false); // 커서 제거 후 타이핑 시작
@@ -42,7 +50,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
         i++;
         setDisplayed(text.slice(0, i));
         if (i >= text.length) {
-          clearInterval(typingTimer);
+          if (typingTimer !== null) clearInterval(typingTimer);
           hasAnimatedThisSession = true; // 타이핑이 완벽히 한 번 끝나면 세션 플래그 true 설정
         }
       }, speed);
@@ -75,7 +83,7 @@ function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }) {
 }
 
 // 시간별 예보 2D 아이콘 매핑
-function getHourlyIcon(code, hour) {
+function getHourlyIcon(code: number, hour: number): LucideIcon {
   const isNight = hour >= 20 || hour < 6;
   if (code <= 0) return isNight ? Moon : Sun;
   if (code <= 1) return isNight ? CloudMoon : CloudSun;
@@ -88,8 +96,8 @@ function getHourlyIcon(code, hour) {
   return CloudLightning;
 }
 
-// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만(무채움) 표시
-function getHourlyIconFill(Icon) {
+// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만 표시
+function getHourlyIconFill(Icon: LucideIcon): string {
   if (
     Icon === Cloud ||
     Icon === CloudSun ||
@@ -104,9 +112,20 @@ function getHourlyIconFill(Icon) {
   return 'none';
 }
 
+interface WeatherCardProps {
+  weather: Weather | null;
+  loading: boolean;
+  isVisible?: boolean;
+}
+
+interface RenderedForecastItem extends HourlyForecastItem {
+  isCurrent: boolean;
+  isPast: boolean;
+}
+
 // 소식탭 날씨 박스: weather를 props로만 받는 순수 표시 컴포넌트 (Storybook 대응)
-export function WeatherCard({ weather, loading, isVisible = true }) {
-  const scrollContainerRef = useRef(null);
+export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const showWeatherDetail = true;
 
   const { maxTemp, minTemp } = useMemo(() => {
@@ -135,7 +154,7 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
   // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
   // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
   //           item.epoch + 브라우저 로컬 시각으로 모든 계산을 수행합니다.
-  const renderedHourlyForecast = useMemo(() => {
+  const renderedHourlyForecast = useMemo((): RenderedForecastItem[] => {
     if (!weather?.hourlyForecast) return [];
 
     const nowEpoch = Date.now();
@@ -143,7 +162,7 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
     const twelveHoursLater = nowEpoch + (12 * 60 * 60 * 1000);
 
     // 현재 시각이 속한 정각 구간(정각 <= 현재 < 다음 정각)의 노드를 "지금"으로 판정
-    const mapped = weather.hourlyForecast.map(item => {
+    const mapped = weather.hourlyForecast.map((item): RenderedForecastItem | null => {
       const epoch = item.epoch;
       if (!epoch) return null; // epoch 없는 구형 캐시 데이터 제거
 
@@ -160,7 +179,7 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
         isCurrent,
         isPast
       };
-    }).filter(Boolean);
+    }).filter((item): item is RenderedForecastItem => item !== null);
 
     const filtered = mapped.filter(item => {
       return item.epoch >= twelveHoursAgo && item.epoch <= twelveHoursLater;
@@ -189,11 +208,12 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
 
   // 더보기로 예보 스트립이 펼쳐졌을 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
-    if (showWeatherDetail && scrollContainerRef.current && renderedHourlyForecast.length > 0) {
+    const container = scrollContainerRef.current;
+    if (showWeatherDetail && container && renderedHourlyForecast.length > 0) {
       const timer = setTimeout(() => {
-        const activeEl = scrollContainerRef.current.querySelector('[data-current="true"]');
+        const activeEl = container.querySelector<HTMLElement>('[data-current="true"]');
         if (activeEl) {
-          scrollContainerRef.current.scrollTo({
+          container.scrollTo({
             left: activeEl.offsetLeft - 16,
             behavior: 'smooth'
           });
@@ -204,7 +224,7 @@ export function WeatherCard({ weather, loading, isVisible = true }) {
   }, [renderedHourlyForecast, showWeatherDetail]);
 
   // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
-  const weatherTheme = useMemo(() => {
+  const weatherTheme = useMemo((): { icon: LucideIcon | null; bg: string; iconColor?: string } => {
     if (!weather) return { icon: null, bg: 'transparent' };
     const code = weather.weatherCode;
 

@@ -1,71 +1,65 @@
-import React, { useState, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
-import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase';
-import { supabase } from '../../lib/supabase';
-import { getPlatform } from '../../lib/platform';
-
-// 한글 받침 유무에 따라 조사를 자연스럽게 변환하는 유틸리티
-const josa = (word, type) => {
-  if (!word) return '';
-  const lastChar = word.charCodeAt(word.length - 1);
-  if (lastChar < 0xAC00 || lastChar > 0xD7A3) return word;
-  const hasBatchim = (lastChar - 0xAC00) % 28 !== 0;
-  
-  if (type === '이/가') return hasBatchim ? `${word}이` : `${word}가`;
-  if (type === '을/를') return hasBatchim ? `${word}을` : `${word}를`;
-  if (type === '와/과') return hasBatchim ? `${word}과` : `${word}와`;
-  return word;
-};
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import { X, Plus } from 'lucide-react';
+import { requestNotificationPermission, checkNotificationPermission } from '../../../lib/firebase';
+import { supabase } from '../../../lib/supabase';
+import { getPlatform } from '../../../lib/platform';
 
 const ITEM_H = 36;
 const VISIBLE = 3;
 
-const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i);
+const HOUR_LIST = Array.from({ length: 12 }, (_, i) => i); // 0~11
 const MINUTE_LIST = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
 const AMPM_LIST = ['오전', '오후'];
 const DAY_LIST = ['전날', '당일'];
 
+// h24 → 표시용 분리
 const parseH24 = (h24) => ({
-  displayHour: h24 % 12,
-  ampmIdx:     h24 < 12 ? 0 : 1,
+  displayHour: h24 % 12,        // 0~11
+  ampmIdx: h24 < 12 ? 0 : 1, // 0=오전, 1=오후
 });
 
+// 표시값 → h24
 const toH24 = (displayHour, ampmIdx) => ampmIdx === 0 ? displayHour : displayHour + 12;
+
 
 function TimePicker({ value, onChange, day, onDayChange }) {
   const [hStr, mStr] = value.split(':');
-  const h24     = Math.max(0, Math.min(parseInt(hStr) || 0, 23));
+  const h24 = Math.max(0, Math.min(parseInt(hStr) || 0, 23));
   const initMin = String(Math.max(0, Math.min(parseInt(mStr) || 0, 55))).padStart(2, '0');
   const initMinIdx = Math.max(0, MINUTE_LIST.indexOf(initMin));
   const initDay = Math.max(0, DAY_LIST.indexOf(day));
   const { displayHour: initHour, ampmIdx: initAmpm } = parseH24(h24);
 
+  // 즉시 색상 피드백용 live state (스크롤하면 바로 반영)
   const [liveHour, setLiveHour] = useState(initHour);
   const [liveAmpm, setLiveAmpm] = useState(initAmpm);
-  const [liveMin,  setLiveMin]  = useState(initMinIdx);
-  const [liveDay,  setLiveDay]  = useState(initDay);
+  const [liveMin, setLiveMin] = useState(initMinIdx);
+  const [liveDay, setLiveDay] = useState(initDay);
 
   const hourRef = useRef(null);
   const ampmRef = useRef(null);
-  const minRef  = useRef(null);
-  const dayRef  = useRef(null);
+  const minRef = useRef(null);
+  const dayRef = useRef(null);
   
   const hourTimer = useRef(null);
   const ampmTimer = useRef(null);
-  const minTimer  = useRef(null);
-  const dayTimer  = useRef(null);
-  
+  const minTimer = useRef(null);
+  const dayTimer = useRef(null);
+
   const hourWheelCooldown = useRef(false);
   const ampmWheelCooldown = useRef(false);
-  const minWheelCooldown  = useRef(false);
+  const minWheelCooldown = useRef(false);
   const dayWheelCooldown = useRef(false);
 
+  // 최초 마운트 시 스크롤 위치 초기화
   useLayoutEffect(() => {
     if (hourRef.current) hourRef.current.scrollTop = initHour * ITEM_H;
     if (ampmRef.current) ampmRef.current.scrollTop = initAmpm * ITEM_H;
-    if (minRef.current)  minRef.current.scrollTop  = initMinIdx * ITEM_H;
-    if (dayRef.current)  dayRef.current.scrollTop  = initDay  * ITEM_H;
+    if (minRef.current) minRef.current.scrollTop = initMinIdx * ITEM_H;
+    if (dayRef.current) dayRef.current.scrollTop = initDay * ITEM_H;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 외부에서 value가 바뀔 때 live state 동기화
   useEffect(() => {
     const [hStr, mStr] = value.split(':');
     const h24 = Math.max(0, Math.min(parseInt(hStr) || 0, 23));
@@ -81,15 +75,16 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     setLiveDay(initDay);
   }, [initDay]);
 
+  // DOM 현재 위치를 읽어 onChange/onDayChange 호출
   const commitTime = () => {
     const hourEl = hourRef.current;
     const ampmEl = ampmRef.current;
-    const minEl  = minRef.current;
+    const minEl = minRef.current;
     if (!hourEl || !ampmEl || !minEl) return;
     const curHour = Math.max(0, Math.min(Math.round(hourEl.scrollTop / ITEM_H), 11));
     const curAmpm = Math.max(0, Math.min(Math.round(ampmEl.scrollTop / ITEM_H), 1));
     const curMinIdx = Math.max(0, Math.min(Math.round(minEl.scrollTop / ITEM_H), 11));
-    const newH24  = toH24(curHour, curAmpm);
+    const newH24 = toH24(curHour, curAmpm);
     const newMinStr = MINUTE_LIST[curMinIdx] || '00';
     const newTime = `${String(newH24).padStart(2, '0')}:${newMinStr}`;
     if (newTime !== value) onChange(newTime);
@@ -102,6 +97,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     if (DAY_LIST[idx] !== day) onDayChange(DAY_LIST[idx]);
   };
 
+  // --- 스크롤 핸들러 (즉시 live 색상 + 디바운스 commit) ---
   const handleHourScroll = () => {
     const el = hourRef.current;
     const ampmEl = ampmRef.current;
@@ -163,6 +159,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     dayTimer.current = setTimeout(commitDay, 150);
   };
 
+  // --- 마우스 휠 핸들러 ---
   const handleHourWheel = (e) => {
     e.preventDefault();
     if (Math.abs(e.deltaY) < 10) return;
@@ -272,6 +269,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
     cursor: 'grab',
   });
 
+  // --- 드래그로 휠 돌리기 (마우스용) ---
   const handleDragScroll = (ref, liveSetter) => {
     let isDown = false;
     let startY;
@@ -325,6 +323,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         margin: '0 auto',
       }}
     >
+      {/* 선택 하이라이트 바 */}
       <div style={{
         position: 'absolute',
         top: '50%',
@@ -337,6 +336,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         pointerEvents: 'none',
       }} />
 
+      {/* 전날/당일 */}
       <div
         ref={dayRef}
         onScroll={handleDayScroll}
@@ -352,6 +352,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         <div style={{ height: ITEM_H }} />
       </div>
 
+      {/* 오전/오후 */}
       <div
         ref={ampmRef}
         onScroll={handleAmpmScroll}
@@ -367,6 +368,7 @@ function TimePicker({ value, onChange, day, onDayChange }) {
         <div style={{ height: ITEM_H }} />
       </div>
 
+      {/* 시간 0~11 */}
       <div
         ref={hourRef}
         onScroll={handleHourScroll}
@@ -438,42 +440,27 @@ function TimePicker({ value, onChange, day, onDayChange }) {
 
 const loadSettings = () => {
   try {
-    const saved = localStorage.getItem('weather_alarm_settings');
-    const defaultVal = {
-      weatherAlert: false,
-      conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
-      notifyTime: '08:00',
-      notifyDay: '당일'
-    };
-    if (!saved) return defaultVal;
+    const saved = localStorage.getItem('alarm_settings');
+    if (!saved) return { jeyukAlert: false, mode: null, selectedCafe: null, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
     const parsed = JSON.parse(saved);
-    
-    // 시간 검증
     if (parsed.notifyTime) {
       const h = parseInt(parsed.notifyTime.split(':')[0]);
       if (isNaN(h) || h < 0 || h > 23) parsed.notifyTime = '08:00';
     }
     if (!DAY_LIST.includes(parsed.notifyDay)) parsed.notifyDay = '당일';
-    
-    // 조건 칩 기본 값 구조 유지 검증
-    parsed.conditions = { ...defaultVal.conditions, ...parsed.conditions };
-    
-    return { ...defaultVal, ...parsed };
+    return { jeyukAlert: false, mode: null, selectedCafe: null, keywords: [], notifyTime: '08:00', notifyDay: '당일', ...parsed };
   } catch {
-    return {
-      weatherAlert: false,
-      conditions: { daily: false, weekday: false, rainSnow: false, dust: false, uv: false },
-      notifyTime: '08:00',
-      notifyDay: '당일'
-    };
+    return { jeyukAlert: false, mode: null, selectedCafe: null, keywords: [], notifyTime: '08:00', notifyDay: '당일' };
   }
 };
 
 const settingsEqual = (a, b) =>
-  a.weatherAlert === b.weatherAlert &&
+  a.jeyukAlert === b.jeyukAlert &&
+  a.mode === b.mode &&
+  a.selectedCafe === b.selectedCafe &&
   a.notifyTime === b.notifyTime &&
   a.notifyDay === b.notifyDay &&
-  JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
+  JSON.stringify(a.keywords) === JSON.stringify(b.keywords);
 
 async function getOrCreateSecureDeviceId() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -485,68 +472,21 @@ async function getOrCreateSecureDeviceId() {
   return data.session.user.id;
 }
 
-export function WeatherAlarmSettings({ onClose }) {
+export function AlarmSettings({ onClose }) {
   const savedRef = useRef(loadSettings());
-  const [settings, setSettings] = useState(() => ({ ...savedRef.current }));
+  const [settings, setSettings] = useState(() => ({
+    ...savedRef.current,
+    keywords: [...savedRef.current.keywords],
+  }));
+  const [keywordInput, setKeywordInput] = useState('');
   const [closing, setClosing] = useState(false);
-  const [dragY, setDragY] = useState(0);
+  const [dragY, setDragY] = useState(0); // 드래그 거리
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
   const backdropRef = useRef(null);
   const sheetRef = useRef(null);
 
   const isDirty = !settingsEqual(settings, savedRef.current);
-
-  // 3단계 영역(날짜 및 시간 선택) 활성화 조건: 2단계 조건이 하나라도 켜져 있는가
-  const isStep3Active = settings.conditions.daily ||
-                        settings.conditions.weekday ||
-                        settings.conditions.rainSnow ||
-                        settings.conditions.dust ||
-                        settings.conditions.uv;
-
-  // 매일/평일(Group A)과 상세 기상 조건(Group B)의 배타적 스타일 적용을 위한 판별 변수
-  const isGroupAActive = settings.conditions.daily || settings.conditions.weekday;
-  const isGroupBActive = settings.conditions.rainSnow || settings.conditions.dust || settings.conditions.uv;
-
-  // 동적 안내 설명 문구 계산 (React Element 형태 반환)
-  const guideElement = useMemo(() => {
-    if (settings.conditions.daily) {
-      return (
-        <span>
-          <span className="font-extrabold">매일</span> 알림으로 날씨를 알려드릴게요.
-        </span>
-      );
-    }
-
-    if (settings.conditions.weekday) {
-      return (
-        <span>
-          <span className="font-extrabold">평일</span> 알림으로 날씨를 알려드릴게요.
-        </span>
-      );
-    }
-    
-    const activeConditions = [];
-    if (settings.conditions.rainSnow) activeConditions.push('비/눈이 오는 날');
-    if (settings.conditions.dust) activeConditions.push('미세먼지가 나쁜 날');
-    if (settings.conditions.uv) activeConditions.push('자외선 지수가 높은 날');
-    
-    if (activeConditions.length > 0) {
-      return (
-        <span>
-          {activeConditions.map((cond, idx) => (
-            <span key={cond}>
-              {idx > 0 && <span>, </span>}
-              <span className="font-extrabold">{cond}</span>
-            </span>
-          ))}
-          <span>에 알림을 보내드릴게요</span>
-        </span>
-      );
-    }
-    
-    return null;
-  }, [settings.conditions]);
 
   // iOS 배경 스크롤 잠금 (position:fixed 대신 클래스 토글로 레이아웃 점프 방지)
   useEffect(() => {
@@ -558,43 +498,23 @@ export function WeatherAlarmSettings({ onClose }) {
     };
   }, []);
 
+  // 백드롭 터치무브 방지 (iOS에서 배경 스크롤 방지)
   useEffect(() => {
     const el = backdropRef.current;
     if (!el) return;
     const prevent = (e) => {
-      if (!e.target.closest('.alarm-picker-scroll')) e.preventDefault();
+      // 시트 내부의 스크롤 요소가 아닐 때만 차단
+      if (!e.target.closest('.alarm-picker-scroll')) {
+        e.preventDefault();
+      }
     };
     el.addEventListener('touchmove', prevent, { passive: false });
     return () => el.removeEventListener('touchmove', prevent);
   }, []);
 
-  useEffect(() => {
-    async function syncWithServer() {
-      try {
-        const deviceId = await getOrCreateSecureDeviceId();
-        const { data, error } = await supabase.rpc('get_alarm_subscription', {
-          p_device_id: deviceId,
-          p_topic: 'WEATHER_ALERT'
-        });
-        if (data && !error) {
-          const newSettings = {
-            weatherAlert: data.is_active,
-            conditions: data.params?.conditions || { daily: false, rainSnow: false, dust: false, uv: false },
-            notifyTime: data.params?.notifyTime || '08:00',
-            notifyDay: data.params?.notifyDay || '당일',
-          };
-          setSettings(newSettings);
-          savedRef.current = newSettings;
-          localStorage.setItem('weather_alarm_settings', JSON.stringify(newSettings));
-        }
-      } catch (err) {
-        console.error('Failed to sync weather alarm settings', err);
-      }
-    }
-    syncWithServer();
-  }, []);
-
+  // 드래그 제어 핸들러 (전체 시트용)
   const handleTouchStart = (e) => {
+    // 내부 스크롤 중이면 드래그 무시
     if (sheetRef.current && sheetRef.current.scrollTop > 0) return;
     startY.current = e.touches ? e.touches[0].clientY : e.clientY;
     setIsDragging(true);
@@ -602,12 +522,17 @@ export function WeatherAlarmSettings({ onClose }) {
 
   const handleTouchMove = (e) => {
     if (!isDragging) return;
+
     const currentY = e.touches ? e.touches[0].clientY : e.clientY;
     const deltaY = currentY - startY.current;
+
+    // 아래로 내릴 때만 시트 이동
     if (deltaY > 0) {
+      // 이벤트 전파 방지 (스크롤 발생 차단)
       if (e.cancelable) e.preventDefault();
       setDragY(deltaY);
     } else {
+      // 위로 올리려 할 때는 드래그 중단 (내부 스크롤 허용)
       setDragY(0);
       setIsDragging(false);
     }
@@ -623,160 +548,144 @@ export function WeatherAlarmSettings({ onClose }) {
     }
   };
 
-  const ensureWeatherAlertOn = async () => {
-    if (!settings.weatherAlert) {
+  const ensureJeyukAlertOn = async () => {
+    if (!settings.jeyukAlert) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
         alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
         return false;
       }
-      setSettings(prev => ({ ...prev, weatherAlert: true }));
+      setSettings(prev => ({ ...prev, jeyukAlert: true }));
     }
     return true;
   };
 
   const toggle = async () => {
-    const turningOn = !settings.weatherAlert;
-    setSettings(p => ({ ...p, weatherAlert: turningOn }));
+    const turningOn = !settings.jeyukAlert;
+    setSettings(p => ({ ...p, jeyukAlert: turningOn }));
     if (turningOn) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
         alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
-        setSettings(p => ({ ...p, weatherAlert: false }));
+        setSettings(p => ({ ...p, jeyukAlert: false }));
       }
     }
   };
 
+  const addKeyword = async () => {
+    const trimmed = keywordInput.trim();
+    if (trimmed) {
+      const ok = await ensureJeyukAlertOn();
+      if (!ok) return;
+      setSettings(p => {
+        if (!p.keywords.includes(trimmed)) {
+          return { ...p, keywords: [...p.keywords, trimmed] };
+        }
+        return p;
+      });
+    }
+    setKeywordInput('');
+  };
+
+  const removeKeyword = (kw) =>
+      setSettings(p => ({ ...p, keywords: p.keywords.filter(k => k !== kw) }));
+
+  // 닫힘 애니메이션 후 실제 onClose 호출
   const triggerClose = (msg) => {
     setClosing(true);
-    setTimeout(() => onClose(msg), 250);
+    // 애니메이션 속도와 맞춤 (260ms)
+    setTimeout(() => {
+      onClose(msg);
+    }, 250);
   };
+
+  // 서버 설정과 동기화 (RPC 호출)
+  useEffect(() => {
+    async function syncWithServer() {
+      try {
+        const deviceId = await getOrCreateSecureDeviceId();
+        const { data, error } = await supabase.rpc('get_alarm_subscription', {
+          p_device_id: deviceId,
+          p_topic: 'CAFETERIA_KEYWORD'
+        });
+
+        if (data && !error) {
+          const newSettings = {
+            jeyukAlert: data.is_active,
+            mode: data.params?.mode || null,
+            selectedCafe: data.params?.selectedCafe || null,
+            keywords: data.params?.keywords || [],
+            notifyTime: data.params?.notifyTime || '08:00',
+            notifyDay: data.params?.notifyDay || '당일'
+          };
+          setSettings(newSettings);
+          savedRef.current = newSettings;
+          localStorage.setItem('alarm_settings', JSON.stringify(newSettings));
+        }
+      } catch (err) {
+        console.error('Failed to sync settings from server', err);
+      }
+    }
+    syncWithServer();
+  }, []);
 
   const handleClose = () => {
     let successMsg;
     if (isDirty) {
-      localStorage.setItem('weather_alarm_settings', JSON.stringify(settings));
+      localStorage.setItem('alarm_settings', JSON.stringify(settings));
 
-      if (settings.weatherAlert) {
-        // 동적 완성형 팝업 완료 메시지 조립
-        if (settings.conditions.daily || settings.conditions.weekday) {
-          successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
-        } else {
-          const activeKeywords = [];
-          if (settings.conditions.rainSnow) activeKeywords.push('비/눈 소식');
-          if (settings.conditions.dust) activeKeywords.push('탁한 공기');
-          if (settings.conditions.uv) activeKeywords.push('강한 자외선 소식');
+      const isSubscribed = settings.jeyukAlert && (settings.mode === 'cafe' || settings.keywords.length > 0);
 
-          if (activeKeywords.length > 0) {
-            let joined = '';
-            if (activeKeywords.length === 3) {
-              joined = `${activeKeywords[0]}, ${activeKeywords[1]}, 그리고 ${activeKeywords[2]}`;
-            } else if (activeKeywords.length === 2) {
-              // 한글 '비/눈 소식'은 받침이 없으므로 '과' 조사로 유기적 매치
-              joined = `${activeKeywords[0]}과 ${activeKeywords[1]}`;
-            } else {
-              joined = activeKeywords[0];
-            }
-            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
-          } else {
-            successMsg = '🔔 설정한 시간에 맞춰\n날씨 알림을 보내드릴게요';
-          }
-        }
+      if (isSubscribed) {
+        successMsg = '🔔 설정한 시간에 맞춰\n학식 알림을 보내드릴게요';
 
         (async () => {
           try {
             const token = await requestNotificationPermission();
             if (token) {
               const deviceId = await getOrCreateSecureDeviceId();
+
+              const params = {
+                mode: settings.mode,
+                selectedCafe: settings.selectedCafe,
+                keywords: settings.keywords,
+                notifyTime: settings.notifyTime,
+                notifyDay: settings.notifyDay
+              };
+
               await supabase.rpc('upsert_alarm_subscription', {
                 p_device_id: deviceId,
                 p_fcm_token: token,
-                p_topic: 'WEATHER_ALERT',
-                p_params: {
-                  conditions: settings.conditions,
-                  notifyTime: settings.notifyTime,
-                  notifyDay: settings.notifyDay
-                },
+                p_topic: 'CAFETERIA_KEYWORD',
+                p_params: params,
                 p_is_active: true,
-                p_platform: getPlatform(),
+                p_platform: getPlatform()
               });
             }
           } catch (err) {
-            console.error('Failed to sync weather alarm settings', err);
+            console.error('Failed to sync alarm settings', err);
           }
         })();
-      } else {
+      } else if (!settings.jeyukAlert) {
         (async () => {
           try {
             const deviceId = await getOrCreateSecureDeviceId();
             await supabase.rpc('upsert_alarm_subscription', {
               p_device_id: deviceId,
               p_fcm_token: null,
-              p_topic: 'WEATHER_ALERT',
+              p_topic: 'CAFETERIA_KEYWORD',
               p_params: null,
               p_is_active: false,
-              p_platform: getPlatform(),
+              p_platform: getPlatform()
             });
           } catch (err) {
-            console.error('Failed to sync weather alarm status', err);
+            console.error('Failed to sync alarm status', err);
           }
         })();
       }
     }
     triggerClose(successMsg);
   };
-
-  // 조건 칩 클릭 제약 처리
-  const handleConditionToggle = async (key) => {
-    const ok = await ensureWeatherAlertOn();
-    if (!ok) return;
-
-    setSettings(prev => {
-      const nextConditions = { ...prev.conditions };
-      if (key === 'daily') {
-        const nextVal = !nextConditions.daily;
-        // '매일' 선택 시 다른 모든 조건은 해제
-        return {
-          ...prev,
-          conditions: {
-            daily: nextVal,
-            weekday: false,
-            rainSnow: false,
-            dust: false,
-            uv: false
-          }
-        };
-      } else if (key === 'weekday') {
-        const nextVal = !nextConditions.weekday;
-        // '평일' 선택 시 다른 모든 조건은 해제
-        return {
-          ...prev,
-          conditions: {
-            daily: false,
-            weekday: nextVal,
-            rainSnow: false,
-            dust: false,
-            uv: false
-          }
-        };
-      } else {
-        // 비/눈, 미세먼지, 자외선은 중복 선택 가능
-        const nextVal = !nextConditions[key];
-        if (nextVal) {
-          // 비/눈, 미세먼지, 자외선 중 하나가 선택되면 매일/평일은 자동 해제 (배타적 선택)
-          nextConditions.daily = false;
-          nextConditions.weekday = false;
-        }
-        nextConditions[key] = nextVal;
-        return {
-          ...prev,
-          conditions: nextConditions
-        };
-      }
-    });
-  };
-
-
 
   return (
     <div
@@ -787,12 +696,12 @@ export function WeatherAlarmSettings({ onClose }) {
     >
       <div
         ref={sheetRef}
-        className="w-[calc(100%-48px)] max-w-[340px] bg-white rounded-card rounded-b-none px-5 pb-[calc(24px+env(safe-area-inset-bottom))] max-h-[90vh] overflow-y-auto mb-0 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)] no-scrollbar"
+        className="w-[calc(100%-48px)] max-w-[340px] bg-white rounded-card rounded-b-none px-5 pb-[calc(24px+env(safe-area-inset-bottom))] max-h-[90vh] overflow-y-auto mb-0 relative select-none shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
         style={{
           transform: `translateY(${dragY}px)`,
           transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           animation: closing ? 'sheetDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          willChange: 'transform',
+          willChange: 'transform'
         }}
         onClick={e => e.stopPropagation()}
         onMouseDown={handleTouchStart}
@@ -807,125 +716,172 @@ export function WeatherAlarmSettings({ onClose }) {
           <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto" />
         </div>
 
-        {/* 1단계: 타이틀 및 온오프 스위치 */}
-        <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-4">
-          <span className="text-[18px] font-extrabold text-text-main leading-none">날씨 알림설정</span>
+        <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-0.5">
+          <span className="text-[18px] font-extrabold text-text-main leading-none">학식 알림설정</span>
           <label className="alarm-toggle" style={{ marginLeft: 'auto', alignSelf: 'center' }}>
-            <input type="checkbox" checked={settings.weatherAlert} onChange={toggle} />
+            <input type="checkbox" checked={settings.jeyukAlert} onChange={toggle} />
             <span className="alarm-toggle-slider" />
           </label>
         </div>
 
         <div style={{
-          opacity: settings.weatherAlert ? 1 : 0.35,
+          opacity: settings.jeyukAlert ? 1 : 0.35,
           transition: 'opacity 0.2s',
         }}>
-          
-          {/* 2단계: 이럴 때 알림을 보내주세요 */}
-          <div className="mb-5">
-            <div className="text-[14px] font-extrabold text-text-main mb-2.5">이럴 때 알림을 보내주세요</div>
+          {/* 1단계: 알림 방식 선택 */}
+          <div className="py-2.5 border-b border-[#f1f5f9]">
+            <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림 방식 선택</div>
             <div className="flex flex-wrap gap-2 items-center">
               <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.daily
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupBActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('daily')}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${settings.mode === 'cafe'
+                  ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                  : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                  }`}
+                onClick={async () => {
+                  const ok = await ensureJeyukAlertOn();
+                  if (ok) setSettings(p => ({ ...p, mode: p.mode === 'cafe' ? null : 'cafe' }));
+                }}
               >
-                매일
+                식당별
               </button>
-
               <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.weekday
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupBActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('weekday')}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${settings.mode === 'keyword'
+                  ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                  : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                  }`}
+                onClick={async () => {
+                  const ok = await ensureJeyukAlertOn();
+                  if (ok) setSettings(p => ({ ...p, mode: p.mode === 'keyword' ? null : 'keyword' }));
+                }}
               >
-                평일
-              </button>
-              
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.rainSnow
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupAActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('rainSnow')}
-              >
-                비/눈
-              </button>
-
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.dust
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupAActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('dust')}
-              >
-                미세먼지
-              </button>
-
-              <button
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                  settings.conditions.uv
-                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                    : isGroupAActive
-                      ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                      : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
-                }`}
-                onClick={() => handleConditionToggle('uv')}
-              >
-                자외선
+                키워드
               </button>
             </div>
-            {guideElement && (
-              <div className="mt-3 px-1 text-[12px] font-medium text-text-sub leading-relaxed transition-all duration-300 animate-[fadeIn_0.2s_ease]">
-                {guideElement}
+            <div className="text-[11px] text-[#64748b] leading-relaxed px-0.5 mt-2">
+              {settings.mode === 'cafe'
+                ? '선택한 식당의 알림을 받습니다.'
+                : settings.mode === 'keyword'
+                  ? '키워드가 메뉴에 포함되어 있을 때만 알림을 받습니다.'
+                  : '알림을 받아볼 방식을 선택해주세요.'
+              }
+            </div>
+          </div>
+
+          {/* 2단계: 식당 모드 상세 설정 */}
+          <div style={{
+            opacity: settings.mode === 'cafe' ? 1 : 0,
+            transform: settings.mode === 'cafe' ? 'translateY(0)' : 'translateY(16px)',
+            maxHeight: settings.mode === 'cafe' ? '200px' : '0px',
+            overflow: 'hidden',
+            transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: settings.mode === 'cafe' ? 'auto' : 'none',
+            marginTop: settings.mode === 'cafe' ? '8px' : '0px',
+          }} className={settings.mode === 'cafe' ? "py-2.5 border-b border-[#f1f5f9]" : ""}>
+            <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림을 받아볼 식당 선택</div>
+            <div className="flex flex-wrap gap-2 items-center">
+              {[
+                { id: 're12', name: '학생식당' },
+                { id: 're15', name: '창업보육센터' },
+                { id: 're11', name: '교직원식당' },
+                { id: 're13', name: '기숙사식당' }
+              ].map(cafe => (
+                <button
+                  key={cafe.id}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${settings.selectedCafe === cafe.id
+                    ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
+                    : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary/50'
+                    }`}
+                  onClick={async () => {
+                    const ok = await ensureJeyukAlertOn();
+                    if (ok) setSettings(p => ({ ...p, selectedCafe: p.selectedCafe === cafe.id ? null : cafe.id }));
+                  }}
+                >
+                  {cafe.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 2단계: 키워드 모드 상세 설정 */}
+          <div style={{
+            opacity: settings.mode === 'keyword' ? 1 : 0,
+            transform: settings.mode === 'keyword' ? 'translateY(0)' : 'translateY(16px)',
+            maxHeight: settings.mode === 'keyword' ? '300px' : '0px',
+            overflow: 'hidden',
+            transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: settings.mode === 'keyword' ? 'auto' : 'none',
+            marginTop: settings.mode === 'keyword' ? '8px' : '0px',
+          }} className={settings.mode === 'keyword' ? "py-2.5 border-b border-[#f1f5f9]" : ""}>
+            <div className="text-[14px] font-extrabold text-text-main mb-1.5">알림 키워드 등록</div>
+            <div className="flex gap-2 mb-2">
+              <input
+                className="flex-1 h-10 border-[1.5px] border-[#e2e8f0] rounded-card px-3 text-[14px] text-text-main bg-surface outline-none transition-colors duration-200 focus:border-[#3b82f6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
+                value={keywordInput}
+                onChange={async (e) => {
+                  setKeywordInput(e.target.value);
+                  if (e.target.value.trim().length > 0) {
+                    await ensureJeyukAlertOn();
+                  }
+                }}
+                onKeyDown={e => e.key === 'Enter' && addKeyword()}
+                placeholder="예: 제육, 돈까스"
+              />
+              <button
+                className="w-10 h-10 bg-[#3b82f6] text-white border-none rounded-card flex items-center justify-center cursor-pointer flex-shrink-0 transition-opacity duration-150 hover:opacity-[0.88]"
+                onClick={addKeyword}
+              >
+                <Plus size={18} />
+              </button>
+            </div>
+            {settings.keywords.length > 0 && (
+              <div className="flex flex-wrap gap-2 max-h-[88px] overflow-y-auto pr-1 no-scrollbar">
+                {settings.keywords.map(kw => (
+                  <span key={kw} className="flex items-center gap-1 bg-[rgba(59,130,246,0.1)] text-[#3b82f6] text-[12px] font-bold px-3 py-1 rounded-full">
+                    {kw}
+                    <button
+                      className="bg-none border-none text-[#3b82f6] cursor-pointer flex items-center p-0 opacity-70 transition-opacity duration-150 hover:opacity-100"
+                      onClick={() => removeKeyword(kw)}
+                    >
+                      <X size={11} />
+                    </button>
+                  </span>
+                ))}
               </div>
             )}
           </div>
 
-          {/* 3단계: 날짜 및 시간 설정 (조건 선택 시 활성화 - 부드럽게 Slide Up & Fade In) */}
-          <div style={{
-            opacity: isStep3Active ? 1 : 0,
-            transform: isStep3Active ? 'translateY(0)' : 'translateY(24px)',
-            maxHeight: isStep3Active ? '200px' : '0px',
-            marginTop: isStep3Active ? '20px' : '0px',
-            paddingTop: isStep3Active ? '4px' : '0px',
-            pointerEvents: isStep3Active ? 'auto' : 'none',
-            overflow: 'hidden',
-            transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}>
-            {/* 시간 선택 */}
-            <div className="py-1">
-              <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 보낼까요?</div>
-              <TimePicker
-                value={settings.notifyTime}
-                onChange={async (t) => {
-                  const ok = await ensureWeatherAlertOn();
-                  if (ok) setSettings(p => ({ ...p, notifyTime: t }));
-                }}
-                day={settings.notifyDay}
-                onDayChange={async (d) => {
-                  const ok = await ensureWeatherAlertOn();
-                  if (ok) setSettings(p => ({ ...p, notifyDay: d }));
-                }}
-              />
-            </div>
-          </div>
-
+          {/* 3단계: 시간 설정 (조건 충족 시 활성화 - 부드럽게 Slide Up & Fade In) */}
+          {(() => {
+            const isTimePickerActive = (settings.mode === 'cafe' && settings.selectedCafe !== null) || (settings.mode === 'keyword' && settings.keywords.length > 0);
+            return (
+              <div style={{
+                opacity: isTimePickerActive ? 1 : 0,
+                transform: isTimePickerActive ? 'translateY(0)' : 'translateY(24px)',
+                maxHeight: isTimePickerActive ? '200px' : '0px',
+                marginTop: isTimePickerActive ? '16px' : '0px',
+                paddingTop: isTimePickerActive ? '4px' : '0px',
+                pointerEvents: isTimePickerActive ? 'auto' : 'none',
+                overflow: 'hidden',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}>
+                <div className="py-1">
+                  <div className="text-[14px] font-extrabold text-text-main mb-2">몇 시에 보낼까요?</div>
+                  <TimePicker
+                    value={settings.notifyTime}
+                    onChange={async (t) => {
+                      const ok = await ensureJeyukAlertOn();
+                      if (ok) setSettings(p => ({ ...p, notifyTime: t }));
+                    }}
+                    day={settings.notifyDay}
+                    onDayChange={async (d) => {
+                      const ok = await ensureJeyukAlertOn();
+                      if (ok) setSettings(p => ({ ...p, notifyDay: d }));
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>

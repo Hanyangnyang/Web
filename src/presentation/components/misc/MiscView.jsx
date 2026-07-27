@@ -4,9 +4,9 @@ import { Dumbbell, CalendarDays, ExternalLink, Loader2, Laugh, Send, ArrowLeft }
 import { usePostHog } from 'posthog-js/react';
 import { GymTimetable } from './GymTimetable.jsx';
 import { InstagramListView } from './InstagramListView.jsx';
-import { pushBackHandler, popBackHandler } from '../../lib/androidBackHandler.js';
-import { supabase } from '../../lib/supabase.js';
-import { getPlatform } from '../../lib/platform.js';
+import { pushBackHandler, popBackHandler } from '../../../lib/androidBackHandler.js';
+import { supabase } from '../../../lib/supabase.js';
+import { getPlatform } from '../../../lib/platform.js';
 
 const InstagramIcon = ({ size = 24, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

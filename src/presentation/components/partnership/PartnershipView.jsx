@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown, ChevronUp, ExternalLink, Info, Clock } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import partnershipsData from '../../data/partnerships.json';
+import partnershipsData from '../../../data/partnerships.json';
 
 // ─── 카테고리 enum (데이터 스키마 기준) ───
 const CATEGORIES = [

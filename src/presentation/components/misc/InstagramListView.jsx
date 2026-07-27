@@ -1,8 +1,8 @@
 // 컴포넌트: 한양대 ERICA 공식 인스타그램 계정 목록 및 프로필 이미지 표시
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import { INSTA_ACCOUNTS } from '../../domain/entities/InstagramAccount.js';
-import { useInstagram } from '../hooks/useInstagram.js';
+import { INSTA_ACCOUNTS } from '../../../domain/entities/InstagramAccount.js';
+import { useInstagram } from '../../hooks/useInstagram.js';
 
 const openInsta = (username) => {
   const start = Date.now();
