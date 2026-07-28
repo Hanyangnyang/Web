@@ -88,7 +88,7 @@ function MainLayout() {
     }
   }, [activeTab]);
 
-  const { menuDate, cafes, cafesDate, menuLoading, changeDate } = useMenu();
+  const { menuDate, cafes, menuLoading, menuRevalidating, changeDate } = useMenu();
 
   // 앱 시작 시 필요한 데이터를 백그라운드에서 미리 로드
   useEffect(() => {
@@ -211,8 +211,8 @@ function MainLayout() {
               date={menuDate}
               changeDate={changeDate}
               cafes={cafes}
-              cafesDate={cafesDate}
               loading={menuLoading}
+              revalidating={menuRevalidating}
               cafeDeepLink={cafeDeepLink}
               onCafeDeepLinkHandled={() => setCafeDeepLink(null)}
             />

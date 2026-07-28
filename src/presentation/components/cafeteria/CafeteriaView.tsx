@@ -22,13 +22,13 @@ interface CafeteriaViewProps {
   date: Date;
   changeDate: (offsetOrDate: number | Date) => void;
   cafes: Cafe[];
-  cafesDate: string | null;
   loading: boolean;
+  revalidating: boolean;
   cafeDeepLink: CafeDeepLink | null;
   onCafeDeepLinkHandled?: () => void;
 }
 
-export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
+export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef<HTMLDivElement>(null);
@@ -131,10 +131,6 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
     const urlType = urlTypeRef.current;
     if (urlType) {
-      // cafes가 현재 date와 일치하는 날짜 데이터인지 확인 (stale 캐시/응답 방지)
-      const expectedDateStr = date.toISOString().split('T')[0];
-      if (cafesDate !== expectedDateStr) return;
-
       const initial: Record<string, boolean> = {};
       let foundExact = false;
 
@@ -196,12 +192,10 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
     }
-  }, [selectedCafeId, cafes, cafesDate, date, deepLinkTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCafeId, cafes, date, deepLinkTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleGroup = (type: string) =>
     setExpandedGroups(prev => ({ ...prev, [type]: !prev[type] }));
-
-  const isDateStale = cafesDate !== date.toISOString().split('T')[0];
 
   const groupedMenus = menusWithCafe.reduce<Record<string, MenuItemWithCafe[]>>((acc, m) => {
     if (!acc[m.type]) acc[m.type] = [];
@@ -261,15 +255,15 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
 
       {/* 메뉴 목록 */}
       <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
-        {loading && !isDateStale && (
+        {revalidating && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
             <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
             <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>식단 정보를 가져오는 중...</span>
           </div>
         )}
 
-        <div style={{ filter: (loading && !isDateStale) ? 'blur(2px)' : 'none', transition: 'filter 0.3s ease' }}>
-          {loading || isDateStale ? (
+        <div style={{ filter: revalidating ? 'blur(2px)' : 'none', transition: 'filter 0.3s ease' }}>
+          {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite]" />
               <span className="text-xs font-semibold text-text-sub">식단 정보를 가져오는 중...</span>

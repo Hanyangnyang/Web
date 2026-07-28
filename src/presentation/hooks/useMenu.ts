@@ -1,9 +1,14 @@
-// 훅(ViewModel): 식단 날짜 탐색 및 식당별 메뉴 데이터 관리
+// 훅(ViewModel): 식단 날짜 탐색 및 식당별 메뉴 데이터 관리 (TanStack Query 기반)
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '../../lib/queryClient.js';
 import { getMenuUseCase } from '../../di.js';
 import { getKSTDate } from '../../utils/time.js';
 import { useBoot } from '../context/BootContext';
 import type { Cafe } from '../../domain/entities/Cafe.js';
+
+const MENU_STALE_TIME = 60 * 60 * 1000; // 1시간 — 학식은 하루 단위로만 갱신되므로 진입마다 재검증할 필요 없음
+const PREFETCH_GAP = 500; // 학교 서버(스크래핑 대상)에 짧은 시간에 요청이 몰리지 않도록 인접 날짜 prefetch 사이에 두는 텀(ms)
 
 function getInitialDate(): Date {
   const dateParam = new URLSearchParams(window.location.search).get('date');
@@ -14,114 +19,57 @@ function getInitialDate(): Date {
   return getKSTDate();
 }
 
-function performMenuCacheGC(): void {
-  try {
-    const todayKST = getKSTDate();
-    const limitDate = new Date(todayKST);
-    limitDate.setDate(limitDate.getDate() - 7);
-    const limitDateStr = limitDate.toISOString().split('T')[0].replace(/-/g, '/');
+function toDateStr(date: Date): string {
+  return date.toISOString().split('T')[0].replace(/-/g, '/');
+}
 
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('menu_')) {
-        const keyDateStr = key.replace('menu_', '');
-        if (keyDateStr < limitDateStr) {
-          localStorage.removeItem(key);
-          i--;
-        }
-      }
-    }
-  } catch (e) {
-    console.error('Menu cache GC failed:', e);
-  }
+function menuQueryKey(dateStr: string) {
+  return ['menu', dateStr] as const;
+}
+
+function prefetchMenu(dateStr: string) {
+  return queryClient.prefetchQuery({
+    queryKey: menuQueryKey(dateStr),
+    queryFn: () => getMenuUseCase.execute(dateStr),
+    staleTime: MENU_STALE_TIME,
+  });
 }
 
 export interface UseMenuResult {
   menuDate: Date;
   cafes: Cafe[];
-  cafesDate: string | null;
-  menuLoading: boolean;
+  menuLoading: boolean; // 이 날짜 데이터가 하나도 없어 전체 스피너를 보여줘야 함
+  menuRevalidating: boolean; // 이미 보여줄 데이터는 있고, 백그라운드로 재검증 중
   changeDate: (offsetOrDate: number | Date) => void;
 }
 
 // BootContext.jsx가 아직 JS라 useBoot()의 반환 타입을 추론할 수 없어 여기서만 임시로 명시
 // (BootContext를 TS로 옮기면 이 타입은 그쪽 export로 대체)
 export function useMenu(): UseMenuResult {
-  const [menuDate, setMenuDate]     = useState<Date>(getInitialDate);
-  const [cafes, setCafes]           = useState<Cafe[]>([]);
-  const [cafesDate, setCafesDate]   = useState<string | null>(null); // cafes가 어느 날짜 데이터인지 추적
-  const [menuLoading, setMenuLoading] = useState(true);
+  const [menuDate, setMenuDate] = useState<Date>(getInitialDate);
   const { markReady } = useBoot() as { markReady: (key: string) => void };
-  const initialFetched = useRef(false); // markReady 중복 호출 방지 (훅 생애주기 중 최초 1회만)
-  const [menuReady, setMenuReady] = useState(false); // prefetch effect가 구독하는 신호 — ref는 값이 바뀌어도 effect를 재실행 못 시키므로 state로 전달
-  const fetchCounterRef = useRef(0); // 가장 최근 페치만 반영하도록 경쟁 조건 방지
+  const dateStr = toDateStr(menuDate);
 
-  const fetchMenus = useCallback(async (targetDate: Date) => {
-    const myCounter = ++fetchCounterRef.current;
-    const dateStr = targetDate.toISOString().split('T')[0].replace(/-/g, '/');
-    const cafesDateStr = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD
-    const cacheKey = `menu_${dateStr}`;
-    let hasCache = false;
+  const query = useQuery({
+    queryKey: menuQueryKey(dateStr),
+    queryFn: () => getMenuUseCase.execute(dateStr),
+    staleTime: MENU_STALE_TIME,
+  });
 
-    try {
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const parsed: Cafe[] = JSON.parse(cached);
-        if (myCounter === fetchCounterRef.current) {
-          setCafes(parsed);
-          setCafesDate(cafesDateStr);
-          setMenuLoading(false);
-        }
-        hasCache = true;
-        if (!initialFetched.current) {
-          initialFetched.current = true;
-          markReady('menu');
-          setMenuReady(true);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to parse cached menu:', e);
-    }
-
-    if (!hasCache && myCounter === fetchCounterRef.current) {
-      setMenuLoading(true);
-    }
-
-    try {
-      const result = await getMenuUseCase.execute(dateStr);
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(result));
-      } catch (e) {
-        console.error('Failed to write menu cache:', e);
-      }
-      if (!initialFetched.current) {
-        initialFetched.current = true;
-        markReady('menu');
-        setMenuReady(true);
-      }
-      if (myCounter === fetchCounterRef.current) {
-        setCafes(result);
-        setCafesDate(cafesDateStr);
-      }
-    } catch (e) {
-      console.error('식단 조회 실패:', e);
-    } finally {
-      if (myCounter === fetchCounterRef.current) {
-        setMenuLoading(false);
-      }
-    }
-  }, [markReady]);
-
+  // 최초 1회, 학식 데이터가 (캐시든 네트워크든) 준비되면 부팅 스플래시에 신호 + 인접 날짜 prefetch 시작
+  const firstLoadHandled = useRef(false);
+  const [prefetchReady, setPrefetchReady] = useState(false);
   useEffect(() => {
-    performMenuCacheGC();
-  }, []);
+    if (query.isSuccess && !firstLoadHandled.current) {
+      firstLoadHandled.current = true;
+      markReady('menu');
+      setPrefetchReady(true);
+    }
+  }, [query.isSuccess, markReady]);
 
+  // 인접 날짜(어제 ~ +7일) 백그라운드 prefetch — 최초 로딩이 끝난 뒤 한 번만 실행
   useEffect(() => {
-    fetchMenus(menuDate);
-  }, [menuDate, fetchMenus]);
-
-  useEffect(() => {
-    if (!menuReady) return;
+    if (!prefetchReady) return;
 
     const prefetchAdjacentDays = async () => {
       const today = getKSTDate();
@@ -130,20 +78,18 @@ export function useMenu(): UseMenuResult {
       for (const offset of offsets) {
         const targetDate = new Date(today);
         targetDate.setDate(targetDate.getDate() + offset);
-        const dateStr = targetDate.toISOString().split('T')[0].replace(/-/g, '/');
-        const cacheKey = `menu_${dateStr}`;
+        const targetDateStr = toDateStr(targetDate);
 
-        if (localStorage.getItem(cacheKey)) {
+        if (queryClient.getQueryData(menuQueryKey(targetDateStr))) {
           continue;
         }
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, PREFETCH_GAP));
 
         try {
-          const result = await getMenuUseCase.execute(dateStr);
-          localStorage.setItem(cacheKey, JSON.stringify(result));
+          await prefetchMenu(targetDateStr);
         } catch (e) {
-          console.warn(`Failed to prefetch menu for ${dateStr}:`, e);
+          console.warn(`Failed to prefetch menu for ${targetDateStr}:`, e);
         }
       }
     };
@@ -159,7 +105,7 @@ export function useMenu(): UseMenuResult {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [menuReady]);
+  }, [prefetchReady]);
 
   const changeDate = useCallback((offsetOrDate: number | Date) => {
     if (offsetOrDate instanceof Date) {
@@ -173,5 +119,11 @@ export function useMenu(): UseMenuResult {
     }
   }, []);
 
-  return { menuDate, cafes, cafesDate, menuLoading, changeDate };
+  return {
+    menuDate,
+    cafes: query.data ?? [],
+    menuLoading: query.isLoading,
+    menuRevalidating: query.isFetching && !query.isLoading,
+    changeDate,
+  };
 }
