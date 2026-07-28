@@ -3,17 +3,18 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getMenuUseCase } from '../../di.js';
 import { getKSTDate } from '../../utils/time.js';
 import { useBoot } from '../context/BootContext';
+import type { Cafe } from '../../domain/entities/Cafe.js';
 
-function getInitialDate() {
+function getInitialDate(): Date {
   const dateParam = new URLSearchParams(window.location.search).get('date');
   if (dateParam) {
     const d = new Date(dateParam + 'T00:00:00Z');
-    if (!isNaN(d)) return d;
+    if (!isNaN(d.getTime())) return d;
   }
   return getKSTDate();
 }
 
-function performMenuCacheGC() {
+function performMenuCacheGC(): void {
   try {
     const todayKST = getKSTDate();
     const limitDate = new Date(todayKST);
@@ -35,16 +36,27 @@ function performMenuCacheGC() {
   }
 }
 
-export function useMenu() {
-  const [menuDate, setMenuDate]     = useState(getInitialDate);
-  const [cafes, setCafes]           = useState([]);
-  const [cafesDate, setCafesDate]   = useState(null); // cafes가 어느 날짜 데이터인지 추적
+export interface UseMenuResult {
+  menuDate: Date;
+  cafes: Cafe[];
+  cafesDate: string | null;
+  menuLoading: boolean;
+  changeDate: (offsetOrDate: number | Date) => void;
+}
+
+// BootContext.jsx가 아직 JS라 useBoot()의 반환 타입을 추론할 수 없어 여기서만 임시로 명시
+// (BootContext를 TS로 옮기면 이 타입은 그쪽 export로 대체)
+export function useMenu(): UseMenuResult {
+  const [menuDate, setMenuDate]     = useState<Date>(getInitialDate);
+  const [cafes, setCafes]           = useState<Cafe[]>([]);
+  const [cafesDate, setCafesDate]   = useState<string | null>(null); // cafes가 어느 날짜 데이터인지 추적
   const [menuLoading, setMenuLoading] = useState(true);
-  const { markReady } = useBoot();
-  const initialFetched = useRef(false);
+  const { markReady } = useBoot() as { markReady: (key: string) => void };
+  const initialFetched = useRef(false); // markReady 중복 호출 방지 (훅 생애주기 중 최초 1회만)
+  const [menuReady, setMenuReady] = useState(false); // prefetch effect가 구독하는 신호 — ref는 값이 바뀌어도 effect를 재실행 못 시키므로 state로 전달
   const fetchCounterRef = useRef(0); // 가장 최근 페치만 반영하도록 경쟁 조건 방지
 
-  const fetchMenus = useCallback(async (targetDate) => {
+  const fetchMenus = useCallback(async (targetDate: Date) => {
     const myCounter = ++fetchCounterRef.current;
     const dateStr = targetDate.toISOString().split('T')[0].replace(/-/g, '/');
     const cafesDateStr = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -54,7 +66,7 @@ export function useMenu() {
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
-        const parsed = JSON.parse(cached);
+        const parsed: Cafe[] = JSON.parse(cached);
         if (myCounter === fetchCounterRef.current) {
           setCafes(parsed);
           setCafesDate(cafesDateStr);
@@ -64,6 +76,7 @@ export function useMenu() {
         if (!initialFetched.current) {
           initialFetched.current = true;
           markReady('menu');
+          setMenuReady(true);
         }
       }
     } catch (e) {
@@ -84,6 +97,7 @@ export function useMenu() {
       if (!initialFetched.current) {
         initialFetched.current = true;
         markReady('menu');
+        setMenuReady(true);
       }
       if (myCounter === fetchCounterRef.current) {
         setCafes(result);
@@ -107,7 +121,7 @@ export function useMenu() {
   }, [menuDate, fetchMenus]);
 
   useEffect(() => {
-    if (!initialFetched.current) return;
+    if (!menuReady) return;
 
     const prefetchAdjacentDays = async () => {
       const today = getKSTDate();
@@ -145,9 +159,9 @@ export function useMenu() {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [menuReady]);
 
-  const changeDate = useCallback((offsetOrDate) => {
+  const changeDate = useCallback((offsetOrDate: number | Date) => {
     if (offsetOrDate instanceof Date) {
       setMenuDate(new Date(offsetOrDate));
     } else {
