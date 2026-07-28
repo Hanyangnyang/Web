@@ -23,9 +23,6 @@ function MenuItemLine({ html }) {
   const spanRef = useRef(null);
   const [marquee, setMarquee] = useState(null);
 
-  const hasBullet = html.startsWith('•');
-  const content = hasBullet ? html.slice(1).trimStart() : html;
-
   useLayoutEffect(() => {
     const wrap = scrollWrapRef.current;
     const span = spanRef.current;
@@ -38,7 +35,7 @@ function MenuItemLine({ html }) {
     }
   }, [html]);
 
-  const parsedContent = parseBoldText(content);
+  const parsedContent = parseBoldText(html);
 
   return (
     <div className="flex items-baseline whitespace-nowrap leading-[1.8]">
@@ -522,9 +519,6 @@ export function CafeteriaView({ date, changeDate, cafes, cafesDate, loading, caf
                                                     let cleaned = line;
                                                     if (lineIdx > 0) {
                                                       cleaned = cleaned.replace(/<\/?b>/g, '');
-                                                    }
-                                                    if (cleaned.startsWith('•')) {
-                                                      cleaned = cleaned.slice(1).trimStart();
                                                     }
                                                     return cleaned;
                                                   });

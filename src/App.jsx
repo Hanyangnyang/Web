@@ -90,7 +90,7 @@ function MainLayout() {
 
   const { menuDate, cafes, cafesDate, menuLoading, changeDate } = useMenu();
 
-  // 앱 시작 시 소식 탭 데이터를 백그라운드에서 미리 로드
+  // 앱 시작 시 필요한 데이터를 백그라운드에서 미리 로드
   useEffect(() => {
     prefetchPortalData();
     prefetchBanners();
