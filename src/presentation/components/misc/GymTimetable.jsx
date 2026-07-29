@@ -1,7 +1,6 @@
 // 컴포넌트: 체대 헬스장 수업 시간표 캘린더 (현재 시간 인디케이터 포함)
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import gymData from '../../../assets/gymSchedule.json';
 
 const COLORS = {
   orange: { bg: '#FFF7ED', text: '#C2410C', border: '#FFEDD5' },
@@ -43,19 +42,27 @@ function CourseName({ name }) {
 }
 
 export function GymTimetable({ onBack }) {
-  // 오늘 날짜 기준 현재 기간 자동 판별
-  const initialPeriodId = React.useMemo(() => {
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const matched = gymData.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
-    return matched ? matched.id : 'semester';
-  }, []);
-
-  const [activePeriodId, setActivePeriodId] = useState(initialPeriodId);
+  const [gymData, setGymData] = useState(null);
+  const [activePeriodId, setActivePeriodId] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = React.useRef(null);
   const [showNotice, setShowNotice] = useState(false);
+
+  // 짐 시간표 정적 데이터 로드 — public/gymSchedule.json (추후 백엔드 API로 교체 예정)
+  useEffect(() => {
+    fetch('/gymSchedule.json')
+      .then(res => res.json())
+      .then(data => {
+        setGymData(data);
+        // 오늘 날짜 기준 현재 기간 자동 판별
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const matched = data.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
+        setActivePeriodId(matched ? matched.id : 'semester');
+      })
+      .catch(e => console.error('Failed to load gym schedule:', e));
+  }, []);
 
   useEffect(() => {
     if (activePeriodId !== 'vacation') {
@@ -86,14 +93,15 @@ export function GymTimetable({ onBack }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const currentPeriod = gymData.periods.find(p => p.id === activePeriodId) || gymData.periods[0];
-  const baseSchedule = currentPeriod.schedule;
+  const currentPeriod = gymData ? (gymData.periods.find(p => p.id === activePeriodId) || gymData.periods[0]) : null;
+  const baseSchedule = currentPeriod?.schedule ?? [];
   const schedule = React.useMemo(() => getMergedSchedule(baseSchedule), [baseSchedule]);
 
   const closingHour = React.useMemo(() => {
+    if (!currentPeriod) return null;
     const match = currentPeriod.hours.match(/-\s*(\d{2}):\d{2}/);
     return match ? parseInt(match[1], 10) : null;
-  }, [currentPeriod.hours]);
+  }, [currentPeriod]);
 
   const getNowPos = () => {
     const h = currentTime.getHours();
@@ -110,6 +118,23 @@ export function GymTimetable({ onBack }) {
   };
 
   const now = getNowPos();
+
+  if (!gymData || !currentPeriod) {
+    return (
+      <div className="pb-20 font-['Pretendard',-apple-system,sans-serif]">
+        <header className="flex items-center gap-4 mb-3">
+          <button
+            className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+            onClick={onBack}
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <h1 className="text-xl font-bold text-text-main m-0">체대 헬스장</h1>
+        </header>
+        <div className="h-64 bg-white border border-[#e2e8f0] rounded-card [animation:pulse_1.5s_infinite]" />
+      </div>
+    );
+  }
 
   const renderCell = (cell, span, startHour) => {
     if (cell === null) return null;

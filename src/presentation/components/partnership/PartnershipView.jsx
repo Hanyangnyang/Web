@@ -2,7 +2,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown, ChevronUp, ExternalLink, Info, Clock } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import partnershipsData from '../../../data/partnerships.json';
 
 // ─── 카테고리 enum (데이터 스키마 기준) ───
 const CATEGORIES = [
@@ -190,9 +189,18 @@ export function PartnershipView({ isActive }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [college, setCollege] = useState(() => localStorage.getItem('partnerCollegeFilter') || 'all');
+  const [partnershipsData, setPartnershipsData] = useState(null);
   const inputRef = useRef(null);
   const rootRef = useRef(null);
   const chipRowRef = useRef(null);
+
+  // 제휴 목록 정적 데이터 로드 — public/partnerships.json (추후 백엔드 API로 교체 예정)
+  useEffect(() => {
+    fetch('/partnerships.json')
+      .then(res => res.json())
+      .then(setPartnershipsData)
+      .catch(e => console.error('Failed to load partnerships:', e));
+  }, []);
 
   useEffect(() => {
     if (!isActive || !chipRowRef.current) return;
@@ -229,6 +237,7 @@ export function PartnershipView({ isActive }) {
 
   // 검색 + 카테고리 + 단과대 필터링
   const filtered = useMemo(() => {
+    if (!partnershipsData) return [];
     let list = partnershipsData.filter(s => s.is_active);
 
     if (category !== 'all') {
@@ -262,7 +271,7 @@ export function PartnershipView({ isActive }) {
       if (bCount !== aCount) return bCount - aCount;
       return a.name.localeCompare(b.name, 'ko');
     });
-  }, [query, category, college]);
+  }, [query, category, college, partnershipsData]);
 
   const clearSearch = useCallback(() => {
     setQuery('');
@@ -349,7 +358,13 @@ export function PartnershipView({ isActive }) {
 
       <div className="mt-3">
         {/* 업체 목록 */}
-        {filtered.length > 0 ? (
+        {!partnershipsData ? (
+          <div className="space-y-2.5">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="h-16 bg-white border border-[#e2e8f0] rounded-card [animation:pulse_1.5s_infinite]" />
+            ))}
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="space-y-2.5">
             {filtered.map(store => (
               <StoreCard key={store.id} store={store} collegeFilter={college} />
