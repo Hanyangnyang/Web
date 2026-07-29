@@ -1,5 +1,11 @@
 // 도메인 엔티티: 한양대 ERICA 공식 인스타그램 계정 목록 및 프로필 정보
-export const INSTA_ACCOUNTS = {
+export interface InstagramAccountInfo {
+  username: string;
+  desc: string;
+  profilePicUrl: string;
+}
+
+export const INSTA_ACCOUNTS: { erica: InstagramAccountInfo[]; college: InstagramAccountInfo[] } = {
   erica: [
     { username: 'hanyang_erica',                   desc: '한양대학교 ERICA 공식 인스타그램', profilePicUrl: '/assets/insta-profiles/hanyang_erica.jpg' },
     { username: 'hanyang_erica_stu',               desc: 'ERICA 총학생회', profilePicUrl: '/assets/insta-profiles/hanyang_erica_stu.jpg' },
@@ -21,7 +27,16 @@ export const INSTA_ACCOUNTS = {
   ],
 };
 
-export const createInstagramProfile = ({ username, fullName, profilePicUrl, desc = '' }) => ({
+export interface InstagramProfile {
+  username: string;
+  fullName: string;
+  profilePicUrl: string | null;
+  desc: string;
+}
+
+export const createInstagramProfile = (
+  { username, fullName, profilePicUrl, desc = '' }: { username: string; fullName: string; profilePicUrl: string | null; desc?: string }
+): InstagramProfile => ({
   username,
   fullName,
   profilePicUrl,
