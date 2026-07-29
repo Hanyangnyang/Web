@@ -17,8 +17,7 @@
 1.  **BootContext 수정**: `src/presentation/context/BootContext.jsx`의 `readyMap` 상태에 새로운 키를 추가합니다.
     ```javascript
     const [readyMap, setReadyMap] = useState({
-      auth: false,
-      menu: false,
+      config: false,
       notice: false, // 새 기능 추가
     });
     ```
@@ -29,7 +28,27 @@
       fetchData().then(() => markReady('notice'));
     }, [markReady]);
     ```
+3.  **실패해도 반드시 markReady를 부르게 하세요**: `.then()`으로만 연결하면 fetch가 실패했을 때
+    (오프라인 등) `markReady`가 영원히 안 불려서 스플래시가 무한 대기하게 됩니다. 성공/실패
+    양쪽 다 markReady를 부르도록 `finally` 블록(또는 `.then(fn, fn)`)을 쓰세요.
+    ```javascript
+    fetchData().finally(() => markReady('notice'));
+    ```
 
-## 4. 주의사항
+## 4. 이 시스템에 등록하면 안 되는 경우
+
+**2026-07-29에 `menu`(학식)를 이 시스템에서 뺐습니다.** 이유: `useMenu`가 `query.isSuccess`일
+때만 `markReady`를 불렀는데, 오프라인 등으로 fetch가 끝까지 실패하면(`isError`) `isSuccess`가
+영원히 `true`가 안 돼서 스플래시가 무한 대기하는 버그가 있었습니다. `CafeteriaView`는 이미
+로딩/빈 데이터 상태를 자체 UI(스피너, "정보를 불러올 수 없습니다")로 처리할 수 있으므로, 학식
+탭 하나의 실패가 앱 전체 진입을 막을 이유가 없어 분리했습니다.
+
+**판단 기준**: 그 탭/화면이 로딩·에러 상태를 스스로 잘 그려낼 수 있다면 굳이 여기 등록하지
+마세요. `config`처럼 **여러 화면에 걸쳐 값이 틀리면 눈에 띄게 이상해지는**(예: 셔틀 시간표가
+학기중/방학을 잘못 판단) 데이터만 이 시스템으로 부팅을 막을 가치가 있습니다. 그리고 등록한다면
+3번 규칙(실패해도 markReady 호출)을 반드시 지키세요 — 그렇지 않으면 이번과 같은 무한 대기
+버그가 재발합니다.
+
+## 5. 주의사항
 - `sessionStorage`를 통해 세션당 한 번만 스플래시가 뜨도록 관리하고 있습니다.
 - 이 구조를 무시하고 `App.jsx`에서 개별 로딩 상태를 직접 체크하지 마십시오.

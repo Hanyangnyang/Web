@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-
 import { supabase } from '../../lib/supabase.js';
 
 const BootContext = createContext(null);
@@ -9,9 +8,10 @@ const BootContext = createContext(null);
  * 새로운 초기 로딩 데이터가 필요할 경우, 여기에 이름을 등록하고 해당 훅에서 markReady를 호출하면 됩니다.
  */
 export function BootProvider({ children }) {
-  // 초기화가 필요한 서비스 목록
+  // 초기화가 필요한 서비스 목록 — menu는 여기서 뺐음: 학식 fetch 실패(오프라인 등)가
+  // markReady를 영원히 못 부르는 경우 스플래시가 무한 대기하던 문제가 있어서,
+  // 학식 로딩/에러 상태는 CafeteriaView 자체 UI가 처리하도록 분리함
   const [readyMap, setReadyMap] = useState({
-    menu: false,
     config: false,
   });
 

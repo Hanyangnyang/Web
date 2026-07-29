@@ -6,13 +6,6 @@ import { queryClient } from '../../lib/queryClient.js';
 import { getKSTDate } from '../../utils/time.js';
 import { useMenu } from './useMenu.js';
 
-// markReady는 매 렌더 동일한 참조를 유지해야 fetchMenus(useCallback)가 안정적으로 유지된다.
-// 이름이 mock으로 시작해야 vi.mock 팩토리보다 앞서 호이스팅된 뒤에도 참조 가능하다 (vitest 컨벤션).
-const mockMarkReady = vi.fn();
-vi.mock('../context/BootContext', () => ({
-  useBoot: () => ({ markReady: mockMarkReady }),
-}));
-
 function wrapper({ children }: { children: ReactNode }) {
   return React.createElement(QueryClientProvider, { client: queryClient }, children);
 }
@@ -50,7 +43,6 @@ function menuApiResponse() {
 describe('useMenu (React Query)', () => {
   beforeEach(() => {
     queryClient.clear();
-    mockMarkReady.mockClear();
   });
 
   afterEach(() => {
@@ -85,22 +77,6 @@ describe('useMenu (React Query)', () => {
     expect(result.current.menuLoading).toBe(false);
     expect(result.current.cafes).toEqual(cached);
     expect(fetchSpy).not.toHaveBeenCalled();
-  });
-
-  it('markReady("menu")는 데이터가 최초로 준비됐을 때 한 번만 호출된다', async () => {
-    mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
-
-    const { result } = renderHook(() => useMenu(), { wrapper });
-    await waitFor(() => expect(result.current.menuLoading).toBe(false));
-
-    expect(mockMarkReady).toHaveBeenCalledWith('menu');
-    expect(mockMarkReady).toHaveBeenCalledTimes(1);
-
-    act(() => { result.current.changeDate(1); });
-    await waitFor(() => expect(result.current.menuLoading).toBe(false));
-
-    // 날짜를 바꿔 다시 로딩이 끝나도 markReady는 추가로 호출되지 않는다
-    expect(mockMarkReady).toHaveBeenCalledTimes(1);
   });
 
   it('changeDate(숫자)는 그만큼 날짜를 이동시킨다', async () => {
