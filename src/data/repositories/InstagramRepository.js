@@ -11,7 +11,7 @@ export const createInstagramRepository = ({ instagramApiDataSource }) => ({
       return createInstagramProfile({
         username: localAccount.username,
         fullName: localAccount.desc,
-        profilePicUrl: localAccount.profilePicUrl || '/hanyang_insta_fallback.png',
+        profilePicUrl: localAccount.profilePicUrl || null,
         desc: localAccount.desc,
       });
     }
@@ -30,7 +30,7 @@ export const createInstagramRepository = ({ instagramApiDataSource }) => ({
       return createInstagramProfile({
         username,
         fullName: username,
-        profilePicUrl: '/hanyang_insta_fallback.png',
+        profilePicUrl: null,
         desc: '',
       });
     }
