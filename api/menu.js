@@ -9,7 +9,7 @@ const CAFES = [
 
 const MEAL_TYPE_KEYWORDS = ['조식', '중식', '석식', '천원'];
 
-// 식단 API: 식당 1곳의 HTML을 긁어서 메뉴 배열로 변환
+// 학식 API: 식당 1곳의 HTML을 긁어서 메뉴 배열로 변환
 async function scrapeCafe(cafeId, dateStr) {
   const encodedDate = encodeURIComponent(dateStr);
   // 1. url 조립 

@@ -1,4 +1,4 @@
-// 훅(ViewModel): 식단 날짜 탐색 및 식당별 메뉴 데이터 관리 (TanStack Query 기반)
+// 훅(ViewModel): 학식 날짜 탐색 및 식당별 메뉴 데이터 관리 (TanStack Query 기반)
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
@@ -53,7 +53,6 @@ export function useMenu(): UseMenuResult {
   });
 
   // 최초 1회, 학식 데이터가 (캐시든 네트워크든) 준비되면 인접 날짜 prefetch 시작
-  // (부팅 스플래시와는 더 이상 묶이지 않음 — 학식 fetch 실패가 앱 전체 진입을 막지 않도록 분리)
   const firstLoadHandled = useRef(false);
   const [prefetchReady, setPrefetchReady] = useState(false);
   useEffect(() => {

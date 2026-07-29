@@ -1,4 +1,4 @@
-// 레포지토리: 식단 API 응답을 Cafe 엔티티 배열로 변환
+// 레포지토리: 학식 API 응답을 Cafe 엔티티 배열로 변환
 import { createCafe, type Cafe } from '../../domain/entities/Cafe.js';
 import type { MenuApiDataSource } from '../datasources/MenuApiDataSource.js';
 

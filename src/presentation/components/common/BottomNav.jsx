@@ -1,4 +1,4 @@
-// 컴포넌트: QR·식단·셔틀·기타 탭 하단 내비게이션 바
+// 컴포넌트: QR·학식·셔틀·기타 탭 하단 내비게이션 바
 import React from 'react';
 import { BookOpen, Utensils, LayoutGrid, Megaphone, Handshake } from 'lucide-react';
 

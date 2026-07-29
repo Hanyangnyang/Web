@@ -1,4 +1,4 @@
-// 유스케이스: 특정 날짜의 식당별 식단 정보 조회
+// 유스케이스: 특정 날짜의 식당별 학식 정보 조회
 import type { Cafe } from '../entities/Cafe.js';
 import type { MenuRepository } from '../../data/repositories/MenuRepository.js';
 
