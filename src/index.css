@@ -101,26 +101,6 @@ body {
   }
 }
 
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes popIn {
   0% {
     opacity: 0;
@@ -336,15 +316,6 @@ body {
   100% {
     opacity: 0.6;
   }
-}
-
-/* ═══ 동적으로 className에 적용되는 애니메이션 클래스 ═══ */
-.tab-slide-right {
-  animation: slideInFromRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tab-slide-left {
-  animation: slideInFromLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .spin-animation {

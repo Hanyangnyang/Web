@@ -1,4 +1,4 @@
-// 데이터 소스: 식단 정보 서버리스 API 원시 호출
+// 데이터 소스: 학식 정보 서버리스 API 원시 호출
 import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
 
 export interface HttpClient {

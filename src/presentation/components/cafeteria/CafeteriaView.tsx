@@ -1,4 +1,4 @@
-// 컴포넌트: 날짜·식당 선택 및 아코디언 식단 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
+// 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
@@ -258,7 +258,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
         {revalidating && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
             <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
-            <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>식단 정보를 가져오는 중...</span>
+            <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>학식 정보를 가져오는 중...</span>
           </div>
         )}
 
@@ -266,7 +266,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite]" />
-              <span className="text-xs font-semibold text-text-sub">식단 정보를 가져오는 중...</span>
+              <span className="text-xs font-semibold text-text-sub">학식 정보를 가져오는 중...</span>
             </div>
           ) : cafes.length > 0 ? (
             Object.keys(groupedMenus).length > 0 ? (

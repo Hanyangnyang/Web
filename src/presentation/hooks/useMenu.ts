@@ -1,10 +1,9 @@
-// 훅(ViewModel): 식단 날짜 탐색 및 식당별 메뉴 데이터 관리 (TanStack Query 기반)
+// 훅(ViewModel): 학식 날짜 탐색 및 식당별 메뉴 데이터 관리 (TanStack Query 기반)
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { getMenuUseCase } from '../../di.js';
 import { getKSTDate } from '../../utils/time.js';
-import { useBoot } from '../context/BootContext';
 import type { Cafe } from '../../domain/entities/Cafe.js';
 
 const MENU_STALE_TIME = 60 * 60 * 1000; // 1시간 — 학식은 하루 단위로만 갱신되므로 진입마다 재검증할 필요 없음
@@ -43,11 +42,8 @@ export interface UseMenuResult {
   changeDate: (offsetOrDate: number | Date) => void;
 }
 
-// BootContext.jsx가 아직 JS라 useBoot()의 반환 타입을 추론할 수 없어 여기서만 임시로 명시
-// (BootContext를 TS로 옮기면 이 타입은 그쪽 export로 대체)
 export function useMenu(): UseMenuResult {
   const [menuDate, setMenuDate] = useState<Date>(getInitialDate);
-  const { markReady } = useBoot() as { markReady: (key: string) => void };
   const dateStr = toDateStr(menuDate);
 
   const query = useQuery({
@@ -56,16 +52,15 @@ export function useMenu(): UseMenuResult {
     staleTime: MENU_STALE_TIME,
   });
 
-  // 최초 1회, 학식 데이터가 (캐시든 네트워크든) 준비되면 부팅 스플래시에 신호 + 인접 날짜 prefetch 시작
+  // 최초 1회, 학식 데이터가 (캐시든 네트워크든) 준비되면 인접 날짜 prefetch 시작
   const firstLoadHandled = useRef(false);
   const [prefetchReady, setPrefetchReady] = useState(false);
   useEffect(() => {
     if (query.isSuccess && !firstLoadHandled.current) {
       firstLoadHandled.current = true;
-      markReady('menu');
       setPrefetchReady(true);
     }
-  }, [query.isSuccess, markReady]);
+  }, [query.isSuccess]);
 
   // 인접 날짜(어제 ~ +7일) 백그라운드 prefetch — 최초 로딩이 끝난 뒤 한 번만 실행
   useEffect(() => {

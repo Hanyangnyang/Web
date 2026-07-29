@@ -1,20 +1,20 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-
 import { supabase } from '../../lib/supabase.js';
 
 const BootContext = createContext(null);
 
 /**
  * 앱의 초기 로딩(부팅) 상태를 중앙 집중식으로 관리하는 프로바이더입니다.
+ * 즉 부팅 상태 관리자입니다.
  * 새로운 초기 로딩 데이터가 필요할 경우, 여기에 이름을 등록하고 해당 훅에서 markReady를 호출하면 됩니다.
  */
 export function BootProvider({ children }) {
-  // 초기화가 필요한 서비스 목록
+  // 부팅 시 필요한 서비스들의 준비 상태를 관리하는 맵
   const [readyMap, setReadyMap] = useState({
-    menu: false,
     config: false,
   });
 
+  // 앱 설정 (Remote Config) 상태
   const [appConfig, setAppConfig] = useState({
     current_period: '학기중',
     custom_holidays: [],
@@ -24,10 +24,12 @@ export function BootProvider({ children }) {
     force_no_operation: false
   });
 
+  // 스플래시를 한번만 보여주기 위한 플래그 
   const [splashDone, setSplashDone] = useState(() => {
     return sessionStorage.getItem('splashShown') === 'true';
   });
 
+  // 특정 서비스가 준비되었음을 표시하는 함수
   const markReady = useCallback((key) => {
     setReadyMap(prev => {
       if (prev[key] === true) return prev;
@@ -51,7 +53,7 @@ export function BootProvider({ children }) {
     return found ? found.name : '학기중';
   };
 
-  // Remote Config (app_config) 로딩 및 캐싱 로직
+  // Remote Config 로딩 및 캐싱 로직
   React.useEffect(() => {
     async function fetchConfig() {
       const cached = localStorage.getItem('app_config_cache');
@@ -93,11 +95,12 @@ export function BootProvider({ children }) {
     fetchConfig();
   }, [markReady]);
 
-  // 모든 서비스가 준비되었는지 확인
+  // 스플래시 내려도 되는지 판단하는 최종 기준 - 모든 서비스가 준비되었는지 확인
   const isAppReady = useMemo(() => {
     return Object.values(readyMap).every(status => status === true);
   }, [readyMap]);
 
+  // 스플래시 끝났다는 표시 
   const completeSplash = useCallback(() => {
     setSplashDone(true);
     sessionStorage.setItem('splashShown', 'true');

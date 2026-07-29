@@ -16,7 +16,7 @@ messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
   // notification 필드 대신 data 필드에서 정보를 가져옴
-  const notificationTitle = payload.data?.title || '한양냥 식단 알림';
+  const notificationTitle = payload.data?.title || '하냥냥 학식 알림';
   const notificationOptions = {
     body: payload.data?.body || '등록하신 키워드의 메뉴가 나왔어요!',
     icon: '/icon-192x192.png',
