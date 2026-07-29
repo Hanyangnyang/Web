@@ -1,7 +1,15 @@
 // 레포지토리: 인스타그램 API 응답을 InstagramProfile 엔티티로 변환
-import { createInstagramProfile, INSTA_ACCOUNTS } from '../../domain/entities/InstagramAccount.js';
+import { createInstagramProfile, INSTA_ACCOUNTS, type InstagramProfile } from '../../domain/entities/InstagramAccount.js';
+import type { InstagramApiDataSource } from '../datasources/InstagramApiDataSource.js';
 
-export const createInstagramRepository = ({ instagramApiDataSource }) => ({
+export interface InstagramRepository {
+  getProfile: (username: string) => Promise<InstagramProfile>;
+  getProxiedImageUrl: (originalUrl: string) => string;
+}
+
+export const createInstagramRepository = (
+  { instagramApiDataSource }: { instagramApiDataSource: InstagramApiDataSource }
+): InstagramRepository => ({
   getProfile: async (username) => {
     // 1. 로컬 데이터 확인 (지속 가능성 및 성능을 위해 우선순위 높임)
     const allAccounts = [...INSTA_ACCOUNTS.erica, ...INSTA_ACCOUNTS.college];

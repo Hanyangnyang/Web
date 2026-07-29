@@ -1,10 +1,12 @@
 // 컴포넌트: 한양대 ERICA 공식 인스타그램 계정 목록 및 프로필 이미지 표시
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import { INSTA_ACCOUNTS } from '../../../domain/entities/InstagramAccount.js';
+import { INSTA_ACCOUNTS, type InstagramAccountInfo, type InstagramProfile } from '../../../domain/entities/InstagramAccount.js';
 import { useInstagram } from '../../hooks/useInstagram.js';
 
-const openInsta = (username) => {
+type GroupKey = 'erica' | 'college';
+
+const openInsta = (username: string) => {
   const start = Date.now();
   window.location.href = `instagram://user?username=${username}`;
   setTimeout(() => {
@@ -14,7 +16,14 @@ const openInsta = (username) => {
   }, 500);
 };
 
-function AccountItem({ acc, isFirst, profile, getProxiedUrl }) {
+interface AccountItemProps {
+  acc: InstagramAccountInfo;
+  isFirst: boolean;
+  profile: InstagramProfile | undefined;
+  getProxiedUrl: (originalUrl: string) => string;
+}
+
+function AccountItem({ acc, isFirst, profile, getProxiedUrl }: AccountItemProps) {
   const [imgLoaded, setImgLoaded] = useState(false);
 
   return (
@@ -61,7 +70,17 @@ function AccountItem({ acc, isFirst, profile, getProxiedUrl }) {
   );
 }
 
-function AccountGroup({ groupKey, title, accounts, expanded, onToggle, profiles, getProxiedUrl }) {
+interface AccountGroupProps {
+  groupKey: GroupKey;
+  title: string;
+  accounts: InstagramAccountInfo[];
+  expanded: Record<GroupKey, boolean>;
+  onToggle: (key: GroupKey) => void;
+  profiles: Record<string, InstagramProfile>;
+  getProxiedUrl: (originalUrl: string) => string;
+}
+
+function AccountGroup({ groupKey, title, accounts, expanded, onToggle, profiles, getProxiedUrl }: AccountGroupProps) {
   const isExpanded = expanded[groupKey];
   return (
     <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3">
@@ -94,9 +113,13 @@ function AccountGroup({ groupKey, title, accounts, expanded, onToggle, profiles,
   );
 }
 
-export function InstagramListView({ onBack }) {
-  const [expanded, setExpanded] = useState({ erica: true, college: true });
-  const toggle = (key) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
+interface InstagramViewProps {
+  onBack: () => void;
+}
+
+export function InstagramView({ onBack }: InstagramViewProps) {
+  const [expanded, setExpanded] = useState<Record<GroupKey, boolean>>({ erica: true, college: true });
+  const toggle = (key: GroupKey) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
   const { profiles, getProxiedUrl } = useInstagram();
 
   return (
