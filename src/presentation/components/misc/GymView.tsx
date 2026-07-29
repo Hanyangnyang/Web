@@ -1,8 +1,22 @@
 // 컴포넌트: 체대 헬스장 수업 시간표 캘린더 (현재 시간 인디케이터 포함)
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
+import { useGymSchedule } from '../../hooks/useGymSchedule.js';
+import type { GymScheduleCell, GymScheduleRow, GymPeriod } from '../../../data/datasources/GymApiDataSource.js';
 
-const COLORS = {
+type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
+const DAYS: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri'];
+
+interface MergedGymScheduleRow extends Omit<GymScheduleRow, DayKey> {
+  spans: Partial<Record<DayKey, number>>;
+  mon: GymScheduleCell | '-' | null;
+  tue: GymScheduleCell | '-' | null;
+  wed: GymScheduleCell | '-' | null;
+  thu: GymScheduleCell | '-' | null;
+  fri: GymScheduleCell | '-' | null;
+}
+
+const COLORS: Record<string, { bg: string; text: string; border: string }> = {
   orange: { bg: '#FFF7ED', text: '#C2410C', border: '#FFEDD5' },
   teal:   { bg: '#F0FDFA', text: '#0F766E', border: '#CCFBF1' },
   green:  { bg: '#F7FEE7', text: '#4D7C0F', border: '#ECFCCB' },
@@ -10,19 +24,22 @@ const COLORS = {
   red:    { bg: '#FEF2F2', text: '#B91C1C', border: '#FEE2E2' },
 };
 
-const getMergedSchedule = (baseSchedule) => {
-  const days   = ['mon', 'tue', 'wed', 'thu', 'fri'];
-  const merged = baseSchedule.map(row => ({ ...row, spans: {} }));
-  days.forEach(day => {
+const getMergedSchedule = (baseSchedule: GymScheduleRow[]): MergedGymScheduleRow[] => {
+  const merged: MergedGymScheduleRow[] = baseSchedule.map(row => ({ ...row, spans: {} }));
+  DAYS.forEach(day => {
     for (let i = 0; i < baseSchedule.length; i++) {
       const current = baseSchedule[i][day];
       if (current === '-' || current === null) continue;
       let span = 1;
-      while (i + span < baseSchedule.length && baseSchedule[i + span][day]?.name === current.name) span++;
+      while (i + span < baseSchedule.length) {
+        const next = baseSchedule[i + span][day];
+        if (next === '-' || next === null || (next as GymScheduleCell).name !== (current as GymScheduleCell).name) break;
+        span++;
+      }
       if (span > 1) {
         merged[i].spans[day] = span;
-        const lastCell = baseSchedule[i + span - 1][day];
-        if (lastCell?.endTime) merged[i][day] = { ...merged[i][day], endTime: lastCell.endTime };
+        const lastCell = baseSchedule[i + span - 1][day] as GymScheduleCell;
+        if (lastCell?.endTime) merged[i][day] = { ...(merged[i][day] as GymScheduleCell), endTime: lastCell.endTime };
         for (let j = 1; j < span; j++) merged[i + j][day] = null;
         i += span - 1;
       }
@@ -31,7 +48,7 @@ const getMergedSchedule = (baseSchedule) => {
   return merged;
 };
 
-function CourseName({ name }) {
+function CourseName({ name }: { name: string }) {
   return (
     <div className="course-name text-[0.6rem] font-extrabold leading-[1.1] overflow-hidden w-full text-center flex flex-col items-center">
       {name.split('\n').map((line, i) => (
@@ -41,35 +58,33 @@ function CourseName({ name }) {
   );
 }
 
-export function GymTimetable({ onBack }) {
-  const [gymData, setGymData] = useState(null);
-  const [activePeriodId, setActivePeriodId] = useState(null);
+interface GymViewProps {
+  onBack: () => void;
+}
+
+export function GymView({ onBack }: GymViewProps) {
+  const { gymData, loadErr } = useGymSchedule();
+  const [activePeriodId, setActivePeriodId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = React.useRef(null);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
   const [showNotice, setShowNotice] = useState(false);
 
-  // 짐 시간표 정적 데이터 로드 — public/gymSchedule.json (추후 백엔드 API로 교체 예정)
+  // 데이터 도착 후, 오늘 날짜 기준 현재 기간 최초 1회 자동 판별
   useEffect(() => {
-    fetch('/gymSchedule.json')
-      .then(res => res.json())
-      .then(data => {
-        setGymData(data);
-        // 오늘 날짜 기준 현재 기간 자동 판별
-        const now = new Date();
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const matched = data.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
-        setActivePeriodId(matched ? matched.id : 'semester');
-      })
-      .catch(e => console.error('Failed to load gym schedule:', e));
-  }, []);
+    if (!gymData || activePeriodId) return;
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const matched = gymData.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
+    setActivePeriodId(matched ? matched.id : 'semester');
+  }, [gymData, activePeriodId]);
 
   useEffect(() => {
     if (activePeriodId !== 'vacation') {
       setShowNotice(false);
       return;
     }
-    
+
     const showTimer = setTimeout(() => {
       setShowNotice(true);
     }, 1000);
@@ -84,8 +99,8 @@ export function GymTimetable({ onBack }) {
 
   // 드롭다운 바깥 클릭 시 닫기
   useEffect(() => {
-    const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     };
@@ -93,7 +108,9 @@ export function GymTimetable({ onBack }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const currentPeriod = gymData ? (gymData.periods.find(p => p.id === activePeriodId) || gymData.periods[0]) : null;
+  const currentPeriod: GymPeriod | null = gymData
+    ? (gymData.periods.find(p => p.id === activePeriodId) || gymData.periods[0])
+    : null;
   const baseSchedule = currentPeriod?.schedule ?? [];
   const schedule = React.useMemo(() => getMergedSchedule(baseSchedule), [baseSchedule]);
 
@@ -103,7 +120,7 @@ export function GymTimetable({ onBack }) {
     return match ? parseInt(match[1], 10) : null;
   }, [currentPeriod]);
 
-  const getNowPos = () => {
+  const getNowPos = (): { top: number; dayIndex: number } | null => {
     const h = currentTime.getHours();
     const m = currentTime.getMinutes();
     const day = currentTime.getDay();
@@ -131,18 +148,22 @@ export function GymTimetable({ onBack }) {
           </button>
           <h1 className="text-xl font-bold text-text-main m-0">체대 헬스장</h1>
         </header>
-        <div className="h-64 bg-white border border-[#e2e8f0] rounded-card [animation:pulse_1.5s_infinite]" />
+        {loadErr ? (
+          <div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div>
+        ) : (
+          <div className="h-64 bg-white border border-[#e2e8f0] rounded-card [animation:pulse_1.5s_infinite]" />
+        )}
       </div>
     );
   }
 
-  const renderCell = (cell, span, startHour) => {
+  const renderCell = (cell: GymScheduleCell | '-' | null, span: number | undefined, startHour: number) => {
     if (cell === null) return null;
     if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-[#e2e8f0] p-0.5 relative" />;
     const s = COLORS[cell.type];
     let innerH = '100%';
     let alignTop = false;
-    if (cell.endTime && span > 1) {
+    if (cell.endTime && span && span > 1) {
       const [endH, endM] = cell.endTime.split(':').map(Number);
       innerH = `${((endH + endM / 60 - startHour) / span) * 100}%`;
       alignTop = true;
@@ -171,7 +192,7 @@ export function GymTimetable({ onBack }) {
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl font-bold text-text-main m-0">체대 헬스장</h1>
-            
+
             {/* 기간 선택 드롭다운 */}
             <div className="relative inline-block select-none" ref={dropdownRef}>
               <button
@@ -181,7 +202,7 @@ export function GymTimetable({ onBack }) {
                 <span>{currentPeriod.title}</span>
                 <ChevronDown size={11} className={`text-primary transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {dropdownOpen && (
                 <div className="absolute top-[calc(100%+6px)] left-0 min-w-[130px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_12px_24px_rgba(0,0,0,0.08)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
                   {gymData.periods.map(p => (
@@ -208,7 +229,7 @@ export function GymTimetable({ onBack }) {
       </header>
 
       {/* 방학 단축 운영 안내 배너 (슬라이드 애니메이션 적용) */}
-      <div 
+      <div
         className={`overflow-hidden transition-all duration-500 ease-in-out ${showNotice && activePeriodId === 'vacation' ? 'max-h-16 mb-4 opacity-100' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
       >
         <div className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/[0.04] border border-primary/10 rounded-card">
@@ -270,6 +291,7 @@ export function GymTimetable({ onBack }) {
         </div>
       </div>
 
+      {/* 하단 주의문 */}
       <footer className="px-2 flex flex-col gap-1.5">
         <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 기상악화로 인해 체대 실외수업이 실내수업으로 전환되거나, 체대에서 행사가 진행될 경우 체대 사용이 어려울 수 있습니다. 이 경우 체대 정문이나 헬스장 출입문에 관련 안내가 부착되니 참고 바랍니다.</p>
         <p className="text-[0.7rem] text-text-hint m-0 font-medium">* 수업 시간에는 일반 학생 이용이 제한됩니다.</p>
