@@ -1,7 +1,10 @@
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { isNativeApp } from '../../lib/platform.js';
+import type { SupportedStorage } from '@supabase/supabase-js';
 
-export const hybridSecureStorage = {
+// Supabase auth의 storage 옵션이 요구하는 형태(SupportedStorage)를 그대로 구현 —
+// 타입 단에서 supabase.js에 그대로 주입 가능함이 보장된다
+export const hybridSecureStorage: SupportedStorage = {
   getItem: async (key) => {
     if (isNativeApp()) {
       try {

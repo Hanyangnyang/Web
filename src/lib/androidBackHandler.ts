@@ -1,8 +1,16 @@
 import { getPlatform } from './platform.js';
 
-const handlerStack = [];
+declare global {
+  interface Window {
+    __androidBackPress?: () => boolean;
+  }
+}
 
-export const pushBackHandler = (fn) => handlerStack.push(fn);
+type BackHandlerFn = () => void;
+
+const handlerStack: BackHandlerFn[] = [];
+
+export const pushBackHandler = (fn: BackHandlerFn) => handlerStack.push(fn);
 export const popBackHandler = () => handlerStack.pop();
 
 // MainActivity.java의 OnBackPressedCallback이 이 함수를 호출

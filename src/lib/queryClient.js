@@ -8,8 +8,8 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000,   // 기본 15분 — usePortalData의 기존 CACHE_TTL과 동일
-      gcTime: 24 * 60 * 60 * 1000, // 24시간 — 탭을 오래 안 봐도 메모리 캐시가 바로 안 사라지게
+      staleTime: 15 * 60 * 1000,   // 기본 15분 
+      gcTime: 24 * 60 * 60 * 1000, // 24시간 
       refetchOnWindowFocus: false, // 모바일 웹뷰 특성상 불필요, 탭 재진입 갱신은 isVisible로 각 훅이 직접 제어
     },
   },

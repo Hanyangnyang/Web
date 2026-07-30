@@ -26,8 +26,6 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String ua = getBridge().getWebView().getSettings().getUserAgentString();
-        getBridge().getWebView().getSettings().setUserAgentString(ua + " HanyangAndroidApp");
         pendingDeepLinkParams = extractDeepLinkParams(getIntent());
         // FCM 알림 탭으로 콜드 스타트된 경우: Capacitor 이벤트가 리스너 등록 전에 드랍되므로
         // Intent extra의 link 필드를 직접 읽어 Kakao 딥링크와 동일한 경로로 주입
