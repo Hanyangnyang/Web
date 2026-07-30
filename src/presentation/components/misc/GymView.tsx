@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useGymSchedule } from '../../hooks/useGymSchedule.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 import type { GymScheduleCell, GymScheduleRow, GymPeriod } from '../../../data/datasources/GymApiDataSource.js';
 
 type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
@@ -63,6 +64,7 @@ interface GymViewProps {
 }
 
 export function GymView({ onBack }: GymViewProps) {
+  useBackHandler(onBack);
   const { gymData, loadErr } = useGymSchedule();
   const [activePeriodId, setActivePeriodId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());

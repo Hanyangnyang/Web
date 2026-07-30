@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { INSTA_ACCOUNTS, type InstagramAccountInfo, type InstagramProfile } from '../../../domain/entities/InstagramAccount.js';
 import { useInstagram } from '../../hooks/useInstagram.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 
 type GroupKey = 'erica' | 'college';
 
@@ -118,6 +119,7 @@ interface InstagramViewProps {
 }
 
 export function InstagramView({ onBack }: InstagramViewProps) {
+  useBackHandler(onBack);
   const [expanded, setExpanded] = useState<Record<GroupKey, boolean>>({ erica: true, college: true });
   const toggle = (key: GroupKey) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
   const { profiles, getProxiedUrl } = useInstagram();

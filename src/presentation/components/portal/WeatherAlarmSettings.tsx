@@ -4,6 +4,7 @@ import { requestNotificationPermission, checkNotificationPermission } from '../.
 import { supabase } from '../../../lib/supabase.js';
 import { getPlatform } from '../../../lib/platform.js';
 import { TimeDayWheelPicker, DAY_LIST } from '../ui/TimeDayWheelPicker.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 
 interface WeatherConditions {
   daily: boolean;
@@ -302,6 +303,9 @@ export function WeatherAlarmSettings({ onClose }: WeatherAlarmSettingsProps) {
     }
     triggerClose(successMsg);
   };
+
+  // 안드로이드 하드웨어 뒤로가기를 눌렀을 때 앱 종료 대신 시트 닫기(닫기 버튼과 동일 동작)
+  useBackHandler(handleClose);
 
   // 조건 칩 클릭 제약 처리
   const handleConditionToggle = async (key: keyof WeatherConditions) => {
