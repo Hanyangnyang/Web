@@ -2,12 +2,14 @@
 import { useState } from 'react';
 import { Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
 import { useFeedback } from '../../hooks/useFeedback.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 
 interface FeedbackViewProps {
   onBack: () => void;
 }
 
 export function FeedbackView({ onBack }: FeedbackViewProps) {
+  useBackHandler(onBack);
   const [content, setContent] = useState('');
   const { loading, submitted, submit } = useFeedback();
 

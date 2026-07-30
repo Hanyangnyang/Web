@@ -5,7 +5,6 @@ import { GymView } from './GymView.jsx';
 import { InstagramView } from './InstagramView.jsx';
 import { FeedbackView } from './FeedbackView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
-import { pushBackHandler, popBackHandler } from '../../../lib/androidBackHandler.js';
 
 type SubView = 'list' | MiscBoxKey;
 
@@ -20,12 +19,6 @@ export function MiscView({ resetSignal }: MiscViewProps) {
   useEffect(() => {
     setSubView('list');
   }, [resetSignal]);
-
-  useEffect(() => {
-    if (subView === 'list') return;
-    pushBackHandler(() => setSubView('list'));
-    return () => popBackHandler();
-  }, [subView]);
 
   const handleBoxClick = (box: MiscBoxKey) => {
     posthog?.capture('misc_box_clicked', { box });

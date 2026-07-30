@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 
 const KakaoIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,6 +30,9 @@ export function ShareSheet({ cafeName, dateText, dateLabel, mealType, menuText, 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
+
+  // 안드로이드 하드웨어 뒤로가기를 눌렀을 때 앱 종료 대신 시트 닫기
+  useBackHandler(onClose);
 
   const handleKakao = () => {
     posthog?.capture('cafeteria_share_clicked', { method: 'kakao', cafeName, mealType });

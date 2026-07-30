@@ -3,6 +3,7 @@ import { X, Plus } from 'lucide-react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../../lib/firebase';
 import { supabase } from '../../../lib/supabase';
 import { getPlatform } from '../../../lib/platform';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 
 const ITEM_H = 36;
 const VISIBLE = 3;
@@ -686,6 +687,9 @@ export function AlarmSettings({ onClose }) {
     }
     triggerClose(successMsg);
   };
+
+  // 안드로이드 하드웨어 뒤로가기를 눌렀을 때 앱 종료 대신 시트 닫기(닫기 버튼과 동일 동작)
+  useBackHandler(handleClose);
 
   return (
     <div
