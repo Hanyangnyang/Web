@@ -3,12 +3,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDate } from '../../../utils/time.js';
-import { AlarmSettings } from './AlarmSettings.jsx';
-import { ShareSheet } from './ShareSheet.jsx';
+import { CafeteriaAlarmSettings } from './CafeteriaAlarmSettings.js';
+import { ShareSheet } from './ShareSheet.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
-import { formatDate, getDateLabel } from './cafeteriaFormat.js';
+import { getDateLabel } from './cafeteriaFormat.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
@@ -217,7 +217,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
         <Bell size={18} />
         학식 알림 받기
       </button>
-      {showAlarm && <AlarmSettings onClose={(msg: string) => {
+      {showAlarm && <CafeteriaAlarmSettings onClose={(msg?: string) => {
         setShowAlarm(false);
         if (msg) {
           setAlarmPopup(msg);
@@ -227,7 +227,6 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       {shareTarget && (
         <ShareSheet
           cafeName={shareTarget.cafeName}
-          dateText={formatDate(date)}
           mealType={shareTarget.type}
           menuText={shareTarget.menu.menu}
           dateLabel={shareTarget.dateLabel}
