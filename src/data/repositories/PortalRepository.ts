@@ -1,19 +1,10 @@
 // 레포지토리: 소식탭 API 응답을 Weather/LibraryRoom 엔티티로 변환
-import { createWeather, type Weather } from '../../domain/entities/Weather.js';
-import { createLibraryRoom, type LibraryRoom } from '../../domain/entities/LibraryRoom.js';
+import { createWeather } from '../../domain/entities/Weather.js';
+import { createLibraryRoom } from '../../domain/entities/LibraryRoom.js';
 import type { PortalApiDataSource } from '../datasources/PortalApiDataSource.js';
+import type { PortalRepository } from '../../domain/repositories/IPortalRepository.js';
 
 const LIBRARY_SORT_ORDER = [61, 63, 132, 131];
-
-export interface LibraryStatus {
-  list: LibraryRoom[];
-  updatedAt: number;
-}
-
-export interface PortalRepository {
-  getWeather: () => Promise<Weather>;
-  getLibrary: () => Promise<LibraryStatus>;
-}
 
 export const createPortalRepository = (
   { portalApiDataSource }: { portalApiDataSource: PortalApiDataSource }

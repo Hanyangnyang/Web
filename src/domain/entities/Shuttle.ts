@@ -1,4 +1,5 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
+import { getKSTParts, getKSTDateKey } from '../../utils/time.js';
 
 export interface RouteStopDef {
   name: string;
@@ -23,12 +24,52 @@ export interface SubwayOpt {
   updnLine: string;
 }
 
-// shuttle.json 원본 행 (ShuttleDataSource가 그대로 통과시키는 로컬 정적 데이터)
+// shuttle.json 원본 행을 정규화한 도메인 셔틀 행
 export interface ShuttleRow {
   route: string;
   period: string;
   dayType: string;
   dep: string;
+}
+
+// ShuttleDataSource의 raw 응답을 도메인 엔티티로 변환 — 지금은 필드가 그대로 대응되지만,
+// 나중에 실제 백엔드 API가 다른 필드명/형식으로 내려줘도 이 함수만 고치면 나머지 도메인
+// 로직(computeSchedule 등)은 안 바뀜
+export function createShuttleRow(raw: { route: string; period: string; dayType: string; dep: string }): ShuttleRow {
+  return {
+    route: raw.route,
+    period: raw.period,
+    dayType: raw.dayType,
+    dep: raw.dep,
+  };
+}
+
+// 지하철 도착 정보 도메인 엔티티 (raw 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
+export interface SubwayArrival {
+  subwayId: string;
+  updnLine: string;
+  dest: string;
+  arrTime: string;
+  trainNo: string;
+  isRealtime: boolean;
+}
+
+export function createSubwayArrival(raw: {
+  subwayId: string;
+  updnLine: string;
+  dest: string;
+  arrTime: string;
+  trainNo: string;
+  isRealtime: boolean;
+}): SubwayArrival {
+  return {
+    subwayId: raw.subwayId,
+    updnLine: raw.updnLine,
+    dest: raw.dest,
+    arrTime: raw.arrTime,
+    trainNo: raw.trainNo,
+    isRealtime: raw.isRealtime,
+  };
 }
 
 export interface ScheduleItem {
@@ -52,7 +93,7 @@ export interface ShuttleAppConfig {
   force_no_operation?: boolean;
 }
 
-// connectingTrains가 필요로 하는 최소 구조 (실제 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
+// connectingTrains가 필요로 하는 최소 구조 (실제 값은 위 SubwayArrival)
 export interface SubwayArrivalLike {
   subwayId: string;
   updnLine: string;
@@ -128,28 +169,23 @@ export const SUBWAY_OPTS: SubwayOpt[] = [
 
 // ── 순수 헬퍼 함수 ──
 export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-export const curMin = ()  => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+export const curMin = () => { const { hours, minutes } = getKSTParts(); return hours * 60 + minutes; };
 
 export const dayType = (isHolidayServer: boolean | null, customHolidays: string[] = [], forceWeekend = false) => {
   if (forceWeekend) return '주말';
   if (isHolidayServer === true) return '주말';
 
-  const now = new Date();
-  const yyyymmdd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  if (customHolidays.includes(yyyymmdd)) return '주말';
+  const { day } = getKSTParts();
+  if (customHolidays.includes(getKSTDateKey())) return '주말';
 
-  const d = now.getDay();
-  return (d === 0 || d === 6) ? '주말' : '평일';
+  return (day === 0 || day === 6) ? '주말' : '평일';
 };
 
 const pad2      = (n: number) => String(n).padStart(2, '0');
 const intToHHMM = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`;
 
-// 현재 날짜 문자열 (YYYY-MM-DD)
-const getYYYYMMDD = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-};
+// 현재 날짜 문자열 (YYYY-MM-DD, KST 기준)
+const getYYYYMMDD = () => getKSTDateKey();
 
 // ── 공통: allData를 displayStop 기준 시간 목록으로 매핑 ──
 function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleItem[] {

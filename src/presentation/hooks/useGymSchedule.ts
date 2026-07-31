@@ -1,13 +1,13 @@
 // 훅(ViewModel): 체대 헬스장 시간표 조회 (TanStack Query 기반)
 import { useQuery } from '@tanstack/react-query';
 import { getGymScheduleUseCase } from '../../di.js';
-import type { GymScheduleApiResponse } from '../../data/datasources/GymApiDataSource.js';
+import type { GymSchedule } from '../../domain/entities/Gym.js';
 
 const GYM_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간 — 학기 중 앱 재배포 전까지 안 바뀌는 정적 데이터
 const GYM_QUERY_KEY = ['gym', 'schedule'];
 
 export interface UseGymScheduleResult {
-  gymData: GymScheduleApiResponse | null;
+  gymData: GymSchedule | null;
   loading: boolean;
   loadErr: string | null;
 }

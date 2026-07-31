@@ -1,116 +1,13 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudLightning, type LucideIcon } from 'lucide-react';
+import React, { useMemo, useEffect, useRef } from 'react';
+import { Sparkles, Wind, Sun } from 'lucide-react';
 import type { Weather, HourlyForecastItem } from '../../../domain/entities/Weather.js';
+import { TypewriterText } from './TypewriterText.js';
+import { getHourlyIcon, getHourlyIconFill, getWeatherTheme } from './weatherTheme.js';
 
 // 한파 판단 기준 기온(℃): 기상청 한파특보 절대기준(-12~-15도)보다 약간 낮춰
 // 좀 더 자주 체감할 수 있도록 설정. 날씨 상태(맑음/흐림/비/눈)와 무관하게
 // 기온만으로 판단해 기존 카드 위에 "한파" 뱃지만 얹는다.
 const COLD_SNAP_TEMP = -10;
-
-// 모듈 레벨 메모리 변수: 앱이 켜진 세션 동안 한 번 완벽히 타이핑이 끝나면 이를 기억하여 내부 탭 전환 시 생략
-let hasAnimatedThisSession = false;
-
-interface TypewriterTextProps {
-  text: string;
-  speed?: number;
-  delay?: number;
-  isVisible?: boolean;
-}
-
-function TypewriterText({ text, speed = 55, delay = 2000, isVisible = true }: TypewriterTextProps) {
-  const [displayed, setDisplayed] = useState(() => {
-    return hasAnimatedThisSession ? text : '';
-  });
-  const [waiting, setWaiting] = useState(false); // delay 구간 (커서 깜빡임)
-
-  useEffect(() => {
-    // 1. 이미 이번 세션에 애니메이션이 완료되었다면 즉시 전문 노출 및 생략
-    if (hasAnimatedThisSession) {
-      setDisplayed(text);
-      setWaiting(false);
-      return;
-    }
-
-    // 2. 탭이 숨겨지거나 텍스트가 아직 없는 경우 플래그 리셋 및 대기
-    if (!isVisible || !text) {
-      setWaiting(false);
-      return;
-    }
-
-    // 3. 타이핑 진행 시작
-    setDisplayed('');
-    setWaiting(true); // 커서 깜빡임 시작
-
-    let i = 0;
-    let typingTimer: ReturnType<typeof setInterval> | null = null;
-
-    const startTyping = () => {
-      setWaiting(false); // 커서 제거 후 타이핑 시작
-      typingTimer = setInterval(() => {
-        i++;
-        setDisplayed(text.slice(0, i));
-        if (i >= text.length) {
-          if (typingTimer !== null) clearInterval(typingTimer);
-          hasAnimatedThisSession = true; // 타이핑이 완벽히 한 번 끝나면 세션 플래그 true 설정
-        }
-      }, speed);
-    };
-
-    const delayTimer = setTimeout(startTyping, delay);
-    return () => {
-      clearTimeout(delayTimer);
-      if (typingTimer) clearInterval(typingTimer);
-    };
-  }, [text, isVisible]);
-
-  return (
-    <span>
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes typewriterBlink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `}} />
-      {displayed || '​'}
-      {waiting && (
-        <span
-          className="inline-block w-[2px] h-[1.1em] bg-white ml-0.5 align-middle rounded-sm"
-          style={{ animation: 'typewriterBlink 1.2s steps(2, start) infinite' }}
-        />
-      )}
-    </span>
-  );
-}
-
-// 시간별 예보 2D 아이콘 매핑
-function getHourlyIcon(code: number, hour: number): LucideIcon {
-  const isNight = hour >= 20 || hour < 6;
-  if (code <= 0) return isNight ? Moon : Sun;
-  if (code <= 1) return isNight ? CloudMoon : CloudSun;
-  if (code <= 2) return CloudSun;
-  if (code <= 3) return Cloud;
-  if (code <= 48) return CloudFog;
-  if (code <= 67) return CloudRain;
-  if (code <= 77) return Snowflake; // 비 아이콘(CloudRain)과 구분되도록 구름 없는 눈송이 아이콘 사용
-  if (code <= 82) return CloudDrizzle;
-  return CloudLightning;
-}
-
-// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만 표시
-function getHourlyIconFill(Icon: LucideIcon): string {
-  if (
-    Icon === Cloud ||
-    Icon === CloudSun ||
-    Icon === CloudMoon ||
-    Icon === CloudFog ||
-    Icon === CloudRain ||
-    Icon === CloudDrizzle ||
-    Icon === CloudLightning
-  ) {
-    return '#ffffff';
-  }
-  return 'none';
-}
 
 interface WeatherCardProps {
   weather: Weather | null;
@@ -223,49 +120,7 @@ export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardP
     }
   }, [renderedHourlyForecast, showWeatherDetail]);
 
-  // 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
-  const weatherTheme = useMemo((): { icon: LucideIcon | null; bg: string; iconColor?: string } => {
-    if (!weather) return { icon: null, bg: 'transparent' };
-    const code = weather.weatherCode;
-
-    // 1. 맑음 / 대체로 맑음 (0, 1)
-    if (code <= 1) {
-      const isHot = weather.temp >= 28;
-      return {
-        icon: Sun,
-        bg: isHot
-          ? 'linear-gradient(135deg, #FAD961 0%, #F76B1C 100%)' // 28도 이상: 찬란하고 강렬한 골드&오렌지 햇살 (빛이 들어오는 느낌)
-          : 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)'  // 28도 미만: 청량하고 깨끗한 시원한 스카이 블루
-      };
-    }
-    // 2. 구름 조금 (2) -> 화사하고 밝은 파스텔톤의 소프트 블루스카이
-    if (code === 2) {
-      return {
-        icon: Cloud,
-        bg: 'linear-gradient(135deg, #4a779d 0%, #7db9e8 100%)'
-      };
-    }
-    // 3. 흐림 / 안개 (3, 45, 48) -> 밝고 화사한 프리미엄 클라우드 그레이
-    if (code === 3 || code <= 48) {
-      return {
-        icon: code <= 3 ? Cloud : Wind,
-        bg: 'linear-gradient(135deg, #a1b0be 0%, #66788a 100%)'
-      };
-    }
-    // 4. 눈 (71 ~ 77) -> 눈 결정 아이콘 + 눈부시게 밝은 설원과 순백의 화이트 스카이
-    if (code >= 71 && code <= 77) {
-      return {
-        icon: Snowflake,
-        bg: 'linear-gradient(135deg, #8ca0ba 0%, #ffffff 100%)',
-        iconColor: '#4A607A'
-      };
-    }
-    // 5. 비 / 소나기 / 뇌우 -> 깊고 차분한 딥스톰 퍼플그레이
-    return {
-      icon: CloudRain,
-      bg: 'linear-gradient(135deg, #2b5876 0%, #4e4376 100%)'
-    };
-  }, [weather]);
+  const weatherTheme = useMemo(() => getWeatherTheme(weather), [weather]);
 
   if (!loading && !weather) return null;
 

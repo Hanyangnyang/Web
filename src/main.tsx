@@ -9,6 +9,19 @@ import * as SentryReact from '@sentry/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient.js'
 
+declare global {
+  interface Window {
+    Kakao?: {
+      isInitialized: () => boolean;
+      init: (key: string) => void;
+      Share: {
+        sendDefault: (options: Record<string, unknown>) => void;
+      };
+    };
+    __kakaoStatus?: string;
+  }
+}
+
 // Sentry 초기화
 Sentry.init(
   {
@@ -53,7 +66,7 @@ if (!kakaoKey) {
   window.__kakaoStatus = 'OK';
 }
 
-// Service Worker 업데이트 감지 후 새로고침 
+// Service Worker 업데이트 감지 후 새로고침
 if ('serviceWorker' in navigator) {
   let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -65,7 +78,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // React 렌더링
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PostHogProvider client={posthog}>
       <QueryClientProvider client={queryClient}>

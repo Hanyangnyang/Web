@@ -59,7 +59,6 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
           setFavorites={bus.setFavorites}
           busArrivals={bus.busArrivals}
           isBusLoading={bus.isBusLoading}
-          setIsBusLoading={bus.setIsBusLoading}
           closestStopName={bus.closestStopName}
           isManualRefreshing={bus.isManualRefreshing}
           handleManualRefresh={bus.handleManualRefresh}

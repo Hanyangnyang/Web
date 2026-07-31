@@ -1,6 +1,6 @@
 // 유스케이스: 인스타그램 계정의 프로필 정보 조회
 import type { InstagramProfile } from '../entities/InstagramAccount.js';
-import type { InstagramRepository } from '../../data/repositories/InstagramRepository.js';
+import type { InstagramRepository } from '../repositories/IInstagramRepository.js';
 
 export interface GetInstagramProfileUseCase {
   execute: (username: string) => Promise<InstagramProfile>;

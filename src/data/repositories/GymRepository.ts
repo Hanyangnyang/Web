@@ -1,10 +1,8 @@
-// 레포지토리: 체대 헬스장 시간표 데이터 제공
-import type { GymApiDataSource, GymScheduleApiResponse } from '../datasources/GymApiDataSource.js';
-
-export interface GymRepository {
-  getSchedule: () => Promise<GymScheduleApiResponse>;
-}
+// 레포지토리: 체대 헬스장 시간표 데이터를 도메인 엔티티로 변환해 제공
+import { createGymSchedule } from '../../domain/entities/Gym.js';
+import type { GymApiDataSource } from '../datasources/GymApiDataSource.js';
+import type { GymRepository } from '../../domain/repositories/IGymRepository.js';
 
 export const createGymRepository = ({ gymApiDataSource }: { gymApiDataSource: GymApiDataSource }): GymRepository => ({
-  getSchedule: () => gymApiDataSource.getSchedule(),
+  getSchedule: async () => createGymSchedule(await gymApiDataSource.getSchedule()),
 });

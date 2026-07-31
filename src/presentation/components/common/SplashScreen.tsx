@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-export function SplashScreen({ ready, onDone, variant = 'default' }) {
+interface SplashScreenProps {
+  ready: boolean;
+  onDone: () => void;
+  variant?: 'default' | 'menu';
+}
+
+export function SplashScreen({ ready, onDone, variant = 'default' }: SplashScreenProps) {
   const [fading, setFading] = useState(false);
   const [minDone, setMinDone] = useState(false);
 

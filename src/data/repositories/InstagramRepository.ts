@@ -1,11 +1,7 @@
 // 레포지토리: 인스타그램 API 응답을 InstagramProfile 엔티티로 변환
-import { createInstagramProfile, INSTA_ACCOUNTS, type InstagramProfile } from '../../domain/entities/InstagramAccount.js';
+import { createInstagramProfile, INSTA_ACCOUNTS } from '../../domain/entities/InstagramAccount.js';
 import type { InstagramApiDataSource } from '../datasources/InstagramApiDataSource.js';
-
-export interface InstagramRepository {
-  getProfile: (username: string) => Promise<InstagramProfile>;
-  getProxiedImageUrl: (originalUrl: string) => string;
-}
+import type { InstagramRepository } from '../../domain/repositories/IInstagramRepository.js';
 
 export const createInstagramRepository = (
   { instagramApiDataSource }: { instagramApiDataSource: InstagramApiDataSource }

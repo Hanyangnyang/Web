@@ -1,14 +1,16 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDate } from '../../../utils/time.js';
+import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
 import { CafeteriaAlarmSettings } from './CafeteriaAlarmSettings.js';
 import { ShareSheet } from './ShareSheet.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
 import { getDateLabel } from './cafeteriaFormat.js';
+import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
@@ -34,18 +36,6 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const scrollToTop = useCallback(() => {
-    let node: (Node & ParentNode) | null = rootRef.current?.parentNode ?? null;
-    while (node) {
-      const style = window.getComputedStyle(node as Element);
-      if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-        (node as HTMLElement).scrollTop = 0;
-        return;
-      }
-      node = node.parentNode;
-    }
-  }, []);
-
   const [selectedCafeId, setSelectedCafeId] = useState(() => urlParams.get('cafe') || 'all');
 
   const foundCafe = cafes.find(c => c.id === selectedCafeId);
@@ -66,7 +56,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
     const cafeName = id === 'all' ? '전체' : (cafes.find(c => c.id === id)?.name || id);
     posthog?.capture('cafeteria_chip_clicked', { cafeId: id, cafeName });
     setSelectedCafeId(id);
-    scrollToTop();
+    scrollNearestScrollableAncestorToTop(rootRef.current);
   };
 
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
@@ -160,35 +150,12 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       return;
     }
 
-    const nowKst = getKSTDate();
-    const isToday = nowKst.toISOString().split('T')[0] === date.toISOString().split('T')[0];
-    const h = nowKst.getUTCHours();
-
-    const getTargetType = () => {
-      if (h < 9) return '조식';
-      if (h >= 14) return '석식';
-      return '중식';
-    };
-
-    const targetType = getTargetType();
-    const hasTarget = menusWithCafe.some(m => m.type.includes(targetType));
-
-    const getOpen = (type: string) => {
-      if (!isToday || !hasTarget) return true;
-      if (h < 9) return type.includes('조식');
-      if (h >= 14) return type.includes('석식');
-      return !type.includes('조식') && !type.includes('석식');
-    };
-
-    const initial: Record<string, boolean> = {};
-    menusWithCafe.forEach(m => {
-      if (initial[m.type] === undefined) initial[m.type] = getOpen(m.type);
-    });
+    const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDate());
     setExpandedGroups(initial);
 
-    if (isToday && (targetType === '중식' || targetType === '석식')) {
+    if (scrollTargetType) {
       setTimeout(() => {
-        const targetEl = listRef.current?.querySelector(`[data-type*="${targetType}"]`);
+        const targetEl = listRef.current?.querySelector(`[data-type*="${scrollTargetType}"]`);
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
     }
@@ -197,11 +164,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   const toggleGroup = (type: string) =>
     setExpandedGroups(prev => ({ ...prev, [type]: !prev[type] }));
 
-  const groupedMenus = menusWithCafe.reduce<Record<string, MenuItemWithCafe[]>>((acc, m) => {
-    if (!acc[m.type]) acc[m.type] = [];
-    acc[m.type].push(m);
-    return acc;
-  }, {});
+  const groupedMenus = groupMenusByType(menusWithCafe);
 
   const handleCopied = () => {
     setCopiedToast(true);
@@ -269,13 +232,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
             </div>
           ) : cafes.length > 0 ? (
             Object.keys(groupedMenus).length > 0 ? (
-              Object.entries(groupedMenus)
-                .sort(([a], [b]) => {
-                  const order = ['조식', '중식', '석식'];
-                  const ai = order.findIndex(k => a.includes(k));
-                  const bi = order.findIndex(k => b.includes(k));
-                  return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-                })
+              sortMealTypeEntries(Object.entries(groupedMenus))
                 .map(([type, menus]) => (
                   <MealTypeAccordion
                     key={type}

@@ -1,10 +1,7 @@
 // 레포지토리: 일반버스 API 원시 응답을 정류소별 정규화 도착정보로 변환
 import { ALLOWED_BUSES_BY_STOP, STATION_IDS, type BusArrival } from '../../domain/entities/PublicBus.js';
 import type { BusApiDataSource, BusArrivalListItem } from '../datasources/BusApiDataSource.js';
-
-export interface BusRepository {
-  getArrivals: (stopName: string) => Promise<BusArrival[]>;
-}
+import type { BusRepository } from '../../domain/repositories/IBusRepository.js';
 
 const CROWD_LABELS: Record<string, string> = { '1': '여유', '2': '보통', '3': '혼잡' };
 

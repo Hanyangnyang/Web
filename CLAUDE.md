@@ -47,6 +47,10 @@ src/
 └── di.js              # 의존성 주입 컨테이너
 ```
 
+### 앱 초기 로딩(Boot) 시스템
+
+**스플래시 화면 관리 규칙은 [src/BOOT_ARCHITECTURE.md](src/BOOT_ARCHITECTURE.md)** — `BootContext`의 `readyMap`/`markReady` 패턴, 새 로딩 항목 추가 방법, 과거 무한 스플래시 버그 사례와 "무엇을 이 시스템에 등록해야 하는가"의 판단 기준까지 포함. 앱 시작 시 필수적인 새 비동기 로딩을 추가하기 전 반드시 먼저 확인할 것.
+
 ### 아키텍처 다이어그램
 
 ```mermaid

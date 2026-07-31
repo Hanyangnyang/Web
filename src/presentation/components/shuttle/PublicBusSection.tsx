@@ -18,7 +18,6 @@ interface PublicBusSectionProps {
   setFavorites: Dispatch<SetStateAction<string[]>>;
   busArrivals: Record<string, TickingBusArrival[]>;
   isBusLoading: Record<string, boolean>;
-  setIsBusLoading: Dispatch<SetStateAction<Record<string, boolean>>>;
   closestStopName: string | null;
   isManualRefreshing: boolean;
   handleManualRefresh: () => void;
@@ -33,16 +32,13 @@ export function PublicBusSection({
   expandedStops, setExpandedStops,
   favorites, setFavorites,
   busArrivals,
-  isBusLoading, setIsBusLoading,
+  isBusLoading,
   closestStopName,
   isManualRefreshing,
   handleManualRefresh,
 }: PublicBusSectionProps) {
   const handleToggleExpand = (stopName: string) => {
     const willExpand = !expandedStops[stopName];
-    if (willExpand) {
-      setIsBusLoading(prev => ({ ...prev, [stopName]: true }));
-    }
     setExpandedStops(prev => ({ ...prev, [stopName]: willExpand }));
   };
 

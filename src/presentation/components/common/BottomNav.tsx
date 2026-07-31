@@ -10,8 +10,13 @@ const BusIcon = () => (
   </svg>
 );
 
-export function BottomNav({ activeTab, setActiveTab }) {
-  const itemClass = (tab) =>
+interface BottomNavProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export function BottomNav({ activeTab, setActiveTab }: BottomNavProps) {
+  const itemClass = (tab: string) =>
     `flex flex-col items-center gap-1 cursor-pointer transition-colors duration-300 flex-1 py-2 [-webkit-tap-highlight-color:transparent] ${
       activeTab === tab ? 'text-hyu-blue-light' : 'text-text-hint'
     }`;

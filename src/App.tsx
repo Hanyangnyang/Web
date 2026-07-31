@@ -20,6 +20,22 @@ import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
 import './lib/androidBackHandler.js';
 
+declare global {
+  interface Window {
+    __NativeDeepLink?: {
+      getParams?: () => string | null | undefined;
+    };
+    __pendingDeepLinkParams?: string | null;
+    __reactReady?: boolean;
+  }
+}
+
+interface CafeDeepLink {
+  date: string | null;
+  cafe: string | null;
+  type: string | null;
+}
+
 export default function App() {
   return (
     <BootProvider>
@@ -29,7 +45,7 @@ export default function App() {
 }
 
 function MainLayout() {
-  // 0. 시작 상태 계산 
+  // 0. 시작 상태 계산
   const isApp = isNativeApp();
   const platform = getPlatform(); // 'ios' | 'android' | 'web'
   const [activeTab, setActiveTab] = useState(() => {
@@ -40,7 +56,7 @@ function MainLayout() {
       if (native) { const np = new URLSearchParams(native); if (np.has('date') || np.has('cafe') || np.has('type')) return 'cafe'; }
     } catch {}
     let lastTab = localStorage.getItem('lastActiveTab') || 'cafe';
-    if (lastTab === 'qr') lastTab = 'cafe'; 
+    if (lastTab === 'qr') lastTab = 'cafe';
     return lastTab;
   });
   const [isCafeteriaLink] = useState(() => {
@@ -52,7 +68,7 @@ function MainLayout() {
     } catch {}
     return false;
   });
-  const [cafeDeepLink, setCafeDeepLink] = useState(null);
+  const [cafeDeepLink, setCafeDeepLink] = useState<CafeDeepLink | null>(null);
   const [showCafeDeepLinkLoader, setShowCafeDeepLinkLoader] = useState(() => {
     try {
       const native = window.__NativeDeepLink?.getParams?.();
@@ -67,8 +83,8 @@ function MainLayout() {
 
   // 1. 탭별 스크롤 위치 저장/복원 — 탭들이 스크롤 컨테이너 하나를 공유하므로
   // 전환 시 떠나는 탭의 scrollTop을 기록해두고 돌아올 때 되돌린다
-  const scrollContainerRef = useRef(null);
-  const scrollPositions = useRef({});
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollPositions = useRef<Record<string, number>>({});
   const activeTabRef = useRef(activeTab);
   useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
   // deps 없는 콜백(routeFromParams)에서도 호출되므로 activeTab을 ref로 읽는다
@@ -100,7 +116,7 @@ function MainLayout() {
   }, [showCafeDeepLinkLoader, splashDone, completeSplash]);
 
   // 3. 탭 라우팅 공통 함수 - Kakao 딥링크 / 푸시 알림 양쪽에서 재사용
-  const routeFromParams = useCallback((paramString) => {
+  const routeFromParams = useCallback((paramString: string) => {
     saveScrollPosition();
     const params = new URLSearchParams(paramString);
     const tab = params.get('tab');
@@ -133,7 +149,7 @@ function MainLayout() {
       window.__pendingDeepLinkParams = null;
       routeFromParams(pending);
     }
-    const handler = (e) => routeFromParams(e.detail);
+    const handler = (e: Event) => routeFromParams((e as CustomEvent<string>).detail);
     document.addEventListener('hanyang-deeplink', handler);
     return () => document.removeEventListener('hanyang-deeplink', handler);
   }, [isApp, routeFromParams]);
@@ -141,7 +157,7 @@ function MainLayout() {
   // 3. 네이티브 푸시 알림 탭 → 딥링크 처리
   useEffect(() => {
     if (!isApp) return;
-    let handle;
+    let handle: { remove: () => void } | undefined;
     PushNotifications.addListener('pushNotificationActionPerformed', (event) => {
       const link = event?.notification?.data?.link;
       if (!link) return;
@@ -156,7 +172,7 @@ function MainLayout() {
   }, [isApp, routeFromParams]);
 
   // 4. 탭 클릭 핸들러
-  const handleTabChange = useCallback((tab) => {
+  const handleTabChange = useCallback((tab: string) => {
     // 1. 같은 탭 재클릭 처리
     if (tab === activeTab) {
       if (tab === 'misc') setMiscResetSignal(s => s + 1);
