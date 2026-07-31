@@ -1,6 +1,6 @@
 // 유스케이스: 소식탭 날씨 정보 조회
 import type { Weather } from '../entities/Weather.js';
-import type { PortalRepository } from '../../data/repositories/PortalRepository.js';
+import type { PortalRepository } from '../repositories/IPortalRepository.js';
 
 export interface GetWeatherUseCase {
   execute: () => Promise<Weather>;

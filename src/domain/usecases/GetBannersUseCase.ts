@@ -1,6 +1,6 @@
 // 유스케이스: 소식탭 배너 목록 조회
 import type { Banner } from '../entities/Banner.js';
-import type { BannerRepository } from '../../data/repositories/BannerRepository.js';
+import type { BannerRepository } from '../repositories/IBannerRepository.js';
 
 export interface GetBannersUseCase {
   execute: () => Promise<Banner[]>;

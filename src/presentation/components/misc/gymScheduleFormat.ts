@@ -1,5 +1,5 @@
 // 순수 함수: 헬스장 시간표 셀 병합 (같은 과목이 연속된 시간대에 걸쳐 있으면 하나의 셀로 rowSpan 병합)
-import type { GymScheduleCell, GymScheduleRow } from '../../../data/datasources/GymApiDataSource.js';
+import type { GymScheduleCell, GymScheduleRow } from '../../../domain/entities/Gym.js';
 
 type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
 const DAYS: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri'];

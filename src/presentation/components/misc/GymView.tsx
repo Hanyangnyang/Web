@@ -6,7 +6,7 @@ import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { getKSTDateKey, getKSTNow } from '../../../utils/time.js';
 import { getMergedSchedule } from './gymScheduleFormat.js';
-import type { GymScheduleCell, GymPeriod } from '../../../data/datasources/GymApiDataSource.js';
+import type { GymScheduleCell, GymPeriod } from '../../../domain/entities/Gym.js';
 
 const COLORS: Record<string, { bg: string; text: string; border: string }> = {
   orange: { bg: '#FFF7ED', text: '#C2410C', border: '#FFEDD5' },

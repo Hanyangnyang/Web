@@ -24,12 +24,52 @@ export interface SubwayOpt {
   updnLine: string;
 }
 
-// shuttle.json 원본 행 (ShuttleDataSource가 그대로 통과시키는 로컬 정적 데이터)
+// shuttle.json 원본 행을 정규화한 도메인 셔틀 행
 export interface ShuttleRow {
   route: string;
   period: string;
   dayType: string;
   dep: string;
+}
+
+// ShuttleDataSource의 raw 응답을 도메인 엔티티로 변환 — 지금은 필드가 그대로 대응되지만,
+// 나중에 실제 백엔드 API가 다른 필드명/형식으로 내려줘도 이 함수만 고치면 나머지 도메인
+// 로직(computeSchedule 등)은 안 바뀜
+export function createShuttleRow(raw: { route: string; period: string; dayType: string; dep: string }): ShuttleRow {
+  return {
+    route: raw.route,
+    period: raw.period,
+    dayType: raw.dayType,
+    dep: raw.dep,
+  };
+}
+
+// 지하철 도착 정보 도메인 엔티티 (raw 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
+export interface SubwayArrival {
+  subwayId: string;
+  updnLine: string;
+  dest: string;
+  arrTime: string;
+  trainNo: string;
+  isRealtime: boolean;
+}
+
+export function createSubwayArrival(raw: {
+  subwayId: string;
+  updnLine: string;
+  dest: string;
+  arrTime: string;
+  trainNo: string;
+  isRealtime: boolean;
+}): SubwayArrival {
+  return {
+    subwayId: raw.subwayId,
+    updnLine: raw.updnLine,
+    dest: raw.dest,
+    arrTime: raw.arrTime,
+    trainNo: raw.trainNo,
+    isRealtime: raw.isRealtime,
+  };
 }
 
 export interface ScheduleItem {
@@ -53,7 +93,7 @@ export interface ShuttleAppConfig {
   force_no_operation?: boolean;
 }
 
-// connectingTrains가 필요로 하는 최소 구조 (실제 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
+// connectingTrains가 필요로 하는 최소 구조 (실제 값은 위 SubwayArrival)
 export interface SubwayArrivalLike {
   subwayId: string;
   updnLine: string;

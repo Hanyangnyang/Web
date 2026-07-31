@@ -1,9 +1,9 @@
 // 유스케이스: 체대 헬스장 시간표 조회
-import type { GymScheduleApiResponse } from '../../data/datasources/GymApiDataSource.js';
-import type { GymRepository } from '../../data/repositories/GymRepository.js';
+import type { GymSchedule } from '../entities/Gym.js';
+import type { GymRepository } from '../repositories/IGymRepository.js';
 
 export interface GetGymScheduleUseCase {
-  execute: () => Promise<GymScheduleApiResponse>;
+  execute: () => Promise<GymSchedule>;
 }
 
 export const createGetGymScheduleUseCase = (

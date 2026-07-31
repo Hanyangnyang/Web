@@ -1,9 +1,9 @@
 // 유스케이스: 셔틀 시간표 원본 데이터 조회 (최초 1회 로드)
-import type { ShuttleScheduleRow } from '../../data/datasources/ShuttleDataSource.js';
-import type { ShuttleRepository } from '../../data/repositories/ShuttleRepository.js';
+import type { ShuttleRow } from '../entities/Shuttle.js';
+import type { ShuttleRepository } from '../repositories/IShuttleRepository.js';
 
 export interface GetShuttleDataUseCase {
-  execute: () => Promise<ShuttleScheduleRow[]>;
+  execute: () => Promise<ShuttleRow[]>;
 }
 
 export const createGetShuttleDataUseCase = (

@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react';
-import type { LibraryStatus } from '../../../data/repositories/PortalRepository.js';
+import type { LibraryStatus } from '../../../domain/repositories/IPortalRepository.js';
 
 interface LibraryStatusCardProps {
   library: LibraryStatus | null;

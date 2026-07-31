@@ -1,8 +1,7 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { ChevronDown } from 'lucide-react';
-import type { ScheduleItem, ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
-import type { SubwayArrivalApiItem } from '../../../data/datasources/ShuttleDataSource.js';
+import type { ScheduleItem, ShuttleAppConfig, SubwayArrival } from '../../../domain/entities/Shuttle.js';
 import { TimetableRow } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { StopSelector } from './StopSelector.jsx';
@@ -25,7 +24,7 @@ interface SchoolShuttleSectionProps {
   schedule: (ScheduleItem & { isLast?: boolean })[];
   nextIdx: number;
   now: number;
-  subwayArrivals: SubwayArrivalApiItem[];
+  subwayArrivals: SubwayArrival[];
   subwayOffPeak: boolean;
   isHolidayServer: boolean | null;
   isWeekend: boolean;
