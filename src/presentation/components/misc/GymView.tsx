@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useGymSchedule } from '../../hooks/useGymSchedule.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
+import { NoticeBanner } from '../common/NoticeBanner.jsx';
+import { getKSTDateKey, getKSTNow } from '../../../utils/time.js';
 import type { GymScheduleCell, GymScheduleRow, GymPeriod } from '../../../data/datasources/GymApiDataSource.js';
 
 type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
@@ -67,35 +69,20 @@ export function GymView({ onBack }: GymViewProps) {
   useBackHandler(onBack);
   const { gymData, loadErr } = useGymSchedule();
   const [activePeriodId, setActivePeriodId] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(getKSTNow);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
-  const [showNotice, setShowNotice] = useState(false);
 
   // 데이터 도착 후, 오늘 날짜 기준 현재 기간 최초 1회 자동 판별
   useEffect(() => {
     if (!gymData || activePeriodId) return;
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const todayStr = getKSTDateKey();
     const matched = gymData.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
     setActivePeriodId(matched ? matched.id : 'semester');
   }, [gymData, activePeriodId]);
 
   useEffect(() => {
-    if (activePeriodId !== 'vacation') {
-      setShowNotice(false);
-      return;
-    }
-
-    const showTimer = setTimeout(() => {
-      setShowNotice(true);
-    }, 1000);
-
-    return () => clearTimeout(showTimer);
-  }, [activePeriodId]);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    const timer = setInterval(() => setCurrentTime(getKSTNow()), 60000);
     return () => clearInterval(timer);
   }, []);
 
@@ -230,19 +217,11 @@ export function GymView({ onBack }: GymViewProps) {
         </div>
       </header>
 
-      {/* 방학 단축 운영 안내 배너 (슬라이드 애니메이션 적용) */}
-      <div
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${showNotice && activePeriodId === 'vacation' ? 'max-h-16 mb-4 opacity-100' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
-      >
-        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/[0.04] border border-primary/10 rounded-card">
-          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" className="text-primary flex-shrink-0">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <span className="text-[12px] font-bold text-text-main leading-tight">
-            방학 기간에는 수업이 없고 19시까지로 단축 운영해요 💪
-          </span>
-        </div>
-      </div>
+      {/* 방학 단축 운영 안내 배너 */}
+      <NoticeBanner
+        shouldShow={activePeriodId === 'vacation'}
+        message="방학 기간에는 수업이 없고 19시까지로 단축 운영해요 💪"
+      />
 
       <div className="mb-8">
         <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden relative">

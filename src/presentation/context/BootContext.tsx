@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { supabase } from '../../lib/supabase.js';
+import { getKSTDateKey } from '../../utils/time.js';
 
 export interface AppConfig {
   current_period: string;
@@ -60,8 +61,7 @@ export function BootProvider({ children }: { children: React.ReactNode }) {
     if (override) return override;
     if (!schedule || schedule.length === 0) return '학기중';
 
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const todayStr = getKSTDateKey();
 
     // 시작일 기준 내림차순 정렬 (최신순)
     const sorted = [...schedule].sort((a, b) => b.start.localeCompare(a.start));

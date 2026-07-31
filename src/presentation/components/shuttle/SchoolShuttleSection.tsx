@@ -10,6 +10,8 @@ import { ViewModeToggle } from './ViewModeToggle.jsx';
 import { ShuttleSelector } from './ShuttleSelector.jsx';
 import { SubwayDropdown } from './SubwayDropdown.jsx';
 import { TimetableRow } from './TimetableRow.jsx';
+import { NoticeBanner } from '../common/NoticeBanner.jsx';
+import { getKSTToday } from '../../../utils/time.js';
 
 interface PeriodScheduleItem {
   start: string;
@@ -83,13 +85,9 @@ export function SchoolShuttleSection({
   const [subwayRedirecting, setSubwayRedirecting] = useState(false);
   const hasInteractedRef = useRef(false);
 
-  // 다음 학기/방학/계절학기 전환 알림 툴팁 상태
-  const [showNotice, setShowNotice] = useState(false);
-
   const upcomingSchedule = (() => {
     if (!appConfig?.period_schedule || appConfig.period_schedule.length === 0) return null;
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = getKSTToday();
 
     const futureSchedules = appConfig.period_schedule.filter(item => {
       const parts = item.start.split('-');
@@ -106,18 +104,46 @@ export function SchoolShuttleSection({
     return futureSchedules[0];
   })();
 
-  useEffect(() => {
-    if (!upcomingSchedule || !isActive) return;
+  // upcomingSchedule이 있을 때 배너에 보여줄 "N월 N일부터 정규학기 시간표로 변경됩니다" 문구 조립
+  const upcomingScheduleMessage = upcomingSchedule ? (() => {
+    const parts = upcomingSchedule.start.split('-');
+    let formattedStartDate = '';
+    if (parts.length === 3) {
+      const targetDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const today = getKSTToday();
 
-    // 1초 뒤 나타남 (이후 그대로 유지)
-    const showTimer = setTimeout(() => {
-      setShowNotice(true);
-    }, 1000);
+      const getMonday = (d: Date) => {
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+        monday.setHours(0, 0, 0, 0);
+        return monday;
+      };
 
-    return () => {
-      clearTimeout(showTimer);
+      const todayMonday = getMonday(today);
+      const targetMonday = getMonday(targetDate);
+
+      const diffWeeks = Math.round((targetMonday.getTime() - todayMonday.getTime()) / (1000 * 60 * 60 * 24 * 7));
+      const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+      const dayName = weekdays[targetDate.getDay()];
+
+      if (diffWeeks === 0) {
+        formattedStartDate = `이번 주 ${dayName}`;
+      } else if (diffWeeks === 1) {
+        formattedStartDate = `다음 주 ${dayName}`;
+      } else {
+        formattedStartDate = `${parseInt(parts[1], 10)}월 ${parseInt(parts[2], 10)}일`;
+      }
+    }
+    const nameMap: Record<string, string> = {
+      '학기중': '정규학기',
+      '방학중': '방학',
+      '계절학기': '계절학기'
     };
-  }, [upcomingSchedule, isActive]);
+    const periodDisplayName = nameMap[upcomingSchedule.name] || upcomingSchedule.name;
+
+    return `${formattedStartDate}부터 ${periodDisplayName} 시간표로 변경됩니다 😊`;
+  })() : null;
 
   const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
   const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
@@ -259,60 +285,8 @@ export function SchoolShuttleSection({
         </div>
       </div>
 
-      {/* 다가오는 시간표 변경 안내 배너 (슬라이드 애니메이션 적용) */}
-      {upcomingSchedule && (() => {
-        const parts = upcomingSchedule.start.split('-');
-        let formattedStartDate = '';
-        if (parts.length === 3) {
-          const targetDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-          const nowObj = new Date();
-          const today = new Date(nowObj.getFullYear(), nowObj.getMonth(), nowObj.getDate());
-
-          const getMonday = (d: Date) => {
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(d.getFullYear(), d.getMonth(), diff);
-            monday.setHours(0, 0, 0, 0);
-            return monday;
-          };
-
-          const todayMonday = getMonday(today);
-          const targetMonday = getMonday(targetDate);
-
-          const diffWeeks = Math.round((targetMonday.getTime() - todayMonday.getTime()) / (1000 * 60 * 60 * 24 * 7));
-          const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-          const dayName = weekdays[targetDate.getDay()];
-
-          if (diffWeeks === 0) {
-            formattedStartDate = `이번 주 ${dayName}`;
-          } else if (diffWeeks === 1) {
-            formattedStartDate = `다음 주 ${dayName}`;
-          } else {
-            formattedStartDate = `${parseInt(parts[1], 10)}월 ${parseInt(parts[2], 10)}일`;
-          }
-        }
-        const nameMap: Record<string, string> = {
-          '학기중': '정규학기',
-          '방학중': '방학',
-          '계절학기': '계절학기'
-        };
-        const periodDisplayName = nameMap[upcomingSchedule.name] || upcomingSchedule.name;
-
-        return (
-          <div
-            className={`overflow-hidden transition-all duration-500 ease-in-out ${showNotice ? 'max-h-16 mb-4 opacity-100' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
-          >
-            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/[0.04] border border-primary/10 rounded-card">
-              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round" className="text-primary flex-shrink-0">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span className="text-[12px] font-bold text-text-main leading-tight">
-                {formattedStartDate}부터 {periodDisplayName} 시간표로 변경됩니다 😊
-              </span>
-            </div>
-          </div>
-        );
-      })()}
+      {/* 다가오는 시간표 변경 안내 배너 — 한번 뜨면 대상 기간이 될 때까지 계속 유지 */}
+      <NoticeBanner shouldShow={isActive && !!upcomingSchedule} message={upcomingScheduleMessage ?? ''} persistOnceShown />
 
       {/* 시간표 */}
       <div className="mb-6">

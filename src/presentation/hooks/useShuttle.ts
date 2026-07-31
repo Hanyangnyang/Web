@@ -7,6 +7,7 @@ import { getDistanceKm } from '../../domain/utils/geo.js';
 import { getShuttleDataUseCase, getSubwayArrivalsUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
+import { getKSTDateKey, getKSTParts } from '../../utils/time.js';
 
 const SCHEDULE_TTL = 24 * 60 * 60 * 1000; // 24시간 — 로컬 shuttle.json은 앱 재배포 전까지 안 바뀜
 const SUBWAY_POLL_INTERVAL = 2 * 60 * 1000; // 2분
@@ -40,10 +41,7 @@ const pickClosestStop = ({ latitude, longitude }: Coords) => {
   return minDistance >= 1.0 ? '한대앞' : closestStop;
 };
 
-const todayStr = () => {
-  const today = new Date();
-  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-};
+const todayStr = () => getKSTDateKey();
 
 // ─── 공개 Prefetch 함수 (App.jsx 에서 앱 시작 시 호출) ─────────────
 export function prefetchShuttleSchedule() {
@@ -127,7 +125,7 @@ export function useShuttle(isActive = false) {
   useEffect(() => {
     if (isFullMode || !normalSubwayQuery.data) return;
     const isHol = normalSubwayQuery.data.isHoliday
-      || [0, 6].includes(new Date().getDay())
+      || [0, 6].includes(getKSTParts().day)
       || (appConfig.custom_holidays || []).includes(todayStr())
       || !!appConfig.force_weekend;
     setFullDayType(isHol ? '주말' : '평일');
@@ -159,7 +157,7 @@ export function useShuttle(isActive = false) {
 
   // isWeekend: 요일 + custom_holidays + force_weekend 모두 반영
   const customHols = appConfig.custom_holidays || [];
-  const isWeekend = [0, 6].includes(new Date().getDay())
+  const isWeekend = [0, 6].includes(getKSTParts().day)
     || customHols.includes(todayStr())
     || !!appConfig.force_weekend;
 

@@ -1,4 +1,5 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
+import { getKSTParts, getKSTDateKey } from '../../utils/time.js';
 
 export interface RouteStopDef {
   name: string;
@@ -128,28 +129,23 @@ export const SUBWAY_OPTS: SubwayOpt[] = [
 
 // ── 순수 헬퍼 함수 ──
 export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-export const curMin = ()  => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+export const curMin = () => { const { hours, minutes } = getKSTParts(); return hours * 60 + minutes; };
 
 export const dayType = (isHolidayServer: boolean | null, customHolidays: string[] = [], forceWeekend = false) => {
   if (forceWeekend) return '주말';
   if (isHolidayServer === true) return '주말';
 
-  const now = new Date();
-  const yyyymmdd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  if (customHolidays.includes(yyyymmdd)) return '주말';
+  const { day } = getKSTParts();
+  if (customHolidays.includes(getKSTDateKey())) return '주말';
 
-  const d = now.getDay();
-  return (d === 0 || d === 6) ? '주말' : '평일';
+  return (day === 0 || day === 6) ? '주말' : '평일';
 };
 
 const pad2      = (n: number) => String(n).padStart(2, '0');
 const intToHHMM = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`;
 
-// 현재 날짜 문자열 (YYYY-MM-DD)
-const getYYYYMMDD = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-};
+// 현재 날짜 문자열 (YYYY-MM-DD, KST 기준)
+const getYYYYMMDD = () => getKSTDateKey();
 
 // ── 공통: allData를 displayStop 기준 시간 목록으로 매핑 ──
 function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleItem[] {
