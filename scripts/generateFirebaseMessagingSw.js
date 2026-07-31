@@ -1,14 +1,26 @@
-// 이 파일은 자동 생성됩니다 — scripts/generateFirebaseMessagingSw.js가 dev/build 시마다 새로 씁니다.
+import { writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+const OUTPUT_PATH = path.resolve(process.cwd(), 'public/firebase-messaging-sw.js');
+
+// public/firebase-messaging-sw.js는 Service Worker라 import.meta.env를 못 읽어서,
+// firebaseConfig 값을 여기 손으로도 하드코딩해야 했음 — src/lib/firebase.ts와 값이
+// 어긋날 위험(Firebase 프로젝트 교체/키 로테이션 시 한쪽만 고치고 잊어버리는 경우)이 있었음.
+// 그래서 같은 .env(VITE_FIREBASE_*)를 유일한 출처로 삼아 dev 서버 시작·빌드 시마다 이 파일을 새로 생성한다.
+export function generateFirebaseMessagingSw(env) {
+  const firebaseConfig = {
+    apiKey: env.VITE_FIREBASE_API_KEY,
+    projectId: env.VITE_FIREBASE_PROJECT_ID,
+    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: env.VITE_FIREBASE_APP_ID,
+  };
+
+  const content = `// 이 파일은 자동 생성됩니다 — scripts/generateFirebaseMessagingSw.js가 dev/build 시마다 새로 씁니다.
 // 직접 수정하지 말고 .env의 VITE_FIREBASE_* 값을 바꾼 뒤 dev 서버를 재시작하거나 다시 빌드하세요.
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-const firebaseConfig = {
-  "apiKey": "AIzaSyDKLyhe1GIcf00pZAVeqB3qveqNKhTcsFs",
-  "projectId": "ha-nyang-nyang",
-  "messagingSenderId": "332911939460",
-  "appId": "1:332911939460:web:a31fab4e45caf457d717d1"
-};
+const firebaseConfig = ${JSON.stringify(firebaseConfig, null, 2)};
 
 firebase.initializeApp(firebaseConfig);
 
@@ -55,3 +67,7 @@ self.addEventListener('notificationclick', function(event) {
     );
   }
 });
+`;
+
+  writeFileSync(OUTPUT_PATH, content, 'utf-8');
+}
