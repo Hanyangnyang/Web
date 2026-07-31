@@ -1,6 +1,8 @@
 // 컴포넌트: 학식 탭 식당 선택 칩 목록 ("전체" + 식당별)
 import { useEffect, useRef } from 'react';
-import type { Cafe } from '../../../domain/entities/Cafe.js';
+import { createCafe, KNOWN_CAFES, type Cafe } from '../../../domain/entities/Cafe.js';
+
+const PLACEHOLDER_CAFES: Cafe[] = KNOWN_CAFES.map(({ id, name }) => createCafe({ id, name, available: true }));
 
 interface CafeChipSelectorProps {
   cafes: Cafe[];
@@ -11,6 +13,7 @@ interface CafeChipSelectorProps {
 
 export function CafeChipSelector({ cafes, selectedCafeId, loading, onSelect }: CafeChipSelectorProps) {
   const chipScrollRef = useRef<HTMLDivElement>(null);
+  const displayCafes = loading && cafes.length === 0 ? PLACEHOLDER_CAFES : cafes;
 
   // 선택된 칩이 잘릴 경우 자동 스크롤
   useEffect(() => {
@@ -48,7 +51,7 @@ export function CafeChipSelector({ cafes, selectedCafeId, loading, onSelect }: C
         전체
       </div>
 
-      {cafes.map(cafe => (
+      {displayCafes.map(cafe => (
         <div
           key={cafe.id}
           data-cafe-id={cafe.id}

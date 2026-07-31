@@ -38,3 +38,10 @@ export const createCafe = ({ id, name, menus = [], hasJeyuk = false, available =
   available,
   hours,
 });
+
+export const KNOWN_CAFES: { id: string; name: string }[] = [
+  { id: 're12', name: '학생식당' },
+  { id: 're15', name: '창업보육센터' },
+  { id: 're11', name: '교직원식당' },
+  { id: 're13', name: '기숙사식당' },
+];
