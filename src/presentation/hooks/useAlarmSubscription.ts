@@ -2,7 +2,7 @@
 // (localStorage 캐시, get/upsert_alarm_subscription RPC, 알림 권한 체크)
 import { useEffect, useState } from 'react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase.js';
-import { supabase } from '../../lib/supabase.js';
+import { supabase, getOrCreateAnonymousUserId } from '../../lib/supabase.js';
 import { getPlatform } from '../../lib/platform.js';
 
 interface StoredState<TParams> {
@@ -33,17 +33,6 @@ export interface UseAlarmSubscriptionResult<TParams> {
   // 시트가 닫히는 시점에 호출 — dirty할 때만 localStorage 저장 + 서버 반영(RPC)하고,
   // 구독 조건을 충족했으면 성공 메시지를, 아니면 undefined를 반환
   commitOnClose: () => string | undefined;
-}
-
-async function getOrCreateSecureDeviceId(): Promise<string> {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user?.id) {
-    return session.user.id;
-  }
-  const { data, error } = await supabase.auth.signInAnonymously();
-  if (error) throw error;
-  if (!data.session) throw new Error('Failed to create anonymous session');
-  return data.session.user.id;
 }
 
 export function useAlarmSubscription<TParams>({
@@ -86,7 +75,7 @@ export function useAlarmSubscription<TParams>({
   useEffect(() => {
     async function syncWithServer() {
       try {
-        const deviceId = await getOrCreateSecureDeviceId();
+        const deviceId = await getOrCreateAnonymousUserId();
         const { data, error } = await supabase.rpc('get_alarm_subscription', {
           p_device_id: deviceId,
           p_topic: topic,
@@ -146,7 +135,7 @@ export function useAlarmSubscription<TParams>({
         try {
           const token = await requestNotificationPermission();
           if (token) {
-            const deviceId = await getOrCreateSecureDeviceId();
+            const deviceId = await getOrCreateAnonymousUserId();
             await supabase.rpc('upsert_alarm_subscription', {
               p_device_id: deviceId,
               p_fcm_token: token,
@@ -167,7 +156,7 @@ export function useAlarmSubscription<TParams>({
     if (!snapshot.enabled) {
       (async () => {
         try {
-          const deviceId = await getOrCreateSecureDeviceId();
+          const deviceId = await getOrCreateAnonymousUserId();
           await supabase.rpc('upsert_alarm_subscription', {
             p_device_id: deviceId,
             p_fcm_token: null,

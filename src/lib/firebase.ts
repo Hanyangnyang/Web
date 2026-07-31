@@ -33,56 +33,61 @@ export const initMessaging = async (): Promise<Messaging | null> => {
 
 let cachedNativeToken: string | null = null;
 
+// 네이티브 알림 권한 요청 + FCM 토큰 발급 (Capacitor PushNotifications + @capacitor-community/fcm)
+const requestNativeFcmToken = async (): Promise<string | null> => {
+  let permStatus = await PushNotifications.checkPermissions(); // OS 권한 확인
+
+  if (permStatus.receive === 'prompt') {
+    permStatus = await PushNotifications.requestPermissions(); // OS 권한 팝업
+  }
+
+  if (permStatus.receive !== 'granted') { // OS 권한 거부
+    console.warn('Native notification permission denied');
+    return null;
+  }
+
+  if (cachedNativeToken) return cachedNativeToken;
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      PushNotifications.addListener('registration', () => resolve());
+      PushNotifications.addListener('registrationError', (err) => reject(new Error(err.error)));
+      PushNotifications.register();
+    });
+    const { token } = await FCM.getToken(); // FCM 토큰 발급
+    cachedNativeToken = token; // FCM 토큰 캐싱
+    return token;
+  } catch (e) {
+    console.error('FCM Push register failed:', e);
+    return null;
+  }
+};
+
+// 웹/PWA 알림 권한 요청 + FCM 토큰 발급 (브라우저 Notification API + firebase/messaging)
+const requestWebFcmToken = async (): Promise<string | null> => {
+  const msg = await initMessaging();
+  if (!msg) {
+    console.warn('Messaging not supported on this browser');
+    return null;
+  }
+
+  const permission = await Notification.requestPermission(); // 브라우저 권한 팝업
+  if (permission !== 'granted') { // 브라우저 권한 거부
+    console.warn('Notification permission denied');
+    return null;
+  }
+
+  return getToken(msg, {
+    vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+  });
+};
+
 // 웹/네이티브 각각 알림 권한 요청 및 토큰 발급
 export const requestNotificationPermission = async (): Promise<string | null> => {
   try {
-    // 네이티브
-    if (Capacitor.isNativePlatform()) {
-      let permStatus = await PushNotifications.checkPermissions(); // OS 권한 확인
-
-      if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions(); // OS 권한 팝업
-      }
-
-      if (permStatus.receive === 'granted') { // OS 권한 허용
-        if (cachedNativeToken) return cachedNativeToken;
-
-        try {
-          await new Promise<void>((resolve, reject) => {
-            PushNotifications.addListener('registration', () => resolve());
-            PushNotifications.addListener('registrationError', (err) => reject(new Error(err.error)));
-            PushNotifications.register();
-          });
-          const { token } = await FCM.getToken(); // FCM 토큰 발급
-          cachedNativeToken = token; // FCM 토큰 캐싱
-          return token;
-        } catch (e) {
-          console.error('FCM Push register failed:', e);
-          return null;
-        }
-      } else { // OS 권한 거부
-        console.warn('Native notification permission denied');
-        return null;
-      }
-    }
-
-    const msg = await initMessaging();
-    if (!msg) {
-      console.warn('Messaging not supported on this browser');
-      return null;
-    }
-
-    // 웹/PWA
-    const permission = await Notification.requestPermission(); // 브라우저 권한 팝업
-    if (permission === 'granted') { // 브라우저 권한 허용
-      const token = await getToken(msg, {
-        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-      });
-      return token;
-    } else { // 브라우저 권한 거부
-      console.warn('Notification permission denied');
-      return null;
-    }
+    return Capacitor.isNativePlatform()
+      ? await requestNativeFcmToken()
+      : await requestWebFcmToken();
   } catch (error) {
     console.error('Error requesting notification permission:', error);
     return null;
