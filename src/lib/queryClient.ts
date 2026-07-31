@@ -8,8 +8,8 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000,   // 기본 15분 
-      gcTime: 24 * 60 * 60 * 1000, // 24시간 
+      staleTime: 15 * 60 * 1000,   // 기본 15분
+      gcTime: 24 * 60 * 60 * 1000, // 24시간
       refetchOnWindowFocus: false, // 모바일 웹뷰 특성상 불필요, 탭 재진입 갱신은 isVisible로 각 훅이 직접 제어
     },
   },

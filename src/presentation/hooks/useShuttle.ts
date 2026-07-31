@@ -45,14 +45,6 @@ const todayStr = () => {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 };
 
-// BootContext.jsx가 아직 JS라 useBoot()의 반환 타입을 추론할 수 없어 여기서만 임시로 명시
-// (BootContext를 TS로 옮기면 이 타입은 그쪽 export로 대체)
-interface AppConfig {
-  current_period: string;
-  custom_holidays: string[];
-  force_weekend: boolean;
-}
-
 // ─── 공개 Prefetch 함수 (App.jsx 에서 앱 시작 시 호출) ─────────────
 export function prefetchShuttleSchedule() {
   return queryClient.prefetchQuery({
@@ -63,7 +55,7 @@ export function prefetchShuttleSchedule() {
 }
 
 export function useShuttle(isActive = false) {
-  const { appConfig } = useBoot() as { appConfig: AppConfig };
+  const { appConfig } = useBoot();
   const [stop, setStopState] = useState(() => localStorage.getItem('shuttle_stop') || '한대앞');
   const [lineId, setLineIdState] = useState(() => localStorage.getItem('shuttle_lineId') || 'line4-bulam');
   const [now, setNow] = useState(curMin);
