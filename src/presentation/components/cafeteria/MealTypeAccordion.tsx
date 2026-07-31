@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { getMenuIcon, parseBoldText } from './cafeteriaFormat.js';
 import { MenuEntry } from './MenuEntry.js';
+import { Accordion } from '../ui/Accordion.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
@@ -56,30 +57,25 @@ export function MealTypeAccordion({
   const cafeGroups = isAllMode ? groupByCafe(menus) : null;
 
   return (
-    <div className="mb-3 bg-white rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)] overflow-hidden" data-type={type} style={{ scrollMarginTop: '140px' }}>
-      <div
-        className="flex justify-between items-center px-4 py-2.5 cursor-pointer transition-colors duration-150 hover:bg-slate-50 select-none"
-        onClick={onToggle}
-      >
-        <div className="flex items-center gap-2 min-w-0">
+    <Accordion
+      isExpanded={isExpanded}
+      onToggle={onToggle}
+      dataType={type}
+      style={{ scrollMarginTop: '140px' }}
+      header={
+        <>
           <span className="text-xl flex-shrink-0">{getMenuIcon(type)}</span>
           <span className="font-bold text-[16px] tracking-tight text-text-main flex-shrink-0">{type}</span>
           {hoursText && <span className="text-[12px] text-text-hint truncate">{hoursText}</span>}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
-            {menus.length}개 메뉴
-          </span>
-          <ChevronRight
-            style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
-            size={16}
-            color="#94a3b8"
-          />
-        </div>
-      </div>
-      <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-        <div className="accordion-inner border-t border-[#f1f5f9]">
-          {isAllMode && cafeGroups ? (
+        </>
+      }
+      extra={
+        <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
+          {menus.length}개 메뉴
+        </span>
+      }
+    >
+      {isAllMode && cafeGroups ? (
             <div className="text-left flex flex-col overflow-hidden w-full">
               {cafeGroups.map((group, groupIdx) => {
                 const isCafeExpanded = !!expandedCafeIds[group.cafeId];
@@ -169,8 +165,6 @@ export function MealTypeAccordion({
               </React.Fragment>
             ))
           )}
-        </div>
-      </div>
-    </div>
+    </Accordion>
   );
 }

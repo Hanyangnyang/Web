@@ -1,9 +1,10 @@
 // 컴포넌트: 한양대 ERICA 공식 인스타그램 계정 목록 및 프로필 이미지 표시
 import { useState } from 'react';
-import { ArrowLeft, ChevronDown } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { INSTA_ACCOUNTS, type InstagramAccountInfo, type InstagramProfile } from '../../../domain/entities/InstagramAccount.js';
 import { useInstagram } from '../../hooks/useInstagram.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
+import { Accordion } from '../ui/Accordion.js';
 
 type GroupKey = 'erica' | 'college';
 
@@ -84,33 +85,22 @@ interface AccountGroupProps {
 function AccountGroup({ groupKey, title, accounts, expanded, onToggle, profiles, getProxiedUrl }: AccountGroupProps) {
   const isExpanded = expanded[groupKey];
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3">
-      <div
-        className="flex justify-between items-center px-4 py-2.5 cursor-pointer transition-colors duration-150 hover:bg-slate-50 select-none"
-        onClick={() => onToggle(groupKey)}
-      >
-        <span className="font-bold text-[16px] tracking-tight text-text-main">{title}</span>
-        <div className="flex items-center gap-2">
-          <ChevronDown
-            size={16}
-            className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-          />
-        </div>
-      </div>
-      <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-        <div className="accordion-inner border-t border-[#f1f5f9]">
-          {accounts.map((acc, idx) => (
-            <AccountItem
-              key={acc.username}
-              acc={acc}
-              isFirst={idx === 0}
-              profile={profiles[acc.username]}
-              getProxiedUrl={getProxiedUrl}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    <Accordion
+      isExpanded={isExpanded}
+      onToggle={() => onToggle(groupKey)}
+      chevronDirection="down"
+      header={<span className="font-bold text-[16px] tracking-tight text-text-main">{title}</span>}
+    >
+      {accounts.map((acc, idx) => (
+        <AccountItem
+          key={acc.username}
+          acc={acc}
+          isFirst={idx === 0}
+          profile={profiles[acc.username]}
+          getProxiedUrl={getProxiedUrl}
+        />
+      ))}
+    </Accordion>
   );
 }
 
