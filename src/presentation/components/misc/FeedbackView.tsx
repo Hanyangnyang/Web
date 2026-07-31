@@ -11,7 +11,7 @@ interface FeedbackViewProps {
 export function FeedbackView({ onBack }: FeedbackViewProps) {
   useBackHandler(onBack);
   const [content, setContent] = useState('');
-  const { loading, submitted, submit } = useFeedback();
+  const { loading, submitted, error, submit } = useFeedback();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +26,6 @@ export function FeedbackView({ onBack }: FeedbackViewProps) {
       setContent('');
     } catch (err) {
       console.error('Failed to submit feedback:', err);
-      alert('피드백 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
@@ -85,6 +84,10 @@ export function FeedbackView({ onBack }: FeedbackViewProps) {
             disabled={loading}
             className="w-full min-h-[140px] p-3.5 text-xs border border-[#cbd5e1] rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-text-hint resize-none font-semibold transition-all bg-slate-50/30"
           />
+
+          {error && (
+            <p className="text-error text-[11px] font-bold">{error}</p>
+          )}
 
           <div className="flex justify-between items-center">
             <span className="text-[10px] text-text-hint font-bold">

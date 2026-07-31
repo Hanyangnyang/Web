@@ -1,26 +1,25 @@
 // 훅(ViewModel): 피드백 작성·제출 상태 관리
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { submitFeedbackUseCase } from '../../di.js';
 
 export interface UseFeedbackResult {
   loading: boolean;
   submitted: boolean;
+  error: string | null;
   submit: (content: string) => Promise<void>;
 }
 
 export function useFeedback(): UseFeedbackResult {
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const mutation = useMutation({
+    mutationFn: (content: string) => submitFeedbackUseCase.execute(content),
+  });
 
-  const submit = async (content: string) => {
-    setLoading(true);
-    try {
-      await submitFeedbackUseCase.execute(content);
-      setSubmitted(true);
-    } finally {
-      setLoading(false);
-    }
+  return {
+    loading: mutation.isPending,
+    submitted: mutation.isSuccess,
+    error: mutation.isError ? '피드백을 보내지 못했어요. 잠시 후 다시 시도해 주세요 🙏' : null,
+    submit: async (content: string) => {
+      await mutation.mutateAsync(content);
+    },
   };
-
-  return { loading, submitted, submit };
 }
