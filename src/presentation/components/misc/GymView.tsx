@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useGymSchedule } from '../../hooks/useGymSchedule.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
-import { NoticeBanner } from '../common/NoticeBanner.jsx';
+import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { getKSTDateKey, getKSTNow } from '../../../utils/time.js';
 import type { GymScheduleCell, GymScheduleRow, GymPeriod } from '../../../data/datasources/GymApiDataSource.js';
 

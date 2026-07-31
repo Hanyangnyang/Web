@@ -10,7 +10,7 @@ import { ViewModeToggle } from './ViewModeToggle.jsx';
 import { ShuttleSelector } from './ShuttleSelector.jsx';
 import { SubwayDropdown } from './SubwayDropdown.jsx';
 import { TimetableRow } from './TimetableRow.jsx';
-import { NoticeBanner } from '../common/NoticeBanner.jsx';
+import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { getKSTToday } from '../../../utils/time.js';
 
 interface PeriodScheduleItem {
