@@ -11,6 +11,8 @@ import { PartnershipView } from './presentation/components/partnership/Partnersh
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
+import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
+import { OfflineModal } from './presentation/components/common/OfflineModal';
 import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
@@ -38,9 +40,11 @@ interface CafeDeepLink {
 
 export default function App() {
   return (
-    <BootProvider>
-      <MainLayout />
-    </BootProvider>
+    <NetworkProvider>
+      <BootProvider>
+        <MainLayout />
+      </BootProvider>
+    </NetworkProvider>
   );
 }
 
@@ -78,6 +82,7 @@ function MainLayout() {
   });
   const [miscResetSignal, setMiscResetSignal] = useState(0);
   const { isAppReady, splashDone, completeSplash } = useBoot();
+  const { isOnline } = useNetwork();
   const posthog = usePostHog();
   const tabStartTime = useRef(Date.now());
 
@@ -196,7 +201,7 @@ function MainLayout() {
       {/* 스플래시 화면 */}
       {!splashDone && (
         <SplashScreen
-          ready={isAppReady}
+          ready={isAppReady && isOnline}
           onDone={completeSplash}
           variant={isCafeteriaLink ? 'menu' : 'default'}
         />
@@ -205,10 +210,13 @@ function MainLayout() {
       {showCafeDeepLinkLoader && (
         <SplashScreen
           variant="menu"
-          ready={!menuLoading}
+          ready={!menuLoading && isOnline}
           onDone={() => setShowCafeDeepLinkLoader(false)}
         />
       )}
+      {/* 오프라인 안내 모달: 스플래시 도중이든 이후든 오프라인이면 항상 노출, 스플래시가 뒤로 넘어가지 못하게 막음 */}
+      <OfflineModal />
+
       {/* 메인 콘텐츠 화면 */}
       <div
         className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden"
