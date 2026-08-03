@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 import { supabase } from '../../lib/supabase.js';
 import { getKSTDateKey } from '../../utils/time.js';
 
+// app_config 조회가 응답 없이 매달리면 markReady('config')가 영영 안 불려 스플래시가 무한로딩되므로,
+// 이 시간 안에 응답이 없으면 요청을 중단하고 캐시값(또는 기본값)으로 진행한다.
+const CONFIG_FETCH_TIMEOUT_MS = 8000;
+
 export interface AppConfig {
   current_period: string;
   current_period_override?: string;
@@ -88,6 +92,7 @@ export function BootProvider({ children }: { children: React.ReactNode }) {
           .from('app_config')
           .select('*')
           .limit(1)
+          .abortSignal(AbortSignal.timeout(CONFIG_FETCH_TIMEOUT_MS))
           .single();
 
         if (data && !error) {
