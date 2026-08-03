@@ -25,6 +25,7 @@
     "@capacitor/core": "^8.3.4",
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/ios": "^8.3.4",
+    "@capacitor/network": "^8.0.1",
     "@capacitor/push-notifications": "^8.1.1",
     "@capacitor/share": "^8.0.1",
     "@sentry/capacitor": "^4.2.0",
