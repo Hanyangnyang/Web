@@ -10,7 +10,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     // 셔틀 탭 측위를 결정적으로 만들기 위한 가짜 GPS (ERICA 캠퍼스 좌표)
     geolocation: { latitude: 37.2973, longitude: 126.8372 },
-    permissions: ['geolocation'],
+    permissions: ['geolocation', 'notifications'],
   },
   projects: [
     // 하냥냥은 모바일 웹뷰 앱이므로 모바일 뷰포트로 테스트

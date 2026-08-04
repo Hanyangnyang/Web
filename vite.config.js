@@ -2,12 +2,18 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { visualizer } from 'rollup-plugin-visualizer';
+import { generateFirebaseMessagingSw } from './scripts/generateFirebaseMessagingSw.js'
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   // Set the third parameter to '' to load all envs regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
   Object.assign(process.env, env);
+
+  // public/firebase-messaging-sw.js는 Service Worker라 별도 빌드 처리가 없으면
+  // .env 값을 못 읽으므로, 같은 env로 매 dev/build 시작 시 다시 생성해 소스를 하나로 유지
+  generateFirebaseMessagingSw(env);
 
   return {
     build: {
@@ -92,6 +98,13 @@ export default defineConfig(({ mode }) => {
         org: "hanyangnyang",
         project: "capacitor",
       }),
-    ]
+      // ANALYZE=true npm run build 로만 실행 — 매 빌드마다 분석 리포트를 만들 필요는 없음
+      process.env.ANALYZE && visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    ].filter(Boolean)
   }
 })
