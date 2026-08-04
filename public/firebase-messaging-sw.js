@@ -1,11 +1,13 @@
+// 이 파일은 자동 생성됩니다 — scripts/generateFirebaseMessagingSw.js가 dev/build 시마다 새로 씁니다.
+// 직접 수정하지 말고 .env의 VITE_FIREBASE_* 값을 바꾼 뒤 dev 서버를 재시작하거나 다시 빌드하세요.
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDKLyhe1GIcf00pZAVeqB3qveqNKhTcsFs",
-  projectId: "ha-nyang-nyang",
-  messagingSenderId: "332911939460",
-  appId: "1:332911939460:web:a31fab4e45caf457d717d1"
+  "apiKey": "AIzaSyDKLyhe1GIcf00pZAVeqB3qveqNKhTcsFs",
+  "projectId": "ha-nyang-nyang",
+  "messagingSenderId": "332911939460",
+  "appId": "1:332911939460:web:a31fab4e45caf457d717d1"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -14,9 +16,9 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
+
   // notification 필드 대신 data 필드에서 정보를 가져옴
-  const notificationTitle = payload.data?.title || '한양냥 식단 알림';
+  const notificationTitle = payload.data?.title || '하냥냥 학식 알림';
   const notificationOptions = {
     body: payload.data?.body || '등록하신 키워드의 메뉴가 나왔어요!',
     icon: '/icon-192x192.png',
@@ -31,9 +33,9 @@ messaging.onBackgroundMessage(function(payload) {
 // 알림 클릭 이벤트 핸들러 추가
 self.addEventListener('notificationclick', function(event) {
   event.notification.close(); // 알림 닫기
-  
+
   const urlToOpen = event.notification.data?.url;
-  
+
   if (urlToOpen) {
     // 백그라운드에서 알림을 클릭했을 때 해당 URL로 이동
     event.waitUntil(

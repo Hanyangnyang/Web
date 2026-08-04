@@ -1,8 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-display: swap;
+  src: local('Pretendard Regular'), url('/fonts/pretendard/Pretendard-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  font-display: swap;
+  src: local('Pretendard Medium'), url('/fonts/pretendard/Pretendard-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 600;
+  font-display: swap;
+  src: local('Pretendard SemiBold'), url('/fonts/pretendard/Pretendard-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-display: swap;
+  src: local('Pretendard Bold'), url('/fonts/pretendard/Pretendard-Bold.woff2') format('woff2');
+}
 
 @font-face {
   font-family: 'HakgyoansimDunggeunmiso';
-  src: url('/fonts/HakgyoansimDunggeunmiso-B.otf') format('opentype');
+  src: url('/fonts/HakgyoansimDunggeunmiso-B.woff2') format('woff2'),
+       url('/fonts/HakgyoansimDunggeunmiso-B.otf') format('opentype');
   font-weight: bold;
   font-display: block;
 }
@@ -92,26 +116,6 @@ body {
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInFromLeft {
   from {
     opacity: 0;
   }
@@ -336,15 +340,6 @@ body {
   100% {
     opacity: 0.6;
   }
-}
-
-/* ═══ 동적으로 className에 적용되는 애니메이션 클래스 ═══ */
-.tab-slide-right {
-  animation: slideInFromRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tab-slide-left {
-  animation: slideInFromLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .spin-animation {
