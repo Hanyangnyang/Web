@@ -4,26 +4,16 @@ import './index.css'
 import App from './App.jsx'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
-import * as Sentry from '@sentry/capacitor'
-import * as SentryReact from '@sentry/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient.js'
+import { initSentry } from './lib/sentry.js'
 
-// Sentry 초기화
-Sentry.init(
-  {
-    dsn: "https://bb060324beea4e9a9a8ebcb92d08c0f6@o4511642871267328.ingest.us.sentry.io/4511642938245120",
-    enabled: import.meta.env.PROD,
-    environment: import.meta.env.MODE,
-    integrations: [
-      Sentry.browserTracingIntegration(),
-    ],
-    tracesSampleRate: 1.0,
-    tracePropagationTargets: ["localhost", "https://www.hanyang.life"],
-    enableLogs: true,
-  },
-  SentryReact.init,
-)
+// Sentry는 초기 렌더를 막지 않도록, 브라우저가 한가할 때(idle) 지연 로드
+const scheduleIdle: (cb: () => void) => void =
+  typeof window.requestIdleCallback === 'function'
+    ? window.requestIdleCallback.bind(window)
+    : (cb) => setTimeout(cb, 200)
+scheduleIdle(() => { initSentry() })
 
 // PostHog 초기화
 if (import.meta.env.VITE_POSTHOG_KEY) {

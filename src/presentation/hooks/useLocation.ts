@@ -3,7 +3,7 @@
 // 동시에 요청해도 실제 측위는 한 번만 일어난다.
 import { useState, useEffect } from 'react';
 import { Geolocation } from '@capacitor/geolocation';
-import * as Sentry from '@sentry/capacitor';
+import { initSentry } from '../../lib/sentry.js';
 
 export interface Coords {
   latitude: number;
@@ -72,7 +72,9 @@ function measure(): Promise<Coords> {
       return cache;
     })
     .catch((error) => {
-      Sentry.captureMessage('Shuttle geolocation failed', { level: 'warning', extra: { error } });
+      initSentry().then(Sentry => {
+        Sentry.captureMessage('Shuttle geolocation failed', { level: 'warning', extra: { error } });
+      });
       throw error; // 호출부가 각자 폴백을 처리할 수 있게 그대로 전파
     })
     .finally(() => { inflight = null; });
