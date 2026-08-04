@@ -2,7 +2,8 @@
 
 @font-face {
   font-family: 'HakgyoansimDunggeunmiso';
-  src: url('/fonts/HakgyoansimDunggeunmiso-B.otf') format('opentype');
+  src: url('/fonts/HakgyoansimDunggeunmiso-B.woff2') format('woff2'),
+       url('/fonts/HakgyoansimDunggeunmiso-B.otf') format('opentype');
   font-weight: bold;
   font-display: block;
 }
