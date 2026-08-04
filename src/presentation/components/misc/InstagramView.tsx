@@ -1,10 +1,10 @@
 // 컴포넌트: 한양대 ERICA 공식 인스타그램 계정 목록 및 프로필 이미지 표시
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { INSTA_ACCOUNTS, type InstagramAccountInfo, type InstagramProfile } from '../../../domain/entities/InstagramAccount.js';
 import { useInstagram } from '../../hooks/useInstagram.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { Accordion } from '../ui/Accordion.js';
+import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 
 type GroupKey = 'erica' | 'college';
 
@@ -115,19 +115,13 @@ export function InstagramView({ onBack }: InstagramViewProps) {
   const { profiles, getProxiedUrl } = useInstagram();
 
   return (
-    <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
-      <div className="flex items-center gap-4 mb-4">
-        <button
-          className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center cursor-pointer text-text-main transition-all duration-200 hover:bg-surface"
-          onClick={onBack}
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <h2 className="text-xl font-bold text-text-main mb-0">학교 인스타그램</h2>
-      </div>
+    <div className="pb-20">
+      <MiscSubViewHeader title="학교 인스타그램" onBack={onBack} />
 
-      <AccountGroup groupKey="erica" title="에리카" accounts={INSTA_ACCOUNTS.erica} expanded={expanded} onToggle={toggle} profiles={profiles} getProxiedUrl={getProxiedUrl} />
-      <AccountGroup groupKey="college" title="단과대학" accounts={INSTA_ACCOUNTS.college} expanded={expanded} onToggle={toggle} profiles={profiles} getProxiedUrl={getProxiedUrl} />
+      <div className="[animation:slideUp_0.4s_ease-out]">
+        <AccountGroup groupKey="erica" title="에리카" accounts={INSTA_ACCOUNTS.erica} expanded={expanded} onToggle={toggle} profiles={profiles} getProxiedUrl={getProxiedUrl} />
+        <AccountGroup groupKey="college" title="단과대학" accounts={INSTA_ACCOUNTS.college} expanded={expanded} onToggle={toggle} profiles={profiles} getProxiedUrl={getProxiedUrl} />
+      </div>
     </div>
   );
 }

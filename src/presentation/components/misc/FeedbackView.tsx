@@ -1,8 +1,9 @@
 // 컴포넌트: 하냥냥에게 피드백 보내기
 import { useState } from 'react';
-import { Loader2, Laugh, Send, ArrowLeft } from 'lucide-react';
+import { Loader2, Laugh, Send } from 'lucide-react';
 import { useFeedback } from '../../hooks/useFeedback.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
+import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 
 interface FeedbackViewProps {
   onBack: () => void;
@@ -53,18 +54,10 @@ export function FeedbackView({ onBack }: FeedbackViewProps) {
   }
 
   return (
-    <div className="pb-20 [animation:slideUp_0.4s_ease-out]">
-      <div className="flex items-center gap-4 mb-5">
-        <button
-          className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center cursor-pointer text-text-main transition-all duration-200 hover:bg-surface"
-          onClick={onBack}
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <h2 className="text-xl font-bold text-text-main mb-0">피드백 보내기</h2>
-      </div>
+    <div className="pb-20">
+      <MiscSubViewHeader title="피드백 보내기" onBack={onBack} />
 
-      <div className="bg-white border border-[#e2e8f0] rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
+      <div className="bg-white border border-[#e2e8f0] rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)] [animation:slideUp_0.4s_ease-out]">
         <div className="flex items-center gap-2 mb-2">
           <Laugh size={18} className="text-hyu-blue-light" />
           <span className="font-extrabold text-[15px] text-text-main">하냥냥에게 피드백 보내기</span>

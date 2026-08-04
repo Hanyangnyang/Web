@@ -245,7 +245,7 @@ function MainLayout() {
             <PortalView isVisible={activeTab === 'portal'} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
-            <MiscView resetSignal={miscResetSignal} />
+            <MiscView resetSignal={miscResetSignal} isActive={activeTab === 'misc'} />
           </div>
           <div style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
             <PartnershipView isActive={activeTab === 'partner'} />
