@@ -111,12 +111,12 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error(`Insta Proxy Final Error for ${safeUsername}:`, error.message);
 
-    // 4. IMPORTANT: On failure, return the local fallback image info
+    // 4. On failure, return no image so the client shows a blank placeholder
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.status(200).json({
       username: safeUsername,
       fullName: safeUsername,
-      profilePicUrl: '/hanyang_insta_fallback.png',
+      profilePicUrl: null,
       error: true,
       success: false
     });

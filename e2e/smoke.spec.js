@@ -16,7 +16,8 @@ test.beforeEach(async ({ page }) => {
   // Vite dev 서버가 서빙하는 posthog-js 모듈 파일까지 차단돼 앱 부팅이 통째로 죽는다.
   await page.route('**://*.posthog.com/**', (route) => route.abort());
 
-  await page.route('**/api/menu*', (route) => route.fulfill({ json: menu }));
+  // 단일 '*'는 '/'를 건너뛰지 못해 date=YYYY/MM/DD 같은 쿼리스트링에서 매칭이 깨짐 → '**'로 접미사 통일
+  await page.route('**/api/menu**', (route) => route.fulfill({ json: menu }));
   await page.route('**/api/banners*', (route) => route.fulfill({ json: banners }));
   await page.route('**/api/portal*', (route) => {
     const type = new URL(route.request().url()).searchParams.get('type');

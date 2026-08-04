@@ -54,7 +54,7 @@ function getJosa(word: string, josaOptions: [string, string]) {
   if (/[2459]$/.test(word)) return josaOptions[1];
   
   // 영어 알파벳 등 기타 문자는 보통 괄호 처리하거나 '가'로 통일하지만, 
-  // 식단 메뉴는 거의 한글이므로 기본적으로 받침 없다고 가정
+  // 학식 메뉴는 거의 한글이므로 기본적으로 받침 없다고 가정
   return josaOptions[1]; 
 }
 
@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
     const menuSentTokens = new Set();
     const weatherSentTokens = new Set();
 
-    // --- A. 식단 알림(CAFETERIA_KEYWORD) 분할 및 처리 ---
+    // --- A. 학식 알림(CAFETERIA_KEYWORD) 분할 및 처리 ---
     const menuSubs = matchingSubscriptions.filter(sub => sub.topic === 'CAFETERIA_KEYWORD');
     if (menuSubs.length > 0) {
       const todaySubs = menuSubs.filter(sub => (sub.params?.notifyDay || '당일') === '당일');
@@ -249,7 +249,7 @@ Deno.serve(async (req) => {
                   bodyText = `${dayText} ${cafeObj.name}에는 ${mainDish}${josa} 나와요`;
                 }
               } else {
-                bodyText = `${dayText} ${cafeObj.name}의 맛있고 영양 가득한 식단을 확인해보세요!`;
+                bodyText = `${dayText} ${cafeObj.name}의 맛있고 영양 가득한 학식을 확인해보세요!`;
               }
 
               const titleText = isTomorrow ? `내일의 학식 메뉴가 나왔어요!` : `오늘의 학식 메뉴가 나왔어요!`;

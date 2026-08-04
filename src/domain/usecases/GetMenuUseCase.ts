@@ -1,0 +1,13 @@
+// 유스케이스: 특정 날짜의 식당별 학식 정보 조회
+import type { Cafe } from '../entities/Cafe.js';
+import type { MenuRepository } from '../repositories/IMenuRepository.js';
+
+export interface GetMenuUseCase {
+  execute: (dateStr: string) => Promise<Cafe[]>;
+}
+
+export const createGetMenuUseCase = (
+  { menuRepository }: { menuRepository: MenuRepository }
+): GetMenuUseCase => ({
+  execute: (dateStr: string) => menuRepository.getMenus(dateStr),
+});
