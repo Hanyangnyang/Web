@@ -8,7 +8,7 @@ import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
 // 지도 SDK가 무거워서 제휴탭 최초 진입 시에만 청크를 로드한다
-const PartnershipMapView = lazy(() => import('./presentation/components/partnership/PartnershipMapView.tsx'));
+const PartnershipMapView = lazy(() => import('./presentation/components/partnership/PartnershipMapView.jsx'));
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
