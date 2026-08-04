@@ -2,17 +2,10 @@ import { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { BottomSheet } from '../ui/BottomSheet.js';
+import { loadKakaoSdk } from '../../../lib/kakao.js';
 
 declare global {
   interface Window {
-    Kakao?: {
-      isInitialized: () => boolean;
-      init: (key: string) => void;
-      Share: {
-        sendDefault: (options: Record<string, unknown>) => void;
-      };
-    };
-    __kakaoStatus?: string;
     Capacitor?: {
       Plugins?: {
         Share?: {
@@ -60,17 +53,19 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const handleKakao = () => {
+  useEffect(() => {
+    loadKakaoSdk().catch(() => {});
+  }, []);
+
+  const handleKakao = async () => {
     posthog?.capture('cafeteria_share_clicked', { method: 'kakao', cafeName, mealType });
-    if (!window.Kakao) {
-      alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]');
-      return;
-    }
-    if (!window.Kakao.isInitialized()) {
+    try {
+      await loadKakaoSdk();
+    } catch {
       const status = window.__kakaoStatus ?? 'UNKNOWN';
       if (status === 'NO_KEY') alert('앱 키가 설정되어 있지 않아요.\n[오류 코드: NO_APP_KEY]');
       else if (status === 'INIT_ERROR') alert('SDK 초기화 중 오류가 발생했어요.\n[오류 코드: INIT_ERROR]');
-      else alert('SDK가 아직 초기화되지 않았어요.\n[오류 코드: NOT_INITIALIZED]');
+      else alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]');
       return;
     }
 
@@ -83,7 +78,7 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
     };
 
     try {
-      window.Kakao.Share.sendDefault({
+      window.Kakao!.Share.sendDefault({
         objectType: 'feed',
         content: {
           title: kakaoTitle,

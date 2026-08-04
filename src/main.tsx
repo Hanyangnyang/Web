@@ -9,19 +9,6 @@ import * as SentryReact from '@sentry/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient.js'
 
-declare global {
-  interface Window {
-    Kakao?: {
-      isInitialized: () => boolean;
-      init: (key: string) => void;
-      Share: {
-        sendDefault: (options: Record<string, unknown>) => void;
-      };
-    };
-    __kakaoStatus?: string;
-  }
-}
-
 // Sentry 초기화
 Sentry.init(
   {
@@ -45,31 +32,14 @@ if (import.meta.env.VITE_POSTHOG_KEY) {
   })
 }
 
-// Kakao SDK 초기화
-const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY;
-if (!kakaoKey) {
-  console.warn('[Kakao] VITE_KAKAO_JS_KEY 없음 — 카카오톡 공유 비활성화');
-  window.__kakaoStatus = 'NO_KEY';
-} else if (!window.Kakao) {
-  console.warn('[Kakao] SDK 로드 실패 — index.html의 script 태그 확인 필요');
-  window.__kakaoStatus = 'SDK_NOT_LOADED';
-} else if (!window.Kakao.isInitialized()) {
-  try {
-    window.Kakao.init(kakaoKey);
-    window.__kakaoStatus = 'OK';
-    console.log('[Kakao] SDK 초기화 완료');
-  } catch (e) {
-    window.__kakaoStatus = 'INIT_ERROR';
-    console.error('[Kakao] init 실패:', e);
-  }
-} else {
-  window.__kakaoStatus = 'OK';
-}
+// Kakao SDK는 더 이상 여기서 초기화하지 않음 — ShareSheet가 마운트될 때 lib/kakao.js가 지연 로드함
 
 // Service Worker 업데이트 감지 후 새로고침
 if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller
   let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return
     if (!refreshing) {
       refreshing = true
       window.location.reload()

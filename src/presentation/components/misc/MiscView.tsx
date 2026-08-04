@@ -1,10 +1,12 @@
 // 컴포넌트: 기타탭 화면 오케스트레이터 (그리드 ↔ 하위 View 라우팅)
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { GymView } from './GymView.jsx';
-import { InstagramView } from './InstagramView.jsx';
-import { FeedbackView } from './FeedbackView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
+import { SuspenseFallback } from '../ui/SuspenseFallback.jsx';
+
+const InstagramView = lazy(() => import('./InstagramView.jsx').then(m => ({ default: m.InstagramView })));
+const FeedbackView = lazy(() => import('./FeedbackView.jsx').then(m => ({ default: m.FeedbackView })));
 
 type SubView = 'list' | MiscBoxKey;
 
@@ -30,8 +32,20 @@ export function MiscView({ resetSignal }: MiscViewProps) {
   };
 
   if (subView === 'gym') return <GymView onBack={() => setSubView('list')} />;
-  if (subView === 'insta') return <InstagramView onBack={() => setSubView('list')} />;
-  if (subView === 'feedback') return <FeedbackView onBack={() => setSubView('list')} />;
+  if (subView === 'insta') {
+    return (
+      <Suspense fallback={<SuspenseFallback />}>
+        <InstagramView onBack={() => setSubView('list')} />
+      </Suspense>
+    );
+  }
+  if (subView === 'feedback') {
+    return (
+      <Suspense fallback={<SuspenseFallback />}>
+        <FeedbackView onBack={() => setSubView('list')} />
+      </Suspense>
+    );
+  }
 
   return <MiscMenuGrid onBoxClick={handleBoxClick} />;
 }

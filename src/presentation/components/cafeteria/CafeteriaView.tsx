@@ -1,11 +1,9 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDate } from '../../../utils/time.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
-import { CafeteriaAlarmSettings } from './CafeteriaAlarmSettings.js';
-import { ShareSheet } from './ShareSheet.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
@@ -13,6 +11,9 @@ import { getDateLabel } from './cafeteriaFormat.js';
 import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
+
+const CafeteriaAlarmSettings = lazy(() => import('./CafeteriaAlarmSettings.js').then(m => ({ default: m.CafeteriaAlarmSettings })));
+const ShareSheet = lazy(() => import('./ShareSheet.js').then(m => ({ default: m.ShareSheet })));
 
 interface CafeDeepLink {
   date: string | null;
@@ -180,23 +181,29 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
         <Bell size={18} />
         학식 알림 받기
       </button>
-      {showAlarm && <CafeteriaAlarmSettings onClose={(msg?: string) => {
-        setShowAlarm(false);
-        if (msg) {
-          setAlarmPopup(msg);
-          setTimeout(() => setAlarmPopup(''), 1500);
-        }
-      }} />}
+      {showAlarm && (
+        <Suspense fallback={null}>
+          <CafeteriaAlarmSettings onClose={(msg?: string) => {
+            setShowAlarm(false);
+            if (msg) {
+              setAlarmPopup(msg);
+              setTimeout(() => setAlarmPopup(''), 1500);
+            }
+          }} />
+        </Suspense>
+      )}
       {shareTarget && (
-        <ShareSheet
-          cafeName={shareTarget.cafeName}
-          mealType={shareTarget.type}
-          menuText={shareTarget.menu.menu}
-          dateLabel={shareTarget.dateLabel}
-          shareUrl={shareTarget.shareUrl}
-          onClose={() => setShareTarget(null)}
-          onCopied={handleCopied}
-        />
+        <Suspense fallback={null}>
+          <ShareSheet
+            cafeName={shareTarget.cafeName}
+            mealType={shareTarget.type}
+            menuText={shareTarget.menu.menu}
+            dateLabel={shareTarget.dateLabel}
+            shareUrl={shareTarget.shareUrl}
+            onClose={() => setShareTarget(null)}
+            onCopied={handleCopied}
+          />
+        </Suspense>
       )}
       {copiedToast && (
         <div className="copy-toast fixed bottom-[calc(20px+64px+52px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.88)] text-white text-[0.78rem] font-semibold px-4 py-2 rounded-full whitespace-nowrap z-[2000] pointer-events-none">
