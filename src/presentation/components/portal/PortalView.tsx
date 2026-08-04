@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 
 import { Bell } from 'lucide-react';
 import { usePortalData } from '../../hooks/usePortalData.js';
 import { useBanners } from '../../hooks/useBanners.js';
-import { WeatherAlarmSettings } from './WeatherAlarmSettings.jsx';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
+
+const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').then(m => ({ default: m.WeatherAlarmSettings })));
 
 interface PortalViewProps {
   isVisible?: boolean;
@@ -30,13 +31,15 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
       </button>
       {/* 0. 날씨 알림 받기 바텀시트 */}
       {showWeatherAlarm && (
-        <WeatherAlarmSettings onClose={(msg?: string) => {
-          setShowWeatherAlarm(false);
-          if (msg) {
-            setAlarmPopup(msg);
-            setTimeout(() => setAlarmPopup(''), 1500);
-          }
-        }} />
+        <Suspense fallback={null}>
+          <WeatherAlarmSettings onClose={(msg?: string) => {
+            setShowWeatherAlarm(false);
+            if (msg) {
+              setAlarmPopup(msg);
+              setTimeout(() => setAlarmPopup(''), 1500);
+            }
+          }} />
+        </Suspense>
       )}
       {/* 0. 날씨 알림 설정 후 하단 토스트팝업 */}
       {alarmPopup && (
