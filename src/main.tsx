@@ -68,8 +68,10 @@ if (!kakaoKey) {
 
 // Service Worker 업데이트 감지 후 새로고침
 if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller
   let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return
     if (!refreshing) {
       refreshing = true
       window.location.reload()
