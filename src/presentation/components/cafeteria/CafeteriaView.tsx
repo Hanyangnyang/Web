@@ -1,15 +1,12 @@
-// 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
+// 컴포넌트: 날짜 선택 및 전체 식당 아코디언 학식 목록 표시
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Bell } from 'lucide-react';
-import { usePostHog } from 'posthog-js/react';
 import { getKSTDate } from '../../../utils/time.js';
-import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
 import { DateNavigator } from './DateNavigator.js';
-import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
 import { getDateLabel } from './cafeteriaFormat.js';
 import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState, isPastMealType } from './cafeteriaSchedule.js';
-import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
+import type { Cafe } from '../../../domain/entities/Cafe.js';
 import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
 const CafeteriaAlarmSettings = lazy(() => import('./CafeteriaAlarmSettings.js').then(m => ({ default: m.CafeteriaAlarmSettings })));
@@ -37,28 +34,13 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const [selectedCafeId, setSelectedCafeId] = useState(() => urlParams.get('cafe') || 'all');
+  const selectedCafeId = 'all';
 
-  const foundCafe = cafes.find(c => c.id === selectedCafeId);
-  const selectedCafeName = selectedCafeId === 'all' ? '전체' : (foundCafe?.name ?? selectedCafeId);
-  const selectedCafeHours: CafeHours = selectedCafeId === 'all' ? {} : (foundCafe?.hours ?? {});
-
-  // "전체"/단일 식당 모드 구분 없이 MealTypeAccordion이 동일한 모양을 다루도록 cafeName/cafeId를 항상 붙인다
-  const menusWithCafe: MenuItemWithCafe[] = selectedCafeId === 'all'
-    ? cafes.reduce<MenuItemWithCafe[]>((acc, c) => {
-        if (!c.available || !c.menus.length) return acc;
-        return acc.concat(c.menus.map(m => ({ ...m, cafeName: c.name, cafeId: c.id })));
-      }, [])
-    : (foundCafe?.menus ?? []).map(m => ({ ...m, cafeName: selectedCafeName, cafeId: selectedCafeId }));
-
-  const posthog = usePostHog();
-
-  const handleCafeSelect = (id: string) => {
-    const cafeName = id === 'all' ? '전체' : (cafes.find(c => c.id === id)?.name || id);
-    posthog?.capture('cafeteria_chip_clicked', { cafeId: id, cafeName });
-    setSelectedCafeId(id);
-    scrollNearestScrollableAncestorToTop(rootRef.current);
-  };
+  // 전체 식당 메뉴 수집
+  const menusWithCafe: MenuItemWithCafe[] = cafes.reduce<MenuItemWithCafe[]>((acc, c) => {
+    if (!c.available || !c.menus.length) return acc;
+    return acc.concat(c.menus.map(m => ({ ...m, cafeName: c.name, cafeId: c.id })));
+  }, []);
 
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
@@ -66,17 +48,6 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
   const [copiedToast, setCopiedToast] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
-
-  // 식당 자동 선택 및 메뉴 유무 확인
-  useEffect(() => {
-    if (!cafes.length) return;
-    if (selectedCafeId === 'all') return;
-    const current = cafes.find(c => c.id === selectedCafeId);
-    if (!current?.menus?.length) {
-      const fallback = cafes.find(c => c.menus?.length > 0);
-      if (fallback) setSelectedCafeId(fallback.id);
-    }
-  }, [cafes, selectedCafeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 딥링크 처리: 날짜 동기화
   useEffect(() => {
@@ -102,13 +73,10 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   // 네이티브 알림 탭 딥링크: App에서 전달된 파라미터 처리
   useEffect(() => {
     if (!cafeDeepLink) return;
-    const { date: dateStr, cafe: cafeId, type: mealType } = cafeDeepLink;
+    const { date: dateStr, type: mealType } = cafeDeepLink;
     if (dateStr) {
       const parsed = new Date(dateStr);
       if (!isNaN(parsed.getTime())) changeDate(parsed);
-    }
-    if (cafeId) {
-      setSelectedCafeId(cafeId);
     }
     if (mealType) {
       urlTypeRef.current = mealType;
@@ -216,10 +184,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
         </div>
       )}
 
-      {/* 고정 헤더: 날짜 및 식당 선택 */}
-      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      {/* 고정 헤더: 날짜 선택 */}
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl py-3.5 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <DateNavigator date={date} loading={loading} onPrev={() => changeDate(-1)} onNext={() => changeDate(1)} />
-        <CafeChipSelector cafes={cafes} selectedCafeId={selectedCafeId} loading={loading} onSelect={handleCafeSelect} />
       </div>
 
       {/* 메뉴 목록 */}
@@ -253,7 +220,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                     isAllMode={selectedCafeId === 'all'}
                     isExpanded={!!expandedGroups[type]}
                     onToggle={() => toggleGroup(type)}
-                    hours={selectedCafeHours}
+                    hours={{}}
                     cafes={cafes}
                     targetStr={date.toISOString().split('T')[0]}
                     dateLabel={getDateLabel(date)}
