@@ -8,7 +8,7 @@ import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
 import { getDateLabel } from './cafeteriaFormat.js';
-import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
+import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState, isPastMealType } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
@@ -238,9 +238,14 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
               <span className="text-xs font-semibold text-text-sub">학식 정보를 가져오는 중...</span>
             </div>
           ) : cafes.length > 0 ? (
-            Object.keys(groupedMenus).length > 0 ? (
-              sortMealTypeEntries(Object.entries(groupedMenus))
-                .map(([type, menus]) => (
+            (() => {
+              const groupedEntries = Object.entries(groupedMenus);
+              const nowKst = getKSTDate();
+              const allPast = groupedEntries.length > 0 && groupedEntries.every(([t]) => isPastMealType(t, date, nowKst));
+              const sorted = sortMealTypeEntries(groupedEntries, date, nowKst);
+
+              return sorted.length > 0 ? (
+                sorted.map(([type, menus]) => (
                   <MealTypeAccordion
                     key={type}
                     type={type}
@@ -253,11 +258,13 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                     targetStr={date.toISOString().split('T')[0]}
                     dateLabel={getDateLabel(date)}
                     onShareRequest={setShareTarget}
+                    allPast={allPast}
                   />
                 ))
-            ) : (
-              <div className="text-center py-12 px-4 text-text-sub">해당 식당은 오늘 등록된 메뉴가 없습니다.</div>
-            )
+              ) : (
+                <div className="text-center py-12 px-4 text-text-sub">해당 식당은 오늘 등록된 메뉴가 없습니다.</div>
+              );
+            })()
           ) : (
             <div className="text-center py-12 px-4 text-text-sub">정보를 불러올 수 없습니다.</div>
           )}

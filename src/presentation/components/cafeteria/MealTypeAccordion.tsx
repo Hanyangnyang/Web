@@ -1,8 +1,8 @@
-// 컴포넌트: 식사 타입(조식/중식/석식/천원 등) 하나의 아코디언
-// "전체" 모드에서는 식당별로 한 번 더 접힌다 (식당별 미리보기 ↔ 상세 토글)
 import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { getMenuIcon, parseBoldText } from './cafeteriaFormat.js';
+import { isPastMealType, isActiveMealType } from './cafeteriaSchedule.js';
+import { getKSTDate } from '../../../utils/time.js';
 import { MenuEntry } from './MenuEntry.js';
 import { Accordion } from '../ui/Accordion.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
@@ -19,6 +19,7 @@ interface MealTypeAccordionProps {
   targetStr: string; // YYYY-MM-DD (공유 URL 조립용)
   dateLabel: string; // 오늘/내일/어제/M월D일 (공유 시트 표시용)
   onShareRequest: (target: ShareTarget) => void;
+  allPast?: boolean;
 }
 
 interface CafeGroup {
@@ -37,10 +38,16 @@ function groupByCafe(menus: MenuItemWithCafe[]): CafeGroup[] {
 }
 
 export function MealTypeAccordion({
-  type, menus, isAllMode, isExpanded, onToggle, hours, cafes, targetStr, dateLabel, onShareRequest,
+  type, menus, isAllMode, isExpanded, onToggle, hours, cafes, targetStr, dateLabel, onShareRequest, allPast = false,
 }: MealTypeAccordionProps) {
   // "전체" 모드에서 식당별 미리보기/상세 토글 상태 — 아코디언 인스턴스마다 로컬로 관리
   const [expandedCafeIds, setExpandedCafeIds] = useState<Record<string, boolean>>({});
+
+  const nowKst = getKSTDate();
+  const currentDate = new Date(targetStr);
+  const isPast = isPastMealType(type, currentDate, nowKst);
+
+  const shouldDim = !allPast && isPast && !isExpanded;
 
   const mealKey = (['조식', '중식', '석식'] as const).find(k => type.includes(k));
   const hoursText = mealKey ? hours?.[mealKey] : null;
@@ -57,24 +64,25 @@ export function MealTypeAccordion({
   const cafeGroups = isAllMode ? groupByCafe(menus) : null;
 
   return (
-    <Accordion
-      isExpanded={isExpanded}
-      onToggle={onToggle}
-      dataType={type}
-      style={{ scrollMarginTop: '140px' }}
-      header={
-        <>
-          <span className="text-xl flex-shrink-0">{getMenuIcon(type)}</span>
-          <span className="font-bold text-[16px] tracking-tight text-text-main flex-shrink-0">{type}</span>
-          {hoursText && <span className="text-[12px] text-text-hint truncate">{hoursText}</span>}
-        </>
-      }
-      extra={
-        <span className="text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
-          {menus.length}개 메뉴
-        </span>
-      }
-    >
+    <div className={`transition-all duration-300 ${shouldDim ? 'opacity-60 grayscale-[25%]' : 'opacity-100'}`}>
+      <Accordion
+        isExpanded={isExpanded}
+        onToggle={onToggle}
+        dataType={type}
+        style={{ scrollMarginTop: '135px' }}
+        header={
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-xl flex-shrink-0">{getMenuIcon(type)}</span>
+            <span className="font-bold text-[16px] tracking-tight text-text-main flex-shrink-0">{type}</span>
+            {hoursText && <span className="text-[12px] text-text-hint truncate">{hoursText}</span>}
+          </div>
+        }
+        extra={
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isPast ? 'bg-slate-200 text-slate-500' : 'bg-[#0E4A84] text-white'}`}>
+            {menus.length}개 메뉴
+          </span>
+        }
+      >
       {isAllMode && cafeGroups ? (
             <div className="text-left flex flex-col overflow-hidden w-full">
               {cafeGroups.map((group, groupIdx) => {
@@ -166,5 +174,6 @@ export function MealTypeAccordion({
             ))
           )}
     </Accordion>
+    </div>
   );
 }
