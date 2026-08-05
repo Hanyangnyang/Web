@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useRef } from 'react';
-import { Sparkles, Wind, Sun } from 'lucide-react';
+import { Sparkles, Wind, Sun, Bell } from 'lucide-react';
 import type { Weather, HourlyForecastItem } from '../../../domain/entities/Weather.js';
 import { TypewriterText } from './TypewriterText.js';
 import { getHourlyIcon, getHourlyIconFill, getWeatherTheme } from './weatherTheme.js';
@@ -13,6 +13,7 @@ interface WeatherCardProps {
   weather: Weather | null;
   loading: boolean;
   isVisible?: boolean;
+  onOpenAlarm?: () => void;
 }
 
 interface RenderedForecastItem extends HourlyForecastItem {
@@ -21,7 +22,7 @@ interface RenderedForecastItem extends HourlyForecastItem {
 }
 
 // 소식탭 날씨 박스: weather를 props로만 받는 순수 표시 컴포넌트 (Storybook 대응)
-export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardProps) {
+export function WeatherCard({ weather, loading, isVisible = true, onOpenAlarm }: WeatherCardProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const showWeatherDetail = true;
 
@@ -166,29 +167,41 @@ export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardP
         }}>
           <div className="relative z-10 w-full">
             <div className="flex flex-col w-full">
-              {/* 배경 그라데이션 밝기와 무관하게 항상 읽히도록 은은한 텍스트 그림자 사용
-                  (아래 날씨 변화 박스의 "그림자로 지지되는 흰 텍스트"와 동일한 톤) */}
-              <div className="pl-2 [text-shadow:0_1px_1px_rgba(0,0,0,0.3)]">
-                <p className="text-xs font-semibold opacity-85 leading-tight">
-                  안산시 상록구 사동
-                </p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
-                  {/* 설명 텍스트와 한파 뱃지는 기준선이 아닌 수평 중앙선을 기준으로 나란히 정렬 */}
-                  <span className="inline-flex items-center gap-1">
-                    <span className="text-lg font-bold opacity-90 leading-tight">{weather.description}</span>
-                    {weather.temp <= COLD_SNAP_TEMP && (
-                      <span className="px-1 py-0.5 rounded-full bg-white/25 text-white/80 text-[10px] font-bold tracking-tight">
-                        한파
-                      </span>
-                    )}
-                  </span>
-                </div>
-                {maxTemp !== null && minTemp !== null && (
-                  <p className="text-xs font-bold opacity-85 leading-tight mt-0.5 flex items-center gap-1">
-                    <span>최고 {maxTemp}°</span>
-                    <span>최저 {minTemp}°</span>
+              {/* 카드의 좌측 정보(위치, 기온) 및 우측 상단 알림 버튼 배치 */}
+              <div className="flex items-start justify-between w-full pl-2">
+                <div className="[text-shadow:0_1px_1px_rgba(0,0,0,0.3)]">
+                  <p className="text-xs font-semibold opacity-85 leading-tight">
+                    안산시 상록구 사동
                   </p>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-5xl font-black tracking-tight leading-none">{weather.temp}°</span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="text-lg font-bold opacity-90 leading-tight">{weather.description}</span>
+                      {weather.temp <= COLD_SNAP_TEMP && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-white/25 text-white/80 text-[10px] font-bold tracking-tight">
+                          한파
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  {maxTemp !== null && minTemp !== null && (
+                    <p className="text-xs font-bold opacity-85 leading-tight mt-0.5 flex items-center gap-1">
+                      <span>최고 {maxTemp}°</span>
+                      <span>최저 {minTemp}°</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* 카드 우측 상단 날씨 알림 받기 버튼 */}
+                {onOpenAlarm && (
+                  <button
+                    type="button"
+                    onClick={onOpenAlarm}
+                    className="px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 backdrop-blur-md border border-white/30 text-white text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer transition-all shadow-xs [text-shadow:none] flex-shrink-0"
+                  >
+                    <Bell size={12} className="text-white" />
+                    <span>알림 받기</span>
+                  </button>
                 )}
               </div>
 
