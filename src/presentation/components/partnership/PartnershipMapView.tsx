@@ -1,5 +1,4 @@
 // 제휴탭 지도 화면: 카카오맵 + 카테고리 칩 + 통합 검색 + 바텀시트 + 클러스터링
-// SDK 스크립트는 이 컴포넌트가 처음 마운트될 때(제휴탭 최초 진입 시) 로드된다
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { LocateFixed, Search } from 'lucide-react';
@@ -14,6 +13,7 @@ import {
   ERICA_MAIN_GATE, STORES, visibleStores, hasCoords, CATEGORY_META,
   type CategoryFilter, type PartnerStore,
 } from './storeData';
+import { KAKAO_MAP_LIBRARIES } from '../../../lib/kakaoMap';
 
 // 학교 앞 상권이 화면에 꽉 차는 기본 확대 수준 (1=최대 확대)
 const DEFAULT_LEVEL = 3;
@@ -32,7 +32,8 @@ export default function PartnershipMapView() {
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY,
     // clusterer: 마커 밀집 대비, services: 좌표↔주소 변환 대비
-    libraries: ['clusterer', 'services'],
+    // lib/kakaoMap.ts의 prefetchKakaoMapSdk()와 동일한 값이어야 Loader 싱글턴이 재사용된다
+    libraries: KAKAO_MAP_LIBRARIES,
   });
   const posthog = usePostHog();
 

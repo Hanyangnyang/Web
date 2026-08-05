@@ -1,5 +1,4 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
-// Triggering redeploy
 import React, { useState, useCallback, useEffect, useLayoutEffect, useRef, Suspense, lazy } from 'react';
 import './index.css';
 import { useMenu } from './presentation/hooks/useMenu.js';
@@ -7,7 +6,6 @@ import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
-// 지도 SDK가 무거워서 제휴탭 최초 진입 시에만 청크를 로드한다
 const PartnershipMapView = lazy(() => import('./presentation/components/partnership/PartnershipMapView.jsx'));
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
@@ -18,6 +16,7 @@ import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
+import { prefetchKakaoMapSdk }   from './lib/kakaoMap';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -114,6 +113,11 @@ function MainLayout() {
     prefetchShuttleSchedule();
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
+
+  // 2-1. 캠퍼스맵 SDK 프리페치 - 스플래시 종료 직후(크리티컬 패스 이후) 카카오맵 스크립트를 미리 받아둔다.
+  useEffect(() => {
+    if (splashDone) prefetchKakaoMapSdk();
+  }, [splashDone]);
 
   // 3. 딥링크 로더 - 학식 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거
   // 학식 로더가 화면을 덮고 있으므로 사용자에게는 보이지 않고, 로더 페이드아웃 시 하냥냥 마스코트가 잠깐 비치는 현상 방지
