@@ -32,7 +32,10 @@ import { createShuttleDataSource } from './data/datasources/ShuttleDataSource.js
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
 
 // Infrastructure
+// 기존 Vercel BFF(/api/*) 전용 — 같은 origin 상대경로
 const httpClient = createHttpClient();
+// 새 백엔드 전용 - 마이그레이션된 DataSource부터 하나씩 이걸로 옮겨 붙인다.
+const apiHttpClient = createHttpClient({ baseUrl: import.meta.env.VITE_API_BASE_URL });
 
 // Data Sources
 const menuApiDataSource = createMenuApiDataSource({ httpClient });

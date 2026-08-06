@@ -7,13 +7,24 @@ export interface HttpClient {
 
 export interface HttpError extends Error {
   statusCode?: number;
+  code?: string;
+}
+
+// 새 백엔드 공용 응답 포맷. success:false일 때의 처리(어떤 에러를 던질지)는
+// HTTP 상태와 무관한 비즈니스 로직이라 Repository 계층에서 판단한다
+// (기존 PortalRepository.getLibrary의 data.success 체크와 같은 자리).
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: { code: string; message: string };
 }
 
 export const parseOrThrow = async (res: Response) => {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const err = new Error(data.message || `HTTP ${res.status}`) as HttpError;
+    const err = new Error(data.error?.message || data.message || `HTTP ${res.status}`) as HttpError;
     err.statusCode = res.status;
+    if (data.error?.code) err.code = data.error.code;
     throw err;
   }
   return data;
