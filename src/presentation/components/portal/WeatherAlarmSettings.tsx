@@ -155,7 +155,7 @@ export function WeatherAlarmSettings({ onClose }: WeatherAlarmSettingsProps) {
       scrollExemptSelector=".alarm-picker-scroll"
     >
       {/* 1단계: 타이틀 및 온오프 스위치 */}
-      <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-4">
+      <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-slate-100 mb-4">
         <span className="text-[18px] font-extrabold text-text-main leading-none">날씨 알림설정</span>
         <label className="alarm-toggle" style={{ marginLeft: 'auto', alignSelf: 'center' }}>
           <input type="checkbox" checked={enabled} onChange={toggle} />
@@ -183,7 +183,7 @@ export function WeatherAlarmSettings({ onClose }: WeatherAlarmSettingsProps) {
                       ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
                       : isDimmed
                         ? 'bg-slate-50 text-slate-400 border-slate-200/80 opacity-60 hover:bg-slate-100/80'
-                        : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                        : 'bg-white text-text-sub border-slate-200 hover:bg-slate-50'
                   }`}
                   onClick={() => handleConditionToggle(key)}
                 >

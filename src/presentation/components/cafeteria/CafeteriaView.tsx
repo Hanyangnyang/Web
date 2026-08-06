@@ -217,7 +217,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       )}
 
       {/* 고정 헤더: 날짜 및 식당 선택 */}
-      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <DateNavigator date={date} loading={loading} onPrev={() => changeDate(-1)} onNext={() => changeDate(1)} />
         <CafeChipSelector cafes={cafes} selectedCafeId={selectedCafeId} loading={loading} onSelect={handleCafeSelect} />
       </div>

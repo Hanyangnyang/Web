@@ -180,7 +180,7 @@ export function SchoolShuttleSection({
           onToggleFullMode={handleToggleFullMode}
         />
 
-        <div ref={containerRef} className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
+        <div ref={containerRef} className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
           {schedule.length > 0 ? (() => {
             const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
             return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
@@ -212,7 +212,7 @@ export function SchoolShuttleSection({
         {!isFullMode && schedule.length > visibleCount && (
           <div className="flex justify-center py-4">
             <button
-              className="bg-transparent border border-[#cbd5e1] text-text-sub rounded-full px-6 py-2 text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-surface"
+              className="bg-transparent border border-slate-300 text-text-sub rounded-full px-6 py-2 text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-surface"
               onClick={loadMore}
             >
               <ChevronDown size={16} />

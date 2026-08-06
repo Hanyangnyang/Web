@@ -85,7 +85,7 @@ export function MealTypeAccordion({
                 return (
                   <div
                     key={group.cafeId}
-                    className={`group pt-4 pb-4 px-5 flex flex-col gap-1.5 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}`}
+                    className={`group pt-4 pb-4 px-5 flex flex-col gap-1.5 transition-colors duration-150 hover:bg-slate-50 cursor-pointer active:bg-slate-100 ${groupIdx > 0 ? 'border-t border-slate-100' : ''}`}
                     onClick={() => setExpandedCafeIds(prev => ({ ...prev, [group.cafeId]: !prev[group.cafeId] }))}
                   >
                     <div className="flex items-center justify-between">

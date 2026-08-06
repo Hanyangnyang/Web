@@ -46,17 +46,17 @@ const COLLEGE_EMOJI = {
 
 // 단과대별 색상 스타일
 const COLLEGE_STYLE = {
-  '1': 'bg-[rgba(254,215,170,0.5)] text-[#1f2937]',    // LIONS 칼리지 - 주황 (🦁)
-  '2': 'bg-[rgba(254,202,202,0.5)] text-[#1f2937]',    // 커뮤니케이션 - 빨강 (📢)
-  '3': 'bg-[rgba(229,231,235,0.6)] text-[#1f2937]',    // 공학대학 - 회색 (⚙️)
-  '4': 'bg-[rgba(254,226,226,0.5)] text-[#1f2937]',    // 약학대학 - 빨강 (💊)
-  '5': 'bg-[rgba(233,213,255,0.5)] text-[#1f2937]',    // 디자인대학 - 보라 (🎨)
-  '6': 'bg-[rgba(187,247,208,0.5)] text-[#1f2937]',    // 글로벌 - 초록 (🌍)
-  '7': 'bg-[rgba(254,240,138,0.5)] text-[#1f2937]',    // 경상대학 - 노랑 (📊)
-  '8': 'bg-[rgba(191,219,254,0.5)] text-[#1f2937]',    // 소프트웨어 - 파랑 (💻)
-  '9': 'bg-[rgba(251,207,232,0.5)] text-[#1f2937]',    // 예체능대학 - 분홍 (🎵)
-  '10': 'bg-[rgba(254,215,170,0.5)] text-[#1f2937]',   // 첨단융합 - 주황 (🚀)
-  '11': 'bg-[rgba(219,234,254,0.6)] text-[#1f2937]',   // 총학생회 - 파랑 (👥)
+  '1': 'bg-[rgba(254,215,170,0.5)] text-gray-800',    // LIONS 칼리지 - 주황 (🦁)
+  '2': 'bg-[rgba(254,202,202,0.5)] text-gray-800',    // 커뮤니케이션 - 빨강 (📢)
+  '3': 'bg-[rgba(229,231,235,0.6)] text-gray-800',    // 공학대학 - 회색 (⚙️)
+  '4': 'bg-[rgba(254,226,226,0.5)] text-gray-800',    // 약학대학 - 빨강 (💊)
+  '5': 'bg-[rgba(233,213,255,0.5)] text-gray-800',    // 디자인대학 - 보라 (🎨)
+  '6': 'bg-[rgba(187,247,208,0.5)] text-gray-800',    // 글로벌 - 초록 (🌍)
+  '7': 'bg-[rgba(254,240,138,0.5)] text-gray-800',    // 경상대학 - 노랑 (📊)
+  '8': 'bg-[rgba(191,219,254,0.5)] text-gray-800',    // 소프트웨어 - 파랑 (💻)
+  '9': 'bg-[rgba(251,207,232,0.5)] text-gray-800',    // 예체능대학 - 분홍 (🎵)
+  '10': 'bg-[rgba(254,215,170,0.5)] text-gray-800',   // 첨단융합 - 주황 (🚀)
+  '11': 'bg-[rgba(219,234,254,0.6)] text-gray-800',   // 총학생회 - 파랑 (👥)
 };
 
 const COLLEGE_DISPLAY_NAME = {
@@ -82,7 +82,7 @@ function StoreCard({ store, collegeFilter }) {
   return (
     <div
       className={`bg-white border rounded-card overflow-hidden transition-all duration-200 ${
-        expanded ? 'border-[#0E4A84]/20 shadow-[0_4px_12px_rgba(0,0,0,0.06)]' : 'border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.03)]'
+        expanded ? 'border-primary/20 shadow-[0_4px_12px_rgba(0,0,0,0.06)]' : 'border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]'
       }`}
     >
       {/* 헤더 */}
@@ -123,7 +123,7 @@ function StoreCard({ store, collegeFilter }) {
       <div className="accordion-content" style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}>
         <div className="overflow-hidden">
           <div className="px-4 pb-3.5 space-y-2.5">
-            <div className="border-t border-[#f1f5f9]" />
+            <div className="border-t border-slate-100" />
 
             {displayedPartnerships.map((p, idx) => (
               <div
@@ -284,10 +284,10 @@ export function PartnershipView({ isActive }) {
   return (
     <div ref={rootRef} className="pb-20 [animation:slideUp_0.4s_ease-out]">
       {/* 고정 헤더 */}
-      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-3 -mx-4 px-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-3 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         {/* 검색 바 */}
         <div className="relative mb-3">
-          <div className="flex items-center gap-2.5 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
+          <div className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
             <Search size={16} className="text-text-hint flex-shrink-0" />
             <input
               ref={inputRef}
@@ -315,8 +315,8 @@ export function PartnershipView({ isActive }) {
                 onClick={() => handleCollegeChange(c.id)}
                 className={`flex items-center gap-1 px-3 py-[7px] rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                   college === c.id
-                    ? 'bg-[#0E4A84] text-white border-[#0E4A84]'
-                    : 'bg-white text-[#334155] border-[#cbd5e1]'
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-white text-slate-700 border-slate-300'
                 }`}
               >
                 {c.id !== 'all' && COLLEGE_EMOJI[c.id]} {c.name}
@@ -335,7 +335,7 @@ export function PartnershipView({ isActive }) {
                 className={`flex items-center gap-1 px-3 py-[7px] rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                   category === cat.key
                     ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]'
-                    : 'bg-white text-[#334155] border-[#cbd5e1]'
+                    : 'bg-white text-slate-700 border-slate-300'
                 }`}
               >
                 {cat.key !== 'all' && <span className="text-[11px] leading-none">{cat.emoji}</span>}
@@ -361,7 +361,7 @@ export function PartnershipView({ isActive }) {
         {!partnershipsData ? (
           <div className="space-y-2.5">
             {[0, 1, 2].map(i => (
-              <div key={i} className="h-16 bg-white border border-[#e2e8f0] rounded-card [animation:pulse_1.5s_infinite]" />
+              <div key={i} className="h-16 bg-white border border-slate-200 rounded-card [animation:pulse_1.5s_infinite]" />
             ))}
           </div>
         ) : filtered.length > 0 ? (

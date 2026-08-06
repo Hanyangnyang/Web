@@ -30,11 +30,11 @@ type SubView = 'list' | MiscBoxKey;
 
 function AccordionGroupShimmer() {
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3">
+    <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3">
       <div className="flex justify-between items-center px-4 py-2.5">
         <div className="h-4 w-16 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
       </div>
-      <div className="border-t border-[#f1f5f9]">
+      <div className="border-t border-slate-100">
         {[0, 1].map((i) => (
           <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? 'border-t border-dashed border-slate-200' : ''}`}>
             <div className="w-[54px] h-[54px] rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse flex-shrink-0" />
@@ -63,7 +63,7 @@ function FeedbackViewFallback({ onBack }: { onBack: () => void }) {
   return (
     <div className="pb-20">
       <MiscSubViewHeader title="피드백 보내기" onBack={onBack} />
-      <div className="bg-white border border-[#e2e8f0] rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
+      <div className="bg-white border border-slate-200 rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-[18px] h-[18px] rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
           <div className="h-4 w-40 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />

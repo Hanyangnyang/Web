@@ -43,7 +43,7 @@ export function CafeChipSelector({ cafes, selectedCafeId, loading, onSelect }: C
         className={`flex-shrink-0 py-2 border rounded-card text-[clamp(0.65rem,3.1vw,0.82rem)] font-semibold cursor-pointer transition-all duration-200 relative flex items-center justify-center gap-[0.3rem] whitespace-nowrap overflow-visible [-webkit-tap-highlight-color:transparent] ${
           selectedCafeId === 'all'
             ? 'bg-primary text-white border-primary shadow-sm'
-            : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary hover:text-primary'
+            : 'bg-white border-slate-200 text-text-sub hover:border-primary hover:text-primary'
         }`}
         style={{ paddingLeft: '18px', paddingRight: '18px' }}
         onClick={() => onSelect('all')}
@@ -59,8 +59,8 @@ export function CafeChipSelector({ cafes, selectedCafeId, loading, onSelect }: C
             selectedCafeId === cafe.id
               ? 'bg-primary text-white border-primary shadow-sm'
               : !cafe.available
-                ? 'bg-white border-[#e2e8f0] text-text-sub opacity-30'
-                : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary hover:text-primary'
+                ? 'bg-white border-slate-200 text-text-sub opacity-30'
+                : 'bg-white border-slate-200 text-text-sub hover:border-primary hover:text-primary'
           }`}
           style={{ paddingLeft: '13px', paddingRight: '13px' }}
           onClick={() => onSelect(cafe.id)}

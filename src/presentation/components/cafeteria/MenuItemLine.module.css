@@ -1,0 +1,19 @@
+.marqueeTrack {
+  display: inline-flex;
+  animation: marqueeLoop linear infinite;
+  will-change: transform;
+}
+
+@keyframes marqueeLoop {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.gap {
+  padding-right: 1em;
+}
