@@ -95,7 +95,7 @@ export function GymView({ onBack }: GymViewProps) {
       <div className="pb-20 font-['Pretendard',-apple-system,sans-serif]">
         <header className="flex items-center gap-4 mb-3">
           <button
-            className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+            className="w-10 h-10 rounded-card bg-white border border-slate-200 flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
             onClick={onBack}
           >
             <ArrowLeft size={20} />
@@ -105,7 +105,7 @@ export function GymView({ onBack }: GymViewProps) {
         {loadErr ? (
           <div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div>
         ) : (
-          <div className="h-64 bg-white border border-[#e2e8f0] rounded-card [animation:pulse_1.5s_infinite]" />
+          <div className="h-64 bg-white border border-slate-200 rounded-card [animation:pulse_1.5s_infinite]" />
         )}
       </div>
     );
@@ -113,7 +113,7 @@ export function GymView({ onBack }: GymViewProps) {
 
   const renderCell = (cell: GymScheduleCell | '-' | null, span: number | undefined, startHour: number) => {
     if (cell === null) return null;
-    if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-[#e2e8f0] p-0.5 relative" />;
+    if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-slate-200 p-0.5 relative" />;
     const s = COLORS[cell.type];
     let innerH = '100%';
     let alignTop = false;
@@ -123,7 +123,7 @@ export function GymView({ onBack }: GymViewProps) {
       alignTop = true;
     }
     return (
-      <td rowSpan={span} className={`h-10 border-b border-r border-[#e2e8f0] p-0.5 relative${alignTop ? ' align-top' : ''}`}>
+      <td rowSpan={span} className={`h-10 border-b border-r border-slate-200 p-0.5 relative${alignTop ? ' align-top' : ''}`}>
         <div
           className="rounded border flex flex-col justify-center items-center gap-px"
           style={{ backgroundColor: s.bg, color: s.text, borderColor: s.border, height: innerH, flexShrink: 0 }}
@@ -138,7 +138,7 @@ export function GymView({ onBack }: GymViewProps) {
     <div className="pb-20 font-['Pretendard',-apple-system,sans-serif] [animation:slideUp_0.4s_ease-out]">
       <header className="flex items-center gap-4 mb-3">
         <button
-          className="w-10 h-10 rounded-card bg-white border border-[#e2e8f0] flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+          className="w-10 h-10 rounded-card bg-white border border-slate-200 flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
           onClick={onBack}
         >
           <ArrowLeft size={20} />
@@ -158,7 +158,7 @@ export function GymView({ onBack }: GymViewProps) {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute top-[calc(100%+6px)] left-0 min-w-[130px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_12px_24px_rgba(0,0,0,0.08)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+                <div className="absolute top-[calc(100%+6px)] left-0 min-w-[130px] bg-white border border-slate-200 rounded-card shadow-[0_12px_24px_rgba(0,0,0,0.08)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
                   {gymData.periods.map(p => (
                     <div
                       key={p.id}
@@ -189,7 +189,7 @@ export function GymView({ onBack }: GymViewProps) {
       />
 
       <div className="mb-8">
-        <div className="bg-white rounded-card border border-[#e2e8f0] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden relative">
+        <div className="bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden relative">
           {now && (
             <div className="absolute left-0 right-0 z-[50] pointer-events-none transition-[top_0.3s_cubic-bezier(0.4,0,0.2,1)]" style={{ top: `${now.top}px` }}>
               <div className="h-[1.5px] bg-error w-full opacity-20" />
@@ -204,9 +204,9 @@ export function GymView({ onBack }: GymViewProps) {
           <table className="w-full border-collapse table-fixed">
             <thead>
               <tr>
-                <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-[#e2e8f0] text-center" style={{ width: '12%' }} />
+                <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-slate-200 text-center" style={{ width: '12%' }} />
                 {['월', '화', '수', '목', '금'].map(d => (
-                  <th key={d} className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-[#e2e8f0] text-center" style={{ width: '17.6%' }}>{d}</th>
+                  <th key={d} className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-slate-200 text-center" style={{ width: '17.6%' }}>{d}</th>
                 ))}
               </tr>
             </thead>
@@ -215,9 +215,9 @@ export function GymView({ onBack }: GymViewProps) {
                 const isClosedRow = closingHour !== null && row.hour >= closingHour;
                 return (
                   <tr key={i}>
-                    <td className="py-2 px-1 text-[0.65rem] font-bold text-text-sub text-center border-r border-[#e2e8f0]">{row.label}</td>
+                    <td className="py-2 px-1 text-[0.65rem] font-bold text-text-sub text-center border-r border-slate-200">{row.label}</td>
                     {isClosedRow ? (
-                      <td colSpan={5} className="bg-slate-50 text-text-hint text-[0.65rem] font-bold text-center py-2 h-10 border-b border-[#e2e8f0]">
+                      <td colSpan={5} className="bg-slate-50 text-text-hint text-[0.65rem] font-bold text-center py-2 h-10 border-b border-slate-200">
                         운영 종료
                       </td>
                     ) : (

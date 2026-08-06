@@ -154,7 +154,7 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
   return (
     <div
       ref={elementRef}
-      className={`flex items-stretch relative transition-all duration-300 select-none ${fullModeActiveStyle || 'border-b border-[#f1f5f9]'} ${!isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20] cursor-pointer active:bg-slate-100' :
+      className={`flex items-stretch relative transition-all duration-300 select-none ${fullModeActiveStyle || 'border-b border-slate-100'} ${!isFullMode && isNext ? 'bg-white shadow-[inset_5px_0_0_0_#0E4A84] z-[20] cursor-pointer active:bg-slate-100' :
         !isFullMode && isPast ? 'opacity-55 bg-[#f8fafc] cursor-pointer active:bg-slate-100' :
           isFullMode ? 'bg-[#fafbfc]' : 'bg-[#fafbfc] cursor-pointer active:bg-slate-100'
         }`}
@@ -163,13 +163,13 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
       }}
     >
       {isPast && !isFullMode && (
-        <div className={`${tagBase} bg-[#e2e8f0] text-[#64748b] px-2.5 h-5 flex items-center rounded-br`}>
-          이전 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
+        <div className={`${tagBase} bg-slate-200 text-slate-500 px-2.5 h-5 flex items-center rounded-br`}>
+          이전 셔틀{isLast && <span className="flex items-center justify-center bg-rose-400 text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
         </div>
       )}
       {isNext && !isFullMode && (
         <div className={`${tagBase} bg-primary px-2.5 h-5 flex items-center rounded-br`}>
-          다음 셔틀{isLast && <span className="flex items-center justify-center bg-[#fb7185] text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
+          다음 셔틀{isLast && <span className="flex items-center justify-center bg-rose-400 text-white rounded-full w-[15px] h-[15px] flex-shrink-0 text-[9px] font-black ml-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]">막</span>}
         </div>
       )}
       {isFullMode && isActiveInFull && (
@@ -178,7 +178,7 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
         </div>
       )}
       {isLast && !isNext && !isPast && !isFullMode && (
-        <div className={`${tagBase} bg-[#fb7185] py-0.5 px-2.5 rounded-br`}>마지막 셔틀</div>
+        <div className={`${tagBase} bg-rose-400 py-0.5 px-2.5 rounded-br`}>마지막 셔틀</div>
       )}
 
       <div
@@ -236,7 +236,7 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
           {row.subway ? (
             isSubwayLoading ? (
               <div className="flex items-center justify-start pl-0.5 h-6">
-                <Loader2 className="text-[#cbd5e1] animate-[spin_1s_linear_infinite]" size={16} />
+                <Loader2 className="text-slate-300 animate-[spin_1s_linear_infinite]" size={16} />
               </div>
             ) : trains.length > 0 ? trains.map((tr, i) => (
               <div key={i} className="flex items-center gap-1.5">
@@ -246,8 +246,8 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
                   {tr.arrTime}
                 </span>
               </div>
-            )) : <span className="text-xs text-[#cbd5e1] font-medium">{noTrainReason}</span>
-          ) : <span className="text-xs text-[#cbd5e1] font-medium">—</span>}
+            )) : <span className="text-xs text-slate-300 font-medium">{noTrainReason}</span>
+          ) : <span className="text-xs text-slate-300 font-medium">—</span>}
         </div>
       )}
     </div>

@@ -133,7 +133,7 @@ export function BottomSheet({
         onTouchEnd={handleTouchEnd}
       >
         <div className="py-3">
-          <div className="w-9 h-1 bg-[#e2e8f0] rounded-full mx-auto" />
+          <div className="w-9 h-1 bg-slate-200 rounded-full mx-auto" />
         </div>
         {children}
       </div>

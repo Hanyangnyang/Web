@@ -51,7 +51,7 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
   };
 
   return (
-    <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
+    <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
       <div className="flex items-center justify-between mb-3">
         <div className="text-2xl font-extrabold text-text-main">출발지</div>
         <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -62,7 +62,7 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
             key={s}
             className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${stop === s
               ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-              : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+              : 'border-slate-200 bg-white text-text-sub hover:bg-surface hover:border-slate-300'
               }`}
             onClick={() => handleStopClick(s)}
             style={{ position: 'relative' }}

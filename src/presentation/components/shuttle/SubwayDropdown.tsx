@@ -25,7 +25,7 @@ export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
   return (
     <div className="relative select-none w-full min-w-0" ref={ref}>
       <div
-        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] w-full min-w-0 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] w-full min-w-0 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-slate-200'}`}
         onClick={() => setOpen(p => !p)}
       >
         <LineBadge opt={opt} size={28} />
@@ -42,7 +42,7 @@ export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[232px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.14)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[232px] bg-white border border-slate-200 rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.14)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
           {[{ label: '4호선', items: line4 }, { label: '수인분당선', items: sb }].map(({ label, items }) => (
             <div key={label}>
               <div className="flex items-center gap-[7px] px-3.5 pt-[9px] pb-1.5 text-[10px] font-bold text-text-hint tracking-[0.05em] border-t border-surface first:border-t-0">
@@ -58,7 +58,7 @@ export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
                     <p className="text-[13px] font-bold text-text-main m-0">{o.dest}</p>
                     <p className="text-[11px] text-text-hint mt-0.5 mb-0">{o.dir} · 한대앞역 출발</p>
                   </div>
-                  <div className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-150 ${selected === o.id ? 'border-primary' : 'border-[#e2e8f0]'}`}>
+                  <div className={`w-[17px] h-[17px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-150 ${selected === o.id ? 'border-primary' : 'border-slate-200'}`}>
                     {selected === o.id && <div className="w-2 h-2 rounded-full bg-primary" />}
                   </div>
                 </div>

@@ -34,7 +34,7 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
   const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
 
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
+    <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
       {/* 아코디언 헤더 */}
       <div
         className="flex justify-between items-center px-4 py-2.5 cursor-pointer hover:bg-slate-50 transition-colors duration-150 select-none"
@@ -75,14 +75,14 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
           )}
           <ChevronDown
             size={16}
-            className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            className={`text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           />
         </div>
       </div>
 
       {/* 아코디언 내용 */}
       <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-        <div className="accordion-inner border-t border-[#f1f5f9] bg-white">
+        <div className="accordion-inner border-t border-slate-100 bg-white">
           {targetBuses.length === 0 ? (
             <p className="text-center text-xs font-semibold text-text-hint py-4">
               운행 정보가 없습니다.
@@ -110,7 +110,7 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
                         />
                       </div>
                       <span
-                        className="text-[16px] font-bold text-[#334155]"
+                        className="text-[16px] font-bold text-slate-700"
                       >
                         {busId}
                       </span>

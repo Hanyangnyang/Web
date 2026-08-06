@@ -52,7 +52,7 @@ export function TimetableHeader({
         </div>
       </div>
 
-      <div className="flex items-center py-0 pb-1.5 border-b border-[#f1f5f9]" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8 }}>
+      <div className="flex items-center py-0 pb-1.5 border-b border-slate-100" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8 }}>
         {!hideSubwayCol && (
           needsSubway ? (
             <button
@@ -77,7 +77,7 @@ export function TimetableHeader({
               <ArrowUpRight size={10} strokeWidth={2.2} />
             </button>
           ) : (
-            <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0" style={{ marginLeft: 'auto' }}>도착</span>
+            <span className="text-[10px] font-bold text-slate-300 tracking-[0.04em] flex-shrink-0" style={{ marginLeft: 'auto' }}>도착</span>
           )
         )}
         <div className={`flex items-center gap-1.5 flex-shrink-0${hideSubwayCol ? ' ml-auto' : ''}`}>

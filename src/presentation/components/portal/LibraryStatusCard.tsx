@@ -13,7 +13,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
       <div className="grid grid-cols-2 gap-3">
         {loading ? (
           [1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-card border border-[#e2e8f0] p-4 flex flex-col gap-3 animate-pulse">
+            <div key={i} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 animate-pulse">
               <div className="flex items-center justify-between gap-2">
                 <div className="h-4 w-2/3 bg-slate-100 rounded-full" />
                 <div className="h-4 w-10 bg-slate-100 rounded-md flex-shrink-0" />
@@ -31,7 +31,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
           library.list.map((room) => {
             const emptySeats = Math.max(0, room.total - room.occupied);
             return (
-              <div key={room.id} className="bg-white rounded-card border border-[#e2e8f0] p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
+              <div key={room.id} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center justify-between gap-2 min-w-0">
                   <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
                     {room.name.replace(' (2F)', '').replace(' (4F)', '')}
@@ -53,7 +53,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
                     }} />
                   </div>
                   <div className="flex justify-between items-center mt-2.5">
-                    <span className="text-[12px] text-[#334155] font-black">
+                    <span className="text-[12px] text-slate-700 font-black">
                       {emptySeats}석 남음
                     </span>
                     <span className="text-[11px] text-[#475569] font-bold">
@@ -65,7 +65,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
             );
           })
         ) : (
-          <div className="col-span-2 bg-white rounded-card border border-[#e2e8f0] py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
+          <div className="col-span-2 bg-white rounded-card border border-slate-200 py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
             <Info size={20} className="text-text-hint" />
             <p className="text-center text-text-sub text-sm font-semibold">혼잡도 정보를 불러올 수 없습니다</p>
           </div>

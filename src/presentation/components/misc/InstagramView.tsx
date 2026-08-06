@@ -33,16 +33,16 @@ function AccountItem({ acc, isFirst, profile, getProxiedUrl }: AccountItemProps)
       {!isFirst && <div className="mx-4 border-b border-dashed border-slate-200" />}
       {!profile ? (
         <div className="flex items-center gap-3 px-4 py-3">
-          <div className="w-[54px] h-[54px] rounded-full bg-[#e2e8f0] [animation:pulse_1.5s_infinite]" />
+          <div className="w-[54px] h-[54px] rounded-full bg-slate-200 [animation:pulse_1.5s_infinite]" />
           <div className="flex-1 flex flex-col gap-2">
-            <div className="h-3 bg-[#e2e8f0] rounded w-2/5 [animation:pulse_1.5s_infinite]" />
-            <div className="h-3 bg-[#e2e8f0] rounded w-[70%] [animation:pulse_1.5s_infinite]" />
+            <div className="h-3 bg-slate-200 rounded w-2/5 [animation:pulse_1.5s_infinite]" />
+            <div className="h-3 bg-slate-200 rounded w-[70%] [animation:pulse_1.5s_infinite]" />
           </div>
         </div>
       ) : (
         <div className="flex items-center justify-between px-4 py-3 transition-colors duration-200 active:bg-black/[0.03]">
           <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
-            <div className="w-[54px] h-[54px] rounded-full bg-[#e2e8f0] flex-shrink-0 relative overflow-hidden">
+            <div className="w-[54px] h-[54px] rounded-full bg-slate-200 flex-shrink-0 relative overflow-hidden">
               {profile.profilePicUrl && (
                 <>
                   {!imgLoaded && <div className="absolute inset-0 [animation:pulse_1.5s_infinite]" />}

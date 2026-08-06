@@ -11,7 +11,7 @@ interface DateNavigatorProps {
 
 export function DateNavigator({ date, loading, onPrev, onNext }: DateNavigatorProps) {
   return (
-    <div className="flex justify-between items-center mb-2 bg-white px-5 py-2 rounded-card border border-[#e2e8f0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+    <div className="flex justify-between items-center mb-2 bg-white px-5 py-2 rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
       <button
         className="bg-none border-none text-text-sub cursor-pointer p-1 flex items-center justify-center transition-colors duration-200 hover:text-text-main"
         onClick={onPrev}
