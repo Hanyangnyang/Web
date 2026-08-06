@@ -1,33 +1,31 @@
 // 제휴탭 지도 화면: 카카오맵 + 카테고리 칩 + 통합 검색 + 바텀시트 + 클러스터링
-import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+// 상태 로직은 usePartnerMap*/usePartnerStore* 훅들이 갖고 있고, 이 컴포넌트는 그것들을
+// 조합해 하위 컴포넌트에 내려주는 조립 역할만 한다
+import { useMemo, useState } from 'react';
 import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { LocateFixed, Search } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { measureLocation } from '../../hooks/useLocation.js';
 import { CategoryChips } from './CategoryChips';
 import { StoreMarkers } from './StoreMarkers';
 import { SearchOverlay } from './SearchOverlay';
 import { StoreSheet } from './StoreSheet';
-import { clusterStores, distanceMeters, type StoreCluster } from './clustering';
+import { clusterStores, type StoreCluster } from './clustering';
 import {
-  ERICA_MAIN_GATE, visibleStores, hasCoords, CATEGORY_META,
-  type CategoryFilter, type PartnerStore,
+  hasCoords, visibleStores, CATEGORY_META,
+  type CategoryFilter,
 } from '../../../domain/entities/PartnerStore.js';
 import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
+import { usePartnerMapFocus, DEFAULT_LEVEL } from '../../hooks/usePartnerMapFocus.js';
+import { usePartnerMapToast } from '../../hooks/usePartnerMapToast.js';
+import { usePartnerMapLocation } from '../../hooks/usePartnerMapLocation.js';
+import { usePartnerStoreFilters } from '../../hooks/usePartnerStoreFilters.js';
+import { usePartnerStoreSelection } from '../../hooks/usePartnerStoreSelection.js';
+import { usePartnerRandomPick } from '../../hooks/usePartnerRandomPick.js';
 import { KAKAO_MAP_LIBRARIES } from '../../../lib/kakaoMap';
 
-// 학교 앞 상권이 화면에 꽉 차는 기본 확대 수준 (1=최대 확대)
-const DEFAULT_LEVEL = 3;
 // 초기 지도 중심: 정문(ERICA_MAIN_GATE)이 아니라 제휴 매장이 밀집한 상권 한가운데.
-// 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고, 첫 화면은 매장이 보이는 곳에서 시작한다.
+// 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고(usePartnerMapLocation), 첫 화면은 매장이 보이는 곳에서 시작한다.
 const INITIAL_CENTER = { lat: 37.3008, lng: 126.8385 } as const;
-// 매장/클러스터 포커스 시 당겨지는 확대 수준 (최대 확대 = 모든 마커 개별 표시)
-const FOCUS_LEVEL = 1;
-// 선택 시 마커가 검색바 하단 ~ 상세 시트(45%) 상단 사이 정중앙에 오도록
-// 지도 중심을 남쪽으로 내리는 위도 오프셋 (FOCUS_LEVEL·시트 높이 기준으로 산출)
-const FOCUS_CENTER_LAT_OFFSET = 0.00035;
-// 이 거리 밖이면 '학교 근처가 아님'으로 보고 현위치로 센터를 옮기지 않는다
-const ERICA_NEARBY_RADIUS_M = 2000;
 
 export default function PartnershipMapView() {
   const [loading, error] = useKakaoLoader({
@@ -39,36 +37,29 @@ export default function PartnershipMapView() {
   const posthog = usePostHog();
   const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
 
-  // 부드러운 줌/이동은 카카오 imperative API(panTo·setLevel animate)로 제어하므로
-  // Map의 center/level prop은 초기값 상수만 넘기고 이후엔 건드리지 않는다
-  const [map, setMap] = useState<kakao.maps.Map | null>(null);
-  // 클러스터링 재계산용 — 사용자 핀치줌·imperative 줌 모두 onZoomChanged로 동기화
-  const [level, setLevel] = useState(DEFAULT_LEVEL);
+  const { setMap, level, onZoomChanged, focusMap, panTo } = usePartnerMapFocus();
+  const { toast, showToast } = usePartnerMapToast();
+  const { userPos, locating, locateMe } = usePartnerMapLocation({ panTo, onMessage: showToast, posthog });
+  const { category, setCategory, college, setCollege } = usePartnerStoreFilters();
 
-  const [category, setCategory] = useState<CategoryFilter>('all');
-  // 단과대 필터 — 예전 리스트 뷰의 기능 승계, 같은 localStorage 키로 이어받는다
-  const [college, setCollege] = useState(() => localStorage.getItem('partnerCollegeFilter') || 'all');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  // 클러스터 탭 시 바텀시트에 보여줄 해당 묶음의 매장들
-  const [clusterFocus, setClusterFocus] = useState<PartnerStore[] | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [sheetExpanded, setSheetExpanded] = useState(false);
-  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
-  const [locating, setLocating] = useState(false);
-  const [rolling, setRolling] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
-  // 토스트 자동 숨김
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 2500);
-    return () => clearTimeout(timer);
-  }, [toast]);
+  const {
+    selected, selectedId, clusterFocus, setClusterFocus, sheetExpanded, setSheetExpanded,
+    selectStore, closeDetail, handleMapClick, handleClusterClick, browseCategory,
+  } = usePartnerStoreSelection({
+    stores,
+    focusMap,
+    posthog,
+    onAfterSelect: () => setSearchOpen(false),
+  });
 
-  const selected = useMemo(
-    () => stores.find((s) => s.id === selectedId) ?? null,
-    [stores, selectedId]
-  );
+  const { rolling, rollRandom, diceLabel } = usePartnerRandomPick({
+    stores,
+    excludeId: selectedId,
+    onPick: (store) => selectStore(store, 'random'),
+    posthog,
+  });
 
   // 마커: 칩 필터 + 줌 레벨 기반 클러스터링. 선택된 매장은 강조(링·라벨)만 되고
   // 다른 매장 마커도 그대로 보인다. 칩과 다른 카테고리를 검색으로 선택한 경우엔 풀에 추가.
@@ -80,111 +71,23 @@ export default function PartnershipMapView() {
     return clusterStores(pool, level);
   }, [stores, selected, category, college, level]);
 
-  // 최대 배율로 부드럽게 당기면서, 시트에 가리지 않는 위치로 센터링
-  const focusMap = useCallback((lat: number, lng: number) => {
-    if (!map) return;
-    const target = new kakao.maps.LatLng(lat - FOCUS_CENTER_LAT_OFFSET, lng);
-    map.setLevel(FOCUS_LEVEL, { animate: true, anchor: target });
-    map.panTo(target);
-  }, [map]);
-
-  const handleCategoryChange = useCallback((next: CategoryFilter) => {
+  const handleCategoryChange = (next: CategoryFilter) => {
     setCategory(next);
-    setSelectedId(null);
-    setClusterFocus(null);
-    setSheetExpanded(true); // 칩 선택 = 그 카테고리를 둘러보겠다는 의도 → 리스트를 바로 올려준다
+    browseCategory(); // 칩 선택 = 그 카테고리를 둘러보겠다는 의도 → 선택 해제 + 리스트 펼침
     posthog?.capture('partner_map_category_selected', { category: next });
-  }, [posthog]);
+  };
 
   // 상세 시트에서도 같은 드롭다운을 쓰므로 선택은 유지한다 (상세 혜택 필터링과 지도 필터가 함께 바뀜)
-  const handleCollegeChange = useCallback((next: string) => {
+  const handleCollegeChange = (next: string) => {
     setCollege(next);
-    localStorage.setItem('partnerCollegeFilter', next);
     setClusterFocus(null);
     posthog?.capture('partner_map_college_selected', { college: next });
-  }, [posthog]);
+  };
 
-  // 목록에서 상세로 들어온 경우, X로 닫을 때 펼쳐진 목록으로 복귀시키기 위한 기록
-  const returnToList = useRef(false);
-
-  const selectStore = useCallback((store: PartnerStore, source: 'marker' | 'list' | 'search' | 'random') => {
-    returnToList.current = source === 'list';
-    setSelectedId(store.id);
-    setClusterFocus(null);
-    setSearchOpen(false);
-    setSheetExpanded(false);
-    if (store.location.latitude != null && store.location.longitude != null) {
-      focusMap(store.location.latitude, store.location.longitude);
-    }
-    posthog?.capture('partner_map_store_selected', { store_id: store.id, store_name: store.name, source });
-  }, [focusMap, posthog]);
-
-  // X로 상세 닫기: 목록에서 들어왔으면 펼쳐진 목록으로 복귀 (배율·센터는 그대로)
-  const closeDetail = useCallback(() => {
-    setSelectedId(null);
-    setSheetExpanded(returnToList.current);
-    returnToList.current = false;
-  }, []);
-
-  // 지도 빈 곳 탭: 어디서 왔든 지도를 보겠다는 의도 → 시트는 접힌 상태로
-  const handleMapClick = useCallback(() => {
-    setSelectedId(null);
-    setSheetExpanded(false);
-    returnToList.current = false;
-  }, []);
-
-  // 클러스터 탭: 최대 배율로 당겨 개별 마커로 펼치고, 시트에 해당 매장 리스트를 올린다
-  const handleClusterClick = useCallback((cluster: StoreCluster) => {
-    setClusterFocus(cluster.stores);
-    setSheetExpanded(true);
-    focusMap(cluster.lat, cluster.lng);
-  }, [focusMap]);
-
-  // 내 위치 버튼: 이 시점에 최초 권한 요청이 일어난다 (진입 즉시 팝업을 띄우지 않기 위함)
-  const locateMe = useCallback(async () => {
-    if (locating) return;
-    setLocating(true);
-    posthog?.capture('partner_map_locate_clicked');
-    try {
-      const pos = await measureLocation();
-      setUserPos({ lat: pos.latitude, lng: pos.longitude });
-      const distFromCampus = distanceMeters(pos.latitude, pos.longitude, ERICA_MAIN_GATE.lat, ERICA_MAIN_GATE.lng);
-      if (distFromCampus <= ERICA_NEARBY_RADIUS_M) {
-        map?.panTo(new kakao.maps.LatLng(pos.latitude, pos.longitude));
-      } else {
-        setToast('학교 근처가 아니라 지도를 이동하지 않았어요');
-      }
-    } catch {
-      setToast('위치를 가져오지 못했어요. 위치 권한을 확인해주세요');
-    } finally {
-      setLocating(false);
-    }
-  }, [locating, map, posthog]);
-
-  // 점메추 🎲: 항상 '식당'에서만 랜덤 추천 (점메추/저메추 = 밥 추천이므로 칩과 무관)
-  // 직전 선택은 제외해 연속 중복 방지
-  const rollRandom = useCallback(() => {
-    if (rolling) return;
-    const pool = visibleStores(stores, 'food').filter((s) => s.id !== selectedId);
-    if (pool.length === 0) return;
-    setRolling(true);
-    posthog?.capture('partner_map_random_clicked');
-    // 주사위가 잠깐 굴러가는 연출 후 결과 공개
-    setTimeout(() => {
-      const store = pool[Math.floor(Math.random() * pool.length)];
-      selectStore(store, 'random');
-      setRolling(false);
-    }, 500);
-  }, [rolling, stores, selectedId, selectStore, posthog]);
-
-  // 시간대에 따라 버튼이 지금의 고민에 말을 건다: 점심(11~15시) 점메추, 저녁(16~21시) 저메추
-  const hour = new Date().getHours();
-  const diceLabel = hour >= 11 && hour < 16 ? '점메추' : hour >= 16 && hour < 22 ? '저메추' : '뭐먹지';
-
-  const openSearch = useCallback(() => {
+  const openSearch = () => {
     setSearchOpen(true);
     posthog?.capture('partner_map_search_opened');
-  }, [posthog]);
+  };
 
   if (error) {
     return (
@@ -221,7 +124,7 @@ export default function PartnershipMapView() {
         center={INITIAL_CENTER}
         level={DEFAULT_LEVEL}
         onCreate={setMap}
-        onZoomChanged={(m) => setLevel(m.getLevel())}
+        onZoomChanged={onZoomChanged}
         onClick={handleMapClick} // 마커 바깥(지도 빈 곳) 탭 → 선택 해제 (오버레이 클릭은 map click을 발생시키지 않음)
         style={{ width: '100%', height: '100%' }}
       >
