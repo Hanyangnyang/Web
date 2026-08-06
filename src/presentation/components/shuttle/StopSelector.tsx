@@ -51,7 +51,7 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
   };
 
   return (
-    <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
+    <div className="sticky top-0 bg-surface/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
       <div className="flex items-center justify-between mb-3">
         <div className="text-2xl font-extrabold text-text-main">출발지</div>
         <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />

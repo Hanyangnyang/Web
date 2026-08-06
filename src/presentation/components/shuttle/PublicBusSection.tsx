@@ -53,7 +53,7 @@ export function PublicBusSection({
   return (
     <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
       {/* 고정 상단 필터 영역 */}
-      <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
+      <div className="sticky top-0 bg-surface/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
         <div className="flex items-center justify-between">
           <span className="text-2xl font-extrabold text-text-main">정류소</span>
           <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />

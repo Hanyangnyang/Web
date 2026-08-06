@@ -82,7 +82,7 @@ function StoreCard({ store, collegeFilter }) {
   return (
     <div
       className={`bg-white border rounded-card overflow-hidden transition-all duration-200 ${
-        expanded ? 'border-[#0E4A84]/20 shadow-[0_4px_12px_rgba(0,0,0,0.06)]' : 'border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]'
+        expanded ? 'border-primary/20 shadow-[0_4px_12px_rgba(0,0,0,0.06)]' : 'border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]'
       }`}
     >
       {/* 헤더 */}
@@ -315,7 +315,7 @@ export function PartnershipView({ isActive }) {
                 onClick={() => handleCollegeChange(c.id)}
                 className={`flex items-center gap-1 px-3 py-[7px] rounded-xl text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
                   college === c.id
-                    ? 'bg-[#0E4A84] text-white border-[#0E4A84]'
+                    ? 'bg-primary text-white border-primary'
                     : 'bg-white text-slate-700 border-slate-300'
                 }`}
               >

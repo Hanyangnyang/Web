@@ -63,7 +63,7 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
             {DIR_MAP[stopName] || ''}
           </span>
           {isClosest && (
-            <span className="text-[10px] font-extrabold text-[#27AE60] bg-[#27AE60]/10 px-1.5 py-0.5 rounded flex-shrink-0">
+            <span className="text-[10px] font-extrabold text-success bg-success/10 px-1.5 py-0.5 rounded flex-shrink-0">
               가장 근처
             </span>
           )}
