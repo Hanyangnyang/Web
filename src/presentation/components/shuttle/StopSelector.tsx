@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { STOPS } from '../../../domain/entities/Shuttle.js';
 import { ViewModeToggle } from './ViewModeToggle.jsx';
+import styles from './StopSelector.module.css';
 
 interface StopSelectorProps {
   viewMode: 'shuttle' | 'bus';
@@ -69,14 +70,14 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
           >
             {tooltipStop === s && showTooltip && (() => {
               const isTop = idx < 3 && s !== '셔틀콕' && s !== '한대앞';
-              const arrowClass = isTop ? 'top' : 'bottom';
+              const arrowClass = isTop ? styles.top : styles.bottom;
               const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
               const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
               const fadeY = isTooltipFadingOut ? (isTop ? ' translateY(-0.5rem)' : ' translateY(0.5rem)') : '';
               const origin = isTop ? 'bottom center' : 'top center';
               return (
                 <div
-                  className={`stt-tooltip ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
+                  className={`${styles.tooltip} ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
                   style={{ transform: `translateX(-50%) scale(0.85)${fadeY}`, transformOrigin: origin, animation: `${anim} 0.4s cubic-bezier(0.175,0.885,0.32,1.275)` }}
                 >
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { SUBWAY_OPTS, connectingTrains, type ScheduleItem, type SubwayArrival } from '../../../domain/entities/Shuttle.js';
 import { LineBadge } from './LineBadge.jsx';
+import styles from './TimetableRow.module.css';
 
 const ROUTE_LABEL: Record<string, string> = {
   '순환': '순환',
@@ -192,10 +193,10 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
           <span className={`inline-flex justify-center items-center w-[58px] min-h-[34px] text-[10px] font-extrabold py-1 rounded flex-shrink-0 transition-all duration-200 whitespace-pre-line leading-[1.1] text-center ${ROUTE_STYLE[routeKey]}`}>
             {rLabel}
           </span>
-          <div className={`perspective-container ${hideSubwayCol ? '' : 'flex-1'}`} style={{ height: 50, ...(hideSubwayCol && { width: 70 }) }}>
-            <div className={`flip-card-inner ${(!isFullMode && showRowRelative) ? 'flipped' : ''}`}>
+          <div className={`${styles.perspective} ${hideSubwayCol ? '' : 'flex-1'}`} style={{ height: 50, ...(hideSubwayCol && { width: 70 }) }}>
+            <div className={`${styles.inner} ${(!isFullMode && showRowRelative) ? styles.flipped : ''}`}>
               {/* Front side (Absolute time) */}
-              <div className="flip-card-front flex flex-col justify-center">
+              <div className={`${styles.front} flex flex-col justify-center`}>
                 <span className={`font-['Inter',-apple-system,sans-serif] text-[28px] font-black leading-none tracking-[-1px] ${isPast && !isFullMode ? 'text-text-hint' : 'text-text-main'}`}>
                   {row.dep}
                 </span>
@@ -210,7 +211,7 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
               </div>
 
               {/* Back side (Relative time) */}
-              <div className="flip-card-back flex flex-col justify-center">
+              <div className={`${styles.back} flex flex-col justify-center`}>
                 <span className={`font-['Inter',-apple-system,sans-serif] text-[22px] font-black leading-none tracking-[-1px] ${isPast && !isFullMode ? 'text-text-hint' : 'text-text-main'}`}>
                   {getShuttleRelativeTime()}
                 </span>

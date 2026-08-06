@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
+import styles from './BottomSheet.module.css';
 
 const CLOSE_ANIMATION_MS = 250;
 const DRAG_CLOSE_THRESHOLD = 120;
@@ -50,11 +51,11 @@ export function BottomSheet({
   // iOS 배경 스크롤 잠금 (position:fixed 대신 클래스 토글로 레이아웃 점프 방지)
   useEffect(() => {
     if (!enableScrollLock) return;
-    document.documentElement.classList.add('scroll-locked');
-    document.body.classList.add('scroll-locked');
+    document.documentElement.classList.add(styles.scrollLocked);
+    document.body.classList.add(styles.scrollLocked);
     return () => {
-      document.documentElement.classList.remove('scroll-locked');
-      document.body.classList.remove('scroll-locked');
+      document.documentElement.classList.remove(styles.scrollLocked);
+      document.body.classList.remove(styles.scrollLocked);
     };
   }, [enableScrollLock]);
 

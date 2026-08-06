@@ -1,0 +1,42 @@
+.nowMarker::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  animation: pulseLite 2s infinite;
+}
+
+@keyframes pulseLite {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.emptyCell {
+  background-image: radial-gradient(#e2e8f0 0.4px, transparent 0.4px);
+  background-size: 8px 8px;
+}
+
+@media (max-width: 375px) {
+  .courseName {
+    letter-spacing: -0.04em;
+  }
+}
+
+@media (max-width: 340px) {
+  .courseName {
+    letter-spacing: -0.07em;
+  }
+}

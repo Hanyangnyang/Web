@@ -7,6 +7,7 @@ import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { getKSTDateKey, getKSTNow } from '../../../utils/time.js';
 import { getMergedSchedule } from './gymScheduleFormat.js';
 import type { GymScheduleCell, GymPeriod } from '../../../domain/entities/Gym.js';
+import styles from './GymView.module.css';
 
 const COLORS: Record<string, { bg: string; text: string; border: string }> = {
   orange: { bg: '#FFF7ED', text: '#C2410C', border: '#FFEDD5' },
@@ -18,7 +19,7 @@ const COLORS: Record<string, { bg: string; text: string; border: string }> = {
 
 function CourseName({ name }: { name: string }) {
   return (
-    <div className="course-name text-[0.6rem] font-extrabold leading-[1.1] overflow-hidden w-full text-center flex flex-col items-center">
+    <div className={`${styles.courseName} text-[0.6rem] font-extrabold leading-[1.1] overflow-hidden w-full text-center flex flex-col items-center`}>
       {name.split('\n').map((line, i) => (
         <span key={i} className="course-name-line block">{line}</span>
       ))}
@@ -113,7 +114,7 @@ export function GymView({ onBack }: GymViewProps) {
 
   const renderCell = (cell: GymScheduleCell | '-' | null, span: number | undefined, startHour: number) => {
     if (cell === null) return null;
-    if (cell === '-') return <td className="cal-cell empty h-10 border-b border-r border-slate-200 p-0.5 relative" />;
+    if (cell === '-') return <td className={`${styles.emptyCell} h-10 border-b border-r border-slate-200 p-0.5 relative`} />;
     const s = COLORS[cell.type];
     let innerH = '100%';
     let alignTop = false;
@@ -194,7 +195,7 @@ export function GymView({ onBack }: GymViewProps) {
             <div className="absolute left-0 right-0 z-[50] pointer-events-none transition-[top_0.3s_cubic-bezier(0.4,0,0.2,1)]" style={{ top: `${now.top}px` }}>
               <div className="h-[1.5px] bg-error w-full opacity-20" />
               <div
-                className="absolute top-0 -translate-x-1/2 -translate-y-1/2 bg-error text-white px-[6px] py-px rounded-full text-[0.55rem] font-black shadow-[0_4px_10px_rgba(239,68,68,0.3)] flex items-center gap-[3px] whitespace-nowrap cal-now-marker"
+                className={`absolute top-0 -translate-x-1/2 -translate-y-1/2 bg-error text-white px-[6px] py-px rounded-full text-[0.55rem] font-black shadow-[0_4px_10px_rgba(239,68,68,0.3)] flex items-center gap-[3px] whitespace-nowrap ${styles.nowMarker}`}
                 style={{ left: `calc(12% + (88% / 5) * ${now.dayIndex} + (88% / 10))` }}
               >
                 <span>지금</span>
