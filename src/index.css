@@ -58,42 +58,8 @@ textarea,
 /* ─── CSS 변수 (style={} 인라인에서 계속 참조됨) ─── */
 :root {
   --color-primary: #0E4A84;
-  --color-primary-glow: rgba(14, 74, 132, 0.2);
-  --color-secondary: #AB863F;
-  --color-success: #27AE60;
-  --color-success-dark: #1a7a42;
-  --color-warning: #F39C12;
-  --color-warning-dark: #9a6200;
-  --color-error: #ef4444;
-  --color-surface: #F8F9FA;
-  --color-text-main: #212529;
-  --color-text-sub: #6C757D;
   --color-text-hint: #94a3b8;
-  --hyu-blue: #0E4A84;
-  --hyu-blue-glow: rgba(14, 74, 132, 0.2);
-  --hyu-blue-light: #3b82f6;
-  --bg-light: #F8F9FA;
-  --text-primary: #212529;
-  --text-secondary: #6C757D;
-  --accent: #0E4A84;
-  --warning: #F39C12;
-  --success: #27AE60;
   --radius-card: 12px;
-  --radius-sm: 4px;
-  --radius-full: 999px;
-  --space-page: 20px;
-  --space-section: 24px;
-  --space-element: 12px;
-  --space-sm: 8px;
-  --font-size-h2: 18px;
-  --font-size-body1: 16px;
-  --font-size-body2: 14px;
-  --font-size-caption: 12px;
-  --font-weight-h1: 700;
-  --font-weight-h2: 600;
-  --font-weight-body2: 500;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
 }
 
 body {
