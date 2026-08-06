@@ -8,6 +8,7 @@ import { createBannerApiDataSource } from './data/datasources/BannerApiDataSourc
 import { createBusApiDataSource } from './data/datasources/BusApiDataSource.js';
 import { createGymApiDataSource } from './data/datasources/GymApiDataSource.js';
 import { createFeedbackDataSource } from './data/datasources/FeedbackDataSource.js';
+import { createPartnershipApiDataSource } from './data/datasources/PartnershipApiDataSource.js';
 
 import { createMenuRepository } from './data/repositories/MenuRepository.js';
 import { createInstagramRepository } from './data/repositories/InstagramRepository.js';
@@ -16,6 +17,7 @@ import { createBannerRepository } from './data/repositories/BannerRepository.js'
 import { createBusRepository } from './data/repositories/BusRepository.js';
 import { createGymRepository } from './data/repositories/GymRepository.js';
 import { createFeedbackRepository } from './data/repositories/FeedbackRepository.js';
+import { createPartnershipRepository } from './data/repositories/PartnershipRepository.js';
 
 import { createGetMenuUseCase } from './domain/usecases/GetMenuUseCase.js';
 import { createGetInstagramProfileUseCase } from './domain/usecases/GetInstagramProfileUseCase.js';
@@ -27,6 +29,7 @@ import { createGetBannersUseCase } from './domain/usecases/GetBannersUseCase.js'
 import { createGetBusArrivalsUseCase } from './domain/usecases/GetBusArrivalsUseCase.js';
 import { createGetGymScheduleUseCase } from './domain/usecases/GetGymScheduleUseCase.js';
 import { createSubmitFeedbackUseCase } from './domain/usecases/SubmitFeedbackUseCase.js';
+import { createGetPartnershipStoresUseCase } from './domain/usecases/GetPartnershipStoresUseCase.js';
 
 import { createShuttleDataSource } from './data/datasources/ShuttleDataSource.js';
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
@@ -43,6 +46,7 @@ const bannerApiDataSource = createBannerApiDataSource({ httpClient });
 const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient });
 const feedbackDataSource = createFeedbackDataSource();
+const partnershipApiDataSource = createPartnershipApiDataSource({ httpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
@@ -53,6 +57,7 @@ export const bannerRepository = createBannerRepository({ bannerApiDataSource });
 export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
 export const feedbackRepository = createFeedbackRepository({ feedbackDataSource });
+export const partnershipRepository = createPartnershipRepository({ partnershipApiDataSource });
 
 // Use Cases
 export const getMenuUseCase = createGetMenuUseCase({ menuRepository });
@@ -65,3 +70,4 @@ export const getBannersUseCase = createGetBannersUseCase({ bannerRepository });
 export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository });
 export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository });
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
+export const getPartnershipStoresUseCase = createGetPartnershipStoresUseCase({ partnershipRepository });
