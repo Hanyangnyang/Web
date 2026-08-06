@@ -10,7 +10,8 @@ import { getPlatform } from '../../../lib/platform.js';
 import {
   searchStores, groupByCategory, activePartnerships,
   CATEGORY_META, type PartnerStore,
-} from './storeData';
+} from '../../../domain/entities/PartnerStore.js';
+import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
 
 interface Props {
   onClose: () => void;
@@ -24,8 +25,10 @@ export function SearchOverlay({ onClose, onSelect }: Props) {
   const [reportState, setReportState] = useState<ReportState>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
   const posthog = usePostHog();
+  // PartnershipMapView와 같은 queryKey를 공유하는 RQ 캐시라 별도 네트워크 요청 없이 재사용된다
+  const { stores } = usePartnershipStores();
 
-  const results = useMemo(() => searchStores(query), [query]);
+  const results = useMemo(() => searchStores(stores, query), [stores, query]);
   const groups = useMemo(() => groupByCategory(results), [results]);
   const trimmed = query.trim();
   const noResult = trimmed.length > 0 && results.length === 0;

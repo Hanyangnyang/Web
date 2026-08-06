@@ -1,7 +1,7 @@
 // 줌 레벨 기반 마커 클러스터링 (그리디 방식)
 // 화면상 일정 픽셀 반경 안에 모이는 매장들을 하나의 원으로 묶는다.
 // 레벨이 낮아질수록(확대) 임계 거리가 줄어 자연스럽게 개별 마커로 분리된다.
-import type { PartnerStore } from './storeData';
+import type { PartnerStore } from '../../../domain/entities/PartnerStore.js';
 
 export interface StoreCluster {
   lat: number;

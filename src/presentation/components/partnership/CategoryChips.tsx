@@ -1,5 +1,5 @@
 // 지도 상단 카테고리 필터 칩 (단일 선택)
-import { CATEGORY_ORDER, CATEGORY_META, type CategoryFilter } from './storeData';
+import { CATEGORY_ORDER, CATEGORY_META, type CategoryFilter } from '../../../domain/entities/PartnerStore.js';
 
 interface Props {
   value: CategoryFilter;

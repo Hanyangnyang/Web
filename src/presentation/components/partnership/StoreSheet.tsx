@@ -5,9 +5,10 @@ import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { X, Info, Clock, ExternalLink, ChevronRight } from 'lucide-react';
 import {
   activePartnerships, CATEGORY_META, COLLEGES,
-  COLLEGE_EMOJI, COLLEGE_STYLE, COLLEGE_DISPLAY_NAME,
+  COLLEGE_EMOJI, COLLEGE_DISPLAY_NAME,
   type PartnerStore,
-} from './storeData';
+} from '../../../domain/entities/PartnerStore.js';
+import { COLLEGE_STYLE } from './collegeStyle.js';
 import { CollegeWheelPicker } from './CollegeWheelPicker';
 
 // 휠피커 옵션 — '전체' 항목 + 단과대 목록. 컴포넌트 바깥에 둬 매 렌더마다 새 배열이 생기지 않게 한다.

@@ -2,7 +2,7 @@
 // - 1개짜리 클러스터 → 개별 매장 마커 (이모지)
 // - 여러 개 클러스터 → 개수 원 (탭하면 한 단계 확대)
 import { CustomOverlayMap } from 'react-kakao-maps-sdk';
-import { CATEGORY_META, type PartnerStore } from './storeData';
+import { CATEGORY_META, type PartnerStore } from '../../../domain/entities/PartnerStore.js';
 import type { StoreCluster } from './clustering';
 
 interface Props {

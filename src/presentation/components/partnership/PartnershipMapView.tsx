@@ -10,9 +10,10 @@ import { SearchOverlay } from './SearchOverlay';
 import { StoreSheet } from './StoreSheet';
 import { clusterStores, distanceMeters, type StoreCluster } from './clustering';
 import {
-  ERICA_MAIN_GATE, STORES, visibleStores, hasCoords, CATEGORY_META,
+  ERICA_MAIN_GATE, visibleStores, hasCoords, CATEGORY_META,
   type CategoryFilter, type PartnerStore,
-} from './storeData';
+} from '../../../domain/entities/PartnerStore.js';
+import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
 import { KAKAO_MAP_LIBRARIES } from '../../../lib/kakaoMap';
 
 // 학교 앞 상권이 화면에 꽉 차는 기본 확대 수준 (1=최대 확대)
@@ -36,6 +37,7 @@ export default function PartnershipMapView() {
     libraries: KAKAO_MAP_LIBRARIES,
   });
   const posthog = usePostHog();
+  const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
 
   // 부드러운 줌/이동은 카카오 imperative API(panTo·setLevel animate)로 제어하므로
   // Map의 center/level prop은 초기값 상수만 넘기고 이후엔 건드리지 않는다
@@ -64,19 +66,19 @@ export default function PartnershipMapView() {
   }, [toast]);
 
   const selected = useMemo(
-    () => STORES.find((s) => s.id === selectedId) ?? null,
-    [selectedId]
+    () => stores.find((s) => s.id === selectedId) ?? null,
+    [stores, selectedId]
   );
 
   // 마커: 칩 필터 + 줌 레벨 기반 클러스터링. 선택된 매장은 강조(링·라벨)만 되고
   // 다른 매장 마커도 그대로 보인다. 칩과 다른 카테고리를 검색으로 선택한 경우엔 풀에 추가.
   const clusters = useMemo<StoreCluster[]>(() => {
-    const pool = visibleStores(category, college);
+    const pool = visibleStores(stores, category, college);
     if (selected && hasCoords(selected) && !pool.some((s) => s.id === selected.id)) {
       pool.push(selected);
     }
     return clusterStores(pool, level);
-  }, [selected, category, college, level]);
+  }, [stores, selected, category, college, level]);
 
   // 최대 배율로 부드럽게 당기면서, 시트에 가리지 않는 위치로 센터링
   const focusMap = useCallback((lat: number, lng: number) => {
@@ -163,7 +165,7 @@ export default function PartnershipMapView() {
   // 직전 선택은 제외해 연속 중복 방지
   const rollRandom = useCallback(() => {
     if (rolling) return;
-    const pool = visibleStores('food').filter((s) => s.id !== selectedId);
+    const pool = visibleStores(stores, 'food').filter((s) => s.id !== selectedId);
     if (pool.length === 0) return;
     setRolling(true);
     posthog?.capture('partner_map_random_clicked');
@@ -173,7 +175,7 @@ export default function PartnershipMapView() {
       selectStore(store, 'random');
       setRolling(false);
     }, 500);
-  }, [rolling, selectedId, selectStore, posthog]);
+  }, [rolling, stores, selectedId, selectStore, posthog]);
 
   // 시간대에 따라 버튼이 지금의 고민에 말을 건다: 점심(11~15시) 점메추, 저녁(16~21시) 저메추
   const hour = new Date().getHours();
@@ -194,7 +196,18 @@ export default function PartnershipMapView() {
     );
   }
 
-  if (loading) {
+  // 매장 데이터 로딩 실패 — 지도 SDK 에러와 별개 축이라 메시지도 구분
+  if (storesError) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center gap-2 text-text-hint">
+        <span className="text-2xl">🏪</span>
+        <p className="text-sm font-bold">매장 정보를 불러오지 못했어요</p>
+        <p className="text-xs">네트워크 연결을 확인해주세요</p>
+      </div>
+    );
+  }
+
+  if (loading || storesLoading) {
     return (
       <div className="h-full flex items-center justify-center bg-slate-50">
         <span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span>
@@ -287,7 +300,7 @@ export default function PartnershipMapView() {
 
       {/* 하단: 매장 리스트 / 상세 바텀시트 */}
       <StoreSheet
-        stores={clusterFocus ?? visibleStores(category, college)}
+        stores={clusterFocus ?? visibleStores(stores, category, college)}
         title={
           clusterFocus
             ? '이 위치 제휴 매장'
