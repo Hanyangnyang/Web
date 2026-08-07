@@ -11,6 +11,11 @@ import {
 import { COLLEGE_STYLE } from './collegeStyle.js';
 import { CollegeWheelPicker } from './CollegeWheelPicker';
 
+// 상세 모드 시트가 화면 높이에서 차지하는 비율 — 아래 SheetFrame의 h-[45%]와 반드시 같은 값으로 맞춘다.
+// (Tailwind 클래스는 정적 문자열이어야 스캔되므로 여기서 곱해 만들지 않고 둘 다 손으로 맞춘다.)
+// 지도 포커스 센터링(usePartnerMapFocus)이 "시트를 제외한 화면 중앙"을 계산할 때 이 값을 쓴다.
+export const STORE_DETAIL_HEIGHT_FRACTION = 0.45;
+
 // 휠피커 옵션 — '전체' 항목 + 단과대 목록. 컴포넌트 바깥에 둬 매 렌더마다 새 배열이 생기지 않게 한다.
 const COLLEGE_OPTIONS = [
   { id: 'all', label: '전체 단과대' },
@@ -34,7 +39,7 @@ interface Props {
 // 콘텐츠는 nav에 가리지 않게 하단 패딩(NAV_CLEARANCE)으로 비워둔다
 const NAV_CLEARANCE = 'pb-[calc(108px+env(safe-area-inset-bottom,0px))]';
 
-function SheetFrame({ heightClass, children }: { heightClass: string; children: ReactNode }) {
+export function SheetFrame({ heightClass, children }: { heightClass: string; children: ReactNode }) {
   return (
     <div
       className={`absolute bottom-0 inset-x-0 z-20 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] flex flex-col transition-[height] duration-300 ease-out ${heightClass}`}

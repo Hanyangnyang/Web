@@ -1,8 +1,7 @@
-// 훅: 캠퍼스맵 매장 선택 상태 — 개별 매장 선택, 클러스터 포커스, 바텀시트 펼침/접힘
-// 이 셋은 서로 강하게 얽혀있어(선택 시 시트 접힘, 클러스터 탭 시 시트 펼침 등) 하나의 훅으로 묶는다
+// 훅: 캠퍼스맵 매장 선택 상태 — 개별 매장 선택과 바텀시트 펼침/접힘
+// 이 둘은 서로 얽혀있어(선택 시 시트 접힘 등) 하나의 훅으로 묶는다
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { PartnerStore } from '../../domain/entities/PartnerStore.js';
-import type { StoreCluster } from '../components/partnership/clustering.js';
 
 type SelectSource = 'marker' | 'list' | 'search' | 'random';
 
@@ -15,8 +14,6 @@ interface Params {
 
 export function usePartnerStoreSelection({ stores, focusMap, posthog, onAfterSelect }: Params) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  // 클러스터 탭 시 바텀시트에 보여줄 해당 묶음의 매장들
-  const [clusterFocus, setClusterFocus] = useState<PartnerStore[] | null>(null);
   const [sheetExpanded, setSheetExpanded] = useState(false);
   // 목록에서 상세로 들어온 경우, X로 닫을 때 펼쳐진 목록으로 복귀시키기 위한 기록
   const returnToList = useRef(false);
@@ -29,7 +26,6 @@ export function usePartnerStoreSelection({ stores, focusMap, posthog, onAfterSel
   const selectStore = useCallback((store: PartnerStore, source: SelectSource) => {
     returnToList.current = source === 'list';
     setSelectedId(store.id);
-    setClusterFocus(null);
     setSheetExpanded(false);
     if (store.location.latitude != null && store.location.longitude != null) {
       focusMap(store.location.latitude, store.location.longitude);
@@ -52,31 +48,20 @@ export function usePartnerStoreSelection({ stores, focusMap, posthog, onAfterSel
     returnToList.current = false;
   }, []);
 
-  // 클러스터 탭: 최대 배율로 당겨 개별 마커로 펼치고, 시트에 해당 매장 리스트를 올린다
-  const handleClusterClick = useCallback((cluster: StoreCluster) => {
-    setClusterFocus(cluster.stores);
-    setSheetExpanded(true);
-    focusMap(cluster.lat, cluster.lng);
-  }, [focusMap]);
-
-  // 카테고리 칩 선택 = 그 카테고리를 둘러보겠다는 의도 → 선택 해제하고 리스트를 바로 펼친다
+  // 필터 칩 선택 = 그 카테고리를 둘러보겠다는 의도 → 선택 해제하고 리스트를 바로 펼친다
   const browseCategory = useCallback(() => {
     setSelectedId(null);
-    setClusterFocus(null);
     setSheetExpanded(true);
   }, []);
 
   return {
     selected,
     selectedId,
-    clusterFocus,
-    setClusterFocus,
     sheetExpanded,
     setSheetExpanded,
     selectStore,
     closeDetail,
     handleMapClick,
-    handleClusterClick,
     browseCategory,
   };
 }

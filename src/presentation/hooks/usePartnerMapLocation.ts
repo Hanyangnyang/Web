@@ -1,7 +1,7 @@
 // 훅: 캠퍼스맵 '내 위치' 버튼 — 온디맨드 측위 후 학교 인근이면 지도 중심 이동
 import { useCallback, useState } from 'react';
 import { measureLocation } from './useLocation.js';
-import { distanceMeters } from '../components/partnership/clustering.js';
+import { distanceMeters } from '../../lib/geo.js';
 import { ERICA_MAIN_GATE } from '../../domain/entities/PartnerStore.js';
 
 // 이 거리 밖이면 '학교 근처가 아님'으로 보고 현위치로 센터를 옮기지 않는다
