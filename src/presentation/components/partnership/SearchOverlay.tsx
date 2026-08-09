@@ -14,6 +14,17 @@ import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
 import { useCampusBuildings } from '../../hooks/useCampusBuildings.js';
 import { useFeedback } from '../../hooks/useFeedback.js';
 
+/**
+ * 한 섹션의 상태 한 줄.
+ * 매장과 교내시설은 서로 다른 JSON에서 오므로 한쪽이 실패해도 다른 쪽 결과는 계속 보여준다 —
+ * 지도에서 "한 레이어가 실패해도 나머지는 쓸 수 있어야 한다"고 정한 것과 같은 원칙이다.
+ */
+function SectionStatus({ error, loading }: { error: string | null; loading: boolean }) {
+  if (error) return <p className="px-4 pb-2 text-[12px] text-red-500 font-medium">{error}</p>;
+  if (loading) return <p className="px-4 pb-2 text-[12px] text-text-hint font-medium animate-pulse">불러오는 중…</p>;
+  return null;
+}
+
 interface Props {
   onClose: () => void;
   onSelect: (store: PartnerStore) => void;
@@ -31,7 +42,9 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   // 건물은 칩과 무관하게 검색 대상이라 여기선 항상 enabled — 이미 받아왔다면 캐시에서 즉시 나온다.
   const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
   const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: true });
-  // 아직 안 왔거나 실패한 상태에서 "결과 없음"을 띄우면, 있는 매장을 없다고 오해해 잘못된 제보를 하게 된다
+  // 로딩·실패는 아래에서 섹션별로 따로 알린다. 여기 합친 값은 '결과 없음' 판정 전용 —
+  // 어느 한쪽이라도 아직 안 왔거나 실패한 상태에서 "없어요"를 띄우면,
+  // 있는 매장을 없다고 오해해 잘못된 제보를 하게 된다.
   const dataLoading = storesLoading || buildingsLoading;
   const dataError = storesError ?? buildingsError;
 
@@ -110,18 +123,12 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
           </p>
         )}
 
-        {/* 검색어는 쳤는데 데이터가 아직/영영 없는 경우 — '결과 없음'과 반드시 구분해야 한다 */}
-        {trimmed.length > 0 && dataError && (
-          <p className="text-center text-[12px] text-red-500 font-medium pt-14">{dataError}</p>
-        )}
-        {trimmed.length > 0 && !dataError && dataLoading && (
-          <p className="text-center text-[12px] text-text-hint font-medium pt-14 animate-pulse">불러오는 중…</p>
-        )}
-
-        {/* 교내시설 — 매장보다 먼저 (건물명을 찾는 의도가 더 분명한 검색어가 많다) */}
-        {buildingResults.length > 0 && (
+        {/* 교내시설 — 매장보다 먼저 (건물명을 찾는 의도가 더 분명한 검색어가 많다).
+            결과가 없어도 실패·로딩 중이면 섹션을 띄워 그 사실을 알린다 */}
+        {trimmed.length > 0 && (buildingResults.length > 0 || buildingsError || buildingsLoading) && (
           <div>
             <p className="px-4 pt-4 pb-1 text-[11px] font-extrabold text-text-hint">🏢 교내시설</p>
+            <SectionStatus error={buildingsError} loading={buildingsLoading} />
             {buildingResults.map((building) => (
               <button
                 key={building.id}
@@ -145,6 +152,14 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
                 </div>
               </button>
             ))}
+          </div>
+        )}
+
+        {/* 매장 쪽 실패·로딩 — 교내시설 결과는 그대로 두고 이 섹션에서만 알린다 */}
+        {trimmed.length > 0 && (storesError || storesLoading) && (
+          <div>
+            <p className="px-4 pt-4 pb-1 text-[11px] font-extrabold text-text-hint">🏪 제휴 매장</p>
+            <SectionStatus error={storesError} loading={storesLoading} />
           </div>
         )}
 
