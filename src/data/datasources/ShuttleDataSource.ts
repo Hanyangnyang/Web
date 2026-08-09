@@ -1,8 +1,6 @@
 // 데이터 소스: 셔틀 시간표 JSON 및 지하철 도착 정보 API 원시 호출
 
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
+import type { HttpClient } from '../../infrastructure/http/HttpClient.js';
 
 export interface ShuttleScheduleRow {
   route: string;

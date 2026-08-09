@@ -2,13 +2,13 @@
 // 동그란 머리 + 좁고 긴 꼬리(삼각형)로 만들어 훨씬 날렵한 실루엣을 낸다.
 // 꼬리 끝이 정확히 실좌표를 가리키도록 xAnchor=0.5·yAnchor=1(바닥 중앙)로 붙인다.
 // 색은 매장·건물·흡연장 모두 동일한 빨강으로 통일 (점 마커와도 같은 색이라 레이어 전환이 자연스럽다).
+import { MARKER_COLOR } from './markerColors';
+
 interface Props {
   selected: boolean;
   onClick: () => void;
   ariaLabel: string;
 }
-
-const PIN_COLOR = '#EF4444'; // 점 마커(dot)와 동일한 빨강
 
 const HEAD_D = 14;
 const HEAD_D_SELECTED = 18;
@@ -36,7 +36,7 @@ export function MapPinMarker({ selected, onClick, ariaLabel }: Props) {
         style={{
           width: headD,
           height: headD,
-          background: PIN_COLOR,
+          background: MARKER_COLOR,
           border: '1px solid rgba(0,0,0,0.15)',
           boxShadow: selected ? '0 3px 10px rgba(239,68,68,0.55)' : '0 2px 6px rgba(0,0,0,0.25)',
         }}
@@ -51,7 +51,7 @@ export function MapPinMarker({ selected, onClick, ariaLabel }: Props) {
           height: 0,
           borderLeft: `${tailW / 2}px solid transparent`,
           borderRight: `${tailW / 2}px solid transparent`,
-          borderTop: `${tailH}px solid ${PIN_COLOR}`,
+          borderTop: `${tailH}px solid ${MARKER_COLOR}`,
         }}
       />
     </button>

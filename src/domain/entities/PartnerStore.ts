@@ -1,4 +1,7 @@
 // 도메인 엔티티: 제휴 매장
+import { normalizeForSearch, matchesQuery } from '../../lib/text.js';
+import type { Coordinates } from './Coordinates.js';
+
 export type StoreCategory = 'food' | 'cafe' | 'pub' | 'play' | 'life';
 export type CategoryFilter = 'all' | StoreCategory;
 
@@ -18,8 +21,10 @@ export interface Partnership {
 }
 
 export interface StoreLocation {
-  latitude: number | null;
-  longitude: number | null;
+  // 좌표는 통째로 있거나 없거나 둘 중 하나다.
+  // 예전엔 latitude·longitude를 각각 nullable로 뒀는데, "위도만 있고 경도는 없는" 불가능한 상태가
+  // 타입상 표현돼 쓰는 쪽마다 두 번씩 null 검사를 해야 했다.
+  coordinates: Coordinates | null;
   address: string | null;
   full_address: string | null;
 }
@@ -34,32 +39,6 @@ export interface PartnerStore {
   emoji?: string;
   kakao_place_id?: string | null;
   partnerships: Partnership[];
-}
-
-// raw 데이터를 도메인 엔티티로 변환 — 지금은 필드가 그대로 대응되지만,
-// 나중에 백엔드 API가 다른 필드명/형식으로 내려줘도 이 함수만 고치면 나머지
-// 도메인/프레젠테이션 로직은 안 바뀐다
-export function createPartnerStore(raw: PartnerStore): PartnerStore {
-  return {
-    id: raw.id,
-    name: raw.name,
-    category: raw.category,
-    is_active: raw.is_active,
-    summary_benefit: raw.summary_benefit ?? null,
-    location: {
-      latitude: raw.location?.latitude ?? null,
-      longitude: raw.location?.longitude ?? null,
-      address: raw.location?.address ?? null,
-      full_address: raw.location?.full_address ?? null,
-    },
-    emoji: raw.emoji,
-    kakao_place_id: raw.kakao_place_id ?? null,
-    partnerships: raw.partnerships ?? [],
-  };
-}
-
-export function createPartnerStores(rawList: PartnerStore[]): PartnerStore[] {
-  return rawList.map(createPartnerStore);
 }
 
 // ─── 메타데이터 ─────────────────────────────────────────────────────
@@ -77,49 +56,30 @@ export const CATEGORY_META: Record<StoreCategory, { label: string; emoji: string
   life: { label: '생활', emoji: '✂️' },
 };
 
-// 단과대 메타
-export const COLLEGE_EMOJI: Record<string, string> = {
-  '1': '🦁', '2': '📢', '3': '⚙️', '4': '💊', '5': '🎨',
-  '6': '🌍', '7': '📊', '8': '💻', '9': '🎵', '10': '🚀', '11': '👥',
-};
-
-export const COLLEGE_DISPLAY_NAME: Record<string, string> = {
-  '1': 'LIONS\n칼리지',
-  '6': '글로벌문화\n통상대학',
-  '8': '소프트웨어\n융합대학',
-};
-
-// 단과대 필터 드롭다운용 (총학생회는 별도 제휴 주체가 아니라 제외)
-export const COLLEGES: { id: string; name: string }[] = [
-  { id: '1', name: 'LIONS 칼리지' },
-  { id: '2', name: '커뮤니케이션&컬쳐대학' },
-  { id: '3', name: '공학대학' },
-  { id: '4', name: '약학대학' },
-  { id: '5', name: '디자인대학' },
-  { id: '6', name: '글로벌문화통상대학' },
-  { id: '7', name: '경상대학' },
-  { id: '8', name: '소프트웨어융합대학' },
-  { id: '9', name: '예체능대학' },
-  { id: '10', name: '첨단융합대학' },
-];
+// 단과대 메타(id·이름·이모지)는 제휴 매장만의 지식이 아니라 학교 공통이라 College.ts로 옮겼다.
 
 // ─── 도메인 로직 (매장 목록 필터·검색) ────────────────────────────────
 // RQ 훅이 데이터를 소유하므로, 여기 함수들은 모두 stores를 파라미터로 받는다
 // (예전 storeData.ts처럼 모듈 전역 STORES를 암묵적으로 참조하지 않는다)
 
-/** 좌표가 있어 지도에 표시 가능한 매장인지 */
-export function hasCoords(store: PartnerStore): boolean {
-  return store.location?.latitude != null && store.location?.longitude != null;
+/** 지도에 찍을 수 있는(좌표를 가진) 매장. 타입 가드라 통과하면 coordinates가 non-null로 좁혀진다 */
+export type PlottableStore = PartnerStore & { location: { coordinates: Coordinates } };
+
+export function hasCoords(store: PartnerStore): store is PlottableStore {
+  return store.location.coordinates !== null;
 }
 
-/** 지도에 마커로 표시할 매장: 영업 중 + 좌표 보유 + 카테고리·단과대 필터 일치 */
+/**
+ * 지도에 마커로 표시할 매장: 영업 중 + 좌표 보유 + 카테고리·단과대 필터 일치.
+ * 좌표를 거른 뒤이므로 반환 타입도 PlottableStore로 좁혀 준다 — 쓰는 쪽이 다시 null 검사를 하지 않아도 된다.
+ */
 export function visibleStores(
   stores: PartnerStore[],
   category: CategoryFilter,
   collegeId: string = 'all'
-): PartnerStore[] {
+): PlottableStore[] {
   return stores.filter(
-    (s) =>
+    (s): s is PlottableStore =>
       s.is_active &&
       hasCoords(s) &&
       (category === 'all' || s.category === category) &&
@@ -138,16 +98,11 @@ export function activePartnerships(store: PartnerStore): Partnership[] {
   });
 }
 
-/** 띄어쓰기·대소문자 무시 정규화 (데이터셋이 작아 실시간 연산 비용은 무시 가능) */
-export function normalize(text: string): string {
-  return text.replace(/\s+/g, '').toLowerCase();
-}
-
 /** 매장명 검색 — 폐업 매장도 포함해 반환한다 (검색은 "이 가게 제휴 되나?"에 답하는 기능이므로) */
 export function searchStores(stores: PartnerStore[], query: string): PartnerStore[] {
-  const q = normalize(query.trim());
+  const q = normalizeForSearch(query.trim());
   if (!q) return [];
-  return stores.filter((s) => normalize(s.name).includes(q));
+  return stores.filter((s) => matchesQuery(s.name, q));
 }
 
 /** 검색 결과를 카테고리별로 그룹핑 — 결과 없는 카테고리는 제외 */

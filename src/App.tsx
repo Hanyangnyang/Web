@@ -260,7 +260,7 @@ function MainLayout() {
           <div className="-mx-4 h-full" style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
             {partnerVisited && (
               <Suspense fallback={<div className="h-full flex items-center justify-center"><span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span></div>}>
-                <PartnershipMapView />
+                <PartnershipMapView isActive={activeTab === 'partner'} />
               </Suspense>
             )}
           </div>

@@ -1,42 +1,53 @@
 // 제휴탭 지도 화면: 카카오맵 + 필터 칩(매장 카테고리·건물·흡연장) + 통합 검색 + 바텀시트
-// 상태 로직은 usePartnerMap*/usePartnerStore* 훅들이 갖고 있고, 이 컴포넌트는 그것들을
-// 조합해 하위 컴포넌트에 내려주는 조립 역할만 한다
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { LocateFixed, Search } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { MapFilterChips, type MapChip } from './MapFilterChips';
+import { MapFilterChips } from './MapFilterChips';
+import { toStoreCategory, type MapChip } from '../../hooks/usePartnerMapFilters.js';
+import { MapStatusScreen } from './MapStatusScreen';
 import { StoreMarkers } from './StoreMarkers';
 import { SearchOverlay } from './SearchOverlay';
-import { StoreSheet, STORE_DETAIL_HEIGHT_FRACTION } from './StoreSheet';
-import { CampusBuildingMarkers } from './CampusBuildingMarkers';
-import { SmokingSpotMarkers } from './SmokingSpotMarkers';
-import { CampusBuildingSheet, BUILDING_DETAIL_HEIGHT_FRACTION } from './CampusBuildingSheet';
-import { SmokingSpotSheet, SMOKING_DETAIL_HEIGHT_FRACTION } from './SmokingSpotSheet';
-import { layoutStores } from './storeLayout';
+import { StoreSheet } from './StoreSheet';
+import { PointMarkers } from './PointMarkers';
+import { CampusBuildingSheet } from './CampusBuildingSheet';
+import { SmokingSpotSheet } from './SmokingSpotSheet';
+import {
+  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
+} from './sheetHeights';
+
 import {
   hasCoords, visibleStores, CATEGORY_META,
-  type CategoryFilter,
+  type CategoryFilter, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
-import type { CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
+import { openSpaceBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
 import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
 import { useCampusBuildings } from '../../hooks/useCampusBuildings.js';
 import { useSmokingSpots } from '../../hooks/useSmokingSpots.js';
 import { usePartnerMapFocus, DEFAULT_LEVEL } from '../../hooks/usePartnerMapFocus.js';
-import { usePartnerMapBounds, isWithinBounds } from '../../hooks/usePartnerMapBounds.js';
+import { useMapCenter } from '../../hooks/useMapCenter.js';
+import { getCachedLocation } from '../../hooks/useLocation.js';
 import { usePartnerMapToast } from '../../hooks/usePartnerMapToast.js';
 import { usePartnerMapLocation } from '../../hooks/usePartnerMapLocation.js';
 import { usePartnerMapFilters } from '../../hooks/usePartnerMapFilters.js';
-import { usePartnerStoreSelection } from '../../hooks/usePartnerStoreSelection.js';
+import { useCampusMapLayers } from '../../hooks/useCampusMapLayers.js';
+import { useCampusMapSelection, selectedBy, type MapSelection, type SelectSource, type StoreSelectSource } from '../../hooks/useCampusMapSelection.js';
 import { usePartnerRandomPick } from '../../hooks/usePartnerRandomPick.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { KAKAO_MAP_LIBRARIES } from '../../../lib/kakaoMap';
+import { SheetHeightContext, type ReportSheetHeight } from '../ui/sheetHeight.js';
 
 // 초기 지도 중심: 정문(ERICA_MAIN_GATE)이 아니라 제휴 매장이 밀집한 상권 한가운데.
 // 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고(usePartnerMapLocation), 첫 화면은 매장이 보이는 곳에서 시작한다.
 const INITIAL_CENTER = { lat: 37.3008, lng: 126.8385 } as const;
 
-export default function PartnershipMapView() {
+interface Props {
+  // 탭이 숨겨져도 컴포넌트는 마운트된 채 남아서, 뒤로가기를 가로챌지 판단하려면 이 값이 필요하다
+  isActive: boolean;
+}
+
+export default function PartnershipMapView({ isActive }: Props) {
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY,
     // clusterer: 마커 밀집 대비, services: 좌표↔주소 변환 대비
@@ -47,7 +58,7 @@ export default function PartnershipMapView() {
   const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
 
   const { map, setMap, level, onZoomChanged, focusMap, panTo } = usePartnerMapFocus();
-  const { bounds: mapBounds, onIdle } = usePartnerMapBounds(map);
+  const { center: mapCenter, onIdle } = useMapCenter(map);
   const { toast, showToast } = usePartnerMapToast();
   const { userPos, locating, locateMe } = usePartnerMapLocation({ panTo, onMessage: showToast, posthog });
   const { chip, setChip, college, setCollege } = usePartnerMapFilters();
@@ -56,106 +67,152 @@ export default function PartnershipMapView() {
 
   // 지도가 실제로 그려지는 컨테이너의 픽셀 높이 — focusMap이 '시트 제외 영역 정중앙'을 계산할 때 쓴다
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const getViewportHeight = () => mapContainerRef.current?.clientHeight ?? window.innerHeight;
+  const getViewportHeight = useCallback(() => mapContainerRef.current?.clientHeight ?? window.innerHeight, []);
 
-  const isBuildingChip = chip === 'building';
-  const isSmokingChip = chip === 'smoking';
-  // 매장 카테고리 칩일 때만 매장 관련 데이터를 계산 — 건물/흡연장/미선택 상태에선 null
-  const storeCategory: CategoryFilter | null = chip && chip !== 'building' && chip !== 'smoking' ? chip : null;
+  // 시트가 보고한 높이를 컨테이너의 CSS 변수에 반영한다 — 플로팅 버튼이 이걸 딛고 선다.
+  // 상태가 아닌 DOM에 직접 쓰는 이유: 높이 트랜지션 매 프레임마다 마커 수백 개가 리렌더되면 안 된다.
+  const reportSheetHeight = useCallback<ReportSheetHeight>((heightPx) => {
+    const el = mapContainerRef.current;
+    if (!el) return;
+    if (heightPx == null) el.style.removeProperty('--sheet-h');
+    else el.style.setProperty('--sheet-h', `${heightPx}px`);
+  }, []);
 
-  // 건물·흡연장은 각자의 칩이 켜졌을 때만 불러온다(RQ enabled)
-  const { buildings } = useCampusBuildings({ enabled: isBuildingChip });
-  const { spots: smokingSpots } = useSmokingSpots({ enabled: isSmokingChip });
+  // 칩 하나에서 파생되는 화면 상태(어떤 레이어를 그릴지·어떤 시트를 띄울지)는 전부 이 훅이 계산한다
+  const {
+    isOpenSpaceChip, isSmokingChip, isBuildingLayerChip,
+    showsBuildingLayer, showsSmokingLayer, storeCategory, sheetVisible,
+  } = useCampusMapLayers(chip);
 
-  const [selectedBuilding, setSelectedBuilding] = useState<CampusBuilding | null>(null);
-  const [selectedSmokingSpot, setSelectedSmokingSpot] = useState<SmokingSpot | null>(null);
+  // 건물·흡연장은 각자의 칩이 켜졌을 때만 불러온다(RQ enabled).
+  // 로딩·실패는 지도 전체를 막지 않고 해당 시트 안에서만 알린다 — 한 레이어가 실패해도
+  // 지도와 나머지 레이어는 계속 쓸 수 있어야 하고, "실패"와 "원래 없음"이 구분돼야 한다.
+  const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: showsBuildingLayer });
+  const { spots: smokingSpots, loading: smokingLoading, loadErr: smokingError } = useSmokingSpots({ enabled: showsSmokingLayer });
 
-  // focusMap은 시트 종류별로 화면에서 차지하는 높이가 달라 그 비율을 알아야 한다 —
-  // 레이어별로 맞는 비율을 미리 발라둔 얇은 래퍼를 만들어 넘긴다.
-  const focusMapForStore = useCallback((lat: number, lng: number) => {
-    focusMap(lat, lng, STORE_DETAIL_HEIGHT_FRACTION, getViewportHeight());
-  }, [focusMap]);
+  // 오픈스페이스 칩이면 오픈스페이스가 있는 건물만 지도·목록에 올린다
+  const layerBuildings = useMemo(
+    () => (isOpenSpaceChip ? openSpaceBuildings(buildings) : buildings),
+    [isOpenSpaceChip, buildings]
+  );
+
+  // 선택된 대상으로 지도를 이동시킨다. 종류마다 상세 시트 높이가 달라 센터링 계산이 달라지므로,
+  // 세 갈래를 여기 한 곳에 모아두고 훅에는 '언제 부를지'만 맡긴다.
+  const focusSelection = useCallback((sel: MapSelection) => {
+    const viewportHeight = getViewportHeight();
+    switch (sel.kind) {
+      case 'store': {
+        const coords = sel.store.location.coordinates;
+        if (coords) focusMap(coords.latitude, coords.longitude, STORE_DETAIL_FRACTION, viewportHeight);
+        break;
+      }
+      case 'building':
+        focusMap(sel.building.coordinates.latitude, sel.building.coordinates.longitude, BUILDING_DETAIL_FRACTION, viewportHeight);
+        break;
+      case 'smoking':
+        focusMap(sel.spot.coordinates.latitude, sel.spot.coordinates.longitude, SMOKING_DETAIL_FRACTION, viewportHeight);
+        break;
+    }
+  }, [focusMap, getViewportHeight]);
 
   const {
-    selected, selectedId, sheetExpanded, setSheetExpanded,
-    selectStore, closeDetail, handleMapClick, browseCategory,
-  } = usePartnerStoreSelection({
-    stores,
-    focusMap: focusMapForStore,
+    selection, sheetExpanded, setSheetExpanded,
+    selectStore, selectBuilding, selectSmokingSpot,
+    closeDetail, clearSelection, browseCategory,
+  } = useCampusMapSelection({
+    onFocus: focusSelection,
     posthog,
     onAfterSelect: () => setSearchOpen(false),
   });
 
-  // 매장을 선택하면 건물·흡연장 상세는 닫아 하단 시트가 하나만 뜨게 한다
-  const pickStore: typeof selectStore = (store, source) => {
-    setSelectedBuilding(null);
-    setSelectedSmokingSpot(null);
+  // 선택은 id로만 들고 있으므로 매번 최신 목록에서 되살린다 (데이터가 갱신되면 상세도 따라 바뀐다).
+  // 건물은 반드시 layerBuildings(오픈스페이스 필터링본)가 아닌 buildings 전체에서 찾아야 한다 —
+  // 오픈스페이스 칩 상태에서 검색으로 고른 건물이 그 목록엔 없을 수 있기 때문.
+  const selectedStore = useMemo(() => selectedBy(selection, 'store', stores), [selection, stores]);
+  const selectedBuilding = useMemo(() => selectedBy(selection, 'building', buildings), [selection, buildings]);
+  const selectedSmokingSpot = useMemo(() => selectedBy(selection, 'smoking', smokingSpots), [selection, smokingSpots]);
+
+  // 무엇을 선택하든 그에 해당하는 칩으로 전환한다.
+  // '전체'에서 마커를 눌렀을 때 그 종류의 칩이 켜지게 하는 게 주 목적이고, 덕분에
+  // "선택된 게 있으면 칩은 '전체'가 아니다"가 보장돼 시트 표시 조건도 단순해진다.
+  // (선택끼리의 상호 배제는 useCampusMapSelection이 타입으로 보장하므로 여기선 칩만 신경 쓰면 된다)
+  const pickStore = (store: PartnerStore, source: StoreSelectSource) => {
+    setChip(store.category);
     selectStore(store, source);
   };
 
-  const selectBuilding = (building: CampusBuilding) => {
-    closeDetail();
-    setSelectedBuilding(building);
-    focusMap(building.coordinates.latitude, building.coordinates.longitude, BUILDING_DETAIL_HEIGHT_FRACTION, getViewportHeight());
-  };
-  const selectSmokingSpot = (spot: SmokingSpot) => {
-    closeDetail();
-    setSelectedSmokingSpot(spot);
-    focusMap(spot.coordinates.latitude, spot.coordinates.longitude, SMOKING_DETAIL_HEIGHT_FRACTION, getViewportHeight());
+  const pickBuilding = (building: CampusBuilding, source: SelectSource) => {
+    // 이미 건물 계열 칩(교내시설/오픈스페이스)이면 그대로 둔다 — 오픈스페이스 탐색 흐름을 끊지 않기 위해
+    if (!isBuildingLayerChip) setChip('building');
+    selectBuilding(building, source);
   };
 
-  // KakaoMap의 onClick prop으로 직접 넘어가므로(useKakaoEvent가 콜백 identity로 리스너를 갈아끼움)
-  // 매 렌더 새 함수가 되지 않도록 메모이즈한다
-  const handleMapClickAll = useCallback(() => {
-    setSelectedBuilding(null);
-    setSelectedSmokingSpot(null);
-    handleMapClick();
-  }, [handleMapClick]);
+  const pickSmokingSpot = (spot: SmokingSpot, source: SelectSource) => {
+    if (!isSmokingChip) setChip('smoking');
+    selectSmokingSpot(spot, source);
+  };
+
+  // 검색에서 건물을 고르면 교내시설 레이어로 확정한다 — 오픈스페이스 칩이 켜져 있어도
+  // 검색 결과는 오픈스페이스가 없는 건물일 수 있어서, 그대로 두면 마커가 안 뜬다
+  const selectBuildingFromSearch = (building: CampusBuilding) => {
+    setChip('building');
+    selectBuilding(building, 'search');
+  };
 
   const { rolling, rollRandom, diceLabel } = usePartnerRandomPick({
     stores,
-    excludeId: selectedId,
+    excludeId: selectedStore?.id ?? null,
     onPick: (store) => pickStore(store, 'random'),
     posthog,
   });
 
-  // 마커: 개수 뱃지로 묶지 않고 항상 전체를 실좌표에 개별 배치(storeLayout). 선택된 매장은 강조만 되고
-  // 다른 매장도 그대로 보인다. 칩과 다른 카테고리를 검색으로 선택한 경우엔 풀에 추가.
+  // 안드로이드 하드웨어 뒤로가기 — 화면에 겹쳐 있는 것을 안쪽부터 하나씩 벗긴다.
+  // 순서가 곧 사용자가 쌓아 올린 순서의 역순이다: 검색 → 상세 → 시트.
+  // 벗길 게 하나도 없으면 등록하지 않는다. 그래야 안드로이드가 평소대로 앱을 종료할 수 있다.
+  // 탭이 숨겨져 있어도(다른 탭 사용 중) 이 컴포넌트는 마운트된 채로 남으므로 isActive를 함께 본다.
+  const hasClosableLayer = searchOpen || selection !== null || sheetVisible;
+  useBackHandler(() => {
+    if (searchOpen) return setSearchOpen(false);
+    if (selection) return closeDetail();
+    setChip('all'); // 시트를 닫고 '전체' 상태로 (칩 해제와 같은 자리)
+  }, isActive && hasClosableLayer);
+
+  // 마커: 개수 뱃지로 묶지 않고 항상 전체를 실좌표에 개별 표시한다. 선택된 매장은 강조만 되고
+  // 다른 매장도 그대로 보인다.
+  // 선택된 매장은 칩 상태와 무관하게 항상 풀에 넣는다 — 점메추·검색처럼 칩을 거치지 않고
+  // 매장이 선택되는 경로가 있어서, 카테고리 칩이 없다고 마커까지 지우면 시트만 뜨고 지도는 빈 화면이 된다.
   const plottedStores = useMemo(() => {
-    if (!storeCategory) return [];
-    const pool = visibleStores(stores, storeCategory, college);
-    if (selected && hasCoords(selected) && !pool.some((s) => s.id === selected.id)) {
-      pool.push(selected);
+    // visibleStores가 이미 좌표 없는 매장을 걸러내므로 결과는 전부 PlottableStore다
+    const pool = storeCategory ? visibleStores(stores, storeCategory, college) : [];
+    if (selectedStore && hasCoords(selectedStore) && !pool.some((s) => s.id === selectedStore.id)) {
+      pool.push(selectedStore);
     }
-    return layoutStores(pool);
-  }, [stores, selected, storeCategory, college]);
+    return pool;
+  }, [stores, selectedStore, storeCategory, college]);
 
-  // 화면(뷰포트)에 보이는 건물/흡연장만 하단 리스트에 올린다
-  const visibleBuildings = useMemo(() => {
-    if (!isBuildingChip || !mapBounds) return [];
-    return buildings.filter((b) => isWithinBounds(mapBounds, b.coordinates.latitude, b.coordinates.longitude));
-  }, [isBuildingChip, mapBounds, buildings]);
+  // 거리 계산·정렬 기준점. 우선순위대로:
+  //   1) '내 위치' 버튼으로 방금 측위한 좌표
+  //   2) 앱 부팅 때 프리페치된 좌표 (권한이 이미 있는 사용자만 존재 — 여기서 팝업이 뜨지는 않는다)
+  //   3) 둘 다 없으면 지금 보고 있는 화면 중심
+  // 마운트 시점에 한 번만 읽는다(지연 초기화) — 이후 갱신은 '내 위치' 버튼 경로가 맡는다.
+  const [prefetchedPos] = useState(() => {
+    const cached = getCachedLocation();
+    return cached ? { lat: cached.latitude, lng: cached.longitude } : null;
+  });
 
-  const visibleSmokingSpots = useMemo(() => {
-    if (!isSmokingChip || !mapBounds) return [];
-    return smokingSpots.filter((s) => isWithinBounds(mapBounds, s.coordinates.latitude, s.coordinates.longitude));
-  }, [isSmokingChip, mapBounds, smokingSpots]);
-
-  // 거리 계산 기준점: '내 위치'를 이미 확인했으면 그 위치, 아니면 지금 보고 있는 화면 중심
   const distanceOrigin = useMemo(() => {
     if (userPos) return userPos;
-    if (!mapBounds) return null;
-    return { lat: (mapBounds.swLat + mapBounds.neLat) / 2, lng: (mapBounds.swLng + mapBounds.neLng) / 2 };
-  }, [userPos, mapBounds]);
+    if (prefetchedPos) return prefetchedPos;
+    return mapCenter;
+  }, [userPos, prefetchedPos, mapCenter]);
 
   const handleChipChange = (next: MapChip | null) => {
     setChip(next);
-    setSelectedBuilding(null);
-    setSelectedSmokingSpot(null);
-    if (next && next !== 'building' && next !== 'smoking') {
+    // 칩을 바꾸면 어떤 종류든 선택은 초기화된다 (종류별로 지울 필요 없이 한 번에)
+    if (next !== 'all' && toStoreCategory(next)) {
       browseCategory(); // 매장 카테고리 칩 선택 = 선택 해제 + 리스트 펼침
     } else {
-      closeDetail(); // 건물/흡연장/선택 해제 → 매장 상세만 닫는다
+      clearSelection(); // '전체'/시설 계열 칩/선택 해제 → 선택만 풀고 리스트는 접어둔다
     }
     posthog?.capture('partner_map_chip_selected', { chip: next });
   };
@@ -171,37 +228,19 @@ export default function PartnershipMapView() {
     posthog?.capture('partner_map_search_opened');
   };
 
+  // 지도 SDK 실패와 매장 데이터 실패는 원인이 달라 메시지를 구분한다
   if (error) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center gap-2 text-text-hint">
-        <span className="text-2xl">🗺️</span>
-        <p className="text-sm font-bold">지도를 불러오지 못했어요</p>
-        <p className="text-xs">네트워크 연결을 확인해주세요</p>
-      </div>
-    );
+    return <MapStatusScreen emoji="🗺️" title="지도를 불러오지 못했어요" description="네트워크 연결을 확인해주세요" />;
   }
-
-  // 매장 데이터 로딩 실패 — 지도 SDK 에러와 별개 축이라 메시지도 구분
   if (storesError) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center gap-2 text-text-hint">
-        <span className="text-2xl">🏪</span>
-        <p className="text-sm font-bold">매장 정보를 불러오지 못했어요</p>
-        <p className="text-xs">네트워크 연결을 확인해주세요</p>
-      </div>
-    );
+    return <MapStatusScreen emoji="🏪" title="매장 정보를 불러오지 못했어요" description="네트워크 연결을 확인해주세요" />;
   }
-
   if (loading || storesLoading) {
-    return (
-      <div className="h-full flex items-center justify-center bg-slate-50">
-        <span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span>
-      </div>
-    );
+    return <MapStatusScreen emoji="🗺️" title="지도 불러오는 중…" pulse />;
   }
 
-  // 매장 상세든 건물·흡연장 상세든, 뭔가 상세가 열려 있으면 칩을 숨겨 화면을 단순하게 유지한다
-  const anyDetailOpen = !!selected || !!selectedBuilding || !!selectedSmokingSpot;
+  // 플로팅 버튼(점메추·내 위치)이 딛고 설 높이.
+  const buttonBase = `var(--sheet-h, ${NAV_CLEARANCE_CSS})`;
 
   return (
     <div ref={mapContainerRef} className="relative h-full overflow-hidden">
@@ -210,34 +249,32 @@ export default function PartnershipMapView() {
         level={DEFAULT_LEVEL}
         onCreate={setMap}
         onZoomChanged={onZoomChanged}
-        onIdle={onIdle} // 건물/흡연장 리스트가 참조하는 화면 경계 갱신 (팬·줌이 끝났을 때만)
-        onClick={handleMapClickAll} // 마커 바깥(지도 빈 곳) 탭 → 선택 해제 (오버레이 클릭은 map click을 발생시키지 않음)
+        onIdle={onIdle} // 거리 정렬 기준점(화면 중심) 갱신 — 팬·줌이 끝났을 때만
+        onClick={clearSelection} // 마커 바깥(지도 빈 곳) 탭 → 선택 해제 (오버레이 클릭은 map click을 발생시키지 않음)
         style={{ width: '100%', height: '100%' }}
       >
-        {storeCategory && (
-          <StoreMarkers
-            stores={plottedStores}
-            level={level}
-            selectedId={selectedId}
-            onSelectStore={(store) => pickStore(store, 'marker')}
-          />
-        )}
+        <StoreMarkers
+          stores={plottedStores}
+          level={level}
+          selectedId={selectedStore?.id ?? null}
+          onSelectStore={(store) => pickStore(store, 'marker')}
+        />
 
-        {isBuildingChip && (
-          <CampusBuildingMarkers
-            buildings={buildings}
+        {showsBuildingLayer && (
+          <PointMarkers
+            items={layerBuildings}
             level={level}
             selectedId={selectedBuilding?.id ?? null}
-            onSelect={selectBuilding}
+            onSelect={(b) => pickBuilding(b, 'marker')}
           />
         )}
 
-        {isSmokingChip && (
-          <SmokingSpotMarkers
-            spots={smokingSpots}
+        {showsSmokingLayer && (
+          <PointMarkers
+            items={smokingSpots}
             level={level}
             selectedId={selectedSmokingSpot?.id ?? null}
-            onSelect={selectSmokingSpot}
+            onSelect={(s) => pickSmokingSpot(s, 'marker')}
           />
         )}
 
@@ -252,18 +289,14 @@ export default function PartnershipMapView() {
         )}
       </KakaoMap>
 
-      {/* 점메추 🎲 — 라벨이 곧 설명(항상 식당 랜덤), 내 위치 버튼 위에 스택 */}
+      {/* 점메추 🎲 — 라벨이 곧 설명(항상 식당 랜덤), 내 위치 버튼 위에 스택.
+          bottom은 활성 시트 높이에서 파생되므로 Tailwind 클래스가 아닌 inline style로 준다 */}
       <button
         onClick={rollRandom}
         disabled={rolling}
         aria-label="랜덤 식당 추천"
-        className={`absolute right-3 z-30 h-11 px-3.5 flex items-center gap-1.5 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-[bottom,transform] duration-300 ease-out ${
-          anyDetailOpen
-            ? 'bottom-[calc(45%+68px)]'
-            : sheetExpanded
-              ? 'bottom-[calc(52%+68px)]'
-              : 'bottom-[calc(236px+env(safe-area-inset-bottom,0px))]'
-        }`}
+        style={{ bottom: `calc(${buttonBase} + 68px)` }}
+        className="absolute right-3 z-30 h-11 px-3.5 flex items-center gap-1.5 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform"
       >
         <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>🎲</span>
         <span className="text-[13px] font-extrabold text-[#334155]">{diceLabel}</span>
@@ -274,13 +307,8 @@ export default function PartnershipMapView() {
         onClick={locateMe}
         disabled={locating}
         aria-label="내 위치로 이동"
-        className={`absolute right-3 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-[bottom,transform] duration-300 ease-out disabled:opacity-60 ${
-          anyDetailOpen
-            ? 'bottom-[calc(45%+12px)]'
-            : sheetExpanded
-              ? 'bottom-[calc(52%+12px)]'
-              : 'bottom-[calc(180px+env(safe-area-inset-bottom,0px))]'
-        }`}
+        style={{ bottom: `calc(${buttonBase} + 12px)` }}
+        className="absolute right-3 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform disabled:opacity-60"
       >
         <LocateFixed size={19} className={locating ? 'text-text-hint animate-pulse' : 'text-[#334155]'} />
       </button>
@@ -301,48 +329,58 @@ export default function PartnershipMapView() {
           className="pointer-events-auto w-full flex items-center gap-2.5 bg-white rounded-full px-4 py-3 shadow-[0_2px_10px_rgba(0,0,0,0.12)] [-webkit-tap-highlight-color:transparent] active:scale-[0.99] transition-transform"
         >
           <Search size={16} className="text-text-hint flex-shrink-0" />
-          <span className="text-[13px] font-semibold text-text-hint">매장명으로 검색</span>
+          <span className="text-[13px] font-semibold text-text-hint">캠퍼스맵 검색</span>
         </button>
         <MapFilterChips value={chip} onChange={handleChipChange} />
       </div>
 
-      {/* 하단: 매장 상세가 열려 있으면 그게 최우선, 아니면 활성 칩에 맞는 시트를 보여준다 */}
-      {selected || storeCategory ? (
+      {/* 하단: '전체'·미선택이면 시트 없이 지도만, 아니면 활성 칩(또는 열린 상세)에 맞는 시트를 보여준다.
+          선택이 일어나면 항상 그 종류의 칩으로 전환되므로, 여기서 '전체'를 걸러도 상세가 가려질 일은 없다.
+          Provider: 어떤 시트가 뜨든 자기 높이를 여기로 보고하고, 플로팅 버튼이 그 위에 자리를 잡는다. */}
+      <SheetHeightContext.Provider value={reportSheetHeight}>
+      {!sheetVisible ? null : selectedStore || storeCategory ? (
         <StoreSheet
           stores={storeCategory ? visibleStores(stores, storeCategory, college) : []}
           title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
           college={college}
           onCollegeChange={handleCollegeChange}
           resetSignal={`${storeCategory ?? 'none'}:${college}`}
-          selected={selected}
+          selected={selectedStore}
           expanded={sheetExpanded}
           onToggleExpand={setSheetExpanded}
           onSelect={(store) => pickStore(store, 'list')}
           onClose={closeDetail}
         />
-      ) : isBuildingChip ? (
+      ) : isBuildingLayerChip ? (
         <CampusBuildingSheet
-          buildings={visibleBuildings}
+          buildings={layerBuildings}
+          loading={buildingsLoading}
+          error={buildingsError}
           origin={distanceOrigin}
+          variant={isOpenSpaceChip ? 'openspace' : 'facility'}
           selected={selectedBuilding}
-          onSelect={selectBuilding}
-          onClose={() => setSelectedBuilding(null)}
+          onSelect={(b) => pickBuilding(b, 'list')}
+          onClose={closeDetail}
         />
       ) : isSmokingChip ? (
         <SmokingSpotSheet
-          spots={visibleSmokingSpots}
+          spots={smokingSpots}
+          loading={smokingLoading}
+          error={smokingError}
           origin={distanceOrigin}
           selected={selectedSmokingSpot}
-          onSelect={selectSmokingSpot}
-          onClose={() => setSelectedSmokingSpot(null)}
+          onSelect={(s) => pickSmokingSpot(s, 'list')}
+          onClose={closeDetail}
         />
       ) : null}
+      </SheetHeightContext.Provider>
 
       {/* 검색 오버레이 */}
       {searchOpen && (
         <SearchOverlay
           onClose={() => setSearchOpen(false)}
           onSelect={(store) => pickStore(store, 'search')}
+          onSelectBuilding={selectBuildingFromSearch}
         />
       )}
     </div>

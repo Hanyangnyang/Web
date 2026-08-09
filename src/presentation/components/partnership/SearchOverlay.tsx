@@ -1,46 +1,51 @@
-// 매장 통합 검색 오버레이
-// - 결과는 카테고리별 그룹핑 (여러 카테고리에 걸칠 때만 섹션 헤더 표시)
+// 캠퍼스맵 통합 검색 오버레이 (제휴 매장 + 교내시설)
+// - 매장 결과는 카테고리별 그룹핑, 교내시설은 별도 섹션으로 먼저 보여준다
 // - 폐업 매장도 뱃지와 함께 노출 ("이 가게 제휴 되나?"의 답이므로)
 // - 결과 없음: 제보하기 + PostHog zero-result 로깅 (수요 데이터 수집)
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Search, X, MapPin, Send } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { supabase } from '../../../lib/supabase.js';
-import { getPlatform } from '../../../lib/platform.js';
 import {
   searchStores, groupByCategory, activePartnerships,
   CATEGORY_META, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
+import { searchBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
 import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
+import { useCampusBuildings } from '../../hooks/useCampusBuildings.js';
+import { useFeedback } from '../../hooks/useFeedback.js';
 
 interface Props {
   onClose: () => void;
   onSelect: (store: PartnerStore) => void;
+  onSelectBuilding: (building: CampusBuilding) => void;
 }
 
-type ReportState = 'idle' | 'sending' | 'done';
-
-export function SearchOverlay({ onClose, onSelect }: Props) {
+export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   const [query, setQuery] = useState('');
-  const [reportState, setReportState] = useState<ReportState>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
   const posthog = usePostHog();
-  // PartnershipMapView와 같은 queryKey를 공유하는 RQ 캐시라 별도 네트워크 요청 없이 재사용된다
-  const { stores } = usePartnershipStores();
+  // 제보는 기타탭 피드백과 같은 경로를 쓴다 (useFeedback → UseCase → Repository → Supabase).
+  // 예전엔 여기서 supabase를 직접 호출해 레이어를 건너뛰고 있었다.
+  const { loading: reporting, submitted: reported, error: reportError, submit: submitFeedback, reset: resetReport } = useFeedback();
+  // PartnershipMapView와 같은 queryKey를 공유하는 RQ 캐시라 별도 네트워크 요청 없이 재사용된다.
+  // 건물은 칩과 무관하게 검색 대상이라 여기선 항상 enabled — 이미 받아왔다면 캐시에서 즉시 나온다.
+  const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
+  const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: true });
+  // 아직 안 왔거나 실패한 상태에서 "결과 없음"을 띄우면, 있는 매장을 없다고 오해해 잘못된 제보를 하게 된다
+  const dataLoading = storesLoading || buildingsLoading;
+  const dataError = storesError ?? buildingsError;
 
   const results = useMemo(() => searchStores(stores, query), [stores, query]);
   const groups = useMemo(() => groupByCategory(results), [results]);
+  const buildingResults = useMemo(() => searchBuildings(buildings, query), [buildings, query]);
   const trimmed = query.trim();
-  const noResult = trimmed.length > 0 && results.length === 0;
+  const noResult = trimmed.length > 0 && !dataLoading && !dataError && results.length === 0 && buildingResults.length === 0;
+  // 교내시설 결과가 섞이면 매장 쪽도 헤더가 있어야 무엇이 무엇인지 구분된다
+  const showSectionHeaders = groups.length > 1 || buildingResults.length > 0;
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
-
-  // 검색어가 바뀌면 제보 상태 초기화
-  useEffect(() => {
-    setReportState('idle');
-  }, [trimmed]);
 
   // 결과 없는 검색어 로깅 (800ms 디바운스) — 사용자들이 찾지만 우리에게 없는 매장 = 수요 데이터
   useEffect(() => {
@@ -51,29 +56,20 @@ export function SearchOverlay({ onClose, onSelect }: Props) {
     return () => clearTimeout(timer);
   }, [noResult, trimmed, posthog]);
 
+  // 검색어가 바뀌면 이전 제보 결과는 다른 맥락이 되므로 지운다.
+  // (effect가 아니라 입력 핸들러에서 처리 — 렌더 중 상태를 되돌리는 연쇄를 만들지 않기 위해)
+  const handleQueryChange = (next: string) => {
+    setQuery(next);
+    if (reported || reportError) resetReport();
+  };
+
   const handleReport = async () => {
-    if (reportState !== 'idle') return;
-    setReportState('sending');
+    if (reporting || reported) return;
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      let userId = session?.user?.id;
-      if (!userId) {
-        const { data, error } = await supabase.auth.signInAnonymously();
-        if (error) throw error;
-        userId = data.session?.user?.id;
-      }
-      const { error } = await supabase.from('feedbacks').insert({
-        user_id: userId,
-        content: `[지도 매장 제보] ${trimmed}`,
-        platform: getPlatform(),
-      });
-      if (error) throw error;
+      await submitFeedback(`[지도 매장 제보] ${trimmed}`);
       posthog?.capture('partner_map_store_reported', { query: trimmed });
-      setReportState('done');
-    } catch (err) {
-      console.error('Failed to report store:', err);
-      setReportState('idle');
-      alert('제보 전송에 실패했어요. 잠시 후 다시 시도해 주세요.');
+    } catch {
+      // 실패 메시지는 useFeedback의 error가 화면에 직접 노출한다
     }
   };
 
@@ -94,12 +90,12 @@ export function SearchOverlay({ onClose, onSelect }: Props) {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="매장명으로 검색"
+            onChange={(e) => handleQueryChange(e.target.value)}
+            placeholder="캠퍼스맵 검색"
             className="flex-1 bg-transparent text-[14px] text-text-main placeholder-text-hint outline-none font-semibold"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="flex-shrink-0 active:scale-90 transition-transform" aria-label="지우기">
+            <button onClick={() => handleQueryChange('')} className="flex-shrink-0 active:scale-90 transition-transform" aria-label="지우기">
               <X size={15} className="text-text-hint" />
             </button>
           )}
@@ -110,14 +106,52 @@ export function SearchOverlay({ onClose, onSelect }: Props) {
       <div className="flex-1 overflow-y-auto pb-[130px]">
         {trimmed.length === 0 && (
           <p className="text-center text-[12px] text-text-hint font-medium pt-14">
-            제휴 매장 이름을 검색해보세요
+            제휴 매장이나 교내시설 이름을 검색해보세요
           </p>
+        )}
+
+        {/* 검색어는 쳤는데 데이터가 아직/영영 없는 경우 — '결과 없음'과 반드시 구분해야 한다 */}
+        {trimmed.length > 0 && dataError && (
+          <p className="text-center text-[12px] text-red-500 font-medium pt-14">{dataError}</p>
+        )}
+        {trimmed.length > 0 && !dataError && dataLoading && (
+          <p className="text-center text-[12px] text-text-hint font-medium pt-14 animate-pulse">불러오는 중…</p>
+        )}
+
+        {/* 교내시설 — 매장보다 먼저 (건물명을 찾는 의도가 더 분명한 검색어가 많다) */}
+        {buildingResults.length > 0 && (
+          <div>
+            <p className="px-4 pt-4 pb-1 text-[11px] font-extrabold text-text-hint">🏢 교내시설</p>
+            {buildingResults.map((building) => (
+              <button
+                key={building.id}
+                onClick={() => onSelectBuilding(building)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left active:bg-slate-50 [-webkit-tap-highlight-color:transparent]"
+              >
+                <span className="text-xl flex-shrink-0">🏢</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[14px] font-extrabold text-text-main truncate">{building.name}</span>
+                    {building.buildingNumber && (
+                      <span className="text-[10px] font-bold text-text-hint flex-shrink-0">{building.buildingNumber}동</span>
+                    )}
+                  </div>
+                  {/* 별칭으로 찾아온 사용자가 "이게 그거 맞나?"를 바로 확인할 수 있게 */}
+                  {building.aliases.length > 0 && (
+                    <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
+                      {building.aliases.join(' · ')}
+                    </p>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
         )}
 
         {groups.map(({ category, stores }) => (
           <div key={category}>
-            {/* 여러 카테고리에 걸칠 때만 섹션 헤더 표시 */}
-            {groups.length > 1 && (
+            {/* 여러 카테고리에 걸치거나 교내시설과 섞일 때만 섹션 헤더 표시 */}
+            {showSectionHeaders && (
               <p className="px-4 pt-4 pb-1 text-[11px] font-extrabold text-text-hint">
                 {CATEGORY_META[category].emoji} {CATEGORY_META[category].label}
               </p>
@@ -166,17 +200,21 @@ export function SearchOverlay({ onClose, onSelect }: Props) {
             <p className="text-[12px] text-text-hint font-medium mt-1 leading-relaxed">
               찾으시는 매장이 지도에 있어야 한다면<br />제보해 주세요. 다음 업데이트에 반영할게요!
             </p>
-            {reportState === 'done' ? (
+            {reported ? (
               <p className="mt-4 text-[13px] font-extrabold text-emerald-600">제보가 접수됐어요, 고마워요! 🎉</p>
             ) : (
               <button
                 onClick={handleReport}
-                disabled={reportState === 'sending'}
+                disabled={reporting}
                 className="mt-4 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0E4A84] text-white text-[13px] font-bold active:scale-[0.96] transition-transform disabled:opacity-60"
               >
                 <Send size={13} />
-                {reportState === 'sending' ? '전송 중…' : `'${trimmed}' 제보하기`}
+                {reporting ? '전송 중…' : `'${trimmed}' 제보하기`}
               </button>
+            )}
+            {/* 실패는 alert 대신 화면 안에서 알린다 — 재시도 버튼이 그대로 남아 있어야 하므로 */}
+            {reportError && (
+              <p className="mt-3 text-[12px] font-medium text-red-500">{reportError}</p>
             )}
           </div>
         )}

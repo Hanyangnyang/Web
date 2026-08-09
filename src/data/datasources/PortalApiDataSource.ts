@@ -1,9 +1,5 @@
 // 데이터 소스: 소식탭 날씨·도서관 혼잡도 API 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
-
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
+import { parseOrThrow, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
 export interface HourlyForecastApiItem {
   time: string;

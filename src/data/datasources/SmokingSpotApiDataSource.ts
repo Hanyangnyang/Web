@@ -1,18 +1,16 @@
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
+// 데이터 소스: ERICA 흡연 부스/구역 정적 JSON 원시 호출
+import { parseOrThrow, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface HttpClient {
-    get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
-
+// 응답 원본(DTO) 
 export interface SmokingSpotApiResponse {
   id: string;
   name: string;
   type: 'BOOTH' | 'AREA';
   campus: string;
   coordinates: { latitude: number; longitude: number };
-  hasAshtray: boolean;
-  description: string;
-  imageUrl: string[];
+  hasAshtray?: boolean;
+  description?: string;
+  imageUrl?: string[];
 }
 
 export interface SmokingSpotApiDataSource {

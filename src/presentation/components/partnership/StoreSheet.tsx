@@ -1,20 +1,17 @@
 // 지도 하단 바텀시트
 // - 매장 미선택: 현재 칩 기준 매장 리스트 (접힘 ↔ 펼침, 핸들 탭/스와이프)
 // - 매장 선택: 혜택 상세 카드
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { X, Info, Clock, ExternalLink, ChevronRight } from 'lucide-react';
-import {
-  activePartnerships, CATEGORY_META, COLLEGES,
-  COLLEGE_EMOJI, COLLEGE_DISPLAY_NAME,
-  type PartnerStore,
-} from '../../../domain/entities/PartnerStore.js';
-import { COLLEGE_STYLE } from './collegeStyle.js';
+import { activePartnerships, CATEGORY_META, type PartnerStore } from '../../../domain/entities/PartnerStore.js';
+import { COLLEGES, collegeById, collegeLabel } from '../../../domain/entities/College.js';
+import { COLLEGE_STYLE } from '../ui/collegeStyle.js';
 import { CollegeWheelPicker } from './CollegeWheelPicker';
-
-// 상세 모드 시트가 화면 높이에서 차지하는 비율 — 아래 SheetFrame의 h-[45%]와 반드시 같은 값으로 맞춘다.
-// (Tailwind 클래스는 정적 문자열이어야 스캔되므로 여기서 곱해 만들지 않고 둘 다 손으로 맞춘다.)
-// 지도 포커스 센터링(usePartnerMapFocus)이 "시트를 제외한 화면 중앙"을 계산할 때 이 값을 쓴다.
-export const STORE_DETAIL_HEIGHT_FRACTION = 0.45;
+import { BottomSheetFrame } from '../ui/BottomSheetFrame.js';
+import {
+  STORE_DETAIL_FRACTION, STORE_LIST_EXPANDED_FRACTION, STORE_LIST_COLLAPSED_CSS,
+  NAV_CLEARANCE_CLASS, toCssHeight,
+} from './sheetHeights';
 
 // 휠피커 옵션 — '전체' 항목 + 단과대 목록. 컴포넌트 바깥에 둬 매 렌더마다 새 배열이 생기지 않게 한다.
 const COLLEGE_OPTIONS = [
@@ -33,20 +30,6 @@ interface Props {
   onToggleExpand: (expanded: boolean) => void;
   onSelect: (store: PartnerStore) => void;
   onClose: () => void;             // 상세 닫기 (선택 해제)
-}
-
-// 플로팅 BottomNav(반투명 블러)가 시트 위로 지나가도록 화면 끝까지 연장하고,
-// 콘텐츠는 nav에 가리지 않게 하단 패딩(NAV_CLEARANCE)으로 비워둔다
-const NAV_CLEARANCE = 'pb-[calc(108px+env(safe-area-inset-bottom,0px))]';
-
-export function SheetFrame({ heightClass, children }: { heightClass: string; children: ReactNode }) {
-  return (
-    <div
-      className={`absolute bottom-0 inset-x-0 z-20 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] flex flex-col transition-[height] duration-300 ease-out ${heightClass}`}
-    >
-      {children}
-    </div>
-  );
 }
 
 export function StoreSheet({ stores, title, college, onCollegeChange, resetSignal, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
@@ -86,17 +69,17 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
     const partnerships = college === 'all'
       ? allPartnerships
       : allPartnerships.filter((p) => p.college_id === college);
-    const { latitude, longitude } = selected.location;
+    const coords = selected.location.coordinates;
     // 카카오맵 place ID가 있으면 업체 상세 페이지로, 없으면(미등록 매장) 좌표 핀 지도로 폴백
     const kakaoMapUrl = selected.kakao_place_id
       ? `https://place.map.kakao.com/${selected.kakao_place_id}`
-      : latitude != null && longitude != null
-        ? `https://map.kakao.com/link/map/${encodeURIComponent(selected.name)},${latitude},${longitude}`
+      : coords
+        ? `https://map.kakao.com/link/map/${encodeURIComponent(selected.name)},${coords.latitude},${coords.longitude}`
         : null;
 
     return (
       // 단과대 카드 1개 + 다음 카드 절반쯤 보이는 높이 — 지도가 주인공으로 남는다
-      <SheetFrame heightClass="h-[45%]">
+      <BottomSheetFrame height={toCssHeight(STORE_DETAIL_FRACTION)}>
         {/* 헤더 */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
@@ -122,7 +105,7 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
         </div>
 
         {/* 혜택 리스트 — key: 모드/매장 전환 시 스크롤 컨테이너를 리마운트해 scrollTop 잔존 방지 */}
-        <div key={`detail-${selected.id}`} className={`flex-1 overflow-y-auto px-4 py-3 space-y-2.5 ${NAV_CLEARANCE}`}>
+        <div key={`detail-${selected.id}`} className={`flex-1 overflow-y-auto px-4 py-3 space-y-2.5 ${NAV_CLEARANCE_CLASS}`}>
           {partnerships.length === 0 && (
             <p className="text-center text-[12px] text-text-hint font-medium pt-6">
               {college !== 'all' && allPartnerships.length > 0
@@ -133,9 +116,9 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
           {partnerships.map((p, idx) => (
             <div key={`${p.college_id}-${idx}`} className="flex items-center gap-3 bg-surface rounded-xl p-4">
               <div className={`flex-shrink-0 w-[70px] flex flex-col items-center justify-center rounded-lg px-1.5 py-4 text-center gap-1 ${COLLEGE_STYLE[p.college_id] ?? 'bg-slate-100'}`}>
-                <span className="text-[20px] leading-none">{COLLEGE_EMOJI[p.college_id]}</span>
+                <span className="text-[20px] leading-none">{collegeById(p.college_id)?.emoji}</span>
                 <span className="text-[11px] font-extrabold leading-tight break-words whitespace-pre-line">
-                  {COLLEGE_DISPLAY_NAME[p.college_id] ?? p.college_name}
+                  {collegeLabel(p.college_id, p.college_name)}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
@@ -180,13 +163,13 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
             </a>
           )}
         </div>
-      </SheetFrame>
+      </BottomSheetFrame>
     );
   }
 
   // ── 리스트 모드 ──
   return (
-    <SheetFrame heightClass={expanded ? 'h-[52%]' : 'h-[calc(72px+96px+env(safe-area-inset-bottom,0px))]'}>
+    <BottomSheetFrame height={expanded ? toCssHeight(STORE_LIST_EXPANDED_FRACTION) : STORE_LIST_COLLAPSED_CSS}>
       {/* 핸들 + 타이틀(좌) + 단과대 드롭다운(우) */}
       <div
         className="flex flex-col flex-shrink-0 px-4 pt-2.5 pb-2"
@@ -222,7 +205,7 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
         key="list"
         ref={attachListRef}
         onScroll={(e) => { listScrollTop.current = e.currentTarget.scrollTop; }}
-        className={`flex-1 overflow-y-auto ${expanded ? NAV_CLEARANCE : ''}`}
+        className={`flex-1 overflow-y-auto ${expanded ? NAV_CLEARANCE_CLASS : ''}`}
       >
         {expanded && stores.map((store, idx) => {
           const colleges = activePartnerships(store);
@@ -260,6 +243,6 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
           );
         })}
       </div>
-    </SheetFrame>
+    </BottomSheetFrame>
   );
 }
