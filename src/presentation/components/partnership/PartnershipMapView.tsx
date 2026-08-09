@@ -1,5 +1,5 @@
 // 제휴탭 지도 화면: 카카오맵 + 필터 칩(매장 카테고리·건물·흡연장) + 통합 검색 + 바텀시트
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
 import { LocateFixed, Search } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
@@ -166,6 +166,12 @@ export default function PartnershipMapView({ isActive }: Props) {
     posthog,
   });
 
+  // 매장 로딩 실패는 StoreSheet 안에서 알리지만, '전체' 칩에서는 시트가 아예 안 뜬다.
+  // 그때 마커만 조용히 사라지면 사용자는 원인을 알 수 없으므로 토스트로 한 번 알린다.
+  useEffect(() => {
+    if (storesError) showToast(storesError);
+  }, [storesError, showToast]);
+
   // 안드로이드 하드웨어 뒤로가기 — 화면에 겹쳐 있는 것을 안쪽부터 하나씩 벗긴다.
   // 순서가 곧 사용자가 쌓아 올린 순서의 역순이다: 검색 → 상세 → 시트.
   // 벗길 게 하나도 없으면 등록하지 않는다. 그래야 안드로이드가 평소대로 앱을 종료할 수 있다.
@@ -228,14 +234,14 @@ export default function PartnershipMapView({ isActive }: Props) {
     posthog?.capture('partner_map_search_opened');
   };
 
-  // 지도 SDK 실패와 매장 데이터 실패는 원인이 달라 메시지를 구분한다
+  // 화면 전체를 막는 건 지도 SDK 자체가 없을 때뿐이다.
+  // 매장·건물·흡연장은 어느 하나가 실패해도 지도와 나머지 레이어는 계속 쓸 수 있어야 하므로
+  // 각자의 시트 안에서만 알린다 (예전엔 매장만 여기서 전체를 막아, 145KB짜리 매장 JSON이
+  // 실패하면 교내시설·흡연장·검색까지 통째로 못 쓰게 됐다).
   if (error) {
     return <MapStatusScreen emoji="🗺️" title="지도를 불러오지 못했어요" description="네트워크 연결을 확인해주세요" />;
   }
-  if (storesError) {
-    return <MapStatusScreen emoji="🏪" title="매장 정보를 불러오지 못했어요" description="네트워크 연결을 확인해주세요" />;
-  }
-  if (loading || storesLoading) {
+  if (loading) {
     return <MapStatusScreen emoji="🗺️" title="지도 불러오는 중…" pulse />;
   }
 
@@ -341,6 +347,8 @@ export default function PartnershipMapView({ isActive }: Props) {
       {!sheetVisible ? null : selectedStore || storeCategory ? (
         <StoreSheet
           stores={storeCategory ? visibleStores(stores, storeCategory, college) : []}
+          loading={storesLoading}
+          error={storesError}
           title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
           college={college}
           onCollegeChange={handleCollegeChange}

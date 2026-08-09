@@ -21,6 +21,10 @@ const COLLEGE_OPTIONS = [
 
 interface Props {
   stores: PartnerStore[];          // 리스트에 표시할 매장들 (칩 필터 또는 클러스터 묶음)
+  // 매장 데이터의 로딩·실패는 지도를 막지 않고 여기서만 알린다 (교내시설·흡연장 시트와 같은 방식).
+  // 실패해도 지도와 다른 레이어는 계속 쓸 수 있어야 하므로.
+  loading: boolean;
+  error: string | null;
   title: string;                   // 리스트 타이틀 (예: '제휴 식당' | '이 위치 제휴 매장')
   college: string;                 // 단과대 필터 ('all' | college_id)
   onCollegeChange: (id: string) => void;
@@ -32,7 +36,7 @@ interface Props {
   onClose: () => void;             // 상세 닫기 (선택 해제)
 }
 
-export function StoreSheet({ stores, title, college, onCollegeChange, resetSignal, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
+export function StoreSheet({ stores, loading, error, title, college, onCollegeChange, resetSignal, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
   const touchStartY = useRef<number | null>(null);
 
   // 목록 스크롤 위치 보존: 상세 진입 시 리마운트(key)로 컨테이너가 사라지므로
@@ -207,6 +211,15 @@ export function StoreSheet({ stores, title, college, onCollegeChange, resetSigna
         onScroll={(e) => { listScrollTop.current = e.currentTarget.scrollTop; }}
         className={`flex-1 overflow-y-auto ${expanded ? NAV_CLEARANCE_CLASS : ''}`}
       >
+        {/* 실패·로딩·빈 목록은 서로 다른 상황이라 문구를 구분한다 (NearbyListSheet와 같은 규칙) */}
+        {expanded && (error ? (
+          <p className="text-center text-[12px] text-red-500 font-medium pt-6">{error}</p>
+        ) : loading ? (
+          <p className="text-center text-[12px] text-text-hint font-medium pt-6 animate-pulse">불러오는 중…</p>
+        ) : stores.length === 0 ? (
+          <p className="text-center text-[12px] text-text-hint font-medium pt-6">표시할 매장이 없어요</p>
+        ) : null)}
+
         {expanded && stores.map((store, idx) => {
           const colleges = activePartnerships(store);
           // 단과대 필터가 걸려 있으면 이미 그 단과대 제휴로 좁혀진 목록이라
