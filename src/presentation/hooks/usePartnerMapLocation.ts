@@ -2,10 +2,7 @@
 import { useCallback, useState } from 'react';
 import { measureLocation } from './useLocation.js';
 import { distanceMeters } from '../../lib/geo.js';
-import { ERICA_MAIN_GATE } from '../../domain/entities/PartnerStore.js';
-
-// 이 거리 밖이면 '학교 근처가 아님'으로 보고 현위치로 센터를 옮기지 않는다
-const ERICA_NEARBY_RADIUS_M = 2000;
+import { ERICA_MAIN_GATE, ERICA_NEARBY_RADIUS_M } from '../../domain/entities/Campus.js';
 
 interface Params {
   panTo: (lat: number, lng: number) => void;

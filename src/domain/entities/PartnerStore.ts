@@ -43,9 +43,6 @@ export interface PartnerStore {
 
 // ─── 메타데이터 ─────────────────────────────────────────────────────
 
-// 에리카 정문 — 위치 권한이 없거나 캠퍼스에서 먼 사용자의 기본 지도 중심
-export const ERICA_MAIN_GATE = { lat: 37.2983, lng: 126.8388 } as const;
-
 export const CATEGORY_ORDER: StoreCategory[] = ['food', 'cafe', 'pub', 'play', 'life'];
 
 export const CATEGORY_META: Record<StoreCategory, { label: string; emoji: string }> = {
