@@ -17,7 +17,11 @@ export const queryClient = new QueryClient({
 
 // 앱 재시작 후에도 마지막 데이터를 즉시 보여주기 위한 localStorage 영속화
 // (기존 usePortalData.js/useBanners.js가 각각 손으로 하던 localStorage.setItem/getItem을 대체)
-if (typeof window !== 'undefined') {
+//
+// 개발 중에는 끈다. public/*.json(매장·건물·흡연장·셔틀·헬스장)은 staleTime이 24시간이라,
+// 저장된 캐시가 복원되면 파일을 고쳐도 새로고침조차 옛 데이터를 보여준다 —
+// 캐시를 손으로 지우기 전까지 변경이 화면에 반영되지 않는다.
+if (typeof window !== 'undefined' && import.meta.env.PROD) {
   const persister = createSyncStoragePersister({
     storage: window.localStorage,
     key: 'hyu_rq_cache_v1',
