@@ -3,12 +3,12 @@
     "id": "building-101",
     "buildingNumber": "101",
     "name": "본관",
-    "englishName": "",
+    "englishName": "Administration Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
-      "latitude": 37.2987455243961,
-      "longitude": 126.832634529018
+      "latitude": 37.298978643926,
+      "longitude": 126.833096442588
     },
     "description": "",
     "primaryColleges": [
@@ -22,8 +22,8 @@
     "id": "building-102",
     "buildingNumber": "102",
     "name": "학생복지관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Student Welfare Building",
+    "aliases": ["복지관"],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2979595559148,
@@ -49,7 +49,7 @@
     "id": "building-103",
     "buildingNumber": "103",
     "name": "학생회관",
-    "englishName": "",
+    "englishName": "Student Center (Uni-Center)",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -68,11 +68,10 @@
     "id": "building-104",
     "buildingNumber": "104",
     "name": "제2공학관",
-    "englishName": "",
+    "englishName": "Engineering Building No. 2",
     "aliases": [
       "2공",
-      "공2관",
-      "공학2관"
+      "2공학관"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -91,7 +90,7 @@
     "id": "building-105",
     "buildingNumber": "105",
     "name": "건축디자인관",
-    "englishName": "",
+    "englishName": "Architecture & Design Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -110,7 +109,7 @@
     "id": "building-106",
     "buildingNumber": "106",
     "name": "초대형구조실험동",
-    "englishName": "",
+    "englishName": "Large-Scale Structure Test Center",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -129,7 +128,7 @@
     "id": "building-107",
     "buildingNumber": "107",
     "name": "풍환경실험관",
-    "englishName": "",
+    "englishName": "Wind Tunnel Laboratory",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -146,7 +145,7 @@
     "id": "building-108",
     "buildingNumber": "108",
     "name": "스마트컨스트럭션교육관",
-    "englishName": "",
+    "englishName": "Smart Construction Education Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -163,7 +162,7 @@
     "id": "building-109",
     "buildingNumber": "109",
     "name": "디자인문화관",
-    "englishName": "",
+    "englishName": "Design & Culture Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -182,7 +181,7 @@
     "id": "building-110",
     "buildingNumber": "110",
     "name": "디자인교육관",
-    "englishName": "",
+    "englishName": "Design Education Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -203,7 +202,7 @@
     "id": "building-111",
     "buildingNumber": "111",
     "name": "디자인연구관",
-    "englishName": "",
+    "englishName": "Design Research Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -222,7 +221,7 @@
     "id": "building-112",
     "buildingNumber": "112",
     "name": "스마트건축관",
-    "englishName": "",
+    "englishName": "Smart Architecture Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -241,7 +240,7 @@
     "id": "building-201",
     "buildingNumber": "201",
     "name": "경상관",
-    "englishName": "",
+    "englishName": "Business & Economics Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -262,7 +261,7 @@
     "id": "building-202",
     "buildingNumber": "202",
     "name": "솔성관",
-    "englishName": "",
+    "englishName": "International Culture Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -283,7 +282,7 @@
     "id": "building-203",
     "buildingNumber": "203",
     "name": "사회교육관 및 학군단",
-    "englishName": "",
+    "englishName": "Continuing Education & ROTC Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -305,7 +304,7 @@
     "id": "building-204",
     "buildingNumber": "204",
     "name": "일신재",
-    "englishName": "",
+    "englishName": "Communication & Social Sciences Building",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -324,10 +323,11 @@
     "id": "building-205",
     "buildingNumber": "205",
     "name": "제1과학기술관",
-    "englishName": "",
+    "englishName": "Science & Technology Building No. 1",
     "aliases": [
       "1과기",
-      "과기1관"
+      "1과학기술관",
+      "과기대"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -348,8 +348,10 @@
     "id": "building-206",
     "buildingNumber": "206",
     "name": "컨퍼런스홀",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Conference Hall",
+    "aliases": [
+      "컨퍼"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2990920202906,
@@ -365,10 +367,11 @@
     "id": "building-207",
     "buildingNumber": "207",
     "name": "제2과학기술관",
-    "englishName": "",
+    "englishName": "Science & Technology Building No. 2",
     "aliases": [
       "2과기",
-      "과기2관"
+      "2과학기술관",
+      "과기대"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -388,8 +391,8 @@
   {
     "id": "building-208",
     "buildingNumber": "208",
-    "name": "한양 맞춤의약연구원",
-    "englishName": "",
+    "name": "한양맞춤의약연구원",
+    "englishName": "Hanyang Precision Medicine Research Institute",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -406,8 +409,10 @@
     "id": "building-209",
     "buildingNumber": "209",
     "name": "제1학술관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Academic Hall No. 1",
+    "aliases": [
+      "학술관"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2982364248091,
@@ -423,11 +428,10 @@
     "id": "building-301",
     "buildingNumber": "301",
     "name": "제1공학관",
-    "englishName": "Engineering Building 1",
+    "englishName": "Engineering Building No. 1",
     "aliases": [
       "1공",
-      "공1관",
-      "공학1관"
+      "1공학관"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -448,12 +452,12 @@
     "id": "building-302",
     "buildingNumber": "302",
     "name": "폐수처리장관리동",
-    "englishName": "",
+    "englishName": "Wastewater Treatment Facility",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
-      "latitude": 0,
-      "longitude": 0
+      "latitude": 37.29698041292171,
+      "longitude": 126.83651541901213
     },
     "description": "",
     "primaryColleges": [],
@@ -465,11 +469,10 @@
     "id": "building-303",
     "buildingNumber": "303",
     "name": "제3공학관",
-    "englishName": "",
+    "englishName": "Engineering Building No. 3",
     "aliases": [
       "3공",
-      "공3관",
-      "공학3관"
+      "3공학관"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -488,11 +491,10 @@
     "id": "building-304",
     "buildingNumber": "304",
     "name": "제4공학관",
-    "englishName": "",
+    "englishName": "Engineering Building No. 4",
     "aliases": [
       "4공",
-      "공4관",
-      "공학4관"
+      "4공학관"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -511,11 +513,10 @@
     "id": "building-305",
     "buildingNumber": "305",
     "name": "제5공학관",
-    "englishName": "",
+    "englishName": "Engineering Building No. 5",
     "aliases": [
       "5공",
-      "공5관",
-      "공학5관"
+      "5공학관"
     ],
     "campus": "ANSAN",
     "coordinates": {
@@ -536,7 +537,7 @@
     "id": "building-306",
     "buildingNumber": "306",
     "name": "셔틀콕",
-    "englishName": "",
+    "englishName": "Shuttlecock",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -556,8 +557,11 @@
     "id": "building-307",
     "buildingNumber": "307",
     "name": "ERICA컨벤션센터",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "ERICA Convention Center",
+    "aliases": [
+      "컨벤션센터",
+      "에리카컨벤션센터"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.298285535083,
@@ -576,8 +580,10 @@
     "id": "building-308",
     "buildingNumber": "308",
     "name": "창업보육센터",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Business Incubator Center",
+    "aliases": [
+      "창보"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2955821777804,
@@ -595,8 +601,10 @@
     "id": "building-309",
     "buildingNumber": "309",
     "name": "약학관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "College of Pharmacy",
+    "aliases": [
+      "약학대"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2965380905718,
@@ -613,13 +621,13 @@
   {
     "id": "building-310",
     "buildingNumber": "310",
-    "name": "동물실험동",
-    "englishName": "",
-    "aliases": [],
+    "name": "실험동물센터",
+    "englishName": "Laboratory Animal Center",
+    "aliases": ["동물실험동"],
     "campus": "ANSAN",
     "coordinates": {
-      "latitude": 0,
-      "longitude": 0
+      "latitude": 37.29602507314854,
+      "longitude": 126.83797803188384
     },
     "description": "",
     "primaryColleges": [],
@@ -631,8 +639,10 @@
     "id": "building-311",
     "buildingNumber": "311",
     "name": "학연산클러스터지원센터",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "ERICA Cluster Support Center",
+    "aliases": [
+      "학연산"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2963916701478,
@@ -648,8 +658,10 @@
     "id": "building-312",
     "buildingNumber": "312",
     "name": "산학연협력관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Industry-University-Research Cooperation Center",
+    "aliases": [
+      "산학연"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2966285684882,
@@ -665,7 +677,7 @@
     "id": "building-313",
     "buildingNumber": "313",
     "name": "포장가속실험동",
-    "englishName": "",
+    "englishName": "Pavement Accelerated Testing Center",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -682,7 +694,7 @@
     "id": "building-314",
     "buildingNumber": "314",
     "name": "퓨전전기기술응용연구센터",
-    "englishName": "",
+    "englishName": "Fusion Electrical Technology Application Center",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -699,7 +711,7 @@
     "id": "building-315",
     "buildingNumber": "315",
     "name": "BMR센터",
-    "englishName": "",
+    "englishName": "BMR Center",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -717,7 +729,9 @@
     "buildingNumber": "316",
     "name": "라이언스홀",
     "englishName": "Lion's Hall",
-    "aliases": [],
+    "aliases": [
+      "라홀"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.29576608518209,
@@ -733,8 +747,10 @@
     "id": "building-317",
     "buildingNumber": "317",
     "name": "융합교육관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Convergence Education Building",
+    "aliases": [
+      "융교"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.295703586448305,
@@ -743,14 +759,13 @@
     "description": "",
     "primaryColleges": [
       "소프트웨어융합대학",
-      "LIONS 칼리지 대학"
+      "LIONS칼리지"
     ],
     "openSpaces": [
       "1층 오픈스페이스",
       "2층 오픈스페이스",
       "3층 오픈스페이스",
-      "4층 오픈스페이스",
-      "5층 오픈스페이스"
+      "4층 오픈스페이스"
     ],
     "facilities": [
       "카페"
@@ -761,8 +776,11 @@
     "id": "building-401",
     "buildingNumber": "401",
     "name": "학술정보관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Academic Information Center (Library)",
+    "aliases": [
+      "학정",
+      "도서관"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2967794521197,
@@ -784,8 +802,10 @@
     "id": "building-402",
     "buildingNumber": "402",
     "name": "체육관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Gymnasium",
+    "aliases": [
+      "체대"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2959014131015,
@@ -806,7 +826,9 @@
     "buildingNumber": "403",
     "name": "뮤즈홀",
     "englishName": "Muse Hall",
-    "aliases": [],
+    "aliases": [
+      "음대"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2960084436689,
@@ -824,7 +846,7 @@
     "id": "building-404",
     "buildingNumber": "404",
     "name": "대운동장",
-    "englishName": "",
+    "englishName": "Main Stadium",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -841,7 +863,7 @@
     "id": "building-405",
     "buildingNumber": "405",
     "name": "테니스장",
-    "englishName": "",
+    "englishName": "Tennis Court",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -858,8 +880,10 @@
     "id": "building-501",
     "buildingNumber": "501",
     "name": "창의관",
-    "englishName": "",
-    "aliases": [],
+    "englishName": "Changui Dormitory",
+    "aliases": [
+      "창의인재원"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.291254159408126,
@@ -884,7 +908,7 @@
     "id": "building-502",
     "buildingNumber": "502",
     "name": "인재관",
-    "englishName": "",
+    "englishName": "Injae Dormitory",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -903,7 +927,7 @@
     "id": "building-503",
     "buildingNumber": "503",
     "name": "행복관",
-    "englishName": "",
+    "englishName": "Haengbok Dormitory",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -922,7 +946,7 @@
     "id": "building-504",
     "buildingNumber": "504",
     "name": "창의인재원 교육관",
-    "englishName": "",
+    "englishName": "Changui-Injae Education Center",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -941,7 +965,7 @@
     "id": "building-C01",
     "buildingNumber": "C01",
     "name": "경기테크노파크",
-    "englishName": "",
+    "englishName": "Gyeonggi Technology Park",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -958,7 +982,7 @@
     "id": "building-C02",
     "buildingNumber": "C02",
     "name": "한국산업기술시험원",
-    "englishName": "",
+    "englishName": "Korea Testing Laboratory",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -975,7 +999,7 @@
     "id": "building-C03",
     "buildingNumber": "C03",
     "name": "한국생산기술연구원",
-    "englishName": "",
+    "englishName": "Korea Institute of Industrial Technology",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -992,7 +1016,7 @@
     "id": "building-C04",
     "buildingNumber": "C04",
     "name": "한국전기연구원",
-    "englishName": "",
+    "englishName": "Korea Electrotechnology Research Institute",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
@@ -1009,7 +1033,7 @@
     "id": "building-C05",
     "buildingNumber": "C05",
     "name": "LG이노텍 안산 R&D연구소",
-    "englishName": "",
+    "englishName": "LG Innotek Ansan R&D Research Center",
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
