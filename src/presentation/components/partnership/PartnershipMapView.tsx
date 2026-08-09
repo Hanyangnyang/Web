@@ -187,14 +187,22 @@ export default function PartnershipMapView({ isActive }: Props) {
   // 다른 매장도 그대로 보인다.
   // 선택된 매장은 칩 상태와 무관하게 항상 풀에 넣는다 — 점메추·검색처럼 칩을 거치지 않고
   // 매장이 선택되는 경로가 있어서, 카테고리 칩이 없다고 마커까지 지우면 시트만 뜨고 지도는 빈 화면이 된다.
+  // 칩·단과대 필터를 통과한 매장. 지도 마커와 하단 시트가 같은 목록을 보므로 한 번만 계산해
+  // 둘이 나눠 쓴다 (예전엔 양쪽에서 각각 visibleStores를 불러, 지도를 드래그해 멈출 때마다
+  // — onIdle로 화면 중심이 갱신될 때마다 — 같은 필터가 두 번씩 다시 돌았다).
+  // visibleStores가 좌표 없는 매장을 이미 걸러내므로 결과는 전부 PlottableStore다.
+  const categoryStores = useMemo(
+    () => (storeCategory ? visibleStores(stores, storeCategory, college) : []),
+    [stores, storeCategory, college]
+  );
+
+  // 선택된 매장이 필터 밖이라도 마커는 보여야 한다 (점메추·검색은 칩을 거치지 않으므로).
+  // 얹을 게 없으면 위 배열을 그대로 돌려줘 참조가 불필요하게 새로 생기지 않게 한다.
   const plottedStores = useMemo(() => {
-    // visibleStores가 이미 좌표 없는 매장을 걸러내므로 결과는 전부 PlottableStore다
-    const pool = storeCategory ? visibleStores(stores, storeCategory, college) : [];
-    if (selectedStore && hasCoords(selectedStore) && !pool.some((s) => s.id === selectedStore.id)) {
-      pool.push(selectedStore);
-    }
-    return pool;
-  }, [stores, selectedStore, storeCategory, college]);
+    if (!selectedStore || !hasCoords(selectedStore)) return categoryStores;
+    if (categoryStores.some((s) => s.id === selectedStore.id)) return categoryStores;
+    return [...categoryStores, selectedStore];
+  }, [categoryStores, selectedStore]);
 
   // 거리 계산·정렬 기준점. 우선순위대로:
   //   1) '내 위치' 버튼으로 방금 측위한 좌표
@@ -346,7 +354,7 @@ export default function PartnershipMapView({ isActive }: Props) {
       <SheetHeightContext.Provider value={reportSheetHeight}>
       {!sheetVisible ? null : selectedStore || storeCategory ? (
         <StoreSheet
-          stores={storeCategory ? visibleStores(stores, storeCategory, college) : []}
+          stores={categoryStores}
           loading={storesLoading}
           error={storesError}
           title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
