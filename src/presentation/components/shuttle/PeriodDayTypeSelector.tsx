@@ -1,9 +1,13 @@
-// 컴포넌트: 셔틀 기간/요일 선택기 (Wheel Picker 스타일)
+// 컴포넌트: 시간표를 "어느 기간 · 어느 요일" 기준으로 볼지 고르는 선택기 (휠피커 스타일)
+//   기간 — 학기중 / 계절학기 / 방학중
+//   요일 — 평일 / 주말·공휴일
+// 전체 시간표 모드(isFullMode)에서만 실제로 고를 수 있고, 평소에는 오늘 기준값을 그냥 보여주기만 한다.
+// 그래서 Picker가 아니라 Selector다 — 정적 표시 모드가 절반을 차지한다.
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
 
-interface ShuttleSelectorProps {
+interface PeriodDayTypeSelectorProps {
   isFullMode: boolean;
   fullPeriod: string;
   setFullPeriod: (period: string) => void;
@@ -14,7 +18,7 @@ interface ShuttleSelectorProps {
   isWeekend: boolean;
 }
 
-export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isHolidayServer, isWeekend }: ShuttleSelectorProps) {
+export function PeriodDayTypeSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isHolidayServer, isWeekend }: PeriodDayTypeSelectorProps) {
   const [open, setOpen] = useState(false);
   const [localPeriod, setLocalPeriod] = useState(fullPeriod);
   const [localDayType, setLocalDayType] = useState(fullDayType);
