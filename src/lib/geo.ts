@@ -12,3 +12,26 @@ export function formatDistance(meters: number): string {
   if (meters < 1000) return `${Math.round(meters)}m`;
   return `${(meters / 1000).toFixed(1)}km`;
 }
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+/**
+ * 기준점에서 가까운 순으로 정렬하고 각 항목의 거리(m)를 함께 돌려준다.
+ * 기준점이 없으면(위치 권한 없음 + 지도 미준비) 거리 없이 원래 순서를 유지한다.
+ */
+export function sortByDistance<T>(
+  items: T[],
+  origin: LatLng | null,
+  getCoords: (item: T) => { latitude: number; longitude: number },
+): { item: T; distance: number | null }[] {
+  if (!origin) return items.map((item) => ({ item, distance: null }));
+  return items
+    .map((item) => {
+      const { latitude, longitude } = getCoords(item);
+      return { item, distance: distanceMeters(origin.lat, origin.lng, latitude, longitude) };
+    })
+    .sort((a, b) => a.distance - b.distance);
+}
