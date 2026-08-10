@@ -122,8 +122,8 @@
     "type": "AREA",
     "campus": "ANSAN",
     "coordinates": {
-      "latitude": 37.29587196479758,
-      "longitude": 126.83316251783046
+      "latitude": 37.295833289019,
+      "longitude": 126.83289192372534
     },
     "hasAshtray": true,
     "description": "뮤즈홀에서 접근이 용이한 흡연구역입니다.",
@@ -174,8 +174,8 @@
     "type": "AREA",
     "campus": "ANSAN",
     "coordinates": {
-      "latitude": 37.29831645976015,
-      "longitude": 126.83834531371484
+      "latitude": 37.29836013133503,
+      "longitude": 126.83898528599553
     },
     "hasAshtray": true,
     "description": "ERICA컨벤션센터 2층 뒤에 위치한 흡연공간입니다.",
