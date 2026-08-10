@@ -23,7 +23,9 @@
     "buildingNumber": "102",
     "name": "학생복지관",
     "englishName": "Student Welfare Building",
-    "aliases": ["복지관"],
+    "aliases": [
+      "복지관"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.2979595559148,
@@ -449,7 +451,8 @@
       "공학대학"
     ],
     "openSpaces": [
-      "1층 해동열람실(정문 들어가서 오른쪽)"
+      "1층 해동열람실(정문 들어가서 오른쪽)",
+      "3층 한자공열람실"
     ],
     "facilities": [],
     "imageUrl": []
@@ -629,7 +632,9 @@
     "buildingNumber": "310",
     "name": "실험동물센터",
     "englishName": "Laboratory Animal Center",
-    "aliases": ["동물실험동"],
+    "aliases": [
+      "동물실험동"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.29602507314854,
@@ -770,8 +775,7 @@
     "openSpaces": [
       "1층 오픈스페이스",
       "2층 오픈스페이스",
-      "3층 오픈스페이스",
-      "4층 오픈스페이스"
+      "5층 오픈스페이스"
     ],
     "facilities": [
       "카페"
