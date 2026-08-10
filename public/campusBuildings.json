@@ -260,9 +260,12 @@
   {
     "id": "building-202",
     "buildingNumber": "202",
-    "name": "솔성관",
+    "name": "솔성관 (글로벌문화통상관)",
     "englishName": "International Culture Building",
-    "aliases": [],
+    "aliases": [
+      "솔성관",
+      "글로벌문화통상관"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.299503918868,
@@ -303,9 +306,12 @@
   {
     "id": "building-204",
     "buildingNumber": "204",
-    "name": "일신재",
+    "name": "일신재 (언론정보관)",
     "englishName": "Communication & Social Sciences Building",
-    "aliases": [],
+    "aliases": [
+      "일신재",
+      "언론정보관"
+    ],
     "campus": "ANSAN",
     "coordinates": {
       "latitude": 37.300282323264135,
