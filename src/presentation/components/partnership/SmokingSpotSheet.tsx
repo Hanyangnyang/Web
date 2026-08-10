@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { X } from 'lucide-react';
 import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { nearestTo, type LatLng } from '../../../lib/geo.js';
-import { BottomSheetFrame } from '../ui/BottomSheetFrame.js';
+import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
 import { SMOKING_DETAIL_FRACTION, SMOKING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetHeights';
 import { NearbyListSheet } from './NearbyListSheet';
 
@@ -37,7 +37,7 @@ export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSe
   // ── 상세 모드 ──
   if (selected) {
     return (
-      <BottomSheetFrame height={toCssHeight(SMOKING_DETAIL_FRACTION)}>
+      <StandardBottomSheet height={toCssHeight(SMOKING_DETAIL_FRACTION)}>
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">🚬</span>
           <div className="flex-1 min-w-0">
@@ -58,7 +58,7 @@ export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSe
             <p className="text-[12px] text-text-main font-medium leading-[1.6]">{selected.description}</p>
           )}
         </div>
-      </BottomSheetFrame>
+      </StandardBottomSheet>
     );
   }
 

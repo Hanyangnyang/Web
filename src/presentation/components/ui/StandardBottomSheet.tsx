@@ -1,4 +1,7 @@
-// 지도 위에 올라오는 바텀시트의 공용 껍데기 (매장·교내시설·흡연장 시트가 함께 쓴다).
+// 캠퍼스맵 바텀시트의 공용 껍데기 — Material의 'standard bottom sheet'에 해당한다.
+// 뒤 화면(지도)을 스크림으로 덮지 않아 시트가 떠 있는 채로 지도를 계속 조작할 수 있고,
+// 스스로 닫히지도 않는다 — 무엇을 띄울지는 바깥(칩 상태)이 정한다.
+// 뒤를 막고 스스로 열렸다 닫히는 모달형이 필요하면 ModalBottomSheet를 쓴다.
 //
 // height/maxHeight는 Tailwind 클래스가 아니라 CSS 길이 문자열을 받는다 —
 // 시트 종류마다 높이가 달라 동적으로 만들어야 하는데, 동적 문자열은 Tailwind 스캐너가 못 잡기 때문.
@@ -12,7 +15,7 @@ interface Props {
   children: ReactNode;
 }
 
-export function BottomSheetFrame({ height, maxHeight, children }: Props) {
+export function StandardBottomSheet({ height, maxHeight, children }: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
   const reportHeight = useReportSheetHeight();
 
@@ -26,7 +29,7 @@ export function BottomSheetFrame({ height, maxHeight, children }: Props) {
     observer.observe(el);
     return () => {
       observer.disconnect();
-      reportHeight(null); // 시트가 사라짐
+      reportHeight(null);
     };
   }, [reportHeight]);
 

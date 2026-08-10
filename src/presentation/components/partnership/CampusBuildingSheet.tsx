@@ -2,7 +2,7 @@
 import { X } from 'lucide-react';
 import type { CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
 import type { LatLng } from '../../../lib/geo.js';
-import { BottomSheetFrame } from '../ui/BottomSheetFrame.js';
+import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
 import { collegeStyleByName } from '../ui/collegeStyle.js';
 import { collegeByName } from '../../../domain/entities/College.js';
 import { BUILDING_DETAIL_MAX_FRACTION, BUILDING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetHeights';
@@ -47,7 +47,7 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
       || selected.openSpaces.length > 0;
 
     return (
-      <BottomSheetFrame height="auto" maxHeight={toCssHeight(BUILDING_DETAIL_MAX_FRACTION)}>
+      <StandardBottomSheet height="auto" maxHeight={toCssHeight(BUILDING_DETAIL_MAX_FRACTION)}>
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">{meta.emoji}</span>
           <div className="flex-1 min-w-0">
@@ -117,7 +117,7 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
             </div>
           )}
         </div>
-      </BottomSheetFrame>
+      </StandardBottomSheet>
     );
   }
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { BottomSheet } from '../ui/BottomSheet.js';
+import { ModalBottomSheet } from '../ui/ModalBottomSheet.js';
 import { loadKakaoSdk } from '../../../lib/kakao.js';
 
 declare global {
@@ -143,7 +143,7 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
   };
 
   return (
-    <BottomSheet
+    <ModalBottomSheet
       onRequestClose={() => {}}
       onClose={onClose}
       className="w-auto min-w-[260px] rounded-t-card px-8 pb-[calc(20px+env(safe-area-inset-bottom,0px))]"
@@ -172,6 +172,6 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
           <span className="text-xs font-semibold text-text-main">공유하기</span>
         </button>
       </div>
-    </BottomSheet>
+    </ModalBottomSheet>
   );
 }

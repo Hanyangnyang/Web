@@ -2,7 +2,7 @@
 // 둘 다 "기준점에서 가까운 순으로 나열하고, 각 행에 거리를 보여준다"는 구조가 같아서
 // 항목 타입만 다른 채로 50줄씩 복붙돼 있었다. 다른 건 행 안의 텍스트뿐이라 그것만 주입받는다.
 import { ChevronRight } from 'lucide-react';
-import { BottomSheetFrame } from '../ui/BottomSheetFrame.js';
+import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
 import { NAV_CLEARANCE_CLASS } from './sheetHeights';
 import { formatDistance, sortByDistance, type LatLng } from '../../../lib/geo.js';
 import type { Coordinates } from '../../../domain/entities/Coordinates.js';
@@ -33,7 +33,7 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
   const rows = sortByDistance(items, origin, (item) => item.coordinates);
 
   return (
-    <BottomSheetFrame height={height}>
+    <StandardBottomSheet height={height}>
       <div className="flex items-baseline justify-between gap-2 px-4 pt-3 pb-2 border-b border-[#f1f5f9]">
         <p className="text-[13px] font-extrabold text-text-main">
           <span className="mr-1 text-[15px]">{emoji}</span>
@@ -69,6 +69,6 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
           </button>
         ))}
       </div>
-    </BottomSheetFrame>
+    </StandardBottomSheet>
   );
 }

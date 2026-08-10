@@ -7,7 +7,7 @@ import { activePartnerships, CATEGORY_META, type PartnerStore } from '../../../d
 import { COLLEGES, collegeById, collegeLabel } from '../../../domain/entities/College.js';
 import { COLLEGE_STYLE } from '../ui/collegeStyle.js';
 import { CollegeWheelPicker } from './CollegeWheelPicker';
-import { BottomSheetFrame } from '../ui/BottomSheetFrame.js';
+import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
 import {
   STORE_DETAIL_FRACTION, STORE_LIST_EXPANDED_FRACTION, STORE_LIST_COLLAPSED_CSS,
   NAV_CLEARANCE_CLASS, toCssHeight,
@@ -83,7 +83,7 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
 
     return (
       // 단과대 카드 1개 + 다음 카드 절반쯤 보이는 높이 — 지도가 주인공으로 남는다
-      <BottomSheetFrame height={toCssHeight(STORE_DETAIL_FRACTION)}>
+      <StandardBottomSheet height={toCssHeight(STORE_DETAIL_FRACTION)}>
         {/* 헤더 */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
@@ -167,13 +167,13 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
             </a>
           )}
         </div>
-      </BottomSheetFrame>
+      </StandardBottomSheet>
     );
   }
 
   // ── 리스트 모드 ──
   return (
-    <BottomSheetFrame height={expanded ? toCssHeight(STORE_LIST_EXPANDED_FRACTION) : STORE_LIST_COLLAPSED_CSS}>
+    <StandardBottomSheet height={expanded ? toCssHeight(STORE_LIST_EXPANDED_FRACTION) : STORE_LIST_COLLAPSED_CSS}>
       {/* 핸들 + 타이틀(좌) + 단과대 드롭다운(우) */}
       <div
         className="flex flex-col flex-shrink-0 px-4 pt-2.5 pb-2"
@@ -256,6 +256,6 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
           );
         })}
       </div>
-    </BottomSheetFrame>
+    </StandardBottomSheet>
   );
 }
