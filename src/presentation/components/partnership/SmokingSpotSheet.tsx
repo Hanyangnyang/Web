@@ -1,7 +1,8 @@
 // 지도 하단 바텀시트: 흡연장 — 지금 화면에 보이는 흡연 부스/구역 리스트(+거리) / 개별 상세
+import { useMemo } from 'react';
 import { X } from 'lucide-react';
 import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
-import type { LatLng } from '../../../lib/geo.js';
+import { nearestTo, type LatLng } from '../../../lib/geo.js';
 import { BottomSheetFrame } from '../ui/BottomSheetFrame.js';
 import { SMOKING_DETAIL_FRACTION, SMOKING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetHeights';
 import { NearbyListSheet } from './NearbyListSheet';
@@ -16,8 +17,23 @@ interface Props {
   onClose: () => void;                          // 상세 닫기 → 목록으로 복귀
 }
 
+// 흡연장 칩을 켜면 이 곳이 자동으로 골라진다. 상세로 바로 들어오면 "왜 여기가 열렸지"가 설명되지 않고,
+// 목록에서는 거리 순 1등을 눈으로 대조하지 않아도 되게 한다. (규격은 매장 시트의 단과대 배지와 동일)
+function NearestBadge() {
+  return (
+    <span className="flex-shrink-0 text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
+      가장 가까운 곳
+    </span>
+  );
+}
 
 export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSelect, onClose }: Props) {
+  // 기준점이 없으면 null이 되어 어디에도 배지가 붙지 않는다 — 거리를 모르는데 '가장 가까운 곳'이라 할 수 없다
+  const nearestId = useMemo(
+    () => nearestTo(spots, origin, (s) => s.coordinates)?.id ?? null,
+    [spots, origin]
+  );
+
   // ── 상세 모드 ──
   if (selected) {
     return (
@@ -27,6 +43,7 @@ export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSe
           <div className="flex-1 min-w-0">
             <span className="block text-[16px] font-extrabold text-text-main truncate">{selected.name}</span>
           </div>
+          {selected.id === nearestId && <NearestBadge />}
           <button
             onClick={onClose}
             className="p-1 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
@@ -62,6 +79,7 @@ export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSe
         // 이름에 이미 '흡연부스'·'흡연구역'이 들어있어 유형 라벨은 같은 말을 두 번 하는 셈이라 뺐다
         <span className="block text-[14px] font-extrabold text-text-main truncate">{s.name}</span>
       )}
+      renderBadge={(s) => (s.id === nearestId ? <NearestBadge /> : null)}
     />
   );
 }

@@ -35,3 +35,16 @@ export function sortByDistance<T>(
     })
     .sort((a, b) => a.distance - b.distance);
 }
+
+/**
+ * 기준점에서 가장 가까운 항목 하나. 기준점이 없으면(위치도 화면 중심도 모름) null —
+ * 그땐 목록 순서가 '가까운 순'이 아니므로 첫 항목을 가장 가까운 곳이라 부를 수 없다.
+ */
+export function nearestTo<T>(
+  items: T[],
+  origin: LatLng | null,
+  getCoords: (item: T) => { latitude: number; longitude: number },
+): T | null {
+  if (!origin) return null;
+  return sortByDistance(items, origin, getCoords)[0]?.item ?? null;
+}

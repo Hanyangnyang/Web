@@ -19,12 +19,14 @@ export interface NearbyListSheetProps<T extends { id: string; coordinates: Coord
   countColorClass: string;            // 개수 강조 색 (레이어별로 다름)
   emptyText: string;                  // 조사(이/가) 때문에 문장을 통째로 받는다
   renderLabel: (item: T) => React.ReactNode;  // 행의 이름/부제 영역
+  // 거리 앞에 붙일 배지. 레이어마다 강조할 게 달라 판단은 호출부에 맡긴다 (없으면 아무것도 안 붙는다)
+  renderBadge?: (item: T) => React.ReactNode;
   onSelect: (item: T) => void;
 }
 
 export function NearbyListSheet<T extends { id: string; coordinates: Coordinates }>({
   items, loading, error, origin, height, emoji, title, countColorClass, emptyText,
-  renderLabel, onSelect,
+  renderLabel, renderBadge, onSelect,
 }: NearbyListSheetProps<T>) {
   const rows = sortByDistance(items, origin, (item) => item.coordinates);
 
@@ -57,6 +59,7 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
           >
             <span className="text-xl flex-shrink-0">{emoji}</span>
             <div className="flex-1 min-w-0">{renderLabel(item)}</div>
+            {renderBadge?.(item)}
             {distance != null && (
               <span className="flex-shrink-0 text-[11px] font-bold text-text-hint">{formatDistance(distance)}</span>
             )}

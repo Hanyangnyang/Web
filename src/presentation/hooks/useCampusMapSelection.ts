@@ -31,8 +31,10 @@ function toRef(selection: MapSelection): MapSelectionRef {
   }
 }
 
-// 어디서 선택했는지 — 마커/목록/검색 중 어느 경로가 실제로 쓰이는지 보려고 계측에 함께 싣는다
-export type SelectSource = 'marker' | 'list' | 'search';
+// 어디서 선택했는지 — 어느 경로가 실제로 쓰이는지 보려고 계측에 함께 싣는다.
+// nearest: 사용자가 고른 게 아니라 칩을 켜자마자 가장 가까운 곳이 자동으로 골라진 경우 —
+// 이 자동 선택이 실제로 도움이 되는지(바로 다른 곳을 다시 고르지는 않는지) 보려면 구분돼야 한다.
+export type SelectSource = 'marker' | 'list' | 'search' | 'nearest';
 export type StoreSelectSource = SelectSource | 'random'; // 매장만 점메추(random) 경로가 있다
 
 interface Params {

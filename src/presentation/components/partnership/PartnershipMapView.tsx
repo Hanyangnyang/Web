@@ -33,6 +33,7 @@ import { usePartnerMapLocation } from '../../hooks/usePartnerMapLocation.js';
 import { usePartnerMapFilters } from '../../hooks/usePartnerMapFilters.js';
 import { useCampusMapLayers } from '../../hooks/useCampusMapLayers.js';
 import { useCampusMapSelection, selectedBy, type MapSelection, type SelectSource, type StoreSelectSource } from '../../hooks/useCampusMapSelection.js';
+import { useNearestAutoPick } from '../../hooks/useNearestAutoPick.js';
 import { usePartnerRandomPick } from '../../hooks/usePartnerRandomPick.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { KAKAO_MAP_LIBRARIES } from '../../../lib/kakaoMap';
@@ -41,6 +42,10 @@ import { SheetHeightContext, type ReportSheetHeight } from '../ui/sheetHeight.js
 // 초기 지도 중심: 정문(ERICA_MAIN_GATE)이 아니라 제휴 매장이 밀집한 상권 한가운데.
 // 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고(usePartnerMapLocation), 첫 화면은 매장이 보이는 곳에서 시작한다.
 const INITIAL_CENTER = { lat: 37.3008, lng: 126.8385 } as const;
+
+// 흡연장만 기본 배율보다 한 단계 더 당겨서 본다. 부스·구역이 건물 뒤편이나 주차장 구석처럼
+// 몇십 미터 단위로 붙어 있어서, 기본 배율에서는 핀이 겹쳐 보여 "정확히 어디로 가야 하는지"가 안 나온다.
+const SMOKING_FOCUS_LEVEL = 2;
 
 interface Props {
   // 탭이 숨겨져도 컴포넌트는 마운트된 채 남아서, 뒤로가기를 가로챌지 판단하려면 이 값이 필요하다
@@ -110,7 +115,7 @@ export default function PartnershipMapView({ isActive }: Props) {
         focusMap(sel.building.coordinates.latitude, sel.building.coordinates.longitude, BUILDING_DETAIL_FRACTION, viewportHeight);
         break;
       case 'smoking':
-        focusMap(sel.spot.coordinates.latitude, sel.spot.coordinates.longitude, SMOKING_DETAIL_FRACTION, viewportHeight);
+        focusMap(sel.spot.coordinates.latitude, sel.spot.coordinates.longitude, SMOKING_DETAIL_FRACTION, viewportHeight, SMOKING_FOCUS_LEVEL);
         break;
     }
   }, [focusMap, getViewportHeight]);
@@ -220,6 +225,17 @@ export default function PartnershipMapView({ isActive }: Props) {
     return mapCenter;
   }, [userPos, prefetchedPos, mapCenter]);
 
+  // 흡연장은 "지금 제일 가까운 데가 어디냐"가 사실상 유일한 질문이라(매장처럼 뭘 파는지 비교할 게 없다),
+  // 칩을 켜는 것만으로 가장 가까운 곳이 골라지고 지도가 그리로 이동한다 — 목록 스크롤·마커 탐색을 건너뛴다.
+  // 칩을 누른 시점엔 아직 목록이 없을 수 있어(그 칩이 켜져야 조회가 시작된다) 예약해두고 도착 후 실행한다.
+  const requestNearestSmoking = useNearestAutoPick({
+    items: smokingSpots,
+    loading: smokingLoading,
+    active: isSmokingChip,
+    origin: distanceOrigin,
+    onPick: (spot) => pickSmokingSpot(spot, 'nearest'),
+  });
+
   const handleChipChange = (next: MapChip | null) => {
     setChip(next);
     // 칩을 바꾸면 어떤 종류든 선택은 초기화된다 (종류별로 지울 필요 없이 한 번에)
@@ -228,6 +244,7 @@ export default function PartnershipMapView({ isActive }: Props) {
     } else {
       clearSelection(); // '전체'/시설 계열 칩/선택 해제 → 선택만 풀고 리스트는 접어둔다
     }
+    if (next === 'smoking') requestNearestSmoking();
     posthog?.capture('partner_map_chip_selected', { chip: next });
   };
 
