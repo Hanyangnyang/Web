@@ -14,6 +14,8 @@ export interface NearbyListSheetProps<T extends { id: string; coordinates: Coord
   error: string | null;
   origin: LatLng | null;              // 거리 기준점 (내 위치 → 프리페치 좌표 → 화면 중심)
   height: string;                     // 시트 높이 (CSS 길이)
+  // 헤더 제목 앞에 붙는 레이어 상징 이모지. 행마다 반복하면 51줄 내내 같은 아이콘이 세로로 늘어서서
+  // 정작 이름을 밀어낼 뿐 아무것도 구분해주지 못하므로, 목록 전체를 대표하는 자리에만 한 번 둔다.
   emoji: string;
   title: string;                      // 예: '교내시설'
   countColorClass: string;            // 개수 강조 색 (레이어별로 다름)
@@ -34,6 +36,7 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
     <BottomSheetFrame height={height}>
       <div className="flex items-baseline justify-between gap-2 px-4 pt-3 pb-2 border-b border-[#f1f5f9]">
         <p className="text-[13px] font-extrabold text-text-main">
+          <span className="mr-1 text-[15px]">{emoji}</span>
           {title} <span className={countColorClass}>{items.length}</span>곳
         </p>
         {origin && <span className="flex-shrink-0 text-[11px] font-bold text-text-hint">가까운 순</span>}
@@ -57,7 +60,6 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
               idx > 0 ? 'border-t border-[#f1f5f9]' : ''
             }`}
           >
-            <span className="text-xl flex-shrink-0">{emoji}</span>
             <div className="flex-1 min-w-0">{renderLabel(item)}</div>
             {renderBadge?.(item)}
             {distance != null && (
