@@ -49,10 +49,11 @@ export default defineConfig(({ mode }) => {
               type: 'image/png'
             },
             {
-              src: 'pwa-512x512.png',
+              // Android는 마스크(원형/스쿼클)로 잘라내므로 로고를 80%로 축소해 여백을 준 별도 파일 사용
+              src: 'pwa-maskable-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'maskable'
             }
           ]
         }
