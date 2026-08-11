@@ -1,5 +1,13 @@
 import { Info } from 'lucide-react';
 import type { LibraryStatus } from '../../../domain/repositories/ILibraryRepository.js';
+import type { LibraryRoomStatus } from '../../../domain/entities/LibraryRoom.js';
+
+const STATUS_STYLE: Record<LibraryRoomStatus, { color: string; emoji: string }> = {
+  '쾌적': { color: '#2563eb', emoji: '🔵' },
+  '보통': { color: '#22c55e', emoji: '🟢' },
+  '혼잡': { color: '#ef4444', emoji: '🔴' },
+  '매우 혼잡': { color: '#991b1b', emoji: '😫' },
+};
 
 interface LibraryStatusCardProps {
   library: LibraryStatus | null;
@@ -29,6 +37,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
           ))
         ) : library?.list ? (
           library.list.map((room) => {
+            const { color, emoji } = STATUS_STYLE[room.status];
             return (
               <div key={room.id} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center justify-between gap-2 min-w-0">
@@ -36,11 +45,11 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
                     {room.name.replace(' (2F)', '').replace(' (4F)', '')}
                   </span>
                   <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0" style={{
-                    backgroundColor: `${room.color}15`,
-                    color: room.color,
-                    border: `1px solid ${room.color}25`
+                    backgroundColor: `${color}15`,
+                    color,
+                    border: `1px solid ${color}25`
                   }}>
-                    {room.emoji} {room.status}
+                    {emoji} {room.status}
                   </div>
                 </div>
 
@@ -48,7 +57,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
                   <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                     <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
                       width: `${room.ratio * 100}%`,
-                      backgroundColor: room.color
+                      backgroundColor: color
                     }} />
                   </div>
                   <div className="flex justify-between items-center mt-2.5">

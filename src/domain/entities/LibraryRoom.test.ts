@@ -2,33 +2,25 @@ import { describe, it, expect } from 'vitest';
 import { createLibraryRoom } from './LibraryRoom.js';
 
 describe('createLibraryRoom', () => {
-  it('점유율 33% 이하면 쾌적(파랑)으로 분류한다', () => {
+  it('점유율 33% 이하면 쾌적으로 분류한다', () => {
     const room = createLibraryRoom({ id: 'FIRST_READING_ROOM', name: '제1열람실', total: 100, occupied: 33, available: 67 });
     expect(room.ratio).toBeCloseTo(0.33);
     expect(room.status).toBe('쾌적');
-    expect(room.color).toBe('#2563eb');
-    expect(room.emoji).toBe('🔵');
   });
 
-  it('점유율이 33% 초과 50% 이하면 보통(초록)으로 분류한다', () => {
+  it('점유율이 33% 초과 50% 이하면 보통으로 분류한다', () => {
     const room = createLibraryRoom({ id: 'FIRST_READING_ROOM', name: '제1열람실', total: 100, occupied: 40, available: 60 });
     expect(room.status).toBe('보통');
-    expect(room.color).toBe('#22c55e');
-    expect(room.emoji).toBe('🟢');
   });
 
-  it('점유율이 50% 초과 67% 이하면 혼잡(빨강)으로 분류한다', () => {
+  it('점유율이 50% 초과 67% 이하면 혼잡으로 분류한다', () => {
     const room = createLibraryRoom({ id: 'FIRST_READING_ROOM', name: '제1열람실', total: 100, occupied: 60, available: 40 });
     expect(room.status).toBe('혼잡');
-    expect(room.color).toBe('#ef4444');
-    expect(room.emoji).toBe('🔴');
   });
 
-  it('점유율이 67% 초과면 매우 혼잡(진빨강)으로 분류한다', () => {
+  it('점유율이 67% 초과면 매우 혼잡으로 분류한다', () => {
     const room = createLibraryRoom({ id: 'FIRST_READING_ROOM', name: '제1열람실', total: 100, occupied: 68, available: 32 });
     expect(room.status).toBe('매우 혼잡');
-    expect(room.color).toBe('#991b1b');
-    expect(room.emoji).toBe('😫');
   });
 
   it('경계값(정확히 33%, 50%, 67%)은 "초과"가 아니라 그 아래 등급으로 분류한다', () => {
