@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { getWeatherUseCase, getLibraryStatusUseCase } from '../../di.js';
 import type { Weather } from '../../domain/entities/Weather.js';
-import type { LibraryStatus } from '../../domain/repositories/IPortalRepository.js';
+import type { LibraryStatus } from '../../domain/repositories/ILibraryRepository.js';
 
 const CACHE_TTL = 900000; // 15분
 

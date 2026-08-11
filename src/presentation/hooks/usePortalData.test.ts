@@ -32,10 +32,11 @@ function makeLibraryApiResponse() {
   return {
     success: true,
     data: {
-      list: [
-        { id: 61, name: '제1열람실', seats: { total: 100, occupied: 30 } },
-        { id: 63, name: '제2열람실', seats: { total: 80, occupied: 60 } },
+      readingRooms: [
+        { room: 'FIRST_READING_ROOM', roomName: '제1열람실', totalSeat: 100, availableSeats: 70, occupiedSeats: 30 },
+        { room: 'SECOND_READING_ROOM', roomName: '제2열람실', totalSeat: 80, availableSeats: 20, occupiedSeats: 60 },
       ],
+      updatedAt: '2026-08-12T09:00:00Z',
     },
   };
 }
@@ -74,7 +75,7 @@ describe('usePortalData (React Query)', () => {
 
     mockFetch((url) => {
       if (url.includes('type=weather')) return weatherDeferred.promise;
-      if (url.includes('type=library')) return libraryDeferred.promise;
+      if (url.includes('/library/seats')) return libraryDeferred.promise;
       throw new Error(`unexpected url: ${url}`);
     });
 
@@ -105,7 +106,7 @@ describe('usePortalData (React Query)', () => {
 
   it('쿼리 캐시에 이미 신선한 데이터가 있으면 즉시 그 데이터로 렌더되고 fetch를 하지 않는다', () => {
     queryClient.setQueryData(['portal', 'weather'], makeWeatherMock());
-    queryClient.setQueryData(['portal', 'library'], { list: [{ id: 61, name: '캐시된 열람실' }] });
+    queryClient.setQueryData(['portal', 'library'], { list: [{ id: 'FIRST_READING_ROOM', name: '캐시된 열람실' }] });
 
     const fetchSpy = mockFetch(() => new Promise(() => {}));
 
@@ -118,11 +119,11 @@ describe('usePortalData (React Query)', () => {
   });
 
   it('도서관 재요청이 실패해도 이전에 받은 도서관 데이터가 그대로 유지된다', async () => {
-    queryClient.setQueryData(['portal', 'library'], { list: [{ id: 61, name: '이전 열람실' }] });
+    queryClient.setQueryData(['portal', 'library'], { list: [{ id: 'FIRST_READING_ROOM', name: '이전 열람실' }] });
 
     mockFetch((url) => {
       if (url.includes('type=weather')) return Promise.resolve(jsonResponse(true, makeWeatherMock()));
-      if (url.includes('type=library')) return Promise.resolve(jsonResponse(false, null));
+      if (url.includes('/library/seats')) return Promise.resolve(jsonResponse(false, null));
       throw new Error(`unexpected url: ${url}`);
     });
 
@@ -142,14 +143,14 @@ describe('usePortalData (React Query)', () => {
   it('prefetchPortalData()를 동시에 두 번 호출해도 실제 fetch는 한 번만 나간다 (react-query 요청 dedup)', async () => {
     const fetchMock = mockFetch((url) => {
       if (url.includes('type=weather')) return Promise.resolve(jsonResponse(true, makeWeatherMock()));
-      if (url.includes('type=library')) return Promise.resolve(jsonResponse(true, makeLibraryApiResponse()));
+      if (url.includes('/library/seats')) return Promise.resolve(jsonResponse(true, makeLibraryApiResponse()));
       throw new Error(`unexpected url: ${url}`);
     });
 
     await Promise.all([prefetchPortalData(), prefetchPortalData()]);
 
     const weatherCalls = fetchMock.mock.calls.filter(([url]) => url.includes('type=weather')).length;
-    const libraryCalls = fetchMock.mock.calls.filter(([url]) => url.includes('type=library')).length;
+    const libraryCalls = fetchMock.mock.calls.filter(([url]) => url.includes('/library/seats')).length;
     expect(weatherCalls).toBe(1);
     expect(libraryCalls).toBe(1);
   });
@@ -157,7 +158,7 @@ describe('usePortalData (React Query)', () => {
   it('같은 훅을 쓰는 컴포넌트 두 개가 동시에 마운트돼도 fetch는 한 번만 나가고 데이터를 공유한다', async () => {
     const fetchMock = mockFetch((url) => {
       if (url.includes('type=weather')) return Promise.resolve(jsonResponse(true, makeWeatherMock()));
-      if (url.includes('type=library')) return Promise.resolve(jsonResponse(true, makeLibraryApiResponse()));
+      if (url.includes('/library/seats')) return Promise.resolve(jsonResponse(true, makeLibraryApiResponse()));
       throw new Error(`unexpected url: ${url}`);
     });
 

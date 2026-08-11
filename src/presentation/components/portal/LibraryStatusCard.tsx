@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react';
-import type { LibraryStatus } from '../../../domain/repositories/IPortalRepository.js';
+import type { LibraryStatus } from '../../../domain/repositories/ILibraryRepository.js';
 
 interface LibraryStatusCardProps {
   library: LibraryStatus | null;
@@ -29,7 +29,6 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
           ))
         ) : library?.list ? (
           library.list.map((room) => {
-            const emptySeats = Math.max(0, room.total - room.occupied);
             return (
               <div key={room.id} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center justify-between gap-2 min-w-0">
@@ -54,7 +53,7 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
                   </div>
                   <div className="flex justify-between items-center mt-2.5">
                     <span className="text-[12px] text-slate-700 font-black">
-                      {emptySeats}석 남음
+                      {room.available}석 남음
                     </span>
                     <span className="text-[11px] text-[#475569] font-bold">
                       {room.occupied} / {room.total}

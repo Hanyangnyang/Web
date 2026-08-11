@@ -3,10 +3,11 @@
 export type LibraryRoomStatus = '쾌적' | '보통' | '혼잡' | '매우 혼잡';
 
 export interface LibraryRoomInput {
-  id: number;
+  id: string;
   name: string;
   total: number;
   occupied: number;
+  available: number;
 }
 
 export interface LibraryRoom extends LibraryRoomInput {
@@ -16,7 +17,7 @@ export interface LibraryRoom extends LibraryRoomInput {
   emoji: string;
 }
 
-export const createLibraryRoom = ({ id, name, total, occupied }: LibraryRoomInput): LibraryRoom => {
+export const createLibraryRoom = ({ id, name, total, occupied, available }: LibraryRoomInput): LibraryRoom => {
   const ratio = occupied / total;
 
   let status: LibraryRoomStatus = '쾌적';
@@ -31,5 +32,5 @@ export const createLibraryRoom = ({ id, name, total, occupied }: LibraryRoomInpu
     status = '보통';     color = '#22c55e'; emoji = '🟢';
   }
 
-  return { id, name, total, occupied, ratio, status, color, emoji };
+  return { id, name, total, occupied, available, ratio, status, color, emoji };
 };

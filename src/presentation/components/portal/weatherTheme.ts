@@ -11,7 +11,7 @@ export function getHourlyIcon(code: number, hour: number): LucideIcon {
   if (code <= 3) return Cloud;
   if (code <= 48) return CloudFog;
   if (code <= 67) return CloudRain;
-  if (code <= 77) return Snowflake; // 비 아이콘(CloudRain)과 구분되도록 구름 없는 눈송이 아이콘 사용
+  if (code <= 77) return Snowflake; 
   if (code <= 82) return CloudDrizzle;
   return CloudLightning;
 }
