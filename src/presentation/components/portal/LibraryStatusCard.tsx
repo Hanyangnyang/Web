@@ -1,6 +1,7 @@
 import { Info } from 'lucide-react';
 import type { LibraryStatus } from '../../../domain/repositories/ILibraryRepository.js';
 import type { LibraryRoomStatus } from '../../../domain/entities/LibraryRoom.js';
+import { formatKSTHourMinute } from '../../../utils/time.js';
 
 const STATUS_STYLE: Record<LibraryRoomStatus, { color: string; emoji: string }> = {
   '쾌적': { color: '#2563eb', emoji: '🔵' },
@@ -15,9 +16,18 @@ interface LibraryStatusCardProps {
 }
 
 export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) {
+  const updatedAtLabel = library ? formatKSTHourMinute(library.updatedAt) : null;
+
   return (
     <section className="mb-6">
-      <h3 className="text-xl font-bold text-text-main mb-2">학정 혼잡도</h3>
+      <div className="flex items-baseline justify-between gap-2 mb-2">
+        <h3 className="text-xl font-bold text-text-main">학정 혼잡도</h3>
+        {updatedAtLabel && (
+          <span className="text-[11px] font-semibold text-text-hint flex-shrink-0">
+            {updatedAtLabel} 기준
+          </span>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-3">
         {loading ? (
           [1, 2, 3, 4].map((i) => (
