@@ -3,9 +3,9 @@ import { parseOrThrow, type HttpClient } from '../../infrastructure/http/HttpCli
 
 export interface OpenSpaceDto {
   id: string;
+  floor: string | null;
   name: string;
-  floor?: string;
-  hint?: string;
+  hint: string | null;
 }
 
 export interface CampusBuildingDto {

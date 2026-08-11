@@ -203,7 +203,8 @@
       {
         "id": "openspace-02",
         "floor": "1층",
-        "name": "오픈스페이스"
+        "name": "오픈스페이스",
+        "hint": null
       }
     ],
     "facilities": [],
@@ -290,7 +291,8 @@
       {
         "id": "openspace-03",
         "floor": "1층",
-        "name": "꿈의둥지"
+        "name": "꿈의둥지",
+        "hint": null
       }
     ],
     "facilities": [],
@@ -483,7 +485,8 @@
       {
         "id": "openspace-07",
         "floor": "3층",
-        "name": "한자공열람실"
+        "name": "한자공열람실",
+        "hint": null
       }
     ],
     "facilities": [],
@@ -572,7 +575,8 @@
       {
         "id": "openspace-08",
         "floor": "1층",
-        "name": "해동열람실"
+        "name": "해동열람실",
+        "hint": null
       }
     ],
     "facilities": [],
@@ -812,17 +816,20 @@
       {
         "id": "openspace-09",
         "floor": "1층",
-        "name": "오픈스페이스"
+        "name": "오픈스페이스",
+        "hint": null
       },
       {
         "id": "openspace-10",
         "floor": "2층",
-        "name": "오픈스페이스"
+        "name": "오픈스페이스",
+        "hint": null
       },
       {
         "id": "openspace-11",
         "floor": "5층",
-        "name": "오픈스페이스"
+        "name": "오픈스페이스",
+        "hint": null
       }
     ],
     "facilities": [
@@ -849,7 +856,9 @@
     "openSpaces": [
       {
         "id": "openspace-12",
-        "name": "열람실"
+        "floor": null,
+        "name": "열람실",
+        "hint": null
       }
     ],
     "facilities": [

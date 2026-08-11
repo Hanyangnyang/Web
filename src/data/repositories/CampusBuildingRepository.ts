@@ -10,9 +10,9 @@ function toOpenSpace(raw: OpenSpaceDto, buildingId: string): OpenSpace {
   return {
     id: raw.id,
     buildingId,
-    floor: raw.floor ?? null,
+    floor: raw.floor,
     name: raw.name,
-    hint: raw.hint ?? null,
+    hint: raw.hint,
   };
 }
 
