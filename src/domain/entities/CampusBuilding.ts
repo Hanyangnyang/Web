@@ -1,5 +1,5 @@
 // 도메인 엔티티: 캠퍼스 건물
-import { normalizeForSearch, matchesQuery } from '../../lib/text.js';
+import { normalizeForSearch, matchesQuery } from '../../lib/searchText.js';
 import { isNullIsland, type Coordinates } from './Coordinates.js';
 
 export interface CampusBuilding {

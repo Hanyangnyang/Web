@@ -1,7 +1,7 @@
 // 지도 위 매장 마커 렌더링 — 개수 뱃지로 묶지 않고 항상 모든 매장을 개별 표시한다.
 // 점/핀 전환은 MapMarkerPoint(공용)에 맡기고, 여기서는 매장 고유의 이름 라벨만 추가로 얹는다.
 import { CustomOverlayMap } from 'react-kakao-maps-sdk';
-import type { PartnerStore, PlottableStore } from '../../../domain/entities/PartnerStore.js';
+import type { PartnerStore, PlottableStore } from '../../../../domain/entities/PartnerStore.js';
 import { MapMarkerPoint } from './MapMarkerPoint';
 import { MARKER_LABEL_COLOR, MARKER_LABEL_SELECTED_COLOR } from './markerColors';
 

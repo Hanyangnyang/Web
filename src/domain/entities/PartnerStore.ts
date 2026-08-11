@@ -1,5 +1,5 @@
 // 도메인 엔티티: 제휴 매장
-import { normalizeForSearch, matchesQuery } from '../../lib/text.js';
+import { normalizeForSearch, matchesQuery } from '../../lib/searchText.js';
 import type { Coordinates } from './Coordinates.js';
 
 export type StoreCategory = 'food' | 'cafe' | 'pub' | 'play' | 'life';

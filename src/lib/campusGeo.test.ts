@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { distanceMeters, formatDistance } from './geo.js';
+import { distanceMeters, formatDistance } from './campusGeo.js';
 
 describe('distanceMeters', () => {
   it('같은 좌표면 0이다', () => {

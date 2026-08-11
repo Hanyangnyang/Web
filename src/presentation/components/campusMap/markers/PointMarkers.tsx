@@ -4,7 +4,7 @@
 //
 // 매장(StoreMarkers)은 여기 들어오지 않는다 — 이름 라벨 오버레이가 더 붙고 z-index 층도 달라서,
 // 공통화하면 "라벨 있는 마커"와 "점만 찍는 마커"의 차이가 옵션 뒤로 숨는다.
-import type { Coordinates } from '../../../domain/entities/Coordinates.js';
+import type { Coordinates } from '../../../../domain/entities/Coordinates.js';
 import { MapMarkerPoint } from './MapMarkerPoint';
 
 /** 점 마커로 찍히기 위해 필요한 최소 조건 — 건물·흡연장 엔티티가 모두 만족한다 */

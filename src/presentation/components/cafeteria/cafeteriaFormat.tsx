@@ -1,5 +1,5 @@
 // 학식 탭 포맷팅 유틸: 날짜 라벨, 식사 아이콘, <b> 태그 파싱
-import { getKSTDate } from '../../../utils/time.js';
+import { getKSTDate } from '../../../utils/kstTime.js';
 
 export function formatDate(targetDate: Date): string {
   const days = ['일', '월', '화', '수', '목', '금', '토'];

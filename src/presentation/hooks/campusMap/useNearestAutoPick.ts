@@ -4,8 +4,8 @@
 // 그래서 클릭 시점엔 '예약'만 걸어두고, 로딩이 끝난 뒤 실제로 고른다.
 // 캐시가 이미 있으면 예약과 실행이 사실상 같은 순간에 끝나 사용자에겐 즉시 반응으로 보인다.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { nearestTo, type LatLng } from '../../lib/geo.js';
-import type { Coordinates } from '../../domain/entities/Coordinates.js';
+import { nearestTo, type LatLng } from '../../../lib/campusGeo.js';
+import type { Coordinates } from '../../../domain/entities/Coordinates.js';
 
 interface Params<T> {
   items: T[];

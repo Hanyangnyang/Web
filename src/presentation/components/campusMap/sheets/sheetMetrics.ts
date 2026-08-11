@@ -3,12 +3,12 @@
 // (2) 마커를 '시트 제외 영역 정중앙'에 놓는 지도 포커스 계산이 모두 같은 값을 봐야 해서 여기 모은다.
 // 값이 흩어져 있으면 시트 종류마다 높이가 다른 지금 구조에서 버튼이 시트 안으로 파고든다.
 
-// 퍼센트 높이는 비율(0~1)로 둔다 — 지도 포커스 계산(usePartnerMapFocus)이 비율을 그대로 쓰기 때문
+// 퍼센트 높이는 비율(0~1)로 둔다 — 지도 포커스 계산(useCampusMapFocus)이 비율을 그대로 쓰기 때문
 export const STORE_DETAIL_FRACTION = 0.45;
 export const STORE_LIST_EXPANDED_FRACTION = 0.52;
 // 교내시설 상세는 내용 높이에 맞춰 늘어나므로(height:auto) 이 값은 두 군데서만 쓰인다:
 //  - MAX: 내용이 길 때 더는 안 커지게 막는 상한
-//  - FRACTION: 선택 순간 지도 센터링(usePartnerMapFocus)에 넘길 어림값.
+//  - FRACTION: 선택 순간 지도 센터링(useCampusMapFocus)에 넘길 어림값.
 //    실제보다 크게 잡히면 마커가 시트보다 위에 놓일 뿐이라 가려지지는 않는다.
 export const BUILDING_DETAIL_MAX_FRACTION = 0.55;
 export const BUILDING_DETAIL_FRACTION = 0.4;

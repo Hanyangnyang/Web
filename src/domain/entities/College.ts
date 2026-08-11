@@ -5,7 +5,7 @@
 // 색상은 여기 없다: Tailwind 클래스는 UI 관심사라
 // presentation/components/ui/collegeStyle.ts가 이 id를 키로 삼아 따로 들고 있다.
 
-import { normalizeForSearch } from '../../lib/text.js';
+import { normalizeForSearch } from '../../lib/searchText.js';
 
 export interface College {
   id: string;

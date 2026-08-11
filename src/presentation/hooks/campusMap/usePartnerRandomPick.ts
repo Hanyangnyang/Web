@@ -1,6 +1,6 @@
 // 훅: 캠퍼스맵 점메추/저메추 랜덤 추천 — 항상 '식당' 카테고리에서만 뽑는다
 import { useCallback, useState } from 'react';
-import { visibleStores, type PartnerStore } from '../../domain/entities/PartnerStore.js';
+import { visibleStores, type PartnerStore } from '../../../domain/entities/PartnerStore.js';
 
 // 주사위가 잠깐 굴러가는 연출 후 결과 공개
 const ROLL_DELAY_MS = 500;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeForSearch, matchesQuery } from './text.js';
+import { normalizeForSearch, matchesQuery } from './searchText.js';
 
 describe('normalizeForSearch', () => {
   it('띄어쓰기를 모두 제거한다 (가운데 공백 포함)', () => {

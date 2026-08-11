@@ -1,10 +1,10 @@
 // 지도 하단 바텀시트: 흡연장 — 지금 화면에 보이는 흡연 부스/구역 리스트(+거리) / 개별 상세
 import { useMemo } from 'react';
 import { X } from 'lucide-react';
-import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
-import { nearestTo, type LatLng } from '../../../lib/geo.js';
-import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
-import { SMOKING_DETAIL_FRACTION, SMOKING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetHeights';
+import type { SmokingSpot } from '../../../../domain/entities/SmokingSpot.js';
+import { nearestTo, type LatLng } from '../../../../lib/campusGeo.js';
+import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
+import { SMOKING_DETAIL_FRACTION, SMOKING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
 import { NearbyListSheet } from './NearbyListSheet';
 
 interface Props {

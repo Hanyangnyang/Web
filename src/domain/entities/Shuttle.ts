@@ -1,5 +1,5 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
-import { getKSTParts, getKSTDateKey } from '../../utils/time.js';
+import { getKSTParts, getKSTDateKey } from '../../utils/kstTime.js';
 
 export interface RouteStopDef {
   name: string;

@@ -10,8 +10,8 @@ import {
   CATEGORY_META, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
 import { searchBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
-import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
-import { useCampusBuildings } from '../../hooks/useCampusBuildings.js';
+import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
+import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useFeedback } from '../../hooks/useFeedback.js';
 
 /**
@@ -38,9 +38,9 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   // 제보는 기타탭 피드백과 같은 경로를 쓴다 (useFeedback → UseCase → Repository → Supabase).
   // 예전엔 여기서 supabase를 직접 호출해 레이어를 건너뛰고 있었다.
   const { loading: reporting, submitted: reported, error: reportError, submit: submitFeedback, reset: resetReport } = useFeedback();
-  // PartnershipMapView와 같은 queryKey를 공유하는 RQ 캐시라 별도 네트워크 요청 없이 재사용된다.
+  // CampusMapView와 같은 queryKey를 공유하는 RQ 캐시라 별도 네트워크 요청 없이 재사용된다.
   // 건물은 칩과 무관하게 검색 대상이라 여기선 항상 enabled — 이미 받아왔다면 캐시에서 즉시 나온다.
-  const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
+  const { stores, loading: storesLoading, loadErr: storesError } = usePartnerStores();
   const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: true });
   // 로딩·실패는 아래에서 섹션별로 따로 알린다. 여기 합친 값은 '결과 없음' 판정 전용 —
   // 어느 한쪽이라도 아직 안 왔거나 실패한 상태에서 "없어요"를 띄우면,

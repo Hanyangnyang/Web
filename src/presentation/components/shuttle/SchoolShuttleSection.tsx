@@ -9,7 +9,7 @@ import { TimetableHeader } from './TimetableHeader.jsx';
 import { SubwayRedirectOverlay } from './SubwayRedirectOverlay.jsx';
 import { openKakaoSubway } from './kakaoSubway.js';
 import { findUpcomingSchedule, formatUpcomingScheduleMessage, type PeriodScheduleItem } from './upcomingSchedule.js';
-import { getKSTToday } from '../../../utils/time.js';
+import { getKSTToday } from '../../../utils/kstTime.js';
 
 type SchoolShuttleAppConfig = ShuttleAppConfig & { period_schedule?: PeriodScheduleItem[] };
 

@@ -1,7 +1,7 @@
 // 훅(ViewModel): 캠퍼스 건물 목록 조회
-import { getCampusBuildingsUseCase } from '../../di.js';
-import { visibleBuildings, type CampusBuilding } from '../../domain/entities/CampusBuilding.js';
-import { createStaticDataQuery, type StaticDataQueryOptions } from './createStaticDataQuery.js';
+import { getCampusBuildingsUseCase } from '../../../di.js';
+import { visibleBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
+import { createStaticDataQuery, type StaticDataQueryOptions } from '../createStaticDataQuery.js';
 
 const useCampusBuildingsQuery = createStaticDataQuery<CampusBuilding, CampusBuilding>({
   queryKey: ['campus', 'buildings'],

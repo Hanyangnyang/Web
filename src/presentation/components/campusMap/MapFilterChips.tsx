@@ -1,7 +1,7 @@
 // 지도 상단 필터 칩: 매장 카테고리와 교내시설/오픈스페이스/흡연장 레이어를 같은 레벨의 단일 선택으로 묶는다.
 import { useEffect, useRef } from 'react';
 import { CATEGORY_ORDER, CATEGORY_META } from '../../../domain/entities/PartnerStore.js';
-import type { MapChip } from '../../hooks/usePartnerMapFilters.js';
+import type { MapChip } from '../../hooks/campusMap/useCampusMapFilters.js';
 
 interface Props {
   value: MapChip | null;

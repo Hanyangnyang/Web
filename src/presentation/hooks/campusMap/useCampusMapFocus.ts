@@ -9,7 +9,7 @@ export const DEFAULT_LEVEL = 3;
 // 기본 배율(DEFAULT_LEVEL)과 같은 수준으로 둔다. 이미 이 배율이면 줌 변화 없이 이동만 한다.
 const FOCUS_LEVEL = DEFAULT_LEVEL;
 
-export function usePartnerMapFocus() {
+export function useCampusMapFocus() {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
   // 마커 렌더링 재계산용 — 사용자 핀치줌·imperative 줌 모두 onZoomChanged로 동기화
   const [level, setLevel] = useState(DEFAULT_LEVEL);

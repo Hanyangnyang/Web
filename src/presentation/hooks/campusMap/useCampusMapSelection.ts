@@ -5,9 +5,9 @@
 // 한 군데씩 빠뜨려 시트가 겹치거나 마커가 안 뜨는 버그가 반복됐다.
 // 판별 유니온 하나로 바꿔 그 규칙을 타입 차원에서 강제한다 — 애초에 둘을 동시에 담을 수 없다.
 import { useCallback, useRef, useState } from 'react';
-import type { PartnerStore } from '../../domain/entities/PartnerStore.js';
-import type { CampusBuilding } from '../../domain/entities/CampusBuilding.js';
-import type { SmokingSpot } from '../../domain/entities/SmokingSpot.js';
+import type { PartnerStore } from '../../../domain/entities/PartnerStore.js';
+import type { CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
+import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 
 // 선택한 '대상 자체' — 지도 포커스처럼 좌표가 당장 필요한 곳에 넘긴다
 export type MapSelection =

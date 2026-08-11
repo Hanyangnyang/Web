@@ -3,7 +3,7 @@ import React, { type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { queryClient } from '../../lib/queryClient.js';
-import { getKSTDate } from '../../utils/time.js';
+import { getKSTDate } from '../../utils/kstTime.js';
 import { useMenu } from './useMenu.js';
 
 function wrapper({ children }: { children: ReactNode }) {

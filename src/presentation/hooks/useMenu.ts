@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { getMenuUseCase } from '../../di.js';
-import { getKSTDate } from '../../utils/time.js';
+import { getKSTDate } from '../../utils/kstTime.js';
 import type { Cafe } from '../../domain/entities/Cafe.js';
 
 const MENU_STALE_TIME = 60 * 60 * 1000; // 1시간 — 학식은 하루 단위로만 갱신되므로 진입마다 재검증할 필요 없음

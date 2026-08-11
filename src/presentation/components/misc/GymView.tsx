@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useGymSchedule } from '../../hooks/useGymSchedule.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
-import { getKSTDateKey, getKSTNow } from '../../../utils/time.js';
+import { getKSTDateKey, getKSTNow } from '../../../utils/kstTime.js';
 import { getMergedSchedule } from './gymScheduleFormat.js';
 import type { GymScheduleCell, GymPeriod } from '../../../domain/entities/Gym.js';
 

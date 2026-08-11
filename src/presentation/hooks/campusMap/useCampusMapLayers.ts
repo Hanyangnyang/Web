@@ -5,8 +5,8 @@
 // 규칙을 한곳에 모아 이름을 붙여두면 "왜 이때 이게 보이지?"를 여기만 보고 답할 수 있다.
 // 이 훅은 칩에서만 파생된다(데이터에 의존하지 않는다) — 그래야 "무엇을 불러올지"를 먼저 정하고
 // 그 결과로 RQ를 켤 수 있다. 받아온 건물을 걸러내는 일은 데이터가 도착한 뒤라 호출부가 맡는다.
-import type { CategoryFilter } from '../../domain/entities/PartnerStore.js';
-import { toStoreCategory, type MapChip } from './usePartnerMapFilters.js';
+import type { CategoryFilter } from '../../../domain/entities/PartnerStore.js';
+import { toStoreCategory, type MapChip } from './useCampusMapFilters.js';
 
 export function useCampusMapLayers(chip: MapChip | null) {
   // '전체'는 모든 레이어를 한꺼번에 보여주는 모드 — 대신 바텀시트는 띄우지 않는다

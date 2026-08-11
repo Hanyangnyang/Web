@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 const TOAST_DURATION_MS = 2500;
 
-export function usePartnerMapToast() {
+export function useCampusMapToast() {
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {

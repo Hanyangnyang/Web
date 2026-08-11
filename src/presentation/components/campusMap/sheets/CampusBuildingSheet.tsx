@@ -1,11 +1,11 @@
 // 지도 하단 바텀시트: 교내시설 — 지금 화면에 보이는 건물 리스트(+거리) / 개별 건물 상세
 import { X } from 'lucide-react';
-import type { CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
-import type { LatLng } from '../../../lib/geo.js';
-import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
-import { collegeStyleByName } from '../ui/collegeStyle.js';
-import { collegeByName } from '../../../domain/entities/College.js';
-import { BUILDING_DETAIL_MAX_FRACTION, BUILDING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetHeights';
+import type { CampusBuilding } from '../../../../domain/entities/CampusBuilding.js';
+import type { LatLng } from '../../../../lib/campusGeo.js';
+import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
+import { collegeStyleByName } from '../../ui/collegeStyle.js';
+import { collegeByName } from '../../../../domain/entities/College.js';
+import { BUILDING_DETAIL_MAX_FRACTION, BUILDING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
 import { NearbyListSheet } from './NearbyListSheet';
 
 export type BuildingSheetVariant = 'facility' | 'openspace';

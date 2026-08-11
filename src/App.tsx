@@ -6,7 +6,7 @@ import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
-const PartnershipMapView = lazy(() => import('./presentation/components/partnership/PartnershipMapView.jsx'));
+const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
@@ -260,7 +260,7 @@ function MainLayout() {
           <div className="-mx-4 h-full" style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
             {partnerVisited && (
               <Suspense fallback={<div className="h-full flex items-center justify-center"><span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span></div>}>
-                <PartnershipMapView isActive={activeTab === 'partner'} />
+                <CampusMapView isActive={activeTab === 'partner'} />
               </Suspense>
             )}
           </div>

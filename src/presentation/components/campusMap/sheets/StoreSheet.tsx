@@ -3,15 +3,15 @@
 // - 매장 선택: 혜택 상세 카드
 import { useCallback, useEffect, useRef } from 'react';
 import { X, Info, Clock, ExternalLink, ChevronRight } from 'lucide-react';
-import { activePartnerships, CATEGORY_META, type PartnerStore } from '../../../domain/entities/PartnerStore.js';
-import { COLLEGES, collegeById, collegeLabel } from '../../../domain/entities/College.js';
-import { COLLEGE_STYLE } from '../ui/collegeStyle.js';
-import { CollegeWheelPicker } from './CollegeWheelPicker';
-import { StandardBottomSheet } from '../ui/StandardBottomSheet.js';
+import { activePartnerships, CATEGORY_META, type PartnerStore } from '../../../../domain/entities/PartnerStore.js';
+import { COLLEGES, collegeById, collegeLabel } from '../../../../domain/entities/College.js';
+import { COLLEGE_STYLE } from '../../ui/collegeStyle.js';
+import { CollegeWheelPicker } from '../../ui/CollegeWheelPicker';
+import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import {
   STORE_DETAIL_FRACTION, STORE_LIST_EXPANDED_FRACTION, STORE_LIST_COLLAPSED_CSS,
   NAV_CLEARANCE_CLASS, toCssHeight,
-} from './sheetHeights';
+} from './sheetMetrics';
 
 // 휠피커 옵션 — '전체' 항목 + 단과대 목록. 컴포넌트 바깥에 둬 매 렌더마다 새 배열이 생기지 않게 한다.
 const COLLEGE_OPTIONS = [

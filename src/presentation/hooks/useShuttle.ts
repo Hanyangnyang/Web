@@ -3,11 +3,11 @@ import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { computeSchedule, computeFullSchedule, curMin, type ScheduleItem } from '../../domain/entities/Shuttle.js';
-import { getDistanceKm } from '../../domain/utils/geo.js';
+import { getDistanceKm } from '../../domain/utils/haversine.js';
 import { getShuttleDataUseCase, getSubwayArrivalsUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
-import { getKSTDateKey, getKSTParts } from '../../utils/time.js';
+import { getKSTDateKey, getKSTParts } from '../../utils/kstTime.js';
 
 const SCHEDULE_TTL = 24 * 60 * 60 * 1000; // 24시간 — 로컬 shuttle.json은 앱 재배포 전까지 안 바뀜
 const SUBWAY_POLL_INTERVAL = 2 * 60 * 1000; // 2분

@@ -4,17 +4,17 @@ import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-m
 import { LocateFixed, Search } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { MapFilterChips } from './MapFilterChips';
-import { toStoreCategory, type MapChip } from '../../hooks/usePartnerMapFilters.js';
+import { toStoreCategory, type MapChip } from '../../hooks/campusMap/useCampusMapFilters.js';
 import { MapStatusScreen } from './MapStatusScreen';
-import { StoreMarkers } from './StoreMarkers';
+import { StoreMarkers } from './markers/StoreMarkers';
 import { SearchOverlay } from './SearchOverlay';
-import { StoreSheet } from './StoreSheet';
-import { PointMarkers } from './PointMarkers';
-import { CampusBuildingSheet } from './CampusBuildingSheet';
-import { SmokingSpotSheet } from './SmokingSpotSheet';
+import { StoreSheet } from './sheets/StoreSheet';
+import { PointMarkers } from './markers/PointMarkers';
+import { CampusBuildingSheet } from './sheets/CampusBuildingSheet';
+import { SmokingSpotSheet } from './sheets/SmokingSpotSheet';
 import {
   STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
-} from './sheetHeights';
+} from './sheets/sheetMetrics';
 
 import {
   hasCoords, visibleStores, CATEGORY_META,
@@ -22,25 +22,25 @@ import {
 } from '../../../domain/entities/PartnerStore.js';
 import { openSpaceBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
 import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
-import { usePartnershipStores } from '../../hooks/usePartnershipStores.js';
-import { useCampusBuildings } from '../../hooks/useCampusBuildings.js';
-import { useSmokingSpots } from '../../hooks/useSmokingSpots.js';
-import { usePartnerMapFocus, DEFAULT_LEVEL } from '../../hooks/usePartnerMapFocus.js';
-import { useMapCenter } from '../../hooks/useMapCenter.js';
+import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
+import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
+import { useSmokingSpots } from '../../hooks/campusMap/useSmokingSpots.js';
+import { useCampusMapFocus, DEFAULT_LEVEL } from '../../hooks/campusMap/useCampusMapFocus.js';
+import { useMapCenter } from '../../hooks/campusMap/useMapCenter.js';
 import { getCachedLocation } from '../../hooks/useLocation.js';
-import { usePartnerMapToast } from '../../hooks/usePartnerMapToast.js';
-import { usePartnerMapLocation } from '../../hooks/usePartnerMapLocation.js';
-import { usePartnerMapFilters } from '../../hooks/usePartnerMapFilters.js';
-import { useCampusMapLayers } from '../../hooks/useCampusMapLayers.js';
-import { useCampusMapSelection, selectedBy, type MapSelection, type SelectSource, type StoreSelectSource } from '../../hooks/useCampusMapSelection.js';
-import { useNearestAutoPick } from '../../hooks/useNearestAutoPick.js';
-import { usePartnerRandomPick } from '../../hooks/usePartnerRandomPick.js';
+import { useCampusMapToast } from '../../hooks/campusMap/useCampusMapToast.js';
+import { useCampusMapLocation } from '../../hooks/campusMap/useCampusMapLocation.js';
+import { useCampusMapFilters } from '../../hooks/campusMap/useCampusMapFilters.js';
+import { useCampusMapLayers } from '../../hooks/campusMap/useCampusMapLayers.js';
+import { useCampusMapSelection, selectedBy, type MapSelection, type SelectSource, type StoreSelectSource } from '../../hooks/campusMap/useCampusMapSelection.js';
+import { useNearestAutoPick } from '../../hooks/campusMap/useNearestAutoPick.js';
+import { usePartnerRandomPick } from '../../hooks/campusMap/usePartnerRandomPick.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { KAKAO_MAP_LIBRARIES } from '../../../lib/kakaoMap';
-import { SheetHeightContext, type ReportSheetHeight } from '../ui/sheetHeight.js';
+import { SheetHeightContext, type ReportSheetHeight } from '../ui/sheetHeightContext.js';
 
 // 초기 지도 중심: 정문(ERICA_MAIN_GATE)이 아니라 제휴 매장이 밀집한 상권 한가운데.
-// 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고(usePartnerMapLocation), 첫 화면은 매장이 보이는 곳에서 시작한다.
+// 정문 좌표는 '학교 근처인지' 판정 기준으로만 쓰고(useCampusMapLocation), 첫 화면은 매장이 보이는 곳에서 시작한다.
 const INITIAL_CENTER = { lat: 37.3008, lng: 126.8385 } as const;
 
 // 흡연장만 기본 배율보다 한 단계 더 당겨서 본다. 부스·구역이 건물 뒤편이나 주차장 구석처럼
@@ -52,7 +52,7 @@ interface Props {
   isActive: boolean;
 }
 
-export default function PartnershipMapView({ isActive }: Props) {
+export default function CampusMapView({ isActive }: Props) {
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY,
     // clusterer: 마커 밀집 대비, services: 좌표↔주소 변환 대비
@@ -60,13 +60,13 @@ export default function PartnershipMapView({ isActive }: Props) {
     libraries: KAKAO_MAP_LIBRARIES,
   });
   const posthog = usePostHog();
-  const { stores, loading: storesLoading, loadErr: storesError } = usePartnershipStores();
+  const { stores, loading: storesLoading, loadErr: storesError } = usePartnerStores();
 
-  const { map, setMap, level, onZoomChanged, focusMap, panTo } = usePartnerMapFocus();
+  const { map, setMap, level, onZoomChanged, focusMap, panTo } = useCampusMapFocus();
   const { center: mapCenter, onIdle } = useMapCenter(map);
-  const { toast, showToast } = usePartnerMapToast();
-  const { userPos, locating, locateMe } = usePartnerMapLocation({ panTo, onMessage: showToast, posthog });
-  const { chip, setChip, college, setCollege } = usePartnerMapFilters();
+  const { toast, showToast } = useCampusMapToast();
+  const { userPos, locating, locateMe } = useCampusMapLocation({ panTo, onMessage: showToast, posthog });
+  const { chip, setChip, college, setCollege } = useCampusMapFilters();
 
   const [searchOpen, setSearchOpen] = useState(false);
 

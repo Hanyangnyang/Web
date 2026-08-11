@@ -22,7 +22,7 @@ if (import.meta.env.VITE_POSTHOG_KEY) {
   })
 }
 
-// Kakao SDK는 더 이상 여기서 초기화하지 않음 — ShareSheet가 마운트될 때 lib/kakao.js가 지연 로드함
+// Kakao SDK는 더 이상 여기서 초기화하지 않음 — ShareSheet가 마운트될 때 lib/kakaoShare.js가 지연 로드함
 
 // Service Worker 업데이트 감지 후 새로고침
 if ('serviceWorker' in navigator) {

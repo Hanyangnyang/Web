@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Share2 } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { ModalBottomSheet } from '../ui/ModalBottomSheet.js';
-import { loadKakaoSdk } from '../../../lib/kakao.js';
+import { loadKakaoSdk } from '../../../lib/kakaoShare.js';
 
 declare global {
   interface Window {

@@ -7,7 +7,7 @@
 // 시트 종류마다 높이가 달라 동적으로 만들어야 하는데, 동적 문자열은 Tailwind 스캐너가 못 잡기 때문.
 // height에 'auto'를 주면 내용 높이에 맞춰지고, maxHeight까지만 커진 뒤 내부가 스크롤된다.
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
-import { useReportSheetHeight } from './sheetHeight.js';
+import { useReportSheetHeight } from './sheetHeightContext.js';
 
 interface Props {
   height: string;

@@ -40,10 +40,10 @@ export interface PartnershipApiResponse {
   partnerships?: Partnership[];
 }
 
-export interface PartnershipApiDataSource {
+export interface PartnerStoreApiDataSource {
     getPartnerStores: () => Promise<PartnershipApiResponse[]>;
 }
 
-export const createPartnershipApiDataSource = ({ httpClient }: { httpClient: HttpClient }): PartnershipApiDataSource => ({
+export const createPartnerStoreApiDataSource = ({ httpClient }: { httpClient: HttpClient }): PartnerStoreApiDataSource => ({
     getPartnerStores: async () => parseOrThrow(await httpClient.get('/partnerships.json')),
 });

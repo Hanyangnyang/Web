@@ -2,7 +2,7 @@
 // 위치 권한이 없는 사용자에게 "가까운 순" 정렬 기준점을 주는 용도다 —
 // 내 위치를 모르면 '지금 보고 있는 곳'을 기준으로 삼는 게 가장 그럴듯하다.
 import { useCallback, useMemo, useState } from 'react';
-import type { LatLng } from '../../lib/geo.js';
+import type { LatLng } from '../../../lib/campusGeo.js';
 
 function readCenter(map: kakao.maps.Map): LatLng {
   const c = map.getCenter();

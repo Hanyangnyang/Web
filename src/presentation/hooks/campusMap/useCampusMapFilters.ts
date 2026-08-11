@@ -1,6 +1,6 @@
 // 훅: 캠퍼스맵 필터 칩 · 단과대 필터 상태
 import { useCallback, useState } from 'react';
-import type { CategoryFilter, StoreCategory } from '../../domain/entities/PartnerStore.js';
+import type { CategoryFilter, StoreCategory } from '../../../domain/entities/PartnerStore.js';
 
 // 칩은 세 갈래다 — '전체'(모든 레이어) · 시설 종류 · 매장 카테고리.
 // 화면 곳곳에서 이 셋을 구분해야 해서 경계를 여기 한 곳에만 둔다.
@@ -29,7 +29,7 @@ export function toStoreCategory(chip: MapChip | null): CategoryFilter | null {
 
 const COLLEGE_FILTER_STORAGE_KEY = 'partnerCollegeFilter';
 
-export function usePartnerMapFilters() {
+export function useCampusMapFilters() {
   // 칩 하나만 선택 가능 (전체 / 교내시설 / 오픈스페이스 / 흡연장 / 매장 카테고리),
   // 다시 탭하면 해제되어 null(아무 표시 없음)이 될 수 있다.
   // 진입 기본값은 '전체' — 모든 레이어가 보이되 바텀시트는 뜨지 않는 상태로 시작한다.

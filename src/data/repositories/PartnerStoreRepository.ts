@@ -1,7 +1,7 @@
 // 레포지토리: 제휴 매장 응답(DTO)을 도메인 엔티티로 변환해 제공
 import type { PartnerStore } from '../../domain/entities/PartnerStore.js';
-import type { PartnershipRepository } from '../../domain/repositories/IPartnershipRepository.js';
-import type { PartnershipApiDataSource, PartnershipApiResponse } from '../datasources/PartnershipApiDataSource.js';
+import type { PartnerStoreRepository } from '../../domain/repositories/IPartnerStoreRepository.js';
+import type { PartnerStoreApiDataSource, PartnershipApiResponse } from '../datasources/PartnerStoreApiDataSource.js';
 
 // DTO → 엔티티 매핑은 데이터 레이어의 책임.
 // 나중에 이 데이터가 정적 JSON에서 백엔드 API로 옮겨가 필드명·형식이 바뀌어도
@@ -29,6 +29,6 @@ function toPartnerStore(raw: PartnershipApiResponse): PartnerStore {
   };
 }
 
-export const createPartnershipRepository = ({ partnershipApiDataSource }: { partnershipApiDataSource: PartnershipApiDataSource }): PartnershipRepository => ({
-    getPartnerStores: async () => (await partnershipApiDataSource.getPartnerStores()).map(toPartnerStore),
+export const createPartnerStoreRepository = ({ partnerStoreApiDataSource }: { partnerStoreApiDataSource: PartnerStoreApiDataSource }): PartnerStoreRepository => ({
+    getPartnerStores: async () => (await partnerStoreApiDataSource.getPartnerStores()).map(toPartnerStore),
 });

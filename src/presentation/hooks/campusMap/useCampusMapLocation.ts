@@ -1,8 +1,8 @@
 // 훅: 캠퍼스맵 '내 위치' 버튼 — 온디맨드 측위 후 학교 인근이면 지도 중심 이동
 import { useCallback, useState } from 'react';
-import { measureLocation } from './useLocation.js';
-import { distanceMeters } from '../../lib/geo.js';
-import { ERICA_MAIN_GATE, ERICA_NEARBY_RADIUS_M } from '../../domain/entities/Campus.js';
+import { measureLocation } from '../useLocation.js';
+import { distanceMeters } from '../../../lib/campusGeo.js';
+import { ERICA_MAIN_GATE, ERICA_NEARBY_RADIUS_M } from '../../../domain/entities/Campus.js';
 
 interface Params {
   panTo: (lat: number, lng: number) => void;
@@ -10,7 +10,7 @@ interface Params {
   posthog?: { capture: (event: string, props?: Record<string, unknown>) => void };
 }
 
-export function usePartnerMapLocation({ panTo, onMessage, posthog }: Params) {
+export function useCampusMapLocation({ panTo, onMessage, posthog }: Params) {
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
 
