@@ -1,10 +1,9 @@
 // 지도를 못 띄우는 상황(로딩·실패)에 화면 전체를 대신 채우는 안내.
-// 같은 마크업이 세 벌 복붙돼 있어서 하나로 모았다.
 interface Props {
   emoji?: string;
   title: string;
   description?: string;
-  pulse?: boolean; // 로딩처럼 '진행 중'을 나타낼 때
+  pulse?: boolean; 
 }
 
 export function MapStatusScreen({ emoji, title, description, pulse }: Props) {

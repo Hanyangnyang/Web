@@ -6,18 +6,11 @@
 // 퍼센트 높이는 비율(0~1)로 둔다 — 지도 포커스 계산(useCampusMapFocus)이 비율을 그대로 쓰기 때문
 export const STORE_DETAIL_FRACTION = 0.45;
 export const STORE_LIST_EXPANDED_FRACTION = 0.52;
-// 교내시설 상세는 내용 높이에 맞춰 늘어나므로(height:auto) 이 값은 두 군데서만 쓰인다:
-//  - MAX: 내용이 길 때 더는 안 커지게 막는 상한
-//  - FRACTION: 선택 순간 지도 센터링(useCampusMapFocus)에 넘길 어림값.
-//    실제보다 크게 잡히면 마커가 시트보다 위에 놓일 뿐이라 가려지지는 않는다.
 export const BUILDING_DETAIL_MAX_FRACTION = 0.55;
 export const BUILDING_DETAIL_FRACTION = 0.4;
 export const BUILDING_LIST_FRACTION = 0.45;
 export const SMOKING_DETAIL_FRACTION = 0.32;
 export const SMOKING_LIST_FRACTION = 0.45;
-
-/** 접힌 매장 리스트: 핸들+타이틀(72px) + 카드 한 줄(96px) */
-export const STORE_LIST_COLLAPSED_CSS = 'calc(72px + 96px + env(safe-area-inset-bottom, 0px))';
 
 // ── 하단 플로팅 BottomNav를 피하기 위한 여백 (108px = nav 높이) ──
 // 시트는 nav가 위로 지나가도록 화면 끝까지 연장하고, 콘텐츠만 이 여백만큼 비워 가려지지 않게 한다.
@@ -32,6 +25,12 @@ export const NAV_CLEARANCE_CLASS = 'pb-[calc(108px+env(safe-area-inset-bottom,0p
 
 /** 시트가 없을 때 버튼이 기준으로 삼을 높이 (CSS 길이) */
 export const NAV_CLEARANCE_CSS = 'calc(108px + env(safe-area-inset-bottom, 0px))';
+
+/**
+ * 접힌 리스트 높이 — 매장·교내시설·오픈스페이스·흡연장이 **같은 값**을 쓴다.
+ */
+export const LIST_COLLAPSED_CSS = 'calc(72px + 96px + env(safe-area-inset-bottom, 0px))';
+
 
 /** 비율 → CSS 길이 */
 export function toCssHeight(fraction: number): string {

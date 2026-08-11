@@ -1,6 +1,7 @@
 // 도메인 엔티티: 캠퍼스 건물
 import { normalizeForSearch, matchesQuery } from '../../lib/searchText.js';
-import { isNullIsland, type Coordinates } from './Coordinates.js';
+import type { Coordinates } from './Coordinates.js';
+import type { OpenSpace } from './OpenSpace.js';
 
 export interface CampusBuilding {
   id: string;
@@ -9,44 +10,45 @@ export interface CampusBuilding {
   englishName: string;
   aliases: string[];
   campus: string;
-  coordinates: Coordinates;
+  coordinates: Coordinates | null;
   description: string;
   primaryColleges: string[];
-  openSpaces: string[];
+  openSpaces: OpenSpace[];
   facilities: string[];
   imageUrl: string[];
 }
 
-/** 좌표가 채워져 지도에 표시 가능한 건물인지 (지오코딩 미확보분은 0,0으로 들어있다) */
-export function hasCoords(building: CampusBuilding): boolean {
-  return !isNullIsland(building.coordinates);
+export type PlottableBuilding = CampusBuilding & { coordinates: Coordinates };
+
+export function hasCoords(building: CampusBuilding): building is PlottableBuilding {
+  return building.coordinates !== null;
 }
 
-export function visibleBuildings(buildings: CampusBuilding[]): CampusBuilding[] {
+// 좌표값이 있는 건물들 필터 함수 
+export function visibleBuildings(buildings: CampusBuilding[]): PlottableBuilding[] {
   return buildings.filter(hasCoords);
 }
 
-/** 개방된 휴게 공간(오픈스페이스·열람실 등)이 있는 건물인지 */
 export function hasOpenSpace(building: CampusBuilding): boolean {
   return building.openSpaces.length > 0;
 }
 
-export function openSpaceBuildings(buildings: CampusBuilding[]): CampusBuilding[] {
+// 오픈스페이스 필터 함수
+export function openSpaceBuildings<T extends CampusBuilding>(buildings: T[]): T[] {
   return buildings.filter(hasOpenSpace);
 }
 
-/**
- * 건물 검색 — 동번호·정식 명칭·별칭(aliases) 어느 쪽이든 부분 일치하면 잡는다.
- * 부분 일치라서 '1공학'처럼 끝까지 안 쳐도 '제1공학관'이 나오고,
- * '과기'처럼 정식 명칭엔 없는 줄임말은 aliases가 받아준다.
- * 동번호는 강의실 표기('301동', 'C01')를 보고 찾는 경우가 많아 함께 대상에 넣는다.
- * 지도에 찍을 수 없는(좌표 미확보) 건물은 검색 결과에서도 제외한다.
- */
-export function searchBuildings(buildings: CampusBuilding[], query: string): CampusBuilding[] {
+// 모든 오픈스페이스를 평탄화하여 반환한다. (건물별로 묶여있던 것을 한 리스트로)
+export function allOpenSpaces(buildings: CampusBuilding[]): OpenSpace[] {
+  return buildings.flatMap((b) => b.openSpaces);
+}
+
+// 건물 검색 함수 
+export function searchBuildings(buildings: CampusBuilding[], query: string): PlottableBuilding[] {
   const q = normalizeForSearch(query.trim());
   if (!q) return [];
   return buildings.filter(
-    (b) =>
+    (b): b is PlottableBuilding =>
       hasCoords(b) &&
       (matchesQuery(b.buildingNumber, q) ||
         matchesQuery(b.name, q) ||

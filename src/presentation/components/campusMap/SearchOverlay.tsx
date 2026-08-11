@@ -9,7 +9,7 @@ import {
   searchStores, groupByCategory, activePartnerships,
   CATEGORY_META, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
-import { searchBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
+import { searchBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useFeedback } from '../../hooks/useFeedback.js';
@@ -17,7 +17,6 @@ import { useFeedback } from '../../hooks/useFeedback.js';
 /**
  * 한 섹션의 상태 한 줄.
  * 매장과 교내시설은 서로 다른 JSON에서 오므로 한쪽이 실패해도 다른 쪽 결과는 계속 보여준다 —
- * 지도에서 "한 레이어가 실패해도 나머지는 쓸 수 있어야 한다"고 정한 것과 같은 원칙이다.
  */
 function SectionStatus({ error, loading }: { error: string | null; loading: boolean }) {
   if (error) return <p className="px-4 pb-2 text-[12px] text-red-500 font-medium">{error}</p>;
@@ -28,23 +27,16 @@ function SectionStatus({ error, loading }: { error: string | null; loading: bool
 interface Props {
   onClose: () => void;
   onSelect: (store: PartnerStore) => void;
-  onSelectBuilding: (building: CampusBuilding) => void;
+  onSelectBuilding: (building: PlottableBuilding) => void;
 }
 
 export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const posthog = usePostHog();
-  // 제보는 기타탭 피드백과 같은 경로를 쓴다 (useFeedback → UseCase → Repository → Supabase).
-  // 예전엔 여기서 supabase를 직접 호출해 레이어를 건너뛰고 있었다.
   const { loading: reporting, submitted: reported, error: reportError, submit: submitFeedback, reset: resetReport } = useFeedback();
-  // CampusMapView와 같은 queryKey를 공유하는 RQ 캐시라 별도 네트워크 요청 없이 재사용된다.
-  // 건물은 칩과 무관하게 검색 대상이라 여기선 항상 enabled — 이미 받아왔다면 캐시에서 즉시 나온다.
   const { stores, loading: storesLoading, loadErr: storesError } = usePartnerStores();
   const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: true });
-  // 로딩·실패는 아래에서 섹션별로 따로 알린다. 여기 합친 값은 '결과 없음' 판정 전용 —
-  // 어느 한쪽이라도 아직 안 왔거나 실패한 상태에서 "없어요"를 띄우면,
-  // 있는 매장을 없다고 오해해 잘못된 제보를 하게 된다.
   const dataLoading = storesLoading || buildingsLoading;
   const dataError = storesError ?? buildingsError;
 
@@ -53,7 +45,6 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   const buildingResults = useMemo(() => searchBuildings(buildings, query), [buildings, query]);
   const trimmed = query.trim();
   const noResult = trimmed.length > 0 && !dataLoading && !dataError && results.length === 0 && buildingResults.length === 0;
-  // 교내시설 결과가 섞이면 매장 쪽도 헤더가 있어야 무엇이 무엇인지 구분된다
   const showSectionHeaders = groups.length > 1 || buildingResults.length > 0;
 
   useEffect(() => {
@@ -70,7 +61,6 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   }, [noResult, trimmed, posthog]);
 
   // 검색어가 바뀌면 이전 제보 결과는 다른 맥락이 되므로 지운다.
-  // (effect가 아니라 입력 핸들러에서 처리 — 렌더 중 상태를 되돌리는 연쇄를 만들지 않기 위해)
   const handleQueryChange = (next: string) => {
     setQuery(next);
     if (reported || reportError) resetReport();
@@ -173,7 +163,7 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
             )}
             {stores.map((store) => {
               const colleges = activePartnerships(store);
-              const closed = !store.is_active;
+              const closed = !store.isActive;
               return (
                 <button
                   key={store.id}
@@ -198,7 +188,7 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
                   </div>
                   {!closed && colleges.length > 0 && (
                     <span className="flex-shrink-0 text-[10px] font-bold text-white bg-hyu-blue-light px-1.5 py-0.5 rounded-full">
-                      {colleges.length === 1 ? colleges[0].college_name.replace(/\n/g, '') : `${colleges.length}개 단과대`}
+                      {colleges.length === 1 ? colleges[0].collegeName.replace(/\n/g, '') : `${colleges.length}개 단과대`}
                     </span>
                   )}
                 </button>

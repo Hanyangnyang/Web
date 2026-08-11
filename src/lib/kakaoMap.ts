@@ -7,6 +7,6 @@ export function prefetchKakaoMapSdk() {
   const appkey = import.meta.env.VITE_KAKAO_JS_KEY;
   if (!appkey) return;
   new Loader({ appkey, libraries: KAKAO_MAP_LIBRARIES }).load().catch(() => {
-    // 실패해도 무시 — 실제 탭 진입 시 CampusMapView의 useKakaoLoader가 다시 시도한다
+    console.warn('카카오맵 SDK 로드 실패 — 지도 기능이 정상 동작하지 않을 수 있음');
   });
 }

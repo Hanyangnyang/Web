@@ -6,8 +6,8 @@ import { MapMarkerPoint } from './MapMarkerPoint';
 import { MARKER_LABEL_COLOR, MARKER_LABEL_SELECTED_COLOR } from './markerColors';
 
 interface Props {
-  stores: PlottableStore[];   // 좌표가 확정된 매장만 (hasCoords로 걸러 넘긴다)
-  level: number;                   // 현재 줌 레벨 — 이름표 상시 표시 기준 (마커 자체의 점/핀 전환은 선택 여부로만 결정)
+  stores: PlottableStore[];   
+  level: number;                   
   selectedId: string | null;
   onSelectStore: (store: PartnerStore) => void;
 }

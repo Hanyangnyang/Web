@@ -20,9 +20,6 @@ export function MapFilterChips({ value, onChange }: Props) {
   const stripRef = useRef<HTMLDivElement>(null);
   const chipRefs = useRef<Partial<Record<MapChip, HTMLButtonElement | null>>>({});
 
-  // 활성 칩을 가로 스크롤 안으로 끌어온다.
-  // 마커를 눌러 칩이 바뀌는 경우(예: 여가·생활)엔 그 칩이 화면 밖에 있어서 뭐가 켜졌는지 안 보인다.
-  // scrollIntoView는 상위 스크롤 컨테이너까지 건드릴 수 있어, 이 스트립의 scrollLeft만 직접 옮긴다.
   useEffect(() => {
     const strip = stripRef.current;
     const chip = value ? chipRefs.current[value] : null;

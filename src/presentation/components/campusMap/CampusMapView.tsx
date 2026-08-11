@@ -20,8 +20,8 @@ import {
   hasCoords, visibleStores, CATEGORY_META,
   type CategoryFilter, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
-import { openSpaceBuildings, type CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
-import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
+import { openSpaceBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
+import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useSmokingSpots } from '../../hooks/campusMap/useSmokingSpots.js';
@@ -146,20 +146,20 @@ export default function CampusMapView({ isActive }: Props) {
     selectStore(store, source);
   };
 
-  const pickBuilding = (building: CampusBuilding, source: SelectSource) => {
+  const pickBuilding = (building: PlottableBuilding, source: SelectSource) => {
     // 이미 건물 계열 칩(교내시설/오픈스페이스)이면 그대로 둔다 — 오픈스페이스 탐색 흐름을 끊지 않기 위해
     if (!isBuildingLayerChip) setChip('building');
     selectBuilding(building, source);
   };
 
-  const pickSmokingSpot = (spot: SmokingSpot, source: SelectSource) => {
+  const pickSmokingSpot = (spot: PlottableSmokingSpot, source: SelectSource) => {
     if (!isSmokingChip) setChip('smoking');
     selectSmokingSpot(spot, source);
   };
 
   // 검색에서 건물을 고르면 교내시설 레이어로 확정한다 — 오픈스페이스 칩이 켜져 있어도
   // 검색 결과는 오픈스페이스가 없는 건물일 수 있어서, 그대로 두면 마커가 안 뜬다
-  const selectBuildingFromSearch = (building: CampusBuilding) => {
+  const selectBuildingFromSearch = (building: PlottableBuilding) => {
     setChip('building');
     selectBuilding(building, 'search');
   };
@@ -239,10 +239,12 @@ export default function CampusMapView({ isActive }: Props) {
   const handleChipChange = (next: MapChip | null) => {
     setChip(next);
     // 칩을 바꾸면 어떤 종류든 선택은 초기화된다 (종류별로 지울 필요 없이 한 번에)
-    if (next !== 'all' && toStoreCategory(next)) {
-      browseCategory(); // 매장 카테고리 칩 선택 = 선택 해제 + 리스트 펼침
+    // 시트가 뜨는 칩(매장 카테고리·시설 계열)은 전부 '둘러보겠다'는 의도라 리스트를 펼친 채로 연다.
+    // '전체'와 칩 해제만 선택을 풀고 접어둔다 — 그땐 시트 자체가 뜨지 않는다.
+    if (next && next !== 'all') {
+      browseCategory();
     } else {
-      clearSelection(); // '전체'/시설 계열 칩/선택 해제 → 선택만 풀고 리스트는 접어둔다
+      clearSelection();
     }
     if (next === 'smoking') requestNearestSmoking();
     posthog?.capture('partner_map_chip_selected', { chip: next });
@@ -391,6 +393,8 @@ export default function CampusMapView({ isActive }: Props) {
           error={buildingsError}
           origin={distanceOrigin}
           variant={isOpenSpaceChip ? 'openspace' : 'facility'}
+          expanded={sheetExpanded}
+          onToggleExpand={setSheetExpanded}
           selected={selectedBuilding}
           onSelect={(b) => pickBuilding(b, 'list')}
           onClose={closeDetail}
@@ -401,6 +405,8 @@ export default function CampusMapView({ isActive }: Props) {
           loading={smokingLoading}
           error={smokingError}
           origin={distanceOrigin}
+          expanded={sheetExpanded}
+          onToggleExpand={setSheetExpanded}
           selected={selectedSmokingSpot}
           onSelect={(s) => pickSmokingSpot(s, 'list')}
           onClose={closeDetail}

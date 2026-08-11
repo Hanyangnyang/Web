@@ -1,5 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { hasCoords, visibleBuildings, hasOpenSpace, openSpaceBuildings, searchBuildings, type CampusBuilding } from './CampusBuilding.js';
+import { hasCoords, visibleBuildings, hasOpenSpace, openSpaceBuildings, allOpenSpaces, searchBuildings, type CampusBuilding } from './CampusBuilding.js';
+import type { OpenSpace } from './OpenSpace.js';
+
+function openSpace(overrides: Partial<OpenSpace> = {}): OpenSpace {
+  return {
+    id: 'openspace-01',
+    buildingId: 'building-301',
+    floor: '1층',
+    name: '오픈스페이스',
+    hint: null,
+    ...overrides,
+  };
+}
 
 // 테스트마다 필요한 필드만 덮어쓰기 위한 최소 건물
 function building(overrides: Partial<CampusBuilding> = {}): CampusBuilding {
@@ -21,20 +33,17 @@ function building(overrides: Partial<CampusBuilding> = {}): CampusBuilding {
 }
 
 describe('hasCoords / visibleBuildings', () => {
-  // 지오코딩에 실패한 건물은 0,0으로 남겨두기로 했다 (착공중·카카오맵 미등록 등)
-  it('좌표가 0,0이면 지도에 표시할 수 없는 건물로 본다', () => {
-    expect(hasCoords(building({ coordinates: { latitude: 0, longitude: 0 } }))).toBe(false);
+  // JSON이 '좌표 미확보'를 {0,0}으로 적는다는 사실은 매퍼(normalizeCoordinates)에서 끝난다.
+  // 도메인에 도착한 시점엔 null이거나 유효한 좌표, 둘 중 하나뿐이다.
+  it('coordinates가 null이면 지도에 표시할 수 없는 건물로 본다', () => {
+    expect(hasCoords(building({ coordinates: null }))).toBe(false);
     expect(hasCoords(building())).toBe(true);
-  });
-
-  it('위도·경도 중 하나만 0이어도 유효한 좌표로 인정한다', () => {
-    expect(hasCoords(building({ coordinates: { latitude: 0, longitude: 126.8 } }))).toBe(true);
   });
 
   it('visibleBuildings는 좌표 미확보 건물을 걸러낸다', () => {
     const list = [
       building({ id: 'a' }),
-      building({ id: 'b', coordinates: { latitude: 0, longitude: 0 } }),
+      building({ id: 'b', coordinates: null }),
     ];
     expect(visibleBuildings(list).map((b) => b.id)).toEqual(['a']);
   });
@@ -43,15 +52,27 @@ describe('hasCoords / visibleBuildings', () => {
 describe('hasOpenSpace / openSpaceBuildings', () => {
   it('openSpaces가 비어있지 않은 건물만 오픈스페이스로 본다', () => {
     expect(hasOpenSpace(building())).toBe(false);
-    expect(hasOpenSpace(building({ openSpaces: ['1층 오픈스페이스'] }))).toBe(true);
+    expect(hasOpenSpace(building({ openSpaces: [openSpace()] }))).toBe(true);
   });
 
   it('openSpaceBuildings는 오픈스페이스가 있는 건물만 남긴다', () => {
     const list = [
-      building({ id: 'a', openSpaces: ['1층 오픈스페이스'] }),
+      building({ id: 'a', openSpaces: [openSpace()] }),
       building({ id: 'b' }),
     ];
     expect(openSpaceBuildings(list).map((b) => b.id)).toEqual(['a']);
+  });
+
+  // 헤더의 "오픈스페이스 N곳"은 건물이 아니라 공간을 센다 —
+  // 한 건물이 여러 개를 가질 수 있어(제1공학관 2개, 융합교육관 3개) 둘이 어긋난다
+  it('allOpenSpaces는 건물 수가 아니라 공간 수를 센다', () => {
+    const list = [
+      building({ id: 'a', openSpaces: [openSpace({ id: 'os-1' }), openSpace({ id: 'os-2' })] }),
+      building({ id: 'b', openSpaces: [openSpace({ id: 'os-3' })] }),
+      building({ id: 'c' }),
+    ];
+    expect(openSpaceBuildings(list)).toHaveLength(2);
+    expect(allOpenSpaces(list).map((s) => s.id)).toEqual(['os-1', 'os-2', 'os-3']);
   });
 });
 
@@ -91,7 +112,7 @@ describe('searchBuildings', () => {
   });
 
   it('좌표가 없는 건물은 검색 결과에서도 제외한다', () => {
-    const withGhost = [...buildings, building({ id: 'ghost', name: '셔틀콕별관', coordinates: { latitude: 0, longitude: 0 } })];
+    const withGhost = [...buildings, building({ id: 'ghost', name: '셔틀콕별관', coordinates: null })];
     expect(searchBuildings(withGhost, '셔틀콕').map((b) => b.id)).toEqual(['306']);
   });
 });

@@ -3,17 +3,12 @@
 // Map 컴포넌트의 center/level prop은 초기값만 넘기고 이후엔 이 훅을 통해서만 제어한다
 import { useCallback, useState } from 'react';
 
-// 학교 앞 상권이 화면에 꽉 차는 기본 확대 수준 (1=최대 확대)
 export const DEFAULT_LEVEL = 3;
-// 매장 포커스 시 맞추는 확대 수준 — 너무 바짝 당기면 주변 건물·길이 하나도 안 보여서
-// 기본 배율(DEFAULT_LEVEL)과 같은 수준으로 둔다. 이미 이 배율이면 줌 변화 없이 이동만 한다.
 const FOCUS_LEVEL = DEFAULT_LEVEL;
 
 export function useCampusMapFocus() {
   const [map, setMap] = useState<kakao.maps.Map | null>(null);
-  // 마커 렌더링 재계산용 — 사용자 핀치줌·imperative 줌 모두 onZoomChanged로 동기화
   const [level, setLevel] = useState(DEFAULT_LEVEL);
-
   const onZoomChanged = useCallback((m: kakao.maps.Map) => setLevel(m.getLevel()), []);
 
   /**
@@ -50,6 +45,7 @@ export function useCampusMapFocus() {
     map.panTo(center);
   }, [map]);
 
+  // 지도 중심을 특정 좌표로 이동한다. 시트 높이와 상관없이 화면 정중앙에 맞춘다.
   const panTo = useCallback((lat: number, lng: number) => {
     map?.panTo(new kakao.maps.LatLng(lat, lng));
   }, [map]);

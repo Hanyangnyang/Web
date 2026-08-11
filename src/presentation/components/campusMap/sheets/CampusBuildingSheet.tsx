@@ -1,6 +1,7 @@
 // 지도 하단 바텀시트: 교내시설 — 지금 화면에 보이는 건물 리스트(+거리) / 개별 건물 상세
 import { X } from 'lucide-react';
-import type { CampusBuilding } from '../../../../domain/entities/CampusBuilding.js';
+import { allOpenSpaces, type CampusBuilding, type PlottableBuilding } from '../../../../domain/entities/CampusBuilding.js';
+import { openSpaceLabel } from '../../../../domain/entities/OpenSpace.js';
 import type { LatLng } from '../../../../lib/campusGeo.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { collegeStyleByName } from '../../ui/collegeStyle.js';
@@ -11,13 +12,15 @@ import { NearbyListSheet } from './NearbyListSheet';
 export type BuildingSheetVariant = 'facility' | 'openspace';
 
 interface Props {
-  buildings: CampusBuilding[];
+  buildings: PlottableBuilding[];        // 좌표가 확정된 건물만 (visibleBuildings로 걸러 넘긴다)
   loading: boolean;
   error: string | null;
   origin: LatLng | null; // 거리 계산 기준점 (내 위치 또는 화면 중심)
   variant: BuildingSheetVariant;
+  expanded: boolean;
+  onToggleExpand: (expanded: boolean) => void;
   selected: CampusBuilding | null;
-  onSelect: (building: CampusBuilding) => void;
+  onSelect: (building: PlottableBuilding) => void;
   onClose: () => void;                       // 상세 닫기 → 목록으로 복귀
 }
 
@@ -36,7 +39,7 @@ const VARIANT_META: Record<BuildingSheetVariant, { title: string; emoji: string;
   },
 };
 
-export function CampusBuildingSheet({ buildings, loading, error, origin, variant, selected, onSelect, onClose }: Props) {
+export function CampusBuildingSheet({ buildings, loading, error, origin, variant, expanded, onToggleExpand, selected, onSelect, onClose }: Props) {
   const meta = VARIANT_META[variant];
 
   // ── 상세 모드 ──
@@ -111,7 +114,11 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
               <p className="text-[11px] font-bold text-text-hint mb-1.5">오픈스페이스</p>
               <ul className="space-y-1">
                 {selected.openSpaces.map((space) => (
-                  <li key={space} className="text-[11px] text-text-main font-medium">· {space}</li>
+                  <li key={space.id} className="text-[11px] text-text-main font-medium">
+                    · {openSpaceLabel(space)}
+                    {/* 찾아가는 요령은 이름과 무게를 달리해 한눈에 구분되게 (예전엔 한 문자열이라 전부 같은 굵기였다) */}
+                    {space.hint && <span className="text-text-hint font-normal"> — {space.hint}</span>}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -129,8 +136,11 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
       error={error}
       origin={origin}
       height={toCssHeight(BUILDING_LIST_FRACTION)}
+      expanded={expanded}
+      onToggleExpand={onToggleExpand}
       emoji={meta.emoji}
       title={meta.title}
+      count={variant === 'openspace' ? allOpenSpaces(buildings).length : undefined}
       countColorClass="text-[#D97706]"
       emptyText={meta.empty}
       onSelect={onSelect}
@@ -140,7 +150,7 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
           {/* 오픈스페이스 모드에선 들어가기 전에 어떤 공간인지 목록에서 바로 보이게 한다 */}
           {variant === 'openspace' && (
             <span className="block text-[11px] text-text-hint font-medium truncate mt-0.5">
-              {b.openSpaces.join(' · ')}
+              {b.openSpaces.map(openSpaceLabel).join(' · ')}
             </span>
           )}
         </>

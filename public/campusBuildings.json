@@ -34,7 +34,12 @@
     "description": "",
     "primaryColleges": [],
     "openSpaces": [
-      "3층 오픈스페이스(국제처와 카페 ING 사이)"
+      {
+        "id": "openspace-01",
+        "floor": "3층",
+        "name": "오픈스페이스",
+        "hint": "국제처와 카페ING 사이"
+      }
     ],
     "facilities": [
       "학생식당",
@@ -151,8 +156,8 @@
     "aliases": [],
     "campus": "ANSAN",
     "coordinates": {
-      "latitude": 0,
-      "longitude": 0
+      "latitude": null,
+      "longitude": null
     },
     "description": "착공중",
     "primaryColleges": [],
@@ -195,7 +200,11 @@
       "디자인대학"
     ],
     "openSpaces": [
-      "1층 오픈스페이스"
+      {
+        "id": "openspace-02",
+        "floor": "1층",
+        "name": "오픈스페이스"
+      }
     ],
     "facilities": [],
     "imageUrl": []
@@ -278,7 +287,11 @@
       "글로벌문화통상대학"
     ],
     "openSpaces": [
-      "1층 꿈의둥지"
+      {
+        "id": "openspace-03",
+        "floor": "1층",
+        "name": "꿈의둥지"
+      }
     ],
     "facilities": [],
     "imageUrl": []
@@ -347,7 +360,12 @@
       "첨단융합대학"
     ],
     "openSpaces": [
-      "1층 오픈스페이스(정문 들어가자마자)"
+      {
+        "id": "openspace-04",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": "정문 들어가자마자"
+      }
     ],
     "facilities": [],
     "imageUrl": []
@@ -391,7 +409,12 @@
       "첨단융합대학"
     ],
     "openSpaces": [
-      "1층 오픈스페이스(정문 들어가서 왼쪽)"
+      {
+        "id": "openspace-05",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": "정문 들어가서 왼쪽"
+      }
     ],
     "facilities": [],
     "imageUrl": []
@@ -451,8 +474,17 @@
       "공학대학"
     ],
     "openSpaces": [
-      "1층 해동열람실(정문 들어가서 오른쪽)",
-      "3층 한자공열람실"
+      {
+        "id": "openspace-06",
+        "floor": "1층",
+        "name": "해동열람실",
+        "hint": "정문 들어가서 오른쪽"
+      },
+      {
+        "id": "openspace-07",
+        "floor": "3층",
+        "name": "한자공열람실"
+      }
     ],
     "facilities": [],
     "imageUrl": []
@@ -537,7 +569,11 @@
       "공학대학"
     ],
     "openSpaces": [
-      "1층 해동열람실"
+      {
+        "id": "openspace-08",
+        "floor": "1층",
+        "name": "해동열람실"
+      }
     ],
     "facilities": [],
     "imageUrl": []
@@ -773,9 +809,21 @@
       "LIONS칼리지"
     ],
     "openSpaces": [
-      "1층 오픈스페이스",
-      "2층 오픈스페이스",
-      "5층 오픈스페이스"
+      {
+        "id": "openspace-09",
+        "floor": "1층",
+        "name": "오픈스페이스"
+      },
+      {
+        "id": "openspace-10",
+        "floor": "2층",
+        "name": "오픈스페이스"
+      },
+      {
+        "id": "openspace-11",
+        "floor": "5층",
+        "name": "오픈스페이스"
+      }
     ],
     "facilities": [
       "카페"
@@ -799,7 +847,10 @@
     "description": "",
     "primaryColleges": [],
     "openSpaces": [
-      "열람실"
+      {
+        "id": "openspace-12",
+        "name": "열람실"
+      }
     ],
     "facilities": [
       "무인인쇄/프린트기",
@@ -902,7 +953,12 @@
     "description": "",
     "primaryColleges": [],
     "openSpaces": [
-      "1층 오픈스페이스(기숙사식당 왼쪽)"
+      {
+        "id": "openspace-13",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": "기숙사식당 왼쪽"
+      }
     ],
     "facilities": [
       "기숙사식당",

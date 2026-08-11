@@ -14,7 +14,6 @@ const HEAD_D = 14;
 const HEAD_D_SELECTED = 18;
 const TAIL_H = 12;
 const TAIL_H_SELECTED = 15;
-// 꼬리 폭 = 머리 지름의 이 비율 — 작을수록 더 뾰족하고 날렵해 보인다
 const TAIL_WIDTH_RATIO = 0.42;
 
 export function MapPinMarker({ selected, onClick, ariaLabel }: Props) {

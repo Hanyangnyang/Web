@@ -5,12 +5,8 @@
 /** 핀 머리와 축소 상태의 점 — 채움(fill)이라 밝은 톤이어도 잘 보인다 */
 export const MARKER_COLOR = '#EF4444';
 
-/**
- * 선택된 매장 이름표 — 앱 기본 남색(tailwind primary).
- * 한때 마커와 같은 빨강으로 맞춰봤지만, 주변에 빨간 점이 깔려 있어 오히려 묻혔다.
- * 마커(빨강)와 다른 색이라야 "여기가 지금 고른 곳"이 배경에서 떠오른다.
- */
+/** 선택된 매장 이름표 — 앱 기본 남색(tailwind primary) */
 export const MARKER_LABEL_SELECTED_COLOR = '#0E4A84';
 
-/** 선택되지 않은 이름표 (기본 본문 색) */
+/** 선택되지 않은 이름표 - 기본 본문 색 */
 export const MARKER_LABEL_COLOR = '#334155';

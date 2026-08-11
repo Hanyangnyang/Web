@@ -1,9 +1,8 @@
-// 교내시설·흡연장 목록 시트의 공통 껍데기.
-// 둘 다 "기준점에서 가까운 순으로 나열하고, 각 행에 거리를 보여준다"는 구조가 같아서
-// 항목 타입만 다른 채로 50줄씩 복붙돼 있었다. 다른 건 행 안의 텍스트뿐이라 그것만 주입받는다.
+// 교내시설·흡연장 목록 시트의 공통 껍데기
 import { ChevronRight } from 'lucide-react';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
-import { NAV_CLEARANCE_CLASS } from './sheetMetrics';
+import { NAV_CLEARANCE_CLASS, LIST_COLLAPSED_CSS } from './sheetMetrics';
+import { SheetHandle } from './SheetHandle';
 import { formatDistance, sortByDistance, type LatLng } from '../../../../lib/campusGeo.js';
 import type { Coordinates } from '../../../../domain/entities/Coordinates.js';
 
@@ -13,34 +12,47 @@ export interface NearbyListSheetProps<T extends { id: string; coordinates: Coord
   loading: boolean;
   error: string | null;
   origin: LatLng | null;              // 거리 기준점 (내 위치 → 프리페치 좌표 → 화면 중심)
-  height: string;                     // 시트 높이 (CSS 길이)
-  // 헤더 제목 앞에 붙는 레이어 상징 이모지. 행마다 반복하면 51줄 내내 같은 아이콘이 세로로 늘어서서
-  // 정작 이름을 밀어낼 뿐 아무것도 구분해주지 못하므로, 목록 전체를 대표하는 자리에만 한 번 둔다.
+  height: string;                     // 펼쳤을 때 시트 높이 (CSS 길이). 접히면 한 줄만 남는다
+  expanded: boolean;
+  onToggleExpand: (expanded: boolean) => void;
   emoji: string;
   title: string;                      // 예: '교내시설'
+  // 헤더에 표시할 개수. 목록 행 수와 다를 수 있어 따로 받는다 —
+  // 오픈스페이스는 건물이 아니라 그 안의 공간을 센다(건물 10곳에 공간 13개). 없으면 행 수를 쓴다.
+  count?: number;
   countColorClass: string;            // 개수 강조 색 (레이어별로 다름)
   emptyText: string;                  // 조사(이/가) 때문에 문장을 통째로 받는다
   renderLabel: (item: T) => React.ReactNode;  // 행의 이름/부제 영역
-  // 거리 앞에 붙일 배지. 레이어마다 강조할 게 달라 판단은 호출부에 맡긴다 (없으면 아무것도 안 붙는다)
   renderBadge?: (item: T) => React.ReactNode;
   onSelect: (item: T) => void;
 }
 
 export function NearbyListSheet<T extends { id: string; coordinates: Coordinates }>({
-  items, loading, error, origin, height, emoji, title, countColorClass, emptyText,
+  items, loading, error, origin, height, expanded, onToggleExpand,
+  emoji, title, count, countColorClass, emptyText,
   renderLabel, renderBadge, onSelect,
 }: NearbyListSheetProps<T>) {
   const rows = sortByDistance(items, origin, (item) => item.coordinates);
 
   return (
-    <StandardBottomSheet height={height}>
-      <div className="flex items-baseline justify-between gap-2 px-4 pt-3 pb-2 border-b border-[#f1f5f9]">
-        <p className="text-[13px] font-extrabold text-text-main">
-          <span className="mr-1 text-[15px]">{emoji}</span>
-          {title} <span className={countColorClass}>{items.length}</span>곳
-        </p>
-        {origin && <span className="flex-shrink-0 text-[11px] font-bold text-text-hint">가까운 순</span>}
-      </div>
+    <StandardBottomSheet height={expanded ? height : LIST_COLLAPSED_CSS}>
+      <SheetHandle
+        expanded={expanded}
+        onToggleExpand={onToggleExpand}
+        className="border-b border-[#f1f5f9]"
+      >
+        <div className="flex items-baseline justify-between gap-2">
+          {/* 타이틀도 눌러서 접었다 펼 수 있게 — 손잡이만 정확히 집기엔 너무 얇다 */}
+          <button
+            className="text-left text-[13px] font-extrabold text-text-main [-webkit-tap-highlight-color:transparent]"
+            onClick={() => onToggleExpand(!expanded)}
+          >
+            <span className="mr-1 text-[15px]">{emoji}</span>
+            {title} <span className={countColorClass}>{count ?? items.length}</span>곳
+          </button>
+          {origin && <span className="flex-shrink-0 text-[11px] font-bold text-text-hint">가까운 순</span>}
+        </div>
+      </SheetHandle>
 
       <div className={`flex-1 overflow-y-auto ${NAV_CLEARANCE_CLASS}`}>
         {/* 실패·로딩·빈 목록은 서로 다른 상황이라 문구도 구분한다 */}

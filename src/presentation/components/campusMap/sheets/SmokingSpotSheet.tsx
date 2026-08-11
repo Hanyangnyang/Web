@@ -1,19 +1,21 @@
 // 지도 하단 바텀시트: 흡연장 — 지금 화면에 보이는 흡연 부스/구역 리스트(+거리) / 개별 상세
 import { useMemo } from 'react';
 import { X } from 'lucide-react';
-import type { SmokingSpot } from '../../../../domain/entities/SmokingSpot.js';
+import type { PlottableSmokingSpot } from '../../../../domain/entities/SmokingSpot.js';
 import { nearestTo, type LatLng } from '../../../../lib/campusGeo.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { SMOKING_DETAIL_FRACTION, SMOKING_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
 import { NearbyListSheet } from './NearbyListSheet';
 
 interface Props {
-  spots: SmokingSpot[];
+  spots: PlottableSmokingSpot[];   // 좌표가 확정된 흡연장만 (visibleSmokingSpots로 걸러 넘긴다)
   loading: boolean;
   error: string | null;
   origin: LatLng | null;  // 거리 계산 기준점 (내 위치 또는 화면 중심)
-  selected: SmokingSpot | null;
-  onSelect: (spot: SmokingSpot) => void;
+  expanded: boolean;
+  onToggleExpand: (expanded: boolean) => void;
+  selected: PlottableSmokingSpot | null;
+  onSelect: (spot: PlottableSmokingSpot) => void;
   onClose: () => void;                          // 상세 닫기 → 목록으로 복귀
 }
 
@@ -27,7 +29,7 @@ function NearestBadge() {
   );
 }
 
-export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSelect, onClose }: Props) {
+export function SmokingSpotSheet({ spots, loading, error, origin, expanded, onToggleExpand, selected, onSelect, onClose }: Props) {
   // 기준점이 없으면 null이 되어 어디에도 배지가 붙지 않는다 — 거리를 모르는데 '가장 가까운 곳'이라 할 수 없다
   const nearestId = useMemo(
     () => nearestTo(spots, origin, (s) => s.coordinates)?.id ?? null,
@@ -70,13 +72,14 @@ export function SmokingSpotSheet({ spots, loading, error, origin, selected, onSe
       error={error}
       origin={origin}
       height={toCssHeight(SMOKING_LIST_FRACTION)}
+      expanded={expanded}
+      onToggleExpand={onToggleExpand}
       emoji="🚬"
       title="흡연장"
       countColorClass="text-[#475569]"
       emptyText="표시할 흡연장이 없어요"
       onSelect={onSelect}
       renderLabel={(s) => (
-        // 이름에 이미 '흡연부스'·'흡연구역'이 들어있어 유형 라벨은 같은 말을 두 번 하는 셈이라 뺐다
         <span className="block text-[14px] font-extrabold text-text-main truncate">{s.name}</span>
       )}
       renderBadge={(s) => (s.id === nearestId ? <NearestBadge /> : null)}

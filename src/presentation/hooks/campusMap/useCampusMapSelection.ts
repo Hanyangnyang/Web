@@ -6,14 +6,14 @@
 // 판별 유니온 하나로 바꿔 그 규칙을 타입 차원에서 강제한다 — 애초에 둘을 동시에 담을 수 없다.
 import { useCallback, useRef, useState } from 'react';
 import type { PartnerStore } from '../../../domain/entities/PartnerStore.js';
-import type { CampusBuilding } from '../../../domain/entities/CampusBuilding.js';
-import type { SmokingSpot } from '../../../domain/entities/SmokingSpot.js';
+import type { PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
+import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 
 // 선택한 '대상 자체' — 지도 포커스처럼 좌표가 당장 필요한 곳에 넘긴다
 export type MapSelection =
   | { kind: 'store'; store: PartnerStore }
-  | { kind: 'building'; building: CampusBuilding }
-  | { kind: 'smoking'; spot: SmokingSpot };
+  | { kind: 'building'; building: PlottableBuilding }
+  | { kind: 'smoking'; spot: PlottableSmokingSpot };
 
 // 상태로 들고 있는 건 종류+id뿐이다. 객체를 통째로 담아두면 그 순간의 스냅샷이 되어,
 // 데이터가 갱신(RQ 재요청)돼도 열려 있는 상세 시트는 옛 내용을 계속 보여준다.
@@ -32,8 +32,6 @@ function toRef(selection: MapSelection): MapSelectionRef {
 }
 
 // 어디서 선택했는지 — 어느 경로가 실제로 쓰이는지 보려고 계측에 함께 싣는다.
-// nearest: 사용자가 고른 게 아니라 칩을 켜자마자 가장 가까운 곳이 자동으로 골라진 경우 —
-// 이 자동 선택이 실제로 도움이 되는지(바로 다른 곳을 다시 고르지는 않는지) 보려면 구분돼야 한다.
 export type SelectSource = 'marker' | 'list' | 'search' | 'nearest';
 export type StoreSelectSource = SelectSource | 'random'; // 매장만 점메추(random) 경로가 있다
 
@@ -65,8 +63,8 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
     onAfterSelect?.();
   }, [select, posthog, onAfterSelect]);
 
-  const selectBuilding = useCallback((building: CampusBuilding, source: SelectSource) => {
-    returnToList.current = false;
+  const selectBuilding = useCallback((building: PlottableBuilding, source: SelectSource) => {
+    returnToList.current = source === 'list';
     select({ kind: 'building', building });
     posthog?.capture('partner_map_building_selected', {
       building_id: building.id, building_name: building.name, source,
@@ -74,8 +72,8 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
     onAfterSelect?.();
   }, [select, posthog, onAfterSelect]);
 
-  const selectSmokingSpot = useCallback((spot: SmokingSpot, source: SelectSource) => {
-    returnToList.current = false;
+  const selectSmokingSpot = useCallback((spot: PlottableSmokingSpot, source: SelectSource) => {
+    returnToList.current = source === 'list' || source === 'nearest';
     select({ kind: 'smoking', spot });
     posthog?.capture('partner_map_smoking_selected', {
       spot_id: spot.id, spot_name: spot.name, spot_type: spot.type, source,
@@ -105,7 +103,6 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
   }, []);
 
   return {
-    // 실제 대상은 호출부가 최신 목록에서 id로 찾아 쓴다 (아래 selectedBy 헬퍼 참고)
     selection,
     sheetExpanded,
     setSheetExpanded,
