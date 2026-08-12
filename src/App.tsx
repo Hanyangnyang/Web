@@ -13,7 +13,8 @@ import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
 import { OfflineModal } from './presentation/components/common/OfflineModal';
-import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
+import { prefetchWeather }       from './presentation/hooks/useWeather.js';
+import { prefetchLibraryStatus } from './presentation/hooks/useLibraryStatus.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
@@ -106,7 +107,8 @@ function MainLayout() {
   // 2. 데이터 프리패치 - 앱 시작 시 필요한 데이터를 백그라운드에서 미리 로드
   const { menuDate, cafes, menuLoading, menuRevalidating, changeDate } = useMenu();
   useEffect(() => {
-    prefetchPortalData();
+    prefetchWeather();
+    prefetchLibraryStatus();
     prefetchBanners();
     prefetchShuttleSchedule();
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)

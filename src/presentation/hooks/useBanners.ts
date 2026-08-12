@@ -14,11 +14,12 @@ export function prefetchBanners() {
 export interface UseBannersResult {
   banners: Banner[];
   loading: boolean;
+  error: Error | null;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────
 export function useBanners(isVisible = true): UseBannersResult {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: BANNERS_QUERY_KEY,
     queryFn: () => getBannersUseCase.execute(),
     staleTime: CACHE_TTL,
@@ -28,5 +29,6 @@ export function useBanners(isVisible = true): UseBannersResult {
   return {
     banners: data || [],
     loading: isLoading,
+    error,
   };
 }
