@@ -6,7 +6,6 @@ import type { Banner } from '../../domain/entities/Banner.js';
 const CACHE_TTL = 86400000; // 24시간 (배너는 거의 바뀌지 않아 하루 주기)
 const BANNERS_QUERY_KEY = ['banners'];
 
-// ─── 공개 Prefetch 함수 (App.jsx 에서 앱 시작 시 호출) ─────────────
 export function prefetchBanners() {
   return queryClient.prefetchQuery({ queryKey: BANNERS_QUERY_KEY, queryFn: () => getBannersUseCase.execute(), staleTime: CACHE_TTL });
 }
@@ -17,7 +16,6 @@ export interface UseBannersResult {
   error: Error | null;
 }
 
-// ─── Hook ─────────────────────────────────────────────────────────
 export function useBanners(isVisible = true): UseBannersResult {
   const { data, isLoading, error } = useQuery({
     queryKey: BANNERS_QUERY_KEY,

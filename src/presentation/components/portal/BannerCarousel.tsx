@@ -4,9 +4,6 @@ import type { Banner } from '../../../domain/entities/Banner.js';
 interface BannerCarouselProps {
   banners: Banner[];
   loading: boolean;
-  // 배너는 부가 콘텐츠라 실패해도 화면에는 아무것도 띄우지 않는다("배너를 못 불러왔습니다"는
-  // 사용자에게 의미 없는 노이즈라서). 다만 실패를 삼키지는 않도록 여기까지 전달해두고,
-  // 어떻게 알릴지(Sentry 보고 등)는 추후 결정한다.
   error?: Error | null;
 }
 
@@ -97,7 +94,7 @@ export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
     }
   };
 
-  // 스켈레톤 
+  // 1. 스켈레톤 
   if (loading) {
     return (
       <div className="mb-3 mt-2">
@@ -106,10 +103,10 @@ export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
     );
   }
 
-  // 배너 0개일때 
+  // 2. 배너 0개일때 
   if (!banners.length) return null;
 
-  // 배너 1개 이상일때
+  //  배너 1개 이상일때
   return (
     <div className="mb-3 mt-2 [animation:fadeIn_0.4s_ease-out]">
       <div
