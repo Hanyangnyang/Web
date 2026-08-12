@@ -1,4 +1,4 @@
-import { Info } from 'lucide-react';
+import { Info, WifiOff } from 'lucide-react';
 import type { LibraryStatus } from '../../../domain/repositories/ILibraryRepository.js';
 import type { LibraryRoomStatus } from '../../../domain/entities/LibraryRoom.js';
 import { formatKSTHourMinute } from '../../../utils/time.js';
@@ -13,11 +13,11 @@ const STATUS_STYLE: Record<LibraryRoomStatus, { color: string; emoji: string }> 
 interface LibraryStatusCardProps {
   library: LibraryStatus | null;
   loading: boolean;
+  error?: Error | null;
 }
 
-export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) {
-  const updatedAtLabel = library ? formatKSTHourMinute(library.updatedAt) : null;
-
+// 제목 줄은 어느 상태에서든 같은 자리에 있어야 해서 껍데기를 공통으로 둔다
+function Section({ updatedAtLabel, children }: { updatedAtLabel?: string | null; children: React.ReactNode }) {
   return (
     <section className="mb-6">
       <div className="flex items-baseline justify-between gap-2 mb-2">
@@ -28,67 +28,93 @@ export function LibraryStatusCard({ library, loading }: LibraryStatusCardProps) 
           </span>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {loading ? (
-          [1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 animate-pulse">
-              <div className="flex items-center justify-between gap-2">
-                <div className="h-4 w-2/3 bg-slate-100 rounded-full" />
-                <div className="h-4 w-10 bg-slate-100 rounded-md flex-shrink-0" />
-              </div>
-              <div className="mt-auto">
-                <div className="w-full h-2 bg-slate-100 rounded-full" />
-                <div className="flex justify-between items-center mt-2.5">
-                  <div className="h-3 w-16 bg-slate-100 rounded-full" />
-                  <div className="h-3 w-12 bg-slate-100 rounded-full" />
-                </div>
+      <div className="grid grid-cols-2 gap-3">{children}</div>
+    </section>
+  );
+}
+
+function Notice({ icon, message }: { icon: React.ReactNode; message: string }) {
+  return (
+    <div className="col-span-2 bg-white rounded-card border border-slate-200 py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
+      {icon}
+      <p className="text-center text-text-sub text-sm font-semibold">{message}</p>
+    </div>
+  );
+}
+
+export function LibraryStatusCard({ library, loading, error }: LibraryStatusCardProps) {
+  // 1. 첫 로딩 — 스켈레톤
+  if (loading) {
+    return (
+      <Section>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 animate-pulse">
+            <div className="flex items-center justify-between gap-2">
+              <div className="h-4 w-2/3 bg-slate-100 rounded-full" />
+              <div className="h-4 w-10 bg-slate-100 rounded-md flex-shrink-0" />
+            </div>
+            <div className="mt-auto">
+              <div className="w-full h-2 bg-slate-100 rounded-full" />
+              <div className="flex justify-between items-center mt-2.5">
+                <div className="h-3 w-16 bg-slate-100 rounded-full" />
+                <div className="h-3 w-12 bg-slate-100 rounded-full" />
               </div>
             </div>
-          ))
-        ) : library?.list ? (
-          library.list.map((room) => {
-            const { color, emoji } = STATUS_STYLE[room.status];
-            return (
-              <div key={room.id} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
-                <div className="flex items-center justify-between gap-2 min-w-0">
-                  <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
-                    {room.name.replace(' (2F)', '').replace(' (4F)', '')}
-                  </span>
-                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0" style={{
-                    backgroundColor: `${color}15`,
-                    color,
-                    border: `1px solid ${color}25`
-                  }}>
-                    {emoji} {room.status}
-                  </div>
-                </div>
-
-                <div className="mt-auto">
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                    <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
-                      width: `${room.ratio * 100}%`,
-                      backgroundColor: color
-                    }} />
-                  </div>
-                  <div className="flex justify-between items-center mt-2.5">
-                    <span className="text-[12px] text-slate-700 font-black">
-                      {room.available}석 남음
-                    </span>
-                    <span className="text-[11px] text-[#475569] font-bold">
-                      {room.occupied} / {room.total}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="col-span-2 bg-white rounded-card border border-slate-200 py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
-            <Info size={20} className="text-text-hint" />
-            <p className="text-center text-text-sub text-sm font-semibold">혼잡도 정보를 불러올 수 없습니다</p>
           </div>
-        )}
-      </div>
-    </section>
+        ))}
+      </Section>
+    );
+  }
+
+  // 2. 조회 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
+  if (error && !library) {
+    return <Section><Notice icon={<WifiOff size={20} className="text-text-hint" />} message="혼잡도 정보를 불러오지 못했습니다" /></Section>;
+  }
+
+  // 3. 응답은 왔지만 열람실이 없음 — 방학 중 휴관 등. 빈 배열은 truthy라 length로 판단해야 한다.
+  if (!library?.list.length) {
+    return <Section><Notice icon={<Info size={20} className="text-text-hint" />} message="지금은 운영 중인 열람실이 없습니다" /></Section>;
+  }
+
+  // 4. 정상
+  return (
+    <Section updatedAtLabel={formatKSTHourMinute(library.updatedAt)}>
+      {library.list.map((room) => {
+        const { color, emoji } = STATUS_STYLE[room.status];
+        return (
+          <div key={room.id} className="bg-white rounded-card border border-slate-200 p-4 flex flex-col gap-3 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <span className="font-black text-[0.95rem] text-text-main leading-tight truncate flex-1 min-w-0">
+                {room.name.replace(' (2F)', '').replace(' (4F)', '')}
+              </span>
+              <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold flex-shrink-0" style={{
+                backgroundColor: `${color}15`,
+                color,
+                border: `1px solid ${color}25`
+              }}>
+                {emoji} {room.status}
+              </div>
+            </div>
+
+            <div className="mt-auto">
+              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
+                  width: `${room.ratio * 100}%`,
+                  backgroundColor: color
+                }} />
+              </div>
+              <div className="flex justify-between items-center mt-2.5">
+                <span className="text-[12px] text-slate-700 font-black">
+                  {room.available}석 남음
+                </span>
+                <span className="text-[11px] text-[#475569] font-bold">
+                  {room.occupied} / {room.total}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </Section>
   );
 }

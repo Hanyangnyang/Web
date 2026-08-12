@@ -16,7 +16,7 @@ interface PortalViewProps {
 
 export function PortalView({ isVisible = true }: PortalViewProps) {
   const { weather, loading: weatherLoading } = useWeather(isVisible);
-  const { library, loading: libraryLoading } = useLibraryStatus(isVisible);
+  const { library, loading: libraryLoading, error: libraryError } = useLibraryStatus(isVisible);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
@@ -59,7 +59,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
         <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} />
 
         {/* 3. 열람실 혼잡도 섹션 */}
-        <LibraryStatusCard library={library} loading={libraryLoading} />
+        <LibraryStatusCard library={library} loading={libraryLoading} error={libraryError} />
       </div>
     </>
   );
