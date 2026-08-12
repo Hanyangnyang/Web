@@ -3,7 +3,7 @@ import { createLibraryRoom } from '../../domain/entities/LibraryRoom.js';
 import type { LibraryApiDataSource, ReadingRoomDto } from '../datasources/LibraryApiDataSource.js';
 import type { LibraryRepository } from '../../domain/repositories/ILibraryRepository.js';
 
-// 화면 노출 순서를 열람실 코드로 고정한다 (서버 응답 순서에 기대지 않음)
+// 화면 노출 순서를 열람실 코드로 고정한다 
 const LIBRARY_SORT_ORDER: ReadingRoomDto['room'][] = [
   'FIRST_READING_ROOM',
   'SECOND_READING_ROOM',

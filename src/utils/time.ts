@@ -27,18 +27,12 @@ export function getKSTNow(): Date {
   return new Date(year, month, date, hours, minutes);
 }
 
-// 서버가 준 시각(ISO 8601)을 KST 'HH:MM'으로. 기기 타임존과 무관하게 같은 값이 나온다.
-// 파싱 불가한 값이면 null — 호출부에서 표시를 생략하라는 뜻.
-// ⚠️ 입력 문자열에 타임존(Z 또는 +09:00)이 있어야 한다. 없으면 JS가 기기 로컬 시각으로
-// 해석해서, 이미 KST인 기기에서는 9시간이 중복으로 밀린다.
-export function formatKSTHourMinute(value: string | Date): string | null {
-  const time = new Date(value).getTime();
-  if (Number.isNaN(time)) return null;
+// 서버가 준 시각 문자열에서 'HH:MM'만 뽑는다. 형식이 안 맞으면 null(= 표시 생략).
+const HOUR_MINUTE = /^\d{4}-\d{2}-\d{2}[T ](\d{2}):(\d{2})/;
 
-  const shifted = new Date(time + 9 * 60 * 60 * 1000);
-  const hours = String(shifted.getUTCHours()).padStart(2, '0');
-  const minutes = String(shifted.getUTCMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
+export function formatKSTHourMinute(value: string): string | null {
+  const matched = HOUR_MINUTE.exec(value);
+  return matched ? `${matched[1]}:${matched[2]}` : null;
 }
 
 // KST 기준 오늘 날짜 키 (YYYY-MM-DD)

@@ -33,12 +33,9 @@ import { createSubmitFeedbackUseCase } from './domain/usecases/SubmitFeedbackUse
 import { createShuttleDataSource } from './data/datasources/ShuttleDataSource.js';
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
 
-// Infrastructure
-// 기존 Vercel BFF(/api/*) 전용 — 같은 origin 상대경로
+// 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
-// 새 백엔드 전용 - 마이그레이션된 DataSource부터 하나씩 이걸로 옮겨 붙인다.
-// 개발 중에는 vite.config.js의 dev 프록시(/backend)를 경유해 CORS를 우회한다.
-// 프로덕션에는 그 프록시가 없으므로 실제 주소로 직접 나간다 — 백엔드 CORS 허용이 필요하다.
+// 새 백엔드 전용 
 const apiHttpClient = createHttpClient({
   baseUrl: import.meta.env.DEV ? '/backend' : import.meta.env.VITE_API_BASE_URL,
 });

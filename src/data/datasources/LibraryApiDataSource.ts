@@ -11,7 +11,7 @@ export interface ReadingRoomDto {
 
 export interface AvailableSeatResponseDto {
   readingRooms: ReadingRoomDto[];
-  updatedAt: string; // ISO 8601 date-time
+  updatedAt: string;
 }
 
 export interface LibraryApiDataSource {
