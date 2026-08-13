@@ -75,7 +75,12 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      data-nosnippet: 구글이 본문에서 스니펫을 자체 생성하지 않고 meta description을 쓰도록 유도한다.
+      탭 5개가 display:none으로 전부 DOM에 상주해 제휴 정보 등 엉뚱한 텍스트가 스니펫으로 잘려 나갔다.
+      색인·랭킹에는 영향이 없으며, 페이지가 여러 URL로 분리되면 반드시 제거할 것.
+    -->
+    <div id="root" data-nosnippet></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
