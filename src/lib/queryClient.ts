@@ -1,11 +1,26 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryCache } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { initSentry } from './sentry.js';
 
 // 앱 전역에서 하나만 쓰는 QueryClient.
 // usePortalData/useBanners의 훅(useQuery)과 App.jsx의 prefetch 호출(queryClient.prefetchQuery)이
 // 항상 같은 캐시를 보도록 이 인스턴스를 공유한다.
 export const queryClient = new QueryClient({
+  // 쿼리 실패는 react-query가 삼켜서 error 상태로 바꾸기 때문에, 전역 에러 핸들러까지 도달하지 않는다.
+  // 여기서 한 번 모아 보내지 않으면 모든 API 실패가 Sentry에 전혀 남지 않는다.
+  // (재시도를 모두 소진하고 최종 실패했을 때만 호출된다)
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      if (!import.meta.env.PROD) return; // 개발 중엔 어차피 Sentry가 비활성이라 SDK만 헛로드된다
+      if (navigator.onLine === false) return; // 기기가 오프라인일 때의 실패는 서버 문제가 아니다. 쌓이면 진짜 오류가 묻힌다.
+      initSentry().then(Sentry => {
+        Sentry.captureException(error, {
+          tags: { queryKey: JSON.stringify(query.queryKey) }, // 어느 API가 실패했는지
+        });
+      });
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 15 * 60 * 1000,   // 기본 15분

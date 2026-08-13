@@ -7,6 +7,8 @@ import { useBanners } from '../../hooks/useBanners.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
+import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
+import { CardFallback } from '../common/CardFallback.jsx';
 
 const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').then(m => ({ default: m.WeatherAlarmSettings })));
 
@@ -50,16 +52,22 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
           {alarmPopup}
         </div>
       )}
-
-      <div className="pb-24 relative [animation:slideUp_0.4s_ease-out]">
+    
+      <div className="pb-24 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
-        <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} />
+        <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
+          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} />
+        </ErrorBoundary>
 
-        {/* 2. 배너 섹션 */}
-        <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} />
+        {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
+        <ErrorBoundary name="portal-banner">
+          <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} />
+        </ErrorBoundary>
 
         {/* 3. 열람실 혼잡도 섹션 */}
-        <LibraryStatusCard library={library} loading={libraryLoading} error={libraryError} />
+        <ErrorBoundary name="portal-library" fallback={<CardFallback message="혼잡도 정보를 표시할 수 없습니다" />}>
+          <LibraryStatusCard library={library} loading={libraryLoading} error={libraryError} />
+        </ErrorBoundary>
       </div>
     </>
   );
