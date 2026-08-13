@@ -3,6 +3,7 @@ import { Sparkles, Wind, Sun } from 'lucide-react';
 import type { Weather, HourlyForecastItem } from '../../../domain/entities/Weather.js';
 import { TypewriterText } from './TypewriterText.js';
 import { getHourlyIcon, getHourlyIconFill, getWeatherTheme } from './weatherTheme.js';
+import { useNow } from '../../hooks/useNow.js';
 
 // 한파 판단 기준 기온(℃): 기상청 한파특보 절대기준(-12~-15도)보다 약간 낮춰
 // 좀 더 자주 체감할 수 있도록 설정. 날씨 상태(맑음/흐림/비/눈)와 무관하게
@@ -25,9 +26,11 @@ export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardP
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const showWeatherDetail = true;
 
+  const nowEpoch = useNow(isVisible);
+
   const { maxTemp, minTemp } = useMemo(() => {
     if (!weather?.hourlyForecast) return { maxTemp: null, minTemp: null };
-    const todayStr = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const todayStr = new Date(nowEpoch + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
     const todayTemps = weather.hourlyForecast
       .filter(item => {
         const itemDateStr = new Date(item.epoch + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -46,15 +49,11 @@ export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardP
       maxTemp: Math.max(...todayTemps),
       minTemp: Math.min(...todayTemps)
     };
-  }, [weather]);
+  }, [weather, nowEpoch]);
 
-  // 클라이언트(브라우저)의 실제 현재 시각 기준으로 ±12시간 필터링
-  // 핵심 원칙: 서버가 반환하는 hour값(UTC 기준 오염 가능)을 절대 신뢰하지 않고
-  //           item.epoch + 브라우저 로컬 시각으로 모든 계산을 수행합니다.
   const renderedHourlyForecast = useMemo((): RenderedForecastItem[] => {
     if (!weather?.hourlyForecast) return [];
 
-    const nowEpoch = Date.now();
     const twelveHoursAgo = nowEpoch - (12 * 60 * 60 * 1000);
     const twelveHoursLater = nowEpoch + (12 * 60 * 60 * 1000);
 
@@ -101,7 +100,7 @@ export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardP
     }
 
     return filtered;
-  }, [weather]);
+  }, [weather, nowEpoch]);
 
   // 더보기로 예보 스트립이 펼쳐졌을 때, 현재 시간('지금') 위치로 가로 스크롤바를 자동 정렬
   useEffect(() => {
@@ -125,7 +124,7 @@ export function WeatherCard({ weather, loading, isVisible = true }: WeatherCardP
   if (!loading && !weather) return null;
 
   return (
-    <section className="-mt-3 mb-3">
+    <section className="-mt-3">
       {loading ? (
         <div className="rounded-card p-4 min-h-[180px] bg-slate-100 animate-pulse flex flex-col justify-start">
           <div className="pl-2">
