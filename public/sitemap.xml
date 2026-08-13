@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  현재 앱은 라우터 없이 탭을 useState로 전환하는 단일 URL SPA다.
+  따라서 색인 대상 URL은 루트 하나뿐이며, 탭별 URL이 생기면 여기에 추가한다.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.hanyang.life/</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
