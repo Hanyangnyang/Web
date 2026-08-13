@@ -1,63 +1,59 @@
 // 도메인 엔티티: 소식탭 날씨 정보
 
-export interface HourlyForecastItem {
-  time: string;
+export const WEATHER_CONDITIONS = [
+  'SUNNY',          // 맑음
+  'MOSTLY_CLOUDY',  // 구름많음
+  'CLOUDY',         // 흐림
+  'RAIN',           // 비
+  'RAIN_SNOW',      // 비/눈
+  'SNOW',           // 눈
+  'SHOWER',         // 소나기
+] as const;
+export type WeatherCondition = typeof WEATHER_CONDITIONS[number];
+export type PmGrade = '좋음' | '보통' | '나쁨' | '매우나쁨';
+export type UvGrade = '낮음' | '보통' | '높음' | '매우높음' | '위험';
+
+export const toWeatherCondition = (raw: string | null): WeatherCondition | null =>
+  raw !== null && (WEATHER_CONDITIONS as readonly string[]).includes(raw)
+    ? (raw as WeatherCondition)
+    : null;
+
+const PM_GRADE_BY_CODE: Record<number, PmGrade> = {
+  1: '좋음',
+  2: '보통',
+  3: '나쁨',
+  4: '매우나쁨',
+};
+export const toPmGrade = (code: number | null): PmGrade | null =>
+  code === null ? null : PM_GRADE_BY_CODE[code] ?? null;
+
+export const toUvGrade = (uvIndex: number): UvGrade => {
+  if (uvIndex >= 9) return '위험';
+  if (uvIndex >= 7) return '매우높음';
+  if (uvIndex >= 5) return '높음';
+  if (uvIndex >= 3) return '보통';
+  return '낮음';
+};
+
+export interface WeatherSnapshot {
   epoch: number;
-  hour: number;
-  temp: number;
-  weatherCode: number;
-  precipProb: number;
+  temp: number;                        // ℃
+  condition: WeatherCondition | null;  
 }
 
-export interface AirQualityLevel {
-  label: string;
-  color: string;
-  level: number;
+export interface HourlyForecast extends WeatherSnapshot {
+  precipProb: number;                  // %
 }
 
-export interface AirQuality {
-  pm10: AirQualityLevel;
-  pm25: AirQualityLevel;
-  uv: AirQualityLevel;
+export interface CurrentWeather extends WeatherSnapshot {
+  maxTemp: number | null;
+  minTemp: number | null;
+  pm10Grade: PmGrade | null;           
+  pm25Grade: PmGrade | null;
+  uvGrade: UvGrade;
 }
 
-export interface WeatherInput {
-  temp: number;
-  description: string;
-  emoji: string;
-  weatherCode: number;
-  message: string;
-  isAiMessage?: boolean;
-  hasPrecipitation?: boolean;
-  hourlyForecast?: HourlyForecastItem[];
-  airQuality?: AirQuality | null;
+export interface Weather {
+  current: CurrentWeather;
+  hourly: HourlyForecast[];
 }
-
-export interface Weather extends WeatherInput {
-  isAiMessage: boolean;
-  hasPrecipitation: boolean;
-  hourlyForecast: HourlyForecastItem[];
-  airQuality: AirQuality | null;
-}
-
-export const createWeather = ({
-  temp,
-  description,
-  emoji,
-  weatherCode,
-  message,
-  isAiMessage = false,
-  hasPrecipitation = false,
-  hourlyForecast = [],
-  airQuality = null,
-}: WeatherInput): Weather => ({
-  temp,
-  description,
-  emoji,
-  weatherCode,
-  message,
-  isAiMessage,
-  hasPrecipitation,
-  hourlyForecast,
-  airQuality,
-});

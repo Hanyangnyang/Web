@@ -35,6 +35,13 @@ export function formatKSTHourMinute(value: string): string | null {
   return matched ? `${matched[1]}:${matched[2]}` : null;
 }
 
+// 서버가 준 시각 문자열을 epoch(ms)으로. 시각 비교·차이 계산은 이 절대값으로만 해야 안전하다.
+const HAS_OFFSET = /(?:Z|[+-]\d{2}:\d{2})$/;
+
+export function toEpoch(value: string): number {
+  return new Date(HAS_OFFSET.test(value) ? value : `${value}+09:00`).getTime();
+}
+
 // KST 기준 오늘 날짜 키 (YYYY-MM-DD)
 export function getKSTDateKey(): string {
   const { year, month, date } = getKSTParts();
