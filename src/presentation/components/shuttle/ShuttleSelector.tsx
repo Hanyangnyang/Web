@@ -85,7 +85,7 @@ export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDay
   return (
     <div className="relative select-none w-full" ref={ref}>
       <div
-        className={`${boxBase} cursor-pointer w-full px-2 gap-1.5 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-[#e2e8f0]'}`}
+        className={`${boxBase} cursor-pointer w-full px-2 gap-1.5 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-slate-200'}`}
         onClick={() => setOpen(p => !p)}
       >
         <div className="flex flex-col flex-1 min-w-0 items-center">
@@ -96,7 +96,7 @@ export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDay
       </div>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[190px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+        <div className="absolute top-[calc(100%+6px)] right-0 w-[190px] bg-white border border-slate-200 rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
           <div className="flex relative" style={{ height: 36 * 3, background: 'white' }}>
             {/* 선택 하이라이트 바 (알림 설정과 동일) */}
             <div style={{

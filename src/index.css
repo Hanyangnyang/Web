@@ -58,42 +58,8 @@ textarea,
 /* ─── CSS 변수 (style={} 인라인에서 계속 참조됨) ─── */
 :root {
   --color-primary: #0E4A84;
-  --color-primary-glow: rgba(14, 74, 132, 0.2);
-  --color-secondary: #AB863F;
-  --color-success: #27AE60;
-  --color-success-dark: #1a7a42;
-  --color-warning: #F39C12;
-  --color-warning-dark: #9a6200;
-  --color-error: #ef4444;
-  --color-surface: #F8F9FA;
-  --color-text-main: #212529;
-  --color-text-sub: #6C757D;
   --color-text-hint: #94a3b8;
-  --hyu-blue: #0E4A84;
-  --hyu-blue-glow: rgba(14, 74, 132, 0.2);
-  --hyu-blue-light: #3b82f6;
-  --bg-light: #F8F9FA;
-  --text-primary: #212529;
-  --text-secondary: #6C757D;
-  --accent: #0E4A84;
-  --warning: #F39C12;
-  --success: #27AE60;
   --radius-card: 12px;
-  --radius-sm: 4px;
-  --radius-full: 999px;
-  --space-page: 20px;
-  --space-section: 24px;
-  --space-element: 12px;
-  --space-sm: 8px;
-  --font-size-h2: 18px;
-  --font-size-body1: 16px;
-  --font-size-body2: 14px;
-  --font-size-caption: 12px;
-  --font-weight-h1: 700;
-  --font-weight-h2: 600;
-  --font-weight-body2: 500;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
 }
 
 body {
@@ -109,12 +75,6 @@ body {
 }
 
 /* ═══ Keyframes ═══ */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -209,43 +169,6 @@ body {
   }
 }
 
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes pulse-lite {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.5);
-    opacity: 0.5;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes menu-marquee-loop {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 @keyframes toastIn {
   from {
     opacity: 0;
@@ -265,18 +188,6 @@ body {
 
   to {
     opacity: 0;
-  }
-}
-
-@keyframes sttDropIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -342,10 +253,6 @@ body {
   }
 }
 
-.spin-animation {
-  animation: rotate 1s linear infinite;
-}
-
 /* ═══ 아코디언 (grid-template-rows 트랜지션 — Tailwind로 표현 불가) ═══ */
 .accordion-content {
   display: grid;
@@ -369,16 +276,6 @@ body {
 
 .accordion-inner {
   overflow: hidden;
-}
-
-/* ═══ 셀렉트 박스 화살표 (SVG 배경 이미지) ═══ */
-.room-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236C757D'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1.25rem;
-  padding-right: 2.5rem;
 }
 
 /* ═══ 알람 토글 스위치 (pseudo-element) ═══ */
@@ -439,140 +336,9 @@ body {
   display: none;
 }
 
-/* ═══ 마키 애니메이션 ═══ */
-.menu-item-marquee-track {
-  display: inline-flex;
-  animation: menu-marquee-loop linear infinite;
-  will-change: transform;
-}
-
-.menu-item-gap {
-  padding-right: 1em;
-}
-
-/* ═══ 시간 선택 드롭다운 ═══ */
-.alarm-time-select {
-  width: 100%;
-  height: 40px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 0 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #212529;
-  background: #F8F9FA;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.alarm-time-select:focus {
-  border-color: #0E4A84;
-  box-shadow: 0 0 0 3px rgba(14, 74, 132, 0.2);
-}
-
-/* ═══ 현재 시간 인디케이터 점 (pulse 애니메이션) ═══ */
-.cal-now-marker::before {
-  content: '';
-  width: 4px;
-  height: 4px;
-  background: white;
-  border-radius: 50%;
-  animation: pulse-lite 2s infinite;
-}
-
-/* ═══ 툴팁 화살표 (CSS border triangle) ═══ */
-.stt-tooltip::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-}
-
-.stt-tooltip.top::after {
-  top: 100%;
-  border-top-color: rgba(33, 37, 41, 0.9);
-}
-
-.stt-tooltip.bottom::after {
-  bottom: 100%;
-  border-bottom-color: rgba(33, 37, 41, 0.9);
-}
-
-/* ═══ QR 플레이스홀더 (repeating-conic-gradient) ═══ */
-.qr-placeholder {
-  width: 220px;
-  height: 220px;
-  background:
-    repeating-conic-gradient(#2d2d2d 0% 25%, #ffffff 0% 50%) 0 0 / 12px 12px;
-  border-radius: 4px;
-}
-
-/* ═══ 헬스장 빈 셀 도트 배경 ═══ */
-.cal-cell.empty {
-  background-image: radial-gradient(#e2e8f0 0.4px, transparent 0.4px);
-  background-size: 8px 8px;
-}
-
-/* ═══ 헬스장 수업명 미디어쿼리 ═══ */
-@media (max-width: 375px) {
-  .course-name {
-    letter-spacing: -0.04em;
-  }
-}
-
-@media (max-width: 340px) {
-  .course-name {
-    letter-spacing: -0.07em;
-  }
-}
-
 /* ═══ 링크 복사 토스트 (JS로 동적 생성) ═══ */
 .copy-toast {
   animation: toastIn 0.2s ease, toastOut 0.3s ease 1.7s forwards;
-}
-
-/* ═══ 모달/시트 열릴 때 배경 스크롤 잠금 (레이아웃 점프 없이) ═══ */
-.scroll-locked {
-  overflow: hidden;
-}
-
-/* ═══ 3D 카드 플립 트랜지션 (셔틀/지하철 시간 토글용) ═══ */
-.perspective-container {
-  perspective: 1000px;
-}
-
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: left;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.flip-card-inner.flipped {
-  transform: rotateY(180deg);
-}
-
-.flip-card-front,
-.flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  top: 0;
-  left: 0;
-}
-
-.flip-card-back {
-  transform: rotateY(180deg);
 }
 
 @layer utilities {

@@ -27,7 +27,7 @@ export function Accordion({
 }: AccordionProps) {
   return (
     <div
-      className={`bg-white border border-[#e2e8f0] rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3 ${className}`}
+      className={`bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3 ${className}`}
       style={style}
       data-type={dataType}
     >
@@ -47,13 +47,13 @@ export function Accordion({
           ) : (
             <ChevronDown
               size={16}
-              className={`text-[#94a3b8] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              className={`text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
             />
           )}
         </div>
       </div>
       <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-        <div className="accordion-inner border-t border-[#f1f5f9]">
+        <div className="accordion-inner border-t border-slate-100">
           {children}
         </div>
       </div>

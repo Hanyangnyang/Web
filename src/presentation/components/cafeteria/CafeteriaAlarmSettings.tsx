@@ -71,7 +71,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
       className="w-[calc(100%-48px)] max-w-[340px] rounded-card rounded-b-none px-5 pb-[calc(24px+env(safe-area-inset-bottom))] mb-0"
       scrollExemptSelector=".alarm-picker-scroll"
     >
-      <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-[#f1f5f9] mb-0.5">
+      <div className="flex items-center justify-between py-3.5 pb-2.5 border-b border-slate-100 mb-0.5">
         <span className="text-[18px] font-extrabold text-text-main leading-none">학식 알림설정</span>
         <label className="alarm-toggle" style={{ marginLeft: 'auto', alignSelf: 'center' }}>
           <input type="checkbox" checked={enabled} onChange={toggle} />
@@ -84,13 +84,13 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
         transition: 'opacity 0.2s',
       }}>
         {/* 1단계: 알림 방식 선택 */}
-        <div className="py-2.5 border-b border-[#f1f5f9]">
+        <div className="py-2.5 border-b border-slate-100">
           <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림 방식 선택</div>
           <div className="flex flex-wrap gap-2 items-center">
             <button
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${params.mode === 'cafe'
                 ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                : 'bg-white text-text-sub border-slate-200 hover:bg-slate-50'
                 }`}
               onClick={async () => {
                 const ok = await ensureEnabled();
@@ -102,7 +102,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
             <button
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${params.mode === 'keyword'
                 ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                : 'bg-white text-text-sub border-[#e2e8f0] hover:bg-slate-50'
+                : 'bg-white text-text-sub border-slate-200 hover:bg-slate-50'
                 }`}
               onClick={async () => {
                 const ok = await ensureEnabled();
@@ -112,7 +112,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
               키워드
             </button>
           </div>
-          <div className="text-[11px] text-[#64748b] leading-relaxed px-0.5 mt-2">
+          <div className="text-[11px] text-slate-500 leading-relaxed px-0.5 mt-2">
             {params.mode === 'cafe'
               ? '선택한 식당의 알림을 받습니다.'
               : params.mode === 'keyword'
@@ -131,7 +131,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
           transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
           pointerEvents: params.mode === 'cafe' ? 'auto' : 'none',
           marginTop: params.mode === 'cafe' ? '8px' : '0px',
-        }} className={params.mode === 'cafe' ? "py-2.5 border-b border-[#f1f5f9]" : ""}>
+        }} className={params.mode === 'cafe' ? "py-2.5 border-b border-slate-100" : ""}>
           <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림을 받아볼 식당 선택</div>
           <div className="flex flex-wrap gap-2 items-center">
             {CAFE_OPTIONS.map(cafe => (
@@ -139,7 +139,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
                 key={cafe.id}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${params.selectedCafe === cafe.id
                   ? 'bg-primary text-white border-primary shadow-[0_2px_8px_rgba(14,74,132,0.18)]'
-                  : 'bg-white border-[#e2e8f0] text-text-sub hover:border-primary/50'
+                  : 'bg-white border-slate-200 text-text-sub hover:border-primary/50'
                   }`}
                 onClick={async () => {
                   const ok = await ensureEnabled();
@@ -161,11 +161,11 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
           transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
           pointerEvents: params.mode === 'keyword' ? 'auto' : 'none',
           marginTop: params.mode === 'keyword' ? '8px' : '0px',
-        }} className={params.mode === 'keyword' ? "py-2.5 border-b border-[#f1f5f9]" : ""}>
+        }} className={params.mode === 'keyword' ? "py-2.5 border-b border-slate-100" : ""}>
           <div className="text-[14px] font-extrabold text-text-main mb-1.5">알림 키워드 등록</div>
           <div className="flex gap-2 mb-2">
             <input
-              className="flex-1 h-10 border-[1.5px] border-[#e2e8f0] rounded-card px-3 text-[14px] text-text-main bg-surface outline-none transition-colors duration-200 focus:border-[#3b82f6] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
+              className="flex-1 h-10 border-[1.5px] border-slate-200 rounded-card px-3 text-[14px] text-text-main bg-surface outline-none transition-colors duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
               value={keywordInput}
               onChange={async (e) => {
                 setKeywordInput(e.target.value);
@@ -177,7 +177,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
               placeholder="예: 제육, 돈까스"
             />
             <button
-              className="w-10 h-10 bg-[#3b82f6] text-white border-none rounded-card flex items-center justify-center cursor-pointer flex-shrink-0 transition-opacity duration-150 hover:opacity-[0.88]"
+              className="w-10 h-10 bg-blue-500 text-white border-none rounded-card flex items-center justify-center cursor-pointer flex-shrink-0 transition-opacity duration-150 hover:opacity-[0.88]"
               onClick={addKeyword}
             >
               <Plus size={18} />
@@ -186,10 +186,10 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
           {params.keywords.length > 0 && (
             <div className="flex flex-wrap gap-2 max-h-[88px] overflow-y-auto pr-1 no-scrollbar">
               {params.keywords.map(kw => (
-                <span key={kw} className="flex items-center gap-1 bg-[rgba(59,130,246,0.1)] text-[#3b82f6] text-[12px] font-bold px-3 py-1 rounded-full">
+                <span key={kw} className="flex items-center gap-1 bg-[rgba(59,130,246,0.1)] text-blue-500 text-[12px] font-bold px-3 py-1 rounded-full">
                   {kw}
                   <button
-                    className="bg-none border-none text-[#3b82f6] cursor-pointer flex items-center p-0 opacity-70 transition-opacity duration-150 hover:opacity-100"
+                    className="bg-none border-none text-blue-500 cursor-pointer flex items-center p-0 opacity-70 transition-opacity duration-150 hover:opacity-100"
                     onClick={() => removeKeyword(kw)}
                   >
                     <X size={11} />

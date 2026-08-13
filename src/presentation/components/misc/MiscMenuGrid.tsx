@@ -11,7 +11,7 @@ const InstagramIcon = ({ size = 24, color = 'currentColor' }: { size?: number; c
   </svg>
 );
 
-const cardClass = "bg-white border border-[#e2e8f0] rounded-card aspect-square px-4 flex flex-col items-center justify-center text-center gap-3 cursor-pointer transition-all duration-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:border-hyu-blue-light hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] active:scale-[0.98]";
+const cardClass = "bg-white border border-slate-200 rounded-card aspect-square px-4 flex flex-col items-center justify-center text-center gap-3 cursor-pointer transition-all duration-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 hover:border-hyu-blue-light hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] active:scale-[0.98]";
 
 interface MiscMenuGridProps {
   onBoxClick: (box: MiscBoxKey) => void;
@@ -73,7 +73,7 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
           href="https://app.notion.com/p/361325c5461f80aa8463ee5ae404d4ba?source=copy_link"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[0.78rem] text-text-hint underline underline-offset-2 hover:text-[#0e4a84]"
+          className="text-[0.78rem] text-text-hint underline underline-offset-2 hover:text-primary"
         >
           개인정보처리방침
         </a>

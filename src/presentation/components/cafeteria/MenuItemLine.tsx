@@ -1,6 +1,7 @@
 // 컴포넌트: 메뉴 한 줄. 컨테이너 폭보다 텍스트가 길면 자동으로 마퀴(가로 스크롤) 애니메이션을 건다.
 import { useState, useLayoutEffect, useRef } from 'react';
 import { parseBoldText } from './cafeteriaFormat.js';
+import styles from './MenuItemLine.module.css';
 
 interface MenuItemLineProps {
   html: string;
@@ -40,9 +41,9 @@ export function MenuItemLine({ html }: MenuItemLineProps) {
           {parsedContent}
         </span>
         {marquee && (
-          <span className="menu-item-marquee-track" style={{ animationDuration: `${marquee.duration}s` }}>
-            <span className="inline-block menu-item-gap">{parsedContent}</span>
-            <span className="inline-block menu-item-gap" aria-hidden="true">{parsedContent}</span>
+          <span className={styles.marqueeTrack} style={{ animationDuration: `${marquee.duration}s` }}>
+            <span className={`inline-block ${styles.gap}`}>{parsedContent}</span>
+            <span className={`inline-block ${styles.gap}`} aria-hidden="true">{parsedContent}</span>
           </span>
         )}
       </div>

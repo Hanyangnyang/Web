@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { STOPS } from '../../../domain/entities/Shuttle.js';
 import { ViewModeToggle } from './ViewModeToggle.jsx';
+import styles from './StopSelector.module.css';
 
 interface StopSelectorProps {
   viewMode: 'shuttle' | 'bus';
@@ -51,7 +52,7 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
   };
 
   return (
-    <div className="sticky top-0 bg-[#F8F9FA]/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
+    <div className="sticky top-0 bg-surface/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
       <div className="flex items-center justify-between mb-3">
         <div className="text-2xl font-extrabold text-text-main">출발지</div>
         <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -62,21 +63,21 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
             key={s}
             className={`py-[7px] px-2 text-center flex items-center justify-center gap-1 border-[1.5px] rounded-full text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all duration-150 shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative ${stop === s
               ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(14,74,132,0.22)]'
-              : 'border-[#e2e8f0] bg-white text-text-sub hover:bg-surface hover:border-[#cbd5e1]'
+              : 'border-slate-200 bg-white text-text-sub hover:bg-surface hover:border-slate-300'
               }`}
             onClick={() => handleStopClick(s)}
             style={{ position: 'relative' }}
           >
             {tooltipStop === s && showTooltip && (() => {
               const isTop = idx < 3 && s !== '셔틀콕' && s !== '한대앞';
-              const arrowClass = isTop ? 'top' : 'bottom';
+              const arrowClass = isTop ? styles.top : styles.bottom;
               const posClass = isTop ? 'bottom-[calc(100%+12px)]' : 'top-[calc(100%+12px)]';
               const anim = isTop ? 'tooltipPopSmall' : 'tooltipPopDownSmall';
               const fadeY = isTooltipFadingOut ? (isTop ? ' translateY(-0.5rem)' : ' translateY(0.5rem)') : '';
               const origin = isTop ? 'bottom center' : 'top center';
               return (
                 <div
-                  className={`stt-tooltip ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
+                  className={`${styles.tooltip} ${arrowClass} absolute left-1/2 bg-[rgba(33,37,41,0.9)] text-white px-3.5 py-2.5 rounded-card text-[11px] font-bold whitespace-nowrap shadow-[0_12px_24px_-6px_rgba(0,0,0,0.3)] z-[500] flex items-center pointer-events-none backdrop-blur-sm transition-all duration-400 ${isTooltipFadingOut ? 'opacity-0' : ''} ${posClass}`}
                   style={{ transform: `translateX(-50%) scale(0.85)${fadeY}`, transformOrigin: origin, animation: `${anim} 0.4s cubic-bezier(0.175,0.885,0.32,1.275)` }}
                 >
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>

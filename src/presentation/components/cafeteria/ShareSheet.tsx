@@ -166,7 +166,7 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
           className="flex flex-col items-center gap-2 bg-none border-none cursor-pointer p-2 rounded-card transition-colors duration-150 font-[inherit] hover:bg-surface"
           onClick={handleShare}
         >
-          <div className="w-[52px] h-[52px] rounded-card flex items-center justify-center bg-[#f1f5f9]">
+          <div className="w-[52px] h-[52px] rounded-card flex items-center justify-center bg-slate-100">
             <Share2 size={20} color="#475569" />
           </div>
           <span className="text-xs font-semibold text-text-main">공유하기</span>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <link rel="preload" href="/fonts/HakgyoansimDunggeunmiso-B.woff2" as="font" type="font/woff2" crossorigin />
@@ -13,17 +13,70 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="하냥냥" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="description" content="에리카인에게 필요한 정보와 기능을 꾹꾹 눌러담은 서비스" />
-    <title>하냥냥</title>
-    <!-- Open Graph -->
+    <title>하냥냥 - 한양대 에리카 학식·셔틀·제휴·학정혼잡도</title>
+    <meta
+      name="description"
+      content="한양대학교 ERICA인을 위한 캠퍼스 필수 앱. 식당별 학식 메뉴, 셔틀버스·지하철 시간표, 단과대별 제휴정보, 날씨와 학정혼잡도, 헬스장 시간표까지 하냥냥에서 한번에 확인하세요!"
+    />
+    <link rel="canonical" href="https://www.hanyang.life/" />
+    <!-- Open Graph: 카카오톡 등 공유 카드용 -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.hanyang.life/" />
-    <meta property="og:title" content="하냥냥" />
-    <meta property="og:description" content="에리카 학생들을 위한 서비스" />
+    <meta property="og:site_name" content="하냥냥" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:title" content="하냥냥 - 한양대 에리카 캠퍼스 필수 앱" />
+    <meta property="og:description" content="에리카생에게 필요한 정보와 기능을 꾹꾹 눌러담은 서비스" />
     <meta property="og:image" content="https://www.hanyang.life/pwa-512x512.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="하냥냥 - 한양대 에리카 캠퍼스 필수 앱" />
+    <meta name="twitter:description" content="에리카생에게 필요한 정보와 기능을 꾹꾹 눌러담은 서비스" />
+    <meta name="twitter:image" content="https://www.hanyang.life/pwa-512x512.png" />
+    <!-- 구조화 데이터: 구글에 사이트명과 앱 정보를 명시적으로 전달 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://www.hanyang.life/#website",
+            "url": "https://www.hanyang.life/",
+            "name": "하냥냥",
+            "alternateName": ["Hanyangnyang", "하냥냥 한양대 에리카"],
+            "description": "한양대학교 ERICA 학생을 위한 캠퍼스 라이프스타일 유틸리티 서비스",
+            "inLanguage": "ko-KR"
+          },
+          {
+            "@type": "MobileApplication",
+            "@id": "https://www.hanyang.life/#app",
+            "name": "하냥냥",
+            "url": "https://www.hanyang.life/",
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Android, iOS",
+            "inLanguage": "ko-KR",
+            "description": "식당별 학식 조회, 셔틀버스·지하철 시간표, 단과대별 제휴 정보, 날씨와 학정 혼잡도, 헬스장 시간표를 제공하는 한양대학교 ERICA 학생용 캠퍼스 앱",
+            "installUrl": [
+              "https://play.google.com/store/apps/details?id=com.hanyangnyang.app",
+              "https://apps.apple.com/kr/app/id6770033067"
+            ],
+            "sameAs": [
+              "https://play.google.com/store/apps/details?id=com.hanyangnyang.app",
+              "https://apps.apple.com/kr/app/id6770033067"
+            ],
+            "featureList": [
+              "식당별 학식 조회",
+              "셔틀버스·지하철 시간표",
+              "단과대별 제휴 정보 모음",
+              "날씨와 학정 혼잡도",
+              "헬스장 시간표 확인"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- 색인·랭킹에는 영향이 없으며, 페이지가 여러 URL로 분리되면 반드시 제거할 것. -->
+    <div id="root" data-nosnippet></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
