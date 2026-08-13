@@ -11,6 +11,7 @@ export const createBannerRepository = (
     if (!Array.isArray(res.data)) throw new Error('banners API returned invalid shape');
 
     return [...res.data]
+      .filter(banner => banner.imageUrl)
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .map(banner => ({
         id: banner.id,
