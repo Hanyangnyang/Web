@@ -14,6 +14,7 @@ import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
 import { OfflineModal } from './presentation/components/common/OfflineModal';
 import { prefetchWeather }       from './presentation/hooks/useWeather.js';
+import { prefetchWeatherBriefing } from './presentation/hooks/useWeatherBriefing.js';
 import { prefetchLibraryStatus } from './presentation/hooks/useLibraryStatus.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
@@ -108,6 +109,7 @@ function MainLayout() {
   const { menuDate, cafes, menuLoading, menuRevalidating, changeDate } = useMenu();
   useEffect(() => {
     prefetchWeather();
+    prefetchWeatherBriefing();
     prefetchLibraryStatus();
     prefetchBanners();
     prefetchShuttleSchedule();

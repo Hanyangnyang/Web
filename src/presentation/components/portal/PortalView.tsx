@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 
 import { Bell } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather.js';
+import { useWeatherBriefing } from '../../hooks/useWeatherBriefing.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
 import { WeatherCard } from './WeatherCard.jsx';
@@ -17,7 +18,8 @@ interface PortalViewProps {
 }
 
 export function PortalView({ isVisible = true }: PortalViewProps) {
-  const { weather, loading: weatherLoading } = useWeather(isVisible);
+  const { weather, loading: weatherLoading, error: weatherError } = useWeather(isVisible);
+  const { briefing } = useWeatherBriefing(isVisible);
   const { library, loading: libraryLoading, error: libraryError } = useLibraryStatus(isVisible);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isVisible);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
@@ -56,7 +58,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
       <div className="pb-24 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
-          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} />
+          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} briefing={briefing} error={weatherError} />
         </ErrorBoundary>
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}

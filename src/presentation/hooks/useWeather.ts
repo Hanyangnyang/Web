@@ -7,7 +7,11 @@ const CACHE_TTL = 900000; // 15분
 const WEATHER_QUERY_KEY = ['portal', 'weather'];
 
 export function prefetchWeather() {
-  return queryClient.prefetchQuery({ queryKey: WEATHER_QUERY_KEY, queryFn: () => getWeatherUseCase.execute(), staleTime: CACHE_TTL });
+  return queryClient.prefetchQuery({ 
+    queryKey: WEATHER_QUERY_KEY, 
+    queryFn: () => getWeatherUseCase.execute(), 
+    staleTime: CACHE_TTL 
+  });
 }
 
 export interface UseWeatherResult {
