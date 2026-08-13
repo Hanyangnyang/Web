@@ -16,7 +16,6 @@ interface LibraryStatusCardProps {
   error?: Error | null;
 }
 
-// 제목 줄은 어느 상태에서든 같은 자리에 있어야 해서 껍데기를 공통으로 둔다
 function Section({ updatedAtLabel, children }: { updatedAtLabel?: string | null; children: React.ReactNode }) {
   return (
     <section>

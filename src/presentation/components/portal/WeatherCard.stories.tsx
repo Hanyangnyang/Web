@@ -1,67 +1,61 @@
 import type { ComponentType } from 'react';
 import { WeatherCard } from './WeatherCard.jsx';
-import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudRain, Snowflake, CloudDrizzle, CloudLightning, type LucideIcon } from 'lucide-react';
-import type { Weather, HourlyForecastItem, AirQualityLevel } from '../../../domain/entities/Weather.js';
+import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudRain, Snowflake, CloudDrizzle, type LucideIcon } from 'lucide-react';
+import type { Weather, HourlyForecast, WeatherCondition, PmGrade } from '../../../domain/entities/Weather.js';
+import type { WeatherBriefing } from '../../../domain/entities/WeatherBriefing.js';
 
 // ── mock 데이터 생성기 ─────────────────────────────────────────────
-// 시간별 예보는 현재 시각 기준 ±12시간으로 생성 — 고정 epoch를 쓰면
-// 시간이 지날수록 렌더 창(±12h) 밖으로 벗어나 스트립이 비어버린다.
+// 시간별 예보는 현재 시각 기준으로 생성한다 — 고정 epoch를 쓰면 시간이 지날수록
+// 카드의 렌더 창(지금 ~ +12시간) 밖으로 벗어나 스트립이 비어버린다.
 
-function makeHourlyForecast(weatherCode: number, baseTemp: number): HourlyForecastItem[] {
-  const now = Date.now();
-  const currentHourEpoch = Math.floor(now / 3600000) * 3600000;
-  return Array.from({ length: 24 }, (_, i) => {
-    const epoch = currentHourEpoch + (i - 11) * 3600000;
-    return {
-      epoch,
-      time: new Date(epoch).toISOString(),
-      hour: new Date(epoch).getHours(),
-      temp: baseTemp + Math.round(3 * Math.sin(i / 3)),
-      precipProb: weatherCode >= 61 ? 60 : 0,
-      weatherCode,
-    };
-  });
+const currentHourEpoch = () => Math.floor(Date.now() / 3600000) * 3600000;
+
+function makeHourly(condition: WeatherCondition, baseTemp: number): HourlyForecast[] {
+  const base = currentHourEpoch();
+  // 지금 칸 + 앞으로 12시간 = 13칸
+  return Array.from({ length: 13 }, (_, i) => ({
+    epoch: base + i * 3600000,
+    temp: baseTemp + Math.round(3 * Math.sin(i / 3)),
+    condition,
+    precipProb: condition === 'RAIN' || condition === 'SHOWER' ? 60 : 0,
+  }));
 }
-
-// api/portal.js getAQILabel과 동일한 등급 체계
-const AQ_GRADES: Record<string, AirQualityLevel> = {
-  좋음: { label: '좋음', color: '#2563eb', level: 1 },
-  보통: { label: '보통', color: '#4ade80', level: 2 },
-  나쁨: { label: '나쁨', color: '#ef4444', level: 3 },
-  매우나쁨: { label: '매우나쁨', color: '#991b1b', level: 4 },
-  점검중: { label: '점검중', color: '#94a3b8', level: 1 },
-};
 
 interface MakeWeatherArgs {
-  weatherCode: number;
+  condition: WeatherCondition;
   temp: number;
-  description: string;
-  grade?: AirQualityLevel;
+  pmGrade?: PmGrade | null; // null = 점검중
 }
 
-function makeWeather({ weatherCode, temp, description, grade = AQ_GRADES.보통 }: MakeWeatherArgs): Weather {
+function makeWeather({ condition, temp, pmGrade = '보통' }: MakeWeatherArgs): Weather {
   return {
-    temp,
-    description,
-    emoji: '',
-    weatherCode,
-    message: '오늘도 좋은 하루 보내세요! 산책하기 좋은 날씨예요.',
-    isAiMessage: true,
-    hasPrecipitation: weatherCode >= 61,
-    hourlyForecast: makeHourlyForecast(weatherCode, temp),
-    airQuality: { pm10: grade, pm25: grade, uv: grade },
+    current: {
+      epoch: currentHourEpoch(),
+      temp,
+      condition,
+      maxTemp: temp + 4,
+      minTemp: temp - 5,
+      pm10Grade: pmGrade,
+      pm25Grade: pmGrade,
+      uvGrade: '보통',
+    },
+    hourly: makeHourly(condition, temp),
   };
 }
 
-// WeatherCard.jsx weatherTheme 분기와 1:1 대응하는 배경 6종
-// (한파는 별도 배경/아이콘 없이 기온(-10°↓)에 따라 기존 카드 위에 "한파" 뱃지만 얹는 방식 — WeatherCard.jsx L299 근처)
-const BACKGROUNDS = [
-  { name: '폭염 맑음 (28°↑ 골드오렌지)', weatherCode: 0, temp: 31, description: '맑음' },
-  { name: '선선한 맑음 (스카이블루)', weatherCode: 0, temp: 21, description: '맑음' },
-  { name: '구름 조금 (소프트블루)', weatherCode: 2, temp: 24, description: '구름 조금' },
-  { name: '흐림 (클라우드그레이)', weatherCode: 3, temp: 18, description: '흐림' },
-  { name: '눈 (화이트스카이)', weatherCode: 71, temp: -2, description: '눈' },
-  { name: '비·뇌우 (딥스톰퍼플)', weatherCode: 63, temp: 15, description: '비' },
+const BRIEFING: WeatherBriefing = {
+  content: '오늘도 좋은 하루 보내세요! 산책하기 좋은 날씨예요.',
+};
+
+// weatherTheme의 배경 분기와 1:1 대응하는 6종
+// (한파는 별도 배경/아이콘 없이 기온(-10°↓)에 따라 기존 카드 위에 "한파" 뱃지만 얹는 방식)
+const BACKGROUNDS: { name: string; condition: WeatherCondition; temp: number }[] = [
+  { name: '폭염 맑음 (28°↑ 골드오렌지)', condition: 'SUNNY', temp: 31 },
+  { name: '선선한 맑음 (스카이블루)', condition: 'SUNNY', temp: 21 },
+  { name: '구름많음 (소프트블루)', condition: 'MOSTLY_CLOUDY', temp: 24 },
+  { name: '흐림 (클라우드그레이)', condition: 'CLOUDY', temp: 18 },
+  { name: '눈 (화이트스카이)', condition: 'SNOW', temp: -2 },
+  { name: '비 (딥스톰퍼플)', condition: 'RAIN', temp: 15 },
 ];
 
 export default {
@@ -85,21 +79,23 @@ const mobileFrame = (Story: ComponentType) => (
 // Storybook 사이드바는 기본적으로 export 순서를 그대로 따른다.
 // 전체 조합 검수(전체매트릭스) → 아이콘 전수 비교(아이콘모음) → 개별 상태 순으로 배치.
 
-// ── 전체 매트릭스: 배경 6종(행) × [미세먼지 등급 5종 + 한파] 6열 = 36조합 표 형태 ─────
+// ── 전체 매트릭스: 배경 6종(행) × [미세먼지 등급 4종 + 점검중 + 한파] 6열 = 36조합 표 형태 ─────
 // 열 개수(라벨 1 + 6 = 7)와 gridTemplateColumns 칸 수를 맞춰뒀기 때문에,
 // 아래 flatMap이 만드는 평평한 배열이 자동으로 "배경별 한 줄"로 줄바꿈된다.
-// 마지막 "한파" 열은 WeatherCard.jsx의 COLD_SNAP_TEMP(-10°)보다 낮은 기온으로 덮어써서
+// 마지막 "한파" 열은 COLD_SNAP_TEMP(-10°)보다 낮은 기온으로 덮어써서
 // 별도 배경 없이 각 날씨 카드 위에 "한파" 뱃지만 얹히는지 한 번에 검수한다.
 interface MatrixColumn {
   key: string;
   label: string;
-  grade: AirQualityLevel;
+  grade: PmGrade | null;
   coldSnapTemp?: number;
 }
 
+const PM_GRADES: (PmGrade | null)[] = ['좋음', '보통', '나쁨', '매우나쁨', null];
+
 const MATRIX_COLUMNS: MatrixColumn[] = [
-  ...Object.values(AQ_GRADES).map((grade) => ({ key: grade.label, label: grade.label, grade })),
-  { key: '한파', label: '한파', grade: AQ_GRADES.보통, coldSnapTemp: -13 },
+  ...PM_GRADES.map((grade) => ({ key: grade ?? '점검중', label: grade ?? '점검중', grade })),
+  { key: '한파', label: '한파', grade: '보통', coldSnapTemp: -13 },
 ];
 
 export const 전체매트릭스 = {
@@ -130,10 +126,11 @@ export const 전체매트릭스 = {
             <WeatherCard
               key={`${bg.name}-${col.key}`}
               weather={makeWeather({
-                ...bg,
-                grade: col.grade,
+                condition: bg.condition,
                 temp: col.coldSnapTemp !== undefined ? col.coldSnapTemp : bg.temp,
+                pmGrade: col.grade,
               })}
+              briefing={BRIEFING}
               loading={false}
             />
           )),
@@ -145,19 +142,17 @@ export const 전체매트릭스 = {
 
 // ── 시간별 예보 아이콘 모음: getHourlyIcon/getHourlyIconFill 분기 전수 나열 ─────
 const HOURLY_ICONS = [
-  { Icon: Moon, name: 'Moon', fill: 'none', when: 'code ≤0 · 야간(20~06시)' },
-  { Icon: Sun, name: 'Sun', fill: 'none', when: 'code ≤0 · 주간' },
-  { Icon: CloudMoon, name: 'CloudMoon', fill: '#ffffff', when: 'code ≤1 · 야간' },
-  { Icon: CloudSun, name: 'CloudSun', fill: '#ffffff', when: 'code ≤1(주간) 또는 code=2' },
-  { Icon: Cloud, name: 'Cloud', fill: '#ffffff', when: 'code ≤3' },
-  { Icon: CloudFog, name: 'CloudFog', fill: '#ffffff', when: 'code ≤48 (안개)' },
-  { Icon: CloudRain, name: 'CloudRain', fill: '#ffffff', when: 'code ≤67 (비)' },
-  { Icon: Snowflake, name: 'Snowflake', fill: 'none', when: 'code ≤77 (눈) — CloudRain과 구분되는 구름 없는 눈송이' },
-  { Icon: CloudDrizzle, name: 'CloudDrizzle', fill: '#ffffff', when: 'code ≤82 (소나기)' },
-  { Icon: CloudLightning, name: 'CloudLightning', fill: '#ffffff', when: 'code >82 (뇌우)' },
+  { Icon: Sun, name: 'Sun', fill: 'none', when: 'SUNNY · 주간' },
+  { Icon: Moon, name: 'Moon', fill: 'none', when: 'SUNNY · 야간(20~06시)' },
+  { Icon: CloudSun, name: 'CloudSun', fill: '#ffffff', when: 'MOSTLY_CLOUDY · 주간' },
+  { Icon: CloudMoon, name: 'CloudMoon', fill: '#ffffff', when: 'MOSTLY_CLOUDY · 야간' },
+  { Icon: Cloud, name: 'Cloud', fill: '#ffffff', when: 'CLOUDY · 상태를 모를 때(null)의 기본값이기도 함' },
+  { Icon: CloudRain, name: 'CloudRain', fill: '#ffffff', when: 'RAIN · RAIN_SNOW' },
+  { Icon: Snowflake, name: 'Snowflake', fill: 'none', when: 'SNOW — CloudRain과 구분되는 구름 없는 눈송이' },
+  { Icon: CloudDrizzle, name: 'CloudDrizzle', fill: '#ffffff', when: 'SHOWER' },
 ];
 
-// 실제 카드의 시간별 예보 칸(WeatherCard.jsx L333-347)과 동일한 마크업 재현.
+// 실제 카드의 시간별 예보 칸과 동일한 마크업 재현.
 // isCurrent(지금 칸)일 때만 배경이 bg-white/90 필로 바뀌고, 아이콘 테두리 색이
 // text-white → text-black으로 반전된다 — fill(내부 채움색)은 두 상태에서 동일하다.
 interface HourlyPillProps {
@@ -195,7 +190,7 @@ export const 아이콘모음 = {
             </p>
           </div>
 
-          {/* 실제 카드 배경(비·뇌우 그라데이션) 위에서 비활성/활성 두 상태 나란히 비교 */}
+          {/* 실제 카드 배경(비 그라데이션) 위에서 비활성/활성 두 상태 나란히 비교 */}
           <div
             style={{
               display: 'flex',
@@ -221,11 +216,38 @@ export const 아이콘모음 = {
 };
 
 // ── 배경 6종 개별 스토리 (미세먼지: 보통) ──────────────────────────
-export const 폭염맑음 = { decorators: [mobileFrame], args: { weather: makeWeather(BACKGROUNDS[0]), loading: false } };
-export const 선선한맑음 = { decorators: [mobileFrame], args: { weather: makeWeather(BACKGROUNDS[1]), loading: false } };
-export const 구름조금 = { decorators: [mobileFrame], args: { weather: makeWeather(BACKGROUNDS[2]), loading: false } };
-export const 흐림 = { decorators: [mobileFrame], args: { weather: makeWeather(BACKGROUNDS[3]), loading: false } };
-export const 눈 = { decorators: [mobileFrame], args: { weather: makeWeather(BACKGROUNDS[4]), loading: false } };
-export const 비뇌우 = { decorators: [mobileFrame], args: { weather: makeWeather(BACKGROUNDS[5]), loading: false } };
+const story = (bg: (typeof BACKGROUNDS)[number]) => ({
+  decorators: [mobileFrame],
+  args: { weather: makeWeather({ condition: bg.condition, temp: bg.temp }), briefing: BRIEFING, loading: false },
+});
+
+export const 폭염맑음 = story(BACKGROUNDS[0]);
+export const 선선한맑음 = story(BACKGROUNDS[1]);
+export const 구름많음 = story(BACKGROUNDS[2]);
+export const 흐림 = story(BACKGROUNDS[3]);
+export const 눈 = story(BACKGROUNDS[4]);
+export const 비 = story(BACKGROUNDS[5]);
+
+// 브리핑이 아직 안 왔거나 없는 경우 — AI 문구 줄 자체가 빠진다
+export const 브리핑없음 = {
+  decorators: [mobileFrame],
+  args: { weather: makeWeather({ condition: 'SUNNY', temp: 24 }), briefing: null, loading: false },
+};
+
+// 서버가 모르는 날씨 상태를 준 경우 — "정보 없음" + 기본 아이콘/배경으로 버틴다
+export const 상태알수없음 = {
+  decorators: [mobileFrame],
+  args: {
+    weather: { ...makeWeather({ condition: 'SUNNY', temp: 24 }), current: { ...makeWeather({ condition: 'SUNNY', temp: 24 }).current, condition: null } },
+    briefing: BRIEFING,
+    loading: false,
+  },
+};
 
 export const 로딩스켈레톤 = { decorators: [mobileFrame], args: { weather: null, loading: true } };
+
+// 조회 실패 + 캐시된 이전 데이터도 없는 경우. 캐시가 있으면 실패해도 그 데이터를 계속 보여준다.
+export const 조회실패 = {
+  decorators: [mobileFrame],
+  args: { weather: null, loading: false, error: new Error('network error') },
+};

@@ -1,83 +1,99 @@
-// 순수 함수: 날씨 코드 → 아이콘/테마 매핑 (React 상태 없이 값만 계산)
-import { CloudRain, Snowflake, Wind, Sun, Moon, Cloud, CloudSun, CloudMoon, CloudFog, CloudDrizzle, CloudLightning, type LucideIcon } from 'lucide-react';
-import type { Weather } from '../../../domain/entities/Weather.js';
+// 표현 계층 룩업: 도메인 값(WeatherCondition·PmGrade·UvGrade)을 화면에 보일 것(라벨·아이콘·색)으로 옮긴다.
 
-// 시간별 예보 2D 아이콘 매핑
-export function getHourlyIcon(code: number, hour: number): LucideIcon {
+import { Cloud, CloudDrizzle, CloudMoon, CloudRain, CloudSun, Moon, Snowflake, Sun, type LucideIcon } from 'lucide-react';
+import type { Weather, WeatherCondition, PmGrade, UvGrade } from '../../../domain/entities/Weather.js';
+
+// 날씨 상태 라벨 
+export const CONDITION_LABEL: Record<WeatherCondition, string> = {
+  SUNNY: '맑음',
+  MOSTLY_CLOUDY: '구름많음',
+  CLOUDY: '흐림',
+  RAIN: '비',
+  RAIN_SNOW: '비/눈',
+  SNOW: '눈',
+  SHOWER: '소나기',
+};
+export const UNKNOWN_CONDITION_LABEL = '정보 없음';
+
+
+// 시간별 예보 아이콘 
+const HOURLY_ICON: Record<WeatherCondition, { day: LucideIcon; night: LucideIcon }> = {
+  SUNNY:         { day: Sun,          night: Moon },
+  MOSTLY_CLOUDY: { day: CloudSun,     night: CloudMoon },
+  CLOUDY:        { day: Cloud,        night: Cloud },
+  RAIN:          { day: CloudRain,    night: CloudRain },
+  RAIN_SNOW:     { day: CloudRain,    night: CloudRain },  // 진눈깨비는 비 쪽으로 본다
+  SNOW:          { day: Snowflake,    night: Snowflake },
+  SHOWER:        { day: CloudDrizzle, night: CloudDrizzle },
+};
+
+export function getHourlyIcon(condition: WeatherCondition | null, hour: number): LucideIcon {
+  if (!condition) return Cloud;
   const isNight = hour >= 20 || hour < 6;
-  if (code <= 0) return isNight ? Moon : Sun;
-  if (code <= 1) return isNight ? CloudMoon : CloudSun;
-  if (code <= 2) return CloudSun;
-  if (code <= 3) return Cloud;
-  if (code <= 48) return CloudFog;
-  if (code <= 67) return CloudRain;
-  if (code <= 77) return Snowflake; 
-  if (code <= 82) return CloudDrizzle;
-  return CloudLightning;
+  const icons = HOURLY_ICON[condition];
+  return isNight ? icons.night : icons.day;
 }
 
-// 구름은 흰색으로 아이콘 내부를 채우고, 해·달·눈송이는 테두리만 표시
-export function getHourlyIconFill(Icon: LucideIcon): string {
-  if (
-    Icon === Cloud ||
-    Icon === CloudSun ||
-    Icon === CloudMoon ||
-    Icon === CloudFog ||
-    Icon === CloudRain ||
-    Icon === CloudDrizzle ||
-    Icon === CloudLightning
-  ) {
-    return '#ffffff';
-  }
-  return 'none';
-}
+const FILLED_ICONS: readonly LucideIcon[] = [Cloud, CloudSun, CloudMoon, CloudRain, CloudDrizzle];
 
+export const getHourlyIconFill = (Icon: LucideIcon): string => 
+  FILLED_ICONS.includes(Icon) ? '#ffffff' : 'none';
+
+
+// 카드 배경 테마 
 export interface WeatherTheme {
   icon: LucideIcon | null;
   bg: string;
   iconColor?: string;
 }
 
-// 날씨 상태에 따른 프리미엄 동적 테마 정의 (배경 그라데이션 및 매칭 아이콘)
+const HOT_TEMP = 28;
+
+const BG = {
+  hotSunny:  'linear-gradient(135deg, #FAD961 0%, #F76B1C 100%)', // 빛이 들어오는 골드&오렌지
+  coolSunny: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', // 청량한 스카이블루
+  partly:    'linear-gradient(135deg, #4a779d 0%, #7db9e8 100%)', // 파스텔 소프트블루
+  cloudy:    'linear-gradient(135deg, #a1b0be 0%, #66788a 100%)', // 프리미엄 클라우드그레이
+  snow:      'linear-gradient(135deg, #8ca0ba 0%, #ffffff 100%)', // 눈부신 설원
+  rain:      'linear-gradient(135deg, #2b5876 0%, #4e4376 100%)', // 깊은 딥스톰 퍼플그레이
+};
+
+const THEME: Record<WeatherCondition, WeatherTheme> = {
+  SUNNY:         { icon: Sun,       bg: BG.coolSunny },
+  MOSTLY_CLOUDY: { icon: Cloud,     bg: BG.partly },
+  CLOUDY:        { icon: Cloud,     bg: BG.cloudy },
+  RAIN:          { icon: CloudRain, bg: BG.rain },
+  RAIN_SNOW:     { icon: CloudRain, bg: BG.rain },
+  SNOW:          { icon: Snowflake, bg: BG.snow, iconColor: '#4A607A' },
+  SHOWER:        { icon: CloudRain, bg: BG.rain },
+};
+
 export function getWeatherTheme(weather: Weather | null): WeatherTheme {
   if (!weather) return { icon: null, bg: 'transparent' };
-  const code = weather.weatherCode;
 
-  // 1. 맑음 / 대체로 맑음 (0, 1)
-  if (code <= 1) {
-    const isHot = weather.temp >= 28;
-    return {
-      icon: Sun,
-      bg: isHot
-        ? 'linear-gradient(135deg, #FAD961 0%, #F76B1C 100%)' // 28도 이상: 찬란하고 강렬한 골드&오렌지 햇살 (빛이 들어오는 느낌)
-        : 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)'  // 28도 미만: 청량하고 깨끗한 시원한 스카이 블루
-    };
-  }
-  // 2. 구름 조금 (2) -> 화사하고 밝은 파스텔톤의 소프트 블루스카이
-  if (code === 2) {
-    return {
-      icon: Cloud,
-      bg: 'linear-gradient(135deg, #4a779d 0%, #7db9e8 100%)'
-    };
-  }
-  // 3. 흐림 / 안개 (3, 45, 48) -> 밝고 화사한 프리미엄 클라우드 그레이
-  if (code === 3 || code <= 48) {
-    return {
-      icon: code <= 3 ? Cloud : Wind,
-      bg: 'linear-gradient(135deg, #a1b0be 0%, #66788a 100%)'
-    };
-  }
-  // 4. 눈 (71 ~ 77) -> 눈 결정 아이콘 + 눈부시게 밝은 설원과 순백의 화이트 스카이
-  if (code >= 71 && code <= 77) {
-    return {
-      icon: Snowflake,
-      bg: 'linear-gradient(135deg, #8ca0ba 0%, #ffffff 100%)',
-      iconColor: '#4A607A'
-    };
-  }
-  // 5. 비 / 소나기 / 뇌우 -> 깊고 차분한 딥스톰 퍼플그레이
-  return {
-    icon: CloudRain,
-    bg: 'linear-gradient(135deg, #2b5876 0%, #4e4376 100%)'
-  };
+  const { condition, temp } = weather.current;
+  if (!condition) return { icon: Cloud, bg: BG.cloudy };
+
+  if (condition === 'SUNNY' && temp >= HOT_TEMP) return { icon: Sun, bg: BG.hotSunny };
+  return THEME[condition];
 }
+
+// 대기질 등급색 
+export const PM_COLOR: Record<PmGrade, string> = {
+  '좋음': '#38bdf8',
+  '보통': '#4ade80',
+  '나쁨': '#ef4444',
+  '매우나쁨': '#991b1b',
+};
+
+export const UV_COLOR: Record<UvGrade, string> = {
+  '낮음': '#4ade80',
+  '보통': '#fbbf24',
+  '높음': '#fb923c',
+  '매우높음': '#ef4444',
+  '위험': '#a855f7',
+};
+
+// 측정소 점검 등으로 등급이 없을 때
+export const UNKNOWN_GRADE_LABEL = '점검중';
+export const UNKNOWN_GRADE_COLOR = '#94a3b8';

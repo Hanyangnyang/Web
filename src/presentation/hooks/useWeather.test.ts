@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { queryClient } from '../../lib/queryClient.js';
 import { useWeather, prefetchWeather } from './useWeather.js';
+import type { Weather } from '../../domain/entities/Weather.js';
 
 // 훅들이 공유하는 전역 QueryClient를 그대로 사용 (프로덕션과 동일 인스턴스).
 // 테스트 간 캐시가 새지 않도록 매 테스트 전에 queryClient.clear()로 초기화한다.
@@ -24,8 +25,45 @@ function mockFetch(impl: (url: string) => Promise<Response>) {
   return fetchMock;
 }
 
-function makeWeatherMock(overrides = {}) {
-  return { temp: 20, hourlyForecast: [], ...overrides };
+// fetch가 돌려주는 서버 응답(DTO) 모양. Repository가 이걸 엔티티로 옮긴다.
+function makeWeatherApiResponse() {
+  return {
+    success: true,
+    data: {
+      current: {
+        forecastAt: '2026-08-13T23:00:00',
+        temperature: 20,
+        humidity: 50,
+        weatherCondition: 'SUNNY',
+        precipitation: 0,
+        pm10Value: 16,
+        pm10Grade: 1,
+        pm25Value: 4,
+        pm25Grade: 1,
+        uvIndex: 0,
+        maxTemperature: 30,
+        minTemperature: 18,
+      },
+      hourly: [],
+    },
+  };
+}
+
+// 이쪽은 캐시에 직접 넣는 용도라 DTO가 아니라 엔티티 모양이어야 한다
+function makeWeatherMock({ temp = 20 } = {}): Weather {
+  return {
+    current: {
+      epoch: 1786629600000,
+      temp,
+      condition: 'SUNNY',
+      maxTemp: 30,
+      minTemp: 18,
+      pm10Grade: '좋음',
+      pm25Grade: '좋음',
+      uvGrade: '낮음',
+    },
+    hourly: [],
+  };
 }
 
 describe('useWeather (React Query)', () => {
@@ -49,7 +87,7 @@ describe('useWeather (React Query)', () => {
   });
 
   it('fetch에 성공하면 날씨가 반영된다', async () => {
-    mockFetch(() => Promise.resolve(jsonResponse(true, makeWeatherMock())));
+    mockFetch(() => Promise.resolve(jsonResponse(true, makeWeatherApiResponse())));
 
     const { result } = renderHook(() => useWeather(true), { wrapper });
 
@@ -66,7 +104,7 @@ describe('useWeather (React Query)', () => {
     const { result } = renderHook(() => useWeather(true), { wrapper });
 
     expect(result.current.loading).toBe(false);
-    expect(result.current.weather!.temp).toBe(7);
+    expect(result.current.weather!.current.temp).toBe(7);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
