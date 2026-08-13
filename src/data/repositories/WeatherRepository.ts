@@ -41,7 +41,7 @@ export const createWeatherRepository = (
   getWeather: async () => {
     const res = await weatherApiDataSource.getWeather();
     if (!res.success) throw new Error(res.error?.message || 'weather API returned success:false');
-    // 현재 기온은 카드의 존재 이유라, 없으면 그릴 게 없다 — current 자체가 없는 것과 같은 급으로 던진다.
+   
     const current = res.data?.current;
     if (!current || typeof current.temperature !== 'number') {
       throw new Error('weather API returned invalid shape');

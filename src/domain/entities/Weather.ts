@@ -13,6 +13,7 @@ export type WeatherCondition = typeof WEATHER_CONDITIONS[number];
 export type PmGrade = '좋음' | '보통' | '나쁨' | '매우나쁨';
 export type UvGrade = '낮음' | '보통' | '높음' | '매우높음' | '위험';
 
+// DTO → 엔티티 변환 헬퍼
 export const toWeatherCondition = (raw: string | null): WeatherCondition | null =>
   raw !== null && (WEATHER_CONDITIONS as readonly string[]).includes(raw)
     ? (raw as WeatherCondition)
@@ -35,6 +36,7 @@ export const toUvGrade = (uvIndex: number): UvGrade => {
   return '낮음';
 };
 
+// 엔티티 정의
 export interface WeatherSnapshot {
   epoch: number;
   temp: number;                        // ℃
