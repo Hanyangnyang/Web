@@ -19,7 +19,7 @@ interface LibraryStatusCardProps {
 // 제목 줄은 어느 상태에서든 같은 자리에 있어야 해서 껍데기를 공통으로 둔다
 function Section({ updatedAtLabel, children }: { updatedAtLabel?: string | null; children: React.ReactNode }) {
   return (
-    <section className="mb-6">
+    <section>
       <div className="flex items-baseline justify-between gap-2 mb-2">
         <h3 className="text-xl font-bold text-text-main">학정 혼잡도</h3>
         {updatedAtLabel && (
@@ -43,7 +43,7 @@ function Notice({ icon, message }: { icon: React.ReactNode; message: string }) {
 }
 
 export function LibraryStatusCard({ library, loading, error }: LibraryStatusCardProps) {
-  // 1. 첫 로딩 — 스켈레톤
+  // 1. 로딩중 — 스켈레톤
   if (loading) {
     return (
       <Section>
@@ -66,12 +66,12 @@ export function LibraryStatusCard({ library, loading, error }: LibraryStatusCard
     );
   }
 
-  // 2. 조회 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
+  // 2. 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
   if (error && !library) {
     return <Section><Notice icon={<WifiOff size={20} className="text-text-hint" />} message="혼잡도 정보를 불러오지 못했습니다" /></Section>;
   }
 
-  // 3. 응답은 왔지만 열람실이 없음 — 방학 중 휴관 등. 빈 배열은 truthy라 length로 판단해야 한다.
+  // 3. 성공했지만 비어있음 — 방학 중 휴관 등. 빈 배열은 truthy라 length로 판단해야 한다.
   if (!library?.list.length) {
     return <Section><Notice icon={<Info size={20} className="text-text-hint" />} message="지금은 운영 중인 열람실이 없습니다" /></Section>;
   }
@@ -98,7 +98,7 @@ export function LibraryStatusCard({ library, loading, error }: LibraryStatusCard
 
             <div className="mt-auto">
               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                <div className="h-full transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{
+                <div className="h-full" style={{
                   width: `${room.ratio * 100}%`,
                   backgroundColor: color
                 }} />
