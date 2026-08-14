@@ -44,6 +44,16 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
           </div>
         </div>
 
+        <div className={cardClass} onClick={() => onBoxClick('playlist')}>
+          <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
+            <Music size={28} color="#10b981" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[0.95rem] font-extrabold text-text-main">에리카 플레이리스트</span>
+            <span className="text-[0.8rem] text-text-sub">음악 추천 & 공유</span>
+          </div>
+        </div>
+
         <div className={cardClass} onClick={() => onBoxClick('calendar')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <CalendarDays size={28} color="#0E4A84" />
@@ -54,16 +64,6 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
               <ExternalLink size={14} strokeWidth={2.75} style={{ opacity: 0.8 }} />
             </span>
             <span className="text-[0.8rem] text-text-sub">에리카 학사 캘린더</span>
-          </div>
-        </div>
-
-        <div className={cardClass} onClick={() => onBoxClick('playlist')}>
-          <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <Music size={28} color="#10b981" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[0.95rem] font-extrabold text-text-main">에리카 플레이리스트</span>
-            <span className="text-[0.8rem] text-text-sub">음악 추천 & 공유</span>
           </div>
         </div>
 
