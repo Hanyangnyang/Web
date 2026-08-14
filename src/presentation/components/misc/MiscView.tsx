@@ -4,6 +4,7 @@ import { usePostHog } from 'posthog-js/react';
 import { GymView } from './GymView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
 import { MiscSubViewHeader } from './MiscSubViewHeader.jsx';
+import { PlaylistView } from '../playlist/PlaylistView';
 
 type SubViewComponent = ComponentType<{ onBack: () => void }>;
 
@@ -116,6 +117,7 @@ export function MiscView({ resetSignal, isActive = false }: MiscViewProps) {
   };
 
   if (subView === 'gym') return <GymView onBack={() => setSubView('list')} />;
+  if (subView === 'playlist') return <PlaylistView onBack={() => setSubView('list')} />;
   if (subView === 'insta') {
     const onBack = () => setSubView('list');
     if (InstagramViewComp) {
