@@ -22,7 +22,7 @@ export function MiscSubViewHeader({ title, onBack, emoji, subtitle, rightAction 
         <div className="flex items-center gap-2 mb-1">
           <h1 className="text-xl font-bold text-text-main m-0">
             {title}
-            {emoji && <span className="ml-2">{emoji}</span>}
+            {emoji}
           </h1>
         </div>
         {subtitle && <p className="text-[0.8rem] text-text-sub font-medium m-0">{subtitle}</p>}

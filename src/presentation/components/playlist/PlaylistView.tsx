@@ -1,25 +1,17 @@
-import { Plus, Heart, Play } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { getGenreColor, getGenreActiveColor } from './playlistTheme';
 import { FloatingSpotifyPlayer } from './FloatingSpotifyPlayer';
 import { SocialLoginModal } from './SocialLoginModal';
+import { AddSongFab } from './AddSongFab';
+import { RecentSongsView } from './RecentSongsView';
+import { RecentSongCard } from './RecentSongCard';
+import { ChartSongRow } from './ChartSongRow';
+import { type Song, GENRES } from './playlistTypes';
 
-interface Song {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-  userProfile: {
-    name: string;
-    avatarUrl: string;
-  };
-  comment: string;
-  genres: string[];
-  heartCount: number;
-  previewUrl: string;
-  createdAt: Date;
-}
+const RECENT_SONGS_LIMIT = 7;
+const CHART_LIMIT = 10;
 
 const USER_NAMES = ['이줄', '민지', '수진', '준호', '태희', '성은', '다영', '호진', '지은', '명준', '민준', '혜원', '기범', '소연', '주현'];
 const USER_COMMENTS = [
@@ -74,7 +66,7 @@ const DUMMY_SONGS: Song[] = [
     createdAt: new Date(),
   },
   {
-    trackId: '3',
+    trackId: '3c0anSTjsn20lztbBmZt03',
     title: '미장원',
     artist: '주혜린',
     albumArtUrl: '',
@@ -86,7 +78,7 @@ const DUMMY_SONGS: Song[] = [
     createdAt: new Date(),
   },
   {
-    trackId: '4',
+    trackId: '0kt2S0FV9DEGIOg247sT8b',
     title: '미친건가',
     artist: '주혜린',
     albumArtUrl: '',
@@ -109,16 +101,78 @@ const DUMMY_SONGS: Song[] = [
     previewUrl: '',
     createdAt: new Date(),
   },
-];
-
-const GENRES = [
-  { key: 'all', label: '전체', emoji: '', colorIndex: -1 },
-  { key: 'rb', label: 'R&B', emoji: '🎤', colorIndex: 0 },
-  { key: 'kpop', label: 'K-pop', emoji: '🎸', colorIndex: 1 },
-  { key: 'indie', label: '인디', emoji: '🎹', colorIndex: 2 },
-  { key: 'rock', label: '락', emoji: '🎸', colorIndex: 3 },
-  { key: 'ballad', label: '발라드', emoji: '🎻', colorIndex: 4 },
-  { key: 'hiphop', label: '힙합', emoji: '🎤', colorIndex: 5 },
+  {
+    trackId: '171mGT1HdxM2HdqZrWNY31',
+    title: '다큐멘터리',
+    artist: '윤마치',
+    albumArtUrl: '',
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    genres: ['K-pop'],
+    heartCount: 265,
+    previewUrl: '',
+    createdAt: new Date(),
+  },
+  {
+    trackId: '3c0anSTjsn20lztbBmZt03',
+    title: '미장원',
+    artist: '주혜린',
+    albumArtUrl: '',
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    genres: ['K-pop'],
+    heartCount: 254,
+    previewUrl: '',
+    createdAt: new Date(),
+  },
+  {
+    trackId: '0kt2S0FV9DEGIOg247sT8b',
+    title: '미친건가',
+    artist: '주혜린',
+    albumArtUrl: '',
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    genres: ['K-pop'],
+    heartCount: 243,
+    previewUrl: '',
+    createdAt: new Date(),
+  },
+  {
+    trackId: '4uh6rj3FryYQXMz9zLqDKL',
+    title: 'Fly away',
+    artist: '권진아',
+    albumArtUrl: '',
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    genres: ['K-pop'],
+    heartCount: 232,
+    previewUrl: '',
+    createdAt: new Date(),
+  },
+  {
+    trackId: '6W4iF5kAqqwKiVwAk3TcN1',
+    title: '하루에 한번씩',
+    artist: '거니',
+    albumArtUrl: '',
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    genres: ['K-pop'],
+    heartCount: 221,
+    previewUrl: '',
+    createdAt: new Date(),
+  },
+  {
+    trackId: '63yKhliWjZOJ39UQhXcBhO',
+    title: '왜,왜,왜',
+    artist: 'SUMIN',
+    albumArtUrl: '',
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    genres: ['K-pop'],
+    heartCount: 210,
+    previewUrl: '',
+    createdAt: new Date(),
+  },
 ];
 
 const DUMMY_CHART: Song[] = [
@@ -171,7 +225,7 @@ const DUMMY_CHART: Song[] = [
     createdAt: new Date(),
   },
   {
-    trackId: '105',
+    trackId: '3c0anSTjsn20lztbBmZt03',
     title: '미장원',
     artist: '주혜린',
     albumArtUrl: '',
@@ -183,7 +237,7 @@ const DUMMY_CHART: Song[] = [
     createdAt: new Date(),
   },
   {
-    trackId: '106',
+    trackId: '0kt2S0FV9DEGIOg247sT8b',
     title: '미친건가',
     artist: '주혜린',
     albumArtUrl: '',
@@ -238,17 +292,78 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<Song | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showAllRecent, setShowAllRecent] = useState(false);
 
+  const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
+  const visibleChart = chart.slice(0, CHART_LIMIT);
+
+  return (
+    <>
+      {showAllRecent ? (
+        <RecentSongsView
+          songs={songs}
+          onBack={() => setShowAllRecent(false)}
+          onPlay={setCurrentTrack}
+          onRequireLogin={() => setShowLoginModal(true)}
+        />
+      ) : (
+        <PlaylistMainContent
+          onBack={onBack}
+          visibleSongs={visibleSongs}
+          visibleChart={visibleChart}
+          selectedGenre={selectedGenre}
+          setSelectedGenre={setSelectedGenre}
+          onShowAllRecent={() => setShowAllRecent(true)}
+          onShowLoginModal={() => setShowLoginModal(true)}
+          onPlay={setCurrentTrack}
+        />
+      )}
+
+      {/* 곡 추가 FAB + 플로팅 Spotify 플레이어 (화면 전환과 무관하게 항상 같은 위치에서 렌더링되어야 상태가 유지됨) */}
+      <AddSongFab isPlayerOpen={!!currentTrack} />
+      <FloatingSpotifyPlayer
+        song={currentTrack}
+        onClose={() => setCurrentTrack(null)}
+        onRequireLogin={() => setShowLoginModal(true)}
+      />
+
+      {/* 소셜 로그인 모달 */}
+      <SocialLoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+    </>
+  );
+}
+
+interface PlaylistMainContentProps {
+  onBack: () => void;
+  visibleSongs: Song[];
+  visibleChart: Song[];
+  selectedGenre: string;
+  setSelectedGenre: (genre: string) => void;
+  onShowAllRecent: () => void;
+  onShowLoginModal: () => void;
+  onPlay: (song: Song) => void;
+}
+
+function PlaylistMainContent({
+  onBack,
+  visibleSongs,
+  visibleChart,
+  selectedGenre,
+  setSelectedGenre,
+  onShowAllRecent,
+  onShowLoginModal,
+  onPlay,
+}: PlaylistMainContentProps) {
   return (
     <div className="pb-24">
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
-        subtitle="에리카인들에게 본인의 곡을 추천해주세요!"
+        subtitle="에리카생들에게 곡을 추천해주세요!"
         onBack={onBack}
         rightAction={
           <button
-            onClick={() => setShowLoginModal(true)}
+            onClick={onShowLoginModal}
             className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-full transition-colors active:scale-95"
           >
             ❤️ 좋아요 누른곡
@@ -258,92 +373,27 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
 
       {/* 최근 추가된 곡 섹션 */}
       <section className="mb-4">
-        <div className="flex items-center mb-3">
+        <div className="flex items-center gap-1 mb-3">
           <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
+          <button
+            onClick={onShowAllRecent}
+            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
+            aria-label="최근 추가된 곡 전체보기"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
 
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
-            {songs.map((song) => {
-              const [heartClicked, setHeartClicked] = useState(false);
-              const [displayHeartCount, setDisplayHeartCount] = useState(song.heartCount);
-
-              const handleHeartClick = () => {
-                setShowLoginModal(true);
-              };
-
-              const handlePlayClick = () => {
-                setCurrentTrack(song);
-              };
-
-              return (
-                <div
-                  key={song.trackId}
-                  className="flex-shrink-0 w-56 aspect-[4/5] bg-white rounded-lg overflow-hidden shadow-md flex flex-col relative"
-                >
-                  {/* 앨범커버 + 오버레이 */}
-                  <div className="relative flex-1">
-                    <img
-                      src={song.albumArtUrl}
-                      alt={song.title}
-                      className="w-full h-full object-cover"
-                    />
-
-                    {/* 중앙 재생 버튼 */}
-                    <div className="absolute inset-0 flex items-center justify-center z-10">
-                      <button onClick={handlePlayClick} className="flex items-center justify-center text-black hover:scale-110 transition-transform active:scale-95">
-                        <Play size={40} fill="none" stroke="currentColor" strokeWidth={2} />
-                      </button>
-                    </div>
-
-                    {/* 우측 상단 하트 버튼 + 개수 */}
-                    <div className="absolute top-2 right-2 flex flex-col items-center gap-0 z-10">
-                      <button
-                        onClick={handleHeartClick}
-                        className="w-9 h-9 rounded-full flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
-                      >
-                        <Heart
-                          size={18}
-                          className="text-red-500 stroke-[2]"
-                          fill={heartClicked ? "currentColor" : "none"}
-                        />
-                      </button>
-                      <div className="text-[10px] font-extrabold text-white drop-shadow-lg">
-                        {displayHeartCount}
-                      </div>
-                    </div>
-
-                    {/* 그라데이션 오버레이 */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black pointer-events-none" />
-                    {/* 곡 정보 오버레이 */}
-                    <div className="absolute bottom-[52px] inset-x-0 px-3 py-3 text-white">
-                      <div className="text-sm font-bold truncate">{song.title}</div>
-                      <div className="text-sm opacity-90 truncate">{song.artist}</div>
-                    </div>
-                  </div>
-
-                  {/* 사용자 정보 섹션 */}
-                  <div className="absolute bottom-0 inset-x-0 px-3 py-3 bg-gradient-to-b from-black/50 to-black rounded-b-lg z-10">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={song.userProfile.avatarUrl}
-                        alt={song.userProfile.name}
-                        className="w-7 h-7 rounded-full object-cover flex-shrink-0 border border-white/30"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold text-white leading-snug line-clamp-1">
-                          "{song.comment}"
-                        </div>
-                        <div className="text-[10px] text-white truncate ml-1 opacity-80 ">
-                          {song.userProfile.name}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              );
-            })}
+            {visibleSongs.map((song) => (
+              <RecentSongCard
+                key={song.trackId}
+                song={song}
+                onPlay={onPlay}
+                onRequireLogin={onShowLoginModal}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -382,78 +432,22 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
             <span className="w-7 text-center">순위</span>
             <div className="flex-1">곡정보</div>
+            <div className="w-6 text-center">듣기</div>
             <div className="flex flex-col items-center justify-center w-8 flex-shrink-0">좋아요</div>
           </div>
 
           {/* 리스트 */}
-          {chart.map((song, index) => {
-            const [heartClicked, setHeartClicked] = useState(false);
-            const [displayHeartCount, setDisplayHeartCount] = useState(song.heartCount);
-
-            const handleHeartClick = () => {
-              setShowLoginModal(true);
-            };
-
-            return (
-              <div
-                key={song.trackId}
-                className="flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 transition-colors"
-              >
-                {/* 순위 */}
-                <span className="font-bold text-sm text-gray-900 w-7 text-center flex-shrink-0">
-                  {index + 1}
-                </span>
-
-                {/* Spotify embed player */}
-                <div className="flex-1">
-                  <iframe
-                    src={`https://open.spotify.com/embed/track/${song.trackId}?utm_source=generator`}
-                    width="100%"
-                    height="88"
-                    frameBorder="0"
-                    allowFullScreen
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    className="rounded"
-                  />
-                </div>
-
-                {/* 좋아요 */}
-                <div className="flex flex-col items-center justify-center gap-0.5 flex-shrink-0">
-                  <button
-                    onClick={handleHeartClick}
-                    className="flex items-center justify-center w-6 text-red-500 hover:scale-110 transition-transform active:scale-95"
-                  >
-                    <Heart
-                      size={18}
-                      className="stroke-[2]"
-                      fill={heartClicked ? "currentColor" : "none"}
-                    />
-                  </button>
-                  <span className="text-[9px] font-semibold text-black">{displayHeartCount}</span>
-                </div>
-              </div>
-            );
-          })}
+          {visibleChart.map((song, index) => (
+            <ChartSongRow
+              key={song.trackId}
+              song={song}
+              rank={index + 1}
+              onPlay={onPlay}
+              onRequireLogin={onShowLoginModal}
+            />
+          ))}
         </div>
       </section>
-
-      {/* 플로팅 Spotify 플레이어 */}
-      <FloatingSpotifyPlayer
-        song={currentTrack}
-        onClose={() => setCurrentTrack(null)}
-      />
-
-      {/* FAB 버튼 */}
-      <button className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-hyu-blue text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow active:scale-95">
-        <Plus size={24} />
-      </button>
-
-      {/* 소셜 로그인 모달 */}
-      <SocialLoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
     </div>
   );
 }
