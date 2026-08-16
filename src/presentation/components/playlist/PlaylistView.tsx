@@ -5,6 +5,8 @@ import { getGenreColor, getGenreActiveColor } from './playlistTheme';
 import { FloatingSpotifyPlayer } from './FloatingSpotifyPlayer';
 import { SocialLoginModal } from './SocialLoginModal';
 import { AddSongFab } from './AddSongFab';
+import { AddSongView } from './AddSongView';
+import { LikedSongsView } from './LikedSongsView';
 import { RecentSongsView } from './RecentSongsView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
@@ -286,23 +288,33 @@ const DUMMY_CHART: Song[] = [
   },
 ];
 
+type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'liked';
+
 export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [songs, setSongs] = useState<Song[]>(DUMMY_SONGS);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<Song | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showAllRecent, setShowAllRecent] = useState(false);
+  const [screen, setScreen] = useState<PlaylistScreen>('main');
 
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = chart.slice(0, CHART_LIMIT);
 
   return (
     <>
-      {showAllRecent ? (
+      {screen === 'recent' ? (
         <RecentSongsView
           songs={songs}
-          onBack={() => setShowAllRecent(false)}
+          onBack={() => setScreen('main')}
+          onPlay={setCurrentTrack}
+          onRequireLogin={() => setShowLoginModal(true)}
+        />
+      ) : screen === 'addSong' ? (
+        <AddSongView onBack={() => setScreen('main')} onRequireLogin={() => setShowLoginModal(true)} />
+      ) : screen === 'liked' ? (
+        <LikedSongsView
+          onBack={() => setScreen('main')}
           onPlay={setCurrentTrack}
           onRequireLogin={() => setShowLoginModal(true)}
         />
@@ -313,14 +325,17 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           visibleChart={visibleChart}
           selectedGenre={selectedGenre}
           setSelectedGenre={setSelectedGenre}
-          onShowAllRecent={() => setShowAllRecent(true)}
+          onShowAllRecent={() => setScreen('recent')}
+          onShowLiked={() => setScreen('liked')}
           onShowLoginModal={() => setShowLoginModal(true)}
           onPlay={setCurrentTrack}
         />
       )}
 
-      {/* 곡 추가 FAB + 플로팅 Spotify 플레이어 (화면 전환과 무관하게 항상 같은 위치에서 렌더링되어야 상태가 유지됨) */}
-      <AddSongFab isPlayerOpen={!!currentTrack} />
+      {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어가 떠있을 땐 평소 위치 그대로 두어 플레이어에 자연히 가려짐 */}
+      {screen !== 'addSong' && <AddSongFab onClick={() => setScreen('addSong')} />}
+
+      {/* 플로팅 Spotify 플레이어 (화면 전환과 무관하게 항상 같은 위치에서 렌더링되어야 상태가 유지됨) */}
       <FloatingSpotifyPlayer
         song={currentTrack}
         onClose={() => setCurrentTrack(null)}
@@ -340,6 +355,7 @@ interface PlaylistMainContentProps {
   selectedGenre: string;
   setSelectedGenre: (genre: string) => void;
   onShowAllRecent: () => void;
+  onShowLiked: () => void;
   onShowLoginModal: () => void;
   onPlay: (song: Song) => void;
 }
@@ -351,6 +367,7 @@ function PlaylistMainContent({
   selectedGenre,
   setSelectedGenre,
   onShowAllRecent,
+  onShowLiked,
   onShowLoginModal,
   onPlay,
 }: PlaylistMainContentProps) {
@@ -363,7 +380,7 @@ function PlaylistMainContent({
         onBack={onBack}
         rightAction={
           <button
-            onClick={onShowLoginModal}
+            onClick={onShowLiked}
             className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-full transition-colors active:scale-95"
           >
             ❤️ 좋아요 누른곡
