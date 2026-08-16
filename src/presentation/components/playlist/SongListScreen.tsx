@@ -14,17 +14,15 @@ interface SongListScreenProps {
   onRequireLogin: () => void;
 }
 
-// "최근 추가된 곡"/"좋아요 누른곡" 등, 세로 리스트 화면들이 공유하는 껍데기
-// (스크롤 시 딱 붙는 헤더 + 장르칩 + 곡 리스트). 헤더 텍스트만 화면마다 다르게 받는다.
 export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, onRequireLogin }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
 
   return (
-    <div className="pb-24">
+    <div className="bg-white -mx-4 px-4 pb-24">
       {/* 고정 헤더 */}
       <div className="sticky -top-6 -mt-6 z-[100] bg-surface/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader title={title} emoji={emoji} subtitle={subtitle} onBack={onBack} />
-        <div className="flex gap-2 overflow-x-auto pb-3 px-2 ml-[-1rem] [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="flex gap-2 overflow-x-auto pb-3 px-4 ml-[-1rem] [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {GENRES.map((genre) => (
             <button
               key={genre.key}
@@ -45,9 +43,8 @@ export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, 
           ))}
         </div>
       </div>
-
       {/* 곡 리스트 */}
-      <div>
+      <div className="bg-white -mx-4 px-4">
         {songs.map((song, index) => (
           <div key={song.trackId}>
             {index > 0 && <div className="border-t border-slate-200" />}

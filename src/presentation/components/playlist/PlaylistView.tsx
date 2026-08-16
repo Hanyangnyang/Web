@@ -17,7 +17,7 @@ const CHART_LIMIT = 10;
 
 const USER_NAMES = ['이줄', '민지', '수진', '준호', '태희', '성은', '다영', '호진', '지은', '명준', '민준', '혜원', '기범', '소연', '주현'];
 const USER_COMMENTS = [
-  '이 노래 진짜 좋아! 🎶',
+  '이 노래 진짜 좋아! 베이스가 미쳤어 내인생 이런 R&B는 처음이야 ㅠㅠ',
   '요즘 내 감성이야 ✨',
   '반복 재생 중...',
   '이렇게 좋은 곡이 있다니',
@@ -31,7 +31,7 @@ const USER_COMMENTS = [
   '요즘 탈출곡',
   '혼자만 알고싶던 곡',
   '신곡 좋네요',
-  '이 아티스트 완전 사랑해',
+  '이 아티스트 완전 사랑해 진짜 너무너무너무너무너무너무너무 사랑해',
 ];
 
 function getRandomElement<T>(arr: T[]): T {
@@ -128,9 +128,9 @@ const DUMMY_SONGS: Song[] = [
     createdAt: new Date(),
   },
   {
-    trackId: '0kt2S0FV9DEGIOg247sT8b',
-    title: '미친건가',
-    artist: '주혜린',
+    trackId: '3aK5mtd4CKxLF6RpC1doh6',
+    title: '마음으로',
+    artist: '유다빈밴드',
     albumArtUrl: '',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
