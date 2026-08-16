@@ -12,37 +12,38 @@ interface SearchTrack {
 }
 
 const COMMENT_MAX_LENGTH = 30;
-const SEARCH_DEBOUNCE_MS = 600;
+const SEARCH_COOLDOWN_MS = 600;
+const MIN_QUERY_LENGTH = 2;
 
-// TODO: 실제 스포티파이 검색 연동 전까지 쓰는 목업 데이터.
-// 기존 /api/music.js는 title+artist로 트랙 1개를 찾는 용도라 자유 검색어에는 못 씀 — 별도 검색 API 필요.
-const MOCK_SEARCH_CATALOG: SearchTrack[] = [
-  { trackId: '5eBM5qATb1IfJvNzGuS2GX', title: 'Busy Boy', artist: '주혜린', albumArtUrl: '' },
-  { trackId: '171mGT1HdxM2HdqZrWNY31', title: '다큐멘터리', artist: '윤마치', albumArtUrl: '' },
-  { trackId: '3c0anSTjsn20lztbBmZt03', title: '미장원', artist: '주혜린', albumArtUrl: '' },
-  { trackId: '0kt2S0FV9DEGIOg247sT8b', title: '미친건가', artist: '주혜린', albumArtUrl: '' },
-  { trackId: '4uh6rj3FryYQXMz9zLqDKL', title: 'Fly away', artist: '권진아', albumArtUrl: '' },
-  { trackId: '3Q3wWJxr6sBt8afP9hJj4J', title: 'LOVE SONG', artist: '유다빈밴드', albumArtUrl: '' },
-  { trackId: '4Qqd4mzQzVGpvPrzq3Dtn8', title: '초록', artist: '윤마치', albumArtUrl: '' },
-  { trackId: '6W4iF5kAqqwKiVwAk3TcN1', title: '하루에 한번씩', artist: '거니', albumArtUrl: '' },
-  { trackId: '63yKhliWjZOJ39UQhXcBhO', title: '왜,왜,왜', artist: 'SUMIN', albumArtUrl: '' },
-];
+function normalizeQuery(query: string): string {
+  return query.trim().replace(/\s+/g, ' ');
+}
 
-function searchTracksMock(query: string): Promise<SearchTrack[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const q = query.trim().toLowerCase();
-      if (!q) {
-        resolve([]);
-        return;
-      }
-      resolve(
-        MOCK_SEARCH_CATALOG.filter(
-          (track) => track.title.toLowerCase().includes(q) || track.artist.toLowerCase().includes(q)
-        )
-      );
-    }, 500);
-  });
+class SearchApiError extends Error {
+  status: number;
+  retryAfterSeconds?: number;
+
+  constructor(message: string, status: number, retryAfterSeconds?: number) {
+    super(message);
+    this.status = status;
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
+
+async function searchTracks(query: string): Promise<SearchTrack[]> {
+  const normalized = normalizeQuery(query);
+  const response = await fetch(`/api/music-search?q=${encodeURIComponent(normalized)}`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const retryAfterHeader = response.headers.get('Retry-After');
+    throw new SearchApiError(
+      body?.error || '검색 중 문제가 생겼어요. 다시 시도해주세요.',
+      response.status,
+      retryAfterHeader ? Number(retryAfterHeader) : undefined
+    );
+  }
+  const data = await response.json();
+  return data.tracks as SearchTrack[];
 }
 
 interface AddSongViewProps {
@@ -55,6 +56,8 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchTrack[]>([]);
+  const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(null);
+  const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
   const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [comment, setComment] = useState('');
@@ -62,19 +65,48 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
   const lastSearchAtRef = useRef(0);
 
   const handleSearchClick = () => {
+    if (query.trim().length < MIN_QUERY_LENGTH) {
+      setSelectedTrack(null);
+      setSearchResults([]);
+      setSearchErrorMessage(`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`);
+      setHasSearched(true);
+      return;
+    }
+
     const now = Date.now();
-    if (now - lastSearchAtRef.current < SEARCH_DEBOUNCE_MS) return;
-    if (!query.trim() || isSearching) return;
+    if (now - lastSearchAtRef.current < SEARCH_COOLDOWN_MS) return;
+    if (isSearching || retryBlockedUntil > 0) return;
     lastSearchAtRef.current = now;
 
     setIsSearching(true);
+    setSearchErrorMessage(null);
     setSelectedTrack(null);
-    searchTracksMock(query).then((results) => {
-      setSearchResults(results);
-      setHasSearched(true);
-      setIsSearching(false);
-    });
+    searchTracks(query)
+      .then((results) => {
+        setSearchResults(results);
+        setHasSearched(true);
+      })
+      .catch((error) => {
+        console.error('[AddSongView] search failed:', error);
+        setSearchResults([]);
+        setHasSearched(true);
+        setSearchErrorMessage(
+          error instanceof SearchApiError ? error.message : '검색 중 문제가 생겼어요. 다시 시도해주세요'
+        );
+
+        if (error instanceof SearchApiError && error.retryAfterSeconds) {
+          const jitterMs = Math.random() * 1000;
+          const waitMs = error.retryAfterSeconds * 1000 + jitterMs;
+          setRetryBlockedUntil(Date.now() + waitMs);
+          setTimeout(() => setRetryBlockedUntil(0), waitMs);
+        }
+      })
+      .finally(() => {
+        setIsSearching(false);
+      });
   };
+
+  const isResultsPanelOpen = !selectedTrack && hasSearched && !isSearching;
 
   const canSubmit = !!selectedTrack && !!selectedGenre && comment.trim().length > 0;
 
@@ -95,27 +127,68 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
       {/* 곡 검색 */}
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-3">곡 검색</h3>
-        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="곡 제목이나 아티스트를 검색해보세요"
-            className="flex-1 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
-          />
-          <button
-            onClick={handleSearchClick}
-            disabled={isSearching || !query.trim()}
-            aria-label="곡 검색"
-            className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-primary disabled:text-text-hint hover:bg-primary/10 transition-colors active:scale-90"
-          >
-            {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-          </button>
+        <div
+          className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all ${
+            isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
+          }`}
+        >
+          <div className="flex items-center gap-2 px-3.5 py-2.5">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="곡 제목이나 아티스트를 검색해보세요"
+              className="flex-1 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+            />
+            <button
+              onClick={handleSearchClick}
+              disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
+              aria-label="곡 검색"
+              className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-primary disabled:text-text-hint hover:bg-primary/10 transition-colors active:scale-90"
+            >
+              {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+            </button>
+          </div>
+        </div>
+
+        {/* 검색 결과 — 검색창과 이어진 아코디언 패널 */}
+        <div
+          className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+            isResultsPanelOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="bg-white border border-t-0 border-slate-200 rounded-b-card divide-y divide-slate-200">
+              {searchResults.length > 0 ? (
+                searchResults.map((track) => (
+                  <button
+                    key={track.trackId}
+                    onClick={() => setSelectedTrack(track)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 transition-colors text-left"
+                  >
+                    <img
+                      src={track.albumArtUrl}
+                      alt={track.title}
+                      className="w-10 h-10 rounded object-cover flex-shrink-0 bg-slate-100"
+                    />
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
+                      <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <p className="text-xs text-text-hint text-center px-3 min-h-[60px] flex items-center justify-center whitespace-pre-line">
+                  {searchErrorMessage || '검색 결과가 없어요'}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* 선택된 곡 */}
         {selectedTrack && (
-          <div className="mt-3 flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-card px-3 py-2.5">
+          <div className="mt-3 flex items-center gap-3 bg-white border border-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
             <img
               src={selectedTrack.albumArtUrl}
               alt={selectedTrack.title}
@@ -133,33 +206,6 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
               <X size={16} className="text-text-sub" />
             </button>
           </div>
-        )}
-
-        {/* 검색 결과 */}
-        {!selectedTrack && hasSearched && !isSearching && (
-          searchResults.length > 0 ? (
-            <div className="mt-3 bg-white rounded-card border border-slate-200 divide-y divide-slate-200 overflow-hidden">
-              {searchResults.map((track) => (
-                <button
-                  key={track.trackId}
-                  onClick={() => setSelectedTrack(track)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 transition-colors text-left"
-                >
-                  <img
-                    src={track.albumArtUrl}
-                    alt={track.title}
-                    className="w-10 h-10 rounded object-cover flex-shrink-0 bg-slate-100"
-                  />
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
-                    <div className="text-xs text-text-sub truncate">{track.artist}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-3 text-xs text-text-hint text-center py-3">검색 결과가 없어요</p>
-          )
         )}
       </section>
 

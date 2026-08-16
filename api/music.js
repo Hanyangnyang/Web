@@ -1,41 +1,9 @@
+import { getSpotifyAccessToken } from './_lib/spotifyAuth.js';
+
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-let cachedToken = { token: null, expiresAt: 0 };
 const trackCache = new Map(); // 트랙 검색 결과 캐시
-
-async function getSpotifyAccessToken() {
-  const now = Date.now();
-  if (cachedToken.token && now < cachedToken.expiresAt) {
-    return cachedToken.token;
-  }
-
-  console.log('[Spotify Auth] Requesting access token...');
-  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${auth}`,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: 'grant_type=client_credentials'
-  });
-
-  console.log('[Spotify Auth] Token response status:', response.status);
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.log('[Spotify Auth] Error body:', errorBody);
-    throw new Error(`Spotify auth failed: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  cachedToken = {
-    token: data.access_token,
-    expiresAt: now + (data.expires_in * 1000)
-  };
-
-  return data.access_token;
-}
 
 async function searchSpotifyTrack(title, artist) {
   const token = await getSpotifyAccessToken();
