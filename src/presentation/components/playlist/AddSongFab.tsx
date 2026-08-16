@@ -3,7 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 
 interface AddSongFabProps {
   onClick?: () => void;
+  // true면 플로팅 플레이어 위(우측 상단)로, false면 화면 하단 우측으로 애니메이션과 함께 이동
+  playerOpen?: boolean;
 }
+
+// max-w-app(440px) 컬럼의 우측 끝에서 1rem 안쪽 — 플레이어 카드와 같은 기준으로 정렬
+const FAB_RIGHT = 'right-[max(1rem,calc((100vw-440px)/2+1rem))]';
+const CLOSED_BOTTOM = 'calc(24px + env(safe-area-inset-bottom))';
+// 플레이어 카드 높이(헤더 ~52px + iframe 152px) + 여백 16px 위에 떠 있도록
+const OPEN_BOTTOM = 'calc(204px + env(safe-area-inset-bottom) + 16px)';
 
 // 이 FAB은 앱 전역 스크롤 컨테이너(App.tsx)를 prop으로 전달받을 방법이 없어서,
 // DOM에서 가장 가까운 스크롤 가능한 조상을 직접 찾아 스크롤 여부를 감지한다.
@@ -16,7 +24,7 @@ function findScrollParent(el: HTMLElement | null): HTMLElement | null {
   return null;
 }
 
-export function AddSongFab({ onClick }: AddSongFabProps) {
+export function AddSongFab({ onClick, playerOpen = false }: AddSongFabProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -35,10 +43,10 @@ export function AddSongFab({ onClick }: AddSongFabProps) {
       ref={buttonRef}
       onClick={onClick}
       aria-label="곡 추천하기"
-      className={`fixed right-[max(2.75rem,calc(50%-168px))] h-12 rounded-full bg-blue-200 text-blue-900 ring-1 ring-blue-300 flex items-center justify-center overflow-hidden shadow-[0_6px_20px_rgba(191,219,254,0.5)] hover:shadow-[0_8px_24px_rgba(191,219,254,0.65)] transition-[width,bottom,box-shadow] duration-300 ease-out active:scale-90 z-40 ${
+      className={`fixed ${FAB_RIGHT} z-40 h-12 rounded-full bg-white text-gray-900 ring-1 ring-gray-900 flex items-center justify-center overflow-hidden shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-[width,bottom,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-90 ${
         collapsed ? 'w-12' : 'w-[128px]'
       }`}
-      style={{ bottom: 'calc(24px + 64px + 24px + env(safe-area-inset-bottom))' }}
+      style={{ bottom: playerOpen ? OPEN_BOTTOM : CLOSED_BOTTOM }}
     >
       <Plus size={22} strokeWidth={2.5} className="flex-shrink-0" />
       <span

@@ -1,7 +1,6 @@
 import { Loader2, Search, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
-import { getGenreColor, getGenreActiveColor } from './playlistTheme';
 import { GENRES } from './playlistTypes';
 
 interface SearchTrack {
@@ -116,7 +115,7 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
   };
 
   return (
-    <div className="pb-32">
+    <div className="pb-[calc(204px+env(safe-area-inset-bottom))]">
       <MiscSubViewHeader
         title="곡 추천하기"
         emoji="🤔"
@@ -219,8 +218,8 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
               onClick={() => setSelectedGenre((prev) => (prev === genre.key ? null : genre.key))}
               className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
                 selectedGenre === genre.key
-                  ? `${getGenreActiveColor(genre.colorIndex)} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
-                  : `${getGenreColor(genre.colorIndex)} text-gray-800 border-transparent`
+                  ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
+                  : `${genre.light} text-gray-800 border-transparent`
               }`}
             >
               <span className="text-base">{genre.emoji}</span>
@@ -255,7 +254,7 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
         className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold shadow-[0_6px_20px_rgba(14,74,132,0.3)] transition-all active:scale-[0.97] z-40 ${
           canSubmit ? 'bg-primary text-white' : 'bg-slate-200 text-slate-400'
         }`}
-        style={{ bottom: 'calc(24px + 64px + 24px + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}
       >
         등록하기
       </button>

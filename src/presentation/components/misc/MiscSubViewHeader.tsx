@@ -18,14 +18,14 @@ export function MiscSubViewHeader({ title, onBack, emoji, subtitle, rightAction 
       >
         <ArrowLeft size={20} />
       </button>
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-xl font-bold text-text-main m-0">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1 min-w-0">
+          <h1 className="text-xl font-bold text-text-main m-0 truncate">
             {title}
             {emoji}
           </h1>
         </div>
-        {subtitle && <p className="text-[0.8rem] text-text-sub font-medium m-0">{subtitle}</p>}
+        {subtitle && <p className="text-[0.8rem] text-text-sub font-medium m-0 truncate">{subtitle}</p>}
       </div>
       {rightAction && <div className="flex-shrink-0">{rightAction}</div>}
     </header>

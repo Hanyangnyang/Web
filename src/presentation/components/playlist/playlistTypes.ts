@@ -15,11 +15,14 @@ export interface Song {
 }
 
 export const GENRES = [
-  { key: 'all', label: '전체', emoji: '', colorIndex: -1 },
-  { key: 'rb', label: 'R&B', emoji: '🎤', colorIndex: 0 },
-  { key: 'kpop', label: 'K-pop', emoji: '🎸', colorIndex: 1 },
-  { key: 'indie', label: '인디', emoji: '🎹', colorIndex: 2 },
-  { key: 'rock', label: '락', emoji: '🎸', colorIndex: 3 },
-  { key: 'ballad', label: '발라드', emoji: '🎻', colorIndex: 4 },
-  { key: 'hiphop', label: '힙합', emoji: '🎤', colorIndex: 5 },
+  { key: 'all', label: '전체', emoji: '', light: '', active: '' },
+  { key: 'kpop', label: 'K-POP', emoji: '🕺', light: 'bg-[rgba(254,215,170,0.6)]', active: 'bg-[rgba(230,140,60,1)]' },
+  { key: 'rock', label: '락', emoji: '🎸', light: 'bg-[rgba(254,202,202,0.6)]', active: 'bg-[rgba(239,68,68,1)]' },
+  { key: 'rb', label: 'R&B', emoji: '🎹', light: 'bg-[rgba(251,207,232,0.6)]', active: 'bg-[rgba(219,39,119,1)]' },
+  { key: 'hiphop', label: '힙합', emoji: '🎤', light: 'bg-[rgba(233,213,255,0.6)]', active: 'bg-[rgba(147,51,234,1)]' },
+  { key: 'indie', label: '인디', emoji: '☁️', light: 'bg-[rgba(191,219,254,0.6)]', active: 'bg-[rgba(59,130,246,1)]' },
+  { key: 'ballad', label: '발라드', emoji: '🎻', light: 'bg-[rgba(187,247,208,0.6)]', active: 'bg-[rgba(34,197,94,1)]' },
+  { key: 'pop', label: 'POP', emoji: '🗽', light: 'bg-[rgba(153,246,228,0.6)]', active: 'bg-[rgba(20,184,166,1)]' },
+  { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]' },
+  { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]' },
 ];
