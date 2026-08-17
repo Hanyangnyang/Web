@@ -1,6 +1,10 @@
-import { Heart, X } from 'lucide-react';
+import { Heart, Play, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
+
+// play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
+// "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요.
+const AUTOPLAY_CHECK_MS = 1500;
 
 interface Song {
   trackId: string;
@@ -20,8 +24,24 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
   const [displaySong, setDisplaySong] = useState<Song | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [showTapToPlay, setShowTapToPlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
+  const isPausedRef = useRef(true);
+  const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const schedulePlaybackCheck = () => {
+    if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
+    autoplayCheckTimerRef.current = setTimeout(() => {
+      if (isPausedRef.current) setShowTapToPlay(true);
+    }, AUTOPLAY_CHECK_MS);
+  };
+
+  const handleTapToPlay = () => {
+    // 사용자 클릭에 바로 이어지는 호출이라야 자동재생 정책에 안 걸림
+    controllerRef.current?.play();
+    setShowTapToPlay(false);
+  };
 
   useEffect(() => {
     if (song) {
@@ -31,6 +51,8 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     }
     if (!displaySong) return;
     controllerRef.current?.pause();
+    if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
+    setShowTapToPlay(false);
     setClosing(true);
     const timer = setTimeout(() => {
       // 컨테이너 DOM이 사라지는 시점이라, 다음에 곡을 다시 열 때 새 컨트롤러를 만들도록 정리
@@ -48,10 +70,14 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     if (!displaySong) return;
     const uri = `spotify:track:${displaySong.trackId}`;
 
+    setShowTapToPlay(false);
+    isPausedRef.current = true;
+
     if (controllerRef.current) {
       // 이미 열려있는 상태에서 다른 곡으로 바꾸는 거라, 굳이 로딩 스켈레톤을 다시 보여줄 필요 없음
       controllerRef.current.loadUri(uri);
       controllerRef.current.play();
+      schedulePlaybackCheck();
       return;
     }
 
@@ -64,7 +90,12 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
         (controller) => {
           controllerRef.current = controller;
           controller.addListener('ready', () => setIframeLoaded(true));
+          controller.addListener('playback_update', (e: { data: { isPaused: boolean } }) => {
+            isPausedRef.current = e.data.isPaused;
+            if (!e.data.isPaused) setShowTapToPlay(false);
+          });
           controller.play();
+          schedulePlaybackCheck();
         }
       );
     });
@@ -79,14 +110,15 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     return () => {
       controllerRef.current?.destroy();
       controllerRef.current = null;
+      if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
     };
   }, []);
 
   if (!displaySong) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4">
-      <div className="w-full max-w-[calc(440px-2rem)]">
+    <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center">
+      <div className="w-full max-w-app">
         <div
           className="bg-black shadow-2xl border-t border-slate-200 rounded-t-lg overflow-hidden"
           style={{
@@ -151,6 +183,22 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
               ref={containerRef}
               className={`w-full h-full rounded transition-opacity duration-200 ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
+
+            {/* iOS Safari 등 자동재생이 막힌 경우에만 노출되는 수동 재생 버튼.
+                containerRef와 같은 부모의 형제 노드라 조건부 마운트/언마운트하면 안 되고(크래시 이슈),
+                항상 마운트해두고 opacity로만 보이고/숨김 처리한다. */}
+            <button
+              onClick={handleTapToPlay}
+              aria-label="탭해서 재생하기"
+              className={`absolute inset-0 z-20 flex items-center justify-center bg-black/50 transition-opacity duration-200 ${
+                showTapToPlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <span className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-black text-sm font-bold shadow-lg">
+                <Play size={18} fill="black" />
+                탭해서 재생하기
+              </span>
+            </button>
           </div>
         </div>
       </div>

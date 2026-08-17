@@ -7,7 +7,7 @@ interface AddSongFabProps {
   playerOpen?: boolean;
 }
 
-// max-w-app(440px) 컬럼의 우측 끝에서 1rem 안쪽 — 플레이어 카드와 같은 기준으로 정렬
+// 열림/닫힘 상태 관계없이 화면 끝에서 항상 1rem 여백
 const FAB_RIGHT = 'right-[max(1rem,calc((100vw-440px)/2+1rem))]';
 const CLOSED_BOTTOM = 'calc(24px + env(safe-area-inset-bottom))';
 // 플레이어 카드 높이(헤더 ~52px + iframe 152px) + 여백 16px 위에 떠 있도록
