@@ -15,7 +15,7 @@ export function RecentSongListRow({ song, onPlay, onRequireLogin }: RecentSongLi
   return (
     <div className="flex items-center gap-2 p-2.5 bg-white rounded-xl border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 transition-colors">
       {/* 왼쪽 60%: 곡 정보 (앨범커버 + 곡명/가수명 + 듣기 + 좋아요) */}
-      <div className="flex-[5.5] min-w-0 flex items-center gap-2">
+      <div className="flex-[6] min-w-0 flex items-center gap-2">
         <img
           src={song.albumArtUrl}
           alt={song.title}
@@ -54,7 +54,7 @@ export function RecentSongListRow({ song, onPlay, onRequireLogin }: RecentSongLi
       <div className="w-px self-stretch bg-slate-200 flex-shrink-0" />
 
       {/* 오른쪽 40%: 사용자 정보 (한마디 + 사용자명) */}
-      <div className="flex-[4.5] min-w-0">
+      <div className="flex-[4] min-w-0">
         <div className="text-[12px] font-semibold text-text-main line-clamp-2 leading-snug">"{song.comment}"</div>
         <div className="text-[10px] text-text-sub truncate pl-0.5 mt-0.5">{song.userProfile.name}</div>
       </div>

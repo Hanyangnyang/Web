@@ -54,7 +54,7 @@ export function AddSongFab({ onClick, playerOpen = false }: AddSongFabProps) {
           collapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[90px] opacity-100 ml-1.5'
         }`}
       >
-        곡추천하기
+        곡 추천하기
       </span>
     </button>
   );
