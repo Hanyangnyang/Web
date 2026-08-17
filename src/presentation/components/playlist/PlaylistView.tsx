@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Heart } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
@@ -11,6 +11,7 @@ import { LikedSongsView } from './LikedSongsView';
 import { RecentSongsView } from './RecentSongsView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
+import { EmptyGenreState } from './EmptyGenreState';
 import { type Song, GENRES } from './playlistTypes';
 
 const RECENT_SONGS_LIMIT = 7;
@@ -51,20 +52,8 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 245,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '171mGT1HdxM2HdqZrWNY31',
-    title: '다큐멘터리',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
-    heartCount: 198,
     previewUrl: '',
     createdAt: new Date(),
   },
@@ -75,7 +64,7 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 187,
     previewUrl: '',
     createdAt: new Date(),
@@ -87,7 +76,7 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 176,
     previewUrl: '',
     createdAt: new Date(),
@@ -99,7 +88,7 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['인디'],
     heartCount: 165,
     previewUrl: '',
     createdAt: new Date(),
@@ -111,20 +100,8 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['인디'],
     heartCount: 265,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '3c0anSTjsn20lztbBmZt03',
-    title: '미장원',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
-    heartCount: 254,
     previewUrl: '',
     createdAt: new Date(),
   },
@@ -135,20 +112,8 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273598f97c45eee469199fd0733',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['발라드'],
     heartCount: 243,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '4uh6rj3FryYQXMz9zLqDKL',
-    title: 'Fly away',
-    artist: '권진아',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
-    heartCount: 232,
     previewUrl: '',
     createdAt: new Date(),
   },
@@ -159,7 +124,7 @@ const DUMMY_SONGS: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27382e910c061e1c7555a02a266',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 221,
     previewUrl: '',
     createdAt: new Date(),
@@ -174,7 +139,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273fd07915694e0ffb3b961a7b5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['인디'],
     heartCount: 298,
     previewUrl: '',
     createdAt: new Date(),
@@ -186,7 +151,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273da16a8d501f1621068b0ea8b',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['인디'],
     heartCount: 287,
     previewUrl: '',
     createdAt: new Date(),
@@ -198,7 +163,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 276,
     previewUrl: '',
     createdAt: new Date(),
@@ -210,7 +175,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['인디'],
     heartCount: 265,
     previewUrl: '',
     createdAt: new Date(),
@@ -222,7 +187,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 254,
     previewUrl: '',
     createdAt: new Date(),
@@ -234,7 +199,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 243,
     previewUrl: '',
     createdAt: new Date(),
@@ -246,7 +211,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['인디'],
     heartCount: 232,
     previewUrl: '',
     createdAt: new Date(),
@@ -258,7 +223,7 @@ const DUMMY_CHART: Song[] = [
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27382e910c061e1c7555a02a266',
     userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
     comment: getRandomElement(USER_COMMENTS),
-    genres: ['K-pop'],
+    genres: ['R&B'],
     heartCount: 221,
     previewUrl: '',
     createdAt: new Date(),
@@ -287,8 +252,15 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   }, [screen, onBack]);
   useBackHandler(handleBack);
 
+  // selectedGenre는 GENRES의 key('indie' 등), song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교
+  // 최근 추가된 곡은 장르 필터와 무관하게 항상 그대로 노출, 주간 인기차트만 필터링됨
+  const selectedGenreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label;
+  const filteredChart = selectedGenre === 'all'
+    ? chart
+    : chart.filter((song) => song.genres.includes(selectedGenreLabel ?? ''));
+
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
-  const visibleChart = chart.slice(0, CHART_LIMIT);
+  const visibleChart = filteredChart.slice(0, CHART_LIMIT);
 
   return (
     // 기타탭(바텀네비바 포함) 위에 화면이 하나 더 쌓이는 형태 — 바텀네비바를 숨기는 대신
@@ -315,6 +287,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={() => setScreen('main')}
             onPlay={setCurrentTrack}
             onRequireLogin={() => setShowLoginModal(true)}
+            onShowAddSong={() => setScreen('addSong')}
           />
         ) : screen === 'addSong' ? (
           <AddSongView onBack={() => setScreen('main')} onRequireLogin={() => setShowLoginModal(true)} />
@@ -323,6 +296,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={() => setScreen('main')}
             onPlay={setCurrentTrack}
             onRequireLogin={() => setShowLoginModal(true)}
+            onShowAddSong={() => setScreen('addSong')}
           />
         ) : (
           <PlaylistMainContent
@@ -333,6 +307,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             setSelectedGenre={setSelectedGenre}
             onShowAllRecent={() => setScreen('recent')}
             onShowLiked={() => setScreen('liked')}
+            onShowAddSong={() => setScreen('addSong')}
             onShowLoginModal={() => setShowLoginModal(true)}
             onPlay={setCurrentTrack}
           />
@@ -365,6 +340,7 @@ interface PlaylistMainContentProps {
   setSelectedGenre: (genre: string) => void;
   onShowAllRecent: () => void;
   onShowLiked: () => void;
+  onShowAddSong: () => void;
   onShowLoginModal: () => void;
   onPlay: (song: Song) => void;
 }
@@ -377,6 +353,7 @@ function PlaylistMainContent({
   setSelectedGenre,
   onShowAllRecent,
   onShowLiked,
+  onShowAddSong,
   onShowLoginModal,
   onPlay,
 }: PlaylistMainContentProps) {
@@ -390,10 +367,10 @@ function PlaylistMainContent({
         rightAction={
           <button
             onClick={onShowLiked}
-            className="w-14 h-14 flex flex-col items-center justify-center gap-1.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-full transition-colors active:scale-95"
+            className="flex items-center gap-1 px-2 h-8 bg-red-400/10 text-red-500 border border-red-400 rounded-full shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-shadow active:scale-95"
           >
-            <span className="text-base leading-none">❤️</span>
-            <span className="text-[9px] font-bold leading-none">좋아요한곡</span>
+            <Heart size={14} fill="currentColor" strokeWidth={2} />
+            <span className="text-xs text-text-main font-bold">좋아요 한 곡</span>
           </button>
         }
       />
@@ -464,15 +441,19 @@ function PlaylistMainContent({
           </div>
 
           {/* 리스트 */}
-          {visibleChart.map((song, index) => (
-            <ChartSongRow
-              key={song.trackId}
-              song={song}
-              rank={index + 1}
-              onPlay={onPlay}
-              onRequireLogin={onShowLoginModal}
-            />
-          ))}
+          {visibleChart.length === 0 ? (
+            <EmptyGenreState onShowAddSong={onShowAddSong} />
+          ) : (
+            visibleChart.map((song, index) => (
+              <ChartSongRow
+                key={song.trackId}
+                song={song}
+                rank={index + 1}
+                onPlay={onPlay}
+                onRequireLogin={onShowLoginModal}
+              />
+            ))
+          )}
         </div>
       </section>
     </div>

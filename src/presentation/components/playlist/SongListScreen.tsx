@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, GENRES } from './playlistTypes';
 import { RecentSongListRow } from './RecentSongListRow';
+import { EmptyGenreState } from './EmptyGenreState';
 
 interface SongListScreenProps {
   title: string;
@@ -11,13 +12,18 @@ interface SongListScreenProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
   onRequireLogin: () => void;
+  onShowAddSong: () => void;
 }
 
-export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, onRequireLogin }: SongListScreenProps) {
+export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, onRequireLogin, onShowAddSong }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
+  const selectedGenreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label;
+  const filteredSongs = selectedGenre === 'all'
+    ? songs
+    : songs.filter((song) => song.genres.includes(selectedGenreLabel ?? ''));
 
   return (
-    <div className="bg-white -mx-4 px-4 pb-[calc(204px+env(safe-area-inset-bottom))]">
+    <div className="-mx-4 px-4 pb-[calc(204px+env(safe-area-inset-bottom))]">
       {/* 고정 헤더 */}
       <div className="sticky -top-6 -mt-6 z-[100] bg-surface/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader title={title} emoji={emoji} subtitle={subtitle} onBack={onBack} />
@@ -43,13 +49,16 @@ export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, 
         </div>
       </div>
       {/* 곡 리스트 */}
-      <div className="bg-white -mx-4 px-4">
-        {songs.map((song, index) => (
-          <div key={song.trackId}>
-            {index > 0 && <div className="border-t border-slate-200" />}
-            <RecentSongListRow song={song} onPlay={onPlay} onRequireLogin={onRequireLogin} />
+      <div className="-mx-4 px-2">
+        {filteredSongs.length === 0 ? (
+          <EmptyGenreState onShowAddSong={onShowAddSong} boxed />
+        ) : (
+          <div className="flex flex-col gap-1 py-1">
+            {filteredSongs.map((song) => (
+              <RecentSongListRow key={song.trackId} song={song} onPlay={onPlay} onRequireLogin={onRequireLogin} />
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

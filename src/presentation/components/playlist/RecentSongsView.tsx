@@ -6,9 +6,10 @@ interface RecentSongsViewProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
   onRequireLogin: () => void;
+  onShowAddSong: () => void;
 }
 
-export function RecentSongsView({ songs, onBack, onPlay, onRequireLogin }: RecentSongsViewProps) {
+export function RecentSongsView({ songs, onBack, onPlay, onRequireLogin, onShowAddSong }: RecentSongsViewProps) {
   return (
     <SongListScreen
       title="최근 추가된 곡"
@@ -18,6 +19,7 @@ export function RecentSongsView({ songs, onBack, onPlay, onRequireLogin }: Recen
       onBack={onBack}
       onPlay={onPlay}
       onRequireLogin={onRequireLogin}
+      onShowAddSong={onShowAddSong}
     />
   );
 }
