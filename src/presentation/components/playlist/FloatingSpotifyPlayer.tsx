@@ -30,6 +30,7 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
   const isPausedRef = useRef(true);
   const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 재생 시작 후 일정 시간 안에 실제로 재생이 시작되지 않으면 자동재생이 막힌 것으로 보고 "탭해서 재생하기" 버튼을 띄운다.
   const schedulePlaybackCheck = () => {
     if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
     autoplayCheckTimerRef.current = setTimeout(() => {
@@ -37,12 +38,13 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     }, AUTOPLAY_CHECK_MS);
   };
 
+  // "탭해서 재생하기" 버튼 클릭 시 controller.play()를 호출하여 재생을 시도한다.
   const handleTapToPlay = () => {
-    // 사용자 클릭에 바로 이어지는 호출이라야 자동재생 정책에 안 걸림
     controllerRef.current?.play();
     setShowTapToPlay(false);
   };
 
+  // song prop이 바뀌면 displaySong을 업데이트하고, song이 null이면 닫기 애니메이션 후 controller를 destroy한다.
   useEffect(() => {
     if (song) {
       setDisplaySong(song);
@@ -55,7 +57,6 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     setShowTapToPlay(false);
     setClosing(true);
     const timer = setTimeout(() => {
-      // 컨테이너 DOM이 사라지는 시점이라, 다음에 곡을 다시 열 때 새 컨트롤러를 만들도록 정리
       controllerRef.current?.destroy();
       controllerRef.current = null;
       setDisplaySong(null);
@@ -64,8 +65,9 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     return () => clearTimeout(timer);
   }, [song]);
 
-  // Spotify IFrame API로 controller.play()를 직접 호출해야 클릭에 이어지는 재생으로 인식되어
-  // 브라우저 자동재생 정책에 걸리지 않고 안정적으로 바로 재생된다.
+  // 곡이 바뀔때마다 Spotify 컨트롤러를 새로 만들거나 재사용해서 실제 재생을 트리거함.
+  // displaySong이 바뀌면 Spotify IFrame API를 로드하고 controller를 생성하여 재생을 시작한다.
+  // controller가 이미 존재하면 loadUri() 후 play()를 호출한다.
   useEffect(() => {
     if (!displaySong) return;
     const uri = `spotify:track:${displaySong.trackId}`;
@@ -74,7 +76,6 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     isPausedRef.current = true;
 
     if (controllerRef.current) {
-      // 이미 열려있는 상태에서 다른 곡으로 바꾸는 거라, 굳이 로딩 스켈레톤을 다시 보여줄 필요 없음
       controllerRef.current.loadUri(uri);
       controllerRef.current.play();
       schedulePlaybackCheck();
@@ -105,7 +106,9 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     };
   }, [displaySong?.trackId]);
 
-  // 화면 자체를 완전히 벗어날 때(탭 이동 등)를 대비한 안전망
+  // 컴포넌트가 완전히 사라질때 컨트롤러/타이머를 정리하는 안전망.
+  // FloatingSpotifyPlayer가 언마운트될 때 controller가 존재하면 destroy()를 호출하고, autoplayCheckTimer를 clearTimeout한다.
+  // controller가 존재하면 destroy()를 호출하고, autoplayCheckTimer를 clearTimeout한다.
   useEffect(() => {
     return () => {
       controllerRef.current?.destroy();
@@ -146,9 +149,6 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
 
           {/* Spotify Embed */}
           <div className="relative bg-white h-[152px]">
-            {/* Spotify IFrame API가 containerRef 노드를 자기 iframe으로 갈아치우기 때문에,
-                이 스켈레톤을 조건부로 마운트/언마운트하면 리액트가 형제 노드 위치를 잘못 찾아 크래시 남.
-                항상 마운트해두고 opacity로만 보이고/숨김 처리한다. */}
             <div
               className={`absolute inset-0 px-4 py-3 bg-white flex flex-col justify-between transition-opacity duration-200 ${
                 iframeLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-pulse'
