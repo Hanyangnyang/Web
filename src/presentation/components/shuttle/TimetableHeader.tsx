@@ -1,5 +1,5 @@
 // 컴포넌트: 셔틀 시간표 헤더 (기간/요일 선택기 + 지하철 노선 드롭다운 + 카카오 지하철 링크 + 전체시간표 토글)
-import { ArrowUpRight } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import type { ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
 import { PeriodDayTypeSelector } from './PeriodDayTypeSelector.jsx';
 import { SubwayDropdown } from './SubwayDropdown.jsx';
@@ -57,24 +57,10 @@ export function TimetableHeader({
           needsSubway ? (
             <button
               onClick={onOpenSubway}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 2,
-                fontSize: 10.5,
-                fontWeight: 800,
-                color: '#64748b',
-                letterSpacing: '0.01em',
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                flexShrink: 0,
-                marginLeft: 'auto',
-              }}
+              className="ml-auto flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-[#56657a] bg-[#eaeff5] rounded-lg px-2 py-1.5 active:bg-[#e2e8f0] transition-colors [-webkit-tap-highlight-color:transparent]"
             >
               카카오 지하철
-              <ArrowUpRight size={10} strokeWidth={2.2} />
+              <ExternalLink size={11} strokeWidth={2.2} />
             </button>
           ) : (
             <span className="text-[10px] font-bold text-[#cbd5e1] tracking-[0.04em] flex-shrink-0" style={{ marginLeft: 'auto' }}>도착</span>

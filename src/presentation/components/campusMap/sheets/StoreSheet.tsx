@@ -74,11 +74,22 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
         {/* 헤더 */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
               <span className="text-[16px] font-extrabold text-text-main truncate">{selected.name}</span>
               <span className="text-[11px] font-bold text-text-hint flex-shrink-0">{CATEGORY_META[selected.category].label}</span>
             </div>
+            {kakaoMapUrl && (
+              <a
+                href={kakaoMapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-[#3C1E1E] bg-[#FEE500]/25 rounded-lg px-2 py-1.5 active:bg-[#FEE500]/40 transition-colors [-webkit-tap-highlight-color:transparent]"
+              >
+                카카오맵
+                <ExternalLink size={11} />
+              </a>
+            )}
           </div>
           <CollegeWheelPicker
             options={COLLEGE_OPTIONS}
@@ -142,17 +153,6 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
               </div>
             </div>
           ))}
-
-          {kakaoMapUrl && (
-            <a
-              href={kakaoMapUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center text-[12px] font-bold text-[#0E4A84] py-2.5 rounded-xl border border-[#e2e8f0] active:bg-slate-50"
-            >
-              카카오맵에서 보기
-            </a>
-          )}
         </div>
       </StandardBottomSheet>
     );
