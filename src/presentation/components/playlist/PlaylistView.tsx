@@ -252,6 +252,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   }, [screen, onBack]);
   useBackHandler(handleBack);
 
+  // Supabase 테이블 붙기 전까지 임시로 최근 추가된 곡 맨 앞에 로컬로만 추가 (새로고침하면 초기화됨)
+  const handleAddSong = useCallback((song: Song) => {
+    setSongs((prev) => [song, ...prev]);
+  }, []);
+
   // selectedGenre는 GENRES의 key('indie' 등), song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교
   // 최근 추가된 곡은 장르 필터와 무관하게 항상 그대로 노출, 주간 인기차트만 필터링됨
   const selectedGenreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label;
@@ -290,7 +295,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onShowAddSong={() => setScreen('addSong')}
           />
         ) : screen === 'addSong' ? (
-          <AddSongView onBack={() => setScreen('main')} onRequireLogin={() => setShowLoginModal(true)} />
+          <AddSongView
+            onBack={() => setScreen('main')}
+            onRequireLogin={() => setShowLoginModal(true)}
+            onSongAdded={handleAddSong}
+          />
         ) : screen === 'liked' ? (
           <LikedSongsView
             onBack={() => setScreen('main')}

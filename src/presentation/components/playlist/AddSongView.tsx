@@ -1,7 +1,7 @@
 import { Loader2, Search, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
-import { GENRES } from './playlistTypes';
+import { type Song, GENRES } from './playlistTypes';
 
 interface SearchTrack {
   trackId: string;
@@ -10,7 +10,7 @@ interface SearchTrack {
   albumArtUrl: string;
 }
 
-const COMMENT_MAX_LENGTH = 30;
+const COMMENT_MAX_LENGTH = 50;
 const SEARCH_COOLDOWN_MS = 600;
 const MIN_QUERY_LENGTH = 2;
 
@@ -48,9 +48,11 @@ async function searchTracks(query: string): Promise<SearchTrack[]> {
 interface AddSongViewProps {
   onBack: () => void;
   onRequireLogin: () => void;
+  // Supabase 테이블 붙기 전까지 임시로 로컬 더미데이터에 곡을 추가하는 콜백
+  onSongAdded: (song: Song) => void;
 }
 
-export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
+export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongViewProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -110,8 +112,22 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
   const canSubmit = !!selectedTrack && !!selectedGenre && comment.trim().length > 0;
 
   const handleSubmit = () => {
-    if (!canSubmit) return;
-    onRequireLogin();
+    if (!canSubmit || !selectedTrack || !selectedGenre) return;
+    const genreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label ?? selectedGenre;
+
+    onSongAdded({
+      trackId: selectedTrack.trackId,
+      title: selectedTrack.title,
+      artist: selectedTrack.artist,
+      albumArtUrl: selectedTrack.albumArtUrl,
+      userProfile: { name: '나', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me' },
+      comment: comment.trim(),
+      genres: [genreLabel],
+      heartCount: 0,
+      previewUrl: '',
+      createdAt: new Date(),
+    });
+    onBack();
   };
 
   return (
@@ -136,6 +152,9 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearchClick();
+              }}
               placeholder="곡 제목이나 아티스트를 검색해보세요"
               className="flex-1 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
             />
@@ -229,9 +248,9 @@ export function AddSongView({ onBack, onRequireLogin }: AddSongViewProps) {
         </div>
       </section>
 
-      {/* 한마디 */}
+      {/* 곡에 대한 한마디 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-3">한마디</h3>
+        <h3 className="text-lg font-bold text-text-main mb-3">곡에 대한 한마디</h3>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
           <input
             type="text"
