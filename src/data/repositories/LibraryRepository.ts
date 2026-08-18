@@ -23,6 +23,7 @@ export const createLibraryRepository = (
   getStatus: async () => {
     const res = await libraryApiDataSource.getStatus();
     if (!res.success) throw new Error(res.error?.message || 'library API returned success:false');
+    if (!Array.isArray(res.data?.readingRooms)) throw new Error('library API returned invalid shape');
 
     const list = [...res.data.readingRooms]
       .sort((a, b) => sortIndex(a.room) - sortIndex(b.room))
