@@ -1,5 +1,3 @@
-// 표현 계층 룩업: 도메인 값(WeatherCondition·PmGrade·UvGrade)을 화면에 보일 것(라벨·아이콘·색)으로 옮긴다.
-
 import { Cloud, CloudDrizzle, CloudMoon, CloudRain, CloudSun, Moon, Snowflake, Sun, type LucideIcon } from 'lucide-react';
 import type { Weather, WeatherCondition, PmGrade, UvGrade } from '../../../domain/entities/Weather.js';
 
@@ -87,11 +85,11 @@ export const PM_COLOR: Record<PmGrade, string> = {
 };
 
 export const UV_COLOR: Record<UvGrade, string> = {
-  '낮음': '#4ade80',
-  '보통': '#fbbf24',
-  '높음': '#fb923c',
+  '낮음': '#38bdf8',
+  '보통': '#4ade80',
+  '높음': '#fbbf24',
   '매우높음': '#ef4444',
-  '위험': '#a855f7',
+  '위험': '#991b1b',
 };
 
 // 측정소 점검 등으로 등급이 없을 때

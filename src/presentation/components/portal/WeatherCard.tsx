@@ -87,9 +87,6 @@ function WeatherSkeleton() {
 export function WeatherCard({ weather, loading, isVisible = true, briefing = null, error = null }: WeatherCardProps) {
   const nowEpoch = useNow(isVisible);
   const current = weather?.current ?? null;
-
-  // 아래 useMemo 안에서 weather.current를 직접 읽으면 React Compiler가 .current를 ref 접근으로
-  // 오해해 의존성 추론이 어긋난다. 필요한 값만 미리 꺼내 쓴다.
   const hourly = weather?.hourly;
   const currentTemp = current?.temp;
 
@@ -105,12 +102,10 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
     return hourly
       .filter(item => item.epoch > from && item.epoch <= to)
       .map(item => {
-        // 필터를 통과한 것 중 이미 지난 칸은 '지금'뿐이다
         const isCurrent = item.epoch <= nowEpoch;
         return {
           epoch: item.epoch,
           hour: new Date(item.epoch).getHours(),
-          // 강조된 칸은 위의 큰 숫자와 같은 값을 보여줘야 어색하지 않다
           temp: isCurrent ? currentTemp : item.temp,
           condition: item.condition,
           isCurrent,
@@ -162,8 +157,6 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
       }}>
         <div className="relative z-10 w-full">
           <div className="flex flex-col w-full">
-            {/* 배경 그라데이션 밝기와 무관하게 항상 읽히도록 은은한 텍스트 그림자 사용
-                (아래 날씨 변화 박스의 "그림자로 지지되는 흰 텍스트"와 동일한 톤) */}
             <div className="pl-2 [text-shadow:0_1px_1px_rgba(0,0,0,0.3)]">
               <p className="text-xs font-semibold opacity-85 leading-tight">
                 안산시 상록구 사동
@@ -189,10 +182,7 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
                 </p>
               )}
             </div>
-
-            {/* 날씨 변화 박스 (AI 브리핑 + 시간별 예보 통합 카드): 배경 그라데이션 밝기와 무관하게
-                흰 텍스트 대비를 확보하기 위해 반투명 검정 오버레이 사용 (기존 bg-white/10은
-                밝은 배경일수록 대비가 무너졌음). 자세히 들여다보지 않는 보조 정보라 /28 정도로만 살짝. */}
+            {/* 날씨 변화 박스 (AI 브리핑 + 시간별 예보 통합 카드) */}
             <div className="mt-2 bg-slate-900/28 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col gap-2">
               {/* 브리핑은 날씨와 따로 도착한다. 늦게 오면 그때 문구만 나타나고, 없으면 이 줄 자체가 빠진다. */}
               {briefing && (
