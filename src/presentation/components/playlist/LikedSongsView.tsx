@@ -1,89 +1,14 @@
 import { type Song } from './playlistTypes';
 import { SongListScreen } from './SongListScreen';
-
-const DUMMY_LIKED_SONGS: Song[] = [
-  {
-    trackId: '5eBM5qATb1IfJvNzGuS2GX',
-    title: 'Busy Boy',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: '민지', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked1' },
-    comment: '완전 내 최애곡',
-    genres: ['R&B'],
-    heartCount: 312,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '3Q3wWJxr6sBt8afP9hJj4J',
-    title: 'LOVE SONG',
-    artist: '유다빈밴드',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273fd07915694e0ffb3b961a7b5',
-    userProfile: { name: '태희', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked2' },
-    comment: '노래방 필수곡',
-    genres: ['인디'],
-    heartCount: 289,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '171mGT1HdxM2HdqZrWNY31',
-    title: '다큐멘터리',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
-    userProfile: { name: '성은', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked3' },
-    comment: '가사가 진짜 좋아요',
-    genres: ['인디'],
-    heartCount: 241,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '4uh6rj3FryYQXMz9zLqDKL',
-    title: 'Fly away',
-    artist: '권진아',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
-    userProfile: { name: '기범', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked4' },
-    comment: '드라이브할 때 딱',
-    genres: ['인디'],
-    heartCount: 198,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '6W4iF5kAqqwKiVwAk3TcN1',
-    title: '하루에 한번씩',
-    artist: '거니',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27382e910c061e1c7555a02a266',
-    userProfile: { name: '준호', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked6' },
-    comment: '매일 듣는 중',
-    genres: ['R&B'],
-    heartCount: 154,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '4Qqd4mzQzVGpvPrzq3Dtn8',
-    title: '초록',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273da16a8d501f1621068b0ea8b',
-    userProfile: { name: '지은', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked7' },
-    comment: '분위기 최고',
-    genres: ['인디'],
-    heartCount: 132,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-];
+import { DUMMY_LIKED_SONGS } from './playlistDummyData';
 
 interface LikedSongsViewProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
-  onRequireLogin: () => void;
   onShowAddSong: () => void;
 }
 
-export function LikedSongsView({ onBack, onPlay, onRequireLogin, onShowAddSong }: LikedSongsViewProps) {
+export function LikedSongsView({ onBack, onPlay, onShowAddSong }: LikedSongsViewProps) {
   return (
     <SongListScreen
       title="좋아요 한 곡"
@@ -92,7 +17,6 @@ export function LikedSongsView({ onBack, onPlay, onRequireLogin, onShowAddSong }
       songs={DUMMY_LIKED_SONGS}
       onBack={onBack}
       onPlay={onPlay}
-      onRequireLogin={onRequireLogin}
       onShowAddSong={onShowAddSong}
     />
   );

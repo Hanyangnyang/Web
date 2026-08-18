@@ -1,10 +1,9 @@
 import { ChevronRight, Heart } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer } from './FloatingSpotifyPlayer';
-import { SocialLoginModal } from './SocialLoginModal';
 import { AddSongFab } from './AddSongFab';
 import { AddSongView } from './AddSongView';
 import { LikedSongsView } from './LikedSongsView';
@@ -13,222 +12,10 @@ import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
 import { type Song, GENRES } from './playlistTypes';
+import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
-
-const USER_NAMES = ['이줄', '민지', '수진', '준호', '태희', '성은', '다영', '호진', '지은', '명준', '민준', '혜원', '기범', '소연', '주현'];
-const USER_COMMENTS = [
-  '이 노래 진짜 좋아! 베이스가 미쳤어 내인생 이런 R&B는 처음이야 ㅠㅠ',
-  '요즘 내 감성이야 ✨',
-  '반복 재생 중...',
-  '이렇게 좋은 곡이 있다니',
-  '감성 만렙 💯',
-  '매일 듣고 있어요',
-  '이 가수 팬입니다! 🎤',
-  '최고의 선택 👍',
-  '중독성 있어요',
-  '찐 명곡',
-  '무한재생',
-  '요즘 탈출곡',
-  '혼자만 알고싶던 곡',
-  '신곡 좋네요',
-  '이 아티스트 완전 사랑해 진짜 너무너무너무너무너무너무너무 사랑해',
-];
-
-function getRandomElement<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function getRandomUserId(): number {
-  return Math.floor(Math.random() * 30) + 1;
-}
-
-const DUMMY_SONGS: Song[] = [
-  {
-    trackId: '5eBM5qATb1IfJvNzGuS2GX',
-    title: 'Busy Boy',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 245,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '3c0anSTjsn20lztbBmZt03',
-    title: '미장원',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 187,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '0kt2S0FV9DEGIOg247sT8b',
-    title: '미친건가',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 176,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '4uh6rj3FryYQXMz9zLqDKL',
-    title: 'Fly away',
-    artist: '권진아',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['인디'],
-    heartCount: 165,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '171mGT1HdxM2HdqZrWNY31',
-    title: '다큐멘터리',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['인디'],
-    heartCount: 265,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '3aK5mtd4CKxLF6RpC1doh6',
-    title: '마음으로',
-    artist: '유다빈밴드',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273598f97c45eee469199fd0733',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['발라드'],
-    heartCount: 243,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '6W4iF5kAqqwKiVwAk3TcN1',
-    title: '하루에 한번씩',
-    artist: '거니',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27382e910c061e1c7555a02a266',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 221,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-];
-
-const DUMMY_CHART: Song[] = [
-  {
-    trackId: '3Q3wWJxr6sBt8afP9hJj4J',
-    title: 'LOVE SONG',
-    artist: '유다빈밴드',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273fd07915694e0ffb3b961a7b5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['인디'],
-    heartCount: 298,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '4Qqd4mzQzVGpvPrzq3Dtn8',
-    title: '초록',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273da16a8d501f1621068b0ea8b',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['인디'],
-    heartCount: 287,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '5eBM5qATb1IfJvNzGuS2GX',
-    title: 'Busy Boy',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 276,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '171mGT1HdxM2HdqZrWNY31',
-    title: '다큐멘터리',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['인디'],
-    heartCount: 265,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '3c0anSTjsn20lztbBmZt03',
-    title: '미장원',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 254,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '0kt2S0FV9DEGIOg247sT8b',
-    title: '미친건가',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 243,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '4uh6rj3FryYQXMz9zLqDKL',
-    title: 'Fly away',
-    artist: '권진아',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['인디'],
-    heartCount: 232,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-  {
-    trackId: '6W4iF5kAqqwKiVwAk3TcN1',
-    title: '하루에 한번씩',
-    artist: '거니',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27382e910c061e1c7555a02a266',
-    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    genres: ['R&B'],
-    heartCount: 221,
-    previewUrl: '',
-    createdAt: new Date(),
-  },
-];
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'liked';
 
@@ -239,18 +26,43 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [songs, setSongs] = useState<Song[]>(DUMMY_SONGS);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<Song | null>(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [screen, setScreen] = useState<PlaylistScreen>('main');
+  // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 좋아요한곡 → 곡추천하기)
+  const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
+  const screen = screenStack[screenStack.length - 1];
 
-  // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 — 뒤로가기는 스택을 한 단계씩 pop
+  const pushScreen = useCallback((next: PlaylistScreen) => {
+    setScreenStack((prev) => [...prev, next]);
+  }, []);
+
+  // 뒤로가기는 스택을 한 단계씩 pop — 어느 화면에서 들어왔는지와 무관하게 항상 바로 이전 화면으로 돌아감
+  const popScreen = useCallback(() => {
+    setScreenStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
+  }, []);
+
   const handleBack = useCallback(() => {
-    if (screen !== 'main') {
-      setScreen('main');
+    if (screenStack.length > 1) {
+      popScreen();
     } else {
       onBack();
     }
-  }, [screen, onBack]);
+  }, [screenStack, popScreen, onBack]);
   useBackHandler(handleBack);
+
+  // 화면(홈/최근추가된곡/좋아요한곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollPositionsRef = useRef<Partial<Record<PlaylistScreen, number>>>({});
+  const prevScreenRef = useRef<PlaylistScreen>(screen);
+
+  useLayoutEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const prevScreen = prevScreenRef.current;
+    if (prevScreen === screen) return;
+
+    scrollPositionsRef.current[prevScreen] = container.scrollTop;
+    container.scrollTop = scrollPositionsRef.current[screen] ?? 0;
+    prevScreenRef.current = screen;
+  }, [screen]);
 
   // Supabase 테이블 붙기 전까지 임시로 최근 추가된 곡 맨 앞에 로컬로만 추가 (새로고침하면 초기화됨)
   const handleAddSong = useCallback((song: Song) => {
@@ -268,12 +80,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const visibleChart = filteredChart.slice(0, CHART_LIMIT);
 
   return (
-    // 기타탭(바텀네비바 포함) 위에 화면이 하나 더 쌓이는 형태 — 바텀네비바를 숨기는 대신
-    // 이 오버레이가 z-index로 덮어버려서, 들어가고 나올 때 바텀네비바가 팝인/팝아웃하는 게 안 보임
     <div
+      ref={scrollContainerRef}
       className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app px-4 py-6"
       style={{
-        // body(index.css)와 완전히 같은 배경 — 기타탭 뒤에 있는 것과 동일한 톤으로 보이게
         backgroundColor: '#F8F9FA',
         backgroundImage:
           'radial-gradient(circle at 10% 20%, rgba(14, 74, 132, 0.05), transparent 30%), radial-gradient(circle at 90% 80%, rgba(14, 74, 132, 0.03), transparent 30%)',
@@ -284,28 +94,24 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
         } : {}),
       }}
     >
-      {/* key={screen}로 화면이 바뀔 때마다 새 엘리먼트로 취급돼 fadeIn이 매번 다시 재생됨 */}
       <div key={screen} style={{ animation: 'fadeIn 0.25s ease-out' }}>
         {screen === 'recent' ? (
           <RecentSongsView
             songs={songs}
-            onBack={() => setScreen('main')}
+            onBack={popScreen}
             onPlay={setCurrentTrack}
-            onRequireLogin={() => setShowLoginModal(true)}
-            onShowAddSong={() => setScreen('addSong')}
+            onShowAddSong={() => pushScreen('addSong')}
           />
         ) : screen === 'addSong' ? (
           <AddSongView
-            onBack={() => setScreen('main')}
-            onRequireLogin={() => setShowLoginModal(true)}
+            onBack={popScreen}
             onSongAdded={handleAddSong}
           />
         ) : screen === 'liked' ? (
           <LikedSongsView
-            onBack={() => setScreen('main')}
+            onBack={popScreen}
             onPlay={setCurrentTrack}
-            onRequireLogin={() => setShowLoginModal(true)}
-            onShowAddSong={() => setScreen('addSong')}
+            onShowAddSong={() => pushScreen('addSong')}
           />
         ) : (
           <PlaylistMainContent
@@ -314,10 +120,9 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             visibleChart={visibleChart}
             selectedGenre={selectedGenre}
             setSelectedGenre={setSelectedGenre}
-            onShowAllRecent={() => setScreen('recent')}
-            onShowLiked={() => setScreen('liked')}
-            onShowAddSong={() => setScreen('addSong')}
-            onShowLoginModal={() => setShowLoginModal(true)}
+            onShowAllRecent={() => pushScreen('recent')}
+            onShowLiked={() => pushScreen('liked')}
+            onShowAddSong={() => pushScreen('addSong')}
             onPlay={setCurrentTrack}
           />
         )}
@@ -325,18 +130,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
 
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
       {screen !== 'addSong' && (
-        <AddSongFab onClick={() => setScreen('addSong')} playerOpen={!!currentTrack} />
+        <AddSongFab onClick={() => pushScreen('addSong')} playerOpen={!!currentTrack} />
       )}
 
-      {/* 플로팅 Spotify 플레이어 (화면 전환과 무관하게 항상 같은 위치에서 렌더링되어야 상태가 유지됨) */}
+      {/* 플로팅 Spotify 플레이어*/}
       <FloatingSpotifyPlayer
         song={currentTrack}
         onClose={() => setCurrentTrack(null)}
-        onRequireLogin={() => setShowLoginModal(true)}
       />
-
-      {/* 소셜 로그인 모달 */}
-      <SocialLoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }
@@ -350,7 +151,6 @@ interface PlaylistMainContentProps {
   onShowAllRecent: () => void;
   onShowLiked: () => void;
   onShowAddSong: () => void;
-  onShowLoginModal: () => void;
   onPlay: (song: Song) => void;
 }
 
@@ -363,7 +163,6 @@ function PlaylistMainContent({
   onShowAllRecent,
   onShowLiked,
   onShowAddSong,
-  onShowLoginModal,
   onPlay,
 }: PlaylistMainContentProps) {
   return (
@@ -376,10 +175,10 @@ function PlaylistMainContent({
         rightAction={
           <button
             onClick={onShowLiked}
-            className="flex items-center gap-1 px-2 h-8 bg-red-400/10 text-red-500 border border-red-400 rounded-full shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-shadow active:scale-95"
+            className="flex items-center gap-1 px-3 h-8 bg-red-400/10 text-red-500 border border-red-400 rounded-full shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-shadow active:scale-95"
           >
             <Heart size={14} fill="currentColor" strokeWidth={2} />
-            <span className="text-xs text-text-main font-bold">좋아요 한 곡</span>
+            <span className="text-[12px] text-text-main font-bold">좋아요 한 곡</span>
           </button>
         }
       />
@@ -404,9 +203,9 @@ function PlaylistMainContent({
                 key={song.trackId}
                 song={song}
                 onPlay={onPlay}
-                onRequireLogin={onShowLoginModal}
               />
             ))}
+            <div className="w-1 flex-shrink-0" aria-hidden="true" />
           </div>
         </div>
       </section>
@@ -427,9 +226,9 @@ function PlaylistMainContent({
                 selectedGenre === genre.key && genre.key !== 'all'
                   ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
                   : genre.key === 'all' && selectedGenre === 'all'
-                    ? 'bg-slate-700 text-white border-transparent shadow-[0_2px_6px_rgba(51,65,85,0.25)]'
+                    ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
                     : genre.key === 'all'
-                      ? 'bg-slate-200 text-slate-800 border-slate-400'
+                      ? 'bg-white text-[#2B3B52] border-[#2B3B52]'
                       : `${genre.light} text-gray-800 border-transparent`
               }`}
             >
@@ -459,7 +258,6 @@ function PlaylistMainContent({
                 song={song}
                 rank={index + 1}
                 onPlay={onPlay}
-                onRequireLogin={onShowLoginModal}
               />
             ))
           )}

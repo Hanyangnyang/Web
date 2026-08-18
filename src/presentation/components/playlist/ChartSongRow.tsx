@@ -6,12 +6,16 @@ interface ChartSongRowProps {
   song: Song;
   rank: number;
   onPlay: (song: Song) => void;
-  onRequireLogin: () => void;
 }
 
-export function ChartSongRow({ song, rank, onPlay, onRequireLogin }: ChartSongRowProps) {
+export function ChartSongRow({ song, rank, onPlay }: ChartSongRowProps) {
   const [heartClicked, setHeartClicked] = useState(false);
   const [displayHeartCount, setDisplayHeartCount] = useState(song.heartCount);
+
+  const handleHeartClick = () => {
+    setHeartClicked((prev) => !prev);
+    setDisplayHeartCount((prev) => (heartClicked ? prev - 1 : prev + 1));
+  };
 
   return (
     <div className="flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 transition-colors">
@@ -46,7 +50,7 @@ export function ChartSongRow({ song, rank, onPlay, onRequireLogin }: ChartSongRo
       {/* 좋아요 */}
       <div className="w-8 mt-3 flex flex-col items-center justify-center gap-0.5 flex-shrink-0">
         <button
-          onClick={onRequireLogin}
+          onClick={handleHeartClick}
           className="flex items-center justify-center w-6 text-red-500 hover:scale-110 transition-transform active:scale-95"
         >
           <Heart

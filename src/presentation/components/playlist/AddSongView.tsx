@@ -13,6 +13,15 @@ interface SearchTrack {
 const COMMENT_MAX_LENGTH = 50;
 const SEARCH_COOLDOWN_MS = 600;
 const MIN_QUERY_LENGTH = 2;
+const MIN_GENRES = 1;
+const MAX_GENRES = 3;
+const GENRES_PER_ROW = 3;
+
+const GENRE_OPTIONS = GENRES.filter((genre) => genre.key !== 'all');
+// 칩 너비에 따라 자연스럽게 줄바꿈되는 flex-wrap 대신, 한 줄에 항상 3개씩 고정되도록 미리 3개씩 묶어둠
+const GENRE_ROWS = Array.from({ length: Math.ceil(GENRE_OPTIONS.length / GENRES_PER_ROW) }, (_, i) =>
+  GENRE_OPTIONS.slice(i * GENRES_PER_ROW, i * GENRES_PER_ROW + GENRES_PER_ROW)
+);
 
 function normalizeQuery(query: string): string {
   return query.trim().replace(/\s+/g, ' ');
@@ -47,12 +56,11 @@ async function searchTracks(query: string): Promise<SearchTrack[]> {
 
 interface AddSongViewProps {
   onBack: () => void;
-  onRequireLogin: () => void;
   // Supabase 테이블 붙기 전까지 임시로 로컬 더미데이터에 곡을 추가하는 콜백
   onSongAdded: (song: Song) => void;
 }
 
-export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongViewProps) {
+export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -60,7 +68,7 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
   const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(null);
   const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
   const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(null);
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [comment, setComment] = useState('');
 
   const lastSearchAtRef = useRef(0);
@@ -109,11 +117,19 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
 
   const isResultsPanelOpen = !selectedTrack && hasSearched && !isSearching;
 
-  const canSubmit = !!selectedTrack && !!selectedGenre && comment.trim().length > 0;
+  const canSubmit = !!selectedTrack && selectedGenres.length >= MIN_GENRES && comment.trim().length > 0;
+
+  const handleGenreClick = (key: string) => {
+    setSelectedGenres((prev) => {
+      if (prev.includes(key)) return prev.filter((g) => g !== key);
+      if (prev.length >= MAX_GENRES) return prev;
+      return [...prev, key];
+    });
+  };
 
   const handleSubmit = () => {
-    if (!canSubmit || !selectedTrack || !selectedGenre) return;
-    const genreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label ?? selectedGenre;
+    if (!canSubmit || !selectedTrack) return;
+    const genreLabels = selectedGenres.map((key) => GENRES.find((genre) => genre.key === key)?.label ?? key);
 
     onSongAdded({
       trackId: selectedTrack.trackId,
@@ -122,7 +138,7 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
       albumArtUrl: selectedTrack.albumArtUrl,
       userProfile: { name: '나', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me' },
       comment: comment.trim(),
-      genres: [genreLabel],
+      genres: genreLabels,
       heartCount: 0,
       previewUrl: '',
       createdAt: new Date(),
@@ -139,9 +155,9 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
         onBack={onBack}
       />
 
-      {/* 곡 검색 */}
+      {/* 1. 곡 검색 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-3">곡 검색</h3>
+        <h3 className="text-lg font-bold text-text-main mb-2">곡 검색</h3>
         <div
           className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all ${
             isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
@@ -206,7 +222,7 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
 
         {/* 선택된 곡 */}
         {selectedTrack && (
-          <div className="mt-3 flex items-center gap-3 bg-white border border-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
+          <div className="mt-2 flex items-center gap-3 bg-white border border-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
             <img
               src={selectedTrack.albumArtUrl}
               alt={selectedTrack.title}
@@ -227,38 +243,49 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
         )}
       </section>
 
-      {/* 장르 */}
+      {/* 2. 장르 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-3">장르</h3>
-        <div className="flex flex-wrap gap-2">
-          {GENRES.filter((genre) => genre.key !== 'all').map((genre) => (
-            <button
-              key={genre.key}
-              onClick={() => setSelectedGenre((prev) => (prev === genre.key ? null : genre.key))}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
-                selectedGenre === genre.key
-                  ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
-                  : `${genre.light} text-gray-800 border-transparent`
-              }`}
-            >
-              <span className="text-base">{genre.emoji}</span>
-              <span>{genre.label}</span>
-            </button>
+        <h3 className="text-lg font-bold text-text-main mb-2">장르</h3>
+        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] flex flex-col gap-2">
+          {GENRE_ROWS.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex justify-center gap-2">
+              {row.map((genre) => {
+                const isSelected = selectedGenres.includes(genre.key);
+                const isDisabled = !isSelected && selectedGenres.length >= MAX_GENRES;
+                return (
+                  <button
+                    key={genre.key}
+                    onClick={() => handleGenreClick(genre.key)}
+                    disabled={isDisabled}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+                      isSelected
+                        ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
+                        : isDisabled
+                          ? 'bg-slate-100 text-slate-300 border-transparent'
+                          : `${genre.light} text-gray-800 border-transparent`
+                    }`}
+                  >
+                    <span className="text-base">{genre.emoji}</span>
+                    <span>{genre.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </div>
       </section>
 
-      {/* 곡에 대한 한마디 */}
+      {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-3">곡에 대한 한마디</h3>
+        <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
-          <input
-            type="text"
+          <textarea
             value={comment}
             maxLength={COMMENT_MAX_LENGTH}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="이 곡에 대한 한마디를 남겨주세요"
-            className="w-full bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+            placeholder="이 곡에 대한 얘기를 자유롭게 남겨주세요!"
+            rows={2}
+            className="w-full bg-transparent text-sm text-text-main placeholder-text-hint outline-none resize-none"
           />
         </div>
         <div className="mt-1 text-right text-[11px] text-text-hint">
@@ -270,8 +297,10 @@ export function AddSongView({ onBack, onRequireLogin, onSongAdded }: AddSongView
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold shadow-[0_6px_20px_rgba(14,74,132,0.3)] transition-all active:scale-[0.97] z-40 ${
-          canSubmit ? 'bg-primary text-white' : 'bg-slate-200 text-slate-400'
+        className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold border transition-all active:scale-[0.97] z-40 ${
+          canSubmit
+            ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_6px_20px_rgba(43,59,82,0.35)]'
+            : 'bg-slate-100 text-slate-300 border-transparent'
         }`}
         style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}
       >

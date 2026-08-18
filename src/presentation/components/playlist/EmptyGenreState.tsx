@@ -19,7 +19,7 @@ export function EmptyGenreState({ onShowAddSong, boxed = false }: EmptyGenreStat
     >
       <span className="text-2xl">🎵</span>
       <p className="text-sm font-semibold text-text-main">아직 이 장르로 등록된 곡이 없어요</p>
-      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-[#2B3B52] text-white shadow-[0_4px_10px_rgba(43,59,82,0.3)] text-xs font-bold">
         <Plus size={14} strokeWidth={2.5} />
         첫 곡 추천하러 가기
       </span>

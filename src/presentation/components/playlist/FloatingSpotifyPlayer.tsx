@@ -15,16 +15,16 @@ interface Song {
 interface FloatingSpotifyPlayerProps {
   song: Song | null;
   onClose: () => void;
-  onRequireLogin: () => void;
 }
 
 const CLOSE_ANIMATION_MS = 250;
 
-export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: FloatingSpotifyPlayerProps) {
+export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerProps) {
   const [displaySong, setDisplaySong] = useState<Song | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);
+  const [heartClicked, setHeartClicked] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
   const isPausedRef = useRef(true);
@@ -49,6 +49,7 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
     if (song) {
       setDisplaySong(song);
       setClosing(false);
+      setHeartClicked(false);
       return;
     }
     if (!displaySong) return;
@@ -134,10 +135,10 @@ export function FloatingSpotifyPlayer({ song, onClose, onRequireLogin }: Floatin
               {displaySong.title} <span className="font-normal">- {displaySong.artist}</span>
             </div>
             <button
-              onClick={onRequireLogin}
+              onClick={() => setHeartClicked((prev) => !prev)}
               className="ml-2 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
             >
-              <Heart size={18} className="text-red-500 stroke-[2]" />
+              <Heart size={18} className="text-red-500 stroke-[2]" fill={heartClicked ? 'currentColor' : 'none'} />
             </button>
             <button
               onClick={onClose}

@@ -5,10 +5,9 @@ import { type Song, GENRES } from './playlistTypes';
 interface RecentSongCardProps {
   song: Song;
   onPlay: (song: Song) => void;
-  onRequireLogin: () => void;
 }
 
-export function RecentSongCard({ song, onPlay, onRequireLogin }: RecentSongCardProps) {
+export function RecentSongCard({ song, onPlay }: RecentSongCardProps) {
   const [heartClicked, setHeartClicked] = useState(false);
   const genre = GENRES.find((g) => g.label === song.genres[0]);
 
@@ -26,7 +25,7 @@ export function RecentSongCard({ song, onPlay, onRequireLogin }: RecentSongCardP
 
       {/* 우측 상단 하트 버튼 */}
       <button
-        onClick={onRequireLogin}
+        onClick={() => setHeartClicked((prev) => !prev)}
         className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
       >
         <Heart

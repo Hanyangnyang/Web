@@ -5,12 +5,16 @@ import { type Song } from './playlistTypes';
 interface RecentSongListRowProps {
   song: Song;
   onPlay: (song: Song) => void;
-  onRequireLogin: () => void;
 }
 
-export function RecentSongListRow({ song, onPlay, onRequireLogin }: RecentSongListRowProps) {
+export function RecentSongListRow({ song, onPlay }: RecentSongListRowProps) {
   const [heartClicked, setHeartClicked] = useState(false);
   const [displayHeartCount, setDisplayHeartCount] = useState(song.heartCount);
+
+  const handleHeartClick = () => {
+    setHeartClicked((prev) => !prev);
+    setDisplayHeartCount((prev) => (heartClicked ? prev - 1 : prev + 1));
+  };
 
   return (
     <div className="flex items-center gap-2 p-2.5 bg-white rounded-xl border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 transition-colors">
@@ -37,7 +41,7 @@ export function RecentSongListRow({ song, onPlay, onRequireLogin }: RecentSongLi
         {/* 하트 아이콘 + 하트수 */}
         <div className="w-8 flex flex-col items-center justify-center gap-0.5 flex-shrink-0">
           <button
-            onClick={onRequireLogin}
+            onClick={handleHeartClick}
             className="flex items-center justify-center w-6 text-red-500 hover:scale-110 transition-transform active:scale-95"
           >
             <Heart

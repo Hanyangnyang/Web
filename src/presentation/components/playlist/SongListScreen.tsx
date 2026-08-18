@@ -11,11 +11,10 @@ interface SongListScreenProps {
   songs: Song[];
   onBack: () => void;
   onPlay: (song: Song) => void;
-  onRequireLogin: () => void;
   onShowAddSong: () => void;
 }
 
-export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, onRequireLogin, onShowAddSong }: SongListScreenProps) {
+export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, onShowAddSong }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const selectedGenreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label;
   const filteredSongs = selectedGenre === 'all'
@@ -55,7 +54,7 @@ export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, 
         ) : (
           <div className="flex flex-col gap-1 py-1">
             {filteredSongs.map((song) => (
-              <RecentSongListRow key={song.trackId} song={song} onPlay={onPlay} onRequireLogin={onRequireLogin} />
+              <RecentSongListRow key={song.trackId} song={song} onPlay={onPlay} />
             ))}
           </div>
         )}
