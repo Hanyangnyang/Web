@@ -44,7 +44,7 @@ const apiHttpClient = createHttpClient({
 });
 
 // Data Sources
-const menuApiDataSource = createMenuApiDataSource({ httpClient });
+const menuApiDataSource = createMenuApiDataSource({ httpClient: apiHttpClient });
 const instagramApiDataSource = createInstagramApiDataSource({ httpClient });
 const shuttleDataSource = createShuttleDataSource({ httpClient });
 const weatherApiDataSource = createWeatherApiDataSource({ httpClient: apiHttpClient });

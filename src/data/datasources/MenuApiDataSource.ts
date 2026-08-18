@@ -1,36 +1,39 @@
-// 데이터 소스: 학식 정보 서버리스 API 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
+// 데이터 소스: 학식 정보 API 원시 호출
+import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
+export interface MenuItemDto {
+  id: number;
+  mealType: 'BREAKFAST' | 'LUNCH' | 'DINNER';
+  displayOrder: number;
+  price: number;
+  menuItems: string[];
+  rawMenu: string;
 }
 
-export interface MenuApiItem {
-  type: string;
-  menu: string;
-  price: string;
-}
-
-export interface CafeApiItem {
-  id: string;
+export interface CafeteriaDto {
+  cafeteriaCode: 'RE11' | 'RE12' | 'RE13' | 'RE15';
   name: string;
-  menus: MenuApiItem[];
-  hours: Record<string, string>;
-  hasJeyuk: boolean;
-  available: boolean;
+  operatingHours: Record<string, string>;
+  menu: MenuItemDto[];
 }
 
-export interface MenusApiResponse {
-  success: boolean;
-  date: string;
-  data: CafeApiItem[];
+export interface MenuResponseDto {
+  [date: string]: CafeteriaDto[];
+}
+
+// 요청 파라미터
+export interface GetMenusParams {
+  startDate: string;
+  endDate: string;
 }
 
 export interface MenuApiDataSource {
-  getMenus: (dateStr: string) => Promise<MenusApiResponse>;
+  getMenus: (params: GetMenusParams) => Promise<ApiResponse<MenuResponseDto>>;
 }
 
 export const createMenuApiDataSource = ({ httpClient }: { httpClient: HttpClient }): MenuApiDataSource => ({
-  getMenus: async (dateStr: string) =>
-    parseOrThrow(await httpClient.get(`/api/menu?id=all&date=${dateStr}`)),
+  getMenus: async ({ startDate, endDate }) => {
+    const query = new URLSearchParams({ startDate, endDate });
+    return parseOrThrow(await httpClient.get(`/api/v1/menu?${query.toString()}`));
+  },
 });
