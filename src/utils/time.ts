@@ -27,12 +27,19 @@ export function getKSTNow(): Date {
   return new Date(year, month, date, hours, minutes);
 }
 
-// 서버가 준 시각 문자열에서 'HH:MM'만 뽑는다. 형식이 안 맞으면 null(= 표시 생략).
-const HOUR_MINUTE = /^\d{4}-\d{2}-\d{2}[T ](\d{2}):(\d{2})/;
+// 도서관(library) API 전용: updatedAt이 UTC인데 타임존 표기가 없다(예: '2026-08-18 02:27:00')
+// ⚠️ 날씨(forecastAt)는 반대로 이미 KST인 채로 오프셋 없이 내려오므로 이 함수를 쓰면 안 된다
+const DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/;
 
 export function formatKSTHourMinute(value: string): string | null {
-  const matched = HOUR_MINUTE.exec(value);
-  return matched ? `${matched[1]}:${matched[2]}` : null;
+  const matched = DATE_TIME.exec(value);
+  if (!matched) return null;
+
+  const [, year, month, date, hours, minutes, seconds = '0'] = matched;
+  const utcMs = Date.UTC(Number(year), Number(month) - 1, Number(date), Number(hours), Number(minutes), Number(seconds));
+  const kst = new Date(utcMs + 9 * 60 * 60 * 1000);
+
+  return `${String(kst.getUTCHours()).padStart(2, '0')}:${String(kst.getUTCMinutes()).padStart(2, '0')}`;
 }
 
 // 서버가 준 시각 문자열을 epoch(ms)으로. 시각 비교·차이 계산은 이 절대값으로만 해야 안전하다.

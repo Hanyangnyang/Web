@@ -2,19 +2,22 @@ import { describe, it, expect } from 'vitest';
 import { formatKSTHourMinute } from './time.js';
 
 describe('formatKSTHourMinute', () => {
-  it("서버 형식('YYYY-MM-DD HH:mm:ss')에서 시:분을 뽑는다", () => {
-    expect(formatKSTHourMinute('2026-08-12 14:27:00')).toBe('14:27');
+  it("서버가 준 UTC 시각('YYYY-MM-DD HH:mm:ss', 오프셋 없음)을 KST(+9)로 변환한다", () => {
+    expect(formatKSTHourMinute('2026-08-12 14:27:00')).toBe('23:27');
   });
 
-  it('타임존을 변환하지 않는다 — 서버가 준 한국 시각을 그대로 보여준다', () => {
-    // new Date()에 맡기면 기기 타임존에 따라 23:27이 되거나 파싱이 실패한다.
-    // 이 함수는 문자열에서 직접 뽑으므로 어떤 기기에서도 14:27이다.
-    expect(formatKSTHourMinute('2026-08-12 14:27:00')).toBe('14:27');
-    expect(formatKSTHourMinute('2026-08-12 00:05:00')).toBe('00:05');
+  it('날짜 경계를 넘어가도 시각만 정확히 뽑는다', () => {
+    // UTC 20:30 → KST 다음날 05:30
+    expect(formatKSTHourMinute('2026-08-12 20:30:00')).toBe('05:30');
   });
 
-  it("나중에 서버가 ISO 형식(+09:00)으로 바꿔도 그대로 동작한다", () => {
-    expect(formatKSTHourMinute('2026-08-12T14:27:00+09:00')).toBe('14:27');
+  it('기기 타임존과 무관하게 문자열을 직접 파싱한다 (T/공백 구분자 모두 지원)', () => {
+    expect(formatKSTHourMinute('2026-08-12T14:27:00')).toBe('23:27');
+    expect(formatKSTHourMinute('2026-08-12 00:05:00')).toBe('09:05');
+  });
+
+  it('초가 없어도 시:분은 정확히 변환한다', () => {
+    expect(formatKSTHourMinute('2026-08-12 14:27')).toBe('23:27');
   });
 
   it('형식이 맞지 않으면 null을 반환한다', () => {
