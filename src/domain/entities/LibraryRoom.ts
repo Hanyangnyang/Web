@@ -15,7 +15,7 @@ export interface LibraryRoom extends LibraryRoomInput {
 }
 
 export const createLibraryRoom = ({ id, name, total, occupied, available }: LibraryRoomInput): LibraryRoom => {
-  const ratio = occupied / total;
+  const ratio = total > 0 ? occupied / total : 0;
 
   let status: LibraryRoomStatus = '쾌적';
   if (ratio > 0.67) status = '매우 혼잡';

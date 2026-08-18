@@ -30,6 +30,12 @@ describe('createLibraryRoom', () => {
     expect(createLibraryRoom({ id: 'QUIET_ROOM', name: 'a', total: 100, occupied: 67, available: 33 }).status).toBe('혼잡');
   });
 
+  it('total이 0이면 ratio가 NaN/Infinity 대신 0이 되어 쾌적으로 분류한다', () => {
+    const room = createLibraryRoom({ id: 'QUIET_ROOM', name: '휴관', total: 0, occupied: 0, available: 0 });
+    expect(room.ratio).toBe(0);
+    expect(room.status).toBe('쾌적');
+  });
+
   it('id/name/total/occupied/available 필드를 그대로 보존한다', () => {
     // available은 total - occupied로 계산하지 않고 서버 값을 그대로 쓴다.
     // 사용 불가 좌석이 있으면 둘이 어긋나는데(218-100=118 ≠ 110), 그때도 서버 값이 살아남아야 한다.
