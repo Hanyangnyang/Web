@@ -3,14 +3,14 @@ import { queryClient } from '../../lib/queryClient.js';
 import { getWeatherBriefingUseCase } from '../../di.js';
 import type { WeatherBriefing } from '../../domain/entities/WeatherBriefing.js';
 
-const CACHE_TTL = 900000; // 15분
+const BRIEFING_STALE_TIME = 900000; // 15분
 const BRIEFING_QUERY_KEY = ['portal', 'weather', 'briefing'];
 
 export function prefetchWeatherBriefing() {
   return queryClient.prefetchQuery({
     queryKey: BRIEFING_QUERY_KEY,
     queryFn: () => getWeatherBriefingUseCase.execute(),
-    staleTime: CACHE_TTL,
+    staleTime: BRIEFING_STALE_TIME,
   });
 }
 
@@ -24,7 +24,7 @@ export function useWeatherBriefing(isVisible = true): UseWeatherBriefingResult {
   const { data, isLoading, error } = useQuery({
     queryKey: BRIEFING_QUERY_KEY,
     queryFn: () => getWeatherBriefingUseCase.execute(),
-    staleTime: CACHE_TTL,
+    staleTime: BRIEFING_STALE_TIME,
     enabled: isVisible,
   });
 

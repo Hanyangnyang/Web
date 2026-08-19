@@ -3,9 +3,7 @@ import { useQueries } from '@tanstack/react-query';
 import { INSTA_ACCOUNTS, type InstagramProfile } from '../../domain/entities/InstagramAccount.js';
 import { getInstagramProfileUseCase, instagramRepository } from '../../di.js';
 
-// 로컬에 등록된 계정은 즉시 반환되고, 원격 폴백일 때만 실제 네트워크를 타므로 넉넉하게 잡아도 됨
 const INSTAGRAM_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간
-
 const ALL_ACCOUNTS = [...INSTA_ACCOUNTS.erica, ...INSTA_ACCOUNTS.college];
 
 export interface UseInstagramResult {
