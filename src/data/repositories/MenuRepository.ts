@@ -24,10 +24,10 @@ function toCafes(cafeterias: CafeteriaDto[]) {
       name: c.name,
       hours: c.operatingHours,
       available: c.menu.length > 0,
-      hasJeyuk: c.menu.some(m => m.rawMenu.includes('제육')),
+      hasJeyuk: c.menu.some(m => (m.rawMenu ?? '').includes('제육')),
       menus: c.menu.map(m => ({
         type: MEAL_TYPE_LABEL[m.mealType] ?? m.mealType,
-        menu: m.menuItems.join('\n'),
+        menuItems: m.menuItems ?? [],
         price: `${m.price.toLocaleString('ko-KR')}원`,
       })),
     });

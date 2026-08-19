@@ -55,6 +55,7 @@ export function getKSTDateKey(): string {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
 }
 
+// 학식 API
 // 임의의 Date를 'YYYY-MM-DD' 문자열로. getKSTDate()가 만든 Date를 넣을 것을 전제로
 // toISOString()으로만 읽는다 — 로컬 getter를 쓰면 위 경고와 같은 이유로 날짜가 틀어진다.
 export function toDateKey(date: Date): string {

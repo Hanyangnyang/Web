@@ -22,13 +22,13 @@ export interface MenuResponseDto {
 }
 
 // 요청 파라미터
-export interface GetMenusParams {
+export interface GetMenuForDateParams {
   startDate: string;
   endDate: string;
 }
 
 export interface MenuApiDataSource {
-  getMenuForDate: (params: GetMenusParams) => Promise<ApiResponse<MenuResponseDto>>;
+  getMenuForDate: (params: GetMenuForDateParams) => Promise<ApiResponse<MenuResponseDto>>;
   getMenuForPeriod: () => Promise<ApiResponse<MenuResponseDto>>;
 }
 

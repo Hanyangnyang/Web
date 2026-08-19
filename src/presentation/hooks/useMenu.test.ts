@@ -67,7 +67,7 @@ describe('useMenu (React Query)', () => {
     ];
     // 배치 조회도 이미 끝난 상태를 재현 — 그래야 개별 날짜 fetch가 배치 완료를 기다리지 않고
     // 캐시를 바로 신뢰해도 되는 상황이 된다
-    queryClient.setQueryData(['menu-batch'], true);
+    queryClient.setQueryData(['menu-period'], true);
     queryClient.setQueryData(['menu', toDateKey(getKSTDate())], cached);
 
     const fetchSpy = mockFetch(() => new Promise(() => {}));

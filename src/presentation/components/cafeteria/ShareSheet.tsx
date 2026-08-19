@@ -28,20 +28,18 @@ const KakaoIcon = () => (
 export interface ShareSheetProps {
   cafeName: string;
   mealType: string;
-  menuText: string;
+  featuredItem: string | null;
   dateLabel: string;
   shareUrl: string;
   onClose: () => void;
   onCopied?: () => void;
 }
 
-export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }: ShareSheetProps) {
+export function ShareSheet({ cafeName, dateLabel, mealType, featuredItem, shareUrl, onClose, onCopied }: ShareSheetProps) {
   const posthog = usePostHog();
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
   const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
 
-  const boldMatch = menuText?.match(/<b[^>]*>(.*?)<\/b>/i);
-  const featuredItem = boldMatch ? boldMatch[1] : null;
   const kakaoTitle = featuredItem
     ? `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 '${featuredItem}'입니다!`
     : `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`;

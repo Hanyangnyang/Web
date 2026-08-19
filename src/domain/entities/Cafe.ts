@@ -8,7 +8,7 @@ export const KNOWN_CAFES: { id: string; name: string }[] = [
 
 export interface Menu {
   type: string;
-  menu: string;
+  menuItems: string[];
   price: string;
 }
 

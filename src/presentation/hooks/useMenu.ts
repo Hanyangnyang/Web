@@ -7,7 +7,7 @@ import { getKSTDate, toDateKey } from '../../utils/time.js';
 import type { Cafe } from '../../domain/entities/Cafe.js';
 
 const MENU_STALE_TIME = 60 * 60 * 1000;  // 1시간 — 학식은 하루 단위로만 갱신되므로 진입마다 재검증할 필요 없음
-const MENU_BATCH_QUERY_KEY = ['menu-batch'] as const;
+const MENU_FOR_PERIOD_QUERY_KEY = ['menu-period'] as const;
 
 function getInitialDate(): Date {
   const dateParam = new URLSearchParams(window.location.search).get('date');
@@ -33,11 +33,11 @@ export interface UseMenuResult {
 export function useMenu(): UseMenuResult {
   const [menuDate, setMenuDate] = useState<Date>(getInitialDate);
 
-  const batchQuery = useQuery({
-    queryKey: MENU_BATCH_QUERY_KEY,
+  const periodQuery = useQuery({
+    queryKey: MENU_FOR_PERIOD_QUERY_KEY,
     queryFn: async () => {
-      const batch = await getMenuForPeriodUseCase.execute();
-      for (const [dateStr, cafes] of Object.entries(batch)) {
+      const menusByDate = await getMenuForPeriodUseCase.execute();
+      for (const [dateStr, cafes] of Object.entries(menusByDate)) {
         queryClient.setQueryData(['menu', dateStr], cafes);
       }
       return true;
@@ -50,7 +50,7 @@ export function useMenu(): UseMenuResult {
     queryKey: menuQueryKey(menuDate),
     queryFn: () => getMenuForDateUseCase.execute(menuDate),
     staleTime: MENU_STALE_TIME,
-    enabled: hasCachedMenu || batchQuery.isFetched,
+    enabled: hasCachedMenu || periodQuery.isFetched,
   });
 
   const changeDate = useCallback((offsetOrDate: number | Date) => {
@@ -68,7 +68,7 @@ export function useMenu(): UseMenuResult {
   return {
     menuDate,
     cafes: query.data ?? [],
-    menuLoading: !batchQuery.isFetched && !hasCachedMenu ? true : query.isLoading,
+    menuLoading: !periodQuery.isFetched && !hasCachedMenu ? true : query.isLoading,
     menuRevalidating: query.isFetching && !query.isLoading,
     changeDate,
   };
