@@ -2,5 +2,6 @@
 import type { Cafe } from '../entities/Cafe.js';
 
 export interface MenuRepository {
-  getMenus: (dateStr: string) => Promise<Cafe[]>;
+  getMenuForDate: (date: Date) => Promise<Cafe[]>;
+  getMenuForPeriod: () => Promise<Record<string, Cafe[]>>;
 }

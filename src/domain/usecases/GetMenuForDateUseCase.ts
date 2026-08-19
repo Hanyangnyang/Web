@@ -2,12 +2,12 @@
 import type { Cafe } from '../entities/Cafe.js';
 import type { MenuRepository } from '../repositories/IMenuRepository.js';
 
-export interface GetMenuUseCase {
-  execute: (dateStr: string) => Promise<Cafe[]>;
+export interface GetMenuForDateUseCase {
+  execute: (date: Date) => Promise<Cafe[]>;
 }
 
-export const createGetMenuUseCase = (
+export const createGetMenuForDateUseCase = (
   { menuRepository }: { menuRepository: MenuRepository }
-): GetMenuUseCase => ({
-  execute: (dateStr: string) => menuRepository.getMenus(dateStr),
+): GetMenuForDateUseCase => ({
+  execute: (date: Date) => menuRepository.getMenuForDate(date),
 });

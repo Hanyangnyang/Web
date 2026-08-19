@@ -1,24 +1,26 @@
 // 레포지토리: 학식 API 응답을 Cafe 엔티티 배열로 변환
-import { createCafe } from '../../domain/entities/Cafe.js';
-import type { MenuApiDataSource, MenuItemDto } from '../datasources/MenuApiDataSource.js';
+import { createCafe, KNOWN_CAFES } from '../../domain/entities/Cafe.js';
+import type { MenuApiDataSource, MenuDto, CafeteriaDto } from '../datasources/MenuApiDataSource.js';
 import type { MenuRepository } from '../../domain/repositories/IMenuRepository.js';
+import { toDateKey } from '../../utils/time.js';
 
-const MEAL_TYPE_LABEL: Record<MenuItemDto['mealType'], string> = {
+const MEAL_TYPE_LABEL: Record<MenuDto['mealType'], string> = {
   BREAKFAST: '조식',
   LUNCH: '중식',
   DINNER: '석식',
 };
 
-export const createMenuRepository = (
-  { menuApiDataSource }: { menuApiDataSource: MenuApiDataSource }
-): MenuRepository => ({
-  getMenus: async (dateStr: string) => {
-    const res = await menuApiDataSource.getMenus({ startDate: dateStr, endDate: dateStr });
-    if (!res.success) return [];
+function toCafes(cafeterias: CafeteriaDto[]) {
+  if (!Array.isArray(cafeterias)) throw new Error('menu API returned invalid shape');
 
-    const cafeterias = res.data?.[dateStr] ?? [];
-    return cafeterias.map(c => createCafe({
-      id: c.cafeteriaCode.toLowerCase(),
+  const byId = new Map<string, CafeteriaDto>(cafeterias.map(c => [c.cafeteriaCode.toLowerCase(), c]));
+
+  return KNOWN_CAFES.map(({ id, name }) => {
+    const c = byId.get(id);
+    if (!c) return createCafe({ id, name });
+
+    return createCafe({
+      id,
       name: c.name,
       hours: c.operatingHours,
       available: c.menu.length > 0,
@@ -28,6 +30,27 @@ export const createMenuRepository = (
         menu: m.menuItems.join('\n'),
         price: `${m.price.toLocaleString('ko-KR')}원`,
       })),
-    }));
+    });
+  });
+}
+
+export const createMenuRepository = (
+  { menuApiDataSource }: { menuApiDataSource: MenuApiDataSource }
+): MenuRepository => ({
+  getMenuForDate: async (date: Date) => {
+    const dateStr = toDateKey(date);
+    const res = await menuApiDataSource.getMenuForDate({ startDate: dateStr, endDate: dateStr });
+    if (!res.success) return [];
+
+    return toCafes(res.data?.[dateStr] ?? []);
+  },
+
+  getMenuForPeriod: async () => {
+    const res = await menuApiDataSource.getMenuForPeriod();
+    if (!res.success || !res.data) return {};
+
+    return Object.fromEntries(
+      Object.entries(res.data).map(([dateStr, cafeterias]) => [dateStr, toCafes(cafeterias)])
+    );
   },
 });

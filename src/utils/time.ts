@@ -1,5 +1,5 @@
 // ⚠️ .toISOString()으로만 읽을 것 — .getFullYear()/.getHours() 같은 로컬 getter로 읽으면
-// 기기가 이미 KST일 때 9시간이 중복으로 밀려서 틀어진다. (cafeteriaFormat.tsx/useMenu.ts/WeatherCard.tsx 참고)
+// 기기가 이미 KST일 때 9시간이 중복으로 밀려서 틀어진다. (cafeteriaFormat.tsx/toDateKey/WeatherCard.tsx 참고)
 export const getKSTDate = (): Date => new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
 
 // 기기 타임존과 무관하게 "진짜 KST 지금"의 년/월/일/시/분/요일을 뽑아냄
@@ -53,4 +53,10 @@ export function toEpoch(value: string): number {
 export function getKSTDateKey(): string {
   const { year, month, date } = getKSTParts();
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+}
+
+// 임의의 Date를 'YYYY-MM-DD' 문자열로. getKSTDate()가 만든 Date를 넣을 것을 전제로
+// toISOString()으로만 읽는다 — 로컬 getter를 쓰면 위 경고와 같은 이유로 날짜가 틀어진다.
+export function toDateKey(date: Date): string {
+  return date.toISOString().split('T')[0];
 }

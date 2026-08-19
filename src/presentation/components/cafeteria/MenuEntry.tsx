@@ -1,10 +1,10 @@
 // 컴포넌트: 메뉴 한 세트 (가격 배지 + 메뉴 줄들 + 공유 버튼). 마지막 줄에만 공유 버튼이 붙는다.
 import { Share2 } from 'lucide-react';
 import { MenuItemLine } from './MenuItemLine.js';
-import type { MenuItem } from '../../../domain/entities/Cafe.js';
+import type { Menu } from '../../../domain/entities/Cafe.js';
 
 interface MenuEntryProps {
-  menu: MenuItem;
+  menu: Menu;
   priceLabel?: string;
   onShare: () => void;
 }

@@ -21,7 +21,8 @@ import { createBusRepository } from './data/repositories/BusRepository.js';
 import { createGymRepository } from './data/repositories/GymRepository.js';
 import { createFeedbackRepository } from './data/repositories/FeedbackRepository.js';
 
-import { createGetMenuUseCase } from './domain/usecases/GetMenuUseCase.js';
+import { createGetMenuForDateUseCase } from './domain/usecases/GetMenuForDateUseCase.js';
+import { createGetMenuForPeriodUseCase } from './domain/usecases/GetMenuForPeriodUseCase.js';
 import { createGetInstagramProfileUseCase } from './domain/usecases/GetInstagramProfileUseCase.js';
 import { createGetShuttleDataUseCase } from './domain/usecases/GetShuttleDataUseCase.js';
 import { createGetSubwayArrivalsUseCase } from './domain/usecases/GetSubwayArrivalsUseCase.js';
@@ -68,7 +69,8 @@ export const gymRepository = createGymRepository({ gymApiDataSource });
 export const feedbackRepository = createFeedbackRepository({ feedbackDataSource });
 
 // Use Cases
-export const getMenuUseCase = createGetMenuUseCase({ menuRepository });
+export const getMenuForDateUseCase = createGetMenuForDateUseCase({ menuRepository });
+export const getMenuForPeriodUseCase = createGetMenuForPeriodUseCase({ menuRepository });
 export const getInstagramProfileUseCase = createGetInstagramProfileUseCase({ instagramRepository });
 export const getShuttleDataUseCase = createGetShuttleDataUseCase({ shuttleRepository });
 export const getSubwayArrivalsUseCase = createGetSubwayArrivalsUseCase({ shuttleRepository });
