@@ -135,12 +135,14 @@ export function SchoolShuttleSection({
     setIsFullMode(!isFullMode);
   };
 
+  // 2. 조회 실패 — 백엔드 요청이 실패한 경우
   if (loadErr) {
     return (
       <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>
     );
   }
 
+  // 1. 첫 로딩 — 스피너
   if (isLoading) {
     return (
       <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>
@@ -182,6 +184,7 @@ export function SchoolShuttleSection({
 
         <div ref={containerRef} className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
           {schedule.length > 0 ? (() => {
+            // 4. 정상 — 조건(정류장/기간/요일)에 맞는 셔틀이 있음
             const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
             return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
               <TimetableRow
@@ -203,6 +206,7 @@ export function SchoolShuttleSection({
               />
             ));
           })() : (
+            // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 오늘 남은 셔틀(또는 해당 조건의 운행)이 없음
             <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
               <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
             </div>

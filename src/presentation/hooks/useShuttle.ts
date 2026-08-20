@@ -9,7 +9,7 @@ import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
 import { getKSTDateKey, getKSTParts } from '../../utils/time.js';
 
-const SCHEDULE_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간 — 로컬 shuttle.json은 앱 재배포 전까지 안 바뀜
+const SCHEDULE_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간 — 백엔드 시간표도 학기/방학 전환 등 배포 주기와 비슷하게만 바뀜
 const SUBWAY_POLL_INTERVAL = 2 * 60 * 1000; // 2분
 
 const SCHEDULE_QUERY_KEY = ['shuttle', 'schedule'];
@@ -88,7 +88,7 @@ export function useShuttle(isActive = false) {
   };
   const setLineId = (l: string) => { setLineIdState(l); localStorage.setItem('shuttle_lineId', l); };
 
-  // 셔틀 시간표 (정적 로컬 JSON — 앱 재배포 전까지 staleTime 내에서 재요청 없음)
+  // 셔틀 시간표 (백엔드 API — staleTime 내에서 재요청 없음)
   const scheduleQuery = useQuery({
     queryKey: SCHEDULE_QUERY_KEY,
     queryFn: () => getShuttleDataUseCase.execute(),

@@ -42,7 +42,8 @@ interface TimetableRowProps {
 export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull, shouldScroll, autoFlip }: TimetableRowProps) {
   const [showRowRelative, setShowRowRelative] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
-  const opt = SUBWAY_OPTS.find(o => o.id === lineId)!;
+  // lineId가 SUBWAY_OPTS에 없을 수 있음(예: 노선 개편 후 남은 오래된 localStorage 값) — 못 찾으면 첫 옵션으로 대체
+  const opt = SUBWAY_OPTS.find(o => o.id === lineId) ?? SUBWAY_OPTS[0];
   const trains = row.subway ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
   const noTrainReason = row.subway && trains.length === 0
     ? (subwayOffPeak ? '운행 시간 외' : '연결 열차 없음') : null;

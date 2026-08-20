@@ -35,6 +35,7 @@ import { createGetGymScheduleUseCase } from './domain/usecases/GetGymScheduleUse
 import { createSubmitFeedbackUseCase } from './domain/usecases/SubmitFeedbackUseCase.js';
 
 import { createShuttleDataSource } from './data/datasources/ShuttleDataSource.js';
+import { createShuttleApiDataSource } from './data/datasources/ShuttleApiDataSource.js';
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
@@ -48,6 +49,7 @@ const apiHttpClient = createHttpClient({
 const menuApiDataSource = createMenuApiDataSource({ httpClient: apiHttpClient });
 const instagramApiDataSource = createInstagramApiDataSource({ httpClient });
 const shuttleDataSource = createShuttleDataSource({ httpClient });
+const shuttleApiDataSource = createShuttleApiDataSource({ httpClient: apiHttpClient });
 const weatherApiDataSource = createWeatherApiDataSource({ httpClient: apiHttpClient });
 const weatherBriefingApiDataSource = createWeatherBriefingApiDataSource({ httpClient: apiHttpClient });
 const libraryApiDataSource = createLibraryApiDataSource({ httpClient: apiHttpClient });
@@ -59,7 +61,7 @@ const feedbackDataSource = createFeedbackDataSource();
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
 export const instagramRepository = createInstagramRepository({ instagramApiDataSource });
-export const shuttleRepository = createShuttleRepository({ shuttleDataSource });
+export const shuttleRepository = createShuttleRepository({ shuttleApiDataSource, shuttleDataSource });
 export const weatherRepository = createWeatherRepository({ weatherApiDataSource });
 export const weatherBriefingRepository = createWeatherBriefingRepository({ weatherBriefingApiDataSource });
 export const libraryRepository = createLibraryRepository({ libraryApiDataSource });

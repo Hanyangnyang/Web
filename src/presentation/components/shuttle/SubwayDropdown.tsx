@@ -11,7 +11,8 @@ interface SubwayDropdownProps {
 export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const opt = SUBWAY_OPTS.find(o => o.id === selected)!;
+  // selected가 SUBWAY_OPTS에 없을 수 있음(예: 노선 개편 후 남은 오래된 localStorage 값) — 못 찾으면 첫 옵션으로 대체
+  const opt = SUBWAY_OPTS.find(o => o.id === selected) ?? SUBWAY_OPTS[0];
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };

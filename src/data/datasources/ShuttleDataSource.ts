@@ -1,14 +1,7 @@
-// 데이터 소스: 셔틀 시간표 JSON 및 지하철 도착 정보 API 원시 호출
+// 데이터 소스: 지하철 도착 정보 API 원시 호출 (셔틀 시간표는 ShuttleApiDataSource 참고)
 
 export interface HttpClient {
   get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
-
-export interface ShuttleScheduleRow {
-  route: string;
-  period: string;
-  dayType: string;
-  dep: string;
 }
 
 export interface SubwayArrivalApiItem {
@@ -27,16 +20,10 @@ export interface SubwayArrivalsApiResponse {
 }
 
 export interface ShuttleDataSource {
-  fetchScheduleData: () => Promise<ShuttleScheduleRow[]>;
   fetchSubwayArrivals: (full?: boolean, dayType?: string | null) => Promise<SubwayArrivalsApiResponse>;
 }
 
 export const createShuttleDataSource = ({ httpClient }: { httpClient: HttpClient }): ShuttleDataSource => ({
-  fetchScheduleData: async () => {
-    const res = await httpClient.get('/shuttle.json');
-    return res.json();
-  },
-
   fetchSubwayArrivals: async (full = false, dayType = null) => {
     let url = '/api/subway';
     const params = new URLSearchParams();

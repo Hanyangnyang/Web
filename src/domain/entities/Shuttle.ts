@@ -24,7 +24,7 @@ export interface SubwayOpt {
   updnLine: string;
 }
 
-// shuttle.json 원본 행을 정규화한 도메인 셔틀 행
+// ShuttleRepository가 정규화한 도메인 셔틀 행
 export interface ShuttleRow {
   route: string;
   period: string;
@@ -32,9 +32,7 @@ export interface ShuttleRow {
   dep: string;
 }
 
-// ShuttleDataSource의 raw 응답을 도메인 엔티티로 변환 — 지금은 필드가 그대로 대응되지만,
-// 나중에 실제 백엔드 API가 다른 필드명/형식으로 내려줘도 이 함수만 고치면 나머지 도메인
-// 로직(computeSchedule 등)은 안 바뀜
+// ShuttleRepository가 백엔드 응답(영문 enum)을 한글 문자열로 변환한 뒤 넘겨주는 값을 받는다 
 export function createShuttleRow(raw: { route: string; period: string; dayType: string; dep: string }): ShuttleRow {
   return {
     route: raw.route,
@@ -74,15 +72,15 @@ export function createSubwayArrival(raw: {
 
 export interface ScheduleItem {
   depMin: number;
-  dep: string;
-  arr: string;
-  arrLabel: string;
-  subway: boolean;
-  route: string;
+  dep: string;  // 출발시각
+  arr: string;  // 다음 정류장 도착시각
+  arrLabel: string;  // 다음 정류장 이름 
+  subway: boolean;   // 그 정류장에서 지하철 연결 가능한지 플래그
+  route: string;     // 노선명 
 }
 
 export interface FullScheduleItem extends ScheduleItem {
-  isLast: boolean;
+  isLast: boolean;  // 막차여부 
 }
 
 export interface ShuttleAppConfig {
