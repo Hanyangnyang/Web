@@ -66,14 +66,13 @@ graph TD
 
     subgraph Vercel["☁️ Vercel (BFF / Serverless)"]
         MenuAPI["api/menu.js\n학식 스크래핑"]
-        SubwayAPI["api/subway.js\n지하철 시간표"]
         PortalAPI["api/portal.js\n날씨 · 도서관"]
         InstaAPI["api/insta-proxy.js\n인스타 프로필"]
+        HolidaysAPI["api/holidays.js\n법정공휴일 조회"]
     end
 
     subgraph ExternalAPIs["🌐 외부 API"]
         HanyangWeb["한양대학교\n학식 홈페이지"]
-        SeoulOpenAPI["서울 열린데이터\n지하철 시간표"]
         OpenMeteo["Open-Meteo\n날씨 / 대기질"]
         LibraryAPI["한양대 도서관\n좌석 현황"]
         GovHolidayAPI["공공데이터포털\n공휴일 API"]
@@ -103,18 +102,18 @@ graph TD
     end
 
     Repo -->|"fetch /api/menu"| MenuAPI
-    Repo -->|"fetch /api/subway"| SubwayAPI
     Repo -->|"fetch /api/portal?type=weather"| PortalAPI
     Repo -->|"fetch /api/portal?type=library"| PortalAPI
     Repo -->|"fetch /api/insta-proxy"| InstaAPI
+    Repo -->|"fetch /api/holidays"| HolidaysAPI
 
     MenuAPI -->|"HTML 스크래핑"| HanyangWeb
-    SubwayAPI -->|"시간표 조회"| SeoulOpenAPI
     PortalAPI -->|"기상 데이터"| OpenMeteo
     PortalAPI -->|"좌석 현황"| LibraryAPI
     PortalAPI -->|"공휴일 조회"| GovHolidayAPI
     PortalAPI -->|"날씨 코멘트 생성"| GeminiAI
     InstaAPI -->|"프로필 조회"| InstaIG
+    HolidaysAPI -->|"법정공휴일 조회"| GovHolidayAPI
 
     UI -->|"익명 로그인"| Auth
     UI -->|"피드백 저장"| Feedbacks
@@ -137,10 +136,12 @@ graph TD
 | 엔드포인트 | 역할 | 외부 호출 대상 | 캐시 TTL |
 |---|---|---|---|
 | `/api/menu` | 학식 HTML 스크래핑 + 파싱 | 한양대 홈페이지 | 1일 |
-| `/api/subway` | 4호선·수인분당선 시간표 | 서울 열린데이터 | 30일 (로컬 번들) |
 | `/api/portal?type=weather` | 날씨·대기질 + Gemini 코멘트 | Open-Meteo, Gemini | 매 정각 갱신 |
 | `/api/portal?type=library` | 도서관 좌석 현황 | 한양대 도서관 API | no-cache |
 | `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 |
+| `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 |
+
+지하철·셔틀 시간표는 새 백엔드(`/api/v1/subway/schedule`, `/api/v1/shuttle`)로 이전 완료 — 더 이상 이 Vercel BFF를 거치지 않음.
 
 ### Supabase 테이블 요약
 

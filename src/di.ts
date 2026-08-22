@@ -10,6 +10,7 @@ import { createBannerApiDataSource } from './data/datasources/BannerApiDataSourc
 import { createBusApiDataSource } from './data/datasources/BusApiDataSource.js';
 import { createGymApiDataSource } from './data/datasources/GymApiDataSource.js';
 import { createFeedbackDataSource } from './data/datasources/FeedbackDataSource.js';
+import { createHolidayApiDataSource } from './data/datasources/HolidayApiDataSource.js';
 
 import { createMenuRepository } from './data/repositories/MenuRepository.js';
 import { createInstagramRepository } from './data/repositories/InstagramRepository.js';
@@ -20,12 +21,13 @@ import { createBannerRepository } from './data/repositories/BannerRepository.js'
 import { createBusRepository } from './data/repositories/BusRepository.js';
 import { createGymRepository } from './data/repositories/GymRepository.js';
 import { createFeedbackRepository } from './data/repositories/FeedbackRepository.js';
+import { createHolidayRepository } from './data/repositories/HolidayRepository.js';
 
 import { createGetMenuForDateUseCase } from './domain/usecases/GetMenuForDateUseCase.js';
 import { createGetMenuForPeriodUseCase } from './domain/usecases/GetMenuForPeriodUseCase.js';
 import { createGetInstagramProfileUseCase } from './domain/usecases/GetInstagramProfileUseCase.js';
 import { createGetShuttleDataUseCase } from './domain/usecases/GetShuttleDataUseCase.js';
-import { createGetSubwayArrivalsUseCase } from './domain/usecases/GetSubwayArrivalsUseCase.js';
+import { createGetSubwayScheduleUseCase } from './domain/usecases/GetSubwayScheduleUseCase.js';
 import { createGetWeatherUseCase } from './domain/usecases/GetWeatherUseCase.js';
 import { createGetWeatherBriefingUseCase } from './domain/usecases/GetWeatherBriefingUseCase.js';
 import { createGetLibraryStatusUseCase } from './domain/usecases/GetLibraryStatusUseCase.js';
@@ -33,10 +35,12 @@ import { createGetBannersUseCase } from './domain/usecases/GetBannersUseCase.js'
 import { createGetBusArrivalsUseCase } from './domain/usecases/GetBusArrivalsUseCase.js';
 import { createGetGymScheduleUseCase } from './domain/usecases/GetGymScheduleUseCase.js';
 import { createSubmitFeedbackUseCase } from './domain/usecases/SubmitFeedbackUseCase.js';
+import { createGetIsHolidayUseCase } from './domain/usecases/GetIsHolidayUseCase.js';
 
-import { createShuttleDataSource } from './data/datasources/ShuttleDataSource.js';
 import { createShuttleApiDataSource } from './data/datasources/ShuttleApiDataSource.js';
+import { createSubwayApiDataSource } from './data/datasources/SubwayApiDataSource.js';
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
+import { createSubwayRepository } from './data/repositories/SubwayRepository.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
@@ -48,8 +52,8 @@ const apiHttpClient = createHttpClient({
 // Data Sources
 const menuApiDataSource = createMenuApiDataSource({ httpClient: apiHttpClient });
 const instagramApiDataSource = createInstagramApiDataSource({ httpClient });
-const shuttleDataSource = createShuttleDataSource({ httpClient });
 const shuttleApiDataSource = createShuttleApiDataSource({ httpClient: apiHttpClient });
+const subwayApiDataSource = createSubwayApiDataSource({ httpClient: apiHttpClient });
 const weatherApiDataSource = createWeatherApiDataSource({ httpClient: apiHttpClient });
 const weatherBriefingApiDataSource = createWeatherBriefingApiDataSource({ httpClient: apiHttpClient });
 const libraryApiDataSource = createLibraryApiDataSource({ httpClient: apiHttpClient });
@@ -57,11 +61,13 @@ const bannerApiDataSource = createBannerApiDataSource({ httpClient: apiHttpClien
 const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient });
 const feedbackDataSource = createFeedbackDataSource();
+const holidayApiDataSource = createHolidayApiDataSource({ httpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
 export const instagramRepository = createInstagramRepository({ instagramApiDataSource });
-export const shuttleRepository = createShuttleRepository({ shuttleApiDataSource, shuttleDataSource });
+export const shuttleRepository = createShuttleRepository({ shuttleApiDataSource });
+export const subwayRepository = createSubwayRepository({ subwayApiDataSource });
 export const weatherRepository = createWeatherRepository({ weatherApiDataSource });
 export const weatherBriefingRepository = createWeatherBriefingRepository({ weatherBriefingApiDataSource });
 export const libraryRepository = createLibraryRepository({ libraryApiDataSource });
@@ -69,13 +75,14 @@ export const bannerRepository = createBannerRepository({ bannerApiDataSource });
 export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
 export const feedbackRepository = createFeedbackRepository({ feedbackDataSource });
+export const holidayRepository = createHolidayRepository({ holidayApiDataSource });
 
 // Use Cases
 export const getMenuForDateUseCase = createGetMenuForDateUseCase({ menuRepository });
 export const getMenuForPeriodUseCase = createGetMenuForPeriodUseCase({ menuRepository });
 export const getInstagramProfileUseCase = createGetInstagramProfileUseCase({ instagramRepository });
 export const getShuttleDataUseCase = createGetShuttleDataUseCase({ shuttleRepository });
-export const getSubwayArrivalsUseCase = createGetSubwayArrivalsUseCase({ shuttleRepository });
+export const getSubwayScheduleUseCase = createGetSubwayScheduleUseCase({ subwayRepository });
 export const getWeatherUseCase = createGetWeatherUseCase({ weatherRepository });
 export const getWeatherBriefingUseCase = createGetWeatherBriefingUseCase({ weatherBriefingRepository });
 export const getLibraryStatusUseCase = createGetLibraryStatusUseCase({ libraryRepository });
@@ -83,3 +90,4 @@ export const getBannersUseCase = createGetBannersUseCase({ bannerRepository });
 export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository });
 export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository });
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
+export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });

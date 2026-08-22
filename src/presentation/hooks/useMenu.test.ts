@@ -3,7 +3,7 @@ import React, { type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { queryClient } from '../../lib/queryClient.js';
-import { getKSTDate, toDateKey } from '../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../utils/time.js';
 import { useMenu } from './useMenu.js';
 
 function wrapper({ children }: { children: ReactNode }) {
@@ -27,7 +27,7 @@ function menuApiResponse() {
   return {
     success: true,
     data: {
-      [toDateKey(getKSTDate())]: [
+      [toDateKey(getKSTDateUnsafe())]: [
         { cafeteriaCode: 'RE12', name: '학생식당', operatingHours: { 중식: '11:30~13:30' }, menu: [{ id: 1, mealType: 'LUNCH', displayOrder: 0, price: 5000, menuItems: ['제육볶음'], rawMenu: '<b>제육볶음</b> 5,000원' }] },
         { cafeteriaCode: 'RE15', name: '창업보육센터', operatingHours: {}, menu: [] },
         { cafeteriaCode: 'RE11', name: '교직원식당', operatingHours: {}, menu: [] },
@@ -68,7 +68,7 @@ describe('useMenu (React Query)', () => {
     // 배치 조회도 이미 끝난 상태를 재현 — 그래야 개별 날짜 fetch가 배치 완료를 기다리지 않고
     // 캐시를 바로 신뢰해도 되는 상황이 된다
     queryClient.setQueryData(['menu-period'], true);
-    queryClient.setQueryData(['menu', toDateKey(getKSTDate())], cached);
+    queryClient.setQueryData(['menu', toDateKey(getKSTDateUnsafe())], cached);
 
     const fetchSpy = mockFetch(() => new Promise(() => {}));
 

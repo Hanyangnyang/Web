@@ -1,5 +1,5 @@
 // 학식 탭 포맷팅 유틸: 날짜 라벨, 식사 아이콘, <b> 태그 파싱
-import { getKSTDate, toDateKey } from '../../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../../utils/time.js';
 
 export function formatDate(targetDate: Date): string {
   const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -7,7 +7,7 @@ export function formatDate(targetDate: Date): string {
   const day = targetDate.getUTCDate();
   const base = `${month}월 ${day}일 (${days[targetDate.getUTCDay()]})`;
 
-  const nowKst = getKSTDate();
+  const nowKst = getKSTDateUnsafe();
   const targetStr = toDateKey(targetDate);
   if (toDateKey(nowKst) === targetStr) return `${base} 오늘`;
 
@@ -22,7 +22,7 @@ export function formatDate(targetDate: Date): string {
 
 // 공유 시트용 짧은 날짜 라벨 (오늘/내일/어제/M월D일) — 기존엔 두 곳에서 각자 계산하던 걸 통합
 export function getDateLabel(targetDate: Date): string {
-  const nowKst = getKSTDate();
+  const nowKst = getKSTDateUnsafe();
   const targetStr = toDateKey(targetDate);
   if (targetStr === toDateKey(nowKst)) return '오늘';
   if (targetStr === toDateKey(new Date(nowKst.getTime() + 86400000))) return '내일';

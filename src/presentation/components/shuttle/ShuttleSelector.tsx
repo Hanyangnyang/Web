@@ -10,11 +10,10 @@ interface ShuttleSelectorProps {
   fullDayType: string;
   setFullDayType: (dayType: string) => void;
   appConfig: ShuttleAppConfig;
-  isHolidayServer: boolean | null;
   isWeekend: boolean;
 }
 
-export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isHolidayServer, isWeekend }: ShuttleSelectorProps) {
+export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isWeekend }: ShuttleSelectorProps) {
   const [open, setOpen] = useState(false);
   const [localPeriod, setLocalPeriod] = useState(fullPeriod);
   const [localDayType, setLocalDayType] = useState(fullDayType);
@@ -66,8 +65,7 @@ export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDay
   const boxBase = "flex items-center gap-2.5 px-3 py-[7px] bg-white border-[1.5px] rounded-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-150";
 
   if (!isFullMode) {
-    const isWk = isHolidayServer || isWeekend;
-    const dType = isWk ? '주말·공휴일' : '평일';
+    const dType = isWeekend ? '주말·공휴일' : '평일';
     const period = appConfig.current_period;
     const displayPeriod = period?.replace('중', ' 중');
     return (

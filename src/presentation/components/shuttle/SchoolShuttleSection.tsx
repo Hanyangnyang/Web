@@ -1,7 +1,7 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { ChevronDown } from 'lucide-react';
-import type { ScheduleItem, ShuttleAppConfig, SubwayArrival } from '../../../domain/entities/Shuttle.js';
+import type { ScheduleItem, ShuttleAppConfig, SubwayScheduleRow } from '../../../domain/entities/Shuttle.js';
 import { TimetableRow } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { StopSelector } from './StopSelector.jsx';
@@ -24,9 +24,8 @@ interface SchoolShuttleSectionProps {
   schedule: (ScheduleItem & { isLast?: boolean })[];
   nextIdx: number;
   now: number;
-  subwayArrivals: SubwayArrival[];
+  subwayArrivals: SubwayScheduleRow[];
   subwayOffPeak: boolean;
-  isHolidayServer: boolean | null;
   isWeekend: boolean;
   needsSubway: boolean;
   loadErr: string | null;
@@ -51,7 +50,7 @@ export function SchoolShuttleSection({
   lineId, setLineId,
   schedule, nextIdx, now,
   subwayArrivals, subwayOffPeak,
-  isHolidayServer, isWeekend,
+  isWeekend,
   needsSubway,
   loadErr, isLoading, isSubwayLoading, isGpsLoading,
   visibleCount, loadMore,
@@ -172,7 +171,6 @@ export function SchoolShuttleSection({
           fullDayType={fullDayType}
           setFullDayType={setFullDayType}
           appConfig={appConfig}
-          isHolidayServer={isHolidayServer}
           isWeekend={isWeekend}
           needsSubway={needsSubway}
           hideSubwayCol={hideSubwayCol}

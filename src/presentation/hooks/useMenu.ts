@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { getMenuForDateUseCase, getMenuForPeriodUseCase } from '../../di.js';
-import { getKSTDate, toDateKey } from '../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../utils/time.js';
 import type { Cafe } from '../../domain/entities/Cafe.js';
 
 const MENU_STALE_TIME = 60 * 60 * 1000;  // 1시간 — 학식은 하루 단위로만 갱신되므로 진입마다 재검증할 필요 없음
@@ -15,7 +15,7 @@ function getInitialDate(): Date {
     const d = new Date(dateParam + 'T00:00:00Z');
     if (!isNaN(d.getTime())) return d;
   }
-  return getKSTDate();
+  return getKSTDateUnsafe();
 }
 
 function menuQueryKey(date: Date) {

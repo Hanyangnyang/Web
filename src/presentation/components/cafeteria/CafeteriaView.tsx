@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { getKSTDate, toDateKey } from '../../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../../utils/time.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.js';
 import { CardFallback } from '../common/CardFallback.js';
@@ -153,7 +153,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       return;
     }
 
-    const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDate());
+    const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDateUnsafe());
     setExpandedGroups(initial);
 
     if (scrollTargetType) {

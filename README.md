@@ -54,10 +54,12 @@ src/
 | 엔드포인트 | 역할 | 외부 호출 대상 | 캐시 TTL |
 |---|---|---|---|
 | `/api/menu` | 학식 HTML 스크래핑 + 파싱 | 한양대 홈페이지 | 1일 |
-| `/api/subway` | 4호선·수인분당선 시간표 | 서울 열린데이터 | 30일 (로컬 번들) |
 | `/api/portal?type=weather` | 날씨·대기질 + Gemini 코멘트 | Open-Meteo, Gemini | 1시간(매 정각) 갱신 |
 | `/api/portal?type=library` | 도서관 좌석 현황 | 한양대 도서관 API | no-cache |
 | `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 |
+| `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 |
+
+지하철·셔틀 시간표는 새 백엔드(`/api/v1/subway/schedule`, `/api/v1/shuttle`)로 이전 완료.
 
 ### Supabase 테이블
 

@@ -17,7 +17,7 @@ import { prefetchWeather }       from './presentation/hooks/useWeather.js';
 import { prefetchWeatherBriefing } from './presentation/hooks/useWeatherBriefing.js';
 import { prefetchLibraryStatus } from './presentation/hooks/useLibraryStatus.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
-import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
+import { prefetchShuttleSchedule, prefetchIsHoliday } from './presentation/hooks/useShuttle.js';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
@@ -113,6 +113,7 @@ function MainLayout() {
     prefetchLibraryStatus();
     prefetchBanners();
     prefetchShuttleSchedule();
+    prefetchIsHoliday();
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
 

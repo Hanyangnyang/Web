@@ -42,31 +42,34 @@ export function createShuttleRow(raw: { route: string; period: string; dayType: 
   };
 }
 
-// 지하철 도착 정보 도메인 엔티티 (raw 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
-export interface SubwayArrival {
-  subwayId: string;
-  updnLine: string;
+// 새 지하철 백엔드(/api/v1/subway/schedule)가 내려주는 전체 시간표 원본 row.
+// subwayId/updnLine/arrTime 필드명은 SUBWAY_OPTS·connectingTrains()와 맞춰서
+// 같은 매칭 로직(SubwayArrivalLike 기준)을 그대로 재사용할 수 있게 함.
+// dayType은 WEEKEND/HOLIDAY를 '주말' 하나로 통합함 — 실제 운행 시간표가 동일함을 확인함(SubwayRepository 참고)
+export interface SubwayScheduleRow {
+  subwayId: string;  // '1004' | '1075'
+  updnLine: string;  // '상행' | '하행'
+  dayType: string;   // '평일' | '주말'
+  arrTime: string;   // 'HH:mm'
   dest: string;
-  arrTime: string;
   trainNo: string;
-  isRealtime: boolean;
 }
 
-export function createSubwayArrival(raw: {
+export function createSubwayScheduleRow(raw: {
   subwayId: string;
   updnLine: string;
-  dest: string;
+  dayType: string;
   arrTime: string;
+  dest: string;
   trainNo: string;
-  isRealtime: boolean;
-}): SubwayArrival {
+}): SubwayScheduleRow {
   return {
     subwayId: raw.subwayId,
     updnLine: raw.updnLine,
-    dest: raw.dest,
+    dayType: raw.dayType,
     arrTime: raw.arrTime,
+    dest: raw.dest,
     trainNo: raw.trainNo,
-    isRealtime: raw.isRealtime,
   };
 }
 
@@ -91,7 +94,7 @@ export interface ShuttleAppConfig {
   force_no_operation?: boolean;
 }
 
-// connectingTrains가 필요로 하는 최소 구조 (실제 값은 위 SubwayArrival)
+// connectingTrains가 필요로 하는 최소 구조 (실제 값은 SubwayScheduleRow)
 export interface SubwayArrivalLike {
   subwayId: string;
   updnLine: string;

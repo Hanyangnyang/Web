@@ -1,7 +1,7 @@
 // 컴포넌트: 셔틀 시간표 한 행 (출발/도착 시각, 연결 지하철)
 import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
-import { SUBWAY_OPTS, connectingTrains, type ScheduleItem, type SubwayArrival } from '../../../domain/entities/Shuttle.js';
+import { SUBWAY_OPTS, connectingTrains, type ScheduleItem, type SubwayScheduleRow } from '../../../domain/entities/Shuttle.js';
 import { LineBadge } from './LineBadge.jsx';
 import styles from './TimetableRow.module.css';
 
@@ -28,7 +28,7 @@ interface TimetableRowProps {
   isNext: boolean;
   isLast: boolean;
   isPast: boolean;
-  subwayArrivals: SubwayArrival[];
+  subwayArrivals: SubwayScheduleRow[];
   subwayOffPeak: boolean;
   isSubwayLoading: boolean;
   hideSubwayCol: boolean;

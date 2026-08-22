@@ -11,7 +11,6 @@ interface TimetableHeaderProps {
   fullDayType: string;
   setFullDayType: (dayType: string) => void;
   appConfig: ShuttleAppConfig;
-  isHolidayServer: boolean | null;
   isWeekend: boolean;
   needsSubway: boolean;
   hideSubwayCol: boolean;
@@ -23,7 +22,7 @@ interface TimetableHeaderProps {
 
 export function TimetableHeader({
   isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
-  appConfig, isHolidayServer, isWeekend, needsSubway, hideSubwayCol,
+  appConfig, isWeekend, needsSubway, hideSubwayCol,
   lineId, setLineId, onOpenSubway, onToggleFullMode,
 }: TimetableHeaderProps) {
   return (
@@ -40,7 +39,6 @@ export function TimetableHeader({
               fullDayType={fullDayType}
               setFullDayType={setFullDayType}
               appConfig={appConfig}
-              isHolidayServer={isHolidayServer}
               isWeekend={isWeekend}
             />
           </div>
