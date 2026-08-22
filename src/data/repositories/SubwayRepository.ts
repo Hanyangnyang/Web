@@ -1,5 +1,5 @@
 // 레포지토리: 지하철 전체 시간표(새 백엔드)를 도메인 엔티티로 변환해 제공 (캐싱은 React Query가 담당)
-import { createSubwayScheduleRow, type SubwayScheduleRow } from '../../domain/entities/Shuttle.js';
+import { createSubwayScheduleRow, type SubwayScheduleRow } from '../../domain/entities/Subway.js';
 import type { SubwayApiDataSource, SubwayTimetableDto } from '../datasources/SubwayApiDataSource.js';
 import type { SubwayRepository } from '../../domain/repositories/ISubwayRepository.js';
 
@@ -38,8 +38,6 @@ function toSubwayScheduleRows(dtos: SubwayTimetableDto[]) {
     return acc;
   }, []);
 
-  // connectingTrains()의 slice(0,2)가 "가장 빠른 2개"를 뜻하려면 입력이 시간순 정렬돼있어야 함 —
-  // 백엔드 응답 순서에 기대지 않고 여기서 직접 보장한다
   return rows.sort((a, b) => a.arrTime.localeCompare(b.arrTime));
 }
 

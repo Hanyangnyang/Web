@@ -1,6 +1,6 @@
 // 컴포넌트: 지하철 노선(4호선/수인분당선 상하행) 선택 드롭다운
 import { useState, useEffect, useRef } from 'react';
-import { SUBWAY_OPTS } from '../../../domain/entities/Shuttle.js';
+import { SUBWAY_OPTS } from '../../../domain/entities/Subway.js';
 import { LineBadge } from './LineBadge.jsx';
 
 interface SubwayDropdownProps {

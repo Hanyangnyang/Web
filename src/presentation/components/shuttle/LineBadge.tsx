@@ -1,5 +1,5 @@
 // 컴포넌트: 지하철 노선 뱃지 (4호선/수인분당선)
-import type { SubwayOpt } from '../../../domain/entities/Shuttle.js';
+import type { SubwayOpt } from '../../../domain/entities/Subway.js';
 
 interface LineBadgeProps {
   opt: SubwayOpt;

@@ -13,18 +13,6 @@ export interface RouteDef {
   stops: RouteStopDef[];
 }
 
-export interface SubwayOpt {
-  id: string;
-  line: string;
-  color: string;
-  dest: string;
-  dir: string;
-  shortDest: string;
-  subwayId: string;
-  updnLine: string;
-}
-
-// ShuttleRepository가 정규화한 도메인 셔틀 행
 export interface ShuttleRow {
   route: string;
   period: string;
@@ -32,44 +20,12 @@ export interface ShuttleRow {
   dep: string;
 }
 
-// ShuttleRepository가 백엔드 응답(영문 enum)을 한글 문자열로 변환한 뒤 넘겨주는 값을 받는다 
 export function createShuttleRow(raw: { route: string; period: string; dayType: string; dep: string }): ShuttleRow {
   return {
     route: raw.route,
     period: raw.period,
     dayType: raw.dayType,
     dep: raw.dep,
-  };
-}
-
-// 새 지하철 백엔드(/api/v1/subway/schedule)가 내려주는 전체 시간표 원본 row.
-// subwayId/updnLine/arrTime 필드명은 SUBWAY_OPTS·connectingTrains()와 맞춰서
-// 같은 매칭 로직(SubwayArrivalLike 기준)을 그대로 재사용할 수 있게 함.
-// dayType은 WEEKEND/HOLIDAY를 '주말' 하나로 통합함 — 실제 운행 시간표가 동일함을 확인함(SubwayRepository 참고)
-export interface SubwayScheduleRow {
-  subwayId: string;  // '1004' | '1075'
-  updnLine: string;  // '상행' | '하행'
-  dayType: string;   // '평일' | '주말'
-  arrTime: string;   // 'HH:mm'
-  dest: string;
-  trainNo: string;
-}
-
-export function createSubwayScheduleRow(raw: {
-  subwayId: string;
-  updnLine: string;
-  dayType: string;
-  arrTime: string;
-  dest: string;
-  trainNo: string;
-}): SubwayScheduleRow {
-  return {
-    subwayId: raw.subwayId,
-    updnLine: raw.updnLine,
-    dayType: raw.dayType,
-    arrTime: raw.arrTime,
-    dest: raw.dest,
-    trainNo: raw.trainNo,
   };
 }
 
@@ -92,13 +48,6 @@ export interface ShuttleAppConfig {
   force_weekend?: boolean;
   no_operation_days?: string[];
   force_no_operation?: boolean;
-}
-
-// connectingTrains가 필요로 하는 최소 구조 (실제 값은 SubwayScheduleRow)
-export interface SubwayArrivalLike {
-  subwayId: string;
-  updnLine: string;
-  arrTime: string;
 }
 
 // 화면에 표시되는 정류장 목록
@@ -161,14 +110,6 @@ export const ROUTE_DEFS: Record<string, RouteDef> = {
   },
 };
 
-export const SUBWAY_OPTS: SubwayOpt[] = [
-  { id: 'line4-bulam', line: '4호선',    color: '#33AADF', dest: '불암산행', dir: '상행', shortDest: '불암산', subwayId: '1004', updnLine: '상행' },
-  { id: 'line4-oido',  line: '4호선',    color: '#33AADF', dest: '오이도행', dir: '하행', shortDest: '오이도', subwayId: '1004', updnLine: '하행' },
-  { id: 'sb-wang',     line: '수인분당선', color: '#F5A623', dest: '왕십리행', dir: '상행', shortDest: '왕십리', subwayId: '1075', updnLine: '상행' },
-  { id: 'sb-incheon',  line: '수인분당선', color: '#F5A623', dest: '인천행',   dir: '하행', shortDest: '인천',   subwayId: '1075', updnLine: '하행' },
-];
-
-// ── 순수 헬퍼 함수 ──
 export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 export const curMin = () => { const { hours, minutes } = getKSTParts(); return hours * 60 + minutes; };
 
@@ -184,11 +125,9 @@ export const dayType = (isHolidayServer: boolean | null, customHolidays: string[
 
 const pad2      = (n: number) => String(n).padStart(2, '0');
 const intToHHMM = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`;
-
-// 현재 날짜 문자열 (YYYY-MM-DD, KST 기준)
 const getYYYYMMDD = () => getKSTDateKey();
 
-// ── 공통: allData를 displayStop 기준 시간 목록으로 매핑 ──
+// 공통: allData를 displayStop 기준 시간 목록으로 매핑 
 function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleItem[] {
   const items: ScheduleItem[] = [];
   for (const row of rows) {
@@ -271,16 +210,4 @@ export function computeFullSchedule(
 
   const lastMin = allMapped.length > 0 ? allMapped[allMapped.length - 1].depMin : -1;
   return allMapped.map(r => ({ ...r, isLast: r.depMin === lastMin }));
-}
-
-// 셔틀 도착 이후 연결 가능한 지하철 편 필터 (순수 함수)
-export function connectingTrains<T extends SubwayArrivalLike>(subwayArrivals: T[], shuttleArrTime: string, lineId: string): T[] {
-  if (!subwayArrivals?.length) return [];
-  const opt = SUBWAY_OPTS.find(o => o.id === lineId);
-  if (!opt) return [];
-  const arrM = toMin(shuttleArrTime);
-  return subwayArrivals
-    .filter(tr => tr.subwayId === opt.subwayId && tr.updnLine === opt.updnLine)
-    .filter(tr => toMin(tr.arrTime) >= arrM)
-    .slice(0, 2);
 }
