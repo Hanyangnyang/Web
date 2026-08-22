@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { ScheduleItem, ShuttleAppConfig, SubwayScheduleRow } from '../../../domain/entities/Shuttle.js';
-import { TimetableRow } from './TimetableRow.jsx';
+import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { StopSelector } from './StopSelector.jsx';
 import { TimetableHeader } from './TimetableHeader.jsx';
@@ -134,20 +134,6 @@ export function SchoolShuttleSection({
     setIsFullMode(!isFullMode);
   };
 
-  // 2. 조회 실패 — 백엔드 요청이 실패한 경우
-  if (loadErr) {
-    return (
-      <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>
-    );
-  }
-
-  // 1. 첫 로딩 — 스피너
-  if (isLoading) {
-    return (
-      <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>
-    );
-  }
-
   return (
     <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
       <StopSelector
@@ -181,7 +167,15 @@ export function SchoolShuttleSection({
         />
 
         <div ref={containerRef} className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-          {schedule.length > 0 ? (() => {
+          {loadErr ? (
+            // 조회 실패 — 백엔드 요청이 실패한 경우
+            <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
+              <p>{loadErr}</p>
+            </div>
+          ) : isLoading ? (
+            // 첫 로딩 — 헤더는 이미 떠있고, 목록 자리만 실제 행과 같은 모양으로 채워둠
+            Array.from({ length: 5 }).map((_, i) => <TimetableRowSkeleton key={i} hideSubwayCol={hideSubwayCol} />)
+          ) : schedule.length > 0 ? (() => {
             // 4. 정상 — 조건(정류장/기간/요일)에 맞는 셔틀이 있음
             const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
             return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (

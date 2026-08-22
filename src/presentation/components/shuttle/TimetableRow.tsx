@@ -22,6 +22,28 @@ const ROUTE_STYLE: Record<string, string> = {
   ja: 'bg-[rgba(253,224,71,0.2)] text-[#854d0e]',
 };
 
+// 시간표를 아직 못 받아왔을 때 실제 행과 같은 모양으로 자리를 채워두는 스켈레톤 (WeatherCard의 WeatherSkeleton과 동일한 패턴)
+export function TimetableRowSkeleton({ hideSubwayCol }: { hideSubwayCol: boolean }) {
+  return (
+    <div className="flex items-stretch border-b border-slate-100 animate-pulse">
+      <div className="flex items-center py-4 pl-4" style={{ flex: hideSubwayCol ? 1 : '0 0 52%' }}>
+        <div className="flex items-center gap-3.5 w-full">
+          <div className="w-[58px] min-h-[34px] rounded bg-slate-200 flex-shrink-0" />
+          <div className="flex flex-col gap-1.5">
+            <div className="h-6 w-[70px] bg-slate-200 rounded-lg" />
+            <div className="h-3 w-24 bg-slate-100 rounded-full" />
+          </div>
+        </div>
+      </div>
+      {!hideSubwayCol && (
+        <div className="flex-1 flex items-center pr-3.5 pl-8">
+          <div className="h-4 w-28 bg-slate-100 rounded-full" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface TimetableRowProps {
   row: ScheduleItem & { isLast?: boolean };
   lineId: string;
