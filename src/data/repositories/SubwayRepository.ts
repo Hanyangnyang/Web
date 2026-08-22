@@ -24,10 +24,10 @@ const SUBWAY_DAY_TYPE_LABEL: Record<SubwayTimetableDto['dayType'], string> = {
 function toSubwayScheduleRows(dtos: SubwayTimetableDto[]) {
   if (!Array.isArray(dtos)) throw new Error('subway schedule API returned invalid shape');
 
-  return dtos.reduce<SubwayScheduleRow[]>((rows, d) => {
-    if (typeof d.time !== 'string' || !TIME_PATTERN.test(d.time)) return rows;
+  const rows = dtos.reduce<SubwayScheduleRow[]>((acc, d) => {
+    if (typeof d.time !== 'string' || !TIME_PATTERN.test(d.time)) return acc;
 
-    rows.push(createSubwayScheduleRow({
+    acc.push(createSubwayScheduleRow({
       subwayId: SUBWAY_LINE_ID[d.subwayLine] ?? d.subwayLine,
       updnLine: DIRECTION_LABEL[d.direction] ?? d.direction,
       dayType: SUBWAY_DAY_TYPE_LABEL[d.dayType] ?? d.dayType,
@@ -35,8 +35,12 @@ function toSubwayScheduleRows(dtos: SubwayTimetableDto[]) {
       dest: d.destination,
       trainNo: d.trainNo,
     }));
-    return rows;
+    return acc;
   }, []);
+
+  // connectingTrains()의 slice(0,2)가 "가장 빠른 2개"를 뜻하려면 입력이 시간순 정렬돼있어야 함 —
+  // 백엔드 응답 순서에 기대지 않고 여기서 직접 보장한다
+  return rows.sort((a, b) => a.arrTime.localeCompare(b.arrTime));
 }
 
 export const createSubwayRepository = (
