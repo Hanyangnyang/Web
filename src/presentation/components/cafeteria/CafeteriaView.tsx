@@ -263,7 +263,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
               ) : (
                 // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 그날 등록된 메뉴가 하나도 없음
                 <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-                  <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
+                  <div className="min-h-[80px] flex flex-col justify-center py-8 text-center text-text-sub">
                     <p>해당 식당은 오늘 등록된 메뉴가 없습니다</p>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
             ) : (
               // 2. 조회 실패 — KNOWN_CAFES 병합 덕에 성공이면 cafes가 항상 4개라, 여긴 진짜 실패일 때만 옴
               <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-                <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
+                <div className="min-h-[80px] flex flex-col justify-center py-8 text-center text-text-sub">
                   <p>정보를 불러올 수 없습니다</p>
                 </div>
               </div>

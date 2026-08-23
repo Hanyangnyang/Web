@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { ScheduleItem } from '../../../domain/entities/Shuttle.js';
 import { SUBWAY_OPTS, connectingTrains, isSubwayOffPeak, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
-import { LineBadge } from './LineBadge.jsx';
+import { SubwayLineBadge } from './SubwayLineBadge.jsx';
 import styles from './TimetableRow.module.css';
 
 const ROUTE_LABEL: Record<string, string> = {
@@ -15,7 +15,7 @@ const ROUTE_LABEL: Record<string, string> = {
   '아침예술인': '예술인\n직행',
 };
 
-// ── 노선 라벨 색상
+// 노선 라벨 색상
 const ROUTE_STYLE: Record<string, string> = {
   d: 'bg-[rgba(14,74,132,0.08)] text-primary',
   c: 'bg-[rgba(39,174,96,0.08)] text-success',
@@ -264,7 +264,7 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
               </div>
             ) : trains.length > 0 ? trains.map((tr, i) => (
               <div key={i} className="flex items-center gap-1.5">
-                <LineBadge opt={opt} size={20} />
+                <SubwayLineBadge opt={opt} size={20} />
                 <span className="text-[13px] font-bold text-text-main whitespace-nowrap">{tr.dest}행</span>
                 <span className="font-['Inter',-apple-system,sans-serif] text-[13px] font-bold text-text-sub whitespace-nowrap">
                   {tr.arrTime}

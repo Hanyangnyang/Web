@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
 
-interface ShuttleSelectorProps {
+interface PeriodDayTypeSelectorProps {
   isFullMode: boolean;
   fullPeriod: string;
   setFullPeriod: (period: string) => void;
@@ -13,7 +13,7 @@ interface ShuttleSelectorProps {
   isWeekend: boolean;
 }
 
-export function ShuttleSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isWeekend }: ShuttleSelectorProps) {
+export function PeriodDayTypeSelector({ isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType, appConfig, isWeekend }: PeriodDayTypeSelectorProps) {
   const [open, setOpen] = useState(false);
   const [localPeriod, setLocalPeriod] = useState(fullPeriod);
   const [localDayType, setLocalDayType] = useState(fullDayType);

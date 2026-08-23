@@ -136,6 +136,7 @@ export function SchoolShuttleSection({
 
   return (
     <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
+      {/* 출발지 */}
       <StopSelector
         viewMode={viewMode}
         setViewMode={setViewMode}
