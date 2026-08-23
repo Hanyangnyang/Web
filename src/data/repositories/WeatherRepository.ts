@@ -47,7 +47,8 @@ export const createWeatherRepository = (
       throw new Error('weather API returned invalid shape');
     }
 
-    const hourly = (res.data.hourly ?? [])
+    const hourlyRaw = Array.isArray(res.data.hourly) ? res.data.hourly : [];
+    const hourly = hourlyRaw
       .map(toHourly)
       .filter(isDrawable)
       .sort((a, b) => a.epoch - b.epoch);

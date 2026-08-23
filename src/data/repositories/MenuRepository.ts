@@ -40,17 +40,17 @@ export const createMenuRepository = (
   getMenuForDate: async (date: Date) => {
     const dateStr = toDateKey(date);
     const res = await menuApiDataSource.getMenuForDate({ startDate: dateStr, endDate: dateStr });
-    if (!res.success) return [];
+    if (!res.success) throw new Error(res.error?.message || 'menu API returned success:false');
 
     return toCafes(res.data?.[dateStr] ?? []);
   },
 
   getMenuForPeriod: async () => {
     const res = await menuApiDataSource.getMenuForPeriod();
-    if (!res.success || !res.data) return {};
+    if (!res.success) throw new Error(res.error?.message || 'menu API returned success:false');
 
     return Object.fromEntries(
-      Object.entries(res.data).map(([dateStr, cafeterias]) => [dateStr, toCafes(cafeterias)])
+      Object.entries(res.data ?? {}).map(([dateStr, cafeterias]) => [dateStr, toCafes(cafeterias)])
     );
   },
 });
