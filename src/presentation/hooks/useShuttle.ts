@@ -3,17 +3,16 @@ import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { computeSchedule, computeFullSchedule, curMin, dayType, pickClosestStop, type ScheduleItem } from '../../domain/entities/Shuttle.js';
-import { getShuttleDataUseCase, getSubwayScheduleUseCase, getIsHolidayUseCase } from '../../di.js';
+import { getShuttleDataUseCase, getSubwayScheduleUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
+import { useHoliday } from './useHoliday.js';
 
 const BUS_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드가 셔틀버스 시간표를 정확히 이 주기로 캐싱한다고 확인함(관리자가 시간표 CRUD할 때만 캐시 삭제)
 const SUBWAY_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드가 지하철 시간표를 정확히 이 주기로 캐싱한다고 확인함(station:line:direction:dayType 키), 그보다 더 길게 잡으면 백엔드가 이미 갱신한 데이터를 우리만 늦게 받게 됨
-const HOLIDAY_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간 — 백엔드 캐시 TTL과 무관하게, 오늘의 공휴일 여부는 날짜가 바뀌기 전까진 안 바뀌므로 캘린더 하루 단위로 잡음
 
 const SCHEDULE_QUERY_KEY = ['shuttle', 'schedule'];
 const SUBWAY_SCHEDULE_QUERY_KEY = ['shuttle', 'subway-schedule'];
-const HOLIDAY_QUERY_KEY = ['holiday', 'today'];
 
 // Prefetch 함수
 export function prefetchShuttleSchedule() {
@@ -21,15 +20,6 @@ export function prefetchShuttleSchedule() {
     queryKey: SCHEDULE_QUERY_KEY,
     queryFn: () => getShuttleDataUseCase.execute(),
     staleTime: BUS_STALE_TIME,
-  });
-}
-
-// 공휴일 여부는 셔틀·지하철 dayType 판정에 둘 다 필요해서, 셔틀 탭 진입을 기다리지 않고 앱 부팅 시 미리 받아둔다
-export function prefetchIsHoliday() {
-  return queryClient.prefetchQuery({
-    queryKey: HOLIDAY_QUERY_KEY,
-    queryFn: () => getIsHolidayUseCase.execute(),
-    staleTime: HOLIDAY_STALE_TIME,
   });
 }
 
@@ -88,12 +78,7 @@ export function useShuttle(isActive = false) {
   const needsSubway = stop === '기숙사' || stop === '셔틀콕';
 
   // 오늘이 법정공휴일인지 (새 백엔드는 셔틀·지하철 둘 다 이 값을 직접 안 내려주므로 별도 조회) — 모드와 무관하게 항상 필요
-  const holidayQuery = useQuery({
-    queryKey: HOLIDAY_QUERY_KEY,
-    queryFn: () => getIsHolidayUseCase.execute(),
-    staleTime: HOLIDAY_STALE_TIME,
-  });
-  const isHolidayServer = holidayQuery.data ?? null;
+  const { isHoliday: isHolidayServer, isLoading: isHolidayLoading } = useHoliday();
   const customHols = appConfig.custom_holidays || [];
 
   // 지하철 전체 시간표 (새 백엔드 — 정적 데이터, 폴링 없음. 백엔드 캐시 TTL(12시간)에 맞춤)
@@ -110,9 +95,9 @@ export function useShuttle(isActive = false) {
 
   // 일반 모드에서만 셔틀 dayType(custom_holidays 포함)을 fullDayType에 동기화 (전체 모드 진입 시엔 사용자가 직접 고름)
   useEffect(() => {
-    if (isFullMode || holidayQuery.data === undefined) return;
+    if (isFullMode || isHolidayLoading) return;
     setFullDayType(dayType(isHolidayServer, customHols, !!appConfig.force_weekend));
-  }, [isFullMode, holidayQuery.data, appConfig]); // eslint-disable-line react-hooks/exhaustive-deps -- isHolidayServer/customHols는 appConfig·holidayQuery.data에서 매 렌더 파생되는 값이라 그 둘 의존성으로 충분
+  }, [isFullMode, isHolidayLoading, isHolidayServer, appConfig]); // eslint-disable-line react-hooks/exhaustive-deps -- customHols는 appConfig에서 매 렌더 파생되는 값이라 appConfig 의존성으로 충분
 
   // 전체 정적 시간표에서 오늘(실제) dayType에 해당하는 열차만 남김 — 특정 노선/방향/시각 필터링은 TimetableRow의 connectingTrains()가 담당
   const subwayArrivals = (subwayScheduleQuery.data ?? []).filter(r => r.dayType === trainDayType);
