@@ -101,7 +101,6 @@ export function useShuttle(isActive = false) {
 
   // 전체 정적 시간표에서 오늘(실제) dayType에 해당하는 열차만 남김 — 특정 노선/방향/시각 필터링은 TimetableRow의 connectingTrains()가 담당
   const subwayArrivals = (subwayScheduleQuery.data ?? []).filter(r => r.dayType === trainDayType);
-  const subwayOffPeak = false; // 구 API도 이 필드를 내려준 적이 없어 항상 false였음 — 동작 변화 없음
   const isSubwayLoading = subwayScheduleQuery.isFetching;
 
   const loadMore = useCallback(() => {
@@ -129,7 +128,7 @@ export function useShuttle(isActive = false) {
     stop, setStop,
     lineId, setLineId,
     schedule, nextIdx, now,
-    subwayArrivals, subwayOffPeak,
+    subwayArrivals,
     needsSubway,
     loadErr,
     isLoading: !allData && !loadErr,

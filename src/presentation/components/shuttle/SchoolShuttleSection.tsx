@@ -26,7 +26,6 @@ interface SchoolShuttleSectionProps {
   nextIdx: number;
   now: number;
   subwayArrivals: SubwayScheduleRow[];
-  subwayOffPeak: boolean;
   isWeekend: boolean;
   needsSubway: boolean;
   loadErr: string | null;
@@ -50,7 +49,7 @@ export function SchoolShuttleSection({
   stop, setStop,
   lineId, setLineId,
   schedule, nextIdx, now,
-  subwayArrivals, subwayOffPeak,
+  subwayArrivals,
   isWeekend,
   needsSubway,
   loadErr, isLoading, isSubwayLoading, isGpsLoading,
@@ -188,7 +187,6 @@ export function SchoolShuttleSection({
                 isLast={row.isLast || i === schedule.length - 1}
                 isPast={!isFullMode && row.depMin < now}
                 subwayArrivals={subwayArrivals}
-                subwayOffPeak={subwayOffPeak}
                 isSubwayLoading={isSubwayLoading}
                 hideSubwayCol={hideSubwayCol}
                 now={now}

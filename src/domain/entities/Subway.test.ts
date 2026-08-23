@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { connectingTrains } from './Subway.js';
+import { connectingTrains, isSubwayOffPeak } from './Subway.js';
 
 describe('connectingTrains', () => {
   const subwayArrivals = [
@@ -26,5 +26,29 @@ describe('connectingTrains', () => {
 
   it('도착정보가 없으면 빈 배열을 반환한다', () => {
     expect(connectingTrains([], '08:00', 'line4-bulam')).toEqual([]);
+  });
+});
+
+describe('isSubwayOffPeak', () => {
+  const subwayArrivals = [
+    { subwayId: '1004', updnLine: '상행', arrTime: '08:10' },
+    { subwayId: '1004', updnLine: '상행', arrTime: '23:30' },
+    { subwayId: '1004', updnLine: '하행', arrTime: '08:12' },
+  ];
+
+  it('해당 노선/방향 열차가 존재하지만 전부 셔틀 도착 이전이면 true(운행 시간 외)', () => {
+    expect(isSubwayOffPeak(subwayArrivals, '23:40', 'line4-bulam')).toBe(true);
+  });
+
+  it('셔틀 도착 이후 열차가 남아있으면 false', () => {
+    expect(isSubwayOffPeak(subwayArrivals, '08:05', 'line4-bulam')).toBe(false);
+  });
+
+  it('해당 노선/방향 데이터 자체가 없으면 false(연결 열차 없음과 구분)', () => {
+    expect(isSubwayOffPeak(subwayArrivals, '08:00', 'sb-wang')).toBe(false);
+  });
+
+  it('존재하지 않는 lineId면 false를 반환한다', () => {
+    expect(isSubwayOffPeak(subwayArrivals, '08:00', 'no-such-line')).toBe(false);
   });
 });

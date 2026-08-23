@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { ScheduleItem } from '../../../domain/entities/Shuttle.js';
-import { SUBWAY_OPTS, connectingTrains, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
+import { SUBWAY_OPTS, connectingTrains, isSubwayOffPeak, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
 import { LineBadge } from './LineBadge.jsx';
 import styles from './TimetableRow.module.css';
 
@@ -52,7 +52,6 @@ interface TimetableRowProps {
   isLast: boolean;
   isPast: boolean;
   subwayArrivals: SubwayScheduleRow[];
-  subwayOffPeak: boolean;
   isSubwayLoading: boolean;
   hideSubwayCol: boolean;
   now: number;
@@ -62,14 +61,14 @@ interface TimetableRowProps {
   autoFlip: boolean;
 }
 
-export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, subwayOffPeak, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull, shouldScroll, autoFlip }: TimetableRowProps) {
+export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArrivals, isSubwayLoading, hideSubwayCol, now, isFullMode, isActiveInFull, shouldScroll, autoFlip }: TimetableRowProps) {
   const [showRowRelative, setShowRowRelative] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
   // lineId가 SUBWAY_OPTS에 없을 수 있음(예: 노선 개편 후 남은 오래된 localStorage 값) — 못 찾으면 첫 옵션으로 대체
   const opt = SUBWAY_OPTS.find(o => o.id === lineId) ?? SUBWAY_OPTS[0];
   const trains = row.subway ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
   const noTrainReason = row.subway && trains.length === 0
-    ? (subwayOffPeak ? '운행 시간 외' : '연결 열차 없음') : null;
+    ? (isSubwayOffPeak(subwayArrivals, row.arr, lineId) ? '운행 시간 외' : '연결 열차 없음') : null;
 
   const rLabel = ROUTE_LABEL[row.route] || row.route;
   const routeKey =

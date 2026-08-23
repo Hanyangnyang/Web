@@ -30,7 +30,6 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
             nextIdx={shuttle.nextIdx}
             now={shuttle.now}
             subwayArrivals={shuttle.subwayArrivals}
-            subwayOffPeak={shuttle.subwayOffPeak}
             isWeekend={shuttle.isWeekend}
             needsSubway={shuttle.needsSubway}
             loadErr={shuttle.loadErr}

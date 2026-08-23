@@ -62,3 +62,14 @@ export function connectingTrains<T extends SubwayArrivalLike>(subwayArrivals: T[
     .filter(tr => toMin(tr.arrTime) >= arrM)
     .slice(0, 2);
 }
+
+// connectingTrains() 결과가 0개일 때, 그 노선/방향 자체의 데이터가 없는 것(연결 열차 없음)과
+// 데이터는 있지만 셔틀 도착 시각까지 막차가 이미 지난 것(운행 시간 외)을 구분한다
+export function isSubwayOffPeak<T extends SubwayArrivalLike>(subwayArrivals: T[], shuttleArrTime: string, lineId: string): boolean {
+  const opt = SUBWAY_OPTS.find(o => o.id === lineId);
+  if (!opt) return false;
+  const lineArrivals = subwayArrivals.filter(tr => tr.subwayId === opt.subwayId && tr.updnLine === opt.updnLine);
+  if (lineArrivals.length === 0) return false;
+  const arrM = toMin(shuttleArrTime);
+  return !lineArrivals.some(tr => toMin(tr.arrTime) >= arrM);
+}
