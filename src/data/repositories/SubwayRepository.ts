@@ -21,9 +21,8 @@ const SUBWAY_DAY_TYPE_LABEL: Record<SubwayTimetableDto['dayType'], string> = {
   HOLIDAY: '주말',
 };
 
+// dtos가 배열임은 호출부(getSubwaySchedule)가 이미 검증했다는 전제 — 여기선 행 단위 변환만 담당
 function toSubwayScheduleRows(dtos: SubwayTimetableDto[]) {
-  if (!Array.isArray(dtos)) throw new Error('subway schedule API returned invalid shape');
-
   const rows = dtos.reduce<SubwayScheduleRow[]>((acc, d) => {
     if (typeof d.time !== 'string' || !TIME_PATTERN.test(d.time)) return acc;
 
@@ -46,8 +45,11 @@ export const createSubwayRepository = (
 ): SubwayRepository => ({
   getSubwaySchedule: async () => {
     const res = await subwayApiDataSource.getSchedule();
+    // success 실패했을때 
     if (!res.success) throw new Error(res.error?.message || 'subway schedule API request failed');
+    // data 비어서왔을때 
+    if (!Array.isArray(res.data)) throw new Error('subway schedule API returned invalid shape');
 
-    return toSubwayScheduleRows(res.data ?? []);
+    return toSubwayScheduleRows(res.data);
   },
 });

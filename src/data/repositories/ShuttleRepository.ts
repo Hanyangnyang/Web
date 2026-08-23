@@ -27,8 +27,6 @@ const DAY_TYPE_LABEL: Record<ShuttleTimetableDto['dayType'], string> = {
 const TIME_PATTERN = /^\d{2}:\d{2}/; // "HH:mm..." — 최소 시:분만 있으면 허용
 
 function toShuttleRows(dtos: ShuttleTimetableDto[]) {
-  if (!Array.isArray(dtos)) throw new Error('shuttle API returned invalid shape');
-
   return dtos.reduce<ShuttleRow[]>((rows, d) => {
     if (typeof d.departureTime !== 'string' || !TIME_PATTERN.test(d.departureTime)) return rows;
 
@@ -47,8 +45,11 @@ export const createShuttleRepository = (
 ): ShuttleRepository => ({
   getScheduleData: async () => {
     const res = await shuttleApiDataSource.getSchedule();
+    // success 실패했을때 
     if (!res.success) throw new Error(res.error?.message || 'shuttle API request failed');
+    // data 비어서왔을때 
+    if (!Array.isArray(res.data)) throw new Error('shuttle API returned invalid shape');
 
-    return toShuttleRows(res.data ?? []);
+    return toShuttleRows(res.data);
   },
 });

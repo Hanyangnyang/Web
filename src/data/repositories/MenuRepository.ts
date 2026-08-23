@@ -11,8 +11,6 @@ const MEAL_TYPE_LABEL: Record<MenuDto['mealType'], string> = {
 };
 
 function toCafes(cafeterias: CafeteriaDto[]) {
-  if (!Array.isArray(cafeterias)) throw new Error('menu API returned invalid shape');
-
   const byId = new Map<string, CafeteriaDto>(cafeterias.map(c => [c.cafeteriaCode.toLowerCase(), c]));
 
   return KNOWN_CAFES.map(({ id, name }) => {
@@ -40,17 +38,26 @@ export const createMenuRepository = (
   getMenuForDate: async (date: Date) => {
     const dateStr = toDateKey(date);
     const res = await menuApiDataSource.getMenuForDate({ startDate: dateStr, endDate: dateStr });
+    // success 실패했을때
     if (!res.success) throw new Error(res.error?.message || 'menu API returned success:false');
+    // data가 비어서왔을때 
+    const cafeterias = res.data?.[dateStr] ?? [];
+    if (!Array.isArray(cafeterias)) throw new Error('menu API returned invalid shape');
 
-    return toCafes(res.data?.[dateStr] ?? []);
+    return toCafes(cafeterias);
   },
 
   getMenuForPeriod: async () => {
     const res = await menuApiDataSource.getMenuForPeriod();
+    // success 실패했을때
     if (!res.success) throw new Error(res.error?.message || 'menu API returned success:false');
 
     return Object.fromEntries(
-      Object.entries(res.data ?? {}).map(([dateStr, cafeterias]) => [dateStr, toCafes(cafeterias)])
+      Object.entries(res.data ?? {}).map(([dateStr, cafeterias]) => {
+        // data가 비어서왔을때 
+        if (!Array.isArray(cafeterias)) throw new Error('menu API returned invalid shape');
+        return [dateStr, toCafes(cafeterias)];
+      })
     );
   },
 });
