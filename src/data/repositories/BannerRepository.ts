@@ -7,7 +7,9 @@ export const createBannerRepository = (
 ): BannerRepository => ({
   getBanners: async () => {
     const res = await bannerApiDataSource.getBanners();
+    // success 실패했을때 
     if (!res.success) throw new Error(res.error?.message || 'banners API returned success:false');
+    // data 비어서왔을때 
     if (!Array.isArray(res.data)) throw new Error('banners API returned invalid shape');
 
     return [...res.data]

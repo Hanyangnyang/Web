@@ -40,13 +40,16 @@ export const createWeatherRepository = (
 ): WeatherRepository => ({
   getWeather: async () => {
     const res = await weatherApiDataSource.getWeather();
+    // success 실패했을때 
     if (!res.success) throw new Error(res.error?.message || 'weather API returned success:false');
    
     const current = res.data?.current;
+    // data 중 current가 비어서왔을때 
     if (!current || typeof current.temperature !== 'number') {
       throw new Error('weather API returned invalid shape');
     }
 
+    // data 중 hourly가 비어서왔을때 
     const hourlyRaw = Array.isArray(res.data.hourly) ? res.data.hourly : [];
     const hourly = hourlyRaw
       .map(toHourly)

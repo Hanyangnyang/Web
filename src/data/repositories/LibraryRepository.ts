@@ -22,7 +22,9 @@ export const createLibraryRepository = (
 ): LibraryRepository => ({
   getStatus: async () => {
     const res = await libraryApiDataSource.getStatus();
+    // success 실패했을때 
     if (!res.success) throw new Error(res.error?.message || 'library API returned success:false');
+    // data 비어서왔을때 
     if (!Array.isArray(res.data?.readingRooms)) throw new Error('library API returned invalid shape');
 
     const list = [...res.data.readingRooms]

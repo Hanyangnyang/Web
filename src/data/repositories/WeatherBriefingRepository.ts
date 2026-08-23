@@ -7,8 +7,10 @@ export const createWeatherBriefingRepository = (
 ): WeatherBriefingRepository => ({
   getBriefing: async (options = {}) => {
     const res = await weatherBriefingApiDataSource.getBriefing(options);
+    // success 실패했을때 
     if (!res.success) throw new Error(res.error?.message || 'weather briefing API returned success:false');
 
+    // data 비어서왔을때 
     const content = res.data?.content?.trim();
     if (!content) return null;
 
