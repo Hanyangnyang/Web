@@ -3,7 +3,7 @@ import { queryClient } from '../../lib/queryClient.js';
 import { getLibraryStatusUseCase } from '../../di.js';
 import type { LibraryStatus } from '../../domain/repositories/ILibraryRepository.js';
 
-const LIBRARY_STALE_TIME = 900000; // 15분
+const LIBRARY_STALE_TIME = 180000; // 3분 (백엔드 LibraryScheduler 실제 갱신 주기와 일치)
 const LIBRARY_QUERY_KEY = ['portal', 'library'];
 
 export function prefetchLibraryStatus() {
