@@ -42,24 +42,59 @@
 
 ## 🛠 기술 스택
 
-| 구분 | 사용 기술 |
+**Frontend**
+
+![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)
+![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+
+TypeScript는 strict 모드로 domain·data·infrastructure·lib 전체 및 presentation 대부분 전환 완료. iOS 빌드·배포는 Codemagic으로 자동화.
+
+**Backend**
+
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Java](https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
+[Spring Boot 3.4.1](https://github.com/Hanyangnyang/Backend) 기반 Gradle 멀티모듈(core/user-api/admin-api) 서버가 JWT·QueryDSL로 학식·날씨·도서관 좌석·배너·지하철·셔틀 등 핵심 API를 담당(`api.hanyang.life`). Vercel Serverless Functions는 인스타그램 프로필 프록시·공공버스 도착정보·공휴일 조회만 남아 있음.
+
+**Data & Infra**
+
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+
+Supabase는 익명 Auth·DB·RPC, Firebase는 FCM 푸시 알림(네이티브 + Web)을 담당.
+
+**Testing & Monitoring**
+
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
+![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=for-the-badge&logo=storybook&logoColor=white)
+![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)
+![PostHog](https://img.shields.io/badge/PostHog-000000?style=for-the-badge&logo=posthog&logoColor=white)
+
+**외부 API**: Open-Meteo(날씨·대기질), 서울열린데이터(지하철), 공공데이터포털(공휴일), 경기도 버스정보시스템(공공버스), 한양대도서관 API, Google Gemini(날씨 코멘트 AI), Instagram API
+
+
+## 📁 폴더 구조 (Clean Architecture)
+
+**Clean Architecture**는 Robert C. Martin이 제안한 아키텍처로, 소스 코드 의존성이 항상 바깥(UI·프레임워크·DB)에서 안쪽(비즈니스 로직)을 향하게 강제해 프레임워크·DB·외부 API가 바뀌어도 핵심 로직은 영향받지 않게 하는 것이 핵심이다.
+
+하냥냥에 적용한 방식:
+
+| 원칙 | 하냥냥에서의 적용 |
 |---|---|
-| 프론트엔드 | React 19 + Vite (Capacitor WebView로 래핑) |
-| 언어 | TypeScript (strict) — domain·data·infrastructure·lib 전체 및 presentation 대부분 전환 완료 |
-| 스타일링 | Tailwind CSS |
-| Android | Capacitor + Java |
-| iOS | Capacitor (Codemagic으로 빌드) |
-| BFF (Vercel) | Vercel Serverless Functions — 인스타그램 프로필 프록시·공공버스 도착정보·공휴일 조회 |
-| 백엔드 서버 | [Spring Boot](https://github.com/Hanyangnyang/Backend) 3.4.1 (Java 17, Gradle 멀티모듈: core/user-api/admin-api) — PostgreSQL·Redis·JWT·QueryDSL, `api.hanyang.life`에서 학식·날씨·도서관 좌석·배너·지하철·셔틀 등 핵심 API 제공 |
-| DB / Auth | Supabase |
-| 푸시 알림 | Firebase Cloud Messaging (FCM) — 네이티브(Android/iOS) + Web 동시 지원 |
-| 에러 모니터링 | Sentry  |
-| 사용자 분석 | PostHog |
-| 테스트 | Playwright(E2E), Vitest, Storybook(UI용) |
-| 외부 API | Open-Meteo(날씨·대기질), 서울열린데이터(지하철), 공공데이터포털(공휴일), 경기도 버스정보시스템(공공버스), 한양대도서관 API, Google Gemini(날씨 코멘트 AI), Instagram API |
-
-
-## 📁 폴더 구조
+| **의존성 규칙** — 바깥 레이어만 안쪽을 알아야 함 | `domain/`은 React·Supabase·fetch 등 어떤 프레임워크도 import하지 않고, `data/`·`presentation/`이 반대로 `domain/`을 참조 |
+| **의존성 역전(DIP)** — 저수준 구현이 고수준 정책의 인터페이스를 구현 | `domain/repositories/`에 인터페이스만 정의하고 실제 구현체(`data/repositories/`)가 이를 구현 — domain은 API가 REST인지, 응답 DTO가 어떤 모양인지 전혀 모름 |
+| **프레임워크 독립성** | `domain/entities`·`usecases`는 순수 TS 타입·함수뿐이라 React 없이도 재사용·테스트 가능 |
+| **테스트 용이성** | domain 레이어 로직(`Weather.test.ts`, `Shuttle.test.ts` 등)을 목(mock) 없이 순수 함수 단위로 테스트 |
+| **Composition Root** | `di.ts`에서만 datasource→repository→usecase의 구체 구현을 실제로 조립해 훅에 주입 |
 
 ```
 src/
