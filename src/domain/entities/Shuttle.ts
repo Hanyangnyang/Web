@@ -1,5 +1,32 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
 import { getKSTParts, getKSTDateKey } from '../../utils/time.js';
+import { getDistanceKm } from '../utils/geo.js';
+
+export interface Coords {
+  latitude: number;
+  longitude: number;
+}
+
+// 셔틀이 정차하는 지점의 좌표 — 이름이 같아도 일반버스 정류소(PublicBus.ts의 STOP_COORDS)와는 실제 위치가 다르다
+export const STATION_COORDS: Record<string, { lat: number; lon: number }> = {
+  '기숙사': { lat: 37.293338, lon: 126.836230 },
+  '셔틀콕': { lat: 37.298737, lon: 126.837870 },
+  '한대앞': { lat: 37.309650, lon: 126.852108 },
+};
+
+// 좌표 기준 가장 가까운 셔틀 정류장. 모든 정류장이 1km 이상이면(캠퍼스 밖) '한대앞' 고정
+export const pickClosestStop = ({ latitude, longitude }: Coords): string => {
+  let closestStop = '한대앞';
+  let minDistance = Infinity;
+  Object.entries(STATION_COORDS).forEach(([name, coord]) => {
+    const dist = getDistanceKm(latitude, longitude, coord.lat, coord.lon);
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestStop = name;
+    }
+  });
+  return minDistance >= 1.0 ? '한대앞' : closestStop;
+};
 
 export interface RouteStopDef {
   name: string;

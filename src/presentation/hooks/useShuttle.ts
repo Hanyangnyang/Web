@@ -2,8 +2,7 @@
 import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
-import { computeSchedule, computeFullSchedule, curMin, dayType, type ScheduleItem } from '../../domain/entities/Shuttle.js';
-import { getDistanceKm } from '../../domain/utils/geo.js';
+import { computeSchedule, computeFullSchedule, curMin, dayType, pickClosestStop, type ScheduleItem } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayScheduleUseCase, getIsHolidayUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
@@ -15,32 +14,6 @@ const HOLIDAY_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간 — 백엔드 캐시
 const SCHEDULE_QUERY_KEY = ['shuttle', 'schedule'];
 const SUBWAY_SCHEDULE_QUERY_KEY = ['shuttle', 'subway-schedule'];
 const HOLIDAY_QUERY_KEY = ['holiday', 'today'];
-
-interface Coords {
-  latitude: number;
-  longitude: number;
-}
-
-// 셔틀이 정차하는 지점의 좌표 — 이름이 같아도 일반버스 정류소(ShuttleView의 STOP_COORDS)와는 실제 위치가 다르다
-const STATION_COORDS: Record<string, { lat: number; lon: number }> = {
-  '기숙사': { lat: 37.293338, lon: 126.836230 },
-  '셔틀콕': { lat: 37.298737, lon: 126.837870 },
-  '한대앞': { lat: 37.309650, lon: 126.852108 },
-};
-
-// 좌표 기준 가장 가까운 셔틀 정류장. 모든 정류장이 1km 이상이면(캠퍼스 밖) '한대앞' 고정
-const pickClosestStop = ({ latitude, longitude }: Coords) => {
-  let closestStop = '한대앞';
-  let minDistance = Infinity;
-  Object.entries(STATION_COORDS).forEach(([name, coord]) => {
-    const dist = getDistanceKm(latitude, longitude, coord.lat, coord.lon);
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestStop = name;
-    }
-  });
-  return minDistance >= 1.0 ? '한대앞' : closestStop;
-};
 
 // Prefetch 함수
 export function prefetchShuttleSchedule() {
