@@ -84,7 +84,7 @@ Supabase는 익명 Auth·DB·RPC, Firebase는 FCM 푸시 알림(네이티브 + W
 
 ## 📁 폴더 구조 (Clean Architecture)
 
-**Clean Architecture**는 Robert C. Martin이 제안한 아키텍처로, 소스 코드 의존성이 항상 바깥(UI·프레임워크·DB)에서 안쪽(비즈니스 로직)을 향하게 강제해 프레임워크·DB·외부 API가 바뀌어도 핵심 로직은 영향받지 않게 하는 것이 핵심이다.
+**Clean Architecture**는 소스 코드 의존성이 항상 바깥(UI·프레임워크·DB)에서 안쪽(비즈니스 로직)을 향하게 강제해 프레임워크·DB·외부 API가 바뀌어도 핵심 로직은 영향받지 않게 하는 것이 핵심이다.
 
 하냥냥에 적용한 방식:
 
