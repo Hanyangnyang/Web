@@ -1,45 +1,41 @@
-// 데이터 소스: 체대 헬스장 시간표 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
+// 데이터 소스: 체대 헬스장 시간표 새 백엔드(/api/v1/gym/gym-periods) 원시 호출
+import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
+export interface GymTimeDto{
+    hour: number;
+    minute: number;
+    second: number;
+    nano: number;
 }
 
-export interface GymScheduleCell {
-  name: string;
-  type: string;
-  endTime?: string;
+export interface GymScheduleDto{
+    id: number;
+    dayOfWeek: "MON" | 'TUE' | 'WED' | 'THU' | 'FRI';
+    startTime: GymTimeDto;
+    endTime: GymTimeDto;
+    classId: number;
+    className: string;
 }
 
-export interface GymScheduleRow {
-  hour: number;
-  label: string;
-  mon: GymScheduleCell | '-';
-  tue: GymScheduleCell | '-';
-  wed: GymScheduleCell | '-';
-  thu: GymScheduleCell | '-';
-  fri: GymScheduleCell | '-';
+export interface GymPeriodDto{
+    id: number;
+    year: number;
+    semester: "FIRST" | "SECOND";
+    periodType: 'SEMESTER' | 'SEASONAL' | 'VACATION';
+    title: string;
+    start_date: string;
+    end_date: string;
+    start_time: GymTimeDto;
+    end_time: GymTimeDto;
+    active_weekend: boolean;
+    timeStamp: string;
+    schedules: GymScheduleDto[];
 }
 
-export interface GymPeriod {
-  id: string;
-  name: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  hours: string;
-  schedule: GymScheduleRow[];
+export interface GymApiDataSource{
+    getSchedule: () => Promise<ApiResponse<GymPeriodDto[]>>;
 }
 
-export interface GymScheduleApiResponse {
-  location: string;
-  periods: GymPeriod[];
-}
-
-export interface GymApiDataSource {
-  getSchedule: () => Promise<GymScheduleApiResponse>;
-}
-
-export const createGymApiDataSource = ({ httpClient }: { httpClient: HttpClient }): GymApiDataSource => ({
-  getSchedule: async () => parseOrThrow(await httpClient.get('/gymSchedule.json')),
-});
+export const createGymApiDataSource = ({httpClient}:{httpClient: HttpClient}) : GymApiDataSource => ({
+    getSchedule: async () => parseOrThrow(await httpClient.get('/api/v1/gym/gym-periods')),
+})
