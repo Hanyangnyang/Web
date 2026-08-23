@@ -11,6 +11,7 @@ export interface UseFeedbackResult {
 
 export function useFeedback(): UseFeedbackResult {
   const mutation = useMutation({
+    mutationKey: ['feedback', 'submit'], // Sentry에서 어느 뮤테이션이 실패했는지 구분하는 태그로 쓰임
     mutationFn: (content: string) => submitFeedbackUseCase.execute(content),
   });
 

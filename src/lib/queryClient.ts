@@ -1,4 +1,4 @@
-import { QueryClient, QueryCache } from '@tanstack/react-query';
+import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { initSentry } from './sentry.js';
@@ -17,6 +17,19 @@ export const queryClient = new QueryClient({
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
           tags: { queryKey: JSON.stringify(query.queryKey) }, // 어느 API가 실패했는지
+        });
+      });
+    },
+  }),
+  // 뮤테이션(useMutation)은 QueryCache가 아니라 별도 캐시로 관리돼서, 위 onError로는 안 잡힌다.
+  // 뮤테이션은 기본적으로 재시도를 안 하기 때문에(retry: false) 실패 즉시 여기로 온다.
+  mutationCache: new MutationCache({
+    onError: (error, _variables, _context, mutation) => {
+      if (!import.meta.env.PROD) return;
+      if (navigator.onLine === false) return;
+      initSentry().then(Sentry => {
+        Sentry.captureException(error, {
+          tags: { mutationKey: JSON.stringify(mutation.options.mutationKey ?? []) },
         });
       });
     },

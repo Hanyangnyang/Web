@@ -23,6 +23,7 @@ import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { initSentry } from './lib/sentry.js';
 import './lib/androidBackHandler.js';
 
 declare global {
@@ -177,6 +178,9 @@ function MainLayout() {
         routeFromParams(url.searchParams.toString());
       } catch (e) {
         console.error('Failed to parse notification deep link', e);
+        initSentry().then(Sentry => {
+          Sentry.captureException(e, { tags: { source: 'push-deeplink-parse' } });
+        });
       }
     }).then(h => { handle = h; });
     return () => { handle?.remove(); };
