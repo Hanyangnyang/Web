@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { supabase } from '../../lib/supabase.js';
-import { getKSTDateKey } from '../../utils/time.js';
+import { getKSTDateKey } from '../../utils/kstTime.js';
 import { initSentry } from '../../lib/sentry.js';
 
 export interface AppConfig {

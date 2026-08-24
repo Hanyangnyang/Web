@@ -2,7 +2,7 @@
 import { createCafe, KNOWN_CAFES } from '../../domain/entities/Cafe.js';
 import type { MenuApiDataSource, MenuDto, CafeteriaDto } from '../datasources/MenuApiDataSource.js';
 import type { MenuRepository } from '../../domain/repositories/IMenuRepository.js';
-import { toDateKey } from '../../utils/time.js';
+import { toDateKey } from '../../utils/kstTime.js';
 
 const MEAL_TYPE_LABEL: Record<MenuDto['mealType'], string> = {
   BREAKFAST: '조식',

@@ -7,6 +7,8 @@ export interface UseFeedbackResult {
   submitted: boolean;
   error: string | null;
   submit: (content: string) => Promise<void>;
+  /** 제출 결과를 지운다 — 같은 화면에서 맥락이 바뀌어 다시 보낼 수 있어야 할 때 (예: 검색어 변경) */
+  reset: () => void;
 }
 
 export function useFeedback(): UseFeedbackResult {
@@ -22,5 +24,6 @@ export function useFeedback(): UseFeedbackResult {
     submit: async (content: string) => {
       await mutation.mutateAsync(content);
     },
+    reset: mutation.reset,
   };
 }

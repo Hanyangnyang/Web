@@ -81,6 +81,20 @@ function measure(): Promise<Coords> {
   return inflight;
 }
 
+// 이미 측위된 좌표가 있으면 그대로 반환하고, 없으면 null.
+// 측위를 새로 시작하지 않으므로 권한 팝업이 절대 뜨지 않는다 —
+// "있으면 쓰고 없으면 만다" 식의 부가 기능(예: 목록 거리순 정렬)에서 쓰라고 있는 함수다.
+export function getCachedLocation(): Coords | null {
+  return isFresh(cache) ? cache : null;
+}
+
+// 온디맨드 측위: 사용자 액션(예: 지도 '내 위치' 버튼)에서 호출.
+// 캐시가 신선하면 재사용하고, 권한이 없으면 이 시점에 OS 권한 팝업이 뜬다.
+export function measureLocation() {
+  if (isFresh(cache)) return Promise.resolve(cache);
+  return measure();
+}
+
 // 앱 부팅 시 호출: 권한이 이미 granted인 사용자에게만 백그라운드 측위를 시작한다.
 // 권한이 없으면 아무것도 하지 않는다 — 앱 시작 직후 맥락 없는 권한 팝업이 뜨면
 // 승인율이 떨어지므로, 권한 요청 자체는 위치가 실제로 필요한 화면에서만 일어나야 한다.

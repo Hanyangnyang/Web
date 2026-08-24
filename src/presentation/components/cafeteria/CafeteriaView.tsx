@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { getKSTDateUnsafe, toDateKey } from '../../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.js';
 import { CardFallback } from '../common/CardFallback.js';

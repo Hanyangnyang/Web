@@ -6,7 +6,7 @@ import {
   type HourlyForecast,
   type CurrentWeather,
 } from '../../domain/entities/Weather.js';
-import { toEpoch } from '../../utils/time.js';
+import { toEpoch } from '../../utils/kstTime.js';
 import type {
   WeatherApiDataSource,
   HourlyForecastDto,

@@ -11,6 +11,9 @@ import { createBusApiDataSource } from './data/datasources/BusApiDataSource.js';
 import { createGymApiDataSource } from './data/datasources/GymApiDataSource.js';
 import { createFeedbackDataSource } from './data/datasources/FeedbackDataSource.js';
 import { createHolidayApiDataSource } from './data/datasources/HolidayApiDataSource.js';
+import { createPartnerStoreApiDataSource } from './data/datasources/PartnerStoreApiDataSource.js';
+import { createCampusBuildingApiDataSource } from './data/datasources/CampusBuildingApiDataSource.js';
+import { createSmokingSpotApiDataSource } from './data/datasources/SmokingSpotApiDataSource.js';
 
 import { createMenuRepository } from './data/repositories/MenuRepository.js';
 import { createInstagramRepository } from './data/repositories/InstagramRepository.js';
@@ -22,6 +25,9 @@ import { createBusRepository } from './data/repositories/BusRepository.js';
 import { createGymRepository } from './data/repositories/GymRepository.js';
 import { createFeedbackRepository } from './data/repositories/FeedbackRepository.js';
 import { createHolidayRepository } from './data/repositories/HolidayRepository.js';
+import { createPartnerStoreRepository } from './data/repositories/PartnerStoreRepository.js';
+import { createCampusBuildingRepository } from './data/repositories/CampusBuildingRepository.js';
+import { createSmokingSpotRepository } from './data/repositories/SmokingSpotRepository.js';
 
 import { createGetMenuForDateUseCase } from './domain/usecases/GetMenuForDateUseCase.js';
 import { createGetMenuForPeriodUseCase } from './domain/usecases/GetMenuForPeriodUseCase.js';
@@ -36,6 +42,9 @@ import { createGetBusArrivalsUseCase } from './domain/usecases/GetBusArrivalsUse
 import { createGetGymScheduleUseCase } from './domain/usecases/GetGymScheduleUseCase.js';
 import { createSubmitFeedbackUseCase } from './domain/usecases/SubmitFeedbackUseCase.js';
 import { createGetIsHolidayUseCase } from './domain/usecases/GetIsHolidayUseCase.js';
+import { createGetPartnerStoresUseCase } from './domain/usecases/GetPartnerStoresUseCase.js';
+import { createGetCampusBuildingsUseCase } from './domain/usecases/GetCampusBuildingsUseCase.js';
+import { createGetSmokingSpotsUseCase } from './domain/usecases/GetSmokingSpotsUseCase.js';
 
 import { createShuttleApiDataSource } from './data/datasources/ShuttleApiDataSource.js';
 import { createSubwayApiDataSource } from './data/datasources/SubwayApiDataSource.js';
@@ -62,6 +71,9 @@ const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const feedbackDataSource = createFeedbackDataSource();
 const holidayApiDataSource = createHolidayApiDataSource({ httpClient });
+const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient });
+const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
+const smokingSpotApiDataSource = createSmokingSpotApiDataSource({ httpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
@@ -76,6 +88,9 @@ export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
 export const feedbackRepository = createFeedbackRepository({ feedbackDataSource });
 export const holidayRepository = createHolidayRepository({ holidayApiDataSource });
+export const partnerStoreRepository = createPartnerStoreRepository({ partnerStoreApiDataSource });
+export const campusBuildingRepository = createCampusBuildingRepository({ campusBuildingApiDataSource });
+export const smokingSpotRepository = createSmokingSpotRepository({ smokingSpotApiDataSource });
 
 // Use Cases
 export const getMenuForDateUseCase = createGetMenuForDateUseCase({ menuRepository });
@@ -91,3 +106,6 @@ export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository
 export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository });
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
 export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });
+export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerStoreRepository });
+export const getCampusBuildingsUseCase = createGetCampusBuildingsUseCase({ campusBuildingRepository });
+export const getSmokingSpotsUseCase = createGetSmokingSpotsUseCase({ smokingSpotRepository });

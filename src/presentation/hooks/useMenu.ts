@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import { getMenuForDateUseCase, getMenuForPeriodUseCase } from '../../di.js';
-import { getKSTDateUnsafe, toDateKey } from '../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../utils/kstTime.js';
 import type { Cafe } from '../../domain/entities/Cafe.js';
 
 const MENU_STALE_TIME = 12 * 60 * 60 * 1000;  // 12시간 — 백엔드 Menu 캐시 TTL과 동일 (매일 오전 1시 스크래핑 시 evict)

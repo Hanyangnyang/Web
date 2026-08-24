@@ -1,5 +1,9 @@
-// 컴포넌트: 알람 설정·공유 등에서 공통으로 쓰는 바텀시트 껍데기
-// (백드롭+슬라이드업 애니메이션, 드래그로 닫기, iOS 배경 스크롤 잠금, 하드웨어 뒤로가기 연동)
+// 알람 설정·공유 등에서 공통으로 쓰는 바텀시트 껍데기 — Material의 'modal bottom sheet'에 해당한다.
+// 백드롭으로 뒤 화면을 덮어 조작을 막고, 열렸다가 스스로 닫힌다
+// (슬라이드업 애니메이션, 드래그로 닫기, iOS 배경 스크롤 잠금, 하드웨어 뒤로가기 연동).
+// 뒤를 막지 않고 화면의 일부로 상주하는 지도용 시트는 StandardBottomSheet를 쓴다.
+//
+// 폭은 이 컴포넌트가 정하지 않는다 — 호출부가 className으로 넘긴다.
 import { useEffect, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
@@ -8,7 +12,7 @@ import styles from './BottomSheet.module.css';
 const CLOSE_ANIMATION_MS = 250;
 const DRAG_CLOSE_THRESHOLD = 120;
 
-export interface BottomSheetProps {
+export interface ModalBottomSheetProps {
   // 닫힘이 트리거된 시점(백드롭 클릭 / 드래그로 닫기 / 하드웨어 뒤로가기)에 동기적으로 1회 실행.
   // 반환값은 닫힘 애니메이션이 끝난 뒤 onClose로 그대로 전달됨 (ex: 저장 성공 메시지)
   onRequestClose: () => string | undefined | void;
@@ -24,7 +28,7 @@ export interface BottomSheetProps {
   scrollExemptSelector?: string;
 }
 
-export function BottomSheet({
+export function ModalBottomSheet({
   onRequestClose,
   onClose,
   children,
@@ -33,7 +37,7 @@ export function BottomSheet({
   enableDragToClose = true,
   enableScrollLock = true,
   scrollExemptSelector,
-}: BottomSheetProps) {
+}: ModalBottomSheetProps) {
   const [closing, setClosing] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);

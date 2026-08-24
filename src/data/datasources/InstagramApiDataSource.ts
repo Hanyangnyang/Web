@@ -1,9 +1,5 @@
 // 데이터 소스: 인스타그램 프로필 조회 및 이미지 프록시 API 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
-
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
+import { parseOrThrow, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
 export interface InstagramProfileApiResponse {
   username: string;
