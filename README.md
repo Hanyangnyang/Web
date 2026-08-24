@@ -155,14 +155,14 @@ gcTime은 아래 모든 엔드포인트가 오버라이드 없이 전역 기본�
 
 | 엔드포인트 | 역할 | 백엔드 Redis TTL, 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
 |---|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 앱부팅시 최초 1회만, 이후엔 네트워크 재연결시에만 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch만, 이후엔 네트워크 재연결시에만 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 호출 및 refetch + 네트워크 재연결시 |
-| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch |
-| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 앱부팅시 prefetch + 소식탭 클릭시 refetch |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 앱부팅시 prefetch + 이후엔 네트워크 재연결시에만 |
-| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시 호출 및 refetch |
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 앱부팅시 최초 1회만, 이후엔 네트워크 재연결시 + 사용자가 "다시 시도" 버튼 클릭시 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch만, 이후엔 네트워크 재연결시 + 사용자가 "다시 시도" 버튼 클릭시 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 호출 및 refetch + 네트워크 재연결시 + 사용자가 "다시 시도" 버튼 클릭시 |
+| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch + 사용자가 "다시 시도" 버튼 클릭시 |
+| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 앱부팅시 prefetch + 소식탭 클릭시 refetch (재시도 버튼 없음) |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 앱부팅시 prefetch + 이후엔 네트워크 재연결시에만 (재시도 버튼 의도적으로 없음) |
+| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch + 사용자가 "다시 시도" 버튼 클릭시 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시 호출 및 refetch + 사용자가 "다시 시도" 버튼 클릭시 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
 
 
