@@ -55,7 +55,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
         </div>
       )}
     
-      <div className="pb-24 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
+      <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
           <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} briefing={briefing} error={weatherError} onRetry={refetchWeather} />

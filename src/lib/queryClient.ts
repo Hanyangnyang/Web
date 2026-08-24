@@ -39,6 +39,7 @@ export const queryClient = new QueryClient({
       staleTime: 15 * 60 * 1000,   // 기본 15분
       gcTime: 24 * 60 * 60 * 1000, // 24시간
       refetchOnWindowFocus: false, // 모바일 웹뷰 특성상 불필요, 탭 재진입 갱신은 isVisible로 각 훅이 직접 제어
+      retry: 2, // 기본값 3(총 4회 요청)은 실패 UI가 뜨기까지 너무 오래 걸림(지수 백오프 포함) — 2로 줄여 체감 대기시간 단축
     },
   },
 });
