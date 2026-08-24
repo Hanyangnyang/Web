@@ -149,29 +149,30 @@ Supabase는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC �
 `devices`(FCM 토큰)·`subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
-### 백엔드 서버 API 엔드포인트
+### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`)
 
-베이스 URL: `https://api.hanyang.life` (env: `VITE_API_BASE_URL`)
+gcTime은 아래 모든 엔드포인트가 오버라이드 없이 전역 기본값(24시간)을 그대로 씀. api 실패시 재시도는 3번, 총 4번 호출함.
 
-| 엔드포인트 | 역할 | staleTime |
-|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 (기간별) | 12시간 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 |
-| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷 + 시간별 예보 | 10분 |
-| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분 (매시 22분 갱신) |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 |
-| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 |
+| 엔드포인트 | 역할 | 백엔드 Redis TTL, 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
+|---|---|---|---|
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 앱부팅시 최초 1회만, 이후엔 네트워크 재연결시에만 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch만, 이후엔 네트워크 재연결시에만 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 호출 및 refetch + 네트워크 재연결시 |
+| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch |
+| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 앱부팅시 prefetch + 소식탭 클릭시 refetch |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 앱부팅시 prefetch + 이후엔 네트워크 재연결시에만 |
+| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시 호출 및 refetch |
+| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
 
 
 ### Vercel API 엔드포인트
 
-| 엔드포인트 | 역할 | 외부 호출 대상 | 캐시 TTL |
-|---|---|---|---|
-| `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 |
-| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털 (경기도 버스정보시스템) | 40초 (메모리 캐시) |
-| `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 |
+| 엔드포인트 | 역할 | 외부 호출 대상 | Vercel 캐시 TTL | 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
+|---|---|---|---|---|---|
+| `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 | 24시간 | 마운트 시 자동 |
+| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | 셔틀 탭 "공공버스" 모드 + 화면 보임(`isPageVisible`) + 사용자 조작 중(`isUserActive`)일 때 30초 간격 자동 폴링(`refetchInterval`) + 새로고침 버튼 수동 refetch |
+| `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
 
 
 ## 💾 캐싱 정책
@@ -181,14 +182,6 @@ Supabase는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC �
 전역 `QueryClient`(`src/lib/queryClient.ts`) 기본값은 `staleTime` 15분·`gcTime` 24시간·`refetchOnWindowFocus: false`(모바일 웹뷰 특성상 꺼두고, 화면 재진입 시 새로고침 여부는 훅별로 직접 제어)
 
 프로덕션 빌드에서만 `persistQueryClient` + `createSyncStoragePersister`로 쿼리 캐시를 localStorage(`hyu_rq_cache_v1`, `maxAge` 24시간)에 영속화 — 개발 중에는 `public/*.json` 픽스처 수정이 캐시에 가려지지 않도록 꺼둠.
-
-도메인별 staleTime은 위 "백엔드 서버 API 엔드포인트" 표를 따르고, 그 외 항목은 다음과 같음:
-
-| 대상 | staleTime | 비고 |
-|---|---|---|
-| 공휴일 여부 | 24시간 | Vercel `/api/holidays` |
-| 인스타그램 프로필 | 24시간 | Vercel `/api/insta-proxy` |
-| 공공버스 도착정보 | 기본 15분 | 화면 활성 중엔 30초 간격으로 강제 폴링, 탭 비활성·유휴 시 중단 |
 
 
 ### 2. 로컬 상태 캐싱 — localStorage
