@@ -6,8 +6,8 @@
 
 <p align="center">
   한양대학교 ERICA인들을 위한 캠퍼스 라이프스타일 유틸리티 앱<br/>
-  학식 · 셔틀버스 · 제휴 · 도서관 혼잡도 · 헬스장 시간표 등<br/>
-  매일 확인해야 하는 캠퍼스 정보를 한곳에 모아 더 슬기로운 에리카 캠퍼스 라이프를 즐겨보세요
+  학식 · 셔틀버스 · 캠퍼스맵 · 도서관 혼잡도 · 헬스장 시간표 등<br/>
+  매일 확인해야 하는 캠퍼스 정보를 한곳에 모아 더 슬기로운 에리카 캠퍼스 라이프를 즐겨보세요!
 </p>
 
 <p align="center">
@@ -24,7 +24,6 @@
 |---|---|---|---|
 | 프론트엔드 | 김예은 | [@yaeunjess](https://github.com/yaeunjess) | manlcoff@hanyang.ac.kr |
 | 백엔드 | 김동준 | [@kdjidkr](https://github.com/kdjidkr) | kdjidkr@hanyang.ac.kr |
-
 문의사항이 있다면 **hanyangnyang01@gmail.com** 으로 연락주세요 :)
 
 ---
@@ -34,11 +33,13 @@
 - 🍚 식당별 학식 조회 
 - 🚌 셔틀버스&지하철와 공공버스 시간표 
 - ☁️ 날씨와 학정혼잡도 
-- 🏫 단과대별 제휴 정보 모음
+- 🏫 교내건물&흡연시설&오픈스페이스와 단과대별 제휴업체를 모은 캠퍼스맵
 - 🔔 학식·날씨 맞춤 푸시알림 (FCM)
-- 🎓 그 외 편리한 학교 생활을 위한 기타 기능
-
+- 💪 체대 헬스장 시간표 조회
+- 🎓 그외 편리한 학교생활을 위한 기타기능
 > 💡 원래는 도서관 열람실 입장용 QR 코드 발급 + 좌석 예약/반납 기능도 준비했었는데, 학교 도서관 측에 문의해보니 외부 앱에서 제공하면 안 된다고 해서 접었어요..ㅎㅎ
+
+---
 
 ## 🛠 기술 스택
 
@@ -52,8 +53,6 @@
 ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=apple&logoColor=white)
 
-TypeScript는 strict 모드로 domain·data·infrastructure·lib 전체 및 presentation 대부분 전환 완료. iOS 빌드·배포는 Codemagic으로 자동화.
-
 **Backend**
 
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
@@ -62,14 +61,10 @@ TypeScript는 strict 모드로 domain·data·infrastructure·lib 전체 및 pres
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-[Spring Boot 3.4.1](https://github.com/Hanyangnyang/Backend) 기반 Gradle 멀티모듈(core/user-api/admin-api) 서버가 JWT·QueryDSL로 학식·날씨·도서관 좌석·배너·지하철·셔틀·헬스장 등 핵심 API를 담당(`api.hanyang.life`). Vercel Serverless Functions는 인스타그램 프로필 프록시·공공버스 도착정보·공휴일 조회만 남아 있음.
-
-**Data & Infra**
+**Data & Infra** - Supabase는 익명 Auth·DB·RPC, Firebase는 FCM 푸시 알림(네이티브 + Web)을 담당
 
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-
-Supabase는 익명 Auth·DB·RPC, Firebase는 FCM 푸시 알림(네이티브 + Web)을 담당.
 
 **Testing & Monitoring**
 
@@ -81,12 +76,11 @@ Supabase는 익명 Auth·DB·RPC, Firebase는 FCM 푸시 알림(네이티브 + W
 
 **외부 API**: Open-Meteo(날씨·대기질), 서울열린데이터(지하철), 공공데이터포털(공휴일), 경기도 버스정보시스템(공공버스), 한양대도서관 API, Google Gemini(날씨 코멘트 AI), Instagram API
 
+---
 
-## 📁 폴더 구조 (Clean Architecture)
+## 📁 폴더 구조 - Clean Architecture
 
 **Clean Architecture**는 소스 코드 의존성이 항상 바깥(UI·프레임워크·DB)에서 안쪽(비즈니스 로직)을 향하게 강제해 프레임워크·DB·외부 API가 바뀌어도 핵심 로직은 영향받지 않게 하는 것이 핵심이다.
-
-하냥냥에 적용한 방식:
 
 | 원칙 | 하냥냥에서의 적용 |
 |---|---|
@@ -132,12 +126,13 @@ src/
 └── di.ts                    # 위 모든 데이터소스·레포지토리·유스케이스를 조립해 훅에 주입하는 컨테이너
 ```
 
-## 🏗 프로젝트 아키텍처
+---
 
-학식·날씨·도서관 혼잡도·배너·지하철·셔틀 등 핵심 데이터는 자체 백엔드 서버(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스·공휴일 조회는 Vercel BFF(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 없습니다.
-Supabase는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
-푸시 알림은 Firebase Cloud Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
+## 🔌서드파티와 💾캐싱정책
 
+학식·날씨·도서관 혼잡도·배너·지하철·셔틀 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스·공휴일 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 없습니다.
+**Supabase**는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
+푸시 알림은 **Firebase Cloud** Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
 
 ### Supabase 테이블
 
@@ -149,9 +144,8 @@ Supabase는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC �
 `devices`(FCM 토큰)·`subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
-### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`)
-
-gcTime은 아래 모든 엔드포인트가 오버라이드 없이 전역 기본값(24시간)을 그대로 씀. api 실패시 재시도는 3번, 총 4번 호출함.
+### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 1️⃣서버 상태 캐싱 — TanStack Query
+(Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 3번, 그래서 총 4번 호출함.)
 
 | 엔드포인트 | 역할 | 백엔드 Redis TTL, 프론트엔드 TanStackQuery staleTime | refetch 트리거 (네트워크 재연결시) |
 |---|---|---|---|
@@ -166,7 +160,7 @@ gcTime은 아래 모든 엔드포인트가 오버라이드 없이 전역 기본�
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
 
 
-### Vercel API 엔드포인트
+### Vercel API 엔드포인트 + 1️⃣서버 상태 캐싱 — TanStack Query
 
 | 엔드포인트 | 역할 | 외부 호출 대상 | Vercel 캐시 TTL | 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
 |---|---|---|---|---|---|
@@ -175,28 +169,38 @@ gcTime은 아래 모든 엔드포인트가 오버라이드 없이 전역 기본�
 | `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
 
 
-## 💾 캐싱 정책
+### 2️⃣로컬 상태 캐싱 — localStorage 
 
-### 1. 서버 상태 캐싱 — TanStack Query
+| 키 | 내용 | 언제 생성되나 |
+|---|---|---|
+| `app_config_cache` | 학기·휴일 등 앱 설정 스냅샷 | 부팅 시 즉시 (TTL 없이 최신 조회 성공 시에만 덮어씀) |
+| `lastActiveTab` | 마지막 선택 탭 | 부팅 시 즉시 + 탭 전환마다 갱신 |
+| `sb-<project>-auth-token` | Supabase 인증 세션 (Supabase SDK가 `hybridSecureStorage`를 통해 자체 관리) | `getOrCreateAnonymousUserId()`가 처음 호출될 때(피드백 전송, 알림 구독 등) — 네이티브는 Keychain/Keystore, 웹은 localStorage |
+| `alarm_settings`, `weather_alarm_settings` | 학식·날씨 알림 구독 설정 로컬 미러 | 알림 설정 시트를 닫을 때만 |
+| `partnerCollegeFilter` | 마지막 제휴 단과대 필터 | 제휴탭에서 단과대 칩을 눌러야 |
+| `shuttle_stop`, `shuttle_lineId` | 마지막 셔틀 정류장·노선 | 사용자가 직접 정류장/노선을 바꿔야 (GPS 자동 선택은 저장 안 함) |
+| `public_bus_selected_stops`, `public_bus_favorites` | 선택·즐겨찾기 버스 정류장 | 셔틀탭 "일반 버스" 모드 진입 시 |
+| `hyu_rq_cache_v1` | TanStack Query 캐시 영속화본 | 프로덕션 빌드에서만 |
+| `ph_phc_<프로젝트키>_posthog` | PostHog device/distinct ID | 앱 코드가 아니라 PostHog JS SDK가 초기화 시 자동 생성 |
 
-전역 `QueryClient`(`src/lib/queryClient.ts`) 기본값은 `staleTime` 15분·`gcTime` 24시간·`refetchOnWindowFocus: false`(모바일 웹뷰 특성상 꺼두고, 화면 재진입 시 새로고침 여부는 훅별로 직접 제어)
-
-프로덕션 빌드에서만 `persistQueryClient` + `createSyncStoragePersister`로 쿼리 캐시를 localStorage(`hyu_rq_cache_v1`, `maxAge` 24시간)에 영속화 — 개발 중에는 `public/*.json` 픽스처 수정이 캐시에 가려지지 않도록 꺼둠.
-
-
-### 2. 로컬 상태 캐싱 — localStorage
-
-React Query가 다루지 않는 값들은 화면별로 개별 저장:
+### 3️⃣세션 저장소 — sessionStorage, 탭 닫으면 사라짐
 
 | 키 | 내용 | 용도 |
 |---|---|---|
-| `app_config_cache` | 학기·휴일 등 앱 설정 스냅샷 | 부팅 시 즉시 렌더링용 — TTL 없이 최신 조회 성공 시에만 덮어씀 |
-| `sb-<project>-auth-token` | Supabase 인증 세션 | 재실행 후 로그인 유지 (네이티브는 Keychain/Keystore, 웹은 localStorage) |
-| `lastActiveTab` | 마지막 선택 탭(학식/포탈) | 재실행 시 복원 |
-| `alarm_settings`, `weather_alarm_settings` | 알림 구독 설정 로컬 미러 | Supabase RPC 동기화 전 상태 보관 |
-| `partnerCollegeFilter` | 마지막 제휴 필터 | UX 상태 복원 |
-| `shuttle_stop`, `shuttle_lineId` | 마지막 셔틀 정류장·노선 | UX 상태 복원 |
-| `public_bus_selected_stops`, `public_bus_favorites` | 선택·즐겨찾기 버스 정류장 | UX 상태 복원 |
+| `splashShown` | 이번 세션에서 스플래시를 이미 보여줬는지 | 세션당 스플래시 1회만 노출 (`BOOT_ARCHITECTURE.md` 참고) |
 
-FCM 토큰은 메모리 변수로만 유지되며 디스크에는 저장되지 않음.
+### 4️⃣메모리 변수 — 새로고침만 해도 사라짐 
+
+| 변수 | 내용 | 용도 |
+|---|---|---|
+| `cachedNativeToken` (`lib/firebase.ts`) | 네이티브 FCM 토큰 | 세션 내 재조회 없이 재사용, 디스크엔 절대 저장 안 함 |
+
+### 5️⃣쿠키 — PostHog SDK가 자체 관리
+
+| 키 | 도메인 | 내용 |
+|---|---|---|
+| `ph_current_instance`, `ph_current_project_name`, `ph_current_project_token` | `.posthog.com` | 연결된 PostHog 프로젝트 식별 정보 |
+| `ph_phc_<프로젝트키>_posthog` | 앱 도메인 | 로컬스토리지의 동명 키와 같은 device/distinct ID — 쿠키·로컬스토리지 이중 저장 |
+| `ph_<세션ID>_posthog` | `.posthog.com` | 세션 단위 식별자로 추정 |
+| `ph_last_login_method` | `.posthog.com` | PostHog 측 로그인 방식 기록으로 추정 |
 
