@@ -21,7 +21,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
   const { weather, loading: weatherLoading, error: weatherError } = useWeather(isVisible);
   const { briefing } = useWeatherBriefing(isVisible);
   const { library, loading: libraryLoading, error: libraryError } = useLibraryStatus(isVisible);
-  const { banners, loading: bannersLoading, error: bannersError } = useBanners(isVisible);
+  const { banners, loading: bannersLoading, error: bannersError } = useBanners();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
 
