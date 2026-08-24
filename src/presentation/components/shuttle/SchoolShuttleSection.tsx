@@ -5,6 +5,7 @@ import type { ScheduleItem, ShuttleAppConfig } from '../../../domain/entities/Sh
 import type { SubwayScheduleRow } from '../../../domain/entities/Subway.js';
 import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
+import { CardFallback } from '../common/CardFallback.js';
 import { StopSelector } from './StopSelector.jsx';
 import { TimetableHeader } from './TimetableHeader.jsx';
 import { SubwayRedirectOverlay } from './SubwayRedirectOverlay.jsx';
@@ -29,8 +30,11 @@ interface SchoolShuttleSectionProps {
   isWeekend: boolean;
   needsSubway: boolean;
   loadErr: string | null;
+  onRetry: () => void;
   isLoading: boolean;
   isSubwayLoading: boolean;
+  isSubwayError: boolean;
+  onSubwayRetry: () => void;
   isGpsLoading: boolean;
   visibleCount: number;
   loadMore: () => void;
@@ -52,7 +56,7 @@ export function SchoolShuttleSection({
   subwayArrivals,
   isWeekend,
   needsSubway,
-  loadErr, isLoading, isSubwayLoading, isGpsLoading,
+  loadErr, onRetry, isLoading, isSubwayLoading, isSubwayError, onSubwayRetry, isGpsLoading,
   visibleCount, loadMore,
   isFullMode, setIsFullMode,
   fullDayType, setFullDayType,
@@ -167,12 +171,23 @@ export function SchoolShuttleSection({
           onToggleFullMode={handleToggleFullMode}
         />
 
+        {/* 지하철 연결편 조회 실패 안내 — 행마다 반복 표시하면 스팸이라 여기 한 번만 */}
+        {needsSubway && !hideSubwayCol && isSubwayError && (
+          <div className="flex items-center justify-between gap-2 px-4 py-2.5 mb-3 bg-error/[0.04] border border-error/10 rounded-card">
+            <span className="text-[12px] font-bold text-text-main leading-tight">지하철 연결 정보를 불러오지 못했습니다</span>
+            <button
+              onClick={onSubwayRetry}
+              className="flex-shrink-0 text-[11px] font-bold text-primary bg-[rgba(14,74,132,0.08)] px-2.5 py-1 rounded-full active:scale-95 transition-transform"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
+
         <div ref={containerRef} className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
           {loadErr ? (
             // 2. 조회 실패 — 백엔드 요청이 실패한 경우
-            <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
-              <p>{loadErr}</p>
-            </div>
+            <CardFallback message={loadErr} onRetry={onRetry} className="min-h-[425px]" />
           ) : isLoading ? (
             // 1. 첫 로딩 — 헤더는 이미 떠있고, 목록 자리만 실제 행과 같은 모양으로 채워둠
             Array.from({ length: 5 }).map((_, i) => <TimetableRowSkeleton key={i} hideSubwayCol={hideSubwayCol} />)
@@ -189,6 +204,7 @@ export function SchoolShuttleSection({
                 isPast={!isFullMode && row.depMin < now}
                 subwayArrivals={subwayArrivals}
                 isSubwayLoading={isSubwayLoading}
+                isSubwayError={isSubwayError}
                 hideSubwayCol={hideSubwayCol}
                 now={now}
                 isFullMode={isFullMode}

@@ -26,6 +26,7 @@ interface WeatherCardProps {
   isVisible?: boolean;
   briefing?: WeatherBriefing | null;
   error?: Error | null;
+  onRetry?: () => void;
 }
 
 interface RenderedForecastItem {
@@ -36,11 +37,19 @@ interface RenderedForecastItem {
   isCurrent: boolean;
 }
 
-function Notice({ message }: { message: string }) {
+function Notice({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <div className="rounded-card border border-slate-200 bg-white min-h-[180px] flex flex-col items-center justify-center gap-2 shadow-sm opacity-80">
       <WifiOff size={20} className="text-text-hint" />
       <p className="text-center text-text-sub text-sm font-semibold">{message}</p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="text-xs font-bold text-primary bg-[rgba(14,74,132,0.08)] px-3.5 py-1.5 rounded-full active:scale-95 transition-transform"
+        >
+          다시 시도
+        </button>
+      )}
     </div>
   );
 }
@@ -84,7 +93,7 @@ function WeatherSkeleton() {
 }
 
 // 소식탭 날씨 박스: weather를 props로만 받는 순수 표시 컴포넌트 (Storybook 대응)
-export function WeatherCard({ weather, loading, isVisible = true, briefing = null, error = null }: WeatherCardProps) {
+export function WeatherCard({ weather, loading, isVisible = true, briefing = null, error = null, onRetry }: WeatherCardProps) {
   const nowEpoch = useNow(isVisible);
   const current = weather?.current ?? null;
   const hourly = weather?.hourly;
@@ -122,7 +131,7 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
 
   // 2. 조회 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
   if (error && !current) {
-    return <section className="-mt-3"><Notice message="날씨 정보를 불러오지 못했습니다" /></section>;
+    return <section className="-mt-3"><Notice message="날씨 정보를 불러오지 못했습니다" onRetry={onRetry} /></section>;
   }
 
   // 3. 아직 아무것도 못 받음 — 실패도 아니므로 자리를 비워둔다

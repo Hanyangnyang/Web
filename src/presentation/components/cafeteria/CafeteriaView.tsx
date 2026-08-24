@@ -29,11 +29,12 @@ interface CafeteriaViewProps {
   cafes: Cafe[];
   loading: boolean;
   revalidating: boolean;
+  onRetry: () => void;
   cafeDeepLink: CafeDeepLink | null;
   onCafeDeepLinkHandled?: () => void;
 }
 
-export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
+export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, onRetry, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef<HTMLDivElement>(null);
@@ -270,11 +271,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
               )
             ) : (
               // 2. 조회 실패 — KNOWN_CAFES 병합 덕에 성공이면 cafes가 항상 4개라, 여긴 진짜 실패일 때만 옴
-              <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-                <div className="min-h-[80px] flex flex-col justify-center py-8 text-center text-text-sub">
-                  <p>정보를 불러올 수 없습니다</p>
-                </div>
-              </div>
+              <CardFallback message="정보를 불러올 수 없습니다" onRetry={onRetry} className="min-h-[80px]" />
             )}
           </div>
         </div>

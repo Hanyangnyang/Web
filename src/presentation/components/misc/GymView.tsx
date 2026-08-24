@@ -42,7 +42,7 @@ interface GymViewProps {
 
 export function GymView({ onBack }: GymViewProps) {
   useBackHandler(onBack);
-  const { gymData, loadErr } = useGymSchedule();
+  const { gymData, loadErr, refetch } = useGymSchedule();
   const [activePeriodId, setActivePeriodId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(getKSTNow);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -184,7 +184,7 @@ export function GymView({ onBack }: GymViewProps) {
       {!gymData || !currentPeriod ? (
         loadErr ? (
           // 2. 에러 — 조회 실패
-          <div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div>
+          <CardFallback message={loadErr} onRetry={refetch} />
         ) : (
           // 1. 로딩 중 — 아직 응답 안 옴 (스켈레톤)
           <div className="h-64 bg-white border border-slate-200 rounded-card [animation:pulse_1.5s_infinite]" />

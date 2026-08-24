@@ -26,8 +26,9 @@ export interface UseMenuResult {
   menuDate: Date;
   cafes: Cafe[];
   menuLoading: boolean;
-  menuRevalidating: boolean; 
+  menuRevalidating: boolean;
   changeDate: (offsetOrDate: number | Date) => void;
+  refetchMenu: () => void;
 }
 
 export function useMenu(): UseMenuResult {
@@ -71,5 +72,6 @@ export function useMenu(): UseMenuResult {
     menuLoading: !periodQuery.isFetched && !hasCachedMenu ? true : query.isLoading,
     menuRevalidating: query.isFetching && !query.isLoading,
     changeDate,
+    refetchMenu: () => { query.refetch(); },
   };
 }

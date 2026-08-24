@@ -10,10 +10,11 @@ export interface UseGymScheduleResult {
   gymData: GymSchedule | null;
   loading: boolean;
   loadErr: string | null;
+  refetch: () => void;
 }
 
 export function useGymSchedule(): UseGymScheduleResult {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: GYM_QUERY_KEY,
     queryFn: () => getGymScheduleUseCase.execute(),
     staleTime: GYM_STALE_TIME,
@@ -23,5 +24,6 @@ export function useGymSchedule(): UseGymScheduleResult {
     gymData: data ?? null,
     loading: isLoading,
     loadErr: isError ? '헬스장 시간표를 불러오지 못했습니다.' : null,
+    refetch: () => { refetch(); },
   };
 }

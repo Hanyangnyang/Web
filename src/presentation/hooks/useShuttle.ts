@@ -67,6 +67,7 @@ export function useShuttle(isActive = false) {
   });
   const allData = scheduleQuery.data ?? null;
   const loadErr = scheduleQuery.isError ? '셔틀 시간표를 불러오지 못했습니다.' : null;
+  const refetchSchedule = () => { scheduleQuery.refetch(); };
 
   // 10초마다 현재 시각 갱신 (시간 경과가 UI에 즉각 반영되도록 주기 단축)
   useEffect(() => {
@@ -102,6 +103,8 @@ export function useShuttle(isActive = false) {
   // 전체 정적 시간표에서 오늘(실제) dayType에 해당하는 열차만 남김 — 특정 노선/방향/시각 필터링은 TimetableRow의 connectingTrains()가 담당
   const subwayArrivals = (subwayScheduleQuery.data ?? []).filter(r => r.dayType === trainDayType);
   const isSubwayLoading = subwayScheduleQuery.isFetching;
+  const isSubwayError = subwayScheduleQuery.isError;
+  const refetchSubway = () => { subwayScheduleQuery.refetch(); };
 
   const loadMore = useCallback(() => {
     setVisibleCount(prev => prev + 5);
@@ -131,8 +134,11 @@ export function useShuttle(isActive = false) {
     subwayArrivals,
     needsSubway,
     loadErr,
+    refetchSchedule,
     isLoading: !allData && !loadErr,
     isSubwayLoading,
+    isSubwayError,
+    refetchSubway,
     isGpsLoading,
     isWeekend,
     visibleCount,

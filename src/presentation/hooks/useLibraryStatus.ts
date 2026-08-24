@@ -18,10 +18,11 @@ export interface UseLibraryStatusResult {
   library: LibraryStatus | null;
   loading: boolean;
   error: Error | null;
+  refetch: () => void;
 }
 
 export function useLibraryStatus(isVisible = true): UseLibraryStatusResult {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: LIBRARY_QUERY_KEY,
     queryFn: () => getLibraryStatusUseCase.execute(),
     staleTime: LIBRARY_STALE_TIME,
@@ -32,5 +33,6 @@ export function useLibraryStatus(isVisible = true): UseLibraryStatusResult {
     library: data ?? null,
     loading: isLoading,
     error,
+    refetch: () => { refetch(); },
   };
 }

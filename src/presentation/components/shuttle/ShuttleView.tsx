@@ -33,8 +33,11 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
             isWeekend={shuttle.isWeekend}
             needsSubway={shuttle.needsSubway}
             loadErr={shuttle.loadErr}
+            onRetry={shuttle.refetchSchedule}
             isLoading={shuttle.isLoading}
             isSubwayLoading={shuttle.isSubwayLoading}
+            isSubwayError={shuttle.isSubwayError}
+            onSubwayRetry={shuttle.refetchSubway}
             isGpsLoading={shuttle.isGpsLoading}
             visibleCount={shuttle.visibleCount}
             loadMore={shuttle.loadMore}

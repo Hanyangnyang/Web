@@ -18,9 +18,9 @@ interface PortalViewProps {
 }
 
 export function PortalView({ isVisible = true }: PortalViewProps) {
-  const { weather, loading: weatherLoading, error: weatherError } = useWeather(isVisible);
+  const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isVisible);
   const { briefing } = useWeatherBriefing(isVisible);
-  const { library, loading: libraryLoading, error: libraryError } = useLibraryStatus(isVisible);
+  const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isVisible);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
@@ -58,7 +58,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
       <div className="pb-24 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
-          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} briefing={briefing} error={weatherError} />
+          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
         </ErrorBoundary>
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
@@ -68,7 +68,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
 
         {/* 3. 열람실 혼잡도 섹션 */}
         <ErrorBoundary name="portal-library" fallback={<CardFallback message="혼잡도 정보를 표시할 수 없습니다" />}>
-          <LibraryStatusCard library={library} loading={libraryLoading} error={libraryError} />
+          <LibraryStatusCard library={library} loading={libraryLoading} error={libraryError} onRetry={refetchLibrary} />
         </ErrorBoundary>
       </div>
     </>

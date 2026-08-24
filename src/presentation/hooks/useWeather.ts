@@ -18,10 +18,11 @@ export interface UseWeatherResult {
   weather: Weather | null;
   loading: boolean;
   error: Error | null;
+  refetch: () => void;
 }
 
 export function useWeather(isVisible = true): UseWeatherResult {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: WEATHER_QUERY_KEY,
     queryFn: () => getWeatherUseCase.execute(),
     staleTime: WEATHER_STALE_TIME,
@@ -32,5 +33,6 @@ export function useWeather(isVisible = true): UseWeatherResult {
     weather: data ?? null,
     loading: isLoading,
     error,
+    refetch: () => { refetch(); },
   };
 }

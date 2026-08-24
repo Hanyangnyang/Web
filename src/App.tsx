@@ -108,7 +108,7 @@ function MainLayout() {
   }, [activeTab]);
 
   // 2. 데이터 프리패치 - 앱 시작 시 필요한 데이터를 백그라운드에서 미리 로드
-  const { menuDate, cafes, menuLoading, menuRevalidating, changeDate } = useMenu();
+  const { menuDate, cafes, menuLoading, menuRevalidating, changeDate, refetchMenu } = useMenu();
   useEffect(() => {
     prefetchWeather();
     prefetchWeatherBriefing();
@@ -244,6 +244,7 @@ function MainLayout() {
               cafes={cafes}
               loading={menuLoading}
               revalidating={menuRevalidating}
+              onRetry={refetchMenu}
               cafeDeepLink={cafeDeepLink}
               onCafeDeepLinkHandled={() => setCafeDeepLink(null)}
             />
