@@ -62,7 +62,7 @@ TypeScript는 strict 모드로 domain·data·infrastructure·lib 전체 및 pres
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-[Spring Boot 3.4.1](https://github.com/Hanyangnyang/Backend) 기반 Gradle 멀티모듈(core/user-api/admin-api) 서버가 JWT·QueryDSL로 학식·날씨·도서관 좌석·배너·지하철·셔틀 등 핵심 API를 담당(`api.hanyang.life`). Vercel Serverless Functions는 인스타그램 프로필 프록시·공공버스 도착정보·공휴일 조회만 남아 있음.
+[Spring Boot 3.4.1](https://github.com/Hanyangnyang/Backend) 기반 Gradle 멀티모듈(core/user-api/admin-api) 서버가 JWT·QueryDSL로 학식·날씨·도서관 좌석·배너·지하철·셔틀·헬스장 등 핵심 API를 담당(`api.hanyang.life`). Vercel Serverless Functions는 인스타그램 프로필 프록시·공공버스 도착정보·공휴일 조회만 남아 있음.
 
 **Data & Infra**
 
@@ -155,13 +155,14 @@ Supabase는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC �
 
 | 엔드포인트 | 역할 | staleTime |
 |---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 (기간별) | 1시간 |
+| `/api/v1/menu` | 학식 메뉴 조회 (기간별) | 12시간 |
 | `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 |
 | `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷 + 시간별 예보 | 10분 |
 | `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분 (매시 22분 갱신) |
-| `/api/v1/banners` | 홈 배너 조회 | 24시간 |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 |
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 |
 
 
 ### Vercel API 엔드포인트
@@ -185,7 +186,6 @@ Supabase는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC �
 
 | 대상 | staleTime | 비고 |
 |---|---|---|
-| 헬스장 시간표 | 24시간 | 정적 파일(`gymSchedule.json`) |
 | 공휴일 여부 | 24시간 | Vercel `/api/holidays` |
 | 인스타그램 프로필 | 24시간 | Vercel `/api/insta-proxy` |
 | 공공버스 도착정보 | 기본 15분 | 화면 활성 중엔 30초 간격으로 강제 폴링, 탭 비활성·유휴 시 중단 |
