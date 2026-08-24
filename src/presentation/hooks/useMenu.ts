@@ -6,7 +6,7 @@ import { getMenuForDateUseCase, getMenuForPeriodUseCase } from '../../di.js';
 import { getKSTDateUnsafe, toDateKey } from '../../utils/time.js';
 import type { Cafe } from '../../domain/entities/Cafe.js';
 
-const MENU_STALE_TIME = 60 * 60 * 1000;  // 1시간 — 학식은 하루 단위로만 갱신되므로 진입마다 재검증할 필요 없음
+const MENU_STALE_TIME = 12 * 60 * 60 * 1000;  // 12시간 — 백엔드 Menu 캐시 TTL과 동일 (매일 오전 1시 스크래핑 시 evict)
 const MENU_FOR_PERIOD_QUERY_KEY = ['menu-period'] as const;
 
 function getInitialDate(): Date {

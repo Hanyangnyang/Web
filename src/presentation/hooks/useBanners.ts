@@ -3,7 +3,7 @@ import { queryClient } from '../../lib/queryClient.js';
 import { getBannersUseCase } from '../../di.js';
 import type { Banner } from '../../domain/entities/Banner.js';
 
-const BANNERS_STALE_TIME = 86400000; // 24시간 (배너는 거의 바뀌지 않아 하루 주기)
+const BANNERS_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드 Banner 캐시 TTL과 동일 (관리자가 등록/수정/순서변경/삭제 시 즉시 evict)
 const BANNERS_QUERY_KEY = ['banners'];
 
 export function prefetchBanners() {
