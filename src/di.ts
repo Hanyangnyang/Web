@@ -59,7 +59,7 @@ const weatherBriefingApiDataSource = createWeatherBriefingApiDataSource({ httpCl
 const libraryApiDataSource = createLibraryApiDataSource({ httpClient: apiHttpClient });
 const bannerApiDataSource = createBannerApiDataSource({ httpClient: apiHttpClient });
 const busApiDataSource = createBusApiDataSource({ httpClient });
-const gymApiDataSource = createGymApiDataSource({ httpClient });
+const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const feedbackDataSource = createFeedbackDataSource();
 const holidayApiDataSource = createHolidayApiDataSource({ httpClient });
 
