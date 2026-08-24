@@ -36,6 +36,32 @@ function CourseName({ name }: { name: string }) {
   );
 }
 
+// 시간표를 아직 못 받아왔을 때 실제 표와 비슷한 크기로 자리를 채워두는 스켈레톤
+// (요일 헤더 + 첫 번째 열(시간 라벨)만 칸별로 표시하고, 나머지 5칸은 다 쪼개면 너무 빽빽해서 큰 박스 하나로 뭉침)
+function GymScheduleSkeleton() {
+  const ROWS = 12;
+  return (
+    <div className="bg-white rounded-card border border-slate-200 overflow-hidden animate-pulse">
+      <div className="flex items-center py-3 px-1 border-b border-slate-200">
+        <div style={{ width: '12%' }} />
+        {['월', '화', '수', '목', '금'].map((_, i) => (
+          <div key={i} className="flex justify-center" style={{ width: '17.6%' }}>
+            <div className="h-3 w-4 bg-slate-200 rounded-full" />
+          </div>
+        ))}
+      </div>
+      <div className="flex m-3" style={{ height: '456px' }}>
+        <div className="flex flex-col items-center justify-between py-1" style={{ width: '10%' }}>
+          {Array.from({ length: ROWS }).map((_, i) => (
+            <div key={i} className="h-3 w-4 bg-slate-100 rounded-full" />
+          ))}
+        </div>
+        <div className="flex-1 rounded bg-slate-100" />
+      </div>
+    </div>
+  );
+}
+
 interface GymViewProps {
   onBack: () => void;
 }
@@ -184,10 +210,10 @@ export function GymView({ onBack }: GymViewProps) {
       {!gymData || !currentPeriod ? (
         loadErr ? (
           // 2. 에러 — 조회 실패
-          <CardFallback message={loadErr} onRetry={refetch} />
+          <CardFallback message={loadErr} onRetry={refetch} className="min-h-[528px]" />
         ) : (
           // 1. 로딩 중 — 아직 응답 안 옴 (스켈레톤)
-          <div className="h-64 bg-white border border-slate-200 rounded-card [animation:pulse_1.5s_infinite]" />
+          <GymScheduleSkeleton />
         )
       ) : (
         // 3. 정상 — gymData/currentPeriod 둘 다 있음 (메인 렌더)

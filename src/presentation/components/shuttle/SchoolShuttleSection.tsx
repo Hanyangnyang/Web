@@ -171,18 +171,15 @@ export function SchoolShuttleSection({
           onToggleFullMode={handleToggleFullMode}
         />
 
-        {/* 지하철 연결편 조회 실패 안내 — 행마다 반복 표시하면 스팸이라 여기 한 번만 */}
-        {needsSubway && !hideSubwayCol && isSubwayError && (
-          <div className="flex items-center justify-between gap-2 px-4 py-2.5 mb-3 bg-error/[0.04] border border-error/10 rounded-card">
-            <span className="text-[12px] font-bold text-text-main leading-tight">지하철 연결 정보를 불러오지 못했습니다</span>
-            <button
-              onClick={onSubwayRetry}
-              className="flex-shrink-0 text-[11px] font-bold text-primary bg-[rgba(14,74,132,0.08)] px-2.5 py-1 rounded-full active:scale-95 transition-transform"
-            >
-              다시 시도
-            </button>
-          </div>
-        )}
+        {/* 지하철 연결편 조회 실패 안내 — 행마다 반복 표시하면 스팸이라 여기 한 번만. 다른 공지 배너와 동일한 UI + 재시도 버튼만 추가 */}
+        <NoticeBanner
+          shouldShow={needsSubway && !hideSubwayCol && isSubwayError}
+          message="지하철 연결 정보를 불러오지 못했습니다"
+          delayMs={0}
+          variant="error"
+          actionLabel="다시 시도"
+          onAction={onSubwayRetry}
+        />
 
         <div ref={containerRef} className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
           {loadErr ? (

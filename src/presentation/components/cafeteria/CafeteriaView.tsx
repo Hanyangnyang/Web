@@ -271,7 +271,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
               )
             ) : (
               // 2. 조회 실패 — KNOWN_CAFES 병합 덕에 성공이면 cafes가 항상 4개라, 여긴 진짜 실패일 때만 옴
-              <CardFallback message="정보를 불러올 수 없습니다" onRetry={onRetry} className="min-h-[80px]" />
+              <CardFallback message="학식 정보를 불러오지 못했습니다" onRetry={onRetry} className="min-h-[80px]" />
             )}
           </div>
         </div>

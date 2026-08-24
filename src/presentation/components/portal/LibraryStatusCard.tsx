@@ -1,7 +1,8 @@
-import { Info, WifiOff } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { LibraryStatus } from '../../../domain/repositories/ILibraryRepository.js';
 import type { LibraryRoomStatus } from '../../../domain/entities/LibraryRoom.js';
 import { formatKSTHourMinute } from '../../../utils/time.js';
+import { CardFallback } from '../common/CardFallback.js';
 
 const STATUS_STYLE: Record<LibraryRoomStatus, { color: string; emoji: string }> = {
   '쾌적': { color: '#2563eb', emoji: '🔵' },
@@ -33,23 +34,6 @@ function Section({ updatedAtLabel, children }: { updatedAtLabel?: string | null;
   );
 }
 
-function Notice({ icon, message, onRetry }: { icon: React.ReactNode; message: string; onRetry?: () => void }) {
-  return (
-    <div className="col-span-2 bg-white rounded-card border border-slate-200 py-8 flex flex-col items-center gap-2 shadow-sm opacity-80">
-      {icon}
-      <p className="text-center text-text-sub text-sm font-semibold">{message}</p>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="text-xs font-bold text-primary bg-[rgba(14,74,132,0.08)] px-3.5 py-1.5 rounded-full active:scale-95 transition-transform"
-        >
-          다시 시도
-        </button>
-      )}
-    </div>
-  );
-}
-
 export function LibraryStatusCard({ library, loading, error, onRetry }: LibraryStatusCardProps) {
   // 1. 로딩중 — 스켈레톤
   if (loading) {
@@ -76,12 +60,13 @@ export function LibraryStatusCard({ library, loading, error, onRetry }: LibraryS
 
   // 2. 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
   if (error && !library) {
-    return <Section><Notice icon={<WifiOff size={20} className="text-text-hint" />} message="혼잡도 정보를 불러오지 못했습니다" onRetry={onRetry} /></Section>;
+    return <Section><CardFallback message="혼잡도 정보를 불러오지 못했습니다" onRetry={onRetry} className="col-span-2" /></Section>;
   }
 
   // 3. 성공했지만 비어있음 — 방학 중 휴관 등. 빈 배열은 truthy라 length로 판단해야 한다.
+  // 실패가 아니라 정상적으로 비어있는 상태라 사과 문구(subtext)는 끄고, 아이콘도 실패용 WifiOff 대신 안내용 Info로 교체
   if (!library?.list.length) {
-    return <Section><Notice icon={<Info size={20} className="text-text-hint" />} message="지금은 운영 중인 열람실이 없습니다" /></Section>;
+    return <Section><CardFallback message="지금은 운영 중인 열람실이 없습니다" icon={<Info size={26} className="text-text-hint mb-1" />} subtext="" className="col-span-2" /></Section>;
   }
 
   // 4. 정상

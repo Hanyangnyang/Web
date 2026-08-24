@@ -66,7 +66,7 @@ export function useShuttle(isActive = false) {
     staleTime: BUS_STALE_TIME,
   });
   const allData = scheduleQuery.data ?? null;
-  const loadErr = scheduleQuery.isError ? '셔틀 시간표를 불러오지 못했습니다.' : null;
+  const loadErr = scheduleQuery.isError ? '셔틀 시간표를 불러오지 못했습니다' : null;
   const refetchSchedule = () => { scheduleQuery.refetch(); };
 
   // 10초마다 현재 시각 갱신 (시간 경과가 UI에 즉각 반영되도록 주기 단축)

@@ -13,7 +13,9 @@ interface CafeChipSelectorProps {
 
 export function CafeChipSelector({ cafes, selectedCafeId, loading, onSelect }: CafeChipSelectorProps) {
   const chipScrollRef = useRef<HTMLDivElement>(null);
-  const displayCafes = loading && cafes.length === 0 ? PLACEHOLDER_CAFES : cafes;
+  // cafes가 비어있는 경우는 로딩 중이거나(응답 전) 조회 자체가 실패했을 때뿐 — 성공하면
+  // MenuRepository의 KNOWN_CAFES 병합 덕에 항상 채워져 있으므로, 두 경우 다 같은 플레이스홀더로 채운다
+  const displayCafes = cafes.length === 0 ? PLACEHOLDER_CAFES : cafes;
 
   // 선택된 칩이 잘릴 경우 자동 스크롤
   useEffect(() => {
