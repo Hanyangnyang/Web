@@ -24,6 +24,7 @@
 |---|---|---|---|
 | 프론트엔드 | 김예은 | [@yaeunjess](https://github.com/yaeunjess) | manlcoff@hanyang.ac.kr |
 | 백엔드 | 김동준 | [@kdjidkr](https://github.com/kdjidkr) | kdjidkr@hanyang.ac.kr |
+
 문의사항이 있다면 **hanyangnyang01@gmail.com** 으로 연락주세요 :)
 
 ---
@@ -141,32 +142,32 @@ src/
 | `feedbacks` | 사용자 피드백 저장 (익명 user_id) |
 | `app_config` | 앱 레벨 설정 조회 (학기 정보, 휴일/주말 오버라이드, 운영일 플래그 등) |
 
-`devices`(FCM 토큰)·`subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
+`devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
 ### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 1️⃣서버 상태 캐싱 — TanStack Query
-(Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 3번, 그래서 총 4번 호출함.)
+(Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 3번, 그래서 총 4번 호출함. staleTime이 지나면 SWR - 백그라운드에서 호출)
 
-| 엔드포인트 | 역할 | 백엔드 Redis TTL, 프론트엔드 TanStackQuery staleTime | refetch 트리거 (네트워크 재연결시) |
+| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 - 네트워크 재연결시, staleTime 지나면 |
 |---|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 앱부팅시 최초 1회만 + 사용자가 "다시 시도" 버튼 클릭시 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch만 + 사용자가 "다시 시도" 버튼 클릭시 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 호출 or refetch + 사용자가 "다시 시도" 버튼 클릭시 |
-| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch + 사용자가 "다시 시도" 버튼 클릭시 |
-| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 앱부팅시 prefetch + 소식탭 클릭시 refetch (재시도 버튼 없음) |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 앱부팅시 prefetch만 (재시도 버튼 의도적으로 없음) |
-| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 앱부팅시 prefetch + 소식탭 클릭시 refetch + 사용자가 "다시 시도" 버튼 클릭시 |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시 호출 및 refetch + 사용자가 "다시 시도" 버튼 클릭시 |
-| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 학식탭 진입시(기본 탭이라 대부분 부팅과 겹침, 단 부팅 시점에 다른 탭이면 그 탭 진입 전까진 호출 안 됨) + "다시 시도" 버튼 클릭시 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 + "다시 시도" 버튼 클릭시 |
+| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
+| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 앱부팅시 prefetch |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 앱부팅시 prefetch |
+| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시 호출 + "다시 시도" 버튼 클릭시 |
+| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | 캠퍼스맵 탭 최초 진입시 호출 + "다시 시도" 버튼 클릭시 |
 
 
 ### Vercel API 엔드포인트 + 1️⃣서버 상태 캐싱 — TanStack Query
 
 | 엔드포인트 | 역할 | 외부 호출 대상 | Vercel 캐시 TTL | 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
 |---|---|---|---|---|---|
-| `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 | 24시간 | 마운트 시 자동 |
-| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | 셔틀 탭 "공공버스" 모드 + 화면 보임(`isPageVisible`) + 사용자 조작 중(`isUserActive`)일 때 30초 간격 자동 폴링(`refetchInterval`) + 새로고침 버튼 수동 refetch |
-| `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
+| `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 | 24시간 | 마운트시 자동 |
+| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | 셔틀탭 "공공버스" 모드 + 화면보임 + 사용자 조작중일 때 30초 간격 자동 폴링 + 새로고침 버튼 수동 refetch |
+| `/api/holidays` | 법정공휴일 여부 조회 - 셔틀·지하철 dayType 판정용 | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
 
 
 ### 2️⃣로컬 상태 캐싱 — localStorage 
@@ -180,7 +181,7 @@ src/
 | `partnerCollegeFilter` | 마지막 제휴 단과대 필터 | 제휴탭에서 단과대 칩을 눌러야 |
 | `shuttle_stop`, `shuttle_lineId` | 마지막 셔틀 정류장·노선 | 사용자가 직접 정류장/노선을 바꿔야 (GPS 자동 선택은 저장 안 함) |
 | `public_bus_selected_stops`, `public_bus_favorites` | 선택·즐겨찾기 버스 정류장 | 셔틀탭 "일반 버스" 모드 진입 시 |
-| `hyu_rq_cache_v1` | TanStack Query 캐시 영속화본 | 프로덕션 빌드에서만 |
+| `hyu_rq_cache_v1` | TanStack Query 캐시 영속화본 | 항상 |
 | `ph_phc_<프로젝트키>_posthog` | PostHog device/distinct ID | 앱 코드가 아니라 PostHog JS SDK가 초기화 시 자동 생성 |
 
 ### 3️⃣세션 저장소 — sessionStorage, 탭 닫으면 사라짐
