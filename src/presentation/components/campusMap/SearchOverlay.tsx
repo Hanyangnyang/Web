@@ -182,8 +182,10 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
                         <span className="text-[9px] font-bold px-1 py-px rounded bg-red-50 text-red-400 border border-red-100">폐업</span>
                       )}
                     </div>
-                    {store.location.address && (
-                      <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">{store.location.address}</p>
+                    {(store.summaryBenefit || store.location.address) && (
+                      <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
+                        {store.summaryBenefit ?? store.location.address}
+                      </p>
                     )}
                   </div>
                   {!closed && colleges.length > 0 && (

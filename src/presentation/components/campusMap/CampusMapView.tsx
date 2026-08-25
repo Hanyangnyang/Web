@@ -1,7 +1,9 @@
 // 제휴탭 지도 화면: 카카오맵 + 필터 칩(매장 카테고리·건물·흡연장) + 통합 검색 + 바텀시트
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
-import { LocateFixed, Search } from 'lucide-react';
+import { ArrowLeft, LocateFixed, Search } from 'lucide-react';
+import { ErrorBoundary } from '../common/ErrorBoundary.js';
+import { CardFallback } from '../common/CardFallback.js';
 import { usePostHog } from 'posthog-js/react';
 import { MapFilterChips } from './MapFilterChips';
 import { toStoreCategory, type MapChip } from '../../hooks/campusMap/useCampusMapFilters.js';
@@ -372,20 +374,33 @@ export default function CampusMapView({ isActive }: Props) {
           Provider: 어떤 시트가 뜨든 자기 높이를 여기로 보고하고, 플로팅 버튼이 그 위에 자리를 잡는다. */}
       <SheetHeightContext.Provider value={reportSheetHeight}>
       {!sheetVisible ? null : selectedStore || storeCategory ? (
-        <StoreSheet
-          stores={categoryStores}
-          loading={storesLoading}
-          error={storesError}
-          title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
-          college={college}
-          onCollegeChange={handleCollegeChange}
-          resetSignal={`${storeCategory ?? 'none'}:${college}`}
-          selected={selectedStore}
-          expanded={sheetExpanded}
-          onToggleExpand={setSheetExpanded}
-          onSelect={(store) => pickStore(store, 'list')}
-          onClose={closeDetail}
-        />
+        // 매장 데이터는 API에서 오는 값이라 여기서 예상 못 한 형태로 렌더가 터져도
+        // 캠퍼스맵 전체(더 나아가 앱 전체)가 하얗게 죽지 않도록 이 시트만 경계로 감싼다.
+        // 백엔드 back 버튼은 CampusMapView의 useBackHandler(칩·선택 상태 기반)가 처리하므로
+        // 시트 자체가 죽어도 뒤로가기로는 빠져나갈 수 있다.
+        <ErrorBoundary
+          name="campus-map-store-sheet"
+          fallback={
+            <div className="absolute bottom-0 inset-x-0 z-20 p-3">
+              <CardFallback message="매장 정보를 표시할 수 없어요" onRetry={() => setChip('all')} />
+            </div>
+          }
+        >
+          <StoreSheet
+            stores={categoryStores}
+            loading={storesLoading}
+            error={storesError}
+            title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
+            college={college}
+            onCollegeChange={handleCollegeChange}
+            resetSignal={`${storeCategory ?? 'none'}:${college}`}
+            selected={selectedStore}
+            expanded={sheetExpanded}
+            onToggleExpand={setSheetExpanded}
+            onSelect={(store) => pickStore(store, 'list')}
+            onClose={closeDetail}
+          />
+        </ErrorBoundary>
       ) : isBuildingLayerChip ? (
         <CampusBuildingSheet
           buildings={layerBuildings}
@@ -414,13 +429,34 @@ export default function CampusMapView({ isActive }: Props) {
       ) : null}
       </SheetHeightContext.Provider>
 
-      {/* 검색 오버레이 */}
+      {/* 검색 오버레이 — 결과 렌더가 터져도 닫기 버튼은 살아있는 자체 폴백을 준다
+          (전역 뒤로가기는 useBackHandler가 처리하지만, iOS/웹은 하드웨어 뒤로가기가 없어 별도 탈출구가 필요하다) */}
       {searchOpen && (
-        <SearchOverlay
-          onClose={() => setSearchOpen(false)}
-          onSelect={(store) => pickStore(store, 'search')}
-          onSelectBuilding={selectBuildingFromSearch}
-        />
+        <ErrorBoundary
+          name="campus-map-search-overlay"
+          fallback={
+            <div className="absolute inset-0 z-30 bg-white flex flex-col">
+              <div className="flex items-center gap-2 px-3 py-3 border-b border-[#f1f5f9]">
+                <button
+                  onClick={() => setSearchOpen(false)}
+                  className="p-1.5 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
+                  aria-label="검색 닫기"
+                >
+                  <ArrowLeft size={20} className="text-text-main" />
+                </button>
+              </div>
+              <div className="flex-1 flex items-center justify-center p-6">
+                <CardFallback message="검색 결과를 표시할 수 없어요" />
+              </div>
+            </div>
+          }
+        >
+          <SearchOverlay
+            onClose={() => setSearchOpen(false)}
+            onSelect={(store) => pickStore(store, 'search')}
+            onSelectBuilding={selectBuildingFromSearch}
+          />
+        </ErrorBoundary>
       )}
     </div>
   );

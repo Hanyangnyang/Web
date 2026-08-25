@@ -115,8 +115,8 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
                 : '현재 진행 중인 제휴 혜택이 없어요'}
             </p>
           )}
-          {partnerships.map((p, idx) => (
-            <div key={`${p.collegeId}-${idx}`} className="flex items-center gap-3 bg-surface rounded-xl p-4">
+          {partnerships.map((p) => (
+            <div key={p.partnershipId} className="flex items-center gap-3 bg-surface rounded-xl p-4">
               <div className={`flex-shrink-0 w-[70px] flex flex-col items-center justify-center rounded-lg px-1.5 py-4 text-center gap-1 ${COLLEGE_STYLE[p.collegeId] ?? 'bg-slate-100'}`}>
                 <span className="text-[20px] leading-none">{collegeById(p.collegeId)?.emoji}</span>
                 <span className="text-[11px] font-extrabold leading-tight break-words whitespace-pre-line">

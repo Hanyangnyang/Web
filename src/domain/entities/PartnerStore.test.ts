@@ -6,6 +6,7 @@ import {
 
 function partnership(overrides: Partial<Partnership> = {}): Partnership {
   return {
+    partnershipId: 1,
     collegeId: '3',
     collegeName: '공학대학',
     benefit: '10% 할인',

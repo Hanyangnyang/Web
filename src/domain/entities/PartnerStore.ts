@@ -12,12 +12,14 @@ export interface PartnershipPeriod {
 }
 
 export interface Partnership {
+  partnershipId: number;
   collegeId: string;
   collegeName: string;
   benefit?: string | null;
   period?: PartnershipPeriod | null;
   conditions?: string | null;
   sourceUrl?: string | null;
+  photoOrder?: number | null;
 }
 
 export interface StoreLocation {
@@ -70,11 +72,15 @@ export function visibleStores(
 }
 
 // 활성화된 제휴만 반환 — 같은 대학이 여러 개 있으면 첫 번째만 남긴다
+// collegeId가 없는(마스터 목록에 없는 department) 제휴는 전부 ''로 뭉개지므로,
+// 그럴 땐 collegeName으로 구분해 서로 다른 제휴끼리 잘못 합쳐지지 않게 한다
 export function activePartnerships(store: PartnerStore): Partnership[] {
   const seen = new Set<string>();
   return store.partnerships.filter((p) => {
-    if (!p.period?.isActive || seen.has(p.collegeId)) return false;
-    seen.add(p.collegeId);
+    if (!p.period?.isActive) return false;
+    const key = p.collegeId || p.collegeName;
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 }

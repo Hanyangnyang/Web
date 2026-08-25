@@ -71,7 +71,7 @@ const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const feedbackDataSource = createFeedbackDataSource();
 const holidayApiDataSource = createHolidayApiDataSource({ httpClient });
-const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient });
+const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: apiHttpClient });
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
 const smokingSpotApiDataSource = createSmokingSpotApiDataSource({ httpClient });
 
