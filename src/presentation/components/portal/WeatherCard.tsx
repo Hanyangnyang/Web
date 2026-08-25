@@ -19,7 +19,7 @@ import { useNow } from '../../hooks/useNow.js';
 
 const COLD_SNAP_TEMP = -10;     // 한파 판단 기준 기온(℃)
 const HOUR = 60 * 60 * 1000;
-const FORECAST_HOURS = 12;      // 지금 시각이 속한 칸부터 앞으로 몇 시간을 보여줄지
+const FORECAST_HOURS = 24;      // 지금 시각이 속한 칸부터 앞으로 몇 시간을 보여줄지 (백엔드가 그만큼 안 주면 필터에서 자연히 있는 만큼만 남음)
 
 interface WeatherCardProps {
   weather: Weather | null;
@@ -86,7 +86,7 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
   const renderedHourlyForecast = useMemo((): RenderedForecastItem[] => {
     if (!hourly || currentTemp === undefined) return [];
 
-    // 지금이 속한 정각 칸(=최근 1시간 안)부터 앞으로 12시간.
+    // 지금이 속한 정각 칸(=최근 1시간 안)부터 앞으로 24시간(백엔드 제공 범위 안에서).
     // 시각 계산은 서버가 준 시(hour)가 아니라 epoch으로만 한다 — 예전에 서버 hour가 UTC로
     // 오염돼 시간대가 밀린 적이 있어서, 절대시각에서 매번 다시 뽑는다.
     const from = nowEpoch - HOUR;
@@ -190,7 +190,7 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
                 </div>
               )}
 
-              {/* 시간별 예보 스트립 (지금부터 앞으로 12시간) */}
+              {/* 시간별 예보 스트립 (지금부터 앞으로 24시간, 백엔드 제공 범위 안에서) */}
               {renderedHourlyForecast.length > 0 && (
                 <div className="w-full overflow-x-auto no-scrollbar">
                   <div className="flex w-full" style={{ minWidth: 'max-content', padding: '1px 0' }}>
