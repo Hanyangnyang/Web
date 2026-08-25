@@ -23,7 +23,7 @@ export function useGymSchedule(): UseGymScheduleResult {
   return {
     gymData: data ?? null,
     loading: isLoading,
-    loadErr: isError ? '헬스장 시간표를 불러오지 못했습니다.' : null,
+    loadErr: isError ? '헬스장 시간표를 불러오지 못했습니다' : null,
     refetch: () => { refetch(); },
   };
 }

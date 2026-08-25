@@ -148,9 +148,9 @@ src/
 ### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 1️⃣서버 상태 캐싱 — TanStack Query
 (Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 3번, 그래서 총 4번 호출함. staleTime이 지나면 SWR - 백그라운드에서 호출)
 
-| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 - 네트워크 재연결시, staleTime 지나면 |
+| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 - 네트워크 재연결시 |
 |---|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 학식탭 진입시(기본 탭이라 대부분 부팅과 겹침, 단 부팅 시점에 다른 탭이면 그 탭 진입 전까진 호출 안 됨) + "다시 시도" 버튼 클릭시 |
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 학식탭 진입시 + "다시 시도" 버튼 클릭시 |
 | `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
 | `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 + "다시 시도" 버튼 클릭시 |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |

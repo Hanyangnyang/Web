@@ -108,37 +108,40 @@ describe('useWeather (React Query)', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('실패하면 react-query 기본 재시도 정책(최대 3회)만큼 재시도한다', async () => {
-    // 주의: queryClient.prefetchQuery()는 react-query 설계상 retry를 명시 안 하면 강제로 retry:false가 되어
-    // (fetchQuery 내부에서 그렇게 덮어씀) 재시도가 없다. 재시도는 useQuery로 "관찰 중인" 쿼리에서만 동작하므로,
-    // 실제 화면에서 쓰이는 useWeather 훅(마운트된 컴포넌트)을 기준으로 검증한다.
+  it('실패하면 queryClient에 설정된 재시도 정책(retry: 2)만큼 재시도한다', async () => {
+    // queryClient.ts의 defaultOptions.queries.retry: 2 (기본값 3에서 축소된 값, 0da832e)
     vi.useFakeTimers();
     const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(false, null)));
 
     renderHook(() => useWeather(true), { wrapper });
 
-    // react-query 기본 retryDelay: attempt => min(1000 * 2^attempt, 30000) → 1s, 2s, 4s
+    // react-query 기본 retryDelay: attempt => min(1000 * 2^attempt, 30000) → 1s, 2s (재시도 2회분)
     await vi.advanceTimersByTimeAsync(1000);
     await vi.advanceTimersByTimeAsync(2000);
-    await vi.advanceTimersByTimeAsync(4000);
 
-    // 최초 1회 + 재시도 3회 = 총 4번 fetch가 나갔어야 함
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    // 최초 1회 + 재시도 2회 = 총 3번 fetch가 나갔어야 함
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
-  it('prefetchWeather()(앱 시작 시 백그라운드 프리페치)는 실패해도 재시도하지 않는다', async () => {
-    // react-query의 의도된 설계: fetchQuery/prefetchQuery류의 "일회성 호출"은 retry를 명시하지 않으면
-    // 자동으로 retry:false가 된다 (호출자를 재시도 지연으로 오래 붙잡지 않기 위함).
-    // 실제 재시도는 useWeather 훅이 마운트되는 시점(사용자가 탭에 들어왔을 때)에 일어난다.
+  it('prefetchWeather()(앱 시작 시 백그라운드 프리페치)도 queryClient의 전역 retry 설정을 따른다', async () => {
+    // prefetchQuery는 useQuery와 같은 QueryClient의 defaultOptions.queries.retry를 그대로 상속한다
+    // (fetchQuery/prefetchQuery가 retry를 강제로 false로 덮어쓰지 않음 — 별도로 retry:false를 넘길 때만 안 함)
+    vi.useFakeTimers();
     const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(false, null)));
 
-    await prefetchWeather();
+    const prefetchPromise = prefetchWeather();
+    await vi.advanceTimersByTimeAsync(1000);
+    await vi.advanceTimersByTimeAsync(2000);
+    await prefetchPromise;
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // 최초 1회 + 재시도 2회 = 총 3번
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it('prefetchWeather()를 동시에 두 번 호출해도 실제 fetch는 한 번만 나간다 (react-query 요청 dedup)', async () => {
-    const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, makeWeatherMock())));
+    // makeWeatherApiResponse()가 실제 fetch 응답(DTO, {success, data}) 모양 — makeWeatherMock()은
+    // 엔티티 모양이라 여기 쓰면 res.success가 undefined가 되어 apiError가 던져지고 재시도가 돎(과거 버그)
+    const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, makeWeatherApiResponse())));
 
     await Promise.all([prefetchWeather(), prefetchWeather()]);
 

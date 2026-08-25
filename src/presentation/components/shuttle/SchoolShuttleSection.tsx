@@ -81,8 +81,8 @@ export function SchoolShuttleSection({
   const upcomingSchedule = findUpcomingSchedule(appConfig?.period_schedule, today);
   const upcomingScheduleMessage = upcomingSchedule ? formatUpcomingScheduleMessage(upcomingSchedule, today) : null;
 
-  const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
-  const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
+  // needsSubway(지하철 연동 필요 정류장)의 여집합 — SUBWAY_CONNECTED_STOPS(Shuttle.ts)에서 파생
+  const hideSubwayCol = !needsSubway;
 
   // 스크롤 동기화 만료 처리 효과
   useEffect(() => {

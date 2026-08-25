@@ -2,6 +2,7 @@ import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { initSentry } from './sentry.js';
+import type { ApiValidationError, HttpError } from '../infrastructure/http/HttpClient.js';
 
 // 앱 전역에서 하나만 쓰는 QueryClient.
 // usePortalData/useBanners의 훅(useQuery)과 App.jsx의 prefetch 호출(queryClient.prefetchQuery)이
@@ -14,9 +15,16 @@ export const queryClient = new QueryClient({
     onError: (error, query) => {
       if (!import.meta.env.PROD) return; // 개발 중엔 어차피 Sentry가 비활성이라 SDK만 헛로드된다
       if (navigator.onLine === false) return; // 기기가 오프라인일 때의 실패는 서버 문제가 아니다. 쌓이면 진짜 오류가 묻힌다.
+      // Repository가 apiError()로 던졌거나(검증 실패) HttpClient가 자체적으로 채운(HTTP 실패) 경우에만 존재 —
+      // 아직 모든 Repository가 apiError로 옮겨간 게 아니라서 둘 다 없을 수 있다(그럴 땐 태그 없이 queryKey만 감)
+      const err = error as (ApiValidationError & HttpError);
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
-          tags: { queryKey: JSON.stringify(query.queryKey) }, // 어느 API가 실패했는지
+          tags: {
+            queryKey: JSON.stringify(query.queryKey), // 어느 API가 실패했는지 (프론트 쿼리 키 기준)
+            ...(err.area && { area: err.area }),           // 어느 기능인지, 한글 이름표 (예: '배너')
+            ...(err.endpoint && { endpoint: err.endpoint }), // 실제로 요청이 나간 백엔드 URL
+          },
         });
       });
     },
