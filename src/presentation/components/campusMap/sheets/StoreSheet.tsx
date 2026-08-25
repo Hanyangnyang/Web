@@ -6,6 +6,7 @@ import { X, Info, Clock, ExternalLink, ChevronRight } from 'lucide-react';
 import { activePartnerships, CATEGORY_META, type PartnerStore } from '../../../../domain/entities/PartnerStore.js';
 import { COLLEGES, collegeById, collegeLabel } from '../../../../domain/entities/College.js';
 import { COLLEGE_STYLE } from '../../ui/collegeStyle.js';
+import { CardFallback } from '../../common/CardFallback.js';
 import { CollegeWheelPicker } from '../../ui/CollegeWheelPicker';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { SheetHandle } from './SheetHandle';
@@ -26,6 +27,7 @@ interface Props {
   // 실패해도 지도와 다른 레이어는 계속 쓸 수 있어야 하므로.
   loading: boolean;
   error: string | null;
+  onRetry: () => void;             // 실패 시 "다시 시도" — 다른 탭(헬스장·학식·셔틀)과 동일한 CardFallback 패턴
   title: string;                   // 리스트 타이틀 (예: '제휴 식당' | '이 위치 제휴 매장')
   college: string;                 // 단과대 필터 ('all' | collegeId)
   onCollegeChange: (id: string) => void;
@@ -37,7 +39,7 @@ interface Props {
   onClose: () => void;             // 상세 닫기 (선택 해제)
 }
 
-export function StoreSheet({ stores, loading, error, title, college, onCollegeChange, resetSignal, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
+export function StoreSheet({ stores, loading, error, onRetry, title, college, onCollegeChange, resetSignal, selected, expanded, onToggleExpand, onSelect, onClose }: Props) {
   // 목록 스크롤 위치 보존: 상세 진입 시 리마운트(key)로 컨테이너가 사라지므로
   // 스크롤 값을 ref에 기록해뒀다가, 목록이 다시 마운트될 때 복원한다 (X 복귀 시 이어보기)
   const listScrollTop = useRef(0);
@@ -192,7 +194,9 @@ export function StoreSheet({ stores, loading, error, title, college, onCollegeCh
       >
         {/* 실패·로딩·빈 목록은 서로 다른 상황이라 문구를 구분한다 (NearbyListSheet와 같은 규칙) */}
         {error ? (
-          <p className="text-center text-[12px] text-red-500 font-medium pt-6">{error}</p>
+          <div className="px-4 pt-6">
+            <CardFallback message={error} onRetry={onRetry} className="!border-0" />
+          </div>
         ) : loading ? (
           <p className="text-center text-[12px] text-text-hint font-medium pt-6 animate-pulse">불러오는 중…</p>
         ) : stores.length === 0 ? (

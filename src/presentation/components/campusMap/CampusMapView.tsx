@@ -62,7 +62,7 @@ export default function CampusMapView({ isActive }: Props) {
     libraries: KAKAO_MAP_LIBRARIES,
   });
   const posthog = usePostHog();
-  const { stores, loading: storesLoading, loadErr: storesError } = usePartnerStores();
+  const { stores, loading: storesLoading, loadErr: storesError, refetch: refetchStores } = usePartnerStores();
 
   const { map, setMap, level, onZoomChanged, focusMap, panTo } = useCampusMapFocus();
   const { center: mapCenter, onIdle } = useMapCenter(map);
@@ -390,6 +390,7 @@ export default function CampusMapView({ isActive }: Props) {
             stores={categoryStores}
             loading={storesLoading}
             error={storesError}
+            onRetry={refetchStores}
             title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
             college={college}
             onCollegeChange={handleCollegeChange}

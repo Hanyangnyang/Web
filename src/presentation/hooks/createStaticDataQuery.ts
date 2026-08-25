@@ -1,7 +1,9 @@
 // 정적 JSON을 읽어오는 RQ 훅을 찍어내는 팩토리.
 //
-// 매장·교내시설·흡연장 세 훅이 queryKey / staleTime 24h / enabled / loadErr 구조가 완전히 같아서,
+// 교내시설·흡연장 훅이 queryKey / staleTime 24h / enabled / loadErr 구조가 완전히 같아서,
 // 새 레이어를 추가할 때마다 30줄을 복붙하고 있었다. 다른 건 '무엇을 부르고 뭐라고 부를지'뿐이다.
+// (제휴매장은 손으로 관리하던 partnerships.json이던 시절엔 여기 같이 있었지만, 백엔드 API로
+// 이전하면서 Redis TTL(12h)에 맞춰야 해서 usePartnerStores.ts가 전용 staleTime으로 분리해나갔다)
 import { useQuery } from '@tanstack/react-query';
 
 // 큐레이션·정적 데이터라 자주 안 바뀐다 — 탭을 오가도 재요청하지 않게 넉넉히 잡는다
