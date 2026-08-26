@@ -95,3 +95,12 @@ export const UV_COLOR: Record<UvGrade, string> = {
 // 측정소 점검 등으로 등급이 없을 때
 export const UNKNOWN_GRADE_LABEL = '점검중';
 export const UNKNOWN_GRADE_COLOR = '#94a3b8';
+
+// PmGrade/UvGrade처럼 "값이 있으면 그 등급, null이면 점검중"인 필드 공용 매칭 함수
+export function gradeLabel<T extends string>(grade: T | null): string {
+  return grade ?? UNKNOWN_GRADE_LABEL;
+}
+
+export function gradeColor<T extends string>(grade: T | null, colorMap: Record<T, string>): string {
+  return grade ? colorMap[grade] : UNKNOWN_GRADE_COLOR;
+}

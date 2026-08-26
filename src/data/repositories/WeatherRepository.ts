@@ -42,9 +42,7 @@ const toCurrent = (dto: CurrentWeatherDto): CurrentWeather => ({
   minTemp: toNumberOrNull(dto.minTemperature),
   pm10Grade: toPmGrade(dto.pm10Grade),
   pm25Grade: toPmGrade(dto.pm25Grade),
-  // ⚠️ null 방어 없음 — uvIndex가 숫자가 아니면 모든 조건 비교가 실패해 조용히 '낮음'으로 떨어짐
-  // (백엔드 스펙 확정 전까지 임시 상태, docs/backend-migration-todo.md 참고)
-  uvGrade: toUvGrade(dto.uvIndex),
+  uvGrade: toUvGrade(dto.uvIndex), 
 });
 
 export const createWeatherRepository = (

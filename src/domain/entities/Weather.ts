@@ -19,6 +19,7 @@ export const toWeatherCondition = (raw: string | null): WeatherCondition | null 
     ? (raw as WeatherCondition)
     : null;
 
+// pm, 미세먼지 등급 매치
 const PM_GRADE_BY_CODE: Record<number, PmGrade> = {
   1: '좋음',
   2: '보통',
@@ -28,7 +29,9 @@ const PM_GRADE_BY_CODE: Record<number, PmGrade> = {
 export const toPmGrade = (code: number | null): PmGrade | null =>
   code === null ? null : PM_GRADE_BY_CODE[code] ?? null;
 
-export const toUvGrade = (uvIndex: number): UvGrade => {
+// uv, 자외선 등급 매치
+export const toUvGrade = (uvIndex: number | null): UvGrade | null => {
+  if (uvIndex === null) return null;
   if (uvIndex >= 9) return '위험';
   if (uvIndex >= 7) return '매우높음';
   if (uvIndex >= 5) return '높음';
@@ -50,9 +53,9 @@ export interface HourlyForecast extends WeatherSnapshot {
 export interface CurrentWeather extends WeatherSnapshot {
   maxTemp: number | null;
   minTemp: number | null;
-  pm10Grade: PmGrade | null;           
+  pm10Grade: PmGrade | null;
   pm25Grade: PmGrade | null;
-  uvGrade: UvGrade;
+  uvGrade: UvGrade | null;
 }
 
 export interface Weather {
