@@ -20,12 +20,12 @@ export interface UseWeatherBriefingResult {
   error: Error | null;
 }
 
-export function useWeatherBriefing(isVisible = true): UseWeatherBriefingResult {
+export function useWeatherBriefing(isActive = true): UseWeatherBriefingResult {
   const { data, isLoading, error } = useQuery({
     queryKey: BRIEFING_QUERY_KEY,
     queryFn: () => getWeatherBriefingUseCase.execute(),
     staleTime: BRIEFING_STALE_TIME,
-    enabled: isVisible,
+    enabled: isActive,
   });
 
   return {

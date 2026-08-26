@@ -1,4 +1,4 @@
-// 훅(ViewModel): 일반버스 정류소 선택·즐겨찾기·도착정보 폴링 상태 관리
+// 훅(ViewModel): 일반버스 즐겨찾기·도착정보 폴링 상태 관리
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { usePostHog } from 'posthog-js/react';
@@ -23,13 +23,6 @@ export function usePublicBus(isActive = false) {
   const [viewMode, setViewMode] = useState<'shuttle' | 'bus'>('shuttle');
 
   const { coords: userCoords } = useLocation(isActive && viewMode === 'bus'); // 사용자의 현재 위치 (위치 권한 허용 시)
-
-  const [selectedStops, setSelectedStops] = useState<string[]>(() => { // 사용자가 필터링한 정류소들
-    try {
-      const saved = localStorage.getItem('public_bus_selected_stops');
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
 
   const [favorites, setFavorites] = useState<string[]>(() => { // 즐겨찾기
     try {
@@ -86,11 +79,7 @@ export function usePublicBus(isActive = false) {
     };
   }, [viewMode, isActive]);
 
-  // selectedStops, favorites localStorage에 저장
-  useEffect(() => {
-    localStorage.setItem('public_bus_selected_stops', JSON.stringify(selectedStops));
-  }, [selectedStops]);
-
+  // favorites localStorage에 저장
   useEffect(() => {
     localStorage.setItem('public_bus_favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -103,39 +92,30 @@ export function usePublicBus(isActive = false) {
 
   const hasInitializedCoordsRef = useRef(false);
   const prevViewModeRef = useRef(viewMode);
-  const prevSelectedStopsRef = useRef(selectedStops);
 
-  // expandedStops 초기화: 전체 조회 모드면 가장 가까운 2개, 필터 모드면 선택한 정류소 전부
+  // expandedStops 초기화: 가장 가까운 2개 정류소를 자동으로 펼침
   useEffect(() => {
     if (viewMode === 'bus') {
       const viewModeChanged = prevViewModeRef.current !== viewMode;
-      const selectedStopsChanged = JSON.stringify(prevSelectedStopsRef.current) !== JSON.stringify(selectedStops);
       const coordsJustLoaded = !hasInitializedCoordsRef.current && userCoords;
 
       prevViewModeRef.current = viewMode;
-      prevSelectedStopsRef.current = selectedStops;
 
-      if (viewModeChanged || selectedStopsChanged || coordsJustLoaded) {
+      if (viewModeChanged || coordsJustLoaded) {
         if (coordsJustLoaded) {
           hasInitializedCoordsRef.current = true;
         }
 
-        if (selectedStops.length === 0) {
-          const top2 = sortedStops.slice(0, 2);
-          const next: Record<string, boolean> = {};
-          top2.forEach(s => { next[s] = true; });
-          setExpandedStops(next);
-        } else {
-          const next: Record<string, boolean> = {};
-          selectedStops.forEach(s => { next[s] = true; });
-          setExpandedStops(next);
-        }
+        const top2 = sortedStops.slice(0, 2);
+        const next: Record<string, boolean> = {};
+        top2.forEach(s => { next[s] = true; });
+        setExpandedStops(next);
       }
     } else {
       hasInitializedCoordsRef.current = false;
       prevViewModeRef.current = viewMode;
     }
-  }, [viewMode, selectedStops, userCoords, sortedStops]);
+  }, [viewMode, userCoords, sortedStops]);
 
   // 정류소별 도착정보 조회 + 30초 폴링
   const expandedStopNames = Object.keys(expandedStops).filter(k => expandedStops[k]);
@@ -226,7 +206,6 @@ export function usePublicBus(isActive = false) {
   return {
     viewMode, setViewMode,
     userCoords,
-    selectedStops, setSelectedStops,
     favorites, setFavorites,
     expandedStops, setExpandedStops,
     busArrivals,

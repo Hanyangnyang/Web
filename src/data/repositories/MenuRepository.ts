@@ -28,11 +28,13 @@ function toCafes(cafeterias: CafeteriaDto[]) {
       hours: c.operatingHours,
       available: c.menu.length > 0,
       hasJeyuk: c.menu.some(m => (m.rawMenu ?? '').includes('제육')),
-      menus: c.menu.map(m => ({
-        type: MEAL_TYPE_LABEL[m.mealType] ?? m.mealType,
-        menuItems: m.menuItems ?? [],
-        price: typeof m.price === 'number' ? `${m.price.toLocaleString('ko-KR')}원` : '',
-      })),
+      menus: [...c.menu]
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .map(m => ({
+          type: MEAL_TYPE_LABEL[m.mealType] ?? m.mealType,
+          menuItems: m.menuItems ?? [],
+          price: typeof m.price === 'number' ? `${m.price.toLocaleString('ko-KR')}원` : '',
+        })),
     });
   });
 }

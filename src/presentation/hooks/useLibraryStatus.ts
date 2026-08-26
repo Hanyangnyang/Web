@@ -21,12 +21,12 @@ export interface UseLibraryStatusResult {
   refetch: () => void;
 }
 
-export function useLibraryStatus(isVisible = true): UseLibraryStatusResult {
+export function useLibraryStatus(isActive = true): UseLibraryStatusResult {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: LIBRARY_QUERY_KEY,
     queryFn: () => getLibraryStatusUseCase.execute(),
     staleTime: LIBRARY_STALE_TIME,
-    enabled: isVisible,
+    enabled: isActive,
   });
 
   return {

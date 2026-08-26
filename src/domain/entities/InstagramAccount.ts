@@ -26,19 +26,3 @@ export const INSTA_ACCOUNTS: { erica: InstagramAccountInfo[]; college: Instagram
     { username: 'hyu_erica_atc',                desc: '첨단융합대학', profilePicUrl: '/assets/insta-profiles/hyu_erica_atc.jpg' },
   ],
 };
-
-export interface InstagramProfile {
-  username: string;
-  fullName: string;
-  profilePicUrl: string | null;
-  desc: string;
-}
-
-export const createInstagramProfile = (
-  { username, fullName, profilePicUrl, desc = '' }: { username: string; fullName: string; profilePicUrl: string | null; desc?: string }
-): InstagramProfile => ({
-  username,
-  fullName,
-  profilePicUrl,
-  desc,
-});

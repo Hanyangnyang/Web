@@ -58,7 +58,6 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
             isUserActive={bus.isUserActive}
             sortedStops={bus.sortedStops}
             activeStops={bus.activeStops}
-            selectedStops={bus.selectedStops}
             expandedStops={bus.expandedStops}
             setExpandedStops={bus.setExpandedStops}
             favorites={bus.favorites}

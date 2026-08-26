@@ -253,7 +253,7 @@ function MainLayout() {
             <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
           <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
-            <PortalView isVisible={activeTab === 'portal'} />
+            <PortalView isActive={activeTab === 'portal'} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView resetSignal={miscResetSignal} isActive={activeTab === 'misc'} />
