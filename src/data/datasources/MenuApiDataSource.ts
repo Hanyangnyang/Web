@@ -1,35 +1,16 @@
 // 데이터 소스: 학식 정보 API 원시 호출
 import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface MenuDto {
-  id: number;
-  mealType: 'BREAKFAST' | 'LUNCH' | 'DINNER';
-  displayOrder: number;
-  price: number;
-  menuItems: string[];
-  rawMenu: string;
-}
-
-export interface CafeteriaDto {
-  cafeteriaCode: 'RE11' | 'RE12' | 'RE13' | 'RE15';
-  name: string;
-  operatingHours: Record<string, string>;
-  menu: MenuDto[];
-}
-
-export interface MenuResponseDto {
-  [date: string]: CafeteriaDto[];
-}
-
 // 요청 파라미터
 export interface GetMenuForDateParams {
   startDate: string;
   endDate: string;
 }
 
+// 응답 shape은 검증 전이라 unknown — 실제 파싱/타입 부여는 MenuSchema.ts의 zod 스키마가 Repository에서 담당
 export interface MenuApiDataSource {
-  getMenuForDate: (params: GetMenuForDateParams) => Promise<ApiResponse<MenuResponseDto>>;
-  getMenuForPeriod: () => Promise<ApiResponse<MenuResponseDto>>;
+  getMenuForDate: (params: GetMenuForDateParams) => Promise<ApiResponse<unknown>>;
+  getMenuForPeriod: () => Promise<ApiResponse<unknown>>;
 }
 
 export const createMenuApiDataSource = ({ httpClient }: { httpClient: HttpClient }): MenuApiDataSource => ({
