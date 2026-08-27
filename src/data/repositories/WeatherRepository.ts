@@ -8,41 +8,38 @@ import {
   type CurrentWeather,
 } from '../../domain/entities/Weather.js';
 import { toEpoch } from '../../utils/time.js';
-import type {
-  WeatherApiDataSource,
-  HourlyForecastDto,
-  CurrentWeatherDto,
-} from '../datasources/WeatherApiDataSource.js';
+import type { WeatherApiDataSource } from '../datasources/WeatherApiDataSource.js';
 import type { WeatherRepository } from '../../domain/repositories/IWeatherRepository.js';
+import {
+  WeatherResponseDataSchema,
+  HourlyForecastDtoSchema,
+  type HourlyForecastDto,
+  type CurrentWeatherDto,
+} from '../schemas/WeatherSchema.js';
 
 const AREA = '날씨'; // Sentry 태그용 — 이 레포지토리가 던지는 모든 검증 에러에 공통으로 붙는 한글 이름표
 
-// 숫자가 아니면 null로 
-const toNumberOrNull = (value: unknown): number | null => typeof value === 'number' ? value : null;
-
-// 시간별 예보 DTO → 엔티티 변환. 여기선 개별 필드를 안 막고 그대로 옮기고,
-// 실제 방어(이상한 항목 제외)는 아래 isDrawable이 매핑 이후에 담당한다
+// 시간별 예보 DTO → 엔티티 변환. dto는 HourlyForecastDtoSchema가 이미 원시 타입을 보장한 값
 const toHourly = (dto: HourlyForecastDto): HourlyForecast => ({
-  epoch: toEpoch(dto.forecastAt),      
-  temp: dto.temperature,              
-  condition: toWeatherCondition(dto.weatherCondition), 
-  precipProb: dto.precipProbability,   
+  epoch: toEpoch(dto.forecastAt),
+  temp: dto.temperature,
+  condition: toWeatherCondition(dto.weatherCondition),
+  precipProb: dto.precipProbability,
 });
 
-// toHourly가 만든 항목 중 epoch가 NaN이거나 temp가 숫자가 아니면(그릴 수 없음) 그 시간 한 칸만 제외
-const isDrawable = (item: HourlyForecast) => !Number.isNaN(item.epoch) && typeof item.temp === 'number';
+// toHourly가 만든 항목 중 epoch가 NaN이면(forecastAt 형식이 이상해서) 그 시간 한 칸만 제외
+const isDrawable = (item: HourlyForecast) => !Number.isNaN(item.epoch);
 
-// 현재 날씨 DTO → 엔티티 변환. temperature는 getWeather의 2번 분기에서 이미 숫자임이 검증된 뒤라 그대로 쓰고,
-// 나머지 필드는 각자 방어한다
+// 현재 날씨 DTO → 엔티티 변환. dto는 CurrentWeatherDtoSchema가 이미 원시 타입을 보장한 값
 const toCurrent = (dto: CurrentWeatherDto): CurrentWeather => ({
-  epoch: toEpoch(dto.forecastAt),      
-  temp: dto.temperature,               
-  condition: toWeatherCondition(dto.weatherCondition), 
-  maxTemp: toNumberOrNull(dto.maxTemperature),
-  minTemp: toNumberOrNull(dto.minTemperature),
+  epoch: toEpoch(dto.forecastAt),
+  temp: dto.temperature,
+  condition: toWeatherCondition(dto.weatherCondition),
+  maxTemp: dto.maxTemperature,
+  minTemp: dto.minTemperature,
   pm10Grade: toPmGrade(dto.pm10Grade),
   pm25Grade: toPmGrade(dto.pm25Grade),
-  uvGrade: toUvGrade(dto.uvIndex), 
+  uvGrade: toUvGrade(dto.uvIndex),
 });
 
 export const createWeatherRepository = (
@@ -54,18 +51,24 @@ export const createWeatherRepository = (
     if (!res.success)
       throw apiError(res.error?.message || `weather API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
 
-    // 2. data 중 current/현재 날씨가 없거나 기온이 숫자가 아닐때, Error 반환 
-    const current = res.data?.current;
-    if (!current || typeof current.temperature !== 'number')
-      throw apiError(`weather API returned invalid shaped 'current': ${JSON.stringify(current)}`, { area: AREA, endpoint: res._requestUrl });
+    // 2. data shape이 스키마와 안 맞을때(특히 current.temperature 누락/타입 이상), 필드별 사유를 담아 Error 반환
+    const parsed = WeatherResponseDataSchema.safeParse(res.data);
+    if (!parsed.success)
+      throw apiError(
+        `weather API returned invalid shaped 'data': ${parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
+        { area: AREA, endpoint: res._requestUrl }
+      );
 
-    // 2. data 중 hourly/시간별 날씨가 비어서왔을때 
-    const hourlyRaw = Array.isArray(res.data.hourly) ? res.data.hourly : [];
-    const hourly = hourlyRaw
+    // 3. hourly 배열은 항목 하나가 이상해도 전체를 못 쓰게 만들지 않도록, 항목별로 개별 parse해서
+    // 실패한 항목만 걸러낸다 (WeatherResponseDataSchema 안에 중첩시키면 항목 하나 실패로 배열 전체가 실패하게 됨)
+    const hourly = parsed.data.hourly
+      .map(s => HourlyForecastDtoSchema.safeParse(s))
+      .filter(r => r.success)
+      .map(r => r.data)
       .map(toHourly)
       .filter(isDrawable)
       .sort((a, b) => a.epoch - b.epoch);
 
-    return { current: toCurrent(current), hourly };
+    return { current: toCurrent(parsed.data.current), hourly };
   },
 });
