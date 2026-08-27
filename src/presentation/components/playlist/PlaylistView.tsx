@@ -11,7 +11,8 @@ import { RecentSongsView } from './RecentSongsView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
-import { type Song, GENRES } from './playlistTypes';
+import { GenreFilterChips } from './GenreFilterChips';
+import { type Song, filterSongsByGenre } from './playlistTypes';
 import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 
 const RECENT_SONGS_LIMIT = 7;
@@ -69,12 +70,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     setSongs((prev) => [song, ...prev]);
   }, []);
 
-  // selectedGenre는 GENRES의 key('indie' 등), song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교
   // 최근 추가된 곡은 장르 필터와 무관하게 항상 그대로 노출, 주간 인기차트만 필터링됨
-  const selectedGenreLabel = GENRES.find((genre) => genre.key === selectedGenre)?.label;
-  const filteredChart = selectedGenre === 'all'
-    ? chart
-    : chart.filter((song) => song.genres.includes(selectedGenreLabel ?? ''));
+  const filteredChart = filterSongsByGenre(chart, selectedGenre);
 
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = filteredChart.slice(0, CHART_LIMIT);
@@ -217,26 +214,12 @@ function PlaylistMainContent({
         </div>
 
         {/* 장르 필터 칩 */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 ml-[-1rem] [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {GENRES.map((genre) => (
-            <button
-              key={genre.key}
-              onClick={() => setSelectedGenre(genre.key)}
-              className={`flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
-                selectedGenre === genre.key && genre.key !== 'all'
-                  ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
-                  : genre.key === 'all' && selectedGenre === 'all'
-                    ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
-                    : genre.key === 'all'
-                      ? 'bg-white text-[#2B3B52] border-[#2B3B52]'
-                      : `${genre.light} text-gray-800 border-transparent`
-              }`}
-            >
-              {genre.emoji && <span className="text-base">{genre.emoji}</span>}
-              <span>{genre.label}</span>
-            </button>
-          ))}
-        </div>
+        <GenreFilterChips
+          selectedGenre={selectedGenre}
+          onSelectGenre={setSelectedGenre}
+          variant="main"
+          className="pb-2 -mx-4"
+        />
 
         {/* 차트 리스트 */}
         <div className="bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">

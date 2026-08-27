@@ -26,3 +26,10 @@ export const GENRES = [
   { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]' },
   { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]' },
 ];
+
+// selectedGenre는 GENRES의 key('indie' 등), song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교
+export function filterSongsByGenre(songs: Song[], selectedGenre: string): Song[] {
+  if (selectedGenre === 'all') return songs;
+  const label = GENRES.find((genre) => genre.key === selectedGenre)?.label;
+  return songs.filter((song) => song.genres.includes(label ?? ''));
+}
