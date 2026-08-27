@@ -12,6 +12,7 @@ import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips } from './GenreFilterChips';
+import { SongPostsModal } from './SongPostsModal';
 import { type Song, filterSongsByGenre } from './playlistTypes';
 import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 
@@ -27,6 +28,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [songs, setSongs] = useState<Song[]>(DUMMY_SONGS);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<Song | null>(null);
+  // 주간 인기차트에서 "게시글 보러가기" 화살표를 눌러 선택된 곡 — 값이 있으면 SongPostsModal이 뜸
+  const [selectedChartSong, setSelectedChartSong] = useState<Song | null>(null);
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 좋아요한곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
@@ -121,6 +124,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onShowLiked={() => pushScreen('liked')}
             onShowAddSong={() => pushScreen('addSong')}
             onPlay={setCurrentTrack}
+            onShowPosts={setSelectedChartSong}
           />
         )}
       </div>
@@ -135,6 +139,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
         song={currentTrack}
         onClose={() => setCurrentTrack(null)}
       />
+
+      {/* 주간 인기차트 → 추천 게시글 캐러셀 모달 */}
+      {selectedChartSong && (
+        <SongPostsModal song={selectedChartSong} onClose={() => setSelectedChartSong(null)} />
+      )}
     </div>
   );
 }
@@ -149,6 +158,7 @@ interface PlaylistMainContentProps {
   onShowLiked: () => void;
   onShowAddSong: () => void;
   onPlay: (song: Song) => void;
+  onShowPosts: (song: Song) => void;
 }
 
 function PlaylistMainContent({
@@ -161,6 +171,7 @@ function PlaylistMainContent({
   onShowLiked,
   onShowAddSong,
   onPlay,
+  onShowPosts,
 }: PlaylistMainContentProps) {
   return (
     <div className="pb-[calc(204px+env(safe-area-inset-bottom))]">
@@ -228,7 +239,7 @@ function PlaylistMainContent({
             <span className="w-7 text-center">순위</span>
             <div className="flex-1">곡정보</div>
             <div className="w-6 text-center">듣기</div>
-            <div className="flex flex-col items-center justify-center w-8 flex-shrink-0">좋아요</div>
+            <div className="w-6 text-center flex-shrink-0">게시글</div>
           </div>
 
           {/* 리스트 */}
@@ -241,6 +252,7 @@ function PlaylistMainContent({
                 song={song}
                 rank={index + 1}
                 onPlay={onPlay}
+                onShowPosts={onShowPosts}
               />
             ))
           )}

@@ -3,21 +3,21 @@ import { type Song } from './playlistTypes';
 
 const USER_NAMES = ['이줄', '민지', '수진', '준호', '태희', '성은', '다영', '호진', '지은', '명준', '민준', '혜원', '기범', '소연', '주현'];
 const USER_COMMENTS = [
-  '이 노래 진짜 좋아! 베이스가 미쳤어 내인생 이런 R&B는 처음이야 ㅠㅠ',
-  '요즘 내 감성이야 ✨',
-  '반복 재생 중...',
-  '이렇게 좋은 곡이 있다니',
-  '감성 만렙 💯',
-  '매일 듣고 있어요',
-  '이 가수 팬입니다! 🎤',
-  '최고의 선택 👍',
-  '중독성 있어요',
-  '찐 명곡',
-  '무한재생',
-  '요즘 탈출곡',
-  '혼자만 알고싶던 곡',
-  '신곡 좋네요',
-  '이 아티스트 완전 사랑해 진짜 너무너무너무너무너무너무너무 사랑해',
+  '이 노래 진짜 좋아! 베이스 라인이 미쳤어, 이런 감성의 R&B는 진짜 오랜만이에요 ㅠㅠ',
+  '요즘 제 감성을 이렇게까지 딱 대변해주는 곡은 진짜 오랜만이라 계속 듣고 있어요 ✨',
+  '자기 전에 이 노래 틀어놓고 잠드는 게 요즘 하루 마무리 루틴이에요, 반복 재생 중...',
+  '이렇게 좋은 곡이 이제야 눈에 들어오다니, 그동안 대체 왜 몰랐었나 싶은 곡이에요',
+  '가사도 멜로디도 감성 만렙이라 듣자마자 바로 플레이리스트 맨 위에 올려놨어요 💯',
+  '아침에 일어나서부터 밤에 잠들 때까지 하루종일 이 노래만 듣고 있는 것 같아요',
+  '이 가수 목소리가 너무 좋아서 팬이 됐어요, 앞으로 나올 곡들도 다 챙겨 들을 예정이에요',
+  '오늘 하루 진짜 힘들었는데 이 곡 듣고 기분이 확 풀렸어요, 최고의 선곡이었어요 👍',
+  '한 번 듣기 시작하면 계속 무한반복하게 되는 묘하게 중독성 있는 노래인 것 같아요',
+  '오랜만에 나온 진짜 명곡이라 주변 사람들한테도 자꾸 추천하고 다니게 되는 곡이에요',
+  '이 노래 나온 뒤로 다른 곡은 잘 안 듣게 될 정도로 요즘 무한재생 중이에요',
+  '요즘 마음이 복잡할 때마다 이 노래 들으면서 잠깐씩 탈출하는 기분이 들어요',
+  '아직 많이 유명하지 않은 것 같은데 혼자만 알고 있고 싶을 정도로 좋은 곡이에요',
+  '신곡 나왔길래 들어봤는데 기대했던 것 이상이라 계속 재생목록에 담아두고 듣는 중이에요',
+  '이 아티스트 진짜 너무너무 사랑해요, 발매하는 곡마다 다 명곡인 것 같아서 매번 놀라요',
 ];
 
 function getRandomElement<T>(arr: T[]): T {
@@ -221,7 +221,7 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     artist: '주혜린',
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
     userProfile: { name: '민지', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked1' },
-    comment: '완전 내 최애곡',
+    comment: '이건 진짜 제 인생곡이에요, 힘들 때마다 듣는 완전 최애곡 중의 최애곡입니다',
     genres: ['R&B'],
     heartCount: 312,
     previewUrl: '',
@@ -233,7 +233,7 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     artist: '유다빈밴드',
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273fd07915694e0ffb3b961a7b5',
     userProfile: { name: '태희', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked2' },
-    comment: '노래방 필수곡',
+    comment: '노래방 가면 무조건 예약해두고 부르는 저만의 필수곡이에요, 분위기 최고예요',
     genres: ['인디'],
     heartCount: 289,
     previewUrl: '',
@@ -245,7 +245,7 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     artist: '윤마치',
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
     userProfile: { name: '성은', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked3' },
-    comment: '가사가 진짜 좋아요',
+    comment: '가사가 진짜 좋아서 몇 번을 곱씹어 듣게 되는 곡이에요, 매번 새롭게 다가와요',
     genres: ['인디'],
     heartCount: 241,
     previewUrl: '',
@@ -257,7 +257,7 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     artist: '권진아',
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
     userProfile: { name: '기범', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked4' },
-    comment: '드라이브할 때 딱',
+    comment: '드라이브할 때 이 노래 틀면 분위기가 완전 살아나요, 창문 열고 듣기 딱이에요',
     genres: ['인디'],
     heartCount: 198,
     previewUrl: '',
@@ -269,7 +269,7 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     artist: '거니',
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b27382e910c061e1c7555a02a266',
     userProfile: { name: '준호', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked6' },
-    comment: '매일 듣는 중',
+    comment: '요즘 매일 듣는 중인데 질리지가 않아서 계속 반복재생하고 있는 곡이에요',
     genres: ['R&B'],
     heartCount: 154,
     previewUrl: '',
@@ -281,10 +281,26 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     artist: '윤마치',
     albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273da16a8d501f1621068b0ea8b',
     userProfile: { name: '지은', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liked7' },
-    comment: '분위기 최고',
+    comment: '분위기 최고라 친구들 모임 때마다 틀어주는데 다들 좋아하는 곡이에요',
     genres: ['인디'],
     heartCount: 132,
     previewUrl: '',
     createdAt: new Date(),
   },
 ];
+
+const POSTS_PER_SONG_MIN = 2;
+const POSTS_PER_SONG_MAX = 4;
+
+// Supabase 붙기 전까지 임시로, 클릭한 곡에 달린 추천 게시글들을 더미로 생성
+// (실제 연동 시 trackId로 게시글 목록을 조회하는 API 호출로 교체)
+export function generateDummyPosts(song: Song): Song[] {
+  const count = POSTS_PER_SONG_MIN + Math.floor(Math.random() * (POSTS_PER_SONG_MAX - POSTS_PER_SONG_MIN + 1));
+  return Array.from({ length: count }, () => ({
+    ...song,
+    userProfile: { name: getRandomElement(USER_NAMES), avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
+    comment: getRandomElement(USER_COMMENTS),
+    heartCount: Math.floor(Math.random() * 300) + 10,
+    createdAt: new Date(),
+  }));
+}

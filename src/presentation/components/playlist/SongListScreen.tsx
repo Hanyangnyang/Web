@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, filterSongsByGenre } from './playlistTypes';
-import { RecentSongListRow } from './RecentSongListRow';
+import { SongPostCard } from './SongPostCard';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips } from './GenreFilterChips';
 
@@ -31,14 +31,14 @@ export function SongListScreen({ title, emoji, subtitle, songs, onBack, onPlay, 
           className="pb-3"
         />
       </div>
-      {/* 곡 리스트 */}
+      {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 */}
       <div className="-mx-4 px-2">
         {filteredSongs.length === 0 ? (
           <EmptyGenreState onShowAddSong={onShowAddSong} boxed />
         ) : (
-          <div className="flex flex-col gap-1 py-1">
+          <div className="grid grid-cols-2 gap-3 py-1">
             {filteredSongs.map((song) => (
-              <RecentSongListRow key={song.trackId} song={song} onPlay={onPlay} />
+              <SongPostCard key={song.trackId} post={song} onPlay={onPlay} className="w-full" />
             ))}
           </div>
         )}
