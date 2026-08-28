@@ -1,4 +1,4 @@
-import { ArrowRight, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { type Song } from './playlistTypes';
 
 interface ChartSongRowProps {
@@ -53,9 +53,6 @@ export function ChartSongRow({ song, rank, onPlay, onShowPosts }: ChartSongRowPr
       >
         <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
-
-      {/* 게시글 보러가기 인디케이터 — 클릭은 row 전체가 담당, 여긴 "더 볼 게 있다"는 시각적 신호만 */}
-      <ArrowRight size={18} strokeWidth={2} className="w-6 text-text-sub flex-shrink-0" aria-hidden="true" />
     </div>
   );
 }
