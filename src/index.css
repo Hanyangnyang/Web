@@ -139,6 +139,34 @@ body {
   }
 }
 
+/* 인스타그램 더블탭 좋아요처럼 하트가 튀어올랐다 사라지는 애니메이션 */
+@keyframes heartPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  15% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  30% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.05);
+    opacity: 0;
+  }
+}
+
 @keyframes sheetUp {
   from {
     transform: translateY(100%);

@@ -1,4 +1,4 @@
-import { Heart, Play, X } from 'lucide-react';
+import { Play, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 
@@ -24,7 +24,6 @@ export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerPr
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);
-  const [heartClicked, setHeartClicked] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
   const isPausedRef = useRef(true);
@@ -49,7 +48,6 @@ export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerPr
     if (song) {
       setDisplaySong(song);
       setClosing(false);
-      setHeartClicked(false);
       return;
     }
     if (!displaySong) return;
@@ -88,7 +86,7 @@ export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerPr
       if (cancelled || !containerRef.current || controllerRef.current) return;
       IFrameAPI.createController(
         containerRef.current,
-        { uri, width: '100%', height: 152 },
+        { uri, width: '100%', height: 80 },
         (controller) => {
           controllerRef.current = controller;
           controller.addListener('ready', () => setIframeLoaded(true));
@@ -135,50 +133,26 @@ export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerPr
               {displaySong.title} <span className="font-normal">- {displaySong.artist}</span>
             </div>
             <button
-              onClick={() => setHeartClicked((prev) => !prev)}
-              className="ml-2 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
-            >
-              <Heart size={18} className="text-red-500 stroke-[2]" fill={heartClicked ? 'currentColor' : 'none'} />
-            </button>
-            <button
               onClick={onClose}
-              className="ml-1 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
+              className="ml-2 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
             >
               <X size={18} className="text-black" />
             </button>
           </div>
 
-          {/* Spotify Embed */}
-          <div className="relative bg-white h-[152px]">
+          {/* Spotify Embed — 압축(80px) 버전: 앨범아트+제목/가수명+재생버튼이 한 줄 */}
+          <div className="relative bg-white h-[80px]">
             <div
-              className={`absolute inset-0 px-4 py-3 bg-white flex flex-col justify-between transition-opacity duration-200 ${
+              className={`absolute inset-0 px-3 flex items-center gap-3 bg-white transition-opacity duration-200 ${
                 iframeLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-pulse'
               }`}
             >
-              {/* 앨범아트 + 제목/아티스트/저장버튼 + 우측 상단 스포티파이 로고 */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="w-16 h-16 rounded bg-slate-200 flex-shrink-0" />
-                  <div className="flex flex-col gap-2 pt-1">
-                    <div className="h-3 w-32 rounded-full bg-slate-200" />
-                    <div className="h-3 w-20 rounded-full bg-slate-200" />
-                    <div className="h-5 w-28 rounded-full bg-slate-200 mt-1" />
-                  </div>
-                </div>
-                <div className="w-6 h-6 rounded-full bg-slate-200 flex-shrink-0" />
+              <div className="w-12 h-12 rounded bg-slate-200 flex-shrink-0" />
+              <div className="flex-1 min-w-0 flex flex-col gap-2">
+                <div className="h-3 w-32 rounded-full bg-slate-200" />
+                <div className="h-3 w-20 rounded-full bg-slate-200" />
               </div>
-
-              {/* 진행바 + 시간/메뉴/재생버튼 */}
-              <div className="flex flex-col gap-2">
-                <div className="h-1 w-full rounded-full bg-slate-200" />
-                <div className="flex items-center justify-between">
-                  <div className="h-2 w-8 rounded-full bg-slate-200" />
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 w-4 rounded-full bg-slate-200" />
-                    <div className="w-9 h-9 rounded-full bg-slate-300 flex-shrink-0" />
-                  </div>
-                </div>
-              </div>
+              <div className="w-9 h-9 rounded-full bg-slate-300 flex-shrink-0" />
             </div>
             <div
               ref={containerRef}

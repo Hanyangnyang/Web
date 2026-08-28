@@ -36,17 +36,27 @@ export function SongListScreen({
 }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(enableViewToggle ? 'list' : 'grid');
+  // 홈 진입 스크롤 + 요약 카드 클릭 시 스크롤을 같은 상태로 관리
+  const [scrollTarget, setScrollTarget] = useState<string | null>(scrollToTrackId ?? null);
   const filteredSongs = filterSongsByGenre(songs, selectedGenre);
+
+  // 2열은 요약 목록, 1열은 상세 — 토글이 켜진 화면에서 2열일 때만 요약 취급
+  const isSummaryMode = enableViewToggle && viewMode === 'grid';
 
   const listContainerRef = useRef<HTMLDivElement>(null);
 
-  // 화면 진입 시 1회 — 홈에서 선택했던 카드가 있으면 그 위치로 부드럽게 스크롤
+  // 대상이 생기거나(홈 진입/요약 카드 클릭) 뷰 모드가 바뀌어 목록 DOM이 다시 그려질 때마다 해당 카드로 부드럽게 스크롤
   useLayoutEffect(() => {
-    if (!scrollToTrackId) return;
-    const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollToTrackId}"]`);
+    if (!scrollTarget) return;
+    const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
     target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [viewMode, scrollTarget]);
+
+  // 요약 목록(2열)에서 카드를 누르면 그 곡의 상세(1열)로 전환
+  const handleSelectSummary = (song: Song) => {
+    setScrollTarget(song.trackId);
+    setViewMode('list');
+  };
 
   return (
     <div className="-mx-4 px-4 pb-[calc(204px+env(safe-area-inset-bottom))]">
@@ -89,6 +99,8 @@ export function SongListScreen({
                   className="w-full"
                   onPlay={() => onPlay(song)}
                   isPlaying={song.trackId === currentTrackId}
+                  hideReactions={isSummaryMode}
+                  onSelect={isSummaryMode ? () => handleSelectSummary(song) : undefined}
                 />
               </div>
             ))}
