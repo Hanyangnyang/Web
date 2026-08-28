@@ -46,14 +46,23 @@ export function apiError(message: string, opts: { area?: string; endpoint?: stri
   return err;
 }
 
-export const createHttpClient = ({ baseUrl = '' }: { baseUrl?: string } = {}): HttpClient => ({
-  get: (path, headers = {}) =>
-    fetch(`${baseUrl}${path}`, { headers }),
+export const createHttpClient = ({ baseUrl = '' }: { baseUrl?: string } = {}): HttpClient => {
+  const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
+  const buildUrl = (path: string) => {
+    if (!cleanBaseUrl) return path;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${cleanBaseUrl}${cleanPath}`;
+  };
 
-  post: (path, body, headers = {}) =>
-    fetch(`${baseUrl}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...headers },
-      body: JSON.stringify(body),
-    }),
-});
+  return {
+    get: (path, headers = {}) =>
+      fetch(buildUrl(path), { headers }),
+
+    post: (path, body, headers = {}) =>
+      fetch(buildUrl(path), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...headers },
+        body: JSON.stringify(body),
+      }),
+  };
+};
