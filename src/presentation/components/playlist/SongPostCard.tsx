@@ -53,10 +53,9 @@ export function SongPostCard({ post, className = '', onPlay }: SongPostCardProps
         <div className="flex items-center gap-1.5 mb-1.5">
           <img
             src={post.userProfile.avatarUrl}
-            alt={post.userProfile.name}
+            alt="작성자 프로필"
             className="w-4 h-4 rounded-full border border-white/40 flex-shrink-0"
           />
-          <span className="text-xs font-semibold truncate">{post.userProfile.name}</span>
         </div>
 
         <p className="text-xs font-medium leading-snug line-clamp-3">"{post.comment}"</p>

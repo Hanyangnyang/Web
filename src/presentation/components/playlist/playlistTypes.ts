@@ -4,7 +4,6 @@ export interface Song {
   artist: string;
   albumArtUrl: string;
   userProfile: {
-    name: string;
     avatarUrl: string;
   };
   comment: string;

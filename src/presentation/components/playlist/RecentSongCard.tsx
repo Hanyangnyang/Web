@@ -1,18 +1,17 @@
-import { Heart, Play } from 'lucide-react';
+import { Heart, MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, GENRES } from './playlistTypes';
 
 interface RecentSongCardProps {
   song: Song;
-  onPlay: (song: Song) => void;
 }
 
-export function RecentSongCard({ song, onPlay }: RecentSongCardProps) {
+export function RecentSongCard({ song }: RecentSongCardProps) {
   const [heartClicked, setHeartClicked] = useState(false);
   const genre = GENRES.find((g) => g.label === song.genres[0]);
 
   return (
-    <div className="flex-shrink-0 w-44 aspect-[4/5] rounded-xl overflow-hidden shadow-lg relative">
+    <div className="flex-shrink-0 w-44 aspect-square rounded-xl overflow-hidden shadow-lg relative">
       {/* 앨범커버 전체 배경 */}
       <img
         src={song.albumArtUrl}
@@ -20,28 +19,25 @@ export function RecentSongCard({ song, onPlay }: RecentSongCardProps) {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* 가독성용 그라데이션 오버레이 */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
-
-      {/* 우측 상단 하트 버튼 */}
-      <button
-        onClick={() => setHeartClicked((prev) => !prev)}
-        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
-      >
-        <Heart
-          size={16}
-          className="text-red-500 stroke-[2]"
-          fill={heartClicked ? 'currentColor' : 'none'}
-        />
-      </button>
-
-      {/* 중앙 재생 버튼: 카드 정중앙 */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+      {/* 우측 상단 버튼 그룹: 하트, 더보기 */}
+      <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5">
         <button
-          onClick={() => onPlay(song)}
-          className="pointer-events-auto w-16 h-16 rounded-full flex items-center justify-center text-white -translate-y-3 active:scale-95 transition-transform"
+          onClick={() => setHeartClicked((prev) => !prev)}
+          className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
         >
-          <Play size={32} fill="white" stroke="white" strokeWidth={1} className="drop-shadow-lg" />
+          <Heart
+            size={16}
+            className="text-red-500 stroke-[2]"
+            fill={heartClicked ? 'currentColor' : 'none'}
+          />
+        </button>
+
+        {/* 더보기 버튼: 동작은 추후 구현 */}
+        <button
+          aria-label="더보기"
+          className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+        >
+          <MoreVertical size={16} className="text-white" />
         </button>
       </div>
 
@@ -52,7 +48,6 @@ export function RecentSongCard({ song, onPlay }: RecentSongCardProps) {
           <span className="text-[10px] font-medium opacity-90 ml-1">{song.artist}</span>
         </div>
         <div className="text-[10px] truncate">"{song.comment}"</div>
-        <div className="text-[9px] opacity-70 truncate ml-0.5">{song.userProfile.name}</div>
 
         <div className="border-t border-white/20 my-1" />
 

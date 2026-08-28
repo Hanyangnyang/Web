@@ -136,7 +136,7 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
       title: selectedTrack.title,
       artist: selectedTrack.artist,
       albumArtUrl: selectedTrack.albumArtUrl,
-      userProfile: { name: '나', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me' },
+      userProfile: { avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me' },
       comment: comment.trim(),
       genres: genreLabels,
       heartCount: 0,

@@ -1,4 +1,4 @@
-import { ChevronRight, Heart } from 'lucide-react';
+import { ChevronRight, Heart, Search } from 'lucide-react';
 import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
@@ -191,6 +191,16 @@ function PlaylistMainContent({
         }
       />
 
+      {/* 검색바 (UI만 — 검색 로직은 추후 구현) */}
+      <div className="mb-4 flex items-center gap-2 px-3.5 h-11 bg-white border border-slate-200 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
+        <Search size={16} className="text-text-hint flex-shrink-0" />
+        <input
+          type="text"
+          placeholder="곡 제목이나 아티스트로 검색해보세요"
+          className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+        />
+      </div>
+
       {/* 최근 추가된 곡 섹션 */}
       <section className="mb-4">
         <div className="flex items-center gap-1 mb-2">
@@ -210,7 +220,6 @@ function PlaylistMainContent({
               <RecentSongCard
                 key={song.trackId}
                 song={song}
-                onPlay={onPlay}
               />
             ))}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
@@ -221,7 +230,7 @@ function PlaylistMainContent({
       {/* 주간 인기차트 섹션 */}
       <section>
         <div className="flex items-center mb-1">
-          <h3 className="text-lg font-bold text-text-main">주간 인기차트</h3>
+          <h3 className="text-lg font-bold text-text-main">주간/월간 인기차트</h3>
         </div>
 
         {/* 장르 필터 칩 */}
