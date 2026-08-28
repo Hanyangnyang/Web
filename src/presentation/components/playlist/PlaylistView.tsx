@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
-import { FloatingSpotifyPlayer } from './FloatingSpotifyPlayer';
+import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlayer';
 import { AddSongFab } from './AddSongFab';
 import { AddSongView } from './AddSongView';
 import { LikedSongsView } from './LikedSongsView';
@@ -14,8 +14,6 @@ import { PostDetailView } from './PostDetailView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
-import { GenreFilterChips } from './GenreFilterChips';
-import { SongPostsModal } from './SongPostsModal';
 import { type Song, filterSongsByGenre } from './playlistTypes';
 import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 
@@ -31,11 +29,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [songs, setSongs] = useState<Song[]>(DUMMY_SONGS);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
-  const [currentTrack, setCurrentTrack] = useState<Song | null>(null);
-  // 주간 인기차트에서 "게시글 보러가기" 화살표를 눌러 선택된 곡 — 값이 있으면 SongPostsModal이 뜸
-  const [selectedChartSong, setSelectedChartSong] = useState<Song | null>(null);
-  // 검색 결과 화면에서 곡 카드를 눌러 선택된 곡 — 값이 있으면 TrackPostsView(곡 단위 게시글 목록)로 이동
-  const [selectedSearchTrack, setSelectedSearchTrack] = useState<TrackResult | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
+  // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostsView(곡 단위 게시글 목록)로 이동
+  const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
+  // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
+  const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 좋아요한곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
@@ -85,13 +83,36 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   }, [searchQuery, pushScreen]);
 
   const handleSelectSearchTrack = useCallback((track: TrackResult) => {
-    setSelectedSearchTrack(track);
+    setSelectedTrackForPosts(track);
+    pushScreen('trackPosts');
+  }, [pushScreen]);
+
+  // 주간/월간 인기차트 리스트 클릭 — Song을 TrackResult 형태로 변환해 동일한 TrackPostsView로 이동
+  const handleSelectChartSong = useCallback((song: Song) => {
+    setSelectedTrackForPosts({
+      trackId: song.trackId,
+      title: song.title,
+      artist: song.artist,
+      albumArtUrl: song.albumArtUrl,
+    });
     pushScreen('trackPosts');
   }, [pushScreen]);
 
   // 게시글 목록(TrackPostsView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동
   const handleSelectPost = useCallback(() => {
     pushScreen('postDetail');
+  }, [pushScreen]);
+
+  // "전체보기" 화살표 클릭 — 특정 곡으로 스크롤할 필요 없이 맨 위부터 보여줌
+  const handleShowAllRecent = useCallback(() => {
+    setRecentScrollTarget(null);
+    pushScreen('recent');
+  }, [pushScreen]);
+
+  // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤
+  const handleSelectRecentSong = useCallback((song: Song) => {
+    setRecentScrollTarget(song.trackId);
+    pushScreen('recent');
   }, [pushScreen]);
 
   // 최근 추가된 곡은 장르 필터와 무관하게 항상 그대로 노출, 주간 인기차트만 필터링됨
@@ -122,6 +143,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={popScreen}
             onPlay={setCurrentTrack}
             onShowAddSong={() => pushScreen('addSong')}
+            scrollToTrackId={recentScrollTarget}
+            currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'addSong' ? (
           <AddSongView
@@ -133,6 +156,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={popScreen}
             onPlay={setCurrentTrack}
             onShowAddSong={() => pushScreen('addSong')}
+            currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'search' ? (
           <SearchResultsView
@@ -141,11 +165,13 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onSelectTrack={handleSelectSearchTrack}
             onSelectPost={handleSelectPost}
           />
-        ) : screen === 'trackPosts' && selectedSearchTrack ? (
+        ) : screen === 'trackPosts' && selectedTrackForPosts ? (
           <TrackPostsView
-            track={selectedSearchTrack}
+            track={selectedTrackForPosts}
             onBack={popScreen}
             onSelectPost={handleSelectPost}
+            onPlay={() => setCurrentTrack(selectedTrackForPosts)}
+            isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
           />
         ) : screen === 'postDetail' ? (
           <PostDetailView onBack={popScreen} />
@@ -159,10 +185,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSubmitSearch={handleSearchSubmit}
-            onShowAllRecent={() => pushScreen('recent')}
+            onShowAllRecent={handleShowAllRecent}
+            onSelectRecentSong={handleSelectRecentSong}
             onShowAddSong={() => pushScreen('addSong')}
             onPlay={setCurrentTrack}
-            onShowPosts={setSelectedChartSong}
+            onShowPosts={handleSelectChartSong}
           />
         )}
       </div>
@@ -177,11 +204,6 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
         song={currentTrack}
         onClose={() => setCurrentTrack(null)}
       />
-
-      {/* 주간 인기차트 → 추천 게시글 캐러셀 모달 */}
-      {selectedChartSong && (
-        <SongPostsModal song={selectedChartSong} onClose={() => setSelectedChartSong(null)} />
-      )}
     </div>
   );
 }
@@ -196,6 +218,7 @@ interface PlaylistMainContentProps {
   setSearchQuery: (query: string) => void;
   onSubmitSearch: () => void;
   onShowAllRecent: () => void;
+  onSelectRecentSong: (song: Song) => void;
   onShowAddSong: () => void;
   onPlay: (song: Song) => void;
   onShowPosts: (song: Song) => void;
@@ -211,6 +234,7 @@ function PlaylistMainContent({
   setSearchQuery,
   onSubmitSearch,
   onShowAllRecent,
+  onSelectRecentSong,
   onShowAddSong,
   onPlay,
   onShowPosts,
@@ -275,6 +299,7 @@ function PlaylistMainContent({
               <RecentSongCard
                 key={song.trackId}
                 song={song}
+                onClick={() => onSelectRecentSong(song)}
               />
             ))}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
@@ -287,14 +312,6 @@ function PlaylistMainContent({
         <div className="flex items-center mb-1">
           <h3 className="text-lg font-bold text-text-main">주간/월간 인기차트</h3>
         </div>
-
-        {/* 장르 필터 칩 */}
-        <GenreFilterChips
-          selectedGenre={selectedGenre}
-          onSelectGenre={setSelectedGenre}
-          variant="main"
-          className="pb-2 -mx-4"
-        />
 
         {/* 차트 리스트 */}
         <div className="bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">

@@ -6,21 +6,21 @@ import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIfra
 // "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요.
 const AUTOPLAY_CHECK_MS = 1500;
 
-interface Song {
+export interface PlayableTrack {
   trackId: string;
   title: string;
   artist: string;
 }
 
 interface FloatingSpotifyPlayerProps {
-  song: Song | null;
+  song: PlayableTrack | null;
   onClose: () => void;
 }
 
 const CLOSE_ANIMATION_MS = 250;
 
 export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerProps) {
-  const [displaySong, setDisplaySong] = useState<Song | null>(song);
+  const [displaySong, setDisplaySong] = useState<PlayableTrack | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);

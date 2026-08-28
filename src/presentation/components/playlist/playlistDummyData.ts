@@ -287,19 +287,3 @@ export const DUMMY_LIKED_SONGS: Song[] = [
     createdAt: new Date(),
   },
 ];
-
-const POSTS_PER_SONG_MIN = 2;
-const POSTS_PER_SONG_MAX = 4;
-
-// Supabase 붙기 전까지 임시로, 클릭한 곡에 달린 추천 게시글들을 더미로 생성
-// (실제 연동 시 trackId로 게시글 목록을 조회하는 API 호출로 교체)
-export function generateDummyPosts(song: Song): Song[] {
-  const count = POSTS_PER_SONG_MIN + Math.floor(Math.random() * (POSTS_PER_SONG_MAX - POSTS_PER_SONG_MIN + 1));
-  return Array.from({ length: count }, () => ({
-    ...song,
-    userProfile: { avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${getRandomUserId()}` },
-    comment: getRandomElement(USER_COMMENTS),
-    heartCount: Math.floor(Math.random() * 300) + 10,
-    createdAt: new Date(),
-  }));
-}

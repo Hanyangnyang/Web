@@ -6,9 +6,11 @@ interface LikedSongsViewProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
   onShowAddSong: () => void;
+  // 지금 하단 플레이어에서 재생 중인 곡
+  currentTrackId?: string | null;
 }
 
-export function LikedSongsView({ onBack, onPlay, onShowAddSong }: LikedSongsViewProps) {
+export function LikedSongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: LikedSongsViewProps) {
   return (
     <SongListScreen
       title="좋아요 한 곡"
@@ -18,6 +20,7 @@ export function LikedSongsView({ onBack, onPlay, onShowAddSong }: LikedSongsView
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}
+      currentTrackId={currentTrackId}
     />
   );
 }

@@ -68,7 +68,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost }
         <MiscSubViewHeader
           title="검색 결과"
           emoji="🔍"
-          subtitle={`"${query}" 검색 결과`}
+          subtitle={`"${query}"`}
           onBack={onBack}
         />
       </div>

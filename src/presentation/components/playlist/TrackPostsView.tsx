@@ -7,6 +7,9 @@ interface TrackPostsViewProps {
   track: TrackResult;
   onBack: () => void;
   onSelectPost: (post: TrackPost) => void;
+  onPlay: () => void;
+  // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 버튼을 숨김
+  isPlaying?: boolean;
 }
 
 export interface TrackPost {
@@ -46,7 +49,7 @@ const DUMMY_POSTS: TrackPost[] = [
 ];
 
 // 곡 단위 게시글 목록 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트. 정렬 로직/API 연동은 추후 작업
-export function TrackPostsView({ track, onBack, onSelectPost }: TrackPostsViewProps) {
+export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying = false }: TrackPostsViewProps) {
   const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]['key']>('latest');
   const [heartedIds, setHeartedIds] = useState<Set<string>>(new Set());
 
@@ -82,13 +85,15 @@ export function TrackPostsView({ track, onBack, onSelectPost }: TrackPostsViewPr
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-text-sub">게시글 {DUMMY_POSTS.length}개</span>
-            {/* 재생 버튼: 동작은 추후 구현 */}
-            <button
-              aria-label={`${track.title} 재생`}
-              className="w-7 h-7 rounded-full bg-slate-700 text-white flex items-center justify-center active:scale-90 transition-transform"
-            >
-              <Play size={13} fill="white" stroke="white" strokeWidth={1} />
-            </button>
+            {!isPlaying && (
+              <button
+                onClick={onPlay}
+                aria-label={`${track.title} 재생`}
+                className="w-7 h-7 rounded-full bg-slate-700 text-white flex items-center justify-center active:scale-90 transition-transform"
+              >
+                <Play size={13} fill="white" stroke="white" strokeWidth={1} />
+              </button>
+            )}
           </div>
         </div>
       </div>

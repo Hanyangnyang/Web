@@ -10,18 +10,13 @@ interface SearchTrack {
   albumArtUrl: string;
 }
 
-const COMMENT_MAX_LENGTH = 50;
+const COMMENT_MAX_LENGTH = 200;
 const SEARCH_COOLDOWN_MS = 600;
 const MIN_QUERY_LENGTH = 2;
 const MIN_GENRES = 1;
 const MAX_GENRES = 3;
-const GENRES_PER_ROW = 3;
 
 const GENRE_OPTIONS = GENRES.filter((genre) => genre.key !== 'all');
-// 칩 너비에 따라 자연스럽게 줄바꿈되는 flex-wrap 대신, 한 줄에 항상 3개씩 고정되도록 미리 3개씩 묶어둠
-const GENRE_ROWS = Array.from({ length: Math.ceil(GENRE_OPTIONS.length / GENRES_PER_ROW) }, (_, i) =>
-  GENRE_OPTIONS.slice(i * GENRES_PER_ROW, i * GENRES_PER_ROW + GENRES_PER_ROW)
-);
 
 function normalizeQuery(query: string): string {
   return query.trim().replace(/\s+/g, ' ');
@@ -246,32 +241,28 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
       {/* 2. 장르 */}
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">장르</h3>
-        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] flex flex-col gap-2">
-          {GENRE_ROWS.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex justify-center gap-2">
-              {row.map((genre) => {
-                const isSelected = selectedGenres.includes(genre.key);
-                const isDisabled = !isSelected && selectedGenres.length >= MAX_GENRES;
-                return (
-                  <button
-                    key={genre.key}
-                    onClick={() => handleGenreClick(genre.key)}
-                    disabled={isDisabled}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
-                      isSelected
-                        ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
-                        : isDisabled
-                          ? 'bg-slate-100 text-slate-300 border-transparent'
-                          : `${genre.light} text-gray-800 border-transparent`
-                    }`}
-                  >
-                    <span className="text-base">{genre.emoji}</span>
-                    <span>{genre.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+        <div className="bg-white border border-slate-200 rounded-card p-2 shadow-[0_2px_4px_rgba(0,0,0,0.03)] flex flex-wrap justify-center gap-2">
+          {GENRE_OPTIONS.map((genre) => {
+            const isSelected = selectedGenres.includes(genre.key);
+            const isDisabled = !isSelected && selectedGenres.length >= MAX_GENRES;
+            return (
+              <button
+                key={genre.key}
+                onClick={() => handleGenreClick(genre.key)}
+                disabled={isDisabled}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+                  isSelected
+                    ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
+                    : isDisabled
+                      ? 'bg-slate-100 text-slate-300 border-transparent'
+                      : `${genre.light} text-gray-800 border-transparent`
+                }`}
+              >
+                <span className="text-base">{genre.emoji}</span>
+                <span>{genre.label}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -284,7 +275,7 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
             maxLength={COMMENT_MAX_LENGTH}
             onChange={(e) => setComment(e.target.value)}
             placeholder="이 곡에 대한 얘기를 자유롭게 남겨주세요!"
-            rows={2}
+            rows={5}
             className="w-full bg-transparent text-sm text-text-main placeholder-text-hint outline-none resize-none"
           />
         </div>
