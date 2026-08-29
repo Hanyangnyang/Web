@@ -1,5 +1,5 @@
-import { ArrowRight, Search } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, Play, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 
 interface SearchResultsViewProps {
@@ -7,6 +7,10 @@ interface SearchResultsViewProps {
   onBack: () => void;
   onSelectTrack: (track: TrackResult) => void;
   onSelectPost: (post: SongPostResult) => void;
+  // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
+  onPlay: (track: TrackResult) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
+  currentTrackId?: string | null;
 }
 
 export interface TrackResult {
@@ -24,13 +28,7 @@ export interface SongPostResult {
   body: string;
 }
 
-// UI 디자인용 임시 더미 — 실제로는 Spotify 검색 API 응답으로 교체될 예정
-const DUMMY_TRACK_RESULTS: TrackResult[] = [
-  { trackId: 't1', title: 'Busy Boy', artist: '주혜린', albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5' },
-  { trackId: 't2', title: 'LOVE SONG', artist: '유다빈밴드', albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273fd07915694e0ffb3b961a7b5' },
-  { trackId: 't3', title: '초록', artist: '윤마치', albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273da16a8d501f1621068b0ea8b' },
-  { trackId: 't4', title: 'Fly away', artist: '권진아', albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f' },
-];
+const MIN_QUERY_LENGTH = 2;
 
 // UI 디자인용 임시 더미 — 실제로는 BE에 등록된 게시글 조회 API 응답으로 교체될 예정
 const DUMMY_POST_RESULTS: SongPostResult[] = [
@@ -57,12 +55,54 @@ const DUMMY_POST_RESULTS: SongPostResult[] = [
   },
 ];
 
-// 검색 결과 화면 — UI 레이아웃만 우선 구현. 실제 Spotify 검색/BE 게시글 조회 로직은 추후 연결
-export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost }: SearchResultsViewProps) {
+// 검색 결과 화면 — 곡 검색은 Spotify 검색 API(/api/music-search) 연동 완료. BE 게시글 조회는 추후 연결
+export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId }: SearchResultsViewProps) {
   const [localQuery, setLocalQuery] = useState(query);
+  const [trackResults, setTrackResults] = useState<TrackResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (trimmed.length < MIN_QUERY_LENGTH) {
+      setTrackResults([]);
+      setSearchError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsSearching(true);
+    setSearchError(null);
+
+    fetch(`/api/music-search?q=${encodeURIComponent(trimmed)}`)
+      .then(async (response) => {
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          throw new Error(body?.error || '검색 중 문제가 생겼어요. 다시 시도해주세요.');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setTrackResults((data.tracks ?? []) as TrackResult[]);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error('[SearchResultsView] 곡 검색 실패:', error);
+        setTrackResults([]);
+        setSearchError(error instanceof Error ? error.message : '검색 중 문제가 생겼어요. 다시 시도해주세요.');
+      })
+      .finally(() => {
+        if (!cancelled) setIsSearching(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [query]);
 
   return (
-    <div className="-mx-4 px-4 pb-[calc(204px+env(safe-area-inset-bottom))]">
+    <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
       {/* 고정 헤더 — 게시글 목록을 세로로 스크롤해도 항상 상단에 유지됨 */}
       <div className="sticky -top-6 -mt-6 z-[100] bg-surface/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader
@@ -97,22 +137,57 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost }
         <h3 className="text-lg font-bold text-text-main mb-2">곡</h3>
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
-            {DUMMY_TRACK_RESULTS.map((track) => (
-              <button
-                key={track.trackId}
-                onClick={() => onSelectTrack(track)}
-                aria-label={`${track.title} 추천 게시글 보기`}
-                className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform"
-              >
-                <img
-                  src={track.albumArtUrl}
-                  alt={track.title}
-                  className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
-                />
-                <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
-                <div className="text-xs text-text-sub truncate">{track.artist}</div>
-              </button>
-            ))}
+            {isSearching ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-28">
+                  <div className="w-28 aspect-square rounded-lg bg-slate-200 animate-pulse" />
+                  <div className="mt-1.5 h-3.5 w-20 rounded-full bg-slate-200 animate-pulse" />
+                  <div className="mt-1.5 h-3 w-14 rounded-full bg-slate-200 animate-pulse" />
+                </div>
+              ))
+            ) : searchError ? (
+              <p className="text-xs text-text-hint py-2">{searchError}</p>
+            ) : trackResults.length === 0 ? (
+              <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
+            ) : (
+              trackResults.map((track) => (
+                <div
+                  key={track.trackId}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onSelectTrack(track)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
+                  }}
+                  aria-label={`${track.title} 추천 게시글 보기`}
+                  className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform cursor-pointer"
+                >
+                  <div className="relative">
+                    <img
+                      src={track.albumArtUrl}
+                      alt={track.title}
+                      className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
+                    />
+                    {track.trackId !== currentTrackId && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPlay(track);
+                        }}
+                        aria-label={`${track.title} 재생`}
+                        className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
+                      >
+                        <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                          <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                  <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
+                  <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                </div>
+              ))
+            )}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
           </div>
         </div>

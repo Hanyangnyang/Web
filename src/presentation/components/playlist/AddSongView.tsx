@@ -142,7 +142,7 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
   };
 
   return (
-    <div className="pb-[calc(204px+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
       <MiscSubViewHeader
         title="곡 추천하기"
         emoji="🤔"

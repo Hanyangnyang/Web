@@ -1,5 +1,3 @@
-import { Heart } from 'lucide-react';
-import { useState } from 'react';
 import { type Song, GENRES } from './playlistTypes';
 
 interface RecentSongCardProps {
@@ -8,7 +6,6 @@ interface RecentSongCardProps {
 }
 
 export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
-  const [heartClicked, setHeartClicked] = useState(false);
   const genre = GENRES.find((g) => g.label === song.genres[0]);
 
   return (
@@ -31,22 +28,6 @@ export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
 
       {/* 가독성용 그라데이션 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
-
-      {/* 우측 상단 하트 버튼 — 카드 전체 클릭(전체보기 이동)과 별개 동작이라 전파를 막음 */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setHeartClicked((prev) => !prev);
-        }}
-        aria-label="좋아요"
-        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
-      >
-        <Heart
-          size={16}
-          className="text-red-500 stroke-[2]"
-          fill={heartClicked ? 'currentColor' : 'none'}
-        />
-      </button>
 
       {/* 하단 정보 */}
       <div className="absolute bottom-0 inset-x-0 z-10 p-3 text-white">

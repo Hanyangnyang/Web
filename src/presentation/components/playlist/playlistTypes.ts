@@ -27,6 +27,15 @@ export const GENRES = [
   { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]' },
 ];
 
+// 인기차트 상단 기간 필터 칩 — 홈 미리보기와 인기차트 상세 화면이 공용으로 사용. 실제 기간별 재집계 로직은 추후 연동
+export const CHART_PERIOD_OPTIONS = [
+  { key: 'weekly', label: '주간' },
+  { key: 'monthly', label: '월간' },
+  { key: 'popular', label: '인기' },
+] as const;
+
+export type ChartPeriod = (typeof CHART_PERIOD_OPTIONS)[number]['key'];
+
 // selectedGenre는 GENRES의 key('indie' 등), song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교
 export function filterSongsByGenre(songs: Song[], selectedGenre: string): Song[] {
   if (selectedGenre === 'all') return songs;

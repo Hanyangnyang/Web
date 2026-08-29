@@ -1,5 +1,5 @@
 import { Play, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
@@ -15,16 +15,19 @@ export interface PlayableTrack {
 interface FloatingSpotifyPlayerProps {
   song: PlayableTrack | null;
   onClose: () => void;
+  // 실제 렌더링된 플레이어 카드 높이(safe-area 포함)를 전달 — 닫히면 0
+  onHeightChange?: (height: number) => void;
 }
 
 const CLOSE_ANIMATION_MS = 250;
 
-export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerProps) {
+export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: FloatingSpotifyPlayerProps) {
   const [displaySong, setDisplaySong] = useState<PlayableTrack | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
   const isPausedRef = useRef(true);
   const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -116,12 +119,29 @@ export function FloatingSpotifyPlayer({ song, onClose }: FloatingSpotifyPlayerPr
     };
   }, []);
 
+  // 플레이어 카드의 실제 높이를 측정해 상위로 전달 — 하단 화면들의 여백/FAB 위치 계산에 쓰임.
+  // displaySong이 null이 되면(닫힘 애니메이션까지 끝난 뒤) 0을 보고해 여백도 함께 줄어들게 한다.
+  useLayoutEffect(() => {
+    if (!displaySong) {
+      onHeightChange?.(0);
+      return;
+    }
+    const el = sheetRef.current;
+    if (!el) return;
+    const report = () => onHeightChange?.(el.offsetHeight);
+    report();
+    const observer = new ResizeObserver(report);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [displaySong, onHeightChange]);
+
   if (!displaySong) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center">
       <div className="w-full max-w-app">
         <div
+          ref={sheetRef}
           className="bg-black shadow-2xl border-t border-slate-200 rounded-t-lg overflow-hidden"
           style={{
             animation: closing ? 'sheetDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',

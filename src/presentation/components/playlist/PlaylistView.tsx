@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronRight, Search, User } from 'lucide-react';
-import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
@@ -14,13 +14,14 @@ import { PostDetailView } from './PostDetailView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
-import { type Song, filterSongsByGenre } from './playlistTypes';
+import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS, filterSongsByGenre } from './playlistTypes';
+import { ChartView } from './ChartView';
 import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
 
-type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'liked' | 'search' | 'trackPosts' | 'postDetail';
+type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'liked' | 'search' | 'trackPosts' | 'postDetail' | 'chart';
 
 export function PlaylistView({ onBack }: { onBack: () => void }) {
   const isApp = isNativeApp();
@@ -30,6 +31,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [songs, setSongs] = useState<Song[]>(DUMMY_SONGS);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
+  // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
+  // 하단 화면들의 여백(--playlist-bottom-space)과 AddSongFab 위치 계산에 함께 쓰임.
+  const [playerHeight, setPlayerHeight] = useState(0);
+  const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
   // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostsView(곡 단위 게시글 목록)로 이동
   const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
@@ -121,6 +126,12 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = filteredChart.slice(0, CHART_LIMIT);
 
+  // 화면 하단 리스트들이 FAB/플레이어에 가리지 않도록 확보해야 하는 여백.
+  // FAB(h-12=48px)와 그 위 여유 버퍼(8px)는 항상 필요하고, 플레이어가 열려있으면
+  // "플레이어 실측 높이 + FAB가 그 위로 뜨는 간격(16px)"만큼 더 필요하다.
+  const FAB_FOOTPRINT = 48 + 8;
+  const bottomSpace = playerHeight > 0 ? playerHeight + 16 + FAB_FOOTPRINT : 24 + FAB_FOOTPRINT;
+
   return (
     <div
       ref={scrollContainerRef}
@@ -134,7 +145,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
           paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
         } : {}),
-      }}
+        '--playlist-bottom-space': `${bottomSpace}px`,
+      } as CSSProperties}
     >
       <div key={screen} style={{ animation: 'fadeIn 0.25s ease-out' }}>
         {screen === 'recent' ? (
@@ -164,6 +176,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={popScreen}
             onSelectTrack={handleSelectSearchTrack}
             onSelectPost={handleSelectPost}
+            onPlay={setCurrentTrack}
+            currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'trackPosts' && selectedTrackForPosts ? (
           <TrackPostsView
@@ -175,6 +189,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           />
         ) : screen === 'postDetail' ? (
           <PostDetailView onBack={popScreen} />
+        ) : screen === 'chart' ? (
+          <ChartView
+            chart={chart}
+            onBack={popScreen}
+            onShowAddSong={() => pushScreen('addSong')}
+            onPlay={setCurrentTrack}
+            onShowPosts={handleSelectChartSong}
+          />
         ) : (
           <PlaylistMainContent
             onBack={onBack}
@@ -187,6 +209,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onSubmitSearch={handleSearchSubmit}
             onShowAllRecent={handleShowAllRecent}
             onSelectRecentSong={handleSelectRecentSong}
+            onShowAllChart={() => pushScreen('chart')}
             onShowAddSong={() => pushScreen('addSong')}
             onPlay={setCurrentTrack}
             onShowPosts={handleSelectChartSong}
@@ -196,13 +219,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
 
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
       {screen !== 'addSong' && (
-        <AddSongFab onClick={() => pushScreen('addSong')} playerOpen={!!currentTrack} />
+        <AddSongFab onClick={() => pushScreen('addSong')} playerHeight={playerHeight} />
       )}
 
       {/* 플로팅 Spotify 플레이어*/}
       <FloatingSpotifyPlayer
         song={currentTrack}
         onClose={() => setCurrentTrack(null)}
+        onHeightChange={handlePlayerHeightChange}
       />
     </div>
   );
@@ -219,6 +243,7 @@ interface PlaylistMainContentProps {
   onSubmitSearch: () => void;
   onShowAllRecent: () => void;
   onSelectRecentSong: (song: Song) => void;
+  onShowAllChart: () => void;
   onShowAddSong: () => void;
   onPlay: (song: Song) => void;
   onShowPosts: (song: Song) => void;
@@ -235,12 +260,14 @@ function PlaylistMainContent({
   onSubmitSearch,
   onShowAllRecent,
   onSelectRecentSong,
+  onShowAllChart,
   onShowAddSong,
   onPlay,
   onShowPosts,
 }: PlaylistMainContentProps) {
+  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
   return (
-    <div className="pb-[calc(204px+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
@@ -307,10 +334,34 @@ function PlaylistMainContent({
         </div>
       </section>
 
-      {/* 주간 인기차트 섹션 */}
+      {/* 인기차트 섹션 */}
       <section>
-        <div className="flex items-center mb-1">
-          <h3 className="text-lg font-bold text-text-main">주간/월간 인기차트</h3>
+        <div className="flex items-center gap-1 mb-2">
+          <h3 className="text-lg font-bold text-text-main">인기차트</h3>
+          <button
+            onClick={onShowAllChart}
+            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
+            aria-label="인기차트 전체보기"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* 기간 필터 칩 */}
+        <div className="flex gap-2 mb-2">
+          {CHART_PERIOD_OPTIONS.map((option) => (
+            <button
+              key={option.key}
+              onClick={() => setChartPeriod(option.key)}
+              className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+                chartPeriod === option.key
+                  ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
+                  : 'bg-white text-[#2B3B52] border-[#2B3B52]'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
 
         {/* 차트 리스트 */}
@@ -337,6 +388,18 @@ function PlaylistMainContent({
             ))
           )}
         </div>
+
+        {/* 더보기 — 인기차트 전체보기로 이동 */}
+        {visibleChart.length > 0 && (
+          <div className="flex justify-center mt-3">
+            <button
+              onClick={onShowAllChart}
+              className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+            >
+              더보기
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
