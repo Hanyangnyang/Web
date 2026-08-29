@@ -54,6 +54,12 @@ export const queryClient = new QueryClient({
 // (구독 함수 시그니처가 정확히 일치해 그대로 대입 가능)
 onlineManager.setEventListener(subscribeToNetworkStatus);
 
+// 캐시에 들어가는 도메인 엔티티(Weather 등)의 구조를 바꾸는 배포를 할 때마다 이 값을 올릴 것.
+// 값이 바뀌면 localStorage에 남아있던 옛날 구조의 캐시를 통째로 버리고 빈 상태로 시작한다 —
+// 안 올리면 배포 직전까지 캐시됐던 옛날 모양의 데이터가 새 코드에서 그대로 읽혀서 런타임 에러가 날 수 있다
+// (예: weather.current가 없던 구엔티티 캐시가 남아있는 상태로 새 weatherTheme.ts가 weather.current를 destructure)
+const CACHE_BUSTER = 'v2';
+
 // 앱 재시작 후에도 마지막 데이터를 즉시 보여주기 위한 localStorage 영속화
 if (typeof window !== 'undefined') {
   const persister = createSyncStoragePersister({
@@ -64,5 +70,6 @@ if (typeof window !== 'undefined') {
     queryClient,
     persister,
     maxAge: 24 * 60 * 60 * 1000, // 24시간
+    buster: CACHE_BUSTER,
   });
 }
