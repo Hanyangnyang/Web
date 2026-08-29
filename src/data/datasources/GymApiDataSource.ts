@@ -1,45 +1,34 @@
-// 데이터 소스: 체대 헬스장 시간표 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
+// 데이터 소스: 체대 헬스장 시간표 새 백엔드(/api/v1/gym/gym-periods) 원시 호출
+import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
+export interface GymScheduleDto{
+    id: number;
+    dayOfWeek: "MON" | 'TUE' | 'WED' | 'THU' | 'FRI';
+    startTime: string;
+    endTime: string;
+    classId: number;
+    className: string;
 }
 
-export interface GymScheduleCell {
-  name: string;
-  type: string;
-  endTime?: string;
+export interface GymPeriodDto{
+    id: number;
+    year: number;
+    semester: "FIRST" | "SECOND";
+    periodType: 'SEMESTER' | 'SEASONAL' | 'VACATION';
+    title: string;
+    start_date: string;
+    end_date: string;
+    start_time: string;
+    end_time: string;
+    active_weekend: boolean;
+    timeStamp: string;
+    schedules: GymScheduleDto[];
 }
 
-export interface GymScheduleRow {
-  hour: number;
-  label: string;
-  mon: GymScheduleCell | '-';
-  tue: GymScheduleCell | '-';
-  wed: GymScheduleCell | '-';
-  thu: GymScheduleCell | '-';
-  fri: GymScheduleCell | '-';
+export interface GymApiDataSource{
+    getSchedule: () => Promise<ApiResponse<GymPeriodDto[]>>;
 }
 
-export interface GymPeriod {
-  id: string;
-  name: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  hours: string;
-  schedule: GymScheduleRow[];
-}
-
-export interface GymScheduleApiResponse {
-  location: string;
-  periods: GymPeriod[];
-}
-
-export interface GymApiDataSource {
-  getSchedule: () => Promise<GymScheduleApiResponse>;
-}
-
-export const createGymApiDataSource = ({ httpClient }: { httpClient: HttpClient }): GymApiDataSource => ({
-  getSchedule: async () => parseOrThrow(await httpClient.get('/gymSchedule.json')),
-});
+export const createGymApiDataSource = ({httpClient}:{httpClient: HttpClient}) : GymApiDataSource => ({
+    getSchedule: async () => parseOrThrow(await httpClient.get('/api/v1/gym/gym-periods')),
+})

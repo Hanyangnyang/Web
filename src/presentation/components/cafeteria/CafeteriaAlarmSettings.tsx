@@ -3,6 +3,7 @@ import { X, Plus } from 'lucide-react';
 import { useAlarmSubscription } from '../../hooks/useAlarmSubscription.js';
 import { TimeDayWheelPicker } from '../ui/TimeDayWheelPicker.js';
 import { BottomSheet } from '../ui/BottomSheet.js';
+import { KNOWN_CAFES } from '../../../domain/entities/Cafe.js';
 
 type AlarmMode = 'cafe' | 'keyword' | null;
 
@@ -21,13 +22,6 @@ const DEFAULT_PARAMS: CafeteriaAlarmParams = {
   notifyTime: '08:00',
   notifyDay: '당일',
 };
-
-const CAFE_OPTIONS = [
-  { id: 're12', name: '학생식당' },
-  { id: 're15', name: '창업보육센터' },
-  { id: 're11', name: '교직원식당' },
-  { id: 're13', name: '기숙사식당' },
-];
 
 export interface CafeteriaAlarmSettingsProps {
   onClose: (message?: string) => void;
@@ -134,7 +128,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
         }} className={params.mode === 'cafe' ? "py-2.5 border-b border-slate-100" : ""}>
           <div className="text-[14px] font-extrabold text-text-main mb-2.5">알림을 받아볼 식당 선택</div>
           <div className="flex flex-wrap gap-2 items-center">
-            {CAFE_OPTIONS.map(cafe => (
+            {KNOWN_CAFES.map(cafe => (
               <button
                 key={cafe.id}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${params.selectedCafe === cafe.id

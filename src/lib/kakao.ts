@@ -1,5 +1,7 @@
 // 카카오톡 공유 SDK를 실제로 필요할 때(ShareSheet 마운트 시)만 로드한다.
 // 예전엔 index.html에서 항상 로드해서 공유를 한 번도 안 쓰는 사용자도 매번 다운로드했었음.
+import { initSentry } from './sentry.js';
+
 declare global {
   interface Window {
     Kakao?: {
@@ -56,6 +58,9 @@ export function loadKakaoSdk(): Promise<void> {
       } catch (e) {
         window.__kakaoStatus = 'INIT_ERROR';
         console.error('[Kakao] init 실패:', e);
+        initSentry().then(Sentry => {
+          Sentry.captureException(e, { tags: { source: 'kakao-sdk-init' } });
+        });
         reject(e);
       }
     };

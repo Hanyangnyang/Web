@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { supabase } from '../../lib/supabase.js';
 import { getKSTDateKey } from '../../utils/time.js';
+import { initSentry } from '../../lib/sentry.js';
 
 export interface AppConfig {
   current_period: string;
@@ -106,6 +107,9 @@ export function BootProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (e) {
         console.error('[Boot] Failed to fetch app config:', e);
+        initSentry().then(Sentry => {
+          Sentry.captureException(e, { tags: { source: 'boot-app-config' } });
+        });
       } finally {
         markReady('config');
       }

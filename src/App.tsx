@@ -13,13 +13,12 @@ import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
 import { OfflineModal } from './presentation/components/common/OfflineModal';
-import { prefetchPortalData }    from './presentation/hooks/usePortalData.js';
-import { prefetchBanners }       from './presentation/hooks/useBanners.js';
-import { prefetchShuttleSchedule } from './presentation/hooks/useShuttle.js';
+import { prefetchIsHoliday }     from './presentation/hooks/useHoliday.js';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { initSentry } from './lib/sentry.js';
 import './lib/androidBackHandler.js';
 
 declare global {
@@ -103,12 +102,10 @@ function MainLayout() {
     }
   }, [activeTab]);
 
-  // 2. 데이터 프리패치 - 앱 시작 시 필요한 데이터를 백그라운드에서 미리 로드
-  const { menuDate, cafes, menuLoading, menuRevalidating, changeDate } = useMenu();
+  // 2. 학식 데이터 - 학식탭이 활성 탭일 때만 요청(다른 탭 진입 시 불필요한 백엔드 호출 방지)
+  const { menuDate, cafes, menuLoading, menuRevalidating, changeDate, refetchMenu } = useMenu(activeTab === 'cafe');
   useEffect(() => {
-    prefetchPortalData();
-    prefetchBanners();
-    prefetchShuttleSchedule();
+    prefetchIsHoliday();
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
 
@@ -171,6 +168,9 @@ function MainLayout() {
         routeFromParams(url.searchParams.toString());
       } catch (e) {
         console.error('Failed to parse notification deep link', e);
+        initSentry().then(Sentry => {
+          Sentry.captureException(e, { tags: { source: 'push-deeplink-parse' } });
+        });
       }
     }).then(h => { handle = h; });
     return () => { handle?.remove(); };
@@ -234,6 +234,7 @@ function MainLayout() {
               cafes={cafes}
               loading={menuLoading}
               revalidating={menuRevalidating}
+              onRetry={refetchMenu}
               cafeDeepLink={cafeDeepLink}
               onCafeDeepLinkHandled={() => setCafeDeepLink(null)}
             />
@@ -242,7 +243,7 @@ function MainLayout() {
             <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
           <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
-            <PortalView isVisible={activeTab === 'portal'} />
+            <PortalView isActive={activeTab === 'portal'} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView resetSignal={miscResetSignal} isActive={activeTab === 'misc'} />

@@ -1,25 +1,18 @@
 // 데이터 소스: 소식탭 배너 API 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
+import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
-
-export interface BannerApiResponse {
+export interface BannerDto {
   id: number;
-  image_url: string;
-  click_url?: string | null;
-  alt_text?: string;
-}
-
-export interface BannersApiResponse {
-  banners: BannerApiResponse[];
+  imageUrl: string;
+  altText: string;
+  clickUrl: string;
+  displayOrder: number;
 }
 
 export interface BannerApiDataSource {
-  getBanners: () => Promise<BannersApiResponse>;
+  getBanners: () => Promise<ApiResponse<BannerDto[]>>;
 }
 
 export const createBannerApiDataSource = ({ httpClient }: { httpClient: HttpClient }): BannerApiDataSource => ({
-  getBanners: async () => parseOrThrow(await httpClient.get('/api/banners')),
+  getBanners: async () => parseOrThrow(await httpClient.get('/api/v1/banners')),
 });

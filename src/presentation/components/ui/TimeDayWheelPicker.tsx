@@ -36,7 +36,7 @@ export interface TimeDayWheelPickerProps {
 // 시-오전오후 컬럼만 캐리오버(11시 넘어가면 오전/오후 자동 전환)로 서로 얽혀 있어
 // 한 컴포넌트 안에서 두 useWheelColumn을 직접 조율한다.
 export function TimeDayWheelPicker({ value, onChange, day, onDayChange }: TimeDayWheelPickerProps) {
-  const [hStr, mStr] = value.split(':');
+  const [hStr, mStr] = (typeof value === 'string' ? value : '').split(':');
   const h24 = Math.max(0, Math.min(parseInt(hStr) || 0, 23));
   const initMin = String(Math.max(0, Math.min(parseInt(mStr) || 0, 55))).padStart(2, '0');
   const initMinIdx = Math.max(0, MINUTE_LIST.indexOf(initMin));

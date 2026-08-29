@@ -3,6 +3,7 @@ import { Share2 } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { BottomSheet } from '../ui/BottomSheet.js';
 import { loadKakaoSdk } from '../../../lib/kakao.js';
+import { initSentry } from '../../../lib/sentry.js';
 
 declare global {
   interface Window {
@@ -28,20 +29,18 @@ const KakaoIcon = () => (
 export interface ShareSheetProps {
   cafeName: string;
   mealType: string;
-  menuText: string;
+  featuredItem: string | null;
   dateLabel: string;
   shareUrl: string;
   onClose: () => void;
   onCopied?: () => void;
 }
 
-export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, onClose, onCopied }: ShareSheetProps) {
+export function ShareSheet({ cafeName, dateLabel, mealType, featuredItem, shareUrl, onClose, onCopied }: ShareSheetProps) {
   const posthog = usePostHog();
   const mealEmoji = mealType.includes('조식') ? '☀️' : mealType.includes('석식') ? '🌙' : mealType.includes('천원') ? '💰' : '🍴';
   const titleLine = `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 공유하기`;
 
-  const boldMatch = menuText?.match(/<b[^>]*>(.*?)<\/b>/i);
-  const featuredItem = boldMatch ? boldMatch[1] : null;
   const kakaoTitle = featuredItem
     ? `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 '${featuredItem}'입니다!`
     : `${dateLabel} ${cafeName} ${mealType}${mealEmoji} 메뉴는 뭘까요?`;
@@ -61,8 +60,11 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
     posthog?.capture('cafeteria_share_clicked', { method: 'kakao', cafeName, mealType });
     try {
       await loadKakaoSdk();
-    } catch {
+    } catch (e) {
       const status = window.__kakaoStatus ?? 'UNKNOWN';
+      initSentry().then(Sentry => {
+        Sentry.captureException(e, { tags: { source: 'kakao-share-load', status } });
+      });
       if (status === 'NO_KEY') alert('앱 키가 설정되어 있지 않아요.\n[오류 코드: NO_APP_KEY]');
       else if (status === 'INIT_ERROR') alert('SDK 초기화 중 오류가 발생했어요.\n[오류 코드: INIT_ERROR]');
       else alert('카카오 SDK를 불러오지 못했어요.\n[오류 코드: SDK_NOT_LOADED]');
@@ -92,6 +94,9 @@ export function ShareSheet({ cafeName, dateLabel, mealType, menuText, shareUrl, 
       onClose();
     } catch (e: any) {
       const code = e?.code ?? e?.status ?? 'UNKNOWN';
+      initSentry().then(Sentry => {
+        Sentry.captureException(e, { tags: { source: 'kakao-share-send', code } });
+      });
       alert(`카카오톡 공유에 실패했어요.\n[오류 코드: ${code}]`);
     }
   };
