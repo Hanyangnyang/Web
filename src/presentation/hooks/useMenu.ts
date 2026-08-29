@@ -31,7 +31,7 @@ export interface UseMenuResult {
   refetchMenu: () => void;
 }
 
-export function useMenu(): UseMenuResult {
+export function useMenu(isActive = true): UseMenuResult {
   const [menuDate, setMenuDate] = useState<Date>(getInitialDate);
 
   const periodQuery = useQuery({
@@ -44,6 +44,7 @@ export function useMenu(): UseMenuResult {
       return true;
     },
     staleTime: MENU_STALE_TIME,
+    enabled: isActive,
   });
 
   const hasCachedMenu = queryClient.getQueryData(menuQueryKey(menuDate)) !== undefined;

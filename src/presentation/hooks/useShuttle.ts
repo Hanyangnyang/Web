@@ -59,11 +59,12 @@ export function useShuttle(isActive = false) {
   };
   const setLineId = (l: string) => { setLineIdState(l); localStorage.setItem('shuttle_lineId', l); };
 
-  // 셔틀 시간표 (백엔드 API — staleTime 내에서 재요청 없음)
+  // 셔틀 시간표 (백엔드 API — staleTime 내에서 재요청 없음, 셔틀탭 진입 시에만 요청)
   const scheduleQuery = useQuery({
     queryKey: SCHEDULE_QUERY_KEY,
     queryFn: () => getShuttleDataUseCase.execute(),
     staleTime: BUS_STALE_TIME,
+    enabled: isActive,
   });
   const allData = scheduleQuery.data ?? null;
   const loadErr = scheduleQuery.isError ? '셔틀 시간표를 불러오지 못했습니다' : null;
@@ -87,7 +88,7 @@ export function useShuttle(isActive = false) {
     queryKey: SUBWAY_SCHEDULE_QUERY_KEY,
     queryFn: () => getSubwayScheduleUseCase.execute(),
     staleTime: SUBWAY_STALE_TIME,
-    enabled: needsSubway,
+    enabled: needsSubway && isActive,
   });
 
   // 지하철 연결편 조회는 셔틀의 custom_holidays(학교 자체 기념일) 미리보기와 무관하게
