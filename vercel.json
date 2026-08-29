@@ -1,4 +1,10 @@
 {
+  "crons": [
+    { "path": "/api/cron/refresh-insta-profiles", "schedule": "0 0 1 */4 *" }
+  ],
+  "functions": {
+    "api/cron/refresh-insta-profiles.js": { "maxDuration": 60 }
+  },
   "headers": [
     {
       "source": "/.well-known/(.*)",

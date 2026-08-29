@@ -24,9 +24,13 @@ function mockFetch(impl: (url: string) => Promise<Response>) {
 
 function makeBanners() {
   return [
-    { id: 1, image_url: 'https://example.com/a.png', click_url: null },
-    { id: 2, image_url: 'https://example.com/b.png', click_url: 'https://example.com' },
+    { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 1 },
+    { id: 2, imageUrl: 'https://example.com/b.png', altText: '광고 배너', clickUrl: 'https://example.com', displayOrder: 2 },
   ];
+}
+
+function bannersResponse(banners = makeBanners()) {
+  return { success: true, data: banners };
 }
 
 describe('useBanners (React Query)', () => {
@@ -41,19 +45,32 @@ describe('useBanners (React Query)', () => {
   it('캐시가 없으면 loading=true, banners=[]로 시작한다', () => {
     mockFetch(() => new Promise(() => {})); // 응답 없이 계속 대기
 
-    const { result } = renderHook(() => useBanners(true), { wrapper });
+    const { result } = renderHook(() => useBanners(), { wrapper });
 
     expect(result.current.banners).toEqual([]);
     expect(result.current.loading).toBe(true);
   });
 
   it('fetch 성공 시 배너가 반영된다', async () => {
-    mockFetch(() => Promise.resolve(jsonResponse(true, { banners: makeBanners() })));
+    mockFetch(() => Promise.resolve(jsonResponse(true, bannersResponse())));
 
-    const { result } = renderHook(() => useBanners(true), { wrapper });
+    const { result } = renderHook(() => useBanners(), { wrapper });
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.banners).toHaveLength(2);
+  });
+
+  it('서버가 뒤섞어 보내도 displayOrder 순서대로 정렬해서 돌려준다', async () => {
+    mockFetch(() => Promise.resolve(jsonResponse(true, bannersResponse([
+      { id: 3, imageUrl: 'https://example.com/c.png', altText: '', clickUrl: '', displayOrder: 30 },
+      { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 10 },
+      { id: 2, imageUrl: 'https://example.com/b.png', altText: '', clickUrl: '', displayOrder: 20 },
+    ]))));
+
+    const { result } = renderHook(() => useBanners(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.banners.map((b) => b.id)).toEqual([1, 2, 3]);
   });
 
   it('쿼리 캐시에 이미 신선한 데이터가 있으면 즉시 그 데이터로 렌더되고 fetch를 하지 않는다', () => {
@@ -61,7 +78,7 @@ describe('useBanners (React Query)', () => {
 
     const fetchSpy = mockFetch(() => new Promise(() => {}));
 
-    const { result } = renderHook(() => useBanners(true), { wrapper });
+    const { result } = renderHook(() => useBanners(), { wrapper });
 
     expect(result.current.loading).toBe(false);
     expect(result.current.banners).toHaveLength(2);
@@ -73,7 +90,7 @@ describe('useBanners (React Query)', () => {
 
     mockFetch(() => Promise.resolve(jsonResponse(false, null)));
 
-    const { result } = renderHook(() => useBanners(true), { wrapper });
+    const { result } = renderHook(() => useBanners(), { wrapper });
 
     // 캐시가 있어 처음엔 재요청을 안 하므로, 명시적으로 무효화해 재검증을 유도
     await act(async () => {
@@ -89,22 +106,14 @@ describe('useBanners (React Query)', () => {
   it('캐시도 없는데 fetch까지 실패하면 banners=[]로 정리되고 loading은 false로 풀린다', async () => {
     mockFetch(() => Promise.resolve(jsonResponse(false, null)));
 
-    const { result } = renderHook(() => useBanners(true), { wrapper });
+    const { result } = renderHook(() => useBanners(), { wrapper });
 
     await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 10000 });
     expect(result.current.banners).toEqual([]);
   }, 15000);
 
-  it('isVisible=false면 쿼리가 비활성화되어 fetch가 나가지 않는다', () => {
-    const fetchSpy = mockFetch(() => new Promise(() => {}));
-
-    renderHook(() => useBanners(false), { wrapper });
-
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
-
   it('prefetchBanners()를 동시에 두 번 호출해도 실제 fetch는 한 번만 나간다 (react-query 요청 dedup)', async () => {
-    const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, { banners: makeBanners() })));
+    const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, bannersResponse())));
 
     await Promise.all([prefetchBanners(), prefetchBanners()]);
 

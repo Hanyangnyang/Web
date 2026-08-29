@@ -1,5 +1,32 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
 import { getKSTParts, getKSTDateKey } from '../../utils/time.js';
+import { getDistanceKm } from '../utils/geo.js';
+
+export interface Coords {
+  latitude: number;
+  longitude: number;
+}
+
+// 셔틀이 정차하는 지점의 좌표 — 이름이 같아도 일반버스 정류소(PublicBus.ts의 STOP_COORDS)와는 실제 위치가 다르다
+export const STATION_COORDS: Record<string, { lat: number; lon: number }> = {
+  '기숙사': { lat: 37.293338, lon: 126.836230 },
+  '셔틀콕': { lat: 37.298737, lon: 126.837870 },
+  '한대앞': { lat: 37.309650, lon: 126.852108 },
+};
+
+// 좌표 기준 가장 가까운 셔틀 정류장. 모든 정류장이 1km 이상이면(캠퍼스 밖) '한대앞' 고정
+export const pickClosestStop = ({ latitude, longitude }: Coords): string => {
+  let closestStop = '한대앞';
+  let minDistance = Infinity;
+  Object.entries(STATION_COORDS).forEach(([name, coord]) => {
+    const dist = getDistanceKm(latitude, longitude, coord.lat, coord.lon);
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestStop = name;
+    }
+  });
+  return minDistance >= 1.0 ? '한대앞' : closestStop;
+};
 
 export interface RouteStopDef {
   name: string;
@@ -13,18 +40,6 @@ export interface RouteDef {
   stops: RouteStopDef[];
 }
 
-export interface SubwayOpt {
-  id: string;
-  line: string;
-  color: string;
-  dest: string;
-  dir: string;
-  shortDest: string;
-  subwayId: string;
-  updnLine: string;
-}
-
-// shuttle.json 원본 행을 정규화한 도메인 셔틀 행
 export interface ShuttleRow {
   route: string;
   period: string;
@@ -32,9 +47,6 @@ export interface ShuttleRow {
   dep: string;
 }
 
-// ShuttleDataSource의 raw 응답을 도메인 엔티티로 변환 — 지금은 필드가 그대로 대응되지만,
-// 나중에 실제 백엔드 API가 다른 필드명/형식으로 내려줘도 이 함수만 고치면 나머지 도메인
-// 로직(computeSchedule 등)은 안 바뀜
 export function createShuttleRow(raw: { route: string; period: string; dayType: string; dep: string }): ShuttleRow {
   return {
     route: raw.route,
@@ -44,45 +56,17 @@ export function createShuttleRow(raw: { route: string; period: string; dayType: 
   };
 }
 
-// 지하철 도착 정보 도메인 엔티티 (raw 응답은 ShuttleDataSource의 SubwayArrivalApiItem)
-export interface SubwayArrival {
-  subwayId: string;
-  updnLine: string;
-  dest: string;
-  arrTime: string;
-  trainNo: string;
-  isRealtime: boolean;
-}
-
-export function createSubwayArrival(raw: {
-  subwayId: string;
-  updnLine: string;
-  dest: string;
-  arrTime: string;
-  trainNo: string;
-  isRealtime: boolean;
-}): SubwayArrival {
-  return {
-    subwayId: raw.subwayId,
-    updnLine: raw.updnLine,
-    dest: raw.dest,
-    arrTime: raw.arrTime,
-    trainNo: raw.trainNo,
-    isRealtime: raw.isRealtime,
-  };
-}
-
 export interface ScheduleItem {
   depMin: number;
-  dep: string;
-  arr: string;
-  arrLabel: string;
-  subway: boolean;
-  route: string;
+  dep: string;  // 출발시각
+  arr: string;  // 다음 정류장 도착시각
+  arrLabel: string;  // 다음 정류장 이름 
+  subway: boolean;   // 그 정류장에서 지하철 연결 가능한지 플래그
+  route: string;     // 노선명 
 }
 
 export interface FullScheduleItem extends ScheduleItem {
-  isLast: boolean;
+  isLast: boolean;  // 막차여부 
 }
 
 export interface ShuttleAppConfig {
@@ -91,13 +75,6 @@ export interface ShuttleAppConfig {
   force_weekend?: boolean;
   no_operation_days?: string[];
   force_no_operation?: boolean;
-}
-
-// connectingTrains가 필요로 하는 최소 구조 (실제 값은 위 SubwayArrival)
-export interface SubwayArrivalLike {
-  subwayId: string;
-  updnLine: string;
-  arrTime: string;
 }
 
 // 화면에 표시되는 정류장 목록
@@ -160,14 +137,12 @@ export const ROUTE_DEFS: Record<string, RouteDef> = {
   },
 };
 
-export const SUBWAY_OPTS: SubwayOpt[] = [
-  { id: 'line4-bulam', line: '4호선',    color: '#33AADF', dest: '불암산행', dir: '상행', shortDest: '불암산', subwayId: '1004', updnLine: '상행' },
-  { id: 'line4-oido',  line: '4호선',    color: '#33AADF', dest: '오이도행', dir: '하행', shortDest: '오이도', subwayId: '1004', updnLine: '하행' },
-  { id: 'sb-wang',     line: '수인분당선', color: '#F5A623', dest: '왕십리행', dir: '상행', shortDest: '왕십리', subwayId: '1075', updnLine: '상행' },
-  { id: 'sb-incheon',  line: '수인분당선', color: '#F5A623', dest: '인천행',   dir: '하행', shortDest: '인천',   subwayId: '1075', updnLine: '하행' },
-];
+// STOPS 중 지하철 연결정보가 필요한 정류장 — ROUTE_DEFS에서 subway:true인 구간의 출발 정류장만 뽑아 도출.
+// 노선이 추가/변경돼도 이 줄을 손댈 필요 없이 항상 최신 상태를 반영한다.
+export const SUBWAY_CONNECTED_STOPS = [...new Set(
+  Object.values(ROUTE_DEFS).flatMap(def => def.stops.filter(s => s.subway).map(s => s.name))
+)];
 
-// ── 순수 헬퍼 함수 ──
 export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 export const curMin = () => { const { hours, minutes } = getKSTParts(); return hours * 60 + minutes; };
 
@@ -183,11 +158,9 @@ export const dayType = (isHolidayServer: boolean | null, customHolidays: string[
 
 const pad2      = (n: number) => String(n).padStart(2, '0');
 const intToHHMM = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`;
-
-// 현재 날짜 문자열 (YYYY-MM-DD, KST 기준)
 const getYYYYMMDD = () => getKSTDateKey();
 
-// ── 공통: allData를 displayStop 기준 시간 목록으로 매핑 ──
+// 공통: allData를 displayStop 기준 시간 목록으로 매핑 
 function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleItem[] {
   const items: ScheduleItem[] = [];
   for (const row of rows) {
@@ -270,16 +243,4 @@ export function computeFullSchedule(
 
   const lastMin = allMapped.length > 0 ? allMapped[allMapped.length - 1].depMin : -1;
   return allMapped.map(r => ({ ...r, isLast: r.depMin === lastMin }));
-}
-
-// 셔틀 도착 이후 연결 가능한 지하철 편 필터 (순수 함수)
-export function connectingTrains<T extends SubwayArrivalLike>(subwayArrivals: T[], shuttleArrTime: string, lineId: string): T[] {
-  if (!subwayArrivals?.length) return [];
-  const opt = SUBWAY_OPTS.find(o => o.id === lineId);
-  if (!opt) return [];
-  const arrM = toMin(shuttleArrTime);
-  return subwayArrivals
-    .filter(tr => tr.subwayId === opt.subwayId && tr.updnLine === opt.updnLine)
-    .filter(tr => toMin(tr.arrTime) >= arrM)
-    .slice(0, 2);
 }

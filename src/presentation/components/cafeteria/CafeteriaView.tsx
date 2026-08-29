@@ -2,15 +2,17 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Bell } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
-import { getKSTDate } from '../../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../../utils/time.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
+import { ErrorBoundary } from '../common/ErrorBoundary.js';
+import { CardFallback } from '../common/CardFallback.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
-import { getDateLabel } from './cafeteriaFormat.js';
+import { getDateLabel, getFeaturedItem } from './cafeteriaFormat.js';
 import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
-import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
+import type { MenuWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
 const CafeteriaAlarmSettings = lazy(() => import('./CafeteriaAlarmSettings.js').then(m => ({ default: m.CafeteriaAlarmSettings })));
 const ShareSheet = lazy(() => import('./ShareSheet.js').then(m => ({ default: m.ShareSheet })));
@@ -27,11 +29,12 @@ interface CafeteriaViewProps {
   cafes: Cafe[];
   loading: boolean;
   revalidating: boolean;
+  onRetry: () => void;
   cafeDeepLink: CafeDeepLink | null;
   onCafeDeepLinkHandled?: () => void;
 }
 
-export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
+export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, onRetry, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef<HTMLDivElement>(null);
@@ -44,8 +47,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   const selectedCafeHours: CafeHours = selectedCafeId === 'all' ? {} : (foundCafe?.hours ?? {});
 
   // "전체"/단일 식당 모드 구분 없이 MealTypeAccordion이 동일한 모양을 다루도록 cafeName/cafeId를 항상 붙인다
-  const menusWithCafe: MenuItemWithCafe[] = selectedCafeId === 'all'
-    ? cafes.reduce<MenuItemWithCafe[]>((acc, c) => {
+  const menusWithCafe: MenuWithCafe[] = selectedCafeId === 'all'
+    ? cafes.reduce<MenuWithCafe[]>((acc, c) => {
         if (!c.available || !c.menus.length) return acc;
         return acc.concat(c.menus.map(m => ({ ...m, cafeName: c.name, cafeId: c.id })));
       }, [])
@@ -83,7 +86,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
     const urlDate = urlParams.get('date');
     if (urlDate) {
       const parsed = new Date(urlDate);
-      if (!isNaN(parsed.getTime()) && urlDate !== date.toISOString().split('T')[0]) {
+      if (!isNaN(parsed.getTime()) && urlDate !== toDateKey(date)) {
         changeDate(parsed);
       }
     }
@@ -151,7 +154,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       return;
     }
 
-    const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDate());
+    const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDateUnsafe());
     setExpandedGroups(initial);
 
     if (scrollTargetType) {
@@ -197,7 +200,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
           <ShareSheet
             cafeName={shareTarget.cafeName}
             mealType={shareTarget.type}
-            menuText={shareTarget.menu.menu}
+            featuredItem={getFeaturedItem(shareTarget.menu.menuItems)}
             dateLabel={shareTarget.dateLabel}
             shareUrl={shareTarget.shareUrl}
             onClose={() => setShareTarget(null)}
@@ -223,46 +226,56 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       </div>
 
       {/* 메뉴 목록 */}
-      <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
-        {revalidating && (
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
-            <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
-            <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>학식 정보를 가져오는 중...</span>
-          </div>
-        )}
-
-        <div style={{ filter: revalidating ? 'blur(2px)' : 'none', transition: 'filter 0.3s ease' }}>
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite]" />
-              <span className="text-xs font-semibold text-text-sub">학식 정보를 가져오는 중...</span>
+      <ErrorBoundary name="cafeteria-list" fallback={<CardFallback message="학식 정보를 표시할 수 없습니다" />}>
+        <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
+          {revalidating && (
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
+              <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
+              <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>학식 정보를 가져오는 중...</span>
             </div>
-          ) : cafes.length > 0 ? (
-            Object.keys(groupedMenus).length > 0 ? (
-              sortMealTypeEntries(Object.entries(groupedMenus))
-                .map(([type, menus]) => (
-                  <MealTypeAccordion
-                    key={type}
-                    type={type}
-                    menus={menus}
-                    isAllMode={selectedCafeId === 'all'}
-                    isExpanded={!!expandedGroups[type]}
-                    onToggle={() => toggleGroup(type)}
-                    hours={selectedCafeHours}
-                    cafes={cafes}
-                    targetStr={date.toISOString().split('T')[0]}
-                    dateLabel={getDateLabel(date)}
-                    onShareRequest={setShareTarget}
-                  />
-                ))
-            ) : (
-              <div className="text-center py-12 px-4 text-text-sub">해당 식당은 오늘 등록된 메뉴가 없습니다.</div>
-            )
-          ) : (
-            <div className="text-center py-12 px-4 text-text-sub">정보를 불러올 수 없습니다.</div>
           )}
+
+          <div style={{ filter: revalidating ? 'blur(2px)' : 'none', transition: 'filter 0.3s ease' }}>
+            {/* 1. 첫 로딩 — 스피너 */}
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 gap-3">
+                <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite]" />
+                <span className="text-xs font-semibold text-text-sub">학식 정보를 가져오는 중...</span>
+              </div>
+            ) : cafes.length > 0 ? (
+              Object.keys(groupedMenus).length > 0 ? (
+                // 4. 정상 — 그날 등록된 메뉴가 하나라도 있음
+                sortMealTypeEntries(Object.entries(groupedMenus))
+                  .map(([type, menus]) => (
+                    <MealTypeAccordion
+                      key={type}
+                      type={type}
+                      menus={menus}
+                      isAllMode={selectedCafeId === 'all'}
+                      isExpanded={!!expandedGroups[type]}
+                      onToggle={() => toggleGroup(type)}
+                      hours={selectedCafeHours}
+                      cafes={cafes}
+                      targetStr={toDateKey(date)}
+                      dateLabel={getDateLabel(date)}
+                      onShareRequest={setShareTarget}
+                    />
+                  ))
+              ) : (
+                // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 그날 등록된 메뉴가 하나도 없음
+                <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
+                  <div className="min-h-[80px] flex flex-col justify-center py-8 text-center text-text-sub">
+                    <p>해당 식당은 오늘 등록된 메뉴가 없습니다</p>
+                  </div>
+                </div>
+              )
+            ) : (
+              // 2. 조회 실패 — KNOWN_CAFES 병합 덕에 성공이면 cafes가 항상 4개라, 여긴 진짜 실패일 때만 옴
+              <CardFallback message="학식 정보를 불러오지 못했습니다" onRetry={onRetry} className="min-h-[80px]" />
+            )}
+          </div>
         </div>
-      </div>
+      </ErrorBoundary>
     </div>
   );
 }

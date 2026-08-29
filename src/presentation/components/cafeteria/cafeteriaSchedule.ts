@@ -1,11 +1,12 @@
 // 순수 함수: 학식 메뉴를 끼니(type)별로 묶고, 표시 순서와 기본 펼침 상태를 결정
-import type { MenuItemWithCafe } from './cafeteriaTypes.js';
+import { toDateKey } from '../../../utils/time.js';
+import type { MenuWithCafe } from './cafeteriaTypes.js';
 
 const MEAL_ORDER = ['조식', '중식', '석식'];
 
 // 메뉴를 끼니 타입(type)별로 그룹핑
-export function groupMenusByType(menus: MenuItemWithCafe[]): Record<string, MenuItemWithCafe[]> {
-  return menus.reduce<Record<string, MenuItemWithCafe[]>>((acc, m) => {
+export function groupMenusByType(menus: MenuWithCafe[]): Record<string, MenuWithCafe[]> {
+  return menus.reduce<Record<string, MenuWithCafe[]>>((acc, m) => {
     if (!acc[m.type]) acc[m.type] = [];
     acc[m.type].push(m);
     return acc;
@@ -29,11 +30,11 @@ export interface DefaultAccordionState {
 
 // 딥링크(urlType) 없이 진입했을 때, 현재 시각(KST) 기준으로 어느 끼니를 기본으로 펼쳐둘지 결정
 export function getDefaultAccordionState(
-  menusWithCafe: MenuItemWithCafe[],
+  menusWithCafe: MenuWithCafe[],
   date: Date,
   nowKst: Date
 ): DefaultAccordionState {
-  const isToday = nowKst.toISOString().split('T')[0] === date.toISOString().split('T')[0];
+  const isToday = toDateKey(nowKst) === toDateKey(date);
   const h = nowKst.getUTCHours();
   const targetType = h < 9 ? '조식' : h >= 14 ? '석식' : '중식';
   const hasTarget = menusWithCafe.some(m => m.type.includes(targetType));

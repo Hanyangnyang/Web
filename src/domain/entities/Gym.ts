@@ -1,42 +1,26 @@
-// 도메인 엔티티: 체대 헬스장 시간표
+// 도메인 엔티티: 체대 헬스장 시간표 (기간 메타데이터 + 요일별 수업 세션 목록)
+// "시간×요일 그리드"로 변환하는 건 테이블 UI 전용 표현이라 presentation/gymScheduleFormat.ts에 위치
 
-export interface GymScheduleCell {
-  name: string;
-  type: string;
-  endTime?: string;
-}
-
-export interface GymScheduleRow {
-  hour: number;
-  label: string;
-  mon: GymScheduleCell | '-';
-  tue: GymScheduleCell | '-';
-  wed: GymScheduleCell | '-';
-  thu: GymScheduleCell | '-';
-  fri: GymScheduleCell | '-';
+export interface GymClassSession {
+  dayOfWeek: 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
+  startTime: string; // "HH:mm"
+  endTime: string;   // "HH:mm"
+  classId: number;
+  className: string;
 }
 
 export interface GymPeriod {
   id: string;
-  name: string;
+  periodType: 'semester' | 'seasonal' | 'vacation';
   title: string;
   startDate: string;
   endDate: string;
-  hours: string;
-  schedule: GymScheduleRow[];
+  openTime: string;  // "HH:mm"
+  closeTime: string; // "HH:mm"
+  classes: GymClassSession[];
 }
 
 export interface GymSchedule {
   location: string;
   periods: GymPeriod[];
-}
-
-// GymApiDataSource의 raw 응답을 도메인 엔티티로 변환 — 지금은 필드가 그대로 대응되지만,
-// 나중에 실제 백엔드 API가 다른 필드명/형식으로 내려줘도 이 함수만 고치면 나머지 도메인/
-// 프레젠테이션 로직은 안 바뀜
-export function createGymSchedule(raw: { location: string; periods: GymPeriod[] }): GymSchedule {
-  return {
-    location: raw.location,
-    periods: raw.periods,
-  };
 }

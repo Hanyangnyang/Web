@@ -6,7 +6,7 @@ describe('createCafe', () => {
     const cafe = createCafe({
       id: 're12',
       name: '학생식당',
-      menus: [{ type: '중식', menu: '<b>제육볶음</b>', price: '5000원' }],
+      menus: [{ type: '중식', menuItems: ['제육볶음'], price: '5000원' }],
       hasJeyuk: true,
       available: true,
       hours: { 중식: '11:30~13:30' },
@@ -14,7 +14,7 @@ describe('createCafe', () => {
     expect(cafe).toEqual({
       id: 're12',
       name: '학생식당',
-      menus: [{ type: '중식', menu: '<b>제육볶음</b>', price: '5000원' }],
+      menus: [{ type: '중식', menuItems: ['제육볶음'], price: '5000원' }],
       hasJeyuk: true,
       available: true,
       hours: { 중식: '11:30~13:30' },

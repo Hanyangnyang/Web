@@ -1,9 +1,11 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { ChevronDown } from 'lucide-react';
-import type { ScheduleItem, ShuttleAppConfig, SubwayArrival } from '../../../domain/entities/Shuttle.js';
-import { TimetableRow } from './TimetableRow.jsx';
+import type { ScheduleItem, ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
+import type { SubwayScheduleRow } from '../../../domain/entities/Subway.js';
+import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
+import { CardFallback } from '../common/CardFallback.js';
 import { StopSelector } from './StopSelector.jsx';
 import { TimetableHeader } from './TimetableHeader.jsx';
 import { SubwayRedirectOverlay } from './SubwayRedirectOverlay.jsx';
@@ -24,14 +26,15 @@ interface SchoolShuttleSectionProps {
   schedule: (ScheduleItem & { isLast?: boolean })[];
   nextIdx: number;
   now: number;
-  subwayArrivals: SubwayArrival[];
-  subwayOffPeak: boolean;
-  isHolidayServer: boolean | null;
+  subwayArrivals: SubwayScheduleRow[];
   isWeekend: boolean;
   needsSubway: boolean;
   loadErr: string | null;
+  onRetry: () => void;
   isLoading: boolean;
   isSubwayLoading: boolean;
+  isSubwayError: boolean;
+  onSubwayRetry: () => void;
   isGpsLoading: boolean;
   visibleCount: number;
   loadMore: () => void;
@@ -50,10 +53,10 @@ export function SchoolShuttleSection({
   stop, setStop,
   lineId, setLineId,
   schedule, nextIdx, now,
-  subwayArrivals, subwayOffPeak,
-  isHolidayServer, isWeekend,
+  subwayArrivals,
+  isWeekend,
   needsSubway,
-  loadErr, isLoading, isSubwayLoading, isGpsLoading,
+  loadErr, onRetry, isLoading, isSubwayLoading, isSubwayError, onSubwayRetry, isGpsLoading,
   visibleCount, loadMore,
   isFullMode, setIsFullMode,
   fullDayType, setFullDayType,
@@ -78,8 +81,8 @@ export function SchoolShuttleSection({
   const upcomingSchedule = findUpcomingSchedule(appConfig?.period_schedule, today);
   const upcomingScheduleMessage = upcomingSchedule ? formatUpcomingScheduleMessage(upcomingSchedule, today) : null;
 
-  const HIDE_COL_STOPS = ['한대앞', '셔틀콕 건너편', '예술인', '중앙역'];
-  const hideSubwayCol = HIDE_COL_STOPS.includes(stop);
+  // needsSubway(지하철 연동 필요 정류장)의 여집합 — SUBWAY_CONNECTED_STOPS(Shuttle.ts)에서 파생
+  const hideSubwayCol = !needsSubway;
 
   // 스크롤 동기화 만료 처리 효과
   useEffect(() => {
@@ -135,20 +138,9 @@ export function SchoolShuttleSection({
     setIsFullMode(!isFullMode);
   };
 
-  if (loadErr) {
-    return (
-      <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>{loadErr}</p></div></div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="pb-20"><div className="py-8 text-center text-text-sub font-semibold"><p>불러오는 중…</p></div></div>
-    );
-  }
-
   return (
     <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
+      {/* 출발지 */}
       <StopSelector
         viewMode={viewMode}
         setViewMode={setViewMode}
@@ -170,7 +162,6 @@ export function SchoolShuttleSection({
           fullDayType={fullDayType}
           setFullDayType={setFullDayType}
           appConfig={appConfig}
-          isHolidayServer={isHolidayServer}
           isWeekend={isWeekend}
           needsSubway={needsSubway}
           hideSubwayCol={hideSubwayCol}
@@ -180,8 +171,25 @@ export function SchoolShuttleSection({
           onToggleFullMode={handleToggleFullMode}
         />
 
+        {/* 지하철 연결편 조회 실패 안내 — 행마다 반복 표시하면 스팸이라 여기 한 번만. 다른 공지 배너와 동일한 UI + 재시도 버튼만 추가 */}
+        <NoticeBanner
+          shouldShow={needsSubway && !hideSubwayCol && isSubwayError}
+          message="지하철 연결 정보를 불러오지 못했습니다"
+          delayMs={0}
+          variant="error"
+          actionLabel="다시 시도"
+          onAction={onSubwayRetry}
+        />
+
         <div ref={containerRef} className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-          {schedule.length > 0 ? (() => {
+          {loadErr ? (
+            // 2. 조회 실패 — 백엔드 요청이 실패한 경우
+            <CardFallback message={loadErr} onRetry={onRetry} className="min-h-[425px]" />
+          ) : isLoading ? (
+            // 1. 첫 로딩 — 헤더는 이미 떠있고, 목록 자리만 실제 행과 같은 모양으로 채워둠
+            Array.from({ length: 5 }).map((_, i) => <TimetableRowSkeleton key={i} hideSubwayCol={hideSubwayCol} />)
+          ) : schedule.length > 0 ? (() => {
+            // 4. 정상 — 조건(정류장/기간/요일)에 맞는 셔틀이 있음
             const fullActiveIdx = isFullMode ? schedule.findIndex(r => r.depMin >= now) : -1;
             return (isFullMode ? schedule : schedule.slice(0, visibleCount)).map((row, i) => (
               <TimetableRow
@@ -192,8 +200,8 @@ export function SchoolShuttleSection({
                 isLast={row.isLast || i === schedule.length - 1}
                 isPast={!isFullMode && row.depMin < now}
                 subwayArrivals={subwayArrivals}
-                subwayOffPeak={subwayOffPeak}
                 isSubwayLoading={isSubwayLoading}
+                isSubwayError={isSubwayError}
                 hideSubwayCol={hideSubwayCol}
                 now={now}
                 isFullMode={isFullMode}
@@ -203,6 +211,7 @@ export function SchoolShuttleSection({
               />
             ));
           })() : (
+            // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 오늘 남은 셔틀(또는 해당 조건의 운행)이 없음
             <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
               <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
             </div>

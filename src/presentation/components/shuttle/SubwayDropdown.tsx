@@ -1,7 +1,7 @@
 // 컴포넌트: 지하철 노선(4호선/수인분당선 상하행) 선택 드롭다운
 import { useState, useEffect, useRef } from 'react';
-import { SUBWAY_OPTS } from '../../../domain/entities/Shuttle.js';
-import { LineBadge } from './LineBadge.jsx';
+import { SUBWAY_OPTS } from '../../../domain/entities/Subway.js';
+import { SubwayLineBadge } from './SubwayLineBadge.jsx';
 
 interface SubwayDropdownProps {
   selected: string;
@@ -11,7 +11,8 @@ interface SubwayDropdownProps {
 export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const opt = SUBWAY_OPTS.find(o => o.id === selected)!;
+  // selected가 SUBWAY_OPTS에 없을 수 있음(예: 노선 개편 후 남은 오래된 localStorage 값) — 못 찾으면 첫 옵션으로 대체
+  const opt = SUBWAY_OPTS.find(o => o.id === selected) ?? SUBWAY_OPTS[0];
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
@@ -28,7 +29,7 @@ export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
         className={`flex items-center gap-2 px-[10px] py-[7px] pl-2 bg-white border-[1.5px] rounded-card cursor-pointer transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.06)] w-full min-w-0 h-[44px] ${open ? 'border-primary shadow-[0_0_0_3px_rgba(14,74,132,0.2)]' : 'border-slate-200'}`}
         onClick={() => setOpen(p => !p)}
       >
-        <LineBadge opt={opt} size={28} />
+        <SubwayLineBadge opt={opt} size={28} />
         <div className="flex flex-col gap-px flex-1 min-w-0">
           <span className="text-[clamp(8px,2vw,9px)] font-bold text-text-hint tracking-[0.04em] whitespace-nowrap overflow-hidden text-ellipsis">{opt.line} · {opt.dir}</span>
           <span className="text-[clamp(12px,3vw,13px)] font-extrabold text-text-main whitespace-nowrap overflow-hidden text-ellipsis">{opt.dest}</span>
@@ -46,7 +47,7 @@ export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
           {[{ label: '4호선', items: line4 }, { label: '수인분당선', items: sb }].map(({ label, items }) => (
             <div key={label}>
               <div className="flex items-center gap-[7px] px-3.5 pt-[9px] pb-1.5 text-[10px] font-bold text-text-hint tracking-[0.05em] border-t border-surface first:border-t-0">
-                <LineBadge opt={items[0]} size={18} /><span>{label}</span>
+                <SubwayLineBadge opt={items[0]} size={18} /><span>{label}</span>
               </div>
               {items.map(o => (
                 <div

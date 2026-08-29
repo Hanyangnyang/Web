@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { requestNotificationPermission, checkNotificationPermission } from '../../lib/firebase.js';
 import { supabase, getOrCreateAnonymousUserId } from '../../lib/supabase.js';
 import { getPlatform } from '../../lib/platform.js';
+import { initSentry } from '../../lib/sentry.js';
 
 interface StoredState<TParams> {
   enabled: boolean;
@@ -92,6 +93,9 @@ export function useAlarmSubscription<TParams>({
         }
       } catch (err) {
         console.error(`Failed to sync alarm subscription (${topic})`, err);
+        initSentry().then(Sentry => {
+          Sentry.captureException(err, { tags: { source: 'alarm-subscription-sync', topic } });
+        });
       }
     }
     syncWithServer();
@@ -147,6 +151,9 @@ export function useAlarmSubscription<TParams>({
           }
         } catch (err) {
           console.error(`Failed to sync alarm subscription (${topic})`, err);
+          initSentry().then(Sentry => {
+            Sentry.captureException(err, { tags: { source: 'alarm-subscription-enable', topic } });
+          });
         }
       })();
 
@@ -167,6 +174,9 @@ export function useAlarmSubscription<TParams>({
           });
         } catch (err) {
           console.error(`Failed to sync alarm subscription status (${topic})`, err);
+          initSentry().then(Sentry => {
+            Sentry.captureException(err, { tags: { source: 'alarm-subscription-disable', topic } });
+          });
         }
       })();
     }

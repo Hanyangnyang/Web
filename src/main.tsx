@@ -7,6 +7,8 @@ import { PostHogProvider } from 'posthog-js/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient.js'
 import { initSentry } from './lib/sentry.js'
+import { ErrorBoundary } from './presentation/components/common/ErrorBoundary.jsx'
+import { AppCrashScreen } from './presentation/components/common/AppCrashScreen.jsx'
 
 // Sentry는 초기 렌더를 막지 않도록, 브라우저가 한가할 때(idle) 지연 로드
 const scheduleIdle: (cb: () => void) => void =
@@ -38,11 +40,14 @@ if ('serviceWorker' in navigator) {
 }
 
 // React 렌더링
+// 최상단 ErrorBoundary는 카드 단위 경계(PortalView)를 빠져나온 예외까지 받아내는 최후의 안전망이다.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PostHogProvider client={posthog}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <ErrorBoundary name="app-root" fallback={<AppCrashScreen />}>
+          <App />
+        </ErrorBoundary>
       </QueryClientProvider>
     </PostHogProvider>
   </StrictMode>,

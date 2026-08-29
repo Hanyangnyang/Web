@@ -342,15 +342,15 @@ Deno.serve(async (req) => {
     // --- B. 날씨 알림(WEATHER_ALERT) 처리 ---
     const weatherSubs = matchingSubscriptions.filter(sub => sub.topic === 'WEATHER_ALERT');
     if (weatherSubs.length > 0) {
-      const [weatherRes, subwayRes] = await Promise.all([
+      const [weatherRes, holidayRes] = await Promise.all([
         fetch(`${protocol}://${host}/api/portal?type=weather`),
-        fetch(`${protocol}://${host}/api/subway`).then(r => r.ok ? r.json() : null).catch(() => null)
+        fetch(`${protocol}://${host}/api/holidays`).then(r => r.ok ? r.json() : null).catch(() => null)
       ]);
 
       if (weatherRes.ok) {
         const weatherData = await weatherRes.ok ? await weatherRes.json() : null;
         if (weatherData) {
-          const isHoliday = subwayRes?.isHoliday || false;
+          const isHoliday = holidayRes?.isHoliday || false;
           const currentDay = kst.dayOfWeek;
           const isWeekday = currentDay >= 1 && currentDay <= 5 && !isHoliday;
           
