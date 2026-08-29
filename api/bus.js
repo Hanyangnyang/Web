@@ -1,5 +1,6 @@
 // Vercel Serverless Function: Bus Arrival Data Proxy
 // Integrates Gyeonggi-do Bus Arrival Service (v2) with Cache-Aside + Single-Flight (Request Coalescing)
+import { captureApiError } from './_lib/sentry.js';
 
 const cache = {};
 const activeFetches = {};
@@ -59,8 +60,10 @@ async function getBusArrivals(stationId) {
       // Fallback to stale cache if it exists to maintain high availability
       if (cached) {
         console.warn(`[Bus API Warning] Serving stale cached data for station ${stationId}`);
+        await captureApiError(error, { source: 'api-bus-stale-fallback', stationId });
         return cached.data;
       }
+      await captureApiError(error, { source: 'api-bus', stationId });
       throw error;
     } finally {
       // Clean up the active fetch promise once complete

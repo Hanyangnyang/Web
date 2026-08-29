@@ -2,6 +2,7 @@
 // public/assets/insta-profiles/*.jpg로 커밋한다. 평소 클라이언트는 이 정적 이미지만
 // 읽고(useInstagram.ts) 인스타그램에 직접 요청하지 않으므로, 이 잡이 유일한 갱신 경로다.
 import * as https from 'https';
+import { captureApiError } from '../_lib/sentry.js';
 
 const USERNAMES = [
   'hanyang_erica', 'hanyang_erica_stu', 'hanyang_erica_club_association', 'hyuerica', 'hanyangerica',
@@ -139,9 +140,12 @@ export default async function handler(req, res) {
 
   const results = await Promise.allSettled(USERNAMES.map(refreshOne));
 
-  const summary = results.map((r, i) =>
-    r.status === 'fulfilled' ? r.value : { username: USERNAMES[i], status: 'failed', error: r.reason?.message }
-  );
+  const summary = await Promise.all(results.map(async (r, i) => {
+    if (r.status === 'fulfilled') return r.value;
+    const username = USERNAMES[i];
+    await captureApiError(r.reason, { source: 'insta-refresh', username });
+    return { username, status: 'failed', error: r.reason?.message };
+  }));
 
   console.log('[refresh-insta-profiles]', JSON.stringify(summary));
   res.status(200).json({ summary });

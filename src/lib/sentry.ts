@@ -12,8 +12,7 @@ async function load() {
   Sentry.init(
     {
       dsn: "https://bb060324beea4e9a9a8ebcb92d08c0f6@o4511642871267328.ingest.us.sentry.io/4511642938245120",
-      // dev/preview/production 세 환경 모두 캡처하되, environment 태그로 구분한다.
-      enabled: true,
+      enabled: true, // dev/preview/production 세 환경 모두 캡처하되, environment 태그로 구분한다.
       environment: import.meta.env.VITE_APP_ENV,
       integrations: [
         Sentry.browserTracingIntegration(),
