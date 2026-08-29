@@ -16,6 +16,10 @@ export default defineConfig(({ mode }) => {
   generateFirebaseMessagingSw(env);
 
   return {
+    define: {
+      // Vercel이 빌드 시 자동 주입하는 VERCEL_ENV(production/preview/development)를
+      'import.meta.env.VITE_APP_ENV': JSON.stringify(process.env.VERCEL_ENV || mode),
+    },
     build: {
       sourcemap: true, // Source map generation must be turned on
     },

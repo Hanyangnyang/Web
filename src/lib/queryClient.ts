@@ -12,8 +12,7 @@ export const queryClient = new QueryClient({
   // (재시도를 모두 소진하고 최종 실패했을 때만 호출된다)
   queryCache: new QueryCache({
     onError: (error, query) => {
-      if (!import.meta.env.PROD) return; // 개발 중엔 어차피 Sentry가 비활성이라 SDK만 헛로드된다
-      if (navigator.onLine === false) return; // 기기가 오프라인일 때 에러를 반환하지 않는다 
+      if (navigator.onLine === false) return; // 기기가 오프라인일 때 에러를 반환하지 않는다
       const err = error as (ApiValidationError & HttpError);
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
@@ -30,7 +29,6 @@ export const queryClient = new QueryClient({
   // 뮤테이션은 기본적으로 재시도를 안 하기 때문에(retry: false) 실패 즉시 여기로 온다.
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) => {
-      if (!import.meta.env.PROD) return;
       if (navigator.onLine === false) return;
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
