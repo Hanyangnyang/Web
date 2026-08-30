@@ -3,6 +3,7 @@ import { getMessaging, getToken, isSupported, type Messaging } from 'firebase/me
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { FCM } from '@capacitor-community/fcm';
+import { initSentry } from './sentry.js';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -59,6 +60,9 @@ const requestNativeFcmToken = async (): Promise<string | null> => {
     return token;
   } catch (e) {
     console.error('FCM Push register failed:', e);
+    initSentry().then(Sentry => {
+      Sentry.captureException(e, { tags: { source: 'fcm-native-register' } });
+    });
     return null;
   }
 };
@@ -90,6 +94,9 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
       : await requestWebFcmToken();
   } catch (error) {
     console.error('Error requesting notification permission:', error);
+    initSentry().then(Sentry => {
+      Sentry.captureException(error, { tags: { source: 'fcm-request-permission' } });
+    });
     return null;
   }
 };
@@ -113,6 +120,9 @@ export const checkNotificationPermission = async (): Promise<boolean> => {
     return permission === 'granted';
   } catch (err) {
     console.error('Error checking notification permission:', err);
+    initSentry().then(Sentry => {
+      Sentry.captureException(err, { tags: { source: 'fcm-check-permission' } });
+    });
     return false;
   }
 };

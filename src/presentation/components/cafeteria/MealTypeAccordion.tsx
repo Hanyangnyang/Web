@@ -2,15 +2,15 @@
 // "전체" 모드에서는 식당별로 한 번 더 접힌다 (식당별 미리보기 ↔ 상세 토글)
 import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { getMenuIcon, parseBoldText } from './cafeteriaFormat.js';
+import { getMenuIcon, filterRealMenuItems, parseBoldText, isCheonwonMarker } from './cafeteriaFormat.js';
 import { MenuEntry } from './MenuEntry.js';
 import { Accordion } from '../ui/Accordion.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
-import type { MenuItemWithCafe, ShareTarget } from './cafeteriaTypes.js';
+import type { MenuWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
 interface MealTypeAccordionProps {
   type: string;
-  menus: MenuItemWithCafe[];
+  menus: MenuWithCafe[];
   isAllMode: boolean;
   isExpanded: boolean;
   onToggle: () => void;
@@ -24,10 +24,10 @@ interface MealTypeAccordionProps {
 interface CafeGroup {
   cafeId: string;
   cafeName: string;
-  items: MenuItemWithCafe[];
+  items: MenuWithCafe[];
 }
 
-function groupByCafe(menus: MenuItemWithCafe[]): CafeGroup[] {
+function groupByCafe(menus: MenuWithCafe[]): CafeGroup[] {
   const map = new Map<string, CafeGroup>();
   menus.forEach(m => {
     if (!map.has(m.cafeId)) map.set(m.cafeId, { cafeId: m.cafeId, cafeName: m.cafeName, items: [] });
@@ -45,9 +45,9 @@ export function MealTypeAccordion({
   const mealKey = (['조식', '중식', '석식'] as const).find(k => type.includes(k));
   const hoursText = mealKey ? hours?.[mealKey] : null;
 
-  const priceLabelFor = (menu: MenuItemWithCafe) => {
+  const priceLabelFor = (menu: MenuWithCafe) => {
     if (!menu.price) return undefined;
-    const isCheonwon = type.includes('천원') || menu.menu.includes('천원의아침밥');
+    const isCheonwon = type.includes('천원') || menu.menuItems.some(isCheonwonMarker);
     return isCheonwon ? `${menu.price}💕` : menu.price;
   };
 
@@ -106,10 +106,8 @@ export function MealTypeAccordion({
                         <div className="accordion-inner">
                           <div className={`flex flex-col gap-2 pl-1 pr-1 transition-opacity duration-75 ${isCafeExpanded ? 'opacity-0' : 'opacity-100'}`}>
                             {group.items.map((item, idx) => {
-                              const menuLines = item.menu.split('\n')
-                                .filter(line => !line.includes('천원의아침밥') && line.trim() !== '');
-                              const joinedMenu = menuLines
-                                .map((line, lineIdx) => (lineIdx > 0 ? line.replace(/<\/?b>/g, '') : line))
+                              const joinedMenu = filterRealMenuItems(item.menuItems)
+                                .map((m, i) => (i === 0 ? `<b>${m}</b>` : m))
                                 .join(', ');
                               return (
                                 <div key={idx} className="flex items-baseline justify-between text-[14px] text-text-main gap-3">

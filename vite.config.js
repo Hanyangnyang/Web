@@ -19,6 +19,32 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: true, // Source map generation must be turned on
     },
+    server: {
+      // 로컬 개발 전용 프록시. 브라우저는 same-origin(/backend)으로만 요청하니 CORS 검사를 타지 않고,
+      // 실제 백엔드 호출은 Vite(Node)가 대신한다 — curl이 통과하는 것과 같은 서버 간 요청이 된다.
+      //
+      // ⚠️ 프로덕션 빌드에는 이 서버가 없다. 앱은 www.hanyang.life에서 api.hanyang.life를 직접 부르므로
+      //    배포 전에는 백엔드 CORS 허용이 반드시 필요하다. 이건 로컬 개발을 막지 않으려는 우회일 뿐이다.
+      //
+      // 접두사가 '/api'가 아닌 이유: 아래 api-emulator 미들웨어가 '/api/'를 먼저 가로채서
+      // ./api/v1/banners.js를 찾다가 매 요청마다 에러 로그를 남긴다.
+      proxy: env.VITE_API_BASE_URL ? {
+        '/backend': {
+          target: env.VITE_API_BASE_URL,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/backend/, ''),
+          configure: (proxy) => {
+            // 핵심: Origin을 그대로 넘기면 백엔드 CORS 필터가 프록시 요청도 똑같이 403으로 막는다.
+            // (Spring의 CORS 검사는 브라우저 여부가 아니라 Origin 헤더 유무로 동작한다)
+            // 헤더를 떼어내 curl과 동일한 조건으로 보낸다.
+            proxy.on('proxyReq', (proxyReq) => {
+              proxyReq.removeHeader('origin');
+              proxyReq.removeHeader('referer');
+            });
+          },
+        },
+      } : undefined,
+    },
     plugins: [
       react(),
       VitePWA({

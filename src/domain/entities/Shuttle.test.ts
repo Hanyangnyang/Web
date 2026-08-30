@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { dayType, computeSchedule, computeFullSchedule, connectingTrains } from './Shuttle.js';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { dayType, computeSchedule, computeFullSchedule } from './Shuttle.js';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -43,6 +43,14 @@ const allData = [
 ];
 
 describe('computeSchedule', () => {
+  // computeSchedule은 dayType 인자를 받지 않고 내부에서 '오늘'의 요일을 직접 읽는다.
+  // 시간을 고정하지 않으면 토·일에 돌릴 때 평일 데이터가 통째로 걸러져(주말 10:00만 남아)
+  // 아래 기대값들이 전부 깨진다 — 실제로 그렇게 실패하고 있었다.
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-27')); // 월요일
+  });
+
   it('현재 기간/요일에 맞는 노선만, 정류장 기준 출발·도착 시각으로 매핑한다', () => {
     // '직행' 노선의 기숙사 정류장: off=0, arrLabel=한대앞역, arrOff=15, subway=true
     const result = computeSchedule(allData, '기숙사', 7 * 60 + 50, false, 0, { current_period: '학기중' });
@@ -92,33 +100,5 @@ describe('computeFullSchedule', () => {
   it('overridePeriod가 있으면 appConfig.current_period보다 우선한다', () => {
     const result = computeFullSchedule(allData, '기숙사', '평일', { current_period: '학기중' }, '방학중');
     expect(result.map(r => r.dep)).toEqual(['11:00']);
-  });
-});
-
-describe('connectingTrains', () => {
-  const subwayArrivals = [
-    { subwayId: '1004', updnLine: '상행', arrTime: '08:10' },
-    { subwayId: '1004', updnLine: '상행', arrTime: '08:20' },
-    { subwayId: '1004', updnLine: '상행', arrTime: '08:30' },
-    { subwayId: '1004', updnLine: '하행', arrTime: '08:12' },
-    { subwayId: '1075', updnLine: '상행', arrTime: '08:15' },
-  ];
-
-  it('같은 노선(subwayId)·같은 방향(updnLine)이면서 셔틀 도착 이후인 열차만, 최대 2개까지 반환한다', () => {
-    const result = connectingTrains(subwayArrivals, '08:05', 'line4-bulam');
-    expect(result.map(t => t.arrTime)).toEqual(['08:10', '08:20']); // 3개 중 앞 2개만
-  });
-
-  it('셔틀 도착 시각 이전 열차는 연결 대상에서 제외한다', () => {
-    const result = connectingTrains(subwayArrivals, '08:25', 'line4-bulam');
-    expect(result.map(t => t.arrTime)).toEqual(['08:30']);
-  });
-
-  it('존재하지 않는 lineId면 빈 배열을 반환한다', () => {
-    expect(connectingTrains(subwayArrivals, '08:00', 'no-such-line')).toEqual([]);
-  });
-
-  it('도착정보가 없으면 빈 배열을 반환한다', () => {
-    expect(connectingTrains([], '08:00', 'line4-bulam')).toEqual([]);
   });
 });

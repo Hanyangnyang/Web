@@ -54,6 +54,8 @@ playwright-report/
 
 # 개인 문서 (로컬 전용)
 docs/frontend-roadmap.md
+docs/backend-migration-todo.md
+docs/sentry-coverage.md
 # Sentry Config File
 .env.sentry-build-plugin
 

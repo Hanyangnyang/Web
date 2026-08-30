@@ -1,16 +1,17 @@
 // 컴포넌트: 메뉴 한 세트 (가격 배지 + 메뉴 줄들 + 공유 버튼). 마지막 줄에만 공유 버튼이 붙는다.
 import { Share2 } from 'lucide-react';
 import { MenuItemLine } from './MenuItemLine.js';
-import type { MenuItem } from '../../../domain/entities/Cafe.js';
+import { filterRealMenuItems } from './cafeteriaFormat.js';
+import type { Menu } from '../../../domain/entities/Cafe.js';
 
 interface MenuEntryProps {
-  menu: MenuItem;
+  menu: Menu;
   priceLabel?: string;
   onShare: () => void;
 }
 
 export function MenuEntry({ menu, priceLabel, onShare }: MenuEntryProps) {
-  const menuLines = menu.menu.split('\n').filter(line => !line.includes('천원의아침밥'));
+  const menuLines = filterRealMenuItems(menu.menuItems).map((item, i) => i === 0 ? `<b>${item}</b>` : item);
 
   return (
     <div className="relative">

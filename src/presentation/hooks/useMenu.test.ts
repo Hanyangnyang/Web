@@ -3,7 +3,7 @@ import React, { type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { queryClient } from '../../lib/queryClient.js';
-import { getKSTDate } from '../../utils/time.js';
+import { getKSTDateUnsafe, toDateKey } from '../../utils/time.js';
 import { useMenu } from './useMenu.js';
 
 function wrapper({ children }: { children: ReactNode }) {
@@ -23,20 +23,17 @@ function mockFetch(impl: (url: string) => Promise<Response>) {
   return fetchMock;
 }
 
-function todayDateStrSlash() {
-  return getKSTDate().toISOString().split('T')[0].replace(/-/g, '/');
-}
-
 function menuApiResponse() {
   return {
     success: true,
-    date: todayDateStrSlash(),
-    data: [
-      { id: 're12', name: '학생식당', menus: [{ type: '중식', menu: '<b>제육볶음</b>', price: '5,000원' }], hasJeyuk: true, available: true, hours: { 중식: '11:30~13:30' } },
-      { id: 're15', name: '창업보육센터', menus: [], hasJeyuk: false, available: false, hours: {} },
-      { id: 're11', name: '교직원식당', menus: [], hasJeyuk: false, available: false, hours: {} },
-      { id: 're13', name: '기숙사식당', menus: [], hasJeyuk: false, available: false, hours: {} },
-    ],
+    data: {
+      [toDateKey(getKSTDateUnsafe())]: [
+        { cafeteriaCode: 'RE12', name: '학생식당', operatingHours: { 중식: '11:30~13:30' }, menu: [{ id: 1, mealType: 'LUNCH', displayOrder: 0, price: 5000, menuItems: ['제육볶음'], rawMenu: '<b>제육볶음</b> 5,000원' }] },
+        { cafeteriaCode: 'RE15', name: '창업보육센터', operatingHours: {}, menu: [] },
+        { cafeteriaCode: 'RE11', name: '교직원식당', operatingHours: {}, menu: [] },
+        { cafeteriaCode: 'RE13', name: '기숙사식당', operatingHours: {}, menu: [] },
+      ],
+    },
   };
 }
 
@@ -68,7 +65,10 @@ describe('useMenu (React Query)', () => {
     const cached = [
       { id: 're12', name: '학생식당(캐시)', menus: [], hasJeyuk: false, available: false, hours: {} },
     ];
-    queryClient.setQueryData(['menu', todayDateStrSlash()], cached);
+    // 배치 조회도 이미 끝난 상태를 재현 — 그래야 개별 날짜 fetch가 배치 완료를 기다리지 않고
+    // 캐시를 바로 신뢰해도 되는 상황이 된다
+    queryClient.setQueryData(['menu-period'], true);
+    queryClient.setQueryData(['menu', toDateKey(getKSTDateUnsafe())], cached);
 
     const fetchSpy = mockFetch(() => new Promise(() => {}));
 
@@ -101,27 +101,54 @@ describe('useMenu (React Query)', () => {
     expect(result.current.menuDate.toISOString()).toBe(target.toISOString());
   });
 
-  it('[회귀] 캐시 미스로 시작해도 최초 로딩 완료 후 인접 날짜 prefetch가 실행된다', async () => {
+  it('최초 진입 시 파라미터 없이 배치 조회 한 번만 요청한다', async () => {
     const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
-
-    // testing-library의 waitFor는 실시간 폴링이라 페이크 타이머와 섞으면 어긋나므로,
-    // 렌더 시점부터 페이크 타이머를 켜고 advanceTimersByTimeAsync로 직접 진행시킨다.
-    vi.useFakeTimers();
     const { result } = renderHook(() => useMenu(), { wrapper });
+    await waitFor(() => expect(result.current.menuLoading).toBe(false));
 
-    // 초기 fetch는 타이머 없이 순수 프로미스 체인이라 0ms 진행만으로 마이크로태스크가 다 풀린다
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(0);
-    });
-    expect(result.current.menuLoading).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).not.toContain('startDate=');
+  });
+
+  it('같은 끼니에 메뉴가 여러 개면 displayOrder 순서대로 정렬한다', async () => {
+    mockFetch(() => Promise.resolve(jsonResponse(true, {
+      success: true,
+      data: {
+        [toDateKey(getKSTDateUnsafe())]: [
+          {
+            cafeteriaCode: 'RE12', name: '학생식당', operatingHours: { 중식: '11:30~13:30' },
+            menu: [
+              { id: 2, mealType: 'LUNCH', displayOrder: 1, price: 6000, menuItems: ['특식'], rawMenu: '' },
+              { id: 1, mealType: 'LUNCH', displayOrder: 0, price: 5000, menuItems: ['일반식'], rawMenu: '' },
+            ],
+          },
+          { cafeteriaCode: 'RE15', name: '창업보육센터', operatingHours: {}, menu: [] },
+          { cafeteriaCode: 'RE11', name: '교직원식당', operatingHours: {}, menu: [] },
+          { cafeteriaCode: 'RE13', name: '기숙사식당', operatingHours: {}, menu: [] },
+        ],
+      },
+    })));
+
+    const { result } = renderHook(() => useMenu(), { wrapper });
+    await waitFor(() => expect(result.current.menuLoading).toBe(false));
+
+    const menus = result.current.cafes[0].menus;
+    expect(menus.map(m => m.menuItems)).toEqual([['일반식'], ['특식']]);
+  });
+
+  it('배치 응답에 없는 날짜로 이동하면 그 날짜만 개별 요청한다', async () => {
+    const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
+    const { result } = renderHook(() => useMenu(), { wrapper });
+    await waitFor(() => expect(result.current.menuLoading).toBe(false));
 
     const callsAfterInitialLoad = fetchMock.mock.calls.length;
 
-    await act(async () => {
-      // prefetch effect: 2초 대기 후 어제~+7일 총 8개 날짜를 500ms 텀으로 순회
-      await vi.advanceTimersByTimeAsync(2000 + 8 * 500 + 500);
-    });
+    // menuApiResponse()의 배치 응답엔 오늘 하루치만 들어있어서, 다른 날짜로 이동하면 확실히 범위 밖이다
+    act(() => { result.current.changeDate(10); });
+    await waitFor(() => expect(result.current.menuLoading).toBe(false));
 
-    expect(fetchMock.mock.calls.length).toBeGreaterThan(callsAfterInitialLoad);
+    const newCalls = fetchMock.mock.calls.slice(callsAfterInitialLoad);
+    expect(newCalls).toHaveLength(1);
+    expect(newCalls[0][0]).toContain('startDate=');
   });
 });

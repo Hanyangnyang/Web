@@ -1,7 +1,7 @@
 // 컴포넌트: 셔틀 시간표 헤더 (기간/요일 선택기 + 지하철 노선 드롭다운 + 카카오 지하철 링크 + 전체시간표 토글)
 import { ArrowUpRight } from 'lucide-react';
 import type { ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
-import { ShuttleSelector } from './ShuttleSelector.jsx';
+import { PeriodDayTypeSelector } from './PeriodDayTypeSelector.jsx';
 import { SubwayDropdown } from './SubwayDropdown.jsx';
 
 interface TimetableHeaderProps {
@@ -11,7 +11,6 @@ interface TimetableHeaderProps {
   fullDayType: string;
   setFullDayType: (dayType: string) => void;
   appConfig: ShuttleAppConfig;
-  isHolidayServer: boolean | null;
   isWeekend: boolean;
   needsSubway: boolean;
   hideSubwayCol: boolean;
@@ -23,7 +22,7 @@ interface TimetableHeaderProps {
 
 export function TimetableHeader({
   isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
-  appConfig, isHolidayServer, isWeekend, needsSubway, hideSubwayCol,
+  appConfig, isWeekend, needsSubway, hideSubwayCol,
   lineId, setLineId, onOpenSubway, onToggleFullMode,
 }: TimetableHeaderProps) {
   return (
@@ -33,14 +32,13 @@ export function TimetableHeader({
 
         <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
           <div className="shrink basis-[125px] min-w-0">
-            <ShuttleSelector
+            <PeriodDayTypeSelector
               isFullMode={isFullMode}
               fullPeriod={fullPeriod}
               setFullPeriod={setFullPeriod}
               fullDayType={fullDayType}
               setFullDayType={setFullDayType}
               appConfig={appConfig}
-              isHolidayServer={isHolidayServer}
               isWeekend={isWeekend}
             />
           </div>

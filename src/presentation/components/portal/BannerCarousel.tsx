@@ -4,6 +4,7 @@ import type { Banner } from '../../../domain/entities/Banner.js';
 interface BannerCarouselProps {
   banners: Banner[];
   loading: boolean;
+  error?: Error | null;
 }
 
 export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
@@ -93,21 +94,21 @@ export function BannerCarousel({ banners, loading }: BannerCarouselProps) {
     }
   };
 
-  // 스켈레톤 
+  // 1. 스켈레톤 
   if (loading) {
     return (
-      <div className="mb-3 mt-2">
+      <div>
         <div className="rounded-card aspect-[10/3] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
       </div>
     );
   }
 
-  // 배너 0개일때 
+  // 2. 배너 0개일때 
   if (!banners.length) return null;
 
-  // 배너 1개 이상일때
+  // 3. 배너 1개 이상일때
   return (
-    <div className="mb-3 mt-2 [animation:fadeIn_0.4s_ease-out]">
+    <div className="[animation:fadeIn_0.4s_ease-out]">
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-xl aspect-[10/3]"

@@ -9,8 +9,14 @@ import babelParser from '@babel/eslint-parser'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 // js/jsx, ts/tsx 공통 규칙 — extends는 파일별로 따로 선언해야 해서 rules만 공유
+// 대문자로 시작하는 이름은 컴포넌트/타입이라 JSX(<Story />)에서 쓰여도 no-unused-vars가
+// 사용을 인지하지 못한다(그걸 알려주는 eslint-plugin-react를 쓰지 않음). 그래서 무시 패턴을 둔다.
+// varsIgnorePattern은 '변수'에만 적용되므로, 매개변수용 argsIgnorePattern도 같이 있어야 한다.
 const sharedRules = {
-  'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+  'no-unused-vars': ['error', {
+    varsIgnorePattern: '^[A-Z_]',
+    argsIgnorePattern: '^[A-Z_]',
+  }],
 }
 
 export default defineConfig([
@@ -66,4 +72,13 @@ export default defineConfig([
       'no-undef': 'off', // 타입/인터페이스 참조를 no-undef가 오탐하므로 끔 — tsc가 실제 미정의 참조를 잡아줌
     },
   },
-  ...storybook.configs["flat/recommended"]])
+  ...storybook.configs["flat/recommended"],
+  // 스토리 이름을 한글로 짓고 있어서(예: 폭염맑음) PascalCase 규칙은 만족시킬 방법이 없다.
+  // 한글에는 대소문자 개념이 없으므로 규칙 자체를 끈다.
+  {
+    files: ['**/*.stories.{js,jsx,ts,tsx}'],
+    rules: {
+      'storybook/prefer-pascal-case': 'off',
+    },
+  },
+])
