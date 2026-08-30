@@ -18,8 +18,9 @@ import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
 import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS, filterSongsByGenre } from './playlistTypes';
 import { ChartView } from './ChartView';
-import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
+import { DUMMY_CHART } from './playlistDummyData';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
+import { useRecentSongs } from '../../hooks/useRecentSongs.js';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
@@ -31,7 +32,13 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const platform = getPlatform();
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [songs, setSongs] = useState<Song[]>(DUMMY_SONGS);
+  // 최근추가된곡은 /api/v1/playlist/songs에서 받아온 뒤 로컬 state로 옮겨 관리 —
+  // 곡 등록 API가 아직 없어서, 등록 직후엔 서버 재조회 없이 로컬로만 맨 앞에 얹기 때문
+  const { data: fetchedSongs } = useRecentSongs();
+  const [songs, setSongs] = useState<Song[]>([]);
+  useEffect(() => {
+    if (fetchedSongs) setSongs(fetchedSongs);
+  }, [fetchedSongs]);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
@@ -85,7 +92,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     prevScreenRef.current = screen;
   }, [screen]);
 
-  // Supabase 테이블 붙기 전까지 임시로 최근 추가된 곡 맨 앞에 로컬로만 추가 (새로고침하면 초기화됨)
+  // 곡 등록 API가 아직 없어서 임시로 최근 추가된 곡 맨 앞에 로컬로만 추가 (새로고침하면 초기화됨)
   const handleAddSong = useCallback((song: Song) => {
     setSongs((prev) => [song, ...prev]);
   }, []);
@@ -347,7 +354,7 @@ function PlaylistMainContent({
           <div className="flex gap-3 pb-2">
             {visibleSongs.map((song) => (
               <RecentSongCard
-                key={song.trackId}
+                key={song.id ?? song.trackId}
                 song={song}
                 onClick={() => onSelectRecentSong(song)}
               />

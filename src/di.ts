@@ -39,6 +39,10 @@ import { createSubwayApiDataSource } from './data/datasources/SubwayApiDataSourc
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
 import { createSubwayRepository } from './data/repositories/SubwayRepository.js';
 
+import { createPlaylistApiDataSource } from './data/datasources/PlaylistApiDataSource.js';
+import { createPlaylistRepository } from './data/repositories/PlaylistRepository.js';
+import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
+
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
 // 새 백엔드 전용 
@@ -58,6 +62,7 @@ const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const feedbackDataSource = createFeedbackDataSource();
 const holidayApiDataSource = createHolidayApiDataSource({ httpClient });
+const playlistApiDataSource = createPlaylistApiDataSource({ httpClient: apiHttpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
@@ -71,6 +76,7 @@ export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
 export const feedbackRepository = createFeedbackRepository({ feedbackDataSource });
 export const holidayRepository = createHolidayRepository({ holidayApiDataSource });
+export const playlistRepository = createPlaylistRepository({ playlistApiDataSource });
 
 // Use Cases
 export const getMenuForDateUseCase = createGetMenuForDateUseCase({ menuRepository });
@@ -85,3 +91,4 @@ export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository
 export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository });
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
 export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });
+export const getRecentSongsUseCase = createGetRecentSongsUseCase({ playlistRepository });

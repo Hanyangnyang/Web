@@ -96,7 +96,7 @@ export function SongListScreen({
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {filteredSongs.map((song) => (
-              <div key={song.trackId} data-track-id={song.trackId}>
+              <div key={song.id ?? song.trackId} data-track-id={song.trackId}>
                 <PostDetailCard
                   post={songToPostDetailCardData(song)}
                   className="w-full"

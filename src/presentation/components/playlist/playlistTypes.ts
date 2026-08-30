@@ -1,12 +1,34 @@
+import type { PlaylistSong } from '../../../domain/entities/PlaylistSong.js';
+
 export interface Song {
+  // 게시글 자체의 id — 실제 API 연동 전 로컬 더미/임시 추가 곡은 없을 수 있어서 옵셔널.
+  // 여러 게시글이 같은 trackId(스포티파이 곡)를 가리킬 수 있어서 리스트 key로는 이 값을 우선 써야 함
+  id?: string;
   trackId: string;
   title: string;
   artist: string;
   albumArtUrl: string;
   comment: string;
   genres: string[];
+  isBookmarked?: boolean;
   previewUrl: string;
   createdAt: Date;
+}
+
+// data 레이어에서 받아온 도메인 엔티티(PlaylistSong)를 화면에서 쓰는 Song 형태로 변환
+export function mapPlaylistSongToSong(song: PlaylistSong): Song {
+  return {
+    id: song.id,
+    trackId: song.trackId,
+    title: song.title,
+    artist: song.artist,
+    albumArtUrl: song.albumArtUrl,
+    comment: song.comment,
+    genres: song.genres,
+    isBookmarked: song.isBookmarked,
+    previewUrl: '',
+    createdAt: song.createdAt,
+  };
 }
 
 export const GENRES = [

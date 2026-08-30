@@ -159,6 +159,7 @@ src/
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
+| `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 15분(FE staleTime, BE 캐시 주기 미확인) | 플레이리스트 화면 진입 시 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage

@@ -10,6 +10,8 @@ export interface PostDetailCardData {
   body: string;
   genres: string[];
   createdAt: Date;
+  // 서버가 계산해서 내려주는 "지금 이 기기가 북마크했는지" 여부 — 없으면 false로 시작
+  isBookmarked?: boolean;
 }
 
 interface PostDetailCardProps {
@@ -36,6 +38,7 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
     body: song.comment,
     genres: song.genres,
     createdAt: song.createdAt,
+    isBookmarked: song.isBookmarked,
   };
 }
 
@@ -59,7 +62,7 @@ export function PostDetailCard({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [myReactions, setMyReactions] = useState<Set<ReactionKey>>(new Set());
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
   const reportMenuRef = useRef<HTMLDivElement>(null);
 
   // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
