@@ -8,7 +8,7 @@ export interface PostDetailCardData {
   title: string;
   artist: string;
   body: string;
-  genre: string;
+  genres: string[];
 }
 
 interface PostDetailCardProps {
@@ -24,14 +24,14 @@ interface PostDetailCardProps {
   onSelect?: () => void;
 }
 
-// 리스트/캐러셀에서 쓰는 Song 엔티티를 PostDetailCard가 받는 형태로 변환 (본문=comment, 장르=genres[0])
+// 리스트/캐러셀에서 쓰는 Song 엔티티를 PostDetailCard가 받는 형태로 변환 (본문=comment)
 export function songToPostDetailCardData(song: Song): PostDetailCardData {
   return {
     albumArtUrl: song.albumArtUrl,
     title: song.title,
     artist: song.artist,
     body: song.comment,
-    genre: song.genres[0] ?? '',
+    genres: song.genres,
   };
 }
 
@@ -60,7 +60,6 @@ export function PostDetailCard({
   const [showBookmarkPop, setShowBookmarkPop] = useState(false);
   const bookmarkPopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reportMenuRef = useRef<HTMLDivElement>(null);
-  const genre = GENRES.find((g) => g.label === post.genre);
 
   useEffect(() => {
     return () => {
@@ -284,10 +283,17 @@ export function PostDetailCard({
         {/* 본문 */}
         <p className="text-sm text-text-main leading-relaxed mb-3 whitespace-pre-line">{post.body}</p>
 
-        {/* 장르 */}
-        <div className="flex items-center gap-1 text-xs font-medium text-text-sub">
-          {genre?.emoji && <span>{genre.emoji}</span>}
-          <span>{post.genre}</span>
+        {/* 장르 — 최대 3개까지 함께 표시 */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-text-sub">
+          {post.genres.map((label) => {
+            const genre = GENRES.find((g) => g.label === label);
+            return (
+              <span key={label} className="flex items-center">
+                {genre?.emoji && <span>{genre.emoji}</span>}
+                <span>{label}</span>
+              </span>
+            );
+          })}
         </div>
       </div>
     </div>

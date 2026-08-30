@@ -6,7 +6,13 @@ interface RecentSongCardProps {
 }
 
 export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
-  const genre = GENRES.find((g) => g.label === song.genres[0]);
+  // 장르마다 자기 이모지를 붙여서 " · "로 나열 (최대 3개)
+  const genreDisplay = song.genres
+    .map((label) => {
+      const genre = GENRES.find((g) => g.label === label);
+      return genre?.emoji ? `${genre.emoji}${label}` : label;
+    })
+    .join(' · ');
 
   return (
     <div
@@ -40,8 +46,7 @@ export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
         <div className="border-t border-white/20 my-1" />
 
         <div className="flex items-center gap-1 text-[9px] font-medium opacity-90 ml-0.5">
-          {genre?.emoji && <span>{genre.emoji}</span>}
-          <span className="truncate">{song.genres[0]}</span>
+          <span className="truncate">{genreDisplay}</span>
         </div>
       </div>
     </div>
