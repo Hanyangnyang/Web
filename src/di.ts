@@ -43,6 +43,7 @@ import { createPlaylistApiDataSource } from './data/datasources/PlaylistApiDataS
 import { createPlaylistRepository } from './data/repositories/PlaylistRepository.js';
 import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
 import { createSubmitSongUseCase } from './domain/usecases/SubmitSongUseCase.js';
+import { createReportSongUseCase } from './domain/usecases/ReportSongUseCase.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
@@ -94,3 +95,4 @@ export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepos
 export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });
 export const getRecentSongsUseCase = createGetRecentSongsUseCase({ playlistRepository });
 export const submitSongUseCase = createSubmitSongUseCase({ playlistRepository });
+export const reportSongUseCase = createReportSongUseCase({ playlistRepository });

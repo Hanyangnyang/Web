@@ -1,6 +1,6 @@
-// 훅(ViewModel): 최근추가된곡 화면의 플레이리스트 피드 곡 목록 로딩 + 곡 추천/등록
+// 훅(ViewModel): 최근추가된곡 화면의 플레이리스트 피드 곡 목록 로딩 + 곡 추천/등록/신고
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getRecentSongsUseCase, submitSongUseCase } from '../../di.js';
+import { getRecentSongsUseCase, submitSongUseCase, reportSongUseCase } from '../../di.js';
 import { getOrCreateAnonymousUserId } from '../../lib/supabase.js';
 import { mapPlaylistSongToSong, type Song } from '../components/playlist/playlistTypes.js';
 
@@ -39,6 +39,21 @@ export function useSubmitSong() {
     },
     onSuccess: (song) => {
       queryClient.setQueryData<Song[]>(RECENT_SONGS_QUERY_KEY, (prev) => (prev ? [song, ...prev] : [song]));
+    },
+  });
+}
+
+export interface ReportSongInput {
+  songId: string;
+  reason: string;
+}
+
+// 곡 신고하기 — 접수 성공 여부만 필요해서 결과값은 없음
+export function useReportSong() {
+  return useMutation({
+    mutationFn: async ({ songId, reason }: ReportSongInput) => {
+      const deviceId = await getOrCreateAnonymousUserId();
+      await reportSongUseCase.execute({ songId, deviceId, reason });
     },
   });
 }

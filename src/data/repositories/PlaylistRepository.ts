@@ -1,4 +1,4 @@
-// 레포지토리: 플레이리스트 피드 곡 목록 조회/등록(새 백엔드)을 도메인 엔티티로 변환해 제공
+// 레포지토리: 플레이리스트 피드 곡 목록 조회/등록/신고(새 백엔드)를 도메인 엔티티로 변환해 제공
 import { apiError } from '../../infrastructure/http/HttpClient.js';
 import { createPlaylistSong, type PlaylistSong } from '../../domain/entities/PlaylistSong.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto } from '../datasources/PlaylistApiDataSource.js';
@@ -81,5 +81,15 @@ export const createPlaylistRepository = (
       throw apiError(`playlist song submit API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
 
     return toPlaylistSong(res.data);
+  },
+
+  reportSong: async (params) => {
+    const res = await playlistApiDataSource.postReport(params.songId, {
+      reporterDeviceId: params.deviceId,
+      reason: params.reason,
+    });
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist song report API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
   },
 });

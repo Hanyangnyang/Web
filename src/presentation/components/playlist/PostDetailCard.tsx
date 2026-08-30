@@ -2,8 +2,11 @@ import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, type PlaylistReaction, GENRES, formatTimeAgo } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
+import { useReportSong } from '../../hooks/useRecentSongs.js';
 
 export interface PostDetailCardData {
+  // 신고하기 등 서버에 곡 id가 필요한 액션에 씀 — 실제 API 연동 전 더미 게시글엔 없을 수 있어서 옵셔널
+  id?: string;
   albumArtUrl: string;
   title: string;
   artist: string;
@@ -15,6 +18,8 @@ export interface PostDetailCardData {
   // 서버가 내려주는 이모지별 반응 수 + 내 반응 여부 — 없으면 반응 0개로 시작
   reactions?: PlaylistReaction[];
 }
+
+const REPORT_REASONS = ['부적절하거나 선정적인 표현', '욕설·비속어 포함', '스팸/광고성 게시글', '기타'];
 
 interface PostDetailCardProps {
   post: PostDetailCardData;
@@ -34,6 +39,7 @@ interface PostDetailCardProps {
 // 리스트/캐러셀에서 쓰는 Song 엔티티를 PostDetailCard가 받는 형태로 변환 (본문=comment)
 export function songToPostDetailCardData(song: Song): PostDetailCardData {
   return {
+    id: song.id,
     albumArtUrl: song.albumArtUrl,
     title: song.title,
     artist: song.artist,
@@ -69,8 +75,12 @@ export function PostDetailCard({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [reactions, setReactions] = useState<ReactionState>(() => toReactionState(post.reactions));
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
+  const [reportReasonPopupOpen, setReportReasonPopupOpen] = useState(false);
+  const [selectedReportReason, setSelectedReportReason] = useState<string | null>(null);
+  const [reportToast, setReportToast] = useState('');
   const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
   const reportMenuRef = useRef<HTMLDivElement>(null);
+  const reportSong = useReportSong();
 
   // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
   useEffect(() => {
@@ -96,6 +106,21 @@ export function PostDetailCard({
 
   const toggleBookmarked = () => setBookmarked((prev) => !prev);
 
+  const handleConfirmReport = () => {
+    if (!post.id || !selectedReportReason) return;
+    reportSong.mutate(
+      { songId: post.id, reason: selectedReportReason },
+      {
+        onSuccess: () => {
+          setReportReasonPopupOpen(false);
+          setSelectedReportReason(null);
+          setReportToast('신고가 접수됐어요. 검토 후 조치할게요.');
+          setTimeout(() => setReportToast(''), 2000);
+        },
+      }
+    );
+  };
+
   // count가 0보다 큰 이모지만 표시
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
@@ -107,7 +132,7 @@ export function PostDetailCard({
   );
 
   // 더보기 버튼: 앨범 커버 바로 아래 첫 행의 맨 오른쪽에 위치 —
-  // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류. 실제 신고 처리는 추후 구현
+  // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류
   const moreButton = (
     <div ref={reportMenuRef} className="relative inline-block flex-shrink-0">
       <button
@@ -127,6 +152,7 @@ export function PostDetailCard({
             onClick={(e) => {
               e.stopPropagation();
               setReportMenuOpen(false);
+              setReportReasonPopupOpen(true);
             }}
             className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
           >
@@ -285,6 +311,67 @@ export function PostDetailCard({
           )}
         </div>
       </div>
+
+      {/* 신고 사유 선택 팝업 */}
+      {reportReasonPopupOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 px-8"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
+            <p className="text-sm font-semibold text-text-main mb-3 text-center">신고 사유를 선택해주세요</p>
+            <div className="flex flex-col gap-1.5 mb-4">
+              {REPORT_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  onClick={() => setSelectedReportReason(reason)}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium border transition-colors active:scale-[0.98] ${
+                    selectedReportReason === reason
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-slate-100 border-transparent text-text-sub hover:bg-slate-200'
+                  }`}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            {reportSong.isError && (
+              <p className="text-xs text-red-500 text-center mb-3">
+                신고 접수에 실패했어요. 다시 시도해주세요.
+              </p>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setReportReasonPopupOpen(false);
+                  setSelectedReportReason(null);
+                }}
+                className="flex-1 h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleConfirmReport}
+                disabled={!selectedReportReason || reportSong.isPending}
+                className={`flex-1 h-10 rounded-full text-sm font-bold active:scale-[0.97] transition-transform ${
+                  selectedReportReason && !reportSong.isPending
+                    ? 'text-white bg-red-500'
+                    : 'text-slate-300 bg-slate-100'
+                }`}
+              >
+                {reportSong.isPending ? '접수 중...' : '신고하기'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 신고 접수 완료 토스트 */}
+      {reportToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
+          {reportToast}
+        </div>
+      )}
     </div>
   );
 }

@@ -60,9 +60,23 @@ export interface CreatePlaylistSongDto {
   genres: PlaylistGenreDto[];
 }
 
+// 곡 신고하기 요청/응답 — 신고 접수 레코드 대부분(status, adminMemo, reviewedAt 등)은
+// 화면에서 쓸 데가 없어 접수 성공 여부만 필요
+export interface CreatePlaylistSongReportDto {
+  reporterDeviceId: string;
+  reason: string;
+}
+
+export interface PlaylistSongReportDto {
+  id: string;
+  songId: string;
+  status: string;
+}
+
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
+  postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
 }
 
 const DEFAULT_PAGE = 0;
@@ -79,4 +93,7 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
   },
 
   postSong: async (body) => parseOrThrow(await httpClient.post('/api/v1/playlist/songs', body)),
+
+  postReport: async (songId, body) =>
+    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/reports`, body)),
 });

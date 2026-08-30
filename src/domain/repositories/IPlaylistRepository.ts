@@ -1,4 +1,4 @@
-// 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록 계약 (구현은 data 레이어의 PlaylistRepository)
+// 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록/신고 계약 (구현은 data 레이어의 PlaylistRepository)
 import type { PlaylistSong } from '../entities/PlaylistSong.js';
 
 export interface GetPlaylistSongsParams {
@@ -19,7 +19,14 @@ export interface SubmitSongParams {
   genres: string[];
 }
 
+export interface ReportSongParams {
+  songId: string;
+  deviceId: string;
+  reason: string;
+}
+
 export interface PlaylistRepository {
   getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;
+  reportSong: (params: ReportSongParams) => Promise<void>;
 }
