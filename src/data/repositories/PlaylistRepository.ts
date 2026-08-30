@@ -1,7 +1,7 @@
-// 레포지토리: 플레이리스트 피드 곡 목록 조회/등록/신고(새 백엔드)를 도메인 엔티티로 변환해 제공
+// 레포지토리: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요/재생기록/이모지반응(새 백엔드)을 도메인 엔티티로 변환해 제공
 import { apiError } from '../../infrastructure/http/HttpClient.js';
-import { createPlaylistSong, type PlaylistSong } from '../../domain/entities/PlaylistSong.js';
-import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto } from '../datasources/PlaylistApiDataSource.js';
+import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '../../domain/entities/PlaylistSong.js';
+import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
 
 const AREA = '플레이리스트';
@@ -25,6 +25,10 @@ const GENRE_ENUM_BY_LABEL = Object.fromEntries(
   (Object.entries(GENRE_LABEL) as [PlaylistGenreDto, string][]).map(([genreEnum, label]) => [label, genreEnum])
 ) as Record<string, PlaylistGenreDto>;
 
+function toReactions(dtos?: PlaylistReactionDto[]): PlaylistReaction[] {
+  return (dtos ?? []).map((r) => ({ type: r.type, emoji: r.emoji, count: r.count, isReacted: r.isReacted }));
+}
+
 function toPlaylistSong(d: PlaylistSongDto): PlaylistSong {
   return createPlaylistSong({
     id: d.id,
@@ -35,7 +39,7 @@ function toPlaylistSong(d: PlaylistSongDto): PlaylistSong {
     comment: d.comment,
     genres: (d.genres ?? []).map((g) => GENRE_LABEL[g] ?? g),
     isBookmarked: d.isLiked,
-    reactions: (d.reactions ?? []).map((r) => ({ type: r.type, emoji: r.emoji, count: r.count, isReacted: r.isReacted })),
+    reactions: toReactions(d.reactions),
     createdAt: d.createdAt,
   });
 }
@@ -91,5 +95,39 @@ export const createPlaylistRepository = (
 
     if (!res.success)
       throw apiError(res.error?.message || `playlist song report API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+  },
+
+  toggleBookmark: async (params) => {
+    const res = await playlistApiDataSource.postLike(params.songId, { deviceId: params.deviceId });
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist song like API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || typeof res.data.isLiked !== 'boolean')
+      throw apiError(`playlist song like API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    return res.data.isLiked;
+  },
+
+  recordTrackPlay: async (trackId) => {
+    const res = await playlistApiDataSource.postTrackPlay(trackId);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist track play API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+  },
+
+  toggleReaction: async (params) => {
+    const res = await playlistApiDataSource.postReaction(params.songId, {
+      deviceId: params.deviceId,
+      reactionType: params.reactionType,
+    });
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist reaction API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.reactions))
+      throw apiError(`playlist reaction API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    return toReactions(res.data.reactions);
   },
 });

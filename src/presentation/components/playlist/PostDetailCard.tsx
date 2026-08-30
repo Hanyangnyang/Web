@@ -2,7 +2,7 @@ import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, type PlaylistReaction, GENRES, formatTimeAgo } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
-import { useReportSong } from '../../hooks/useRecentSongs.js';
+import { useReportSong, useToggleBookmark, useToggleReaction } from '../../hooks/useRecentSongs.js';
 
 export interface PostDetailCardData {
   // 신고하기 등 서버에 곡 id가 필요한 액션에 씀 — 실제 API 연동 전 더미 게시글엔 없을 수 있어서 옵셔널
@@ -81,6 +81,8 @@ export function PostDetailCard({
   const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
   const reportMenuRef = useRef<HTMLDivElement>(null);
   const reportSong = useReportSong();
+  const toggleBookmark = useToggleBookmark();
+  const toggleReactionMutation = useToggleReaction();
 
   // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
   useEffect(() => {
@@ -94,17 +96,43 @@ export function PostDetailCard({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [reportMenuOpen]);
 
-  // 실제 반응 등록 API가 아직 없어서 로컬 카운트만 낙관적으로 증감 (서버가 내려준 count엔 이미 내 반응이 포함돼 있음)
+  // 먼저 로컬 카운트를 낙관적으로 증감시켜 바로 반응이 보이게 하고(서버가 내려준 count엔 이미 내 반응이
+  // 포함돼 있어 +1/-1로 계산), 서버 응답이 오면 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤.
+  // 실패하면 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글
   const toggleReaction = (key: ReactionKey) => {
+    const previous = reactions;
     setReactions((prev) => {
       const current = prev[key] ?? { count: 0, mine: false };
       const mine = !current.mine;
       const count = Math.max(0, current.count + (mine ? 1 : -1));
       return { ...prev, [key]: { count, mine } };
     });
+
+    if (!post.id) return;
+
+    toggleReactionMutation.mutate(
+      { songId: post.id, reactionType: key },
+      {
+        onSuccess: (updatedReactions) => setReactions(toReactionState(updatedReactions)),
+        onError: () => setReactions(previous),
+      }
+    );
   };
 
-  const toggleBookmarked = () => setBookmarked((prev) => !prev);
+  // 서버 응답이 오기 전에 먼저 눈에 보이게 뒤집고(낙관적 업데이트), 응답 오면 실제 값으로 맞추거나
+  // 실패 시 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글
+  const toggleBookmarked = () => {
+    if (!post.id) {
+      setBookmarked((prev) => !prev);
+      return;
+    }
+    const optimistic = !bookmarked;
+    setBookmarked(optimistic);
+    toggleBookmark.mutate(post.id, {
+      onSuccess: (isLiked) => setBookmarked(isLiked),
+      onError: () => setBookmarked(!optimistic),
+    });
+  };
 
   const handleConfirmReport = () => {
     if (!post.id || !selectedReportReason) return;

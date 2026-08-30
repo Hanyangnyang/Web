@@ -44,6 +44,9 @@ import { createPlaylistRepository } from './data/repositories/PlaylistRepository
 import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
 import { createSubmitSongUseCase } from './domain/usecases/SubmitSongUseCase.js';
 import { createReportSongUseCase } from './domain/usecases/ReportSongUseCase.js';
+import { createToggleBookmarkUseCase } from './domain/usecases/ToggleBookmarkUseCase.js';
+import { createRecordTrackPlayUseCase } from './domain/usecases/RecordTrackPlayUseCase.js';
+import { createToggleReactionUseCase } from './domain/usecases/ToggleReactionUseCase.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
@@ -96,3 +99,6 @@ export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository
 export const getRecentSongsUseCase = createGetRecentSongsUseCase({ playlistRepository });
 export const submitSongUseCase = createSubmitSongUseCase({ playlistRepository });
 export const reportSongUseCase = createReportSongUseCase({ playlistRepository });
+export const toggleBookmarkUseCase = createToggleBookmarkUseCase({ playlistRepository });
+export const recordTrackPlayUseCase = createRecordTrackPlayUseCase({ playlistRepository });
+export const toggleReactionUseCase = createToggleReactionUseCase({ playlistRepository });

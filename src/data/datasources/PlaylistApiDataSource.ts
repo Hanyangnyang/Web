@@ -73,10 +73,30 @@ export interface PlaylistSongReportDto {
   status: string;
 }
 
+// 좋아요(=서비스 내 표기는 "북마크") 토글 응답 — 서버가 현재 상태 보고 등록/취소를 알아서 판단.
+// 동시성 제어·원자적 카운트 증감은 서버가 보장하므로 클라이언트는 그냥 호출만 하면 됨
+export interface ToggleLikeDto {
+  isLiked: boolean;
+  heartCount: number; // 화면에 표기 안 해서 레포지토리에서 버림
+}
+
+// 이모지 반응 토글 응답 — 좋아요와 마찬가지로 서버가 현재 상태 보고 등록/취소를 판단.
+// reactions에 그 곡의 9종 반응 전체 최신 카운트가 함께 내려와서, 화면 상태를 통째로 이걸로 맞추면 됨
+export interface ToggleReactionDto {
+  songId: string;
+  reactionType: string;
+  isReacted: boolean;
+  reactions: PlaylistReactionDto[];
+}
+
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
+  postLike: (songId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
+  // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 응답 data는 빈 객체라 성공 여부만 확인
+  postTrackPlay: (trackId: string) => Promise<ApiResponse<Record<string, never>>>;
+  postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
 }
 
 const DEFAULT_PAGE = 0;
@@ -96,4 +116,13 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
 
   postReport: async (songId, body) =>
     parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/reports`, body)),
+
+  postLike: async (songId, body) =>
+    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/like`, body)),
+
+  postTrackPlay: async (trackId) =>
+    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/tracks/${trackId}/play`, {})),
+
+  postReaction: async (songId, body) =>
+    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/reactions`, body)),
 });

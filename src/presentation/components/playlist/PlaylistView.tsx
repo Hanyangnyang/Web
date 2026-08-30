@@ -20,7 +20,7 @@ import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS, filterSongsByGenre }
 import { ChartView } from './ChartView';
 import { DUMMY_CHART } from './playlistDummyData';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
-import { useRecentSongs } from '../../hooks/useRecentSongs.js';
+import { useRecentSongs, useRecordTrackPlay } from '../../hooks/useRecentSongs.js';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
@@ -41,6 +41,13 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   }, [fetchedSongs]);
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
+  const recordTrackPlay = useRecordTrackPlay();
+  // 재생 버튼이 어디서 눌리든(최근추가곡/인기차트/검색/게시글 등) 이 함수 하나로 모여서
+  // 플레이어를 띄우는 것과 별개로 재생수 기록 API를 함께 호출함
+  const handlePlay = useCallback((track: PlayableTrack) => {
+    setCurrentTrack(track);
+    recordTrackPlay.mutate(track.trackId);
+  }, [recordTrackPlay.mutate]);
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
   // 하단 화면들의 여백(--playlist-bottom-space)과 AddSongFab 위치 계산에 함께 쓰임.
   const [playerHeight, setPlayerHeight] = useState(0);
@@ -159,7 +166,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <RecentSongsView
             songs={songs}
             onBack={popScreen}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
             scrollToTrackId={recentScrollTarget}
             currentTrackId={currentTrack?.trackId}
@@ -168,7 +175,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <AddSongView
             onBack={popScreen}
             playerHeight={playerHeight}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'search' ? (
@@ -177,7 +184,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={popScreen}
             onSelectTrack={handleSelectSearchTrack}
             onSelectPost={handleSelectPost}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'trackPosts' && selectedTrackForPosts ? (
@@ -185,7 +192,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             track={selectedTrackForPosts}
             onBack={popScreen}
             onSelectPost={handleSelectPost}
-            onPlay={() => setCurrentTrack(selectedTrackForPosts)}
+            onPlay={() => handlePlay(selectedTrackForPosts)}
             isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
           />
         ) : screen === 'postDetail' ? (
@@ -195,7 +202,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             chart={chart}
             onBack={popScreen}
             onShowAddSong={() => pushScreen('addSong')}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
           />
         ) : screen === 'myActivity' ? (
@@ -207,14 +214,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
         ) : screen === 'bookmarked' ? (
           <BookmarkedSongsView
             onBack={popScreen}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
             currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'mySongs' ? (
           <MySongsView
             onBack={popScreen}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
             currentTrackId={currentTrack?.trackId}
           />
@@ -232,7 +239,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onSelectRecentSong={handleSelectRecentSong}
             onShowAllChart={() => pushScreen('chart')}
             onShowAddSong={() => pushScreen('addSong')}
-            onPlay={setCurrentTrack}
+            onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
           />
