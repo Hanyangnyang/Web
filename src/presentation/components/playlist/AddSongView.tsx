@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, GENRES } from './playlistTypes';
 import { type PlayableTrack } from './FloatingSpotifyPlayer';
+import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 
 interface SearchTrack {
   trackId: string;
@@ -138,6 +139,10 @@ export function AddSongView({ onBack, onSongAdded, playerHeight = 0, onPlay, cur
   const handleSubmit = () => {
     if (!canSubmit || !selectedTrack) return;
     const genreLabels = selectedGenres.map((key) => GENRES.find((genre) => genre.key === key)?.label ?? key);
+
+    // 실제로 곡을 등록(저장)하는 시점에만 익명 기기 식별자를 발급/재사용 —
+    // 탭을 열기만 했을 때는 굳이 만들지 않고, 백엔드 연동 시 이 device_id를 함께 전송하면 됨
+    getOrCreateAnonymousUserId().catch((err) => console.error('[AddSongView] anonymous auth failed:', err));
 
     onSongAdded({
       trackId: selectedTrack.trackId,

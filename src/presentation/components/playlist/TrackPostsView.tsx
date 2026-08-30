@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
+import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 
 interface TrackPostsViewProps {
   track: TrackResult;
@@ -77,6 +78,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
       else next.add(id);
       return next;
     });
+    // 북마크 추가/해제는 실제로 서버에 저장이 필요한 액션이라 이때 익명 기기 식별자를 발급/재사용
+    getOrCreateAnonymousUserId().catch((err) => console.error('[TrackPostsView] anonymous auth failed:', err));
   };
 
   const toggleReaction = (postId: string, key: ReactionKey) => {

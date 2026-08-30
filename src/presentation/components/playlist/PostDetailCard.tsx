@@ -2,6 +2,7 @@ import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, GENRES } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
+import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 
 export interface PostDetailCardData {
   albumArtUrl: string;
@@ -42,8 +43,6 @@ const DUMMY_REACTION_COUNTS: Partial<Record<ReactionKey, number>> = {
   FIRE: 1,
 };
 
-const BOOKMARK_POP_DURATION_MS = 800;
-
 // 인스타그램 게시물처럼 앨범커버와 하단 콘텐츠가 하나의 카드로 이어지는 게시글 조회 카드. PostDetailView에서 사용
 export function PostDetailCard({
   post,
@@ -57,15 +56,7 @@ export function PostDetailCard({
   const [myReactions, setMyReactions] = useState<Set<ReactionKey>>(new Set());
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
-  const [showBookmarkPop, setShowBookmarkPop] = useState(false);
-  const bookmarkPopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reportMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    return () => {
-      if (bookmarkPopTimerRef.current) clearTimeout(bookmarkPopTimerRef.current);
-    };
-  }, []);
 
   // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
   useEffect(() => {
@@ -88,14 +79,14 @@ export function PostDetailCard({
     });
   };
 
-  const toggleBookmarked = () => setBookmarked((prev) => !prev);
+  // 북마크 추가/해제는 실제로 서버에 저장이 필요한 액션이라 이때 익명 기기 식별자를 발급/재사용
+  const ensureDeviceId = () => {
+    getOrCreateAnonymousUserId().catch((err) => console.error('[PostDetailCard] anonymous auth failed:', err));
+  };
 
-  // 인스타그램 더블탭 좋아요처럼: 이미 북마크 상태여도 항상 북마크로 고정하고, 팝 애니메이션을 다시 보여줌
-  const handleDoubleTapBookmark = () => {
-    setBookmarked(true);
-    setShowBookmarkPop(true);
-    if (bookmarkPopTimerRef.current) clearTimeout(bookmarkPopTimerRef.current);
-    bookmarkPopTimerRef.current = setTimeout(() => setShowBookmarkPop(false), BOOKMARK_POP_DURATION_MS);
+  const toggleBookmarked = () => {
+    setBookmarked((prev) => !prev);
+    ensureDeviceId();
   };
 
   // 다른 사용자 반응 수 + 내 반응 여부를 합쳐서 0보다 큰 이모지만 표시
@@ -156,8 +147,8 @@ export function PostDetailCard({
       aria-label={onSelect ? `${post.title} 상세 보기` : undefined}
       className={`bg-white rounded-2xl border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden ${onSelect ? 'cursor-pointer' : ''} ${className}`}
     >
-      {/* 앨범 커버 — 상세(1열)에서는 더블클릭하면 인스타그램처럼 북마크 아이콘이 튀어오름 */}
-      <div className="relative" onDoubleClick={!hideReactions ? handleDoubleTapBookmark : undefined}>
+      {/* 앨범 커버 */}
+      <div className="relative">
         <img
           src={post.albumArtUrl}
           alt={post.title}
@@ -191,17 +182,6 @@ export function PostDetailCard({
         >
           <Bookmark className={`w-1/2 h-1/2 ${bookmarked ? 'text-primary' : 'text-white'}`} strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
         </button>
-
-        {/* 더블탭 좋아요처럼 북마크 아이콘이 튀어오르는 애니메이션 */}
-        {showBookmarkPop && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <Bookmark
-              className="w-1/4 h-1/4 text-white drop-shadow-lg"
-              fill="white"
-              style={{ animation: `bookmarkPop ${BOOKMARK_POP_DURATION_MS}ms ease-out forwards` }}
-            />
-          </div>
-        )}
       </div>
 
       <div className="px-4 pt-3 pb-4">
