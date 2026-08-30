@@ -2,7 +2,7 @@ import { Plus } from 'lucide-react';
 
 interface EmptyGenreStateProps {
   onShowAddSong: () => void;
-  // true면 최근추가된곡/좋아요누른곡 화면의 카드 그리드와 같은 카드 박스 스타일로 표시
+  // true면 최근추가된곡 화면의 카드 그리드와 같은 카드 박스 스타일로 표시
   boxed?: boolean;
 }
 

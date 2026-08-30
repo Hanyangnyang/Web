@@ -6,7 +6,6 @@ import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlayer';
 import { AddSongFab } from './AddSongFab';
 import { AddSongView } from './AddSongView';
-import { LikedSongsView } from './LikedSongsView';
 import { RecentSongsView } from './RecentSongsView';
 import { SearchResultsView, type TrackResult } from './SearchResultsView';
 import { TrackPostsView } from './TrackPostsView';
@@ -21,7 +20,7 @@ import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
 
-type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'liked' | 'search' | 'trackPosts' | 'postDetail' | 'chart';
+type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart';
 
 export function PlaylistView({ onBack }: { onBack: () => void }) {
   const isApp = isNativeApp();
@@ -39,7 +38,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
   const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
-  // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 좋아요한곡 → 곡추천하기)
+  // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
 
@@ -61,7 +60,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   }, [screenStack, popScreen, onBack]);
   useBackHandler(handleBack);
 
-  // 화면(홈/최근추가된곡/좋아요한곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원
+  // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollPositionsRef = useRef<Partial<Record<PlaylistScreen, number>>>({});
   const prevScreenRef = useRef<PlaylistScreen>(screen);
@@ -162,13 +161,6 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <AddSongView
             onBack={popScreen}
             onSongAdded={handleAddSong}
-          />
-        ) : screen === 'liked' ? (
-          <LikedSongsView
-            onBack={popScreen}
-            onPlay={setCurrentTrack}
-            onShowAddSong={() => pushScreen('addSong')}
-            currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'search' ? (
           <SearchResultsView
@@ -274,7 +266,7 @@ function PlaylistMainContent({
         subtitle="에리카생들에게 곡을 추천해주세요!"
         onBack={onBack}
         rightAction={
-          // 내 추천곡/좋아요한 곡 보기: 동작은 추후 구현
+          // 내 추천곡 보기: 동작은 추후 구현
           <button
             aria-label="내 활동 보기"
             className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"

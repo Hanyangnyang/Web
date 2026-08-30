@@ -14,7 +14,7 @@ interface SongListScreenProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
   onShowAddSong: () => void;
-  // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원, 좋아요 한 곡은 그리드만
+  // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;

@@ -3,12 +3,8 @@ export interface Song {
   title: string;
   artist: string;
   albumArtUrl: string;
-  userProfile: {
-    avatarUrl: string;
-  };
   comment: string;
   genres: string[];
-  heartCount: number;
   previewUrl: string;
   createdAt: Date;
 }

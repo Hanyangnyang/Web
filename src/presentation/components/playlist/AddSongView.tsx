@@ -131,10 +131,8 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
       title: selectedTrack.title,
       artist: selectedTrack.artist,
       albumArtUrl: selectedTrack.albumArtUrl,
-      userProfile: { avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me' },
       comment: comment.trim(),
       genres: genreLabels,
-      heartCount: 0,
       previewUrl: '',
       createdAt: new Date(),
     });
