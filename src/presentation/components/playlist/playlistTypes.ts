@@ -1,4 +1,6 @@
-import type { PlaylistSong } from '../../../domain/entities/PlaylistSong.js';
+import type { PlaylistSong, PlaylistReaction } from '../../../domain/entities/PlaylistSong.js';
+
+export type { PlaylistReaction };
 
 export interface Song {
   // 게시글 자체의 id — 실제 API 연동 전 로컬 더미/임시 추가 곡은 없을 수 있어서 옵셔널.
@@ -11,8 +13,11 @@ export interface Song {
   comment: string;
   genres: string[];
   isBookmarked?: boolean;
+  reactions?: PlaylistReaction[];
   previewUrl: string;
-  createdAt: Date;
+  // react-query 캐시에 그대로 들어가 localStorage에 직렬화되므로 Date 인스턴스가 아니라 ISO 문자열로 유지 —
+  // Date로 저장하면 새로고침 후 복원 시 문자열로 풀리면서 formatTimeAgo가 크래시남 (Gym.ts 등 다른 엔티티와 동일한 이유)
+  createdAt: string;
 }
 
 // data 레이어에서 받아온 도메인 엔티티(PlaylistSong)를 화면에서 쓰는 Song 형태로 변환
@@ -26,6 +31,7 @@ export function mapPlaylistSongToSong(song: PlaylistSong): Song {
     comment: song.comment,
     genres: song.genres,
     isBookmarked: song.isBookmarked,
+    reactions: song.reactions,
     previewUrl: '',
     createdAt: song.createdAt,
   };
@@ -67,9 +73,10 @@ const DAY_MS = 24 * HOUR_MS;
 const MONTH_MS = 30 * DAY_MS;
 const YEAR_MS = 12 * MONTH_MS;
 
-// 게시글/곡 카드에 공용으로 쓰는 상대 시간 표시 ("12분 전", "3시간 전" 등)
-export function formatTimeAgo(date: Date): string {
-  const diffMs = Date.now() - date.getTime();
+// 게시글/곡 카드에 공용으로 쓰는 상대 시간 표시 ("12분 전", "3시간 전" 등). ISO 문자열/Date 둘 다 받음
+export function formatTimeAgo(date: Date | string): string {
+  const time = typeof date === 'string' ? new Date(date).getTime() : date.getTime();
+  const diffMs = Date.now() - time;
   if (diffMs < MINUTE_MS) return '방금 전';
   if (diffMs < HOUR_MS) return `${Math.floor(diffMs / MINUTE_MS)}분 전`;
   if (diffMs < DAY_MS) return `${Math.floor(diffMs / HOUR_MS)}시간 전`;

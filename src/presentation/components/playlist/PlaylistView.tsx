@@ -92,11 +92,6 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     prevScreenRef.current = screen;
   }, [screen]);
 
-  // 곡 등록 API가 아직 없어서 임시로 최근 추가된 곡 맨 앞에 로컬로만 추가 (새로고침하면 초기화됨)
-  const handleAddSong = useCallback((song: Song) => {
-    setSongs((prev) => [song, ...prev]);
-  }, []);
-
   const handleSearchSubmit = useCallback(() => {
     if (!searchQuery.trim()) return;
     pushScreen('search');
@@ -172,7 +167,6 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
         ) : screen === 'addSong' ? (
           <AddSongView
             onBack={popScreen}
-            onSongAdded={handleAddSong}
             playerHeight={playerHeight}
             onPlay={setCurrentTrack}
             currentTrackId={currentTrack?.trackId}

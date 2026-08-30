@@ -1,8 +1,8 @@
 // 데이터 소스: 플레이리스트 피드 곡 목록 새 백엔드(/api/v1/playlist/songs) 원시 호출
 import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-// 백엔드 genre enum — 'band'(밴드)에 대응하는 값은 아직 없음
-export type PlaylistGenreDto = 'KPOP' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OTHER';
+// 백엔드 genre enum
+export type PlaylistGenreDto = 'KPOP' | 'ROCK' | 'BAND' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OTHER';
 
 export interface PlaylistReactionDto {
   type: string;
@@ -43,8 +43,26 @@ export interface GetPlaylistSongsDataSourceParams {
   size?: number;
 }
 
+// 곡 추천 및 등록 요청 바디. 등록자 IP는 클라이언트 헤더로 백엔드가 알아서 수집하므로 안 보냄.
+// 실패 시 HTTP 400/500 + error.code로 내려오며(parseOrThrow가 HttpError.code에 그대로 실어줌), 코드별 의미:
+//   PL001 (400) 1일 3곡 등록 제한(기기당 KST 당일 기준) 초과
+//   PL002 (400) 동일 기기가 최근 7일 내 같은 trackId를 이미 추천함
+//   PL003 (400) Gemini 모더레이션이 제목+아티스트+코멘트 결합 문맥에서 부적절한 표현 감지
+//   C001  (400) 장르 0개/4개 이상 선택 또는 코멘트 200자 초과 등 입력값 검증 실패
+//   C004  (500) DB 등 서버 내부 일시 장애 — 재시도 유도
+export interface CreatePlaylistSongDto {
+  trackId: string;
+  title: string;
+  artist: string;
+  albumArtUrl: string;
+  comment: string;
+  deviceId: string;
+  genres: PlaylistGenreDto[];
+}
+
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
+  postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
 }
 
 const DEFAULT_PAGE = 0;
@@ -59,4 +77,6 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
 
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs?${query.toString()}`));
   },
+
+  postSong: async (body) => parseOrThrow(await httpClient.post('/api/v1/playlist/songs', body)),
 });

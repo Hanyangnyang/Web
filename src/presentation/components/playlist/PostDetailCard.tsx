@@ -1,6 +1,6 @@
 import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { type Song, GENRES, formatTimeAgo } from './playlistTypes';
+import { type Song, type PlaylistReaction, GENRES, formatTimeAgo } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
 
 export interface PostDetailCardData {
@@ -9,9 +9,11 @@ export interface PostDetailCardData {
   artist: string;
   body: string;
   genres: string[];
-  createdAt: Date;
+  createdAt: Date | string;
   // 서버가 계산해서 내려주는 "지금 이 기기가 북마크했는지" 여부 — 없으면 false로 시작
   isBookmarked?: boolean;
+  // 서버가 내려주는 이모지별 반응 수 + 내 반응 여부 — 없으면 반응 0개로 시작
+  reactions?: PlaylistReaction[];
 }
 
 interface PostDetailCardProps {
@@ -39,15 +41,20 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
     genres: song.genres,
     createdAt: song.createdAt,
     isBookmarked: song.isBookmarked,
+    reactions: song.reactions,
   };
 }
 
-// UI 디자인용 임시 더미 — 다른 사용자들이 이미 남긴 이모지별 반응 수
-const DUMMY_REACTION_COUNTS: Partial<Record<ReactionKey, number>> = {
-  LOVE: 3,
-  THUMBS_UP: 5,
-  FIRE: 1,
-};
+type ReactionState = Partial<Record<ReactionKey, { count: number; mine: boolean }>>;
+
+// 서버가 내려준 반응 목록을 이모지 키 기준 상태로 변환 — reaction.type이 ReactionKey와 동일한 문자열이라는 전제(예: 'FIRE')
+function toReactionState(reactions?: PlaylistReaction[]): ReactionState {
+  const state: ReactionState = {};
+  for (const r of reactions ?? []) {
+    state[r.type as ReactionKey] = { count: r.count, mine: r.isReacted };
+  }
+  return state;
+}
 
 // 인스타그램 게시물처럼 앨범커버와 하단 콘텐츠가 하나의 카드로 이어지는 게시글 조회 카드. PostDetailView에서 사용
 export function PostDetailCard({
@@ -60,7 +67,7 @@ export function PostDetailCard({
   onSelect,
 }: PostDetailCardProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [myReactions, setMyReactions] = useState<Set<ReactionKey>>(new Set());
+  const [reactions, setReactions] = useState<ReactionState>(() => toReactionState(post.reactions));
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
   const reportMenuRef = useRef<HTMLDivElement>(null);
@@ -77,21 +84,20 @@ export function PostDetailCard({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [reportMenuOpen]);
 
+  // 실제 반응 등록 API가 아직 없어서 로컬 카운트만 낙관적으로 증감 (서버가 내려준 count엔 이미 내 반응이 포함돼 있음)
   const toggleReaction = (key: ReactionKey) => {
-    setMyReactions((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
+    setReactions((prev) => {
+      const current = prev[key] ?? { count: 0, mine: false };
+      const mine = !current.mine;
+      const count = Math.max(0, current.count + (mine ? 1 : -1));
+      return { ...prev, [key]: { count, mine } };
     });
   };
 
   const toggleBookmarked = () => setBookmarked((prev) => !prev);
 
-  // 다른 사용자 반응 수 + 내 반응 여부를 합쳐서 0보다 큰 이모지만 표시
-  const displayedReactions = EMOJI_REACTIONS.filter(
-    ({ key }) => (DUMMY_REACTION_COUNTS[key] ?? 0) + (myReactions.has(key) ? 1 : 0) > 0
-  );
+  // count가 0보다 큰 이모지만 표시
+  const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
   const titleBlock = (
     <div className="truncate">
@@ -229,8 +235,7 @@ export function PostDetailCard({
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {displayedReactions.map(({ key, emoji }) => {
-                const count = (DUMMY_REACTION_COUNTS[key] ?? 0) + (myReactions.has(key) ? 1 : 0);
-                const mine = myReactions.has(key);
+                const { count, mine } = reactions[key] ?? { count: 0, mine: false };
                 return (
                   <button
                     key={key}

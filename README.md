@@ -160,6 +160,7 @@ src/
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
 | `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 15분(FE staleTime, BE 캐시 주기 미확인) | 플레이리스트 화면 진입 시 |
+| `POST /api/v1/playlist/songs` | 곡 추천 및 등록 (곡추천하기) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록하기 버튼 클릭 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage

@@ -42,6 +42,7 @@ import { createSubwayRepository } from './data/repositories/SubwayRepository.js'
 import { createPlaylistApiDataSource } from './data/datasources/PlaylistApiDataSource.js';
 import { createPlaylistRepository } from './data/repositories/PlaylistRepository.js';
 import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
+import { createSubmitSongUseCase } from './domain/usecases/SubmitSongUseCase.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
@@ -92,3 +93,4 @@ export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
 export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });
 export const getRecentSongsUseCase = createGetRecentSongsUseCase({ playlistRepository });
+export const submitSongUseCase = createSubmitSongUseCase({ playlistRepository });

@@ -13,6 +13,11 @@ const DUMMY_POST: PostDetailCardData = {
   body: '이 노래 진짜 좋아! 베이스 라인이 미쳤어, 이런 감성의 R&B는 진짜 오랜만이에요 ㅠㅠ 요즘 계속 듣는 중인데 질리지가 않아요.',
   genres: ['R&B', '인디', '발라드'],
   createdAt: new Date(Date.now() - 12 * 60 * 1000),
+  reactions: [
+    { type: 'LOVE', emoji: '😍', count: 3, isReacted: false },
+    { type: 'THUMBS_UP', emoji: '👍', count: 5, isReacted: false },
+    { type: 'FIRE', emoji: '🔥', count: 1, isReacted: false },
+  ],
 };
 
 // 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일. 데이터는 아직 더미

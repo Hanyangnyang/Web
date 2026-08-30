@@ -42,7 +42,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '3c0anSTjsn20lztbBmZt03',
@@ -52,7 +52,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '0kt2S0FV9DEGIOg247sT8b',
@@ -62,7 +62,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '4uh6rj3FryYQXMz9zLqDKL',
@@ -72,7 +72,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '171mGT1HdxM2HdqZrWNY31',
@@ -82,7 +82,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '3aK5mtd4CKxLF6RpC1doh6',
@@ -92,7 +92,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('발라드'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '6W4iF5kAqqwKiVwAk3TcN1',
@@ -102,7 +102,7 @@ export const DUMMY_SONGS: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
 ];
 
@@ -115,7 +115,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '4Qqd4mzQzVGpvPrzq3Dtn8',
@@ -125,7 +125,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '5eBM5qATb1IfJvNzGuS2GX',
@@ -135,7 +135,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '171mGT1HdxM2HdqZrWNY31',
@@ -145,7 +145,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '3c0anSTjsn20lztbBmZt03',
@@ -155,7 +155,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '0kt2S0FV9DEGIOg247sT8b',
@@ -165,7 +165,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '4uh6rj3FryYQXMz9zLqDKL',
@@ -175,7 +175,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '6W4iF5kAqqwKiVwAk3TcN1',
@@ -185,7 +185,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '3aK5mtd4CKxLF6RpC1doh6',
@@ -195,7 +195,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('발라드'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   // 10순위까지 채우기 위한 추가 더미 — 실제 Spotify 트랙 ID가 아니라서 재생은 되지 않음(실 데이터 연동 전까지 임시)
   {
@@ -206,7 +206,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: 'dummy-chart-11',
@@ -216,7 +216,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('발라드'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: 'dummy-chart-12',
@@ -226,7 +226,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('POP'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: 'dummy-chart-13',
@@ -236,7 +236,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('힙합'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: 'dummy-chart-14',
@@ -246,7 +246,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('락'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: 'dummy-chart-15',
@@ -256,7 +256,7 @@ export const DUMMY_CHART: Song[] = [
     comment: getRandomElement(USER_COMMENTS),
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
 ];
 
@@ -269,7 +269,7 @@ export const DUMMY_BOOKMARKED_SONGS: Song[] = [
     comment: '이건 진짜 제 인생곡이에요, 힘들 때마다 듣는 완전 최애곡 중의 최애곡입니다',
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '3Q3wWJxr6sBt8afP9hJj4J',
@@ -279,7 +279,7 @@ export const DUMMY_BOOKMARKED_SONGS: Song[] = [
     comment: '노래방 가면 무조건 예약해두고 부르는 저만의 필수곡이에요, 분위기 최고예요',
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '171mGT1HdxM2HdqZrWNY31',
@@ -289,7 +289,7 @@ export const DUMMY_BOOKMARKED_SONGS: Song[] = [
     comment: '가사가 진짜 좋아서 몇 번을 곱씹어 듣게 되는 곡이에요, 매번 새롭게 다가와요',
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '4uh6rj3FryYQXMz9zLqDKL',
@@ -299,7 +299,7 @@ export const DUMMY_BOOKMARKED_SONGS: Song[] = [
     comment: '드라이브할 때 이 노래 틀면 분위기가 완전 살아나요, 창문 열고 듣기 딱이에요',
     genres: withRandomGenres('인디'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
 ];
 
@@ -312,7 +312,7 @@ export const DUMMY_MY_SONGS: Song[] = [
     comment: '요즘 자기 전에 꼭 듣는 곡이라 에리카생들한테도 추천하고 싶어서 올려봐요',
     genres: withRandomGenres('발라드'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
   {
     trackId: '6W4iF5kAqqwKiVwAk3TcN1',
@@ -322,6 +322,6 @@ export const DUMMY_MY_SONGS: Song[] = [
     comment: '과제하다 지칠 때 이 노래 들으면 기분전환이 돼서 자주 듣는 곡이에요',
     genres: withRandomGenres('R&B'),
     previewUrl: '',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   },
 ];

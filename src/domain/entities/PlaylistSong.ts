@@ -16,7 +16,7 @@ export interface PlaylistSong {
   genres: string[];
   isBookmarked: boolean;
   reactions: PlaylistReaction[];
-  createdAt: Date;
+  createdAt: string; // ISO 문자열 — react-query 캐시 직렬화 안전을 위해 Date 인스턴스로 안 바꿈
 }
 
 export function createPlaylistSong(raw: {
@@ -29,7 +29,7 @@ export function createPlaylistSong(raw: {
   genres: string[];
   isBookmarked: boolean;
   reactions: PlaylistReaction[];
-  createdAt: Date;
+  createdAt: string; // ISO 문자열 — react-query 캐시 직렬화 안전을 위해 Date 인스턴스로 안 바꿈
 }): PlaylistSong {
   return {
     id: raw.id,
