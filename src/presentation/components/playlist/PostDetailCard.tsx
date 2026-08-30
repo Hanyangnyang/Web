@@ -1,4 +1,4 @@
-import { Bookmark, Play, Smile } from 'lucide-react';
+import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, GENRES } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
@@ -55,9 +55,11 @@ export function PostDetailCard({
 }: PostDetailCardProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [myReactions, setMyReactions] = useState<Set<ReactionKey>>(new Set());
+  const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [showBookmarkPop, setShowBookmarkPop] = useState(false);
   const bookmarkPopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reportMenuRef = useRef<HTMLDivElement>(null);
   const genre = GENRES.find((g) => g.label === post.genre);
 
   useEffect(() => {
@@ -65,6 +67,18 @@ export function PostDetailCard({
       if (bookmarkPopTimerRef.current) clearTimeout(bookmarkPopTimerRef.current);
     };
   }, []);
+
+  // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
+  useEffect(() => {
+    if (!reportMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (reportMenuRef.current && !reportMenuRef.current.contains(e.target as Node)) {
+        setReportMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [reportMenuOpen]);
 
   const toggleReaction = (key: ReactionKey) => {
     setMyReactions((prev) => {
@@ -94,6 +108,37 @@ export function PostDetailCard({
     <div className="truncate">
       <span className="text-base font-bold text-text-main">{post.title}</span>
       <span className="text-sm font-medium text-text-sub"> · {post.artist}</span>
+    </div>
+  );
+
+  // 더보기 버튼: 앨범 커버 바로 아래 첫 행의 맨 오른쪽에 위치 —
+  // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류. 실제 신고 처리는 추후 구현
+  const moreButton = (
+    <div ref={reportMenuRef} className="relative inline-block flex-shrink-0">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setReportMenuOpen((prev) => !prev);
+        }}
+        aria-label="더보기"
+        className="active:scale-90 transition-transform"
+      >
+        <MoreVertical size={18} className="text-text-sub" />
+      </button>
+
+      {reportMenuOpen && (
+        <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setReportMenuOpen(false);
+            }}
+            className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
+          >
+            신고하기
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -226,10 +271,15 @@ export function PostDetailCard({
                 );
               })}
             </div>
+
+            {moreButton}
           </div>
         )}
 
-        <div className="mb-2">{titleBlock}</div>
+        <div className={`mb-2 ${hideReactions ? 'flex items-center gap-2' : ''}`}>
+          <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
+          {hideReactions && moreButton}
+        </div>
 
         {/* 본문 */}
         <p className="text-sm text-text-main leading-relaxed mb-3 whitespace-pre-line">{post.body}</p>

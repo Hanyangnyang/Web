@@ -1,5 +1,5 @@
 import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
@@ -55,6 +55,20 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [myReactionsByPost, setMyReactionsByPost] = useState<Record<string, Set<ReactionKey>>>({});
   const [openPickerPostId, setOpenPickerPostId] = useState<string | null>(null);
+  const [reportMenuOpenPostId, setReportMenuOpenPostId] = useState<string | null>(null);
+  const reportMenuRef = useRef<HTMLDivElement>(null);
+
+  // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
+  useEffect(() => {
+    if (!reportMenuOpenPostId) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (reportMenuRef.current && !reportMenuRef.current.contains(e.target as Node)) {
+        setReportMenuOpenPostId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [reportMenuOpenPostId]);
 
   const toggleBookmark = (id: string) => {
     setBookmarkedIds((prev) => {
@@ -168,14 +182,36 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                       strokeWidth={2}
                     />
                   </button>
-                  {/* 더보기 버튼: 동작은 추후 구현 */}
-                  <button
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label="더보기"
-                    className="active:scale-90 transition-transform"
+                  {/* 더보기 버튼 — 실제 신고 처리는 추후 구현 */}
+                  <div
+                    ref={reportMenuOpenPostId === post.id ? reportMenuRef : undefined}
+                    className="relative inline-block flex-shrink-0"
                   >
-                    <MoreVertical size={18} className="text-text-sub" />
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setReportMenuOpenPostId((prev) => (prev === post.id ? null : post.id));
+                      }}
+                      aria-label="더보기"
+                      className="active:scale-90 transition-transform"
+                    >
+                      <MoreVertical size={18} className="text-text-sub" />
+                    </button>
+
+                    {reportMenuOpenPostId === post.id && (
+                      <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setReportMenuOpenPostId(null);
+                          }}
+                          className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
+                        >
+                          신고하기
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
