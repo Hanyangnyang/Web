@@ -90,7 +90,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
   };
 
   return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"

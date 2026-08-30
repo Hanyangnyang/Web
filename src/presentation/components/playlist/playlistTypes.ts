@@ -27,7 +27,7 @@ export const GENRES = [
 export const CHART_PERIOD_OPTIONS = [
   { key: 'weekly', label: '주간' },
   { key: 'monthly', label: '월간' },
-  { key: 'popular', label: '인기' },
+  { key: 'popular', label: '실시간' },
 ] as const;
 
 export type ChartPeriod = (typeof CHART_PERIOD_OPTIONS)[number]['key'];

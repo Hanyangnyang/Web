@@ -9,8 +9,7 @@ interface AddSongFabProps {
 
 // 열림/닫힘 상태 관계없이 화면 끝에서 항상 1rem 여백
 const FAB_RIGHT = 'right-[max(1rem,calc((100vw-440px)/2+1rem))]';
-const CLOSED_BOTTOM = 'calc(24px + env(safe-area-inset-bottom))';
-// 플레이어 카드 위 16px 간격을 두고 뜨도록 — 높이는 실측값을 그대로 사용
+const CLOSED_BOTTOM = 'calc(8px + env(safe-area-inset-bottom))';
 const PLAYER_GAP = 16;
 
 // 이 FAB은 앱 전역 스크롤 컨테이너(App.tsx)를 prop으로 전달받을 방법이 없어서,

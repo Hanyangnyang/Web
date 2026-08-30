@@ -1,7 +1,8 @@
-import { Loader2, Search, X } from 'lucide-react';
+import { Loader2, Play, Search, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, GENRES } from './playlistTypes';
+import { type PlayableTrack } from './FloatingSpotifyPlayer';
 
 interface SearchTrack {
   trackId: string;
@@ -53,9 +54,18 @@ interface AddSongViewProps {
   onBack: () => void;
   // Supabase 테이블 붙기 전까지 임시로 로컬 더미데이터에 곡을 추가하는 콜백
   onSongAdded: (song: Song) => void;
+  // 플레이어가 떠 있으면 등록하기 버튼이 그 위로 뜨도록 — 0이면 플레이어 닫힘
+  playerHeight?: number;
+  // 선택한 곡을 미리 들어볼 수 있게 하단 플레이어를 띄우는 콜백
+  onPlay?: (track: PlayableTrack) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 선택한 곡과 같으면 재생 버튼을 숨김
+  currentTrackId?: string | null;
 }
 
-export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
+// 플레이어 카드 위 16px 간격을 두고 뜨도록 — AddSongFab과 동일한 값
+const PLAYER_GAP = 16;
+
+export function AddSongView({ onBack, onSongAdded, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -140,7 +150,7 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
   };
 
   return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
         title="곡 추천하기"
         emoji="🤔"
@@ -225,6 +235,15 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
               <div className="text-sm font-semibold text-text-main truncate">{selectedTrack.title}</div>
               <div className="text-xs text-text-sub truncate">{selectedTrack.artist}</div>
             </div>
+            {onPlay && selectedTrack.trackId !== currentTrackId && (
+              <button
+                onClick={() => onPlay(selectedTrack)}
+                aria-label={`${selectedTrack.title} 재생`}
+                className="flex-shrink-0 p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+              >
+                <Play size={16} className="text-text-sub" fill="currentColor" />
+              </button>
+            )}
             <button
               onClick={() => setSelectedTrack(null)}
               aria-label="선택한 곡 취소"
@@ -288,10 +307,16 @@ export function AddSongView({ onBack, onSongAdded }: AddSongViewProps) {
         disabled={!canSubmit}
         className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold border transition-all active:scale-[0.97] z-40 ${
           canSubmit
-            ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_6px_20px_rgba(43,59,82,0.35)]'
+            ? 'bg-primary text-white border-transparent shadow-[0_6px_20px_rgba(14,74,132,0.35)]'
             : 'bg-slate-100 text-slate-300 border-transparent'
         }`}
-        style={{ bottom: 'calc(24px + env(safe-area-inset-bottom))' }}
+        style={{
+          bottom:
+            playerHeight > 0
+              ? `calc(${playerHeight}px + ${PLAYER_GAP}px + env(safe-area-inset-bottom))`
+              : 'calc(24px + env(safe-area-inset-bottom))',
+          transition: 'bottom 300ms ease-out',
+        }}
       >
         등록하기
       </button>

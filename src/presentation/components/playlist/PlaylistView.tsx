@@ -125,16 +125,12 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = filteredChart.slice(0, CHART_LIMIT);
 
-  // 화면 하단 리스트들이 FAB/플레이어에 가리지 않도록 확보해야 하는 여백.
-  // FAB(h-12=48px)와 그 위 여유 버퍼(8px)는 항상 필요하고, 플레이어가 열려있으면
-  // "플레이어 실측 높이 + FAB가 그 위로 뜨는 간격(16px)"만큼 더 필요하다.
-  const FAB_FOOTPRINT = 48 + 8;
-  const bottomSpace = playerHeight > 0 ? playerHeight + 16 + FAB_FOOTPRINT : 24 + FAB_FOOTPRINT;
+  const bottomSpace = playerHeight > 0 ? playerHeight + 4 : 4;
 
   return (
     <div
       ref={scrollContainerRef}
-      className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app px-4 py-6"
+      className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app px-4 py-4"
       style={{
         backgroundColor: '#F8F9FA',
         backgroundImage:
@@ -161,6 +157,9 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <AddSongView
             onBack={popScreen}
             onSongAdded={handleAddSong}
+            playerHeight={playerHeight}
+            onPlay={setCurrentTrack}
+            currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'search' ? (
           <SearchResultsView
@@ -259,7 +258,7 @@ function PlaylistMainContent({
 }: PlaylistMainContentProps) {
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
   return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
@@ -302,7 +301,7 @@ function PlaylistMainContent({
       {/* 최근 추가된 곡 섹션 */}
       <section className="mb-4">
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
+          <h3 className="text-lg font-bold text-text-main">🎵 최근 추가된 곡</h3>
           <button
             onClick={onShowAllRecent}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
@@ -329,7 +328,7 @@ function PlaylistMainContent({
       {/* 인기차트 섹션 */}
       <section>
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">인기차트</h3>
+          <h3 className="text-lg font-bold text-text-main">🔥 인기차트</h3>
           <button
             onClick={onShowAllChart}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"

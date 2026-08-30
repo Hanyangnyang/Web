@@ -17,7 +17,7 @@ export function ChartView({ chart, onBack, onShowAddSong, onPlay, onShowPosts }:
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
 
   return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
         title="인기차트"
         emoji="🔥"

@@ -17,7 +17,7 @@ const DUMMY_POST: PostDetailCardData = {
 // 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일. 데이터는 아직 더미
 export function PostDetailView({ onBack }: PostDetailViewProps) {
   return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))]">
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
