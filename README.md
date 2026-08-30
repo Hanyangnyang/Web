@@ -159,8 +159,12 @@ src/
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
-| `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 15분(FE staleTime, BE 캐시 주기 미확인) | 플레이리스트 화면 진입 시 |
-| `POST /api/v1/playlist/songs` | 곡 추천 및 등록 (곡추천하기) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록하기 버튼 클릭 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영 |
+| `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 1분(FE staleTime, BE 캐시 주기 미확인) — 실시간성이 중요해 전역 기본값보다 짧게 지정 | 콜드스타트 fetch, 최근추가된곡 화면 진입 시 명시적 refetch(화면 전환은 컴포넌트 재마운트가 아니라서 staleTime만으론 재조회 안 됨) |
+| `POST /api/v1/playlist/songs` | 곡 추천 및 등록 | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록 확인 팝업에서 최종 확정 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영. `isPending` 동안 버튼 비활성화로 중복 제출 방지 |
+| `POST /api/v1/playlist/songs/{id}/reports` | 곡 게시글 신고하기 | 해당없음 (뮤테이션) | 더보기 메뉴 → 사유 선택 → 신고하기 클릭 시 |
+| `POST /api/v1/playlist/songs/{id}/like` | 좋아요(=서비스 내 "북마크") 토글 | 해당없음 (뮤테이션) | 북마크 배지 클릭 시. 낙관적 업데이트 + 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
+| `POST /api/v1/playlist/songs/tracks/{trackId}/play` | 곡 재생수 기록 (인기차트 집계용) | 해당없음 (뮤테이션) | 재생 버튼 클릭 시(모든 재생 버튼이 `PlaylistView`의 `handlePlay` 한 곳으로 모임). 같은 trackId는 10초 스로틀 — 연타로 재생수가 부풀지 않게 프론트에서 직접 제한 |
+| `POST /api/v1/playlist/songs/{id}/reactions` | 이모지 리액션 토글 (9종) | 해당없음 (뮤테이션) | 이모지 반응 버튼 클릭 시. 응답으로 온 9종 전체 최신 카운트로 로컬 상태를 통째로 동기화, 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage

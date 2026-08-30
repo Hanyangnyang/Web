@@ -98,8 +98,11 @@ export function PostDetailCard({
 
   // 먼저 로컬 카운트를 낙관적으로 증감시켜 바로 반응이 보이게 하고(서버가 내려준 count엔 이미 내 반응이
   // 포함돼 있어 +1/-1로 계산), 서버 응답이 오면 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤.
-  // 실패하면 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글
+  // 실패하면 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글.
+  // 이전 요청이 아직 처리 중이면 연타를 무시 — 여러 요청이 동시에 나가면 응답 도착 순서가
+  // 클릭 순서와 안 맞아서 최종 상태가 서버 상태와 어긋날 수 있음
   const toggleReaction = (key: ReactionKey) => {
+    if (toggleReactionMutation.isPending) return;
     const previous = reactions;
     setReactions((prev) => {
       const current = prev[key] ?? { count: 0, mine: false };
@@ -120,8 +123,10 @@ export function PostDetailCard({
   };
 
   // 서버 응답이 오기 전에 먼저 눈에 보이게 뒤집고(낙관적 업데이트), 응답 오면 실제 값으로 맞추거나
-  // 실패 시 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글
+  // 실패 시 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글.
+  // 이전 요청이 처리 중이면 연타 무시(같은 이유로 이모지 반응과 동일하게 가드)
   const toggleBookmarked = () => {
+    if (toggleBookmark.isPending) return;
     if (!post.id) {
       setBookmarked((prev) => !prev);
       return;
@@ -236,8 +241,9 @@ export function PostDetailCard({
             e.stopPropagation();
             toggleBookmarked();
           }}
+          disabled={toggleBookmark.isPending}
           aria-label="북마크"
-          className="absolute bottom-[4%] right-[4%] z-10 w-[min(16%,32px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+          className={`absolute bottom-[4%] right-[4%] z-10 w-[min(16%,32px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
         >
           <Bookmark className={`w-1/2 h-1/2 ${bookmarked ? 'text-primary' : 'text-white'}`} strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
         </button>
@@ -270,8 +276,9 @@ export function PostDetailCard({
                           toggleReaction(key);
                           setPickerOpen(false);
                         }}
+                        disabled={toggleReactionMutation.isPending}
                         aria-label={`${emoji} 남기기`}
-                        className="w-6 h-6 flex items-center justify-center text-xs rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
+                        className={`w-6 h-6 flex items-center justify-center text-xs rounded-full hover:bg-slate-100 active:scale-90 transition-transform ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
                       >
                         {emoji}
                       </button>
@@ -297,10 +304,11 @@ export function PostDetailCard({
                       e.stopPropagation();
                       toggleReaction(key);
                     }}
+                    disabled={toggleReactionMutation.isPending}
                     aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
                     className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
                       mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                    }`}
+                    } ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
                   >
                     <span className="text-xs">{emoji}</span>
                     <span>{count}</span>

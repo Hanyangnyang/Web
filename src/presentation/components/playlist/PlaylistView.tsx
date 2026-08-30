@@ -24,6 +24,8 @@ import { useRecentSongs, useRecordTrackPlay } from '../../hooks/useRecentSongs.j
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
+// 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
+const TRACK_PLAY_THROTTLE_MS = 10 * 1000;
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
 
@@ -34,7 +36,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   // 최근추가된곡은 /api/v1/playlist/songs에서 받아온 뒤 로컬 state로 옮겨 관리 —
   // 곡 등록 API가 아직 없어서, 등록 직후엔 서버 재조회 없이 로컬로만 맨 앞에 얹기 때문
-  const { data: fetchedSongs } = useRecentSongs();
+  const { data: fetchedSongs, refetch: refetchRecentSongs } = useRecentSongs();
   const [songs, setSongs] = useState<Song[]>([]);
   useEffect(() => {
     if (fetchedSongs) setSongs(fetchedSongs);
@@ -42,10 +44,18 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
   const recordTrackPlay = useRecordTrackPlay();
+  // trackId별 마지막 재생기록 전송 시각 — 리렌더와 무관하게 유지돼야 해서 state가 아니라 ref
+  const lastPlayRecordedAtRef = useRef<Map<string, number>>(new Map());
   // 재생 버튼이 어디서 눌리든(최근추가곡/인기차트/검색/게시글 등) 이 함수 하나로 모여서
-  // 플레이어를 띄우는 것과 별개로 재생수 기록 API를 함께 호출함
+  // 플레이어를 띄우는 것과 별개로 재생수 기록 API를 함께 호출함 — 단, 같은 트랙은 스로틀 시간 안엔 다시 안 보냄
   const handlePlay = useCallback((track: PlayableTrack) => {
     setCurrentTrack(track);
+
+    const now = Date.now();
+    const lastRecordedAt = lastPlayRecordedAtRef.current.get(track.trackId) ?? 0;
+    if (now - lastRecordedAt < TRACK_PLAY_THROTTLE_MS) return;
+
+    lastPlayRecordedAtRef.current.set(track.trackId, now);
     recordTrackPlay.mutate(track.trackId);
   }, [recordTrackPlay.mutate]);
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
@@ -59,6 +69,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
+
+  // PlaylistView 자체는 최근추가된곡 화면을 드나들어도 마운트가 유지돼서, react-query의
+  // staleTime이 지나 있어도 "새로 마운트되는 시점" 트리거가 없어 자동으로 재조회되지 않았음.
+  // 그래서 이 화면에 들어오는 시점 자체를 트리거로 삼아 직접 refetch — staleTime이 안 지났으면
+  // react-query가 알아서 네트워크 요청 없이 캐시를 그대로 반환함
+  useEffect(() => {
+    if (screen === 'recent') refetchRecentSongs();
+  }, [screen, refetchRecentSongs]);
 
   const pushScreen = useCallback((next: PlaylistScreen) => {
     setScreenStack((prev) => [...prev, next]);
