@@ -1,6 +1,6 @@
 import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { type Song, GENRES } from './playlistTypes';
+import { type Song, GENRES, formatTimeAgo } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
 
 export interface PostDetailCardData {
@@ -9,6 +9,7 @@ export interface PostDetailCardData {
   artist: string;
   body: string;
   genres: string[];
+  createdAt: Date;
 }
 
 interface PostDetailCardProps {
@@ -34,6 +35,7 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
     artist: song.artist,
     body: song.comment,
     genres: song.genres,
+    createdAt: song.createdAt,
   };
 }
 
@@ -257,17 +259,22 @@ export function PostDetailCard({
         {/* 본문 */}
         <p className="text-sm text-text-main leading-relaxed mb-3 whitespace-pre-line">{post.body}</p>
 
-        {/* 장르 — 최대 3개까지 함께 표시 */}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-text-sub">
-          {post.genres.map((label) => {
-            const genre = GENRES.find((g) => g.label === label);
-            return (
-              <span key={label} className="flex items-center">
-                {genre?.emoji && <span>{genre.emoji}</span>}
-                <span>{label}</span>
-              </span>
-            );
-          })}
+        {/* 장르 — 최대 3개까지 함께 표시. 시간은 1열(리액션 있는) 모드에서만 카드 우측 끝에 같이 표시 */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-text-sub">
+            {post.genres.map((label) => {
+              const genre = GENRES.find((g) => g.label === label);
+              return (
+                <span key={label} className="flex items-center">
+                  {genre?.emoji && <span>{genre.emoji}</span>}
+                  <span>{label}</span>
+                </span>
+              );
+            })}
+          </div>
+          {!hideReactions && (
+            <span className="flex-shrink-0 text-xs text-text-hint">{formatTimeAgo(post.createdAt)}</span>
+          )}
         </div>
       </div>
     </div>

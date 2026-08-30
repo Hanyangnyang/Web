@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
+import { formatTimeAgo } from './playlistTypes';
 
 interface TrackPostsViewProps {
   track: TrackResult;
@@ -24,17 +25,6 @@ const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 const MONTH_MS = 30 * DAY_MS;
-const YEAR_MS = 12 * MONTH_MS;
-
-function formatTimeAgo(date: Date): string {
-  const diffMs = Date.now() - date.getTime();
-  if (diffMs < MINUTE_MS) return '방금 전';
-  if (diffMs < HOUR_MS) return `${Math.floor(diffMs / MINUTE_MS)}분 전`;
-  if (diffMs < DAY_MS) return `${Math.floor(diffMs / HOUR_MS)}시간 전`;
-  if (diffMs < MONTH_MS) return `${Math.floor(diffMs / DAY_MS)}일 전`;
-  if (diffMs < YEAR_MS) return `${Math.floor(diffMs / MONTH_MS)}달 전`;
-  return `${Math.floor(diffMs / YEAR_MS)}년 전`;
-}
 
 const SORT_OPTIONS = [
   { key: 'latest', label: '최신' },
