@@ -64,6 +64,9 @@ interface AddSongViewProps {
 
 // 플레이어 카드 위 16px 간격을 두고 뜨도록 — AddSongFab과 동일한 값
 const PLAYER_GAP = 16;
+// 등록하기 버튼 자체의 높이(h-12)와, 그 위 마지막 섹션(곡에 대한 한마디)이 버튼에 가리지 않도록 두는 여유 간격
+const REGISTER_BUTTON_HEIGHT = 48;
+const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
 export function AddSongView({ onBack, onSongAdded, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
   const [query, setQuery] = useState('');
@@ -149,8 +152,19 @@ export function AddSongView({ onBack, onSongAdded, playerHeight = 0, onPlay, cur
     onBack();
   };
 
+  // FAB는 이 화면에서 숨겨지고 등록하기 버튼만 떠 있어서, 공용 --playlist-bottom-space 대신
+  // 이 버튼 자신의 높이+여백만큼만 마지막 섹션이 가려지지 않게 직접 계산
+  const registerButtonClearance = REGISTER_BUTTON_HEIGHT + REGISTER_BUTTON_CLEARANCE_GAP;
+  const contentBottomPadding =
+    playerHeight > 0
+      ? `calc(${playerHeight}px + ${PLAYER_GAP}px + ${registerButtonClearance}px + env(safe-area-inset-bottom))`
+      : `calc(24px + ${registerButtonClearance}px + env(safe-area-inset-bottom))`;
+
   return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
+    <div
+      className="transition-[padding-bottom] duration-300 ease-out"
+      style={{ paddingBottom: contentBottomPadding }}
+    >
       <MiscSubViewHeader
         title="곡 추천하기"
         emoji="🤔"
@@ -195,25 +209,50 @@ export function AddSongView({ onBack, onSongAdded, playerHeight = 0, onPlay, cur
           }`}
         >
           <div className="overflow-hidden">
-            <div className="bg-white border border-t-0 border-slate-200 rounded-b-card divide-y divide-slate-200">
+            <div className="bg-white border border-t-0 border-slate-200 rounded-b-card py-3">
               {searchResults.length > 0 ? (
-                searchResults.map((track) => (
-                  <button
-                    key={track.trackId}
-                    onClick={() => setSelectedTrack(track)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 transition-colors text-left"
-                  >
-                    <img
-                      src={track.albumArtUrl}
-                      alt={track.title}
-                      className="w-10 h-10 rounded object-cover flex-shrink-0 bg-slate-100"
-                    />
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
+                <div
+                  className="flex gap-3 px-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {searchResults.map((track) => (
+                    <div
+                      key={track.trackId}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedTrack(track)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') setSelectedTrack(track);
+                      }}
+                      aria-label={`${track.title} 선택`}
+                      className="flex-shrink-0 w-28 text-left cursor-pointer active:scale-[0.97] transition-transform"
+                    >
+                      <div className="relative w-28 aspect-square rounded-lg overflow-hidden bg-slate-100">
+                        <img
+                          src={track.albumArtUrl}
+                          alt={track.title}
+                          className="w-full h-full object-cover"
+                        />
+                        {onPlay && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onPlay(track);
+                            }}
+                            aria-label={`${track.title} 재생`}
+                            className="absolute inset-0 flex items-center justify-center"
+                          >
+                            <span className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
+                              <Play size={16} className="text-white" fill="white" />
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                      <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
                       <div className="text-xs text-text-sub truncate">{track.artist}</div>
                     </div>
-                  </button>
-                ))
+                  ))}
+                </div>
               ) : (
                 <p className="text-xs text-text-hint text-center px-3 min-h-[60px] flex items-center justify-center whitespace-pre-line">
                   {searchErrorMessage || '검색 결과가 없어요'}
