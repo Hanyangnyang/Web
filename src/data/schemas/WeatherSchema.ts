@@ -11,9 +11,10 @@ export const HourlyForecastDtoSchema = z.object({
 });
 
 // 현재 날씨. temperature는 화면에 반드시 필요한 핵심 값이라 여기서 실패하면(숫자 아님/누락)
-// 응답 전체를 에러로 취급하고, 나머지 부가 필드는 이상해도 null로 대체(.catch(null))
+// 응답 전체를 에러로 취급하고, 나머지 부가 필드(forecastAt 포함)는 이상해도 기본값으로 대체 —
+// forecastAt이 깨져도 카드 자체는 떠야 하므로 current를 통째로 실패시키면 안 된다
 export const CurrentWeatherDtoSchema = z.object({
-  forecastAt: z.string(),
+  forecastAt: z.string().catch(''),
   temperature: z.number(),
   weatherCondition: z.string().nullable().catch(null),
   maxTemperature: z.number().nullable().catch(null),
