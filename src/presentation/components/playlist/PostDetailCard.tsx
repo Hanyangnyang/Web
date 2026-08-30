@@ -2,7 +2,6 @@ import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, GENRES } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
-import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 
 export interface PostDetailCardData {
   albumArtUrl: string;
@@ -82,15 +81,7 @@ export function PostDetailCard({
     });
   };
 
-  // 북마크 추가/해제는 실제로 서버에 저장이 필요한 액션이라 이때 익명 기기 식별자를 발급/재사용
-  const ensureDeviceId = () => {
-    getOrCreateAnonymousUserId().catch((err) => console.error('[PostDetailCard] anonymous auth failed:', err));
-  };
-
-  const toggleBookmarked = () => {
-    setBookmarked((prev) => !prev);
-    ensureDeviceId();
-  };
+  const toggleBookmarked = () => setBookmarked((prev) => !prev);
 
   // 다른 사용자 반응 수 + 내 반응 여부를 합쳐서 0보다 큰 이모지만 표시
   const displayedReactions = EMOJI_REACTIONS.filter(

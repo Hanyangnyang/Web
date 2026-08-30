@@ -19,6 +19,7 @@ import { EmptyGenreState } from './EmptyGenreState';
 import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS, filterSongsByGenre } from './playlistTypes';
 import { ChartView } from './ChartView';
 import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
+import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
@@ -62,6 +63,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     }
   }, [screenStack, popScreen, onBack]);
   useBackHandler(handleBack);
+
+  // 플레이리스트의 모든 API가 device_id를 요구해서, 화면 진입 시점에 무조건 익명 기기 식별자를 발급/재사용해둠
+  useEffect(() => {
+    getOrCreateAnonymousUserId().catch((err) => console.error('[PlaylistView] anonymous auth failed:', err));
+  }, []);
 
   // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원
   const scrollContainerRef = useRef<HTMLDivElement>(null);
