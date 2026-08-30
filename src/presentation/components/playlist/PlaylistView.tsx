@@ -10,6 +10,9 @@ import { RecentSongsView } from './RecentSongsView';
 import { SearchResultsView, type TrackResult } from './SearchResultsView';
 import { TrackPostsView } from './TrackPostsView';
 import { PostDetailView } from './PostDetailView';
+import { MyActivityView } from './MyActivityView';
+import { BookmarkedSongsView } from './BookmarkedSongsView';
+import { MySongsView } from './MySongsView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
@@ -20,7 +23,7 @@ import { DUMMY_SONGS, DUMMY_CHART } from './playlistDummyData';
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
 
-type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart';
+type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
 
 export function PlaylistView({ onBack }: { onBack: () => void }) {
   const isApp = isNativeApp();
@@ -188,6 +191,26 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onPlay={setCurrentTrack}
             onShowPosts={handleSelectChartSong}
           />
+        ) : screen === 'myActivity' ? (
+          <MyActivityView
+            onBack={popScreen}
+            onShowBookmarked={() => pushScreen('bookmarked')}
+            onShowMySongs={() => pushScreen('mySongs')}
+          />
+        ) : screen === 'bookmarked' ? (
+          <BookmarkedSongsView
+            onBack={popScreen}
+            onPlay={setCurrentTrack}
+            onShowAddSong={() => pushScreen('addSong')}
+            currentTrackId={currentTrack?.trackId}
+          />
+        ) : screen === 'mySongs' ? (
+          <MySongsView
+            onBack={popScreen}
+            onPlay={setCurrentTrack}
+            onShowAddSong={() => pushScreen('addSong')}
+            currentTrackId={currentTrack?.trackId}
+          />
         ) : (
           <PlaylistMainContent
             onBack={onBack}
@@ -204,6 +227,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onShowAddSong={() => pushScreen('addSong')}
             onPlay={setCurrentTrack}
             onShowPosts={handleSelectChartSong}
+            onShowMyActivity={() => pushScreen('myActivity')}
           />
         )}
       </div>
@@ -238,6 +262,7 @@ interface PlaylistMainContentProps {
   onShowAddSong: () => void;
   onPlay: (song: Song) => void;
   onShowPosts: (song: Song) => void;
+  onShowMyActivity: () => void;
 }
 
 function PlaylistMainContent({
@@ -255,6 +280,7 @@ function PlaylistMainContent({
   onShowAddSong,
   onPlay,
   onShowPosts,
+  onShowMyActivity,
 }: PlaylistMainContentProps) {
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
   return (
@@ -265,8 +291,8 @@ function PlaylistMainContent({
         subtitle="에리카생들에게 곡을 추천해주세요!"
         onBack={onBack}
         rightAction={
-          // 내 추천곡 보기: 동작은 추후 구현
           <button
+            onClick={onShowMyActivity}
             aria-label="내 활동 보기"
             className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
           >
