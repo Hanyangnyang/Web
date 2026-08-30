@@ -20,6 +20,8 @@ export function MySongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: M
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}
+      enableViewToggle
+      hideMoreButton
       currentTrackId={currentTrackId}
     />
   );

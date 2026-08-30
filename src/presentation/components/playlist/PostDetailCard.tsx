@@ -21,6 +21,8 @@ interface PostDetailCardProps {
   isPlaying?: boolean;
   // true면 이모지 리액션을 숨김 — 빠르게 훑어보는 요약 목록(2열)용
   hideReactions?: boolean;
+  // true면 더보기(신고하기) 버튼을 숨김 — 본인이 등록한 곡 목록처럼 자기 자신을 신고할 수 없는 화면용
+  hideMoreButton?: boolean;
   // 넘겨주면 카드 전체가 클릭 가능해짐 — 요약 목록(2열)에서 눌러 상세(1열)로 전환할 때 사용
   onSelect?: () => void;
 }
@@ -50,6 +52,7 @@ export function PostDetailCard({
   onPlay,
   isPlaying = false,
   hideReactions = false,
+  hideMoreButton = false,
   onSelect,
 }: PostDetailCardProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -251,13 +254,13 @@ export function PostDetailCard({
               })}
             </div>
 
-            {moreButton}
+            {!hideMoreButton && moreButton}
           </div>
         )}
 
         <div className={`mb-2 ${hideReactions ? 'flex items-center gap-2' : ''}`}>
           <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
-          {hideReactions && moreButton}
+          {hideReactions && !hideMoreButton && moreButton}
         </div>
 
         {/* 본문 */}

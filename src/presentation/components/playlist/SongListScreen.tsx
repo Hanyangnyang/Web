@@ -16,6 +16,8 @@ interface SongListScreenProps {
   onShowAddSong: () => void;
   // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
+  // true면 카드의 더보기(신고하기) 버튼을 숨김 — 본인이 등록한 곡 목록처럼 자기 자신을 신고할 수 없는 화면용
+  hideMoreButton?: boolean;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
@@ -31,6 +33,7 @@ export function SongListScreen({
   onPlay,
   onShowAddSong,
   enableViewToggle = false,
+  hideMoreButton = false,
   scrollToTrackId,
   currentTrackId,
 }: SongListScreenProps) {
@@ -100,6 +103,7 @@ export function SongListScreen({
                   onPlay={() => onPlay(song)}
                   isPlaying={song.trackId === currentTrackId}
                   hideReactions={isSummaryMode}
+                  hideMoreButton={hideMoreButton}
                   onSelect={isSummaryMode ? () => handleSelectSummary(song) : undefined}
                 />
               </div>
