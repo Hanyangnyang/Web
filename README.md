@@ -159,7 +159,8 @@ src/
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
 | `POST /api/v1/feedbacks` | 통합 피드백 접수 | 해당없음 | 기타탭 > 피드백 보내기(category `GENERAL`), 캠퍼스맵 화면 상단에 제보 버튼(`CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보 버튼(`PARTNERSHIP`) |
-| `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) — Supabase `app_config`(현재기간·공휴일·강제주말·미운행 오버라이드)를 완전히 대체하는 자리라, 관리자가 긴급 미운행 등을 바꿔도 앱 재시작 없이 비교적 빨리 반영되도록 짧게 잡음 | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `calendar`/`academic`/`shuttle` 필드로 기간·평일/주말·운행여부를 직접 판정 |
+| `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) — Supabase `app_config`(현재기간·공휴일·강제주말·미운행 오버라이드)를 완전히 대체하는 자리라, 관리자가 긴급 미운행 등을 바꿔도 앱 재시작 없이 비교적 빨리 반영되도록 짧게 잡음 | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `academic`/`shuttle` 필드로 기간·셔틀 dayType·운행여부를 판정. `calendar` 필드는 학교 자체 공휴일까지 섞여 있어 지하철엔 안 씀(아래 date-info 참고) |
+| `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 24시간 — 평일/주말/공휴일 여부는 하루 안에 안 바뀜 | 셔틀탭이 지하철 dayType 판정에만 씀(`useShuttle`) — academic/status.calendar와 달리 학교 자체 공휴일이 안 섞인 순수 공공기념일 기준이라, 학교 사정과 무관한 실제 지하철 운행에 맞음. 지하철 연결정보가 필요한 정류장에서만 조회 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage

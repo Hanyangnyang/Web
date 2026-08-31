@@ -106,7 +106,6 @@ function MainLayout() {
   // 2. 학식 데이터 - 학식탭이 활성 탭일 때만 요청(다른 탭 진입 시 불필요한 백엔드 호출 방지)
   const { menuDate, cafes, menuLoading, menuRevalidating, changeDate, refetchMenu } = useMenu(activeTab === 'cafe');
   useEffect(() => {
-    // academic/status는 BootContext가 스플래시 게이팅용으로 이미 prefetch함 — 여기서 또 부를 필요 없음
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
 

@@ -10,6 +10,7 @@ import { getShuttleDataUseCase, getSubwayScheduleUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
 import { useAcademicStatus } from './useAcademicStatus.js';
+import { useDateInfo } from './useDateInfo.js';
 
 const BUS_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 셔틀버스 캐시 TTL(12시간)보다 짧게 재검증. 관리자가 시간표 CRUD할 때만 백엔드 캐시가 지워지므로 대부분은 같은 값을 그대로 돌려받음
 const SUBWAY_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 지하철 시간표 캐시 TTL(12시간, station:line:direction:dayType 키)보다 짧게 재검증
@@ -35,6 +36,9 @@ export function useShuttle(isActive = false) {
   const [isFullMode, setIsFullMode] = useState(false);
   const [fullDayType, setFullDayType] = useState('평일');
 
+  // 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕)에서만 전체 시간표를 받아옴
+  const needsSubway = SUBWAY_CONNECTED_STOPS.includes(stop);
+
   // 오늘의 학사/셔틀 통합 운영 상태 — 예전엔 Supabase app_config(현재기간·공휴일·강제주말·미운행 오버라이드)를
   // 프론트에서 직접 조합해서 판정했는데, 이제 이 값 하나로 백엔드가 전부 계산해서 내려준다.
   // 모드와 무관하게 항상 필요(전체 모드 진입 시 기본값 동기화에도 씀)
@@ -42,9 +46,12 @@ export function useShuttle(isActive = false) {
   const currentPeriod = academicStatus ? mapServerPeriodType(academicStatus.academic.periodType) : '학기중';
   const shuttleDayType = academicStatus ? mapServerDayType(academicStatus.shuttle.dayType) : localWeekdayFallback();
   const isShuttleOperating = academicStatus ? academicStatus.shuttle.isOperating : true;
-  // 지하철 연결편 조회는 셔틀 전용 오버라이드(학교 자체 기념일 등)와 무관하게 항상 실제 달력(법정공휴일) 기준을
-  // 따른다 — 학교 기념일이어도 열차는 평일대로 다니므로 shuttle.dayType이 아닌 calendar.dayType을 쓴다
-  const trainDayType = academicStatus ? mapServerDayType(academicStatus.calendar.dayType) : localWeekdayFallback();
+
+  // 지하철 연결편 조회는 셔틀 전용 오버라이드(학교 자체 기념일 등)와 무관하게 항상 실제 공휴일 달력 기준을
+  // 따른다 — 학교 기념일이어도 열차는 평일대로 다니므로. academic/status.calendar는 학교 자체 공휴일까지
+  // 섞여 내려와서 못 쓰고, 순수 공공기념일 기준인 date-info를 따로 조회한다. 지하철 연결정보가 필요할 때만 요청.
+  const { data: dateInfo } = useDateInfo(undefined, needsSubway && isActive);
+  const trainDayType = dateInfo ? mapServerDayType(dateInfo.dayType) : localWeekdayFallback();
 
   const [fullPeriod, setFullPeriod] = useState(currentPeriod);
 
@@ -90,9 +97,6 @@ export function useShuttle(isActive = false) {
     const id = setInterval(() => setNow(curMin()), 10_000);
     return () => clearInterval(id);
   }, []);
-
-  // 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕)에서만 전체 시간표를 받아옴
-  const needsSubway = SUBWAY_CONNECTED_STOPS.includes(stop);
 
   // 지하철 전체 시간표 (새 백엔드 — 정적 데이터, 폴링 없음. 백엔드 캐시 TTL(12시간)에 맞춤)
   const subwayScheduleQuery = useQuery({

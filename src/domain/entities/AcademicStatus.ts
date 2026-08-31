@@ -4,6 +4,8 @@ export type DayType = 'WEEKDAY' | 'WEEKEND' | 'HOLIDAY' | 'NO_OPERATION';
 export type Semester = 'FIRST' | 'SECOND';
 export type PeriodType = 'SEMESTER' | 'SEASONAL' | 'VACATION';
 
+// ⚠️ isHoliday/dayType은 학교 자체 공휴일까지 섞여서 내려온다(순수 공공기념일 기준 아님) — 학교 사정과
+// 무관해야 하는 판정(예: 지하철 운행)엔 쓰면 안 되고, 그런 경우엔 DateInfo.ts(/api/v1/holidays/date-info)를 쓸 것
 export interface CalendarStatus {
   dayType: DayType;
   isHoliday: boolean;
