@@ -73,7 +73,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
         <ErrorBoundary name="portal-banner">
-          <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} onNavigateToTab={onNavigateToTab} />
+          <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} isActive={isActive} onNavigateToTab={onNavigateToTab} />
         </ErrorBoundary>
 
         {/* 3. 열람실 혼잡도 섹션 */}
