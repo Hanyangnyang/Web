@@ -1,4 +1,4 @@
-import { Bookmark, Loader2, MoreVertical, Play, Smile } from 'lucide-react';
+import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
@@ -170,9 +170,14 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
       </div>
 
       {isLoading && (
-        <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-sub">
-          <Loader2 size={16} className="animate-spin" />
-          불러오는 중...
+        <div className="flex flex-col gap-1">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200">
+              <div className="h-4 w-full skeleton-shimmer rounded-full" />
+              <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
+              <div className="h-3 w-16 skeleton-shimmer rounded-full mt-1" />
+            </div>
+          ))}
         </div>
       )}
 
@@ -269,7 +274,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                     }}
                     disabled={toggleReactionMutation.isPending}
                     aria-label="이모지 추가"
-                    className={`w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
+                    className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform"
                   >
                     <Smile size={11} className="text-text-sub" strokeWidth={2} />
                   </button>
@@ -316,7 +321,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                           aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
                           className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
                             mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                          } ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
+                          }`}
                         >
                           <span className="text-xs">{emoji}</span>
                           <span>{count}</span>

@@ -77,9 +77,12 @@ const DAY_MS = 24 * HOUR_MS;
 const MONTH_MS = 30 * DAY_MS;
 const YEAR_MS = 12 * MONTH_MS;
 
-// 게시글/곡 카드에 공용으로 쓰는 상대 시간 표시 ("12분 전", "3시간 전" 등). ISO 문자열/Date 둘 다 받음
-export function formatTimeAgo(date: Date | string): string {
+// 게시글/곡 카드에 공용으로 쓰는 상대 시간 표시 ("12분 전", "3시간 전" 등). ISO 문자열/Date 둘 다 받음.
+// null/유효하지 않은 값(예: 곡 등록 직후 API가 createdAt을 null로 내려주는 경우)이 와도 화면이 안 죽게 방어
+export function formatTimeAgo(date: Date | string | null | undefined): string {
+  if (!date) return '방금 전';
   const time = typeof date === 'string' ? new Date(date).getTime() : date.getTime();
+  if (Number.isNaN(time)) return '방금 전';
   const diffMs = Date.now() - time;
   if (diffMs < MINUTE_MS) return '방금 전';
   if (diffMs < HOUR_MS) return `${Math.floor(diffMs / MINUTE_MS)}분 전`;

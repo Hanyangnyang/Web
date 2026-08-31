@@ -102,7 +102,35 @@ export function SongListScreen({
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}
       <div ref={listContainerRef} className="-mx-4 px-2">
         {isLoading ? (
-          <div className="py-16 text-center text-sm text-text-hint">불러오는 중...</div>
+          <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
+            {Array.from({ length: viewMode === 'grid' ? 4 : 3 }).map((_, i) =>
+              viewMode === 'grid' ? (
+                <div key={i} className="h-full flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                  <div className="w-full aspect-square skeleton-shimmer" />
+                  <div className="px-4 pt-3 pb-4 flex-1 flex flex-col gap-2">
+                    <div className="h-4 w-3/4 rounded-full skeleton-shimmer" />
+                    <div className="h-3 w-1/2 rounded-full skeleton-shimmer" />
+                    <div className="h-3 w-full rounded-full skeleton-shimmer" />
+                    <div className="h-3 w-16 rounded-full skeleton-shimmer mt-auto" />
+                  </div>
+                </div>
+              ) : (
+                <div key={i} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                  <div className="w-full aspect-square skeleton-shimmer" />
+                  <div className="px-4 pt-3 pb-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className="w-6 h-6 rounded-full skeleton-shimmer flex-shrink-0" />
+                      <div className="h-5 w-14 rounded-full skeleton-shimmer" />
+                    </div>
+                    <div className="h-4 w-1/2 rounded-full skeleton-shimmer mb-2" />
+                    <div className="h-3.5 w-full rounded-full skeleton-shimmer mb-1.5" />
+                    <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer mb-3" />
+                    <div className="h-3 w-24 rounded-full skeleton-shimmer" />
+                  </div>
+                </div>
+              )
+            )}
+          </div>
         ) : filteredSongs.length === 0 ? (
           <EmptyGenreState
             onAction={onEmptyStateAction ?? onShowAddSong}
@@ -111,12 +139,13 @@ export function SongListScreen({
             boxed
           />
         ) : (
-          <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
             {filteredSongs.map((song) => (
-              <div key={song.id ?? song.trackId} data-track-id={song.trackId}>
+              <div key={song.id ?? song.trackId} data-track-id={song.trackId} className={viewMode === 'grid' ? 'h-full' : undefined}>
                 <PostDetailCard
                   post={songToPostDetailCardData(song)}
-                  className="w-full"
+                  // 2열(그리드)에서는 같은 행 카드끼리 높이를 맞춤 — 본문 길이가 짧은 카드도 옆 카드 높이만큼 늘어남
+                  className={viewMode === 'grid' ? 'w-full h-full' : 'w-full'}
                   onPlay={() => onPlay(song)}
                   isPlaying={song.trackId === currentTrackId}
                   hideReactions={isSummaryMode}

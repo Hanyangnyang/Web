@@ -45,7 +45,9 @@ function toPlaylistSong(d: PlaylistSongDto, myDeviceId?: string): PlaylistSong {
     isBookmarked: d.isLiked,
     isMine: !!myDeviceId && d.deviceId === myDeviceId,
     reactions: toReactions(d.reactions),
-    createdAt: d.createdAt,
+    // 곡 등록(POST) 직후 응답엔 createdAt이 null로 내려옴(DB 기록 시점과 응답 시점이 안 맞는 것으로 보임) —
+    // 방금 등록한 게시글이니 "지금"으로 채워도 실제 값과 사실상 같음
+    createdAt: d.createdAt ?? new Date().toISOString(),
   });
 }
 

@@ -1,5 +1,5 @@
 // 훅(ViewModel): 최근추가된곡 화면의 플레이리스트 피드 곡 목록 로딩 + 곡 추천/등록/신고/좋아요(북마크)/재생기록/이모지반응/곡별게시글모아보기
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import {
   getRecentSongsUseCase,
   getSongByIdUseCase,
@@ -111,6 +111,22 @@ export function useSongSearch(keyword: string) {
   });
 }
 
+// 최근추가된곡/저장한곡/내가등록한곡 화면은 모두 이 세 캐시 중 하나에서 목록을 읽는데, 화면을 나갔다 들어오면
+// SongListScreen/PostDetailCard가 통째로 리마운트되면서 카드 안에서만 들고 있던 낙관적 업데이트(북마크/반응)가
+// 사라진다. 그 시점에 이 캐시들이 아직 옛날 값이면(백그라운드 refetch가 안 끝났으면) 방금 한 반응이 안 보였다가,
+// 다음번 재진입에야(그땐 refetch가 이미 끝나서) 보이는 것처럼 느껴짐 — 그래서 토글 성공 시 여기 캐시들도 같이 패치
+const SONG_LIST_QUERY_KEYS = [
+  ['playlist', 'recent-songs'],
+  ['playlist', 'bookmarked-songs'],
+  ['playlist', 'my-songs'],
+];
+
+function patchSongInListCaches(queryClient: QueryClient, songId: string, patch: (song: Song) => Song) {
+  for (const key of SONG_LIST_QUERY_KEYS) {
+    queryClient.setQueryData<Song[]>(key, (prev) => prev?.map((song) => (song.id === songId ? patch(song) : song)));
+  }
+}
+
 export interface SubmitSongInput {
   trackId: string;
   title: string;
@@ -154,10 +170,15 @@ export function useReportSong() {
 // 좋아요(북마크) 토글 — 서버가 현재 상태 보고 등록/취소를 알아서 판단하므로 songId만 넘기면 됨.
 // 결과 isLiked로 화면 상태를 서버 값과 맞춤(낙관적 업데이트는 호출부에서 처리)
 export function useToggleBookmark() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (songId: string) => {
       const deviceId = await getOrCreateAnonymousUserId();
       return toggleBookmarkUseCase.execute({ songId, deviceId });
+    },
+    onSuccess: (isLiked, songId) => {
+      patchSongInListCaches(queryClient, songId, (song) => ({ ...song, isBookmarked: isLiked }));
     },
   });
 }
@@ -177,10 +198,15 @@ export interface ToggleReactionInput {
 // 이모지 반응 토글 — 이모지 버튼이 눌리는 곳 어디서든. 서버가 그 곡의 9종 반응 전체 최신 카운트를
 // 함께 내려주므로, 호출부는 결과를 그대로 화면 상태에 덮어씌우면 됨(낙관적 업데이트는 호출부에서 처리)
 export function useToggleReaction() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (input: ToggleReactionInput): Promise<PlaylistReaction[]> => {
       const deviceId = await getOrCreateAnonymousUserId();
       return toggleReactionUseCase.execute({ ...input, deviceId });
+    },
+    onSuccess: (updatedReactions, input) => {
+      patchSongInListCaches(queryClient, input.songId, (song) => ({ ...song, reactions: updatedReactions }));
     },
   });
 }

@@ -253,6 +253,23 @@ body {
   }
 }
 
+/* 스켈레톤 로딩 카드에 쓰는 shimmer(좌→우로 밝은 띠가 스쳐 지나가는) 효과 */
+@keyframes shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
 /* ═══ 아코디언 (grid-template-rows 트랜지션 — Tailwind로 표현 불가) ═══ */
 .accordion-content {
   display: grid;

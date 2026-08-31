@@ -210,7 +210,7 @@ export function PostDetailCard({
           : undefined
       }
       aria-label={onSelect ? `${post.title} 상세 보기` : undefined}
-      className={`bg-white rounded-2xl border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden ${onSelect ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex flex-col bg-white rounded-2xl border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden ${onSelect ? 'cursor-pointer' : ''} ${className}`}
     >
       {/* 앨범 커버 */}
       <div className="relative">
@@ -253,7 +253,7 @@ export function PostDetailCard({
         )}
       </div>
 
-      <div className="px-4 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-4 flex-1 flex flex-col">
         {!hideReactions && (
           <div className="flex items-center gap-1.5 mb-2">
             {/* 이모지 추가 버튼 — 스크롤 영역 밖에 고정, 위로 뜨는 팝오버가 잘리지 않게 함 */}
@@ -282,7 +282,7 @@ export function PostDetailCard({
                         }}
                         disabled={toggleReactionMutation.isPending}
                         aria-label={`${emoji} 남기기`}
-                        className={`w-6 h-6 flex items-center justify-center text-xs rounded-full hover:bg-slate-100 active:scale-90 transition-transform ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
+                        className="w-6 h-6 flex items-center justify-center text-xs rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
                       >
                         {emoji}
                       </button>
@@ -312,7 +312,7 @@ export function PostDetailCard({
                     aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
                     className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
                       mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                    } ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
+                    }`}
                   >
                     <span className="text-xs">{emoji}</span>
                     <span>{count}</span>
@@ -333,8 +333,9 @@ export function PostDetailCard({
         {/* 본문 */}
         <p className="text-sm text-text-main leading-relaxed mb-3 whitespace-pre-line">{post.body}</p>
 
-        {/* 장르 — 최대 3개까지 함께 표시. 시간은 1열(리액션 있는) 모드에서만 카드 우측 끝에 같이 표시 */}
-        <div className="flex items-center justify-between gap-2">
+        {/* 장르 — 최대 3개까지 함께 표시. 시간은 1열(리액션 있는) 모드에서만 카드 우측 끝에 같이 표시.
+            mt-auto로 카드 하단에 고정 — 2열 그리드에서 같은 행 카드끼리 높이가 늘어나도(flex-1) 본문 길이와 무관하게 정렬됨 */}
+        <div className="flex items-center justify-between gap-2 mt-auto">
           <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs font-medium text-text-sub">
             {post.genres.flatMap((label, index) => {
               const genre = GENRES.find((g) => g.label === label);

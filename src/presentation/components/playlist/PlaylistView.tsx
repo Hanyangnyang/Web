@@ -117,9 +117,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     if (prevScreen === screen) return;
 
     scrollPositionsRef.current[prevScreen] = container.scrollTop;
-    container.scrollTop = scrollPositionsRef.current[screen] ?? 0;
+    // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
+    // 여기서 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
+    // 안 그러면 이 효과가 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
+    if (!(screen === 'recent' && recentScrollTarget)) {
+      container.scrollTop = scrollPositionsRef.current[screen] ?? 0;
+    }
     prevScreenRef.current = screen;
-  }, [screen]);
+  }, [screen, recentScrollTarget]);
 
   const handleSearchSubmit = useCallback(() => {
     if (!searchQuery.trim()) return;

@@ -21,7 +21,7 @@ export interface PlaylistSongDto {
   genres: PlaylistGenreDto[];
   isLiked: boolean; // 서비스 내 명칭은 "북마크"지만 API 필드명은 isLiked
   reactions: PlaylistReactionDto[];
-  createdAt: string; // ISO 8601
+  createdAt: string | null; // ISO 8601 — 곡 등록(POST) 직후 응답엔 null로 내려옴
   // 이 곡을 추천 등록한 기기 — 화면에 직접 표기하진 않지만, 요청 기기의 deviceId와 비교해서
   // "내가 등록한 게시글인지"(isMine)를 판단하는 데 씀 (신고/북마크 아이콘 노출 여부 결정)
   deviceId: string;
