@@ -29,6 +29,10 @@ export const parseOrThrow = async (res: Response) => {
     err.endpoint = res.url;
     throw err;
   }
+  // 정적 JSON(교내건물·흡연장 등)은 배열을 그대로 반환한다 — 스프레드하면 배열이 아닌
+  // 숫자 키 객체가 돼 뒤에서 .map()/.filter()가 깨진다. _requestUrl은 {success,data,error}
+  // 백엔드 응답 봉투에서만 의미가 있으므로 배열이면 그대로 돌려준다.
+  if (Array.isArray(data)) return data;
   return { ...data, _requestUrl: res.url };
 };
 
