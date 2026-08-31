@@ -53,8 +53,15 @@ export interface GetPopularityChartParams {
   type?: ChartType;
 }
 
+export interface GetSongByIdParams {
+  songId: string;
+  deviceId?: string;
+}
+
 export interface PlaylistRepository {
   getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
+  // 게시글 단건 상세 조회 — 딥링크/SNS 공유/알림 연동, 그리고 게시글 목록에서 상세화면 진입 시 사용
+  getSongById: (params: GetSongByIdParams) => Promise<PlaylistSong>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;
   reportSong: (params: ReportSongParams) => Promise<void>;
   // 서버가 현재 상태를 보고 등록/취소를 알아서 판단(토글)하므로 원하는 목표값은 넘기지 않음 —

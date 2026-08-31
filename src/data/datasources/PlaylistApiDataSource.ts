@@ -131,6 +131,8 @@ export interface ChartDto {
 
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
+  // 게시글 단건 상세 조회 — 응답 형태가 PlaylistSongDto와 동일(+heartCount/totalPlayCount/updatedAt, 화면에 안 써서 버림)
+  getSongById: (songId: string, deviceId?: string) => Promise<ApiResponse<PlaylistSongDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
   postLike: (songId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
@@ -152,6 +154,11 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     if (deviceId) query.set('deviceId', deviceId);
 
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs?${query.toString()}`));
+  },
+
+  getSongById: async (songId, deviceId) => {
+    const query = deviceId ? `?deviceId=${deviceId}` : '';
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/${songId}${query}`));
   },
 
   postSong: async (body) => parseOrThrow(await httpClient.post('/api/v1/playlist/songs', body)),

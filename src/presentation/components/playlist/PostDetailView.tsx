@@ -1,11 +1,15 @@
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
-import { PostDetailCard, type PostDetailCardData } from './PostDetailCard';
+import { PostDetailCard, songToPostDetailCardData, type PostDetailCardData } from './PostDetailCard';
+import { usePostDetail } from '../../hooks/useRecentSongs.js';
 
 interface PostDetailViewProps {
+  // 게시글 목록에서 눌러서 들어온 게시글 id — GET /api/v1/playlist/songs/{id}로 상세 조회
+  postId: string | null;
   onBack: () => void;
 }
 
-// UI 디자인용 임시 더미 — 실제로는 클릭해서 들어온 게시글 데이터로 교체될 예정
+// 검색 결과의 "게시글" 섹션은 아직 BE 게시글 검색 API가 연결 전이라 id가 없는 더미로 남아있어,
+// 그 경로로 들어오면(postId가 없으면) 화면 디자인용 더미로 대체
 const DUMMY_POST: PostDetailCardData = {
   albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
   title: 'Busy Boy',
@@ -20,8 +24,10 @@ const DUMMY_POST: PostDetailCardData = {
   ],
 };
 
-// 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일. 데이터는 아직 더미
-export function PostDetailView({ onBack }: PostDetailViewProps) {
+// 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일
+export function PostDetailView({ postId, onBack }: PostDetailViewProps) {
+  const { data: post, isLoading } = usePostDetail(postId);
+
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -31,7 +37,11 @@ export function PostDetailView({ onBack }: PostDetailViewProps) {
         onBack={onBack}
       />
 
-      <PostDetailCard post={DUMMY_POST} />
+      {postId && isLoading ? (
+        <div className="py-16 text-center text-sm text-text-hint">불러오는 중...</div>
+      ) : (
+        <PostDetailCard post={post ? songToPostDetailCardData(post) : DUMMY_POST} />
+      )}
     </div>
   );
 }

@@ -64,6 +64,18 @@ export const createPlaylistRepository = (
     return res.data.content.map((d) => toPlaylistSong(d, params?.deviceId));
   },
 
+  getSongById: async (params) => {
+    const res = await playlistApiDataSource.getSongById(params.songId, params.deviceId);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist song detail API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data?.id)
+      throw apiError(`playlist song detail API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    return toPlaylistSong(res.data, params.deviceId);
+  },
+
   submitSong: async (params) => {
     const genres = params.genres
       .map((label) => GENRE_ENUM_BY_LABEL[label])

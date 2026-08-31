@@ -42,6 +42,7 @@ import { createSubwayRepository } from './data/repositories/SubwayRepository.js'
 import { createPlaylistApiDataSource } from './data/datasources/PlaylistApiDataSource.js';
 import { createPlaylistRepository } from './data/repositories/PlaylistRepository.js';
 import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
+import { createGetSongByIdUseCase } from './domain/usecases/GetSongByIdUseCase.js';
 import { createSubmitSongUseCase } from './domain/usecases/SubmitSongUseCase.js';
 import { createReportSongUseCase } from './domain/usecases/ReportSongUseCase.js';
 import { createToggleBookmarkUseCase } from './domain/usecases/ToggleBookmarkUseCase.js';
@@ -99,6 +100,7 @@ export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
 export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });
 export const getRecentSongsUseCase = createGetRecentSongsUseCase({ playlistRepository });
+export const getSongByIdUseCase = createGetSongByIdUseCase({ playlistRepository });
 export const submitSongUseCase = createSubmitSongUseCase({ playlistRepository });
 export const reportSongUseCase = createReportSongUseCase({ playlistRepository });
 export const toggleBookmarkUseCase = createToggleBookmarkUseCase({ playlistRepository });

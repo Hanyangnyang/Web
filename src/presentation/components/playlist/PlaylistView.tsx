@@ -7,7 +7,7 @@ import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlay
 import { AddSongFab } from './AddSongFab';
 import { AddSongView } from './AddSongView';
 import { RecentSongsView } from './RecentSongsView';
-import { SearchResultsView, type TrackResult } from './SearchResultsView';
+import { SearchResultsView, type TrackResult, type SongPostResult } from './SearchResultsView';
 import { TrackPostsView } from './TrackPostsView';
 import { PostDetailView } from './PostDetailView';
 import { MyActivityView } from './MyActivityView';
@@ -66,6 +66,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
   // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostsView(곡 단위 게시글 목록)로 이동
   const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
+  // 게시글 목록에서 눌러 선택된 게시글 id — 값이 있으면 PostDetailView가 GET /api/v1/playlist/songs/{id}로 상세 조회
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
   const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
@@ -140,8 +142,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     pushScreen('trackPosts');
   }, [pushScreen]);
 
-  // 게시글 목록(TrackPostsView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동
-  const handleSelectPost = useCallback(() => {
+  // 게시글 목록(TrackPostsView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동.
+  // SearchResultsView의 게시글 섹션은 아직 BE 검색 API 연결 전이라 id가 없는 더미라서, 그 경로는 id 없이 넘어올 수 있음
+  const handleSelectPost = useCallback((post: Song | SongPostResult) => {
+    setSelectedPostId('id' in post ? post.id ?? null : null);
     pushScreen('postDetail');
   }, [pushScreen]);
 
@@ -213,7 +217,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
           />
         ) : screen === 'postDetail' ? (
-          <PostDetailView onBack={popScreen} />
+          <PostDetailView postId={selectedPostId} onBack={popScreen} />
         ) : screen === 'chart' ? (
           <ChartView
             chart={chartTracks}
