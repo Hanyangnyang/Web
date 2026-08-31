@@ -50,6 +50,19 @@ export function apiError(message: string, opts: { area?: string; endpoint?: stri
   return err;
 }
 
+// Repository 메서드 전체를 감싸는 헬퍼 — apiError로 직접 던지는 검증 실패뿐 아니라, parseOrThrow가
+// 던지는 순수 HTTP 실패(4xx/5xx)나 fetch 자체가 실패하는 네트워크 에러까지 이 API의 area가 붙게 한다.
+// 이미 area가 있는 에러(apiError로 이미 태깅됨)는 덮어쓰지 않는다.
+export async function withAreaTag<T>(area: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    const err = e as ApiValidationError;
+    if (err && typeof err === 'object' && !err.area) err.area = area;
+    throw e;
+  }
+}
+
 export const createHttpClient = ({ baseUrl = '' }: { baseUrl?: string } = {}): HttpClient => {
   const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
   const buildUrl = (path: string) => {

@@ -1,5 +1,5 @@
 // 레포지토리: 학식 API 응답을 Cafe 엔티티 배열로 변환
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import { createCafe, KNOWN_CAFES } from '../../domain/entities/Cafe.js';
 import type { MenuApiDataSource, MenuDto, CafeteriaDto } from '../datasources/MenuApiDataSource.js';
 import type { MenuRepository } from '../../domain/repositories/IMenuRepository.js';
@@ -41,7 +41,7 @@ function toCafes(cafeterias: CafeteriaDto[]) {
 export const createMenuRepository = (
   { menuApiDataSource }: { menuApiDataSource: MenuApiDataSource }
 ): MenuRepository => ({
-  getMenuForPeriod: async () => {
+  getMenuForPeriod: () => withAreaTag(AREA, async () => {
     const res = await menuApiDataSource.getMenuForPeriod();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -55,5 +55,5 @@ export const createMenuRepository = (
         return [dateStr, toCafes(cafeterias)];
       })
     );
-  },
+  }),
 });

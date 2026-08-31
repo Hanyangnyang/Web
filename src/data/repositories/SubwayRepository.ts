@@ -1,5 +1,5 @@
 // 레포지토리: 지하철 전체 시간표(새 백엔드)를 도메인 엔티티로 변환해 제공 (캐싱은 React Query가 담당)
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import { createSubwayScheduleRow, type SubwayScheduleRow } from '../../domain/entities/Subway.js';
 import type { SubwayApiDataSource, SubwayTimetableDto } from '../datasources/SubwayApiDataSource.js';
 import type { SubwayRepository } from '../../domain/repositories/ISubwayRepository.js';
@@ -46,7 +46,7 @@ function toSubwayScheduleRows(dtos: SubwayTimetableDto[]) {
 export const createSubwayRepository = (
   { subwayApiDataSource }: { subwayApiDataSource: SubwayApiDataSource }
 ): SubwayRepository => ({
-  getSubwaySchedule: async () => {
+  getSubwaySchedule: () => withAreaTag(AREA, async () => {
     const res = await subwayApiDataSource.getSchedule();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -63,5 +63,5 @@ export const createSubwayRepository = (
       throw apiError('subway schedule API returned no valid rows', { area: AREA, endpoint: res._requestUrl });
 
     return rows;
-  },
+  }),
 });

@@ -1,6 +1,6 @@
 // 레포지토리: 셔틀 시간표(새 백엔드)를 도메인 엔티티로 변환해 제공 (캐싱은 React Query가 담당)
 // 지하철 관련 데이터는 SubwayRepository.ts 참고
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import { createShuttleRow, type ShuttleRow } from '../../domain/entities/Shuttle.js';
 import type { ShuttleApiDataSource, ShuttleTimetableDto } from '../datasources/ShuttleApiDataSource.js';
 import type { ShuttleRepository } from '../../domain/repositories/IShuttleRepository.js';
@@ -48,7 +48,7 @@ function toShuttleRows(dtos: ShuttleTimetableDto[]) {
 export const createShuttleRepository = (
   { shuttleApiDataSource }: { shuttleApiDataSource: ShuttleApiDataSource }
 ): ShuttleRepository => ({
-  getScheduleData: async () => {
+  getScheduleData: () => withAreaTag(AREA, async () => {
     const res = await shuttleApiDataSource.getSchedule();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -65,5 +65,5 @@ export const createShuttleRepository = (
       throw apiError('shuttle API returned no valid rows', { area: AREA, endpoint: res._requestUrl });
 
     return rows;
-  },
+  }),
 });

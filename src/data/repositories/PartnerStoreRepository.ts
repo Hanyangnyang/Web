@@ -1,5 +1,5 @@
 // 레포지토리: 제휴 매장 API 응답(DTO)을 도메인 엔티티로 변환해 제공
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import {
   CATEGORY_ORDER, type PartnerStore, type Partnership, type StoreCategory,
 } from '../../domain/entities/PartnerStore.js';
@@ -77,7 +77,7 @@ function toPartnerStore(raw: PartnerStoreDto): PartnerStore | null {
 }
 
 export const createPartnerStoreRepository = ({ partnerStoreApiDataSource }: { partnerStoreApiDataSource: PartnerStoreApiDataSource }): PartnerStoreRepository => ({
-    getPartnerStores: async () => {
+    getPartnerStores: () => withAreaTag(AREA, async () => {
       const res = await partnerStoreApiDataSource.getPartnerStores();
       if (!res.success)
         throw apiError(res.error?.message || 'partnerships API returned success:false', { area: AREA, endpoint: res._requestUrl });
@@ -96,5 +96,5 @@ export const createPartnerStoreRepository = ({ partnerStoreApiDataSource }: { pa
           }
         })
         .filter((store): store is PartnerStore => store !== null);
-    },
+    }),
 });

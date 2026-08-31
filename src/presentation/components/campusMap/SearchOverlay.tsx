@@ -91,15 +91,15 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
         >
           <ArrowLeft size={20} className="text-text-main" />
         </button>
-        <div className="flex-1 flex items-center gap-2 bg-surface rounded-full px-3.5 py-2.5">
-          <Search size={15} className="text-text-hint flex-shrink-0" />
+        <div className="flex-1 flex items-center gap-2.5 bg-surface rounded-full px-4 py-2">
+          <Search size={16} className="text-text-hint flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="캠퍼스맵 검색"
-            className="flex-1 bg-transparent text-[14px] text-text-main placeholder-text-hint outline-none font-semibold"
+            className="flex-1 bg-transparent text-[13px] text-text-main placeholder-text-hint outline-none font-semibold"
           />
           {query && (
             <button onClick={() => handleQueryChange('')} className="flex-shrink-0 active:scale-90 transition-transform" aria-label="지우기">

@@ -20,19 +20,20 @@
 - **프론트엔드**: React + Vite (Capacitor WebView로 래핑)
 - **Android**: Capacitor + Java (Kotlin 전환 예정)
 - **iOS**: Capacitor (Codemagic으로 빌드)
-- **BFF / API**: Vercel Serverless Functions — 학식 스크래핑, 지하철·날씨·도서관 프록시, Instagram 프록시 (CORS 차단·API Key 보호 역할)
+- **백엔드**: 자체 백엔드 서버(`api.hanyang.life`, Spring Boot) — 학식·날씨·도서관 혼잡도·배너·헬스장·지하철·셔틀·제휴매장·통합피드백·학사달력(공휴일 포함)까지 대부분의 핵심 데이터를 여기서 서빙 (CORS 차단·API Key 보호 역할도 겸함)
+- **BFF / API**: Vercel Serverless Functions — 공공버스 도착정보, 인스타그램 프로필 사진 정적 이미지 주기 갱신(Cron)만 남음. 학식·날씨·도서관·지하철·셔틀·공휴일은 전부 위 백엔드로 이전 완료
 - **DB / Auth**: Supabase — 익명 Auth, FCM 구독·알림 설정(subscriptions·devices), 배너, app_config(다가오는 시간표 변경 배너용 period_schedule만 남음 — 나머지 셔틀 설정은 새 백엔드 `/api/v1/academic/status`로 이전)
 - **푸시 알림**: Firebase Cloud Messaging (FCM) — Capacitor 네이티브(Android/iOS) + Web 동시 지원
 - **에러 모니터링**: Sentry (@sentry/capacitor + @sentry/react, 프로덕션 빌드에서만 활성화)
 - **사용자 분석**: PostHog
-- **외부 API (Vercel에서 호출)**: Open-Meteo(날씨·대기질), 서울 열린데이터(지하철), 공공데이터포털(공휴일), 한양대 도서관 API, Google Gemini(날씨 코멘트 AI 생성), Instagram API
+- **외부 API**: (백엔드 서버에서 호출) Open-Meteo(날씨·대기질), 서울 열린데이터(지하철), 공공데이터포털(공휴일), 한양대 도서관 API, Google Gemini(날씨 코멘트 AI 생성) / (Vercel에서 호출) 경기도 버스정보시스템, Instagram API, GitHub Contents API
 
 ## 아키텍처
 
 ### 데이터 흐름 원칙
 
-- 앱은 외부 API를 **절대 직접 호출하지 않음** — 반드시 Vercel BFF를 경유
-- Supabase는 클라이언트에서 직접 연결 (Auth·DB·RPC)
+- 앱은 외부 API를 **절대 직접 호출하지 않음** — 반드시 자체 백엔드 서버 또는 Vercel BFF를 경유 (자체 백엔드가 대부분을 흡수했고, Vercel은 공공버스·인스타 정적 이미지 갱신만 남음)
+- Supabase는 클라이언트에서 직접 연결 (Auth·DB·RPC), 이제 app_config는 다가오는 시간표 변경 배너용 period_schedule만 조회
 - FCM 토큰은 네이티브 레이어에서 발급 → Supabase에 저장 → 서버에서 발송
 
 ### 소스 코드 구조 (Clean Architecture)
@@ -64,11 +65,19 @@ graph TD
         NativeLayer["Native Layer\n(Android / iOS)"]
     end
 
-    subgraph Vercel["☁️ Vercel (BFF / Serverless)"]
-        MenuAPI["api/menu.js\n학식 스크래핑"]
-        PortalAPI["api/portal.js\n날씨 · 도서관"]
-        InstaAPI["api/insta-proxy.js\n인스타 프로필"]
-        HolidaysAPI["api/holidays.js\n법정공휴일 조회"]
+    subgraph Backend["🖥️ 백엔드 서버 (api.hanyang.life, Spring Boot)"]
+        BackendAPI["/api/v1/*\n학식·날씨·도서관·배너·헬스장·\n지하철·셔틀·제휴매장·통합피드백·학사상태"]
+    end
+
+    subgraph Vercel["☁️ Vercel (BFF / Serverless) — 이제 이 2개만 프론트가 직접 호출"]
+        BusAPI["api/bus.js\n공공버스 도착정보"]
+        InstaCron["api/cron/refresh-insta-profiles.js\n인스타 프로필 정적 이미지 갱신(Cron 전용)"]
+    end
+
+    subgraph VercelLegacy["☁️ Vercel — 프론트는 안 쓰지만 아직 파일은 있음"]
+        MenuAPI["api/menu.js"]
+        PortalAPI["api/portal.js"]
+        HolidaysAPI["api/holidays.js"]
     end
 
     subgraph ExternalAPIs["🌐 외부 API"]
@@ -77,7 +86,10 @@ graph TD
         LibraryAPI["한양대 도서관\n좌석 현황"]
         GovHolidayAPI["공공데이터포털\n공휴일 API"]
         GeminiAI["Google Gemini API\n날씨 코멘트 AI"]
+        SeoulSubway["서울 열린데이터\n지하철"]
+        GyeonggiBus["경기도 버스정보시스템"]
         InstaIG["Instagram\n프로필 API"]
+        GithubAPI["GitHub Contents API"]
     end
 
     subgraph Supabase["🗄️ Supabase (DB + Auth + RPC)"]
@@ -86,7 +98,6 @@ graph TD
             Devices["devices\nFCM 토큰 등록"]
             Subscriptions["subscriptions\n알림 구독 설정"]
             Banners["banners\n앱 내 배너"]
-            Feedbacks["feedbacks\n피드백 수집"]
             AppConfig["app_config\n다가오는 시간표 변경 배너용\nperiod_schedule만 보관"]
         end
         RPC["RPC Functions\nupsert_alarm_subscription\nget_alarm_subscription"]
@@ -101,24 +112,26 @@ graph TD
         Sentry["Sentry\n에러 모니터링"]
     end
 
-    Repo -->|"fetch /api/menu"| MenuAPI
-    Repo -->|"fetch /api/portal?type=weather"| PortalAPI
-    Repo -->|"fetch /api/portal?type=library"| PortalAPI
-    Repo -->|"fetch /api/insta-proxy"| InstaAPI
-    Repo -->|"fetch /api/holidays"| HolidaysAPI
+    Repo -->|"fetch /api/v1/*"| BackendAPI
+    Repo -->|"fetch /api/bus"| BusAPI
 
-    MenuAPI -->|"HTML 스크래핑"| HanyangWeb
-    PortalAPI -->|"기상 데이터"| OpenMeteo
-    PortalAPI -->|"좌석 현황"| LibraryAPI
-    PortalAPI -->|"공휴일 조회"| GovHolidayAPI
-    PortalAPI -->|"날씨 코멘트 생성"| GeminiAI
-    InstaAPI -->|"프로필 조회"| InstaIG
-    HolidaysAPI -->|"법정공휴일 조회"| GovHolidayAPI
+    BackendAPI -->|"학식 스크래핑"| HanyangWeb
+    BackendAPI -->|"기상 데이터"| OpenMeteo
+    BackendAPI -->|"좌석 현황"| LibraryAPI
+    BackendAPI -->|"공휴일 조회"| GovHolidayAPI
+    BackendAPI -->|"날씨 코멘트 생성"| GeminiAI
+    BackendAPI -->|"지하철 시간표"| SeoulSubway
+    BusAPI -->|"도착정보 조회"| GyeonggiBus
+    InstaCron -.->|"Vercel Cron, 4개월마다 1회"| InstaIG
+    InstaCron -.->|"정적 이미지 커밋"| GithubAPI
+
+    MenuAPI -.->|"menu-alerts Edge Function이\n직접 fetch(프론트는 안 씀)"| HanyangWeb
+    PortalAPI -.->|"menu-alerts Edge Function이\ntype=weather만 직접 fetch"| OpenMeteo
+    HolidaysAPI -.->|"menu-alerts Edge Function이\n직접 fetch"| GovHolidayAPI
 
     UI -->|"익명 로그인"| Auth
-    UI -->|"피드백 저장"| Feedbacks
     UI -->|"배너 조회"| Banners
-    UI -->|"앱 설정 조회"| AppConfig
+    UI -->|"다가오는 시간표 변경 일정 조회"| AppConfig
     UI -->|"알림 구독 설정/조회"| RPC
     RPC --> Devices
     RPC --> Subscriptions
@@ -133,15 +146,18 @@ graph TD
 
 ### Vercel API 엔드포인트 요약
 
-| 엔드포인트 | 역할 | 외부 호출 대상 | 캐시 TTL |
-|---|---|---|---|
-| `/api/menu` | 학식 HTML 스크래핑 + 파싱 | 한양대 홈페이지 | 1일 |
-| `/api/portal?type=weather` | 날씨·대기질 + Gemini 코멘트 | Open-Meteo, Gemini | 매 정각 갱신 |
-| `/api/portal?type=library` | 도서관 좌석 현황 | 한양대 도서관 API | no-cache |
-| `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 |
-| `/api/holidays` | 법정공휴일 여부 조회 (셔틀·지하철 dayType 판정용) | 공공데이터포털 | 7일 |
+**이 표는 이제 프론트엔드 호출 기준으로는 대부분 사실이 아님 — 학식·날씨·도서관·지하철·셔틀·공휴일 전부 새 백엔드(`api.hanyang.life`)로 이전 완료.** 아래는 남아있는 Vercel 함수 파일과 실제 살아있는 이유.
 
-지하철·셔틀 시간표는 새 백엔드(`/api/v1/subway/schedule`, `/api/v1/shuttle`)로 이전 완료 — 더 이상 이 Vercel BFF를 거치지 않음.
+| 엔드포인트 | 역할 | 외부 호출 대상 | 프론트엔드에서 호출? |
+|---|---|---|---|
+| `/api/menu` | 학식 HTML 스크래핑 + 파싱 | 한양대 홈페이지 | ❌ `/api/v1/menu`로 대체. Supabase Edge Function `menu-alerts`(푸시 발송)가 직접 호출해서 파일은 살아있음 |
+| `/api/portal?type=weather` | 날씨·대기질 + Gemini 코멘트 | Open-Meteo, Gemini | ❌ `/api/v1/weather`로 대체. `menu-alerts`가 직접 호출해서 파일은 살아있음 |
+| `/api/portal?type=library` | 도서관 좌석 현황 | 한양대 도서관 API | ❌ `/api/v1/library/seats`로 대체. 이 라우트는 아무도 안 불러서 완전히 죽음 |
+| `/api/holidays` | 법정공휴일 여부 조회 | 공공데이터포털 | ❌ `/api/v1/academic/status`로 대체. `menu-alerts`가 직접 호출해서 파일은 살아있음 |
+| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | ✅ 아직 이 Vercel BFF를 그대로 씀 |
+| `/api/cron/refresh-insta-profiles` | 인스타 프로필 사진을 정적 이미지로 주기 갱신(Vercel Cron 전용, HTTP로 직접 호출 안 됨) | Instagram, GitHub Contents API | 해당없음 — 프론트는 결과 정적 이미지만 읽음 |
+
+`/api/insta-proxy`(인스타 프로필 실시간 프록시)는 존재하지 않음 — 위 cron 기반 정적 이미지 방식으로 완전히 교체됨. 학식·날씨·도서관·지하철·셔틀·공휴일 전부 새 백엔드(`/api/v1/menu`, `/api/v1/weather`, `/api/v1/library/seats`, `/api/v1/subway/schedule`, `/api/v1/shuttle`, `/api/v1/academic/status`)로 이전 완료.
 
 ### Supabase 테이블 요약
 
@@ -150,8 +166,7 @@ graph TD
 | `devices` | FCM 토큰 등록 (기기 식별) |
 | `subscriptions` | 알림 구독 설정 (학식·날씨 알람 시간/조건) |
 | `banners` | 앱 내 공지 배너 |
-| `feedbacks` | 사용자 피드백 수집 |
-| `app_config` | 앱 레벨 설정값 (점검 메시지, 최소 버전 등 추정) |
+| `app_config` | 다가오는 시간표 변경 배너용 `period_schedule`만 조회 — 나머지 셔틀 설정(현재기간·공휴일·강제주말·미운행 오버라이드)은 새 백엔드 `/api/v1/academic/status`로 이전 완료 |
 
 ### FCM 푸시 알림 전체 흐름
 
