@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import type { Banner } from '../../../domain/entities/Banner.js';
 
 // BottomNav가 실제로 그리는 탭 키 목록 — clickUrl의 tab 파라미터에 오타/미지원 값이 오면
@@ -14,6 +15,7 @@ interface BannerCarouselProps {
 }
 
 export function BannerCarousel({ banners, loading, onNavigateToTab }: BannerCarouselProps) {
+  const posthog = usePostHog();
   const [current, setCurrent] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -96,6 +98,8 @@ export function BannerCarousel({ banners, loading, onNavigateToTab }: BannerCaro
   const handleClick = (banner: Banner) => {
     if (isSwiping.current) return;
     if (!banner.clickUrl) return;
+
+    posthog?.capture('banner_clicked', { banner_id: banner.id, banner_alt_text: banner.altText, click_url: banner.clickUrl });
 
     // 우리 앱 자신을 가리키는 링크(예: https://hanyang.life/?tab=partner)면 새 창/브라우저를 열지 않고
     // 바로 그 탭으로 전환한다 — 네이티브에서는 window.open이 외부 브라우저로 튀어나가버리기 때문
