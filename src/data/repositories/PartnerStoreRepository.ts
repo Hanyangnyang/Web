@@ -1,4 +1,5 @@
 // 레포지토리: 제휴 매장 API 응답(DTO)을 도메인 엔티티로 변환해 제공
+import { apiError } from '../../infrastructure/http/HttpClient.js';
 import {
   CATEGORY_ORDER, type PartnerStore, type Partnership, type StoreCategory,
 } from '../../domain/entities/PartnerStore.js';
@@ -9,6 +10,9 @@ import type { PartnerStoreRepository } from '../../domain/repositories/IPartnerS
 import type {
   PartnerStoreApiDataSource, PartnerStoreDto, PartnershipDto,
 } from '../datasources/PartnerStoreApiDataSource.js';
+
+// Sentry 태그용 — 이 레포지토리가 던지는 검증 에러에 공통으로 붙는 한글 이름표 (다른 /api/v1/* 레포지토리들과 동일한 apiError 패턴)
+const AREA = '제휴매장';
 
 // API가 활성 여부를 안 주고 startDate/endDate만 주므로, KST 기준 오늘이 그 구간 안에 있는지로 직접 판정한다
 function isWithinPeriod(startDate: string, endDate: string): boolean {
@@ -75,8 +79,10 @@ function toPartnerStore(raw: PartnerStoreDto): PartnerStore | null {
 export const createPartnerStoreRepository = ({ partnerStoreApiDataSource }: { partnerStoreApiDataSource: PartnerStoreApiDataSource }): PartnerStoreRepository => ({
     getPartnerStores: async () => {
       const res = await partnerStoreApiDataSource.getPartnerStores();
-      if (!res.success) throw new Error(res.error?.message || 'partnerships API returned success:false');
-      if (!Array.isArray(res.data)) throw new Error('partnerships API returned invalid shape');
+      if (!res.success)
+        throw apiError(res.error?.message || 'partnerships API returned success:false', { area: AREA, endpoint: res._requestUrl });
+      if (!Array.isArray(res.data))
+        throw apiError('partnerships API returned invalid shape', { area: AREA, endpoint: res._requestUrl });
 
       return res.data
         .map((raw) => {
