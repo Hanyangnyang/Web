@@ -152,7 +152,13 @@ export function PostDetailCard({
   // count가 0보다 큰 이모지만 표시
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
-  const titleBlock = (
+  // 2열(hideReactions, 요약 카드)에서는 제목/가수명을 세로로 쌓고, 1열에서는 "제목 · 가수명" 한 줄로 표시
+  const titleBlock = hideReactions ? (
+    <div className="min-w-0">
+      <div className="text-base font-bold text-text-main truncate">{post.title}</div>
+      <div className="text-sm font-medium text-text-sub truncate">{post.artist}</div>
+    </div>
+  ) : (
     <div className="truncate">
       <span className="text-base font-bold text-text-main">{post.title}</span>
       <span className="text-sm font-medium text-text-sub"> · {post.artist}</span>
@@ -329,15 +335,20 @@ export function PostDetailCard({
 
         {/* 장르 — 최대 3개까지 함께 표시. 시간은 1열(리액션 있는) 모드에서만 카드 우측 끝에 같이 표시 */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-text-sub">
-            {post.genres.map((label) => {
+          <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs font-medium text-text-sub">
+            {post.genres.flatMap((label, index) => {
               const genre = GENRES.find((g) => g.label === label);
-              return (
+              const chip = (
                 <span key={label} className="flex items-center">
                   {genre?.emoji && <span>{genre.emoji}</span>}
                   <span>{label}</span>
                 </span>
               );
+              if (index === 0) return [chip];
+              return [
+                <span key={`${label}-dot`} className="text-text-hint" aria-hidden="true">·</span>,
+                chip,
+              ];
             })}
           </div>
           {!hideReactions && (

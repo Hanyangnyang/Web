@@ -1,6 +1,6 @@
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { ChartSongRow } from './ChartSongRow';
-import { EmptyGenreState } from './EmptyGenreState';
+import { EmptyChartState } from './EmptyChartState';
 import { type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 
@@ -56,7 +56,10 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
         {isLoading ? (
           <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
         ) : chart.length === 0 ? (
-          <EmptyGenreState onShowAddSong={onShowAddSong} />
+          <EmptyChartState
+            onShowAddSong={onShowAddSong}
+            periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
+          />
         ) : (
           chart.map((track) => (
             <ChartSongRow

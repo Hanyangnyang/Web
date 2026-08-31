@@ -15,7 +15,7 @@ import { BookmarkedSongsView } from './BookmarkedSongsView';
 import { MySongsView } from './MySongsView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
-import { EmptyGenreState } from './EmptyGenreState';
+import { EmptyChartState } from './EmptyChartState';
 import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
 import { ChartView } from './ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
@@ -433,7 +433,10 @@ function PlaylistMainContent({
           {isChartLoading ? (
             <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
           ) : visibleChart.length === 0 ? (
-            <EmptyGenreState onShowAddSong={onShowAddSong} />
+            <EmptyChartState
+              onShowAddSong={onShowAddSong}
+              periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
+            />
           ) : (
             visibleChart.map((track) => (
               <ChartSongRow
