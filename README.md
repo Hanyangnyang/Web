@@ -150,13 +150,14 @@ src/
 | 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
 | `/api/v1/menu` | 학식 메뉴 조회 | 12시간 / 1시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status의 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`) — staleTime만으로는 "전환 직후 관리자가 새 기간 데이터를 올려도 옛 캐시를 계속 쓰는" 확률적 갭이 남아서 이벤트 기반으로 보강 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`). academic/status 자체는 셔틀화면이 열릴 때 낡았으면 재검증 + 화면이 켜져있는 동안만 10초마다 KST 날짜 확인해서 자정 넘으면 재요청 — 화면을 계속 띄워둔 채로 자정을 넘겨도(예: 11:50pm부터 보고 있다가) 뱃지(학기중/평일)가 자동으로 갱신됨 |
 | `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼, **date-info의 dayType이 바뀌는 순간 강제 재요청**(위와 동일한 이유) |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
 | `/api/v1/banners` | 홈 배너 조회 | 12시간 / 1시간 | 콜드스타트 prefetch |
 
-배너 `clickUrl`이 `https://hanyang.life/?tab=<cafe\|shuttle\|portal\|partner\|misc>` 형태로 우리 도메인 + `tab` 파라미터를 가리키면, 새 창을 열지 않고 앱 내부에서 바로 그 탭으로 전환됩니다(`BannerCarousel.tsx`) — SPA라 페이지 경로가 하나뿐이라, 카카오 딥링크·푸시알림과 동일한 `?tab=` 쿼리 컨벤션을 재사용한 것. 그 외(다른 도메인 등)는 기존처럼 `window.open`으로 외부 링크 취급.
+배너 `clickUrl`이 `https://www.hanyang.life/?tab=<cafe\|shuttle\|portal\|partner\|misc>` 형태로 우리 도메인 + `tab` 파라미터를 가리키면, 새 창을 열지 않고 앱 내부에서 바로 그 탭으로 전환됩니다(`BannerCarousel.tsx`) — SPA라 페이지 경로가 하나뿐이라, 카카오 딥링크·푸시알림과 동일한 `?tab=` 쿼리 컨벤션을 재사용한 것. 그 외(다른 도메인 등)는 기존처럼 `window.open`으로 외부 링크 취급.
+**⚠️ 반드시 `www.hanyang.life`로 입력할 것** — `BannerCarousel.tsx`의 판정 로직이 `url.origin === window.location.origin`으로 완전 일치를 요구하는데, `capacitor.config.json`의 `server.url`이 `https://www.hanyang.life`라 앱이 실제로 로딩되는 origin이 `www.` 포함이다. `www.` 없이 `https://hanyang.life/?tab=partner`로 주면 origin이 안 맞아 판정에 실패하고, 그냥 `window.open`으로 새 창이 열려버린다(내부 탭 전환 안 됨).
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 / 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼, **KST 날짜(자정)가 바뀌는 순간 강제 재요청**(`useGymSchedule`이 1분마다 날짜 확인). 셔틀과 달리 academic/status를 안 쓰고 `GymPeriod.startDate/endDate`로 직접 오늘과 비교해 기간을 고르는 구조라, "기간이 바뀌는 순간"이 아니라 "날짜가 바뀌는 순간"을 감지함. `GymView`도 자동판별을 매 gymData 갱신마다 다시 하도록 고쳐서(예전엔 최초 1회만) 화면을 계속 띄워놓은 채로 날짜가 바뀌어도 새 기간으로 따라감(사용자가 드롭다운으로 직접 고른 뒤엔 안 덮어씀) |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
