@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getRecentSongsUseCase,
   getSongByIdUseCase,
+  getSongCreationStatusUseCase,
+  getBookmarkedSongsUseCase,
   submitSongUseCase,
   reportSongUseCase,
   toggleBookmarkUseCase,
@@ -43,6 +45,35 @@ export function usePostDetail(postId: string | null) {
       return mapPlaylistSongToSong(song);
     },
     enabled: !!postId,
+  });
+}
+
+// 곡추천하기 화면 진입 시 1일 3곡 제한/최근 7일 중복 추천 사전 확인. 등록 후 다시 들어오면
+// 값이 바뀌어있을 수 있어서(예: 1곡 등록 후 재진입) staleTime 0으로 화면 진입마다 최신값을 다시 불러옴
+export function useSongCreationStatus() {
+  return useQuery({
+    queryKey: ['playlist', 'creation-status'],
+    queryFn: async () => {
+      const deviceId = await getOrCreateAnonymousUserId();
+      return getSongCreationStatusUseCase.execute({ deviceId });
+    },
+    staleTime: 0,
+  });
+}
+
+const BOOKMARKED_SONGS_SIZE = 50;
+
+// 북마크한 곡 화면용 — 북마크 토글은 여러 화면(최근추가된곡/곡별게시글모아보기 등)에서 흩어져 일어나서
+// 이 목록 자체를 실시간으로 갱신 대상에 넣기보단, 화면 진입(컴포넌트 재마운트)마다 최신값을 다시 불러옴
+export function useBookmarkedSongs() {
+  return useQuery<Song[]>({
+    queryKey: ['playlist', 'bookmarked-songs'],
+    queryFn: async () => {
+      const deviceId = await getOrCreateAnonymousUserId();
+      const songs = await getBookmarkedSongsUseCase.execute({ deviceId, size: BOOKMARKED_SONGS_SIZE });
+      return songs.map(mapPlaylistSongToSong);
+    },
+    staleTime: 0,
   });
 }
 

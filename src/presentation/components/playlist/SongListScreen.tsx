@@ -11,6 +11,8 @@ interface SongListScreenProps {
   emoji?: string;
   subtitle?: string;
   songs: Song[];
+  // true면 목록이 아직 로딩 중이라 EmptyGenreState 대신 로딩 표시를 보여줌
+  isLoading?: boolean;
   onBack: () => void;
   onPlay: (song: Song) => void;
   onShowAddSong: () => void;
@@ -29,6 +31,7 @@ export function SongListScreen({
   emoji,
   subtitle,
   songs,
+  isLoading = false,
   onBack,
   onPlay,
   onShowAddSong,
@@ -91,7 +94,9 @@ export function SongListScreen({
       </div>
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}
       <div ref={listContainerRef} className="-mx-4 px-2">
-        {filteredSongs.length === 0 ? (
+        {isLoading ? (
+          <div className="py-16 text-center text-sm text-text-hint">불러오는 중...</div>
+        ) : filteredSongs.length === 0 ? (
           <EmptyGenreState onShowAddSong={onShowAddSong} boxed />
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2' : 'grid-cols-1'}`}>

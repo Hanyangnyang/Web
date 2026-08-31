@@ -2,6 +2,7 @@
 import type { PlaylistSong, PlaylistReaction } from '../entities/PlaylistSong.js';
 import type { TrackPosts } from '../entities/TrackPosts.js';
 import type { PopularityChart } from '../entities/PopularityChart.js';
+import type { SongCreationStatus } from '../entities/SongCreationStatus.js';
 
 export interface GetPlaylistSongsParams {
   genre?: string;
@@ -58,10 +59,24 @@ export interface GetSongByIdParams {
   deviceId?: string;
 }
 
+export interface GetSongCreationStatusParams {
+  deviceId: string;
+}
+
+export interface GetBookmarkedSongsParams {
+  deviceId: string;
+  page?: number;
+  size?: number;
+}
+
 export interface PlaylistRepository {
   getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
   // 게시글 단건 상세 조회 — 딥링크/SNS 공유/알림 연동, 그리고 게시글 목록에서 상세화면 진입 시 사용
   getSongById: (params: GetSongByIdParams) => Promise<PlaylistSong>;
+  // 곡 등록 화면 진입 시 1일 3곡 제한/최근 7일 중복 추천 사전 확인용 기기 상태 조회
+  getSongCreationStatus: (params: GetSongCreationStatusParams) => Promise<SongCreationStatus>;
+  // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 조회 — 북마크한 곡 화면용
+  getBookmarkedSongs: (params: GetBookmarkedSongsParams) => Promise<PlaylistSong[]>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;
   reportSong: (params: ReportSongParams) => Promise<void>;
   // 서버가 현재 상태를 보고 등록/취소를 알아서 판단(토글)하므로 원하는 목표값은 넘기지 않음 —

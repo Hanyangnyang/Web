@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { GENRES } from './playlistTypes';
 import { type PlayableTrack } from './FloatingSpotifyPlayer';
-import { useSubmitSong } from '../../hooks/useRecentSongs.js';
+import { useSubmitSong, useSongCreationStatus } from '../../hooks/useRecentSongs.js';
 import { type HttpError } from '../../../infrastructure/http/HttpClient.js';
 
 interface SearchTrack {
@@ -95,6 +95,8 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
   const [showSubmitRetryPopup, setShowSubmitRetryPopup] = useState(false);
   const [showRegisterNoticePopup, setShowRegisterNoticePopup] = useState(false);
   const submitSong = useSubmitSong();
+  const { data: creationStatus } = useSongCreationStatus();
+  const recentlyRecommendedTrackIds = new Set(creationStatus?.recentTrackIdsIn7Days ?? []);
 
   const lastSearchAtRef = useRef(0);
 
@@ -142,8 +144,14 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
 
   const isResultsPanelOpen = !selectedTrack && hasSearched && !isSearching;
 
+  // 서버가 최종 판단하지만(PL001/PL002 토스트가 안전망), creation-status 값이 이미 있으면 미리 막아서
+  // 어차피 실패할 요청을 보내지 않게 함. 아직 안 불러와졌으면(undefined) 막지 않고 그대로 진행
   const canSubmit =
-    !!selectedTrack && selectedGenres.length >= MIN_GENRES && comment.trim().length > 0 && !submitSong.isPending;
+    !!selectedTrack &&
+    selectedGenres.length >= MIN_GENRES &&
+    comment.trim().length > 0 &&
+    creationStatus?.canCreate !== false &&
+    !submitSong.isPending;
 
   const handleGenreClick = (key: string) => {
     setSelectedGenres((prev) => {
@@ -215,7 +223,13 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
       <MiscSubViewHeader
         title="곡 추천하기"
         emoji="🤔"
-        subtitle=""
+        subtitle={
+          creationStatus
+            ? creationStatus.canCreate
+              ? `오늘 ${creationStatus.remainingCount}곡 더 등록할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
+              : '오늘 등록 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
+            : ''
+        }
         onBack={onBack}
       />
 
@@ -262,43 +276,55 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                   className="flex gap-3 px-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                  {searchResults.map((track) => (
-                    <div
-                      key={track.trackId}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setSelectedTrack(track)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') setSelectedTrack(track);
-                      }}
-                      aria-label={`${track.title} 선택`}
-                      className="flex-shrink-0 w-28 text-left cursor-pointer active:scale-[0.97] transition-transform"
-                    >
-                      <div className="relative w-28 aspect-square rounded-lg overflow-hidden bg-slate-100">
-                        <img
-                          src={track.albumArtUrl}
-                          alt={track.title}
-                          className="w-full h-full object-cover"
-                        />
-                        {onPlay && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onPlay(track);
-                            }}
-                            aria-label={`${track.title} 재생`}
-                            className="absolute inset-0 flex items-center justify-center"
-                          >
-                            <span className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
-                              <Play size={16} className="text-white" fill="white" />
-                            </span>
-                          </button>
+                  {searchResults.map((track) => {
+                    // 최근 7일 이내에 이미 추천한 곡은 검색 결과에서 바로 골라내지 못하게 막음(어차피 서버가 PL002로 거절함)
+                    const alreadyRecommended = recentlyRecommendedTrackIds.has(track.trackId);
+                    return (
+                      <div
+                        key={track.trackId}
+                        role="button"
+                        tabIndex={alreadyRecommended ? -1 : 0}
+                        onClick={() => {
+                          if (!alreadyRecommended) setSelectedTrack(track);
+                        }}
+                        onKeyDown={(e) => {
+                          if (alreadyRecommended) return;
+                          if (e.key === 'Enter' || e.key === ' ') setSelectedTrack(track);
+                        }}
+                        aria-label={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
+                        className={`flex-shrink-0 w-28 text-left transition-transform ${
+                          alreadyRecommended ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer active:scale-[0.97]'
+                        }`}
+                      >
+                        <div className="relative w-28 aspect-square rounded-lg overflow-hidden bg-slate-100">
+                          <img
+                            src={track.albumArtUrl}
+                            alt={track.title}
+                            className="w-full h-full object-cover"
+                          />
+                          {onPlay && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onPlay(track);
+                              }}
+                              aria-label={`${track.title} 재생`}
+                              className="absolute inset-0 flex items-center justify-center"
+                            >
+                              <span className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
+                                <Play size={16} className="text-white" fill="white" />
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                        <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
+                        <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                        {alreadyRecommended && (
+                          <div className="text-[10px] font-semibold text-red-400">최근 추천함</div>
                         )}
                       </div>
-                      <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
-                      <div className="text-xs text-text-sub truncate">{track.artist}</div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-xs text-text-hint text-center px-3 min-h-[60px] flex items-center justify-center whitespace-pre-line">
@@ -464,7 +490,10 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
             <p className="text-sm font-semibold text-text-main mb-3 text-center">등록 전에 확인해주세요!</p>
             <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
               <li>한 번 등록한 곡은 삭제하거나 수정할 수 없어요.</li>
-              <li>하루에 최대 3곡까지만 등록할 수 있어요.</li>
+              <li>
+                하루에 최대 3곡까지만 등록할 수 있어요
+                {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
+              </li>
             </ul>
             <div className="flex gap-2">
               <button

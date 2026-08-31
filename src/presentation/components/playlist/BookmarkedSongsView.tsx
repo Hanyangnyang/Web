@@ -1,6 +1,6 @@
 import { type Song } from './playlistTypes';
 import { SongListScreen } from './SongListScreen';
-import { DUMMY_BOOKMARKED_SONGS } from './playlistDummyData';
+import { useBookmarkedSongs } from '../../hooks/useRecentSongs.js';
 
 interface BookmarkedSongsViewProps {
   onBack: () => void;
@@ -11,12 +11,15 @@ interface BookmarkedSongsViewProps {
 }
 
 export function BookmarkedSongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: BookmarkedSongsViewProps) {
+  const { data: songs, isLoading } = useBookmarkedSongs();
+
   return (
     <SongListScreen
       title="북마크한 곡"
       emoji="🔖"
       subtitle=""
-      songs={DUMMY_BOOKMARKED_SONGS}
+      songs={songs ?? []}
+      isLoading={isLoading}
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}

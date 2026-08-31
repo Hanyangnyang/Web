@@ -106,49 +106,6 @@ export const DUMMY_SONGS: Song[] = [
   },
 ];
 
-export const DUMMY_BOOKMARKED_SONGS: Song[] = [
-  {
-    trackId: '5eBM5qATb1IfJvNzGuS2GX',
-    title: 'Busy Boy',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    comment: '이건 진짜 제 인생곡이에요, 힘들 때마다 듣는 완전 최애곡 중의 최애곡입니다',
-    genres: withRandomGenres('R&B'),
-    previewUrl: '',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    trackId: '3Q3wWJxr6sBt8afP9hJj4J',
-    title: 'LOVE SONG',
-    artist: '유다빈밴드',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273fd07915694e0ffb3b961a7b5',
-    comment: '노래방 가면 무조건 예약해두고 부르는 저만의 필수곡이에요, 분위기 최고예요',
-    genres: withRandomGenres('인디'),
-    previewUrl: '',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    trackId: '171mGT1HdxM2HdqZrWNY31',
-    title: '다큐멘터리',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
-    comment: '가사가 진짜 좋아서 몇 번을 곱씹어 듣게 되는 곡이에요, 매번 새롭게 다가와요',
-    genres: withRandomGenres('인디'),
-    previewUrl: '',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    trackId: '4uh6rj3FryYQXMz9zLqDKL',
-    title: 'Fly away',
-    artist: '권진아',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273bee4779793a1d10af6e8bd4f',
-    comment: '드라이브할 때 이 노래 틀면 분위기가 완전 살아나요, 창문 열고 듣기 딱이에요',
-    genres: withRandomGenres('인디'),
-    previewUrl: '',
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export const DUMMY_MY_SONGS: Song[] = [
   {
     trackId: '3aK5mtd4CKxLF6RpC1doh6',

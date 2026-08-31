@@ -129,10 +129,28 @@ export interface ChartDto {
   // snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀
 }
 
+// 곡 등록 화면 진입 시 사전 확인 응답 — 오늘 남은 등록 가능 횟수 및 최근 7일 내 이미 추천한 곡 목록
+export interface SongCreationStatusDto {
+  canCreate: boolean;
+  dailyCount: number;
+  dailyMaxLimit: number;
+  remainingCount: number;
+  recentTrackIdsIn7Days: string[];
+}
+
+export interface GetLikedSongsDataSourceParams {
+  deviceId: string;
+  page?: number;
+  size?: number;
+}
+
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   // 게시글 단건 상세 조회 — 응답 형태가 PlaylistSongDto와 동일(+heartCount/totalPlayCount/updatedAt, 화면에 안 써서 버림)
   getSongById: (songId: string, deviceId?: string) => Promise<ApiResponse<PlaylistSongDto>>;
+  getCreationStatus: (deviceId: string) => Promise<ApiResponse<SongCreationStatusDto>>;
+  // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
+  getLikedSongs: (params: GetLikedSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
   postLike: (songId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
@@ -159,6 +177,16 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
   getSongById: async (songId, deviceId) => {
     const query = deviceId ? `?deviceId=${deviceId}` : '';
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/${songId}${query}`));
+  },
+
+  getCreationStatus: async (deviceId) =>
+    parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/creation-status?deviceId=${deviceId}`)),
+
+  getLikedSongs: async (params) => {
+    const { deviceId, page = DEFAULT_PAGE, size = DEFAULT_SIZE } = params;
+    const query = new URLSearchParams({ deviceId, page: String(page), size: String(size) });
+
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/liked?${query.toString()}`));
   },
 
   postSong: async (body) => parseOrThrow(await httpClient.post('/api/v1/playlist/songs', body)),

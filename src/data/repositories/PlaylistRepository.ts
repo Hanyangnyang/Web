@@ -3,6 +3,7 @@ import { apiError } from '../../infrastructure/http/HttpClient.js';
 import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '../../domain/entities/PlaylistSong.js';
 import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
 import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
+import { createSongCreationStatus } from '../../domain/entities/SongCreationStatus.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
 
@@ -74,6 +75,31 @@ export const createPlaylistRepository = (
       throw apiError(`playlist song detail API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
 
     return toPlaylistSong(res.data, params.deviceId);
+  },
+
+  getBookmarkedSongs: async (params) => {
+    const res = await playlistApiDataSource.getLikedSongs(params);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist liked songs API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.content))
+      throw apiError(`playlist liked songs API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    // 북마크한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
+    return res.data.content.map((d) => toPlaylistSong(d, params.deviceId));
+  },
+
+  getSongCreationStatus: async (params) => {
+    const res = await playlistApiDataSource.getCreationStatus(params.deviceId);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist creation-status API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data)
+      throw apiError(`playlist creation-status API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    return createSongCreationStatus(res.data);
   },
 
   submitSong: async (params) => {
