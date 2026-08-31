@@ -41,7 +41,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     if (fetchedSongs) setSongs(fetchedSongs);
   }, [fetchedSongs]);
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
-  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
+  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
   const { data: chartData, isLoading: isChartLoading } = usePopularityChart(chartPeriod);
   const chartTracks = chartData?.tracks ?? [];
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
