@@ -32,9 +32,14 @@ export const queryClient = new QueryClient({
     onError: (error, _variables, _context, mutation) => {
       if (!import.meta.env.PROD) return;
       if (navigator.onLine === false) return;
+      const err = error as (ApiValidationError & HttpError);
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
-          tags: { mutationKey: JSON.stringify(mutation.options.mutationKey ?? []) },
+          tags: {
+            mutationKey: JSON.stringify(mutation.options.mutationKey ?? []),
+            ...(err.area && { area: err.area }),
+            ...(err.endpoint && { endpoint: err.endpoint }),
+          },
         });
       });
     },

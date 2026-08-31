@@ -141,6 +141,7 @@ export function useSubmitSong() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['playlist', 'submit-song'], // Sentry에서 어느 뮤테이션이 실패했는지 구분하는 태그로 쓰임
     mutationFn: async (input: SubmitSongInput) => {
       const deviceId = await getOrCreateAnonymousUserId();
       const song = await submitSongUseCase.execute({ ...input, deviceId });
@@ -160,6 +161,7 @@ export interface ReportSongInput {
 // 곡 신고하기 — 접수 성공 여부만 필요해서 결과값은 없음
 export function useReportSong() {
   return useMutation({
+    mutationKey: ['playlist', 'report-song'],
     mutationFn: async ({ songId, reason }: ReportSongInput) => {
       const deviceId = await getOrCreateAnonymousUserId();
       await reportSongUseCase.execute({ songId, deviceId, reason });
@@ -173,6 +175,7 @@ export function useToggleBookmark() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['playlist', 'toggle-bookmark'],
     mutationFn: async (songId: string) => {
       const deviceId = await getOrCreateAnonymousUserId();
       return toggleBookmarkUseCase.execute({ songId, deviceId });
@@ -186,6 +189,7 @@ export function useToggleBookmark() {
 // 재생 버튼이 눌리는 곳 어디서든 호출하는 재생수 기록(인기차트 집계용) — 결과를 화면에서 안 써서 fire-and-forget
 export function useRecordTrackPlay() {
   return useMutation({
+    mutationKey: ['playlist', 'record-track-play'],
     mutationFn: (trackId: string) => recordTrackPlayUseCase.execute(trackId),
   });
 }
@@ -201,6 +205,7 @@ export function useToggleReaction() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['playlist', 'toggle-reaction'],
     mutationFn: async (input: ToggleReactionInput): Promise<PlaylistReaction[]> => {
       const deviceId = await getOrCreateAnonymousUserId();
       return toggleReactionUseCase.execute({ ...input, deviceId });
