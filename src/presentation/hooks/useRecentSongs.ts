@@ -5,6 +5,7 @@ import {
   getSongByIdUseCase,
   getSongCreationStatusUseCase,
   getBookmarkedSongsUseCase,
+  getMySongsUseCase,
   searchSongsUseCase,
   submitSongUseCase,
   reportSongUseCase,
@@ -69,6 +70,21 @@ export function useBookmarkedSongs() {
     queryFn: async () => {
       const deviceId = await getOrCreateAnonymousUserId();
       const songs = await getBookmarkedSongsUseCase.execute({ deviceId, size: BOOKMARKED_SONGS_SIZE });
+      return songs.map(mapPlaylistSongToSong);
+    },
+    staleTime: 0,
+  });
+}
+
+const MY_SONGS_SIZE = 20;
+
+// 내가 등록한 곡 화면용
+export function useMySongs() {
+  return useQuery<Song[]>({
+    queryKey: ['playlist', 'my-songs'],
+    queryFn: async () => {
+      const deviceId = await getOrCreateAnonymousUserId();
+      const songs = await getMySongsUseCase.execute({ deviceId, size: MY_SONGS_SIZE });
       return songs.map(mapPlaylistSongToSong);
     },
     staleTime: 0,

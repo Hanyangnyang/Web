@@ -1,6 +1,6 @@
 import { type Song } from './playlistTypes';
 import { SongListScreen } from './SongListScreen';
-import { DUMMY_MY_SONGS } from './playlistDummyData';
+import { useMySongs } from '../../hooks/useRecentSongs.js';
 
 interface MySongsViewProps {
   onBack: () => void;
@@ -11,12 +11,15 @@ interface MySongsViewProps {
 }
 
 export function MySongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: MySongsViewProps) {
+  const { data: songs, isLoading } = useMySongs();
+
   return (
     <SongListScreen
       title="내가 등록한 곡"
       emoji="🎤"
       subtitle=""
-      songs={DUMMY_MY_SONGS}
+      songs={songs ?? []}
+      isLoading={isLoading}
       emptyStateMessage="아직 이 장르로 추천한 곡이 없어요"
       onBack={onBack}
       onPlay={onPlay}

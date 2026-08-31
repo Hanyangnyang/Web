@@ -151,6 +151,13 @@ export interface SearchSongsDataSourceParams {
   size?: number;
 }
 
+export interface GetMySongsDataSourceParams {
+  deviceId: string;
+  direction?: 'ASC' | 'DESC';
+  page?: number;
+  size?: number;
+}
+
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   // 게시글 단건 상세 조회 — 응답 형태가 PlaylistSongDto와 동일(+heartCount/totalPlayCount/updatedAt, 화면에 안 써서 버림)
@@ -158,6 +165,8 @@ export interface PlaylistApiDataSource {
   getCreationStatus: (deviceId: string) => Promise<ApiResponse<SongCreationStatusDto>>;
   // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   getLikedSongs: (params: GetLikedSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
+  // 내가 등록한 추천글 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
+  getMySongs: (params: GetMySongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   // 추천글 가중치 통합 검색(제목/가수/코멘트) — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   searchSongs: (params: SearchSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
@@ -198,6 +207,14 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     const query = new URLSearchParams({ deviceId, page: String(page), size: String(size) });
 
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/liked?${query.toString()}`));
+  },
+
+  getMySongs: async (params) => {
+    const { deviceId, direction, page = DEFAULT_PAGE, size = DEFAULT_SIZE } = params;
+    const query = new URLSearchParams({ deviceId, page: String(page), size: String(size) });
+    if (direction) query.set('direction', direction);
+
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/my-songs?${query.toString()}`));
   },
 
   searchSongs: async (params) => {

@@ -163,6 +163,7 @@ src/
 | `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 0(항상 최신값) | 게시글 목록(TrackPostsView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostDetailView) 진입 |
 | `/api/v1/playlist/songs/creation-status` | 곡 작성 전 사용자 기기 상태 조회 (오늘 남은 등록 횟수, 최근 7일 중복 추천곡) | 0(항상 최신값) | 곡추천하기 화면 진입(컴포넌트 재마운트)마다. 헤더에 남은 횟수 표시, 최근 7일 내 추천한 곡은 검색 결과에서 선택 자체를 막음 |
 | `/api/v1/playlist/songs/liked` | 내가 좋아요(=서비스 내 "저장") 누른 곡 목록 조회 | 0(항상 최신값) | 저장한 곡 화면 진입(컴포넌트 재마운트)마다 |
+| `/api/v1/playlist/songs/my-songs` | 내가 등록(작성)한 추천글 목록 조회 | 0(항상 최신값) | 내가 등록한 곡 화면 진입(컴포넌트 재마운트)마다 |
 | `/api/v1/playlist/songs/search` | 추천글 가중치 통합 검색 (제목/가수/코멘트) | 0(항상 최신값) | 검색 결과 화면의 "게시글" 섹션 — 검색어(query)가 바뀔 때마다(queryKey에 포함돼 자동 재조회), 2자 미만이면 호출 안 함 |
 | `POST /api/v1/playlist/songs` | 곡 추천 및 등록 | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록 확인 팝업에서 최종 확정 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영. `isPending` 동안 버튼 비활성화로 중복 제출 방지 |
 | `POST /api/v1/playlist/songs/{id}/reports` | 곡 게시글 신고하기 | 해당없음 (뮤테이션) | 더보기 메뉴 → 사유 선택 → 신고하기 클릭 시 |

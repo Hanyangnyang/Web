@@ -90,6 +90,19 @@ export const createPlaylistRepository = (
     return res.data.content.map((d) => toPlaylistSong(d, params.deviceId));
   },
 
+  getMySongs: async (params) => {
+    const res = await playlistApiDataSource.getMySongs(params);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist my-songs API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.content))
+      throw apiError(`playlist my-songs API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    // 등록한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
+    return res.data.content.map((d) => toPlaylistSong(d, params.deviceId));
+  },
+
   searchSongs: async (params) => {
     const res = await playlistApiDataSource.searchSongs(params);
 

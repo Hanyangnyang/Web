@@ -76,6 +76,14 @@ export interface SearchSongsParams {
   size?: number;
 }
 
+export interface GetMySongsParams {
+  deviceId: string;
+  // 작성일시(createdAt) 기준 정렬 방향 — 기본값 DESC(최신순)
+  direction?: 'ASC' | 'DESC';
+  page?: number;
+  size?: number;
+}
+
 export interface PlaylistRepository {
   getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
   // 게시글 단건 상세 조회 — 딥링크/SNS 공유/알림 연동, 그리고 게시글 목록에서 상세화면 진입 시 사용
@@ -84,6 +92,8 @@ export interface PlaylistRepository {
   getSongCreationStatus: (params: GetSongCreationStatusParams) => Promise<SongCreationStatus>;
   // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 조회 — 북마크한 곡 화면용
   getBookmarkedSongs: (params: GetBookmarkedSongsParams) => Promise<PlaylistSong[]>;
+  // 내가 등록(작성)한 추천글 목록 조회 — 내가 등록한 곡 화면용
+  getMySongs: (params: GetMySongsParams) => Promise<PlaylistSong[]>;
   // 추천글 가중치 통합 검색(제목/가수/코멘트) — 검색 결과 화면의 "게시글" 섹션용
   searchSongs: (params: SearchSongsParams) => Promise<PlaylistSong[]>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;
