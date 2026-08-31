@@ -177,7 +177,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   };
 
   return (
-    <div ref={rootRef} className="pb-28 relative">
+    <div ref={rootRef} className="pb-28 relative [animation:slideUp_0.4s_ease-out]">
       <button
         className="fixed bottom-[calc(20px+64px+12px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
         onClick={() => setShowAlarm(true)}
@@ -234,9 +234,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       <ErrorBoundary name="cafeteria-list" fallback={<CardFallback message="학식 정보를 표시할 수 없습니다" />}>
         <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
           {revalidating && (
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
-              <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
-              <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>학식 정보를 가져오는 중...</span>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
+              <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
+              <span className="text-[0.85rem] font-semibold text-text-sub">학식 정보를 가져오는 중...</span>
             </div>
           )}
 

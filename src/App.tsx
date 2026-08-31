@@ -81,6 +81,8 @@ function MainLayout() {
   // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
   const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
+  // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
+  const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const { isOnline } = useNetwork();
   const posthog = usePostHog();
@@ -187,8 +189,11 @@ function MainLayout() {
     return () => { handle?.remove(); };
   }, [isApp, routeFromParams]);
 
-  // 4. 탭 클릭 핸들러
-  const handleTabChange = useCallback((tab: string) => {
+  // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정하고 싶을 때만 넘어온다.
+  // 이미 캠퍼스맵 탭에 있는 상태에서 다시 눌러도 칩은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
+  const handleTabChange = useCallback((tab: string, chip?: string) => {
+    if (chip && tab === 'partner') setPendingMapChip(chip);
+
     // 1. 같은 탭 재클릭 처리
     if (tab === activeTab) {
       if (tab === 'misc') setMiscResetSignal(s => s + 1);
@@ -265,7 +270,11 @@ function MainLayout() {
           <div className="-mx-4 h-full" style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
             {partnerVisited && (
               <Suspense fallback={<div className="h-full flex items-center justify-center"><span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span></div>}>
-                <CampusMapView isActive={activeTab === 'partner'} />
+                <CampusMapView
+                  isActive={activeTab === 'partner'}
+                  deepLinkChip={pendingMapChip}
+                  onDeepLinkChipHandled={() => setPendingMapChip(null)}
+                />
               </Suspense>
             )}
           </div>

@@ -53,9 +53,13 @@ const SMOKING_FOCUS_LEVEL = 2;
 interface Props {
   // 탭이 숨겨져도 컴포넌트는 마운트된 채 남아서, 뒤로가기를 가로챌지 판단하려면 이 값이 필요하다
   isActive: boolean;
+  // 배너 등 앱 내부 딥링크로 특정 칩(예: 오픈스페이스)을 미리 켠 채 진입시키기 위해 씀.
+  // 소비하고 나면 onDeepLinkChipHandled로 부모(App.tsx)에 알려 null로 되돌리게 한다
+  deepLinkChip?: string | null;
+  onDeepLinkChipHandled?: () => void;
 }
 
-export default function CampusMapView({ isActive }: Props) {
+export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHandled }: Props) {
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY,
     // clusterer: 마커 밀집 대비, services: 좌표↔주소 변환 대비
@@ -70,6 +74,13 @@ export default function CampusMapView({ isActive }: Props) {
   const { toast, showToast } = useCampusMapToast();
   const { userPos, locating, locateMe } = useCampusMapLocation({ panTo, onMessage: showToast, posthog });
   const { chip, setChip, college, setCollege } = useCampusMapFilters();
+
+  // 배너 등 딥링크로 넘어온 칩을 한 번 적용하고 부모에 소비 완료를 알린다 (App.tsx의 cafeDeepLink와 동일한 방식)
+  useEffect(() => {
+    if (!deepLinkChip) return;
+    setChip(deepLinkChip as MapChip);
+    onDeepLinkChipHandled?.();
+  }, [deepLinkChip]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -291,7 +302,7 @@ export default function CampusMapView({ isActive }: Props) {
   const buttonBase = `var(--sheet-h, ${NAV_CLEARANCE_CSS})`;
 
   return (
-    <div ref={mapContainerRef} className="relative h-full overflow-hidden">
+    <div ref={mapContainerRef} className="relative h-full overflow-hidden [animation:slideUp_0.4s_ease-out]">
       <KakaoMap
         center={INITIAL_CENTER}
         level={DEFAULT_LEVEL}
