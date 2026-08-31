@@ -37,7 +37,7 @@ export function StandardBottomSheet({ height, maxHeight, children }: Props) {
     <div
       ref={frameRef}
       style={{ height, maxHeight }}
-      className="absolute bottom-0 inset-x-0 z-20 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] flex flex-col transition-[height] duration-300 ease-out"
+      className="absolute bottom-0 inset-x-0 z-20 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] flex flex-col transition-[height] duration-300 ease-out [animation:sheetUp_0.3s_cubic-bezier(0.16,1,0.3,1)]"
     >
       {children}
     </div>
