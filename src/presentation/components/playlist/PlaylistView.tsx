@@ -239,6 +239,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={popScreen}
             onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
+            onShowRecent={handleShowAllRecent}
             currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'mySongs' ? (

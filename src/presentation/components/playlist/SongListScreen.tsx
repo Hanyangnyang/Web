@@ -16,6 +16,10 @@ interface SongListScreenProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
   onShowAddSong: () => void;
+  // 빈 상태 문구/버튼/동작을 화면마다 다르게 하고 싶을 때 오버라이드 — 없으면 장르 안내 문구 + 곡추천하기로 기본 동작
+  emptyStateMessage?: string;
+  emptyStateButtonLabel?: string;
+  onEmptyStateAction?: () => void;
   // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
   // true면 카드의 더보기(신고하기) 버튼을 숨김 — 본인이 등록한 곡 목록처럼 자기 자신을 신고할 수 없는 화면용
@@ -35,6 +39,9 @@ export function SongListScreen({
   onBack,
   onPlay,
   onShowAddSong,
+  emptyStateMessage,
+  emptyStateButtonLabel,
+  onEmptyStateAction,
   enableViewToggle = false,
   hideMoreButton = false,
   scrollToTrackId,
@@ -97,7 +104,12 @@ export function SongListScreen({
         {isLoading ? (
           <div className="py-16 text-center text-sm text-text-hint">불러오는 중...</div>
         ) : filteredSongs.length === 0 ? (
-          <EmptyGenreState onShowAddSong={onShowAddSong} boxed />
+          <EmptyGenreState
+            onAction={onEmptyStateAction ?? onShowAddSong}
+            message={emptyStateMessage}
+            buttonLabel={emptyStateButtonLabel}
+            boxed
+          />
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {filteredSongs.map((song) => (

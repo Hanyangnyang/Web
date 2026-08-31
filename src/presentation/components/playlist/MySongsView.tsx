@@ -13,10 +13,11 @@ interface MySongsViewProps {
 export function MySongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: MySongsViewProps) {
   return (
     <SongListScreen
-      title="내가 추천한 곡"
+      title="내가 등록한 곡"
       emoji="🎤"
       subtitle=""
       songs={DUMMY_MY_SONGS}
+      emptyStateMessage="아직 이 장르로 추천한 곡이 없어요"
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}
