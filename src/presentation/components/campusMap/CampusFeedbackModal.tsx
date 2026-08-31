@@ -48,13 +48,13 @@ export function CampusFeedbackModal({ onClose }: CampusFeedbackModalProps) {
           <>
             <p className="text-sm font-semibold text-text-main mb-1 text-center">캠퍼스맵 제보하기</p>
             <p className="text-xs text-text-sub mb-3 text-center">
-              오픈스페이스·흡연장 등 지도 정보가 다르거나 빠졌다면 알려주세요
+              오픈스페이스·흡연장 등 지도 정보가 다르거나 빠졌다면 알려주세요!
             </p>
             <textarea
               value={content}
               maxLength={MAX_LENGTH}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="예: OO관 1층에 흡연장이 있는데 지도엔 안 보여요"
+              placeholder="OO관 앞에 흡연장이 있는데 지도엔 안 보여요"
               rows={4}
               className="w-full bg-surface border border-[#e2e8f0] rounded-xl px-3 py-2.5 text-sm text-text-main placeholder-text-hint outline-none resize-none focus:border-primary"
             />

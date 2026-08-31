@@ -4,7 +4,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getDateInfoUseCase } from '../../di.js';
 
-const DATE_INFO_STALE_TIME = 24 * 60 * 60 * 1000; // 24시간 — 평일/주말/공휴일 여부는 하루 안에 안 바뀜
+const DATE_INFO_STALE_TIME = 60 * 60 * 1000; // 1시간 — 평일/주말/공휴일 여부는 하루 안에 안 바뀌지만, 다른 API들과 통일해 더 짧게 재검증
 
 // date를 생략하면(undefined) 백엔드가 한국 시간 기준 오늘로 처리 — 날짜별로 캐시가 분리되도록 queryKey에 포함
 // enabled: 지하철 연결정보가 필요 없는 상황(정류장·탭 비활성)에서는 조회 자체를 건너뛸 때 씀
