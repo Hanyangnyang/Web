@@ -16,9 +16,11 @@ const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').the
 
 interface PortalViewProps {
   isActive?: boolean;
+  // 배너가 캠퍼스맵 등 앱 내부 탭으로 이동하는 링크일 때 새 창을 열지 않고 바로 탭을 전환하기 위해 씀
+  onNavigateToTab?: (tab: string) => void;
 }
 
-export function PortalView({ isActive = true }: PortalViewProps) {
+export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
   const { briefing } = useWeatherBriefing(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
@@ -66,7 +68,7 @@ export function PortalView({ isActive = true }: PortalViewProps) {
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
         <ErrorBoundary name="portal-banner">
-          <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} />
+          <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} onNavigateToTab={onNavigateToTab} />
         </ErrorBoundary>
 
         {/* 3. 열람실 혼잡도 섹션 */}

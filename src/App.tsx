@@ -132,6 +132,12 @@ function MainLayout() {
       localStorage.setItem('lastActiveTab', 'portal');
       return;
     }
+    if (tab === 'partner') {
+      setPartnerVisited(true);
+      setActiveTab('partner');
+      localStorage.setItem('lastActiveTab', 'partner');
+      return;
+    }
     if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
       setActiveTab('cafe');
       localStorage.setItem('lastActiveTab', 'cafe');
@@ -250,7 +256,7 @@ function MainLayout() {
             <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
           <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
-            <PortalView isActive={activeTab === 'portal'} />
+            <PortalView isActive={activeTab === 'portal'} onNavigateToTab={handleTabChange} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView resetSignal={miscResetSignal} isActive={activeTab === 'misc'} />
