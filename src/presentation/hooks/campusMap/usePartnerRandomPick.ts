@@ -44,8 +44,6 @@ export function usePartnerRandomPick({ stores, excludeId, activeCategory, onPick
   const diceLabel = isNonFoodCategoryActive
     ? '어디가지'
     : hour >= 11 && hour < 16 ? '점메추' : hour >= 16 && hour < 22 ? '저메추' : '뭐먹지';
-  // "어디가지"일 땐 주사위 대신 빨간 물음표로 — 밥 고르기가 아니라 "정체 모를 어딘가"라는 뉘앙스
-  const diceEmoji = isNonFoodCategoryActive ? '❓' : '🎲';
 
-  return { rolling, rollRandom, diceLabel, diceEmoji };
+  return { rolling, rollRandom, diceLabel };
 }

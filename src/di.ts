@@ -9,6 +9,7 @@ import { createBannerApiDataSource } from './data/datasources/BannerApiDataSourc
 import { createBusApiDataSource } from './data/datasources/BusApiDataSource.js';
 import { createGymApiDataSource } from './data/datasources/GymApiDataSource.js';
 import { createFeedbackDataSource } from './data/datasources/FeedbackDataSource.js';
+import { createFeedbackApiDataSource } from './data/datasources/FeedbackApiDataSource.js';
 import { createHolidayApiDataSource } from './data/datasources/HolidayApiDataSource.js';
 import { createPartnerStoreApiDataSource } from './data/datasources/PartnerStoreApiDataSource.js';
 import { createCampusBuildingApiDataSource } from './data/datasources/CampusBuildingApiDataSource.js';
@@ -22,6 +23,7 @@ import { createBannerRepository } from './data/repositories/BannerRepository.js'
 import { createBusRepository } from './data/repositories/BusRepository.js';
 import { createGymRepository } from './data/repositories/GymRepository.js';
 import { createFeedbackRepository } from './data/repositories/FeedbackRepository.js';
+import { createFeedbackApiRepository } from './data/repositories/FeedbackApiRepository.js';
 import { createHolidayRepository } from './data/repositories/HolidayRepository.js';
 import { createPartnerStoreRepository } from './data/repositories/PartnerStoreRepository.js';
 import { createCampusBuildingRepository } from './data/repositories/CampusBuildingRepository.js';
@@ -38,6 +40,7 @@ import { createGetBannersUseCase } from './domain/usecases/GetBannersUseCase.js'
 import { createGetBusArrivalsUseCase } from './domain/usecases/GetBusArrivalsUseCase.js';
 import { createGetGymScheduleUseCase } from './domain/usecases/GetGymScheduleUseCase.js';
 import { createSubmitFeedbackUseCase } from './domain/usecases/SubmitFeedbackUseCase.js';
+import { createSubmitFeedbackApiUseCase } from './domain/usecases/SubmitFeedbackApiUseCase.js';
 import { createGetIsHolidayUseCase } from './domain/usecases/GetIsHolidayUseCase.js';
 import { createGetPartnerStoresUseCase } from './domain/usecases/GetPartnerStoresUseCase.js';
 import { createGetCampusBuildingsUseCase } from './domain/usecases/GetCampusBuildingsUseCase.js';
@@ -66,6 +69,7 @@ const bannerApiDataSource = createBannerApiDataSource({ httpClient: apiHttpClien
 const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const feedbackDataSource = createFeedbackDataSource();
+const feedbackApiDataSource = createFeedbackApiDataSource({ httpClient: apiHttpClient });
 const holidayApiDataSource = createHolidayApiDataSource({ httpClient });
 const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: apiHttpClient });
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
@@ -82,6 +86,7 @@ export const bannerRepository = createBannerRepository({ bannerApiDataSource });
 export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
 export const feedbackRepository = createFeedbackRepository({ feedbackDataSource });
+export const feedbackApiRepository = createFeedbackApiRepository({ feedbackApiDataSource });
 export const holidayRepository = createHolidayRepository({ holidayApiDataSource });
 export const partnerStoreRepository = createPartnerStoreRepository({ partnerStoreApiDataSource });
 export const campusBuildingRepository = createCampusBuildingRepository({ campusBuildingApiDataSource });
@@ -99,6 +104,7 @@ export const getBannersUseCase = createGetBannersUseCase({ bannerRepository });
 export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository });
 export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository });
 export const submitFeedbackUseCase = createSubmitFeedbackUseCase({ feedbackRepository });
+export const submitFeedbackApiUseCase = createSubmitFeedbackApiUseCase({ feedbackApiRepository });
 export const getIsHolidayUseCase = createGetIsHolidayUseCase({ holidayRepository });
 export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerStoreRepository });
 export const getCampusBuildingsUseCase = createGetCampusBuildingsUseCase({ campusBuildingRepository });

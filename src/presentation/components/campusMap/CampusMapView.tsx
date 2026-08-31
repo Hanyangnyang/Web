@@ -14,6 +14,7 @@ import { StoreSheet } from './sheets/StoreSheet';
 import { PointMarkers } from './markers/PointMarkers';
 import { CampusBuildingSheet } from './sheets/CampusBuildingSheet';
 import { SmokingSpotSheet } from './sheets/SmokingSpotSheet';
+import { CampusFeedbackModal } from './CampusFeedbackModal';
 import {
   STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
 } from './sheets/sheetMetrics';
@@ -71,6 +72,7 @@ export default function CampusMapView({ isActive }: Props) {
   const { chip, setChip, college, setCollege } = useCampusMapFilters();
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // 지도가 실제로 그려지는 컨테이너의 픽셀 높이 — focusMap이 '시트 제외 영역 정중앙'을 계산할 때 쓴다
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -166,7 +168,7 @@ export default function CampusMapView({ isActive }: Props) {
     selectBuilding(building, 'search');
   };
 
-  const { rolling, rollRandom, diceLabel, diceEmoji } = usePartnerRandomPick({
+  const { rolling, rollRandom, diceLabel } = usePartnerRandomPick({
     stores,
     excludeId: selectedStore?.id ?? null,
     activeCategory: storeCategory,
@@ -345,7 +347,7 @@ export default function CampusMapView({ isActive }: Props) {
         style={{ bottom: `calc(${buttonBase} + 68px)` }}
         className="absolute right-3 z-30 h-11 px-3.5 flex items-center gap-1.5 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform"
       >
-        <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>{diceEmoji}</span>
+        <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>🎲</span>
         <span className="text-[13px] font-extrabold text-[#334155]">{diceLabel}</span>
       </button>
 
@@ -360,6 +362,8 @@ export default function CampusMapView({ isActive }: Props) {
         <LocateFixed size={19} className={locating ? 'text-text-hint animate-pulse' : 'text-[#334155]'} />
       </button>
 
+      {feedbackOpen && <CampusFeedbackModal onClose={() => setFeedbackOpen(false)} />}
+
       {/* 토스트 */}
       {toast && (
         <div className="absolute top-[120px] inset-x-0 z-40 flex justify-center pointer-events-none">
@@ -369,15 +373,26 @@ export default function CampusMapView({ isActive }: Props) {
         </div>
       )}
 
-      {/* 상단: 검색바 + 필터 칩 — 상세 시트가 떠 있어도 칩은 계속 보이게 둔다 */}
+      {/* 상단: 검색바+제보 버튼(7:3 비율) + 필터 칩 — 상세 시트가 떠 있어도 칩은 계속 보이게 둔다 */}
       <div className="absolute top-0 inset-x-0 z-10 p-3 space-y-2 pointer-events-none">
-        <button
-          onClick={openSearch}
-          className="pointer-events-auto w-full flex items-center gap-2.5 bg-white rounded-full px-4 py-3 shadow-[0_2px_10px_rgba(0,0,0,0.12)] [-webkit-tap-highlight-color:transparent] active:scale-[0.99] transition-transform"
-        >
-          <Search size={16} className="text-text-hint flex-shrink-0" />
-          <span className="text-[13px] font-semibold text-text-hint">캠퍼스맵 검색</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={openSearch}
+            className="pointer-events-auto min-w-0 flex-[8] flex items-center gap-2.5 bg-white rounded-full px-4 py-2 shadow-[0_2px_10px_rgba(0,0,0,0.12)] [-webkit-tap-highlight-color:transparent] active:scale-[0.99] transition-transform"
+          >
+            <Search size={16} className="text-text-hint flex-shrink-0" />
+            <span className="text-[13px] font-semibold text-text-hint truncate">캠퍼스맵 검색</span>
+          </button>
+          {/* 제보 📢 — 오픈스페이스·흡연장 등 지도 정보 오류/누락 제보. 폭이 좁아서(2/10) 안쪽 여백을 최소로 줘 내용이 경계에 거의 붙게 함 */}
+          <button
+            onClick={() => setFeedbackOpen(true)}
+            aria-label="캠퍼스맵 제보하기"
+            className="pointer-events-auto min-w-0 flex-[2] flex items-center justify-center gap-0.5 bg-white rounded-full px-1 py-2 shadow-[0_2px_10px_rgba(0,0,0,0.12)] [-webkit-tap-highlight-color:transparent] active:scale-[0.99] transition-transform"
+          >
+            <span className="text-[15px] leading-none flex-shrink-0">📢</span>
+            <span className="text-[13px] font-bold text-[#334155] truncate">제보</span>
+          </button>
+        </div>
         <MapFilterChips value={chip} onChange={handleChipChange} />
       </div>
 

@@ -159,6 +159,7 @@ src/
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
+| `POST /api/v1/feedbacks` | 통합 피드백 접수 (기능별 category/feedbackType 태깅) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 화면 연동 예정 — 현재는 도메인/데이터/유스케이스/훅(`useSubmitFeedbackApi`)만 구성됨. 기존 `useFeedback`(Supabase 직접, 자유 텍스트)와 별개 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
