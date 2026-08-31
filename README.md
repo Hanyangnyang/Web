@@ -158,8 +158,8 @@ src/
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 / 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
-| `POST /api/v1/feedbacks` | 통합 피드백 접수 (기능별 category/feedbackType 태깅) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 기타탭 > 피드백 보내기(`FeedbackView`, category `GENERAL`), 캠퍼스맵 제보 모달(`CampusFeedbackModal`, category `CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보(`SearchOverlay`, category `PARTNERSHIP`)에서 씀. 기존 Supabase 직접 연결 피드백 스택(`useFeedback` 등)은 전 화면 이전 완료 후 제거함 |
-| `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 (날짜별 달력/공휴일, 학사 일정, 셔틀 운행 기준) | 5분(FE staleTime, BE 캐시 주기 미확인) — Supabase `app_config`(현재기간·공휴일·강제주말·미운행 오버라이드)를 완전히 대체하는 자리라, 관리자가 긴급 미운행 등을 바꿔도 앱 재시작 없이 비교적 빨리 반영되도록 짧게 잡음 | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상 — 실패해도 markReady는 호출) + 셔틀탭(`useShuttle`)이 `calendar`/`academic`/`shuttle` 필드로 기간·평일/주말·운행여부를 직접 판정. `date-info`는 완전히 대체되어 삭제함 |
+| `POST /api/v1/feedbacks` | 통합 피드백 접수 | 해당없음 | 기타탭 > 피드백 보내기(category `GENERAL`), 캠퍼스맵 화면 상단에 제보 버튼(`CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보 버튼(`PARTNERSHIP`) |
+| `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) — Supabase `app_config`(현재기간·공휴일·강제주말·미운행 오버라이드)를 완전히 대체하는 자리라, 관리자가 긴급 미운행 등을 바꿔도 앱 재시작 없이 비교적 빨리 반영되도록 짧게 잡음 | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `calendar`/`academic`/`shuttle` 필드로 기간·평일/주말·운행여부를 직접 판정 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
@@ -169,7 +169,9 @@ src/
 | `/api/cron/refresh-insta-profiles`* | 인스타 계정 프로필 사진 정적 이미지 갱신 | Instagram API(스크래핑) + GitHub Contents API(커밋) | 해당없음 | 해당없음 | Vercel Cron이 4개월마다 1회만 서버에서 실행, 클라이언트는 API 호출 안 하고 정적 이미지만 읽음 |
 | `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | "공공버스" 모드 + 화면보임 + 사용자 조작중일 때 30초 간격 자동 폴링, 새로고침 버튼 수동 refetch |
 
-**프론트는 안 쓰지만 아직 살아있는 Vercel 함수** — `api/menu.js`, `api/portal.js`(weather+library 통합), `api/holidays.js` 3개는 전부 새 백엔드(`/api/v1/menu`, `/api/v1/weather`, `/api/v1/library/seats`, `/api/v1/academic/status`)로 완전히 대체되어 프론트엔드 어디에서도 더 이상 호출하지 않음. 하지만 Supabase Edge Function `menu-alerts`(1분마다 도는 푸시 발송 로직)가 `/api/menu`, `/api/portal?type=weather`, `/api/holidays`를 직접 `fetch()`하고 있어서 세 함수 다 삭제하면 안 됨. 단, `/api/portal?type=library`는 Edge Function도 호출하지 않아 완전히 죽은 라우트 — `api/portal.js` 리팩토링/삭제 시 이 부분만은 안전하게 정리 가능.
+**프론트는 안 쓰지만 아직 살아있는 Vercel 함수** — `api/menu.js`, `api/portal.js`(weather+library 통합), `api/holidays.js` 3개는 전부 새 백엔드로 완전히 대체되어 프론트엔드 어디에서도 더 이상 호출하지 않음. 하지만 Supabase Edge Function `menu-alerts`(1분마다 도는 푸시 발송 로직)가 `/api/menu`, `/api/portal?type=weather`, `/api/holidays`를 직접 `fetch()`하고 있어서 세 함수 다 삭제하면 안 됨. 단, `/api/portal?type=library`는 Edge Function도 호출하지 않아 완전히 죽은 라우트 — `api/portal.js` 리팩토링/삭제 시 이 부분만은 안전하게 정리 가능.
+
+**`/api/sentry-discord-webhook`** — 위 표들과 달리 앱이 호출하는 게 아니라 **Sentry가 호출하는 인바운드 웹훅**. Sentry Internal Integration의 Issue Alert(`event_alert`)를 받아서 `sentry-hook-signature` 헤더로 HMAC-SHA256 서명 검증(비교는 `crypto.timingSafeEqual`) 후, Discord 임베드 메시지 형식으로 변환해 `DISCORD_WEBHOOK_URL`로 재전송함. Sentry 무료(Developer) 플랜엔 네이티브 Discord 연동이 없어서(유료 Slack 연동을 억지로 꽂는 방식뿐) 만든 중계 함수. 캐싱 대상이 아니고 staleTime 개념도 없음.
 
 ### 💾localStorage (디스크)
 
