@@ -1,9 +1,10 @@
 import { Play, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
+import { isIOSDevice } from '../../../lib/platform.js';
 
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
-// "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요.
+// "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요 — Android/데스크톱은 이 정책이 없어서 해당 없음.
 const AUTOPLAY_CHECK_MS = 1500;
 
 export interface PlayableTrack {
@@ -33,7 +34,9 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
   const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 재생 시작 후 일정 시간 안에 실제로 재생이 시작되지 않으면 자동재생이 막힌 것으로 보고 "탭해서 재생하기" 버튼을 띄운다.
+  // 이 자동재생 차단은 iOS Safari 정책이라 iOS 기기가 아니면 애초에 검사할 필요가 없음
   const schedulePlaybackCheck = () => {
+    if (!isIOSDevice()) return;
     if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
     autoplayCheckTimerRef.current = setTimeout(() => {
       if (isPausedRef.current) setShowTapToPlay(true);

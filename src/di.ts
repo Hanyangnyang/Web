@@ -46,7 +46,6 @@ import { createGetSongByIdUseCase } from './domain/usecases/GetSongByIdUseCase.j
 import { createGetSongCreationStatusUseCase } from './domain/usecases/GetSongCreationStatusUseCase.js';
 import { createGetBookmarkedSongsUseCase } from './domain/usecases/GetBookmarkedSongsUseCase.js';
 import { createSearchSongsUseCase } from './domain/usecases/SearchSongsUseCase.js';
-import { createSearchTrackStatsUseCase } from './domain/usecases/SearchTrackStatsUseCase.js';
 import { createSubmitSongUseCase } from './domain/usecases/SubmitSongUseCase.js';
 import { createReportSongUseCase } from './domain/usecases/ReportSongUseCase.js';
 import { createToggleBookmarkUseCase } from './domain/usecases/ToggleBookmarkUseCase.js';
@@ -108,7 +107,6 @@ export const getSongByIdUseCase = createGetSongByIdUseCase({ playlistRepository 
 export const getSongCreationStatusUseCase = createGetSongCreationStatusUseCase({ playlistRepository });
 export const getBookmarkedSongsUseCase = createGetBookmarkedSongsUseCase({ playlistRepository });
 export const searchSongsUseCase = createSearchSongsUseCase({ playlistRepository });
-export const searchTrackStatsUseCase = createSearchTrackStatsUseCase({ playlistRepository });
 export const submitSongUseCase = createSubmitSongUseCase({ playlistRepository });
 export const reportSongUseCase = createReportSongUseCase({ playlistRepository });
 export const toggleBookmarkUseCase = createToggleBookmarkUseCase({ playlistRepository });

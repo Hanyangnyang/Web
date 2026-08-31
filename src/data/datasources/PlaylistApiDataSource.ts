@@ -151,34 +151,6 @@ export interface SearchSongsDataSourceParams {
   size?: number;
 }
 
-// 음원 트랙(Spotify 곡) 검색 결과 — title/artist/albumArtUrl은 이미 Spotify 검색 결과에 있어서
-// 레포지토리에서 그대로 버리고 trackId 매칭용 통계(totalSongsCount/totalHeartCount)만 씀
-export interface TrackStatsDto {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-  totalSongsCount: number;
-  totalHeartCount: number;
-}
-
-export interface PagedTrackStatsDto {
-  content: TrackStatsDto[];
-  totalElements: number;
-  totalPages: number;
-  number: number;
-  size: number;
-  first: boolean;
-  last: boolean;
-  empty: boolean;
-}
-
-export interface SearchTrackStatsDataSourceParams {
-  keyword: string;
-  page?: number;
-  size?: number;
-}
-
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   // 게시글 단건 상세 조회 — 응답 형태가 PlaylistSongDto와 동일(+heartCount/totalPlayCount/updatedAt, 화면에 안 써서 버림)
@@ -188,7 +160,6 @@ export interface PlaylistApiDataSource {
   getLikedSongs: (params: GetLikedSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   // 추천글 가중치 통합 검색(제목/가수/코멘트) — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   searchSongs: (params: SearchSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
-  searchTrackStats: (params: SearchTrackStatsDataSourceParams) => Promise<ApiResponse<PagedTrackStatsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
   postLike: (songId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
@@ -203,8 +174,6 @@ const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 50;
 // 게시글 검색은 API 문서 기본값(size=20)을 그대로 따름 — 다른 목록보다 짧게
 const SEARCH_DEFAULT_SIZE = 20;
-// 트랙 검색은 API 문서 기본값(size=10)을 그대로 따름
-const TRACK_SEARCH_DEFAULT_SIZE = 10;
 
 export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpClient }): PlaylistApiDataSource => ({
   getSongs: async (params = {}) => {
@@ -237,13 +206,6 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     if (deviceId) query.set('deviceId', deviceId);
 
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/search?${query.toString()}`));
-  },
-
-  searchTrackStats: async (params) => {
-    const { keyword, page = DEFAULT_PAGE, size = TRACK_SEARCH_DEFAULT_SIZE } = params;
-    const query = new URLSearchParams({ keyword, page: String(page), size: String(size) });
-
-    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/tracks/search?${query.toString()}`));
   },
 
   postSong: async (body) => parseOrThrow(await httpClient.post('/api/v1/playlist/songs', body)),

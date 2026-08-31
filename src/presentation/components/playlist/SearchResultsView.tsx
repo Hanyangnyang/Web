@@ -1,8 +1,8 @@
-import { ArrowRight, Bookmark, MessageSquare, Play, Search } from 'lucide-react';
+import { ArrowRight, Play, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song } from './playlistTypes';
-import { useSongSearch, useTrackStatsSearch } from '../../hooks/useRecentSongs.js';
+import { useSongSearch } from '../../hooks/useRecentSongs.js';
 
 interface SearchResultsViewProps {
   query: string;
@@ -26,16 +26,24 @@ const MIN_QUERY_LENGTH = 2;
 
 // 검색 결과 화면 — 곡 검색은 Spotify 검색 API(/api/music-search), 게시글 검색은 BE 추천글 통합 검색 API 연동 완료
 export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId }: SearchResultsViewProps) {
-  const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(query);
-  const { data: trackStats } = useTrackStatsSearch(query);
-  const trackStatsByTrackId = new Map((trackStats ?? []).map((stats) => [stats.trackId, stats]));
+  // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
+  // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
+  const [activeQuery, setActiveQuery] = useState(query);
+  const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(activeQuery);
   const [localQuery, setLocalQuery] = useState(query);
   const [trackResults, setTrackResults] = useState<TrackResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
+  // 검색바에서 Enter를 치거나 화살표 버튼을 누르면 재검색
+  const handleResearch = () => {
+    const trimmed = localQuery.trim();
+    if (!trimmed) return;
+    setActiveQuery(trimmed);
+  };
+
   useEffect(() => {
-    const trimmed = query.trim();
+    const trimmed = activeQuery.trim();
     if (trimmed.length < MIN_QUERY_LENGTH) {
       setTrackResults([]);
       setSearchError(null);
@@ -71,7 +79,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
     return () => {
       cancelled = true;
     };
-  }, [query]);
+  }, [activeQuery]);
 
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
@@ -80,22 +88,26 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         <MiscSubViewHeader
           title="검색 결과"
           emoji="🔍"
-          subtitle={`"${query}"`}
+          subtitle={`"${activeQuery}"`}
           onBack={onBack}
         />
       </div>
 
-      {/* 검색바: 사용자가 검색했던 텍스트를 보여줌. 재검색 로직은 추후 구현 */}
+      {/* 검색바: 검색어를 수정하고 Enter나 화살표 버튼을 누르면 이 화면 안에서 재검색 */}
       <div className="mt-4 mb-4 flex items-center gap-2 px-3.5 h-11 bg-white border border-slate-200 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
         <Search size={16} className="text-text-hint flex-shrink-0" />
         <input
           type="text"
           value={localQuery}
           onChange={(e) => setLocalQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleResearch();
+          }}
           placeholder="곡 제목이나 아티스트로 검색해보세요"
           className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
         />
         <button
+          onClick={handleResearch}
           disabled={!localQuery.trim()}
           aria-label="검색"
           className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full text-text-sub disabled:text-text-hint hover:bg-slate-100 transition-colors active:scale-90"
@@ -122,59 +134,43 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             ) : trackResults.length === 0 ? (
               <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
             ) : (
-              trackResults.map((track) => {
-                const stats = trackStatsByTrackId.get(track.trackId);
-                return (
-                  <div
-                    key={track.trackId}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onSelectTrack(track)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
-                    }}
-                    aria-label={`${track.title} 추천 게시글 보기`}
-                    className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform cursor-pointer"
-                  >
-                    <div className="relative">
-                      <img
-                        src={track.albumArtUrl}
-                        alt={track.title}
-                        className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
-                      />
-                      {track.trackId !== currentTrackId && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onPlay(track);
-                          }}
-                          aria-label={`${track.title} 재생`}
-                          className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
-                        >
-                          <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                            <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
-                          </span>
-                        </button>
-                      )}
-                    </div>
-                    <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
-                    <div className="text-xs text-text-sub truncate">{track.artist}</div>
-                    {/* 이 곡에 달린 추천글수/북마크수 — 아직 아무도 추천 안 한 곡은 API 결과에 없어서 아예 표시 안 함 */}
-                    {stats && stats.totalSongsCount > 0 && (
-                      <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-text-hint">
-                        <span className="flex items-center gap-0.5">
-                          <MessageSquare size={10} />
-                          {stats.totalSongsCount}
+              trackResults.map((track) => (
+                <div
+                  key={track.trackId}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onSelectTrack(track)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
+                  }}
+                  aria-label={`${track.title} 추천 게시글 보기`}
+                  className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform cursor-pointer"
+                >
+                  <div className="relative">
+                    <img
+                      src={track.albumArtUrl}
+                      alt={track.title}
+                      className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
+                    />
+                    {track.trackId !== currentTrackId && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPlay(track);
+                        }}
+                        aria-label={`${track.title} 재생`}
+                        className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
+                      >
+                        <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                          <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
                         </span>
-                        <span className="flex items-center gap-0.5">
-                          <Bookmark size={10} />
-                          {stats.totalHeartCount}
-                        </span>
-                      </div>
+                      </button>
                     )}
                   </div>
-                );
-              })
+                  <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
+                  <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                </div>
+              ))
             )}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
           </div>
@@ -197,7 +193,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                 </div>
               </div>
             ))
-          ) : query.trim().length < MIN_QUERY_LENGTH ? (
+          ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
             <p className="text-xs text-text-hint py-2">최소 {MIN_QUERY_LENGTH}자 이상 입력해주세요!</p>
           ) : !postResults || postResults.length === 0 ? (
             <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>

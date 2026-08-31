@@ -1,9 +1,10 @@
 import { Loader2, Play, Search, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { GENRES } from './playlistTypes';
 import { type PlayableTrack } from './FloatingSpotifyPlayer';
 import { useSubmitSong, useSongCreationStatus } from '../../hooks/useRecentSongs.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { type HttpError } from '../../../infrastructure/http/HttpClient.js';
 
 interface SearchTrack {
@@ -11,6 +12,40 @@ interface SearchTrack {
   title: string;
   artist: string;
   albumArtUrl: string;
+}
+
+// 뒤로가기 시 임시저장한 곡추천하기 초안 — 기기(브라우저)당 1개만 유지
+const DRAFT_STORAGE_KEY = 'hyu_add_song_draft_v1';
+
+interface AddSongDraft {
+  track: SearchTrack | null;
+  selectedGenres: string[];
+  comment: string;
+}
+
+function loadDraft(): AddSongDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as AddSongDraft) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(draft: AddSongDraft) {
+  try {
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+  } catch {
+    // 시크릿 모드 등 localStorage 접근 불가 시 임시저장은 부가 기능이라 조용히 무시
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_STORAGE_KEY);
+  } catch {
+    // 위와 동일
+  }
 }
 
 const COMMENT_MAX_LENGTH = 200;
@@ -81,22 +116,50 @@ const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
 export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
+  // 화면 진입 시 임시저장된 초안이 있으면 한 번만 불러와서 초기값으로 씀
+  const [initialDraft] = useState(() => loadDraft());
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchTrack[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(null);
   const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
-  const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(null);
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [comment, setComment] = useState('');
+  const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(initialDraft?.track ?? null);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>(initialDraft?.selectedGenres ?? []);
+  const [comment, setComment] = useState(initialDraft?.comment ?? '');
+  const [draftRestoredToast, setDraftRestoredToast] = useState(initialDraft ? '작성 중이던 내용을 불러왔어요' : '');
   const [submitToast, setSubmitToast] = useState('');
   const [submitInlineError, setSubmitInlineError] = useState<string | null>(null);
   const [showSubmitRetryPopup, setShowSubmitRetryPopup] = useState(false);
   const [showRegisterNoticePopup, setShowRegisterNoticePopup] = useState(false);
+  const [showLeaveConfirmPopup, setShowLeaveConfirmPopup] = useState(false);
   const submitSong = useSubmitSong();
   const { data: creationStatus } = useSongCreationStatus();
   const recentlyRecommendedTrackIds = new Set(creationStatus?.recentTrackIdsIn7Days ?? []);
+
+  useEffect(() => {
+    if (!draftRestoredToast) return;
+    const timer = setTimeout(() => setDraftRestoredToast(''), 2500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 마운트 시 초안 복원 여부만 한 번 확인하면 됨
+  }, []);
+
+  // 곡/장르/코멘트 중 하나라도 채워져 있으면 뒤로가기 시 확인 팝업을 거침
+  const hasUnsavedContent = !!selectedTrack || selectedGenres.length > 0 || comment.trim().length > 0;
+
+  // 안드로이드 하드웨어 뒤로가기 — 확인 팝업이 떠 있으면 팝업만 닫고, 저장 안 한 내용이 있으면 팝업을 띄움
+  const handleBackRequest = () => {
+    if (showLeaveConfirmPopup) {
+      setShowLeaveConfirmPopup(false);
+      return;
+    }
+    if (hasUnsavedContent) {
+      setShowLeaveConfirmPopup(true);
+      return;
+    }
+    onBack();
+  };
+  useBackHandler(handleBackRequest);
 
   const lastSearchAtRef = useRef(0);
 
@@ -183,7 +246,10 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         genres: genreLabels,
       },
       {
-        onSuccess: onBack,
+        onSuccess: () => {
+          clearDraft();
+          onBack();
+        },
         onError: (error) => {
           const code = (error as HttpError).code;
 
@@ -230,7 +296,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
               : '오늘 등록 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
             : ''
         }
-        onBack={onBack}
+        onBack={handleBackRequest}
       />
 
       {/* 1. 곡 검색 */}
@@ -449,6 +515,13 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         </div>
       )}
 
+      {/* 임시저장 초안을 복원했을 때 안내 토스트 */}
+      {draftRestoredToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-50 whitespace-pre-line text-center copy-toast">
+          {draftRestoredToast}
+        </div>
+      )}
+
       {/* 1일 3곡 제한(PL001)/최근 7일 중복 추천(PL002) 안내 토스트 */}
       {submitToast && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-50 whitespace-pre-line text-center copy-toast">
@@ -510,6 +583,44 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                 className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
               >
                 등록하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 뒤로가기 시 작성 중인 내용이 있으면 확인 — 임시저장/저장 안 함/계속 작성 3가지 중 선택 */}
+      {showLeaveConfirmPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8">
+          <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
+            <p className="text-sm font-semibold text-text-main mb-1 text-center">작성 중인 내용이 있어요</p>
+            <p className="text-xs text-text-sub mb-4 text-center">나가기 전에 어떻게 할까요?</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  saveDraft({ track: selectedTrack, selectedGenres, comment });
+                  setShowLeaveConfirmPopup(false);
+                  onBack();
+                }}
+                className="h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+              >
+                임시저장하고 나가기
+              </button>
+              <button
+                onClick={() => {
+                  clearDraft();
+                  setShowLeaveConfirmPopup(false);
+                  onBack();
+                }}
+                className="h-10 rounded-full text-sm font-bold text-red-500 bg-red-50 active:scale-[0.97] transition-transform"
+              >
+                저장 안 하고 나가기
+              </button>
+              <button
+                onClick={() => setShowLeaveConfirmPopup(false)}
+                className="h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+              >
+                계속 작성하기
               </button>
             </div>
           </div>
