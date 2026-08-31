@@ -291,7 +291,7 @@ export default function CampusMapView({ isActive }: Props) {
   const buttonBase = `var(--sheet-h, ${NAV_CLEARANCE_CSS})`;
 
   return (
-    <div ref={mapContainerRef} className="relative h-full overflow-hidden">
+    <div ref={mapContainerRef} className="relative h-full overflow-hidden [animation:slideUp_0.4s_ease-out]">
       <KakaoMap
         center={INITIAL_CENTER}
         level={DEFAULT_LEVEL}
