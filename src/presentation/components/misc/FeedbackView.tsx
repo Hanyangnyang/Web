@@ -1,7 +1,7 @@
 // 컴포넌트: 하냥냥에게 피드백 보내기
 import { useState } from 'react';
 import { Loader2, Laugh, Send } from 'lucide-react';
-import { useFeedback } from '../../hooks/useFeedback.js';
+import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 
@@ -12,7 +12,8 @@ interface FeedbackViewProps {
 export function FeedbackView({ onBack }: FeedbackViewProps) {
   useBackHandler(onBack);
   const [content, setContent] = useState('');
-  const { loading, submitted, error, submit } = useFeedback();
+  const { mutateAsync, isPending: loading, isSuccess: submitted, isError } = useSubmitFeedbackApi();
+  const error = isError ? '피드백을 보내지 못했어요. 잠시 후 다시 시도해 주세요 🙏' : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ export function FeedbackView({ onBack }: FeedbackViewProps) {
     }
 
     try {
-      await submit(trimmed);
+      await mutateAsync({ category: 'GENERAL', feedbackType: 'GENERAL_OPINION', content: trimmed });
       setContent('');
     } catch (err) {
       console.error('Failed to submit feedback:', err);

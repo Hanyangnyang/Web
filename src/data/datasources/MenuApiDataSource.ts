@@ -21,22 +21,10 @@ export interface MenuResponseDto {
   [date: string]: CafeteriaDto[];
 }
 
-// 요청 파라미터
-export interface GetMenuForDateParams {
-  startDate: string;
-  endDate: string;
-}
-
 export interface MenuApiDataSource {
-  getMenuForDate: (params: GetMenuForDateParams) => Promise<ApiResponse<MenuResponseDto>>;
   getMenuForPeriod: () => Promise<ApiResponse<MenuResponseDto>>;
 }
 
 export const createMenuApiDataSource = ({ httpClient }: { httpClient: HttpClient }): MenuApiDataSource => ({
-  getMenuForDate: async ({ startDate, endDate }) => {
-    const query = new URLSearchParams({ startDate, endDate });
-    return parseOrThrow(await httpClient.get(`/api/v1/menu?${query.toString()}`));
-  },
-
   getMenuForPeriod: async () => parseOrThrow(await httpClient.get('/api/v1/menu')),
 });

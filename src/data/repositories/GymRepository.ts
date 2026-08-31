@@ -1,5 +1,5 @@
 // 레포지토리: 체대 헬스장 시간표(새 백엔드)를 도메인 엔티티로 변환해 제공
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import type { GymSchedule, GymPeriod } from '../../domain/entities/Gym.js';
 import type { GymApiDataSource, GymPeriodDto } from '../datasources/GymApiDataSource.js';
 import type { GymRepository } from '../../domain/repositories/IGymRepository.js';
@@ -47,21 +47,21 @@ function toGymPeriod(dto: GymPeriodDto): GymPeriod {
 export const createGymRepository = (
   { gymApiDataSource }: { gymApiDataSource: GymApiDataSource }
 ): GymRepository => ({
-  getSchedule: async (): Promise<GymSchedule> => {
+  getSchedule: (): Promise<GymSchedule> => withAreaTag(AREA, async () => {
     const res = await gymApiDataSource.getSchedule();
     // 1. success 실패했을때, Error 반환
-    if (!res.success) 
+    if (!res.success)
       throw apiError(res.error?.message || 'gym schedule API request failed', { area: AREA, endpoint: res._requestUrl });
 
     // 2. data가 배열 형태로 오지 않았을때, Error 반환
-    if (!Array.isArray(res.data)) 
+    if (!Array.isArray(res.data))
       throw apiError(`gym schedule API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
 
     // 3. 최소 필요한 정보의 단위가 하나도 없을때, Error 반환
     const periods = res.data.map(toGymPeriod);
-    if (periods.length === 0) 
+    if (periods.length === 0)
       throw apiError('gym schedule API returned no periods', { area: AREA, endpoint: res._requestUrl });
 
     return { location: GYM_LOCATION, periods };
-  },
+  }),
 });

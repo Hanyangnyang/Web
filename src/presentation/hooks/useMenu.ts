@@ -1,12 +1,11 @@
 // 훅(ViewModel): 학식 날짜 탐색 및 식당별 메뉴 데이터 관리 (TanStack Query 기반)
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { queryClient } from '../../lib/queryClient.js';
-import { getMenuForDateUseCase, getMenuForPeriodUseCase } from '../../di.js';
-import { getKSTDateUnsafe, toDateKey } from '../../utils/time.js';
-import type { Cafe } from '../../domain/entities/Cafe.js';
+import { getMenuForPeriodUseCase } from '../../di.js';
+import { getKSTDateUnsafe, toDateKey } from '../../utils/kstTime.js';
+import { createEmptyCafes, type Cafe } from '../../domain/entities/Cafe.js';
 
-const MENU_STALE_TIME = 12 * 60 * 60 * 1000;  // 12시간 — 백엔드 Menu 캐시 TTL과 동일 (매일 오전 1시 스크래핑 시 evict)
+const MENU_STALE_TIME = 60 * 60 * 1000;  // 1시간 — 백엔드 Menu 캐시 TTL(12시간)보다 짧게 재검증. 대부분은 백엔드도 같은 캐시값을 그대로 돌려줌
 const MENU_FOR_PERIOD_QUERY_KEY = ['menu-period'] as const;
 
 function getInitialDate(): Date {
@@ -16,10 +15,6 @@ function getInitialDate(): Date {
     if (!isNaN(d.getTime())) return d;
   }
   return getKSTDateUnsafe();
-}
-
-function menuQueryKey(date: Date) {
-  return ['menu', toDateKey(date)] as const;
 }
 
 export interface UseMenuResult {
@@ -36,24 +31,14 @@ export function useMenu(isActive = true): UseMenuResult {
 
   const periodQuery = useQuery({
     queryKey: MENU_FOR_PERIOD_QUERY_KEY,
-    queryFn: async () => {
-      const menusByDate = await getMenuForPeriodUseCase.execute();
-      for (const [dateStr, cafes] of Object.entries(menusByDate)) {
-        queryClient.setQueryData(['menu', dateStr], cafes);
-      }
-      return true;
-    },
+    queryFn: () => getMenuForPeriodUseCase.execute(),
     staleTime: MENU_STALE_TIME,
     enabled: isActive,
   });
 
-  const hasCachedMenu = queryClient.getQueryData(menuQueryKey(menuDate)) !== undefined;
-  const query = useQuery({
-    queryKey: menuQueryKey(menuDate),
-    queryFn: () => getMenuForDateUseCase.execute(menuDate),
-    staleTime: MENU_STALE_TIME,
-    enabled: hasCachedMenu || periodQuery.isFetched,
-  });
+  // 배치 응답에 이 날짜 키가 없으면 그날 등록된 메뉴가 없다는 뜻(백엔드가 그렇게 응답하기로 확인됨) —
+  // 예전엔 이 경우 날짜별 API를 따로 호출했는데, 결과가 항상 "메뉴 없음"으로 정해져 있어 헛수고라 없앰
+  const cafes = periodQuery.data?.[toDateKey(menuDate)] ?? createEmptyCafes();
 
   const changeDate = useCallback((offsetOrDate: number | Date) => {
     if (offsetOrDate instanceof Date) {
@@ -69,10 +54,10 @@ export function useMenu(isActive = true): UseMenuResult {
 
   return {
     menuDate,
-    cafes: query.data ?? [],
-    menuLoading: !periodQuery.isFetched && !hasCachedMenu ? true : query.isLoading,
-    menuRevalidating: query.isFetching && !query.isLoading,
+    cafes,
+    menuLoading: periodQuery.isLoading,
+    menuRevalidating: periodQuery.isFetching && !periodQuery.isLoading,
     changeDate,
-    refetchMenu: () => { query.refetch(); },
+    refetchMenu: () => { periodQuery.refetch(); },
   };
 }

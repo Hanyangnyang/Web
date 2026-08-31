@@ -29,6 +29,10 @@ export const parseOrThrow = async (res: Response) => {
     err.endpoint = res.url;
     throw err;
   }
+  // 정적 JSON(교내건물·흡연장 등)은 배열을 그대로 반환한다 — 스프레드하면 배열이 아닌
+  // 숫자 키 객체가 돼 뒤에서 .map()/.filter()가 깨진다. _requestUrl은 {success,data,error}
+  // 백엔드 응답 봉투에서만 의미가 있으므로 배열이면 그대로 돌려준다.
+  if (Array.isArray(data)) return data;
   return { ...data, _requestUrl: res.url };
 };
 
@@ -44,6 +48,19 @@ export function apiError(message: string, opts: { area?: string; endpoint?: stri
   err.area = opts.area;
   err.endpoint = opts.endpoint;
   return err;
+}
+
+// Repository 메서드 전체를 감싸는 헬퍼 — apiError로 직접 던지는 검증 실패뿐 아니라, parseOrThrow가
+// 던지는 순수 HTTP 실패(4xx/5xx)나 fetch 자체가 실패하는 네트워크 에러까지 이 API의 area가 붙게 한다.
+// 이미 area가 있는 에러(apiError로 이미 태깅됨)는 덮어쓰지 않는다.
+export async function withAreaTag<T>(area: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    const err = e as ApiValidationError;
+    if (err && typeof err === 'object' && !err.area) err.area = area;
+    throw e;
+  }
 }
 
 export const createHttpClient = ({ baseUrl = '' }: { baseUrl?: string } = {}): HttpClient => {

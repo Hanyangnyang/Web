@@ -1,5 +1,5 @@
 // 도메인 엔티티: 일반버스 정류소 상수 및 도착정보 정렬/병합 순수 함수
-import { getDistanceKm } from '../utils/geo.js';
+import { getDistanceKm } from '../utils/haversine.js';
 
 export interface Coords {
   latitude: number;
