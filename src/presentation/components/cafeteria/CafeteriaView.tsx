@@ -6,6 +6,7 @@ import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.js';
 import { CardFallback } from '../common/CardFallback.js';
+import { ModalErrorFallback } from '../common/ModalErrorFallback.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
@@ -186,26 +187,30 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       </button>
       {showAlarm && (
         <Suspense fallback={null}>
-          <CafeteriaAlarmSettings onClose={(msg?: string) => {
-            setShowAlarm(false);
-            if (msg) {
-              setAlarmPopup(msg);
-              setTimeout(() => setAlarmPopup(''), 1500);
-            }
-          }} />
+          <ErrorBoundary name="cafeteria-alarm-settings" fallback={<ModalErrorFallback message="알림 설정을 열 수 없어요" onClose={() => setShowAlarm(false)} />}>
+            <CafeteriaAlarmSettings onClose={(msg?: string) => {
+              setShowAlarm(false);
+              if (msg) {
+                setAlarmPopup(msg);
+                setTimeout(() => setAlarmPopup(''), 1500);
+              }
+            }} />
+          </ErrorBoundary>
         </Suspense>
       )}
       {shareTarget && (
         <Suspense fallback={null}>
-          <ShareSheet
-            cafeName={shareTarget.cafeName}
-            mealType={shareTarget.type}
-            featuredItem={getFeaturedItem(shareTarget.menu.menuItems)}
-            dateLabel={shareTarget.dateLabel}
-            shareUrl={shareTarget.shareUrl}
-            onClose={() => setShareTarget(null)}
-            onCopied={handleCopied}
-          />
+          <ErrorBoundary name="cafeteria-share-sheet" fallback={<ModalErrorFallback message="공유 화면을 열 수 없어요" onClose={() => setShareTarget(null)} />}>
+            <ShareSheet
+              cafeName={shareTarget.cafeName}
+              mealType={shareTarget.type}
+              featuredItem={getFeaturedItem(shareTarget.menu.menuItems)}
+              dateLabel={shareTarget.dateLabel}
+              shareUrl={shareTarget.shareUrl}
+              onClose={() => setShareTarget(null)}
+              onCopied={handleCopied}
+            />
+          </ErrorBoundary>
         </Suspense>
       )}
       {copiedToast && (

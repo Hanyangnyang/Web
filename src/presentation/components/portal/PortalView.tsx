@@ -10,6 +10,7 @@ import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
+import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
 
 const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').then(m => ({ default: m.WeatherAlarmSettings })));
 
@@ -38,13 +39,15 @@ export function PortalView({ isActive = true }: PortalViewProps) {
       {/* 0. 날씨 알림 받기 바텀시트 */}
       {showWeatherAlarm && (
         <Suspense fallback={null}>
-          <WeatherAlarmSettings onClose={(msg?: string) => {
-            setShowWeatherAlarm(false);
-            if (msg) {
-              setAlarmPopup(msg);
-              setTimeout(() => setAlarmPopup(''), 1500);
-            }
-          }} />
+          <ErrorBoundary name="weather-alarm-settings" fallback={<ModalErrorFallback message="알림 설정을 열 수 없어요" onClose={() => setShowWeatherAlarm(false)} />}>
+            <WeatherAlarmSettings onClose={(msg?: string) => {
+              setShowWeatherAlarm(false);
+              if (msg) {
+                setAlarmPopup(msg);
+                setTimeout(() => setAlarmPopup(''), 1500);
+              }
+            }} />
+          </ErrorBoundary>
         </Suspense>
       )}
       
