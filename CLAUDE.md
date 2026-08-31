@@ -22,7 +22,7 @@
 - **iOS**: Capacitor (Codemagic으로 빌드)
 - **백엔드**: 자체 백엔드 서버(`api.hanyang.life`, Spring Boot) — 학식·날씨·도서관 혼잡도·배너·헬스장·지하철·셔틀·제휴매장·통합피드백·학사달력(공휴일 포함)까지 대부분의 핵심 데이터를 여기서 서빙 (CORS 차단·API Key 보호 역할도 겸함)
 - **BFF / API**: Vercel Serverless Functions — 공공버스 도착정보, 인스타그램 프로필 사진 정적 이미지 주기 갱신(Cron)만 남음. 학식·날씨·도서관·지하철·셔틀·공휴일은 전부 위 백엔드로 이전 완료
-- **DB / Auth**: Supabase — 익명 Auth, FCM 구독·알림 설정(subscriptions·devices), 배너, app_config(다가오는 시간표 변경 배너용 period_schedule만 남음 — 나머지 셔틀 설정은 새 백엔드 `/api/v1/academic/status`로 이전)
+- **DB / Auth**: Supabase — 익명 Auth, FCM 구독·알림 설정(subscriptions·devices), app_config(다가오는 시간표 변경 배너용 period_schedule만 남음 — 나머지 셔틀 설정은 새 백엔드 `/api/v1/academic/status`로 이전). 앱 내 배너 자체는 더 이상 Supabase가 아니라 새 백엔드 `/api/v1/banners`가 서빙
 - **푸시 알림**: Firebase Cloud Messaging (FCM) — Capacitor 네이티브(Android/iOS) + Web 동시 지원
 - **에러 모니터링**: Sentry (@sentry/capacitor + @sentry/react, 프로덕션 빌드에서만 활성화)
 - **사용자 분석**: PostHog
@@ -97,7 +97,6 @@ graph TD
         subgraph Tables["Tables"]
             Devices["devices\nFCM 토큰 등록"]
             Subscriptions["subscriptions\n알림 구독 설정"]
-            Banners["banners\n앱 내 배너"]
             AppConfig["app_config\n다가오는 시간표 변경 배너용\nperiod_schedule만 보관"]
         end
         RPC["RPC Functions\nupsert_alarm_subscription\nget_alarm_subscription"]
@@ -130,7 +129,6 @@ graph TD
     HolidaysAPI -.->|"menu-alerts Edge Function이\n직접 fetch"| GovHolidayAPI
 
     UI -->|"익명 로그인"| Auth
-    UI -->|"배너 조회"| Banners
     UI -->|"다가오는 시간표 변경 일정 조회"| AppConfig
     UI -->|"알림 구독 설정/조회"| RPC
     RPC --> Devices
@@ -165,8 +163,9 @@ graph TD
 |---|---|
 | `devices` | FCM 토큰 등록 (기기 식별) |
 | `subscriptions` | 알림 구독 설정 (학식·날씨 알람 시간/조건) |
-| `banners` | 앱 내 공지 배너 |
 | `app_config` | 다가오는 시간표 변경 배너용 `period_schedule`만 조회 — 나머지 셔틀 설정(현재기간·공휴일·강제주말·미운행 오버라이드)은 새 백엔드 `/api/v1/academic/status`로 이전 완료 |
+
+`banners`(앱 내 공지 배너)는 더 이상 Supabase 테이블이 아님 — 새 백엔드 `/api/v1/banners`로 이전 완료.
 
 ### FCM 푸시 알림 전체 흐름
 

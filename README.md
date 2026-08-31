@@ -158,7 +158,7 @@ src/
 
 배너 `clickUrl`이 `https://hanyang.life/?tab=<cafe\|shuttle\|portal\|partner\|misc>` 형태로 우리 도메인 + `tab` 파라미터를 가리키면, 새 창을 열지 않고 앱 내부에서 바로 그 탭으로 전환됩니다(`BannerCarousel.tsx`) — SPA라 페이지 경로가 하나뿐이라, 카카오 딥링크·푸시알림과 동일한 `?tab=` 쿼리 컨벤션을 재사용한 것. 그 외(다른 도메인 등)는 기존처럼 `window.open`으로 외부 링크 취급.
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 / 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼, **KST 날짜(자정)가 바뀌는 순간 강제 재요청**(`useGymSchedule`이 1분마다 날짜 확인). 셔틀과 달리 academic/status를 안 쓰고 `GymPeriod.startDate/endDate`로 직접 오늘과 비교해 기간을 고르는 구조라, "기간이 바뀌는 순간"이 아니라 "날짜가 바뀌는 순간"을 감지함. `GymView`도 자동판별을 매 gymData 갱신마다 다시 하도록 고쳐서(예전엔 최초 1회만) 화면을 계속 띄워놓은 채로 날짜가 바뀌어도 새 기간으로 따라감(사용자가 드롭다운으로 직접 고른 뒤엔 안 덮어씀) |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
 | `POST /api/v1/feedbacks` | 통합 피드백 접수 | 해당없음 | 기타탭 > 피드백 보내기(category `GENERAL`), 캠퍼스맵 화면 상단에 제보 버튼(`CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보 버튼(`PARTNERSHIP`) |
 | `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `academic`/`shuttle` 필드로 기간·셔틀 dayType·운행여부를 판정. `calendar` 필드는 학교 자체 공휴일까지 섞여 있어 지하철엔 안 씀(아래 date-info 참고) |

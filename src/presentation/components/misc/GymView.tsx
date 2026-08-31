@@ -71,15 +71,18 @@ export function GymView({ onBack }: GymViewProps) {
   const [currentTime, setCurrentTime] = useState(getKSTNow);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  // 사용자가 드롭다운에서 기간을 직접 골랐는지 — 골랐으면 gymData가 새로 갱신돼도 자동판별로 덮어쓰지 않음
+  const userPickedRef = React.useRef(false);
 
-  // 데이터 도착 후, 오늘 날짜 기준 현재 기간 최초 1회 자동 판별
+  // 오늘 날짜 기준 현재 기간을 자동 판별 — gymData가 새로 갱신될 때마다(자정 넘어 강제 재요청된 경우 포함)
+  // 다시 계산해야, 화면을 계속 띄워놓은 채로 날짜가 바뀌어도 새 기간으로 따라감
   useEffect(() => {
-    if (!gymData || activePeriodId) return;
+    if (!gymData || userPickedRef.current) return;
     const todayStr = getKSTDateKey();
     const matched = gymData.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
     const fallback = gymData.periods.find(p => p.periodType === 'semester') ?? gymData.periods[0];
     setActivePeriodId(matched ? matched.id : (fallback?.id ?? null));
-  }, [gymData, activePeriodId]);
+  }, [gymData]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(getKSTNow()), 60000);
@@ -185,6 +188,7 @@ export function GymView({ onBack }: GymViewProps) {
                       <div
                         key={p.id}
                         onClick={() => {
+                          userPickedRef.current = true;
                           setActivePeriodId(p.id);
                           setDropdownOpen(false);
                         }}
