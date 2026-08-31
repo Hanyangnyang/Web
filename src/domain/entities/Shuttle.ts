@@ -137,6 +137,12 @@ export const ROUTE_DEFS: Record<string, RouteDef> = {
   },
 };
 
+// STOPS 중 지하철 연결정보가 필요한 정류장 — ROUTE_DEFS에서 subway:true인 구간의 출발 정류장만 뽑아 도출.
+// 노선이 추가/변경돼도 이 줄을 손댈 필요 없이 항상 최신 상태를 반영한다.
+export const SUBWAY_CONNECTED_STOPS = [...new Set(
+  Object.values(ROUTE_DEFS).flatMap(def => def.stops.filter(s => s.subway).map(s => s.name))
+)];
+
 export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 export const curMin = () => { const { hours, minutes } = getKSTParts(); return hours * 60 + minutes; };
 

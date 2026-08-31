@@ -2,7 +2,7 @@
 import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
-import { computeSchedule, computeFullSchedule, curMin, dayType, pickClosestStop, type ScheduleItem } from '../../domain/entities/Shuttle.js';
+import { computeSchedule, computeFullSchedule, curMin, dayType, pickClosestStop, SUBWAY_CONNECTED_STOPS, type ScheduleItem } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayScheduleUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
@@ -59,11 +59,12 @@ export function useShuttle(isActive = false) {
   };
   const setLineId = (l: string) => { setLineIdState(l); localStorage.setItem('shuttle_lineId', l); };
 
-  // 셔틀 시간표 (백엔드 API — staleTime 내에서 재요청 없음)
+  // 셔틀 시간표 (백엔드 API — staleTime 내에서 재요청 없음, 셔틀탭 진입 시에만 요청)
   const scheduleQuery = useQuery({
     queryKey: SCHEDULE_QUERY_KEY,
     queryFn: () => getShuttleDataUseCase.execute(),
     staleTime: BUS_STALE_TIME,
+    enabled: isActive,
   });
   const allData = scheduleQuery.data ?? null;
   const loadErr = scheduleQuery.isError ? '셔틀 시간표를 불러오지 못했습니다' : null;
@@ -76,7 +77,7 @@ export function useShuttle(isActive = false) {
   }, []);
 
   // 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕)에서만 전체 시간표를 받아옴
-  const needsSubway = stop === '기숙사' || stop === '셔틀콕';
+  const needsSubway = SUBWAY_CONNECTED_STOPS.includes(stop);
 
   // 오늘이 법정공휴일인지 (새 백엔드는 셔틀·지하철 둘 다 이 값을 직접 안 내려주므로 별도 조회) — 모드와 무관하게 항상 필요
   const { isHoliday: isHolidayServer, isLoading: isHolidayLoading } = useHoliday();
@@ -87,7 +88,7 @@ export function useShuttle(isActive = false) {
     queryKey: SUBWAY_SCHEDULE_QUERY_KEY,
     queryFn: () => getSubwayScheduleUseCase.execute(),
     staleTime: SUBWAY_STALE_TIME,
-    enabled: needsSubway,
+    enabled: needsSubway && isActive,
   });
 
   // 지하철 연결편 조회는 셔틀의 custom_holidays(학교 자체 기념일) 미리보기와 무관하게

@@ -14,14 +14,14 @@ import { CardFallback } from '../common/CardFallback.jsx';
 const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').then(m => ({ default: m.WeatherAlarmSettings })));
 
 interface PortalViewProps {
-  isVisible?: boolean;
+  isActive?: boolean;
 }
 
-export function PortalView({ isVisible = true }: PortalViewProps) {
-  const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isVisible);
-  const { briefing } = useWeatherBriefing(isVisible);
-  const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isVisible);
-  const { banners, loading: bannersLoading, error: bannersError } = useBanners();
+export function PortalView({ isActive = true }: PortalViewProps) {
+  const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
+  const { briefing } = useWeatherBriefing(isActive);
+  const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
+  const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
 
@@ -58,7 +58,7 @@ export function PortalView({ isVisible = true }: PortalViewProps) {
       <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
-          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isVisible} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
+          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
         </ErrorBoundary>
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}

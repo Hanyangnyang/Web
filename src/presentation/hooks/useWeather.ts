@@ -21,12 +21,12 @@ export interface UseWeatherResult {
   refetch: () => void;
 }
 
-export function useWeather(isVisible = true): UseWeatherResult {
+export function useWeather(isActive = true): UseWeatherResult {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: WEATHER_QUERY_KEY,
     queryFn: () => getWeatherUseCase.execute(),
     staleTime: WEATHER_STALE_TIME,
-    enabled: isVisible,
+    enabled: isActive,
   });
 
   return {

@@ -36,8 +36,6 @@ function CourseName({ name }: { name: string }) {
   );
 }
 
-// 시간표를 아직 못 받아왔을 때 실제 표와 비슷한 크기로 자리를 채워두는 스켈레톤
-// (요일 헤더 + 첫 번째 열(시간 라벨)만 칸별로 표시하고, 나머지 5칸은 다 쪼개면 너무 빽빽해서 큰 박스 하나로 뭉침)
 function GymScheduleSkeleton() {
   const ROWS = 12;
   return (
@@ -207,9 +205,11 @@ export function GymView({ onBack }: GymViewProps) {
         )}
       </header>
 
+      {/* periods가 빈 배열이면 GymRepository가 이미 throw하므로, gymData가 있으면 currentPeriod도
+          항상 있다 — 로딩/에러 2단계로 충분하다 (에러엔 재시도 버튼, Sentry는 전역 onError가 캡처) */}
       {!gymData || !currentPeriod ? (
         loadErr ? (
-          // 2. 에러 — 조회 실패
+          // 2. 에러 — 조회 실패 (운영 기간이 하나도 없는 경우 포함)
           <CardFallback message={loadErr} onRetry={refetch} className="min-h-[528px]" />
         ) : (
           // 1. 로딩 중 — 아직 응답 안 옴 (스켈레톤)

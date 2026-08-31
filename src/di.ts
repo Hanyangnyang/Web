@@ -2,7 +2,6 @@
 import { createHttpClient } from './infrastructure/http/HttpClient.js';
 
 import { createMenuApiDataSource } from './data/datasources/MenuApiDataSource.js';
-import { createInstagramApiDataSource } from './data/datasources/InstagramApiDataSource.js';
 import { createWeatherApiDataSource } from './data/datasources/WeatherApiDataSource.js';
 import { createWeatherBriefingApiDataSource } from './data/datasources/WeatherBriefingApiDataSource.js';
 import { createLibraryApiDataSource } from './data/datasources/LibraryApiDataSource.js';
@@ -16,7 +15,6 @@ import { createCampusBuildingApiDataSource } from './data/datasources/CampusBuil
 import { createSmokingSpotApiDataSource } from './data/datasources/SmokingSpotApiDataSource.js';
 
 import { createMenuRepository } from './data/repositories/MenuRepository.js';
-import { createInstagramRepository } from './data/repositories/InstagramRepository.js';
 import { createWeatherRepository } from './data/repositories/WeatherRepository.js';
 import { createWeatherBriefingRepository } from './data/repositories/WeatherBriefingRepository.js';
 import { createLibraryRepository } from './data/repositories/LibraryRepository.js';
@@ -31,7 +29,6 @@ import { createSmokingSpotRepository } from './data/repositories/SmokingSpotRepo
 
 import { createGetMenuForDateUseCase } from './domain/usecases/GetMenuForDateUseCase.js';
 import { createGetMenuForPeriodUseCase } from './domain/usecases/GetMenuForPeriodUseCase.js';
-import { createGetInstagramProfileUseCase } from './domain/usecases/GetInstagramProfileUseCase.js';
 import { createGetShuttleDataUseCase } from './domain/usecases/GetShuttleDataUseCase.js';
 import { createGetSubwayScheduleUseCase } from './domain/usecases/GetSubwayScheduleUseCase.js';
 import { createGetWeatherUseCase } from './domain/usecases/GetWeatherUseCase.js';
@@ -60,7 +57,6 @@ const apiHttpClient = createHttpClient({
 
 // Data Sources
 const menuApiDataSource = createMenuApiDataSource({ httpClient: apiHttpClient });
-const instagramApiDataSource = createInstagramApiDataSource({ httpClient });
 const shuttleApiDataSource = createShuttleApiDataSource({ httpClient: apiHttpClient });
 const subwayApiDataSource = createSubwayApiDataSource({ httpClient: apiHttpClient });
 const weatherApiDataSource = createWeatherApiDataSource({ httpClient: apiHttpClient });
@@ -77,7 +73,6 @@ const smokingSpotApiDataSource = createSmokingSpotApiDataSource({ httpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
-export const instagramRepository = createInstagramRepository({ instagramApiDataSource });
 export const shuttleRepository = createShuttleRepository({ shuttleApiDataSource });
 export const subwayRepository = createSubwayRepository({ subwayApiDataSource });
 export const weatherRepository = createWeatherRepository({ weatherApiDataSource });
@@ -95,7 +90,6 @@ export const smokingSpotRepository = createSmokingSpotRepository({ smokingSpotAp
 // Use Cases
 export const getMenuForDateUseCase = createGetMenuForDateUseCase({ menuRepository });
 export const getMenuForPeriodUseCase = createGetMenuForPeriodUseCase({ menuRepository });
-export const getInstagramProfileUseCase = createGetInstagramProfileUseCase({ instagramRepository });
 export const getShuttleDataUseCase = createGetShuttleDataUseCase({ shuttleRepository });
 export const getSubwayScheduleUseCase = createGetSubwayScheduleUseCase({ subwayRepository });
 export const getWeatherUseCase = createGetWeatherUseCase({ weatherRepository });

@@ -11,7 +11,6 @@ interface PublicBusSectionProps {
   isUserActive: boolean;
   sortedStops: string[];
   activeStops: string[];
-  selectedStops: string[];
   expandedStops: Record<string, boolean>;
   setExpandedStops: Dispatch<SetStateAction<Record<string, boolean>>>;
   favorites: string[];
@@ -28,7 +27,6 @@ export function PublicBusSection({
   isUserActive,
   sortedStops,
   activeStops,
-  selectedStops,
   expandedStops, setExpandedStops,
   favorites, setFavorites,
   busArrivals,
@@ -72,11 +70,7 @@ export function PublicBusSection({
       {/* 정류장별 버스 도착 정보 목록 */}
       <div className="space-y-3">
         {sortedStops
-          .filter(stopName => {
-            const passesBus = activeStops.includes(stopName);
-            const matchesStopFilter = selectedStops.length === 0 || selectedStops.includes(stopName);
-            return passesBus && matchesStopFilter;
-          })
+          .filter(stopName => activeStops.includes(stopName))
           .map(stopName => (
             <BusStopCard
               key={stopName}

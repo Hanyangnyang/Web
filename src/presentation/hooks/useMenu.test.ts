@@ -110,6 +110,32 @@ describe('useMenu (React Query)', () => {
     expect(fetchMock.mock.calls[0][0]).not.toContain('startDate=');
   });
 
+  it('같은 끼니에 메뉴가 여러 개면 displayOrder 순서대로 정렬한다', async () => {
+    mockFetch(() => Promise.resolve(jsonResponse(true, {
+      success: true,
+      data: {
+        [toDateKey(getKSTDateUnsafe())]: [
+          {
+            cafeteriaCode: 'RE12', name: '학생식당', operatingHours: { 중식: '11:30~13:30' },
+            menu: [
+              { id: 2, mealType: 'LUNCH', displayOrder: 1, price: 6000, menuItems: ['특식'], rawMenu: '' },
+              { id: 1, mealType: 'LUNCH', displayOrder: 0, price: 5000, menuItems: ['일반식'], rawMenu: '' },
+            ],
+          },
+          { cafeteriaCode: 'RE15', name: '창업보육센터', operatingHours: {}, menu: [] },
+          { cafeteriaCode: 'RE11', name: '교직원식당', operatingHours: {}, menu: [] },
+          { cafeteriaCode: 'RE13', name: '기숙사식당', operatingHours: {}, menu: [] },
+        ],
+      },
+    })));
+
+    const { result } = renderHook(() => useMenu(), { wrapper });
+    await waitFor(() => expect(result.current.menuLoading).toBe(false));
+
+    const menus = result.current.cafes[0].menus;
+    expect(menus.map(m => m.menuItems)).toEqual([['일반식'], ['특식']]);
+  });
+
   it('배치 응답에 없는 날짜로 이동하면 그 날짜만 개별 요청한다', async () => {
     const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
     const { result } = renderHook(() => useMenu(), { wrapper });

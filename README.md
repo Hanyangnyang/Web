@@ -131,11 +131,11 @@ src/
 
 ## 🔌서드파티와 💾캐싱정책
 
-학식·날씨·도서관 혼잡도·배너·지하철·셔틀 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스·공휴일 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 없습니다.
+학식·날씨·도서관 혼잡도·배너·지하철·셔틀 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스·공휴일 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
 **Supabase**는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
 푸시 알림은 **Firebase Cloud** Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
 
-### Supabase 테이블
+### Supabase 테이블 - Supabase 로그인 되면 수정해야함
 
 | 테이블 | 용도 |
 |--------|------|
@@ -145,63 +145,59 @@ src/
 `devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
-### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 1️⃣서버 상태 캐싱 — TanStack Query
-(Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 3번, 그래서 총 4번 호출함. staleTime이 지나면 SWR - 백그라운드에서 호출)
+### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
+(Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 2번, 그래서 총 3번 호출함. staleTime이 지났는데 트리거가 있을 경우 SWR. localStorage는 maxAge 24시간으로 설정함. maxAge는 캐싱된 값을 불러올지 말지를 결정하는 기준.)
 
-| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 - 네트워크 재연결시, staleTime 지나면 |
+| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 학식탭 진입시(기본 탭이라 대부분 부팅과 겹침, 단 부팅 시점에 다른 탭이면 그 탭 진입 전까진 호출 안 됨) + "다시 시도" 버튼 클릭시 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕) 선택시 + "다시 시도" 버튼 클릭시 |
-| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
-| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 앱부팅시 prefetch |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 앱부팅시 prefetch |
-| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 앱부팅시 prefetch + "다시 시도" 버튼 클릭시 |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시 호출 + "다시 시도" 버튼 클릭시 |
-| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | 캠퍼스맵 탭 최초 진입시 호출 + "다시 시도" 버튼 클릭시 |
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 콜드스타트 prefetch, "다시 시도" 버튼 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼 |
+| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
+| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 콜드스타트 prefetch, 소식탭 진입 |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 콜드스타트 prefetch |
+| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
+| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
 
 
-### Vercel API 엔드포인트 + 1️⃣서버 상태 캐싱 — TanStack Query
+### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
 
 | 엔드포인트 | 역할 | 외부 호출 대상 | Vercel 캐시 TTL | 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
 |---|---|---|---|---|---|
-| `/api/insta-proxy` | 인스타 계정 프로필 사진 | Instagram API | 30일 | 24시간 | 마운트시 자동 |
-| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | 셔틀탭 "공공버스" 모드 + 화면보임 + 사용자 조작중일 때 30초 간격 자동 폴링 + 새로고침 버튼 수동 refetch |
+| `/api/cron/refresh-insta-profiles`* | 인스타 계정 프로필 사진 정적 이미지 갱신 | Instagram API(스크래핑) + GitHub Contents API(커밋) | 해당없음 | 해당없음 | Vercel Cron이 4개월마다 1회만 서버에서 실행, 클라이언트는 API 호출 안 하고 정적 이미지만 읽음 |
+| `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | "공공버스" 모드 + 화면보임 + 사용자 조작중일 때 30초 간격 자동 폴링, 새로고침 버튼 수동 refetch |
 | `/api/holidays` | 법정공휴일 여부 조회 - 셔틀·지하철 dayType 판정용 | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
 
-
-### 2️⃣로컬 상태 캐싱 — localStorage 
+### 💾localStorage (디스크)
 
 | 키 | 내용 | 언제 생성되나 |
 |---|---|---|
-| `app_config_cache` | 학기·휴일 등 앱 설정 스냅샷 | 부팅 시 즉시 (TTL 없이 최신 조회 성공 시에만 덮어씀) |
-| `lastActiveTab` | 마지막 선택 탭 | 부팅 시 즉시 + 탭 전환마다 갱신 |
-| `sb-<project>-auth-token` | Supabase 인증 세션 (Supabase SDK가 `hybridSecureStorage`를 통해 자체 관리) | `getOrCreateAnonymousUserId()`가 처음 호출될 때(피드백 전송, 알림 구독 등) — 네이티브는 Keychain/Keystore, 웹은 localStorage |
-| `alarm_settings`, `weather_alarm_settings` | 학식·날씨 알림 구독 설정 로컬 미러 | 알림 설정 시트를 닫을 때만 |
-| `partnerCollegeFilter` | 마지막 제휴 단과대 필터 | 제휴탭에서 단과대 칩을 눌러야 |
-| `shuttle_stop`, `shuttle_lineId` | 마지막 셔틀 정류장·노선 | 사용자가 직접 정류장/노선을 바꿔야 (GPS 자동 선택은 저장 안 함) |
-| `public_bus_selected_stops`, `public_bus_favorites` | 선택·즐겨찾기 버스 정류장 | 셔틀탭 "일반 버스" 모드 진입 시 |
-| `hyu_rq_cache_v1` | TanStack Query 캐시 영속화본 | 항상 |
+| `app_config_cache` | Supabase의 app_config 테이블 데이터 - 학기·휴일 등 앱설정 스냅샷 | 콜드스타트시 즉시 (TTL 없이 조회 성공 시에만 덮어씀) |
+| `lastActiveTab` | 마지막으로 선택한 탭 | 콜드스타트 시 즉시 + 탭 전환마다 갱신 |
+| `sb-<project>-auth-token` | Supabase 인증 세션 토큰 (Supabase SDK가 자체관리) | `getOrCreateAnonymousUserId()`가 처음 호출될 때(피드백 전송, 알림 구독 등) — 네이티브는 Keychain/Keystore, 웹은 localStorage |
+| `alarm_settings`, `weather_alarm_settings` | 학식·날씨 알림구독 설정값 | 알림 바텀시트를 닫을 때만 |
+| `partnerCollegeFilter` | 마지막으로 선택한 제휴단과대 칩 | 제휴탭에서 단과대 칩을 누르면 |
+| `shuttle_stop`, `shuttle_lineId` | 마지막으로 선택한 셔틀 정류장·노선 | 사용자가 직접 정류장/노선을 바꿔야 (GPS 자동 선택은 저장 안 함) |
+| `public_bus_favorites` | 즐겨찾기한 버스 정류장 | 셔틀탭 '일반 버스' 모드에서 즐겨찾기 토글 시 |
+| `hyu_rq_cache` | TanStack Query 캐시 영속화본 | 항상 |
 | `ph_phc_<프로젝트키>_posthog` | PostHog device/distinct ID | 앱 코드가 아니라 PostHog JS SDK가 초기화 시 자동 생성 |
 
-### 3️⃣세션 저장소 — sessionStorage, 탭 닫으면 사라짐
+### 💾sessionStorage (탭 단위)
 
 | 키 | 내용 | 용도 |
 |---|---|---|
-| `splashShown` | 이번 세션에서 스플래시를 이미 보여줬는지 | 세션당 스플래시 1회만 노출 (`BOOT_ARCHITECTURE.md` 참고) |
+| `splashShown` | 이번 세션에서 스플래시를 이미 보여줬는지 | 세션당 스플래시 1회만 노출 |
 
-### 4️⃣메모리 변수 — 새로고침만 해도 사라짐 
+### 💾메모리 캐시 (JS힙, 새로고침 단위)
 
 | 변수 | 내용 | 용도 |
 |---|---|---|
-| `cachedNativeToken` (`lib/firebase.ts`) | 네이티브 FCM 토큰 | 세션 내 재조회 없이 재사용, 디스크엔 절대 저장 안 함 |
+| `cachedNativeToken` | 네이티브 FCM 토큰 | 세션 내 재조회 없이 재사용, 디스크엔 절대 저장 안 함 |
 
-### 5️⃣쿠키 — PostHog SDK가 자체 관리
+### 💾cookie (도메인 단위)
 
-| 키 | 도메인 | 내용 |
+| 키 | 내용 | 저장되는곳 |
 |---|---|---|
-| `ph_current_instance`, `ph_current_project_name`, `ph_current_project_token` | `.posthog.com` | 연결된 PostHog 프로젝트 식별 정보 |
-| `ph_phc_<프로젝트키>_posthog` | 앱 도메인 | 로컬스토리지의 동명 키와 같은 device/distinct ID — 쿠키·로컬스토리지 이중 저장 |
-| `ph_<세션ID>_posthog` | `.posthog.com` | 세션 단위 식별자로 추정 |
-| `ph_last_login_method` | `.posthog.com` | PostHog 측 로그인 방식 기록으로 추정 |
+| `ph_phc_<프로젝트키>_posthog` | device_id/distinct_id (사용자 식별) | 쿠키·로컬스토리지 이중 저장 |
 

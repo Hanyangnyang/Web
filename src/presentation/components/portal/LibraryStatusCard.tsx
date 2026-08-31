@@ -71,7 +71,7 @@ export function LibraryStatusCard({ library, loading, error, onRetry }: LibraryS
           // 2. 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
           <InlineNotice icon={<Info size={18} className="text-slate-400" />} message="혼잡도 정보를 불러오지 못했습니다" onRetry={onRetry} />
         ) : !library?.list.length ? (
-          // 3. 성공했지만 비어있음 — 방학 중 휴관 등. 빈 배열은 truthy라 length로 판단해야 한다. 실패가 아니라 재시도 버튼은 없음
+          // 3. 성공했지만 비어있음 — 방학 중 휴관 등. 추후 이슈 121 해결되면 사용하게될 분기.
           <InlineNotice icon={<Info size={18} className="text-slate-400" />} message="지금은 운영 중인 열람실이 없습니다" />
         ) : (
           // 4. 정상 — 2x2 프레임리스 십자 분할 현황판 (외곽 테두리 상자 없이 순수 십자 구분선만 배치)

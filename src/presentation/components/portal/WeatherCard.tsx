@@ -12,8 +12,8 @@ import {
   UNKNOWN_CONDITION_LABEL,
   PM_COLOR,
   UV_COLOR,
-  UNKNOWN_GRADE_LABEL,
-  UNKNOWN_GRADE_COLOR,
+  gradeLabel,
+  gradeColor,
 } from './weatherTheme.js';
 import { useNow } from '../../hooks/useNow.js';
 
@@ -123,24 +123,9 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
 
   // 4. 정상
   const airQuality = [
-    {
-      label: '미세',
-      text: current.pm10Grade ?? UNKNOWN_GRADE_LABEL,
-      color: current.pm10Grade ? PM_COLOR[current.pm10Grade] : UNKNOWN_GRADE_COLOR,
-      Icon: Wind,
-    },
-    {
-      label: '초미세',
-      text: current.pm25Grade ?? UNKNOWN_GRADE_LABEL,
-      color: current.pm25Grade ? PM_COLOR[current.pm25Grade] : UNKNOWN_GRADE_COLOR,
-      Icon: Wind,
-    },
-    {
-      label: '자외선',
-      text: current.uvGrade,
-      color: UV_COLOR[current.uvGrade],
-      Icon: Sun,
-    },
+    { label: '미세', text: gradeLabel(current.pm10Grade), color: gradeColor(current.pm10Grade, PM_COLOR), Icon: Wind },
+    { label: '초미세', text: gradeLabel(current.pm25Grade), color: gradeColor(current.pm25Grade, PM_COLOR), Icon: Wind },
+    { label: '자외선', text: gradeLabel(current.uvGrade), color: gradeColor(current.uvGrade, UV_COLOR), Icon: Sun },
   ];
 
   return (

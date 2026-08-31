@@ -121,7 +121,7 @@ describe('useLibraryStatus (React Query)', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('isVisible=false면 쿼리가 비활성화되어 fetch가 나가지 않는다', () => {
+  it('isActive=false면 쿼리가 비활성화되어 fetch가 나가지 않는다', () => {
     const fetchSpy = mockFetch(() => new Promise(() => {}));
 
     renderHook(() => useLibraryStatus(false), { wrapper });
