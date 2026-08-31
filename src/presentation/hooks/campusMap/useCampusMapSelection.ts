@@ -64,7 +64,8 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
   }, [select, posthog, onAfterSelect]);
 
   const selectBuilding = useCallback((building: PlottableBuilding, source: SelectSource) => {
-    returnToList.current = source === 'list';
+    // 오픈스페이스도 흡연장처럼 'nearest' 경로가 있어서, X로 닫으면 흡연장과 동일하게 펼쳐진 목록으로 복귀시킨다
+    returnToList.current = source === 'list' || source === 'nearest';
     select({ kind: 'building', building });
     posthog?.capture('partner_map_building_selected', {
       building_id: building.id, building_name: building.name, source,

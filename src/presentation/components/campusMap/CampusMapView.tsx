@@ -238,6 +238,15 @@ export default function CampusMapView({ isActive }: Props) {
     onPick: (spot) => pickSmokingSpot(spot, 'nearest'),
   });
 
+  // 오픈스페이스도 흡연장과 같은 방식으로 — 칩을 켜면 가장 가까운 곳을 바로 보여준다
+  const requestNearestOpenSpace = useNearestAutoPick({
+    items: layerBuildings,
+    loading: buildingsLoading,
+    active: isOpenSpaceChip,
+    origin: distanceOrigin,
+    onPick: (building) => pickBuilding(building, 'nearest'),
+  });
+
   const handleChipChange = (next: MapChip | null) => {
     setChip(next);
     // 칩을 바꾸면 어떤 종류든 선택은 초기화된다 (종류별로 지울 필요 없이 한 번에)
@@ -249,6 +258,7 @@ export default function CampusMapView({ isActive }: Props) {
       clearSelection();
     }
     if (next === 'smoking') requestNearestSmoking();
+    if (next === 'openspace') requestNearestOpenSpace();
     posthog?.capture('partner_map_chip_selected', { chip: next });
   };
 
