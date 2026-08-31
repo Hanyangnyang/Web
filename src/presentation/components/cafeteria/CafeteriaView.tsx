@@ -234,9 +234,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       <ErrorBoundary name="cafeteria-list" fallback={<CardFallback message="학식 정보를 표시할 수 없습니다" />}>
         <div ref={listRef} style={{ position: 'relative', minHeight: '200px' }}>
           {revalidating && (
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
-              <div className="w-10 h-10 border-[3px] border-white/10 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
-              <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: '600' }}>학식 정보를 가져오는 중...</span>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(4px)', zIndex: 10, borderRadius: 'var(--radius-card)', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem' }}>
+              <div className="w-10 h-10 border-[3px] border-slate-200 rounded-full border-t-primary animate-[spin_0.8s_linear_infinite] mb-4" />
+              <span className="text-[0.85rem] font-semibold text-text-sub">학식 정보를 가져오는 중...</span>
             </div>
           )}
 
