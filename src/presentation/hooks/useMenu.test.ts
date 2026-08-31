@@ -52,8 +52,11 @@ describe('useMenu (React Query)', () => {
 
     const { result } = renderHook(() => useMenu(), { wrapper });
 
+    // 로딩 중엔 실제 화면도 menuLoading으로만 스피너를 띄우고 cafes 내용은 안 보므로,
+    // 데이터 도착 전에도 "메뉴 없음" 기본 형태(4개 식당, 빈 메뉴)로 시작해도 무방하다
     expect(result.current.menuLoading).toBe(true);
-    expect(result.current.cafes).toEqual([]);
+    expect(result.current.cafes).toHaveLength(4);
+    expect(result.current.cafes.every(cafe => cafe.menus.length === 0)).toBe(true);
 
     await waitFor(() => expect(result.current.menuLoading).toBe(false));
 
@@ -61,14 +64,11 @@ describe('useMenu (React Query)', () => {
     expect(result.current.cafes[0].name).toBe('학생식당');
   });
 
-  it('쿼리 캐시에 이미 신선한 데이터가 있으면 즉시 그 데이터로 렌더되고 fetch를 하지 않는다', () => {
+  it('쿼리 캐시에 이미 신선한 배치 데이터가 있으면 즉시 그 데이터로 렌더되고 fetch를 하지 않는다', () => {
     const cached = [
       { id: 're12', name: '학생식당(캐시)', menus: [], hasJeyuk: false, available: false, hours: {} },
     ];
-    // 배치 조회도 이미 끝난 상태를 재현 — 그래야 개별 날짜 fetch가 배치 완료를 기다리지 않고
-    // 캐시를 바로 신뢰해도 되는 상황이 된다
-    queryClient.setQueryData(['menu-period'], true);
-    queryClient.setQueryData(['menu', toDateKey(getKSTDateUnsafe())], cached);
+    queryClient.setQueryData(['menu-period'], { [toDateKey(getKSTDateUnsafe())]: cached });
 
     const fetchSpy = mockFetch(() => new Promise(() => {}));
 
@@ -136,19 +136,20 @@ describe('useMenu (React Query)', () => {
     expect(menus.map(m => m.menuItems)).toEqual([['일반식'], ['특식']]);
   });
 
-  it('배치 응답에 없는 날짜로 이동하면 그 날짜만 개별 요청한다', async () => {
+  it('배치 응답에 없는 날짜로 이동해도 추가 요청 없이 빈 메뉴(등록된 식당 4개, 메뉴 없음)로 취급한다', async () => {
     const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
     const { result } = renderHook(() => useMenu(), { wrapper });
     await waitFor(() => expect(result.current.menuLoading).toBe(false));
 
     const callsAfterInitialLoad = fetchMock.mock.calls.length;
 
-    // menuApiResponse()의 배치 응답엔 오늘 하루치만 들어있어서, 다른 날짜로 이동하면 확실히 범위 밖이다
+    // menuApiResponse()의 배치 응답엔 오늘 하루치만 들어있어서, 다른 날짜로 이동하면 확실히 범위 밖이다.
+    // 백엔드가 그 날짜에 메뉴가 없으면 날짜 키 자체를 빼고 응답하기로 확인됐으므로, 추가 API 호출 없이
+    // 바로 "메뉴 없음"으로 판단해야 한다
     act(() => { result.current.changeDate(10); });
-    await waitFor(() => expect(result.current.menuLoading).toBe(false));
 
-    const newCalls = fetchMock.mock.calls.slice(callsAfterInitialLoad);
-    expect(newCalls).toHaveLength(1);
-    expect(newCalls[0][0]).toContain('startDate=');
+    expect(result.current.cafes).toHaveLength(4);
+    expect(result.current.cafes.every(cafe => cafe.menus.length === 0)).toBe(true);
+    expect(fetchMock.mock.calls.length).toBe(callsAfterInitialLoad);
   });
 });

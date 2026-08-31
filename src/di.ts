@@ -29,7 +29,6 @@ import { createPartnerStoreRepository } from './data/repositories/PartnerStoreRe
 import { createCampusBuildingRepository } from './data/repositories/CampusBuildingRepository.js';
 import { createSmokingSpotRepository } from './data/repositories/SmokingSpotRepository.js';
 
-import { createGetMenuForDateUseCase } from './domain/usecases/GetMenuForDateUseCase.js';
 import { createGetMenuForPeriodUseCase } from './domain/usecases/GetMenuForPeriodUseCase.js';
 import { createGetShuttleDataUseCase } from './domain/usecases/GetShuttleDataUseCase.js';
 import { createGetSubwayScheduleUseCase } from './domain/usecases/GetSubwayScheduleUseCase.js';
@@ -93,7 +92,6 @@ export const campusBuildingRepository = createCampusBuildingRepository({ campusB
 export const smokingSpotRepository = createSmokingSpotRepository({ smokingSpotApiDataSource });
 
 // Use Cases
-export const getMenuForDateUseCase = createGetMenuForDateUseCase({ menuRepository });
 export const getMenuForPeriodUseCase = createGetMenuForPeriodUseCase({ menuRepository });
 export const getShuttleDataUseCase = createGetShuttleDataUseCase({ shuttleRepository });
 export const getSubwayScheduleUseCase = createGetSubwayScheduleUseCase({ subwayRepository });
