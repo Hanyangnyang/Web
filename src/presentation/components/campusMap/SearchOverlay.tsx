@@ -12,7 +12,7 @@ import {
 import { searchBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
-import { useFeedback } from '../../hooks/useFeedback.js';
+import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
 
 /**
  * 한 섹션의 상태 한 줄.
@@ -34,7 +34,11 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const posthog = usePostHog();
-  const { loading: reporting, submitted: reported, error: reportError, submit: submitFeedback, reset: resetReport } = useFeedback();
+  const reportMutation = useSubmitFeedbackApi();
+  const reporting = reportMutation.isPending;
+  const reported = reportMutation.isSuccess;
+  const reportError = reportMutation.isError ? '제보를 보내지 못했어요. 잠시 후 다시 시도해 주세요 🙏' : null;
+  const resetReport = reportMutation.reset;
   const { stores, loading: storesLoading, loadErr: storesError } = usePartnerStores();
   const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: true });
   const dataLoading = storesLoading || buildingsLoading;
@@ -69,10 +73,10 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
   const handleReport = async () => {
     if (reporting || reported) return;
     try {
-      await submitFeedback(`[지도 매장 제보] ${trimmed}`);
+      await reportMutation.mutateAsync({ category: 'PARTNERSHIP', feedbackType: 'INACCURACY', content: trimmed });
       posthog?.capture('partner_map_store_reported', { query: trimmed });
     } catch {
-      // 실패 메시지는 useFeedback의 error가 화면에 직접 노출한다
+      // 실패 메시지는 reportError가 화면에 직접 노출한다
     }
   };
 
@@ -205,7 +209,7 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
             <MapPin size={28} className="text-text-hint" />
             <p className="text-[14px] font-extrabold text-text-main mt-3">검색 결과가 없어요</p>
             <p className="text-[12px] text-text-hint font-medium mt-1 leading-relaxed">
-              찾으시는 매장이 지도에 있어야 한다면<br />제보해 주세요. 다음 업데이트에 반영할게요!
+              찾으시는 곳이 지도에 있어야 한다면<br />제보해 주세요. 다음 업데이트에 반영할게요!
             </p>
             {reported ? (
               <p className="mt-4 text-[13px] font-extrabold text-emerald-600">제보가 접수됐어요, 고마워요! 🎉</p>

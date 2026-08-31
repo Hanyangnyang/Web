@@ -139,7 +139,6 @@ src/
 
 | 테이블 | 용도 |
 |--------|------|
-| `feedbacks` | 사용자 피드백 저장 (익명 user_id) |
 | `app_config` | 앱 레벨 설정 조회 (학기 정보, 휴일/주말 오버라이드, 운영일 플래그 등) |
 
 `devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
@@ -159,7 +158,9 @@ src/
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
-| `POST /api/v1/feedbacks` | 통합 피드백 접수 (기능별 category/feedbackType 태깅) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 화면 연동 예정 — 현재는 도메인/데이터/유스케이스/훅(`useSubmitFeedbackApi`)만 구성됨. 기존 `useFeedback`(Supabase 직접, 자유 텍스트)와 별개 |
+| `POST /api/v1/feedbacks` | 통합 피드백 접수 (기능별 category/feedbackType 태깅) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 기타탭 > 피드백 보내기(`FeedbackView`, category `GENERAL`), 캠퍼스맵 제보 모달(`CampusFeedbackModal`, category `CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보(`SearchOverlay`, category `PARTNERSHIP`)에서 씀. 기존 Supabase 직접 연결 피드백 스택(`useFeedback` 등)은 전 화면 이전 완료 후 제거함 |
+| `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 (날짜별 달력/공휴일, 학사 일정, 셔틀 운행 기준) | 10분(FE staleTime, BE 캐시 주기 미확인) — 셔틀 긴급 미운행 같은 당일 상태 변경도 담고 있어 날씨와 비슷한 수준으로 지정 | 화면 연동 예정 — 현재는 도메인/데이터/유스케이스/훅(`useAcademicStatus`)만 구성됨 |
+| `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 24시간 — 평일/주말/공휴일 여부는 하루 안에 안 바뀜 | 앱부팅 시 prefetch + 마운트시 자동(`useHoliday`가 dayType==='HOLIDAY' 여부만 뽑아 셔틀·지하철 dayType 판정에 씀). 화면 직접 노출은 아직 예정 — 전체 데이터(`dayOfWeek`/`name` 등)를 쓰는 `useDateInfo`는 미연동 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
@@ -168,7 +169,8 @@ src/
 |---|---|---|---|---|---|
 | `/api/cron/refresh-insta-profiles`* | 인스타 계정 프로필 사진 정적 이미지 갱신 | Instagram API(스크래핑) + GitHub Contents API(커밋) | 해당없음 | 해당없음 | Vercel Cron이 4개월마다 1회만 서버에서 실행, 클라이언트는 API 호출 안 하고 정적 이미지만 읽음 |
 | `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | "공공버스" 모드 + 화면보임 + 사용자 조작중일 때 30초 간격 자동 폴링, 새로고침 버튼 수동 refetch |
-| `/api/holidays` | 법정공휴일 여부 조회 - 셔틀·지하철 dayType 판정용 | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
+
+`/api/holidays`(법정공휴일 여부 조회)는 새 백엔드 `/api/v1/holidays/date-info`로 이전 완료 — 프론트에서 더 이상 호출하지 않음 (아래 새 백엔드 표 참고). `api/holidays.js` Vercel 함수 자체는 아직 삭제하지 않음.
 
 ### 💾localStorage (디스크)
 
