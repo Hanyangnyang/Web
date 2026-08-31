@@ -1,6 +1,6 @@
 import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { type Song, type PlaylistReaction, GENRES, formatTimeAgo } from './playlistTypes';
+import { type Song, type PlaylistReaction, type ReactionState, GENRES, formatTimeAgo, toReactionState } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
 import { useReportSong, useToggleBookmark, useToggleReaction } from '../../hooks/useRecentSongs.js';
 
@@ -15,6 +15,8 @@ export interface PostDetailCardData {
   createdAt: Date | string;
   // 서버가 계산해서 내려주는 "지금 이 기기가 북마크했는지" 여부 — 없으면 false로 시작
   isBookmarked?: boolean;
+  // 지금 이 기기가 등록한 게시글인지 — true면 북마크/신고 아이콘을 자동으로 숨김
+  isMine?: boolean;
   // 서버가 내려주는 이모지별 반응 수 + 내 반응 여부 — 없으면 반응 0개로 시작
   reactions?: PlaylistReaction[];
 }
@@ -47,19 +49,9 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
     genres: song.genres,
     createdAt: song.createdAt,
     isBookmarked: song.isBookmarked,
+    isMine: song.isMine,
     reactions: song.reactions,
   };
-}
-
-type ReactionState = Partial<Record<ReactionKey, { count: number; mine: boolean }>>;
-
-// 서버가 내려준 반응 목록을 이모지 키 기준 상태로 변환 — reaction.type이 ReactionKey와 동일한 문자열이라는 전제(예: 'FIRE')
-function toReactionState(reactions?: PlaylistReaction[]): ReactionState {
-  const state: ReactionState = {};
-  for (const r of reactions ?? []) {
-    state[r.type as ReactionKey] = { count: r.count, mine: r.isReacted };
-  }
-  return state;
 }
 
 // 인스타그램 게시물처럼 앨범커버와 하단 콘텐츠가 하나의 카드로 이어지는 게시글 조회 카드. PostDetailView에서 사용
@@ -83,6 +75,9 @@ export function PostDetailCard({
   const reportSong = useReportSong();
   const toggleBookmark = useToggleBookmark();
   const toggleReactionMutation = useToggleReaction();
+  // 본인이 등록한 게시글은 스스로 신고할 수 없어 더보기 버튼을 숨김 — 화면 단위 강제(hideMoreButton)와 별개로,
+  // 여러 사람 글이 섞인 목록(최근추가된곡 등)에서도 게시글 단위로 자동 적용됨
+  const shouldHideMoreButton = hideMoreButton || post.isMine;
 
   // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
   useEffect(() => {
@@ -235,18 +230,21 @@ export function PostDetailCard({
           </button>
         )}
 
-        {/* 앨범커버 우측 하단 북마크 배지 — 1열/2열 공통, 크기를 카드 폭 대비 %로 지정해서 항상 같은 비율로 보이게 함 */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleBookmarked();
-          }}
-          disabled={toggleBookmark.isPending}
-          aria-label="북마크"
-          className={`absolute bottom-[4%] right-[4%] z-10 w-[min(16%,32px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
-        >
-          <Bookmark className={`w-1/2 h-1/2 ${bookmarked ? 'text-primary' : 'text-white'}`} strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
-        </button>
+        {/* 앨범커버 우측 하단 북마크 배지 — 1열/2열 공통, 크기를 카드 폭 대비 %로 지정해서 항상 같은 비율로 보이게 함.
+            본인이 등록한 게시글은 자기 글을 북마크할 이유가 없어서 숨김 */}
+        {!post.isMine && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBookmarked();
+            }}
+            disabled={toggleBookmark.isPending}
+            aria-label="북마크"
+            className={`absolute bottom-[4%] right-[4%] z-10 w-[min(16%,32px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
+          >
+            <Bookmark className={`w-1/2 h-1/2 ${bookmarked ? 'text-primary' : 'text-white'}`} strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
+          </button>
+        )}
       </div>
 
       <div className="px-4 pt-3 pb-4">
@@ -317,13 +315,13 @@ export function PostDetailCard({
               })}
             </div>
 
-            {!hideMoreButton && moreButton}
+            {!shouldHideMoreButton && moreButton}
           </div>
         )}
 
         <div className={`mb-2 ${hideReactions ? 'flex items-center gap-2' : ''}`}>
           <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
-          {hideReactions && !hideMoreButton && moreButton}
+          {hideReactions && !shouldHideMoreButton && moreButton}
         </div>
 
         {/* 본문 */}

@@ -1,52 +1,60 @@
-import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
+import { Bookmark, Loader2, MoreVertical, Play, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
-import { formatTimeAgo } from './playlistTypes';
+import { type Song, type ReactionState, formatTimeAgo, toReactionState } from './playlistTypes';
+import { useToggleBookmark, useReportSong, useToggleReaction, useTrackPosts, type TrackPostsSort } from '../../hooks/useRecentSongs.js';
 
 interface TrackPostsViewProps {
   track: TrackResult;
   onBack: () => void;
-  onSelectPost: (post: TrackPost) => void;
+  onSelectPost: (post: Song) => void;
   onPlay: () => void;
   // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 버튼을 숨김
   isPlaying?: boolean;
 }
-
-export interface TrackPost {
-  id: string;
-  body: string;
-  createdAt: Date;
-  reactionCounts: Partial<Record<ReactionKey, number>>;
-}
-
-const MINUTE_MS = 60 * 1000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
-const MONTH_MS = 30 * DAY_MS;
 
 const SORT_OPTIONS = [
   { key: 'latest', label: '최신' },
   { key: 'popular', label: '인기' },
 ] as const;
 
-// UI 디자인용 임시 더미 — 실제로는 BE에서 이 곡(trackId)에 달린 게시글 조회 API 응답으로 교체될 예정
-const DUMMY_POSTS: TrackPost[] = [
-  { id: 'post1', body: '이 노래 진짜 좋아! 베이스 라인이 미쳤어, 이런 감성의 R&B는 진짜 오랜만이에요 ㅠㅠ', createdAt: new Date(Date.now() - 5 * MINUTE_MS), reactionCounts: { LOVE: 4, FIRE: 2 } },
-  { id: 'post2', body: '자기 전에 이 노래 틀어놓고 잠드는 게 요즘 하루 마무리 루틴이에요, 반복 재생 중...', createdAt: new Date(Date.now() - 3 * HOUR_MS), reactionCounts: { EMOTIONAL: 6, THUMBS_UP: 3 } },
-  { id: 'post3', body: '가사도 멜로디도 감성 만렙이라 듣자마자 바로 플레이리스트 맨 위에 올려놨어요 💯 요즘 계속 듣는 중이에요', createdAt: new Date(Date.now() - 2 * DAY_MS), reactionCounts: { LOVE: 1, BITTERSWEET: 2, DANCE: 1 } },
-  { id: 'post4', body: '오랜만에 나온 진짜 명곡이라 주변 사람들한테도 자꾸 추천하고 다니게 되는 곡이에요', createdAt: new Date(Date.now() - 1 * MONTH_MS), reactionCounts: {} },
-];
+const REPORT_REASONS = ['부적절하거나 선정적인 표현', '욕설·비속어 포함', '스팸/광고성 게시글', '기타'];
 
-// 곡 단위 게시글 목록 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트. 정렬 로직/API 연동은 추후 작업
+// 곡 단위 게시글 목록 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
 export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying = false }: TrackPostsViewProps) {
-  const [sort, setSort] = useState<(typeof SORT_OPTIONS)[number]['key']>('latest');
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
-  const [myReactionsByPost, setMyReactionsByPost] = useState<Record<string, Set<ReactionKey>>>({});
+  const [sort, setSort] = useState<TrackPostsSort>('latest');
+  const { data, isLoading } = useTrackPosts(track.trackId, sort);
+  const posts = data?.posts ?? [];
+  const totalCount = data?.totalSongsCount ?? posts.length;
+
+  const [bookmarkedByPost, setBookmarkedByPost] = useState<Record<string, boolean>>({});
+  const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
+  // 게시글 목록을 새로 받아올 때마다(정렬 변경 포함) 서버가 준 초기 북마크/반응 상태로 로컬 상태를 다시 맞춤
+  useEffect(() => {
+    if (!data) return;
+    const bookmarks: Record<string, boolean> = {};
+    const reactions: Record<string, ReactionState> = {};
+    for (const post of data.posts) {
+      if (!post.id) continue;
+      bookmarks[post.id] = post.isBookmarked ?? false;
+      reactions[post.id] = toReactionState(post.reactions);
+    }
+    setBookmarkedByPost(bookmarks);
+    setReactionsByPost(reactions);
+  }, [data]);
+
   const [openPickerPostId, setOpenPickerPostId] = useState<string | null>(null);
   const [reportMenuOpenPostId, setReportMenuOpenPostId] = useState<string | null>(null);
+  const [reportReasonPopupPostId, setReportReasonPopupPostId] = useState<string | null>(null);
+  const [selectedReportReason, setSelectedReportReason] = useState<string | null>(null);
+  const [reportToast, setReportToast] = useState('');
   const reportMenuRef = useRef<HTMLDivElement>(null);
+
+  const toggleBookmark = useToggleBookmark();
+  const toggleReactionMutation = useToggleReaction();
+  const reportSong = useReportSong();
 
   // 신고하기 드롭다운이 열려있을 때, 버튼/드롭다운 바깥을 누르면 닫음
   useEffect(() => {
@@ -60,23 +68,52 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [reportMenuOpenPostId]);
 
-  const toggleBookmark = (id: string) => {
-    setBookmarkedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+  // 낙관적으로 먼저 뒤집고, 서버 응답의 실제 isLiked로 맞추거나 실패 시 되돌림. 연타는 무시
+  const handleToggleBookmark = (postId: string) => {
+    if (toggleBookmark.isPending) return;
+    const optimistic = !(bookmarkedByPost[postId] ?? false);
+    setBookmarkedByPost((prev) => ({ ...prev, [postId]: optimistic }));
+    toggleBookmark.mutate(postId, {
+      onSuccess: (isLiked) => setBookmarkedByPost((prev) => ({ ...prev, [postId]: isLiked })),
+      onError: () => setBookmarkedByPost((prev) => ({ ...prev, [postId]: !optimistic })),
     });
   };
 
-  const toggleReaction = (postId: string, key: ReactionKey) => {
-    setMyReactionsByPost((prev) => {
-      const current = prev[postId] ?? new Set<ReactionKey>();
-      const next = new Set(current);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return { ...prev, [postId]: next };
+  // 낙관적으로 카운트 증감 후, 서버가 내려준 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤. 연타는 무시
+  const handleToggleReaction = (postId: string, key: ReactionKey) => {
+    if (toggleReactionMutation.isPending) return;
+    const previous = reactionsByPost[postId] ?? {};
+    setReactionsByPost((prev) => {
+      const current = prev[postId] ?? {};
+      const currentReaction = current[key] ?? { count: 0, mine: false };
+      const mine = !currentReaction.mine;
+      const count = Math.max(0, currentReaction.count + (mine ? 1 : -1));
+      return { ...prev, [postId]: { ...current, [key]: { count, mine } } };
     });
+
+    toggleReactionMutation.mutate(
+      { songId: postId, reactionType: key },
+      {
+        onSuccess: (updatedReactions) =>
+          setReactionsByPost((prev) => ({ ...prev, [postId]: toReactionState(updatedReactions) })),
+        onError: () => setReactionsByPost((prev) => ({ ...prev, [postId]: previous })),
+      }
+    );
+  };
+
+  const handleConfirmReport = () => {
+    if (!reportReasonPopupPostId || !selectedReportReason) return;
+    reportSong.mutate(
+      { songId: reportReasonPopupPostId, reason: selectedReportReason },
+      {
+        onSuccess: () => {
+          setReportReasonPopupPostId(null);
+          setSelectedReportReason(null);
+          setReportToast('신고가 접수됐어요. 검토 후 조치할게요.');
+          setTimeout(() => setReportToast(''), 2000);
+        },
+      }
+    );
   };
 
   return (
@@ -101,7 +138,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
             <div className="text-sm text-text-sub truncate">{track.artist}</div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-text-sub">게시글 {DUMMY_POSTS.length}개</span>
+            <span className="text-xs text-text-sub">게시글 {totalCount}개</span>
             {!isPlaying && (
               <button
                 onClick={onPlay}
@@ -132,17 +169,28 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
         ))}
       </div>
 
+      {isLoading && (
+        <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-sub">
+          <Loader2 size={16} className="animate-spin" />
+          불러오는 중...
+        </div>
+      )}
+
+      {!isLoading && posts.length === 0 && (
+        <p className="py-10 text-center text-sm text-text-sub">아직 이 곡에 등록된 게시글이 없어요</p>
+      )}
+
       {/* 게시글 리스트 — 카드 사이 간격을 둬서 항목마다 분리된 느낌 */}
       <div className="flex flex-col gap-1">
-        {DUMMY_POSTS.map((post) => {
-          const bookmarked = bookmarkedIds.has(post.id);
-          const myReactions = myReactionsByPost[post.id] ?? new Set<ReactionKey>();
-          const displayedReactions = EMOJI_REACTIONS.filter(
-            ({ key }) => (post.reactionCounts[key] ?? 0) + (myReactions.has(key) ? 1 : 0) > 0
-          );
+        {posts.map((post) => {
+          const postId = post.id;
+          const bookmarked = postId ? bookmarkedByPost[postId] ?? false : false;
+          const reactions = (postId ? reactionsByPost[postId] : undefined) ?? {};
+          const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
+
           return (
             <div
-              key={post.id}
+              key={postId ?? post.trackId}
               role="button"
               tabIndex={0}
               onClick={() => onSelectPost(post)}
@@ -154,55 +202,58 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
             >
               {/* 본문 + 북마크/더보기 */}
               <div className="flex items-start gap-3">
-                <p className="min-w-0 flex-1 text-sm text-text-main leading-snug line-clamp-2">{post.body}</p>
+                <p className="min-w-0 flex-1 text-sm text-text-main leading-snug line-clamp-2">{post.comment}</p>
 
-                <div className="flex items-start gap-3 flex-shrink-0">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleBookmark(post.id);
-                    }}
-                    aria-label="이 게시글 북마크"
-                    className="active:scale-90 transition-transform"
-                  >
-                    <Bookmark
-                      size={18}
-                      className={bookmarked ? 'text-primary' : 'text-text-sub'}
-                      fill={bookmarked ? 'currentColor' : 'none'}
-                      strokeWidth={2}
-                    />
-                  </button>
-                  {/* 더보기 버튼 — 실제 신고 처리는 추후 구현 */}
-                  <div
-                    ref={reportMenuOpenPostId === post.id ? reportMenuRef : undefined}
-                    className="relative inline-block flex-shrink-0"
-                  >
+                {!post.isMine && (
+                  <div className="flex items-start gap-3 flex-shrink-0">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setReportMenuOpenPostId((prev) => (prev === post.id ? null : post.id));
+                        if (postId) handleToggleBookmark(postId);
                       }}
-                      aria-label="더보기"
-                      className="active:scale-90 transition-transform"
+                      disabled={toggleBookmark.isPending}
+                      aria-label="이 게시글 북마크"
+                      className={`active:scale-90 transition-transform ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
                     >
-                      <MoreVertical size={18} className="text-text-sub" />
+                      <Bookmark
+                        size={18}
+                        className={bookmarked ? 'text-primary' : 'text-text-sub'}
+                        fill={bookmarked ? 'currentColor' : 'none'}
+                        strokeWidth={2}
+                      />
                     </button>
+                    <div
+                      ref={reportMenuOpenPostId === postId ? reportMenuRef : undefined}
+                      className="relative inline-block flex-shrink-0"
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setReportMenuOpenPostId((prev) => (prev === postId ? null : postId ?? null));
+                        }}
+                        aria-label="더보기"
+                        className="active:scale-90 transition-transform"
+                      >
+                        <MoreVertical size={18} className="text-text-sub" />
+                      </button>
 
-                    {reportMenuOpenPostId === post.id && (
-                      <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setReportMenuOpenPostId(null);
-                          }}
-                          className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
-                        >
-                          신고하기
-                        </button>
-                      </div>
-                    )}
+                      {reportMenuOpenPostId === postId && (
+                        <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setReportMenuOpenPostId(null);
+                              setReportReasonPopupPostId(postId ?? null);
+                            }}
+                            className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
+                          >
+                            신고하기
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* 시간 + 이모지 반응 — 카드 전체 너비를 다 활용 */}
@@ -214,15 +265,16 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setOpenPickerPostId((prev) => (prev === post.id ? null : post.id));
+                      setOpenPickerPostId((prev) => (prev === postId ? null : postId ?? null));
                     }}
+                    disabled={toggleReactionMutation.isPending}
                     aria-label="이모지 추가"
-                    className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform"
+                    className={`w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
                   >
                     <Smile size={11} className="text-text-sub" strokeWidth={2} />
                   </button>
 
-                  {openPickerPostId === post.id && (
+                  {openPickerPostId === postId && (
                     <div className="absolute bottom-full left-0 mb-2 z-10">
                       <div className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-full shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
                         {EMOJI_REACTIONS.map(({ key, emoji }) => (
@@ -230,7 +282,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                             key={key}
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleReaction(post.id, key);
+                              if (postId) handleToggleReaction(postId, key);
                               setOpenPickerPostId(null);
                             }}
                             aria-label={`${emoji} 남기기`}
@@ -252,19 +304,19 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
                     {displayedReactions.map(({ key, emoji }) => {
-                      const count = (post.reactionCounts[key] ?? 0) + (myReactions.has(key) ? 1 : 0);
-                      const mine = myReactions.has(key);
+                      const { count, mine } = reactions[key] ?? { count: 0, mine: false };
                       return (
                         <button
                           key={key}
                           onClick={(e) => {
                             e.stopPropagation();
-                            toggleReaction(post.id, key);
+                            if (postId) handleToggleReaction(postId, key);
                           }}
+                          disabled={toggleReactionMutation.isPending}
                           aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
                           className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
                             mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                          }`}
+                          } ${toggleReactionMutation.isPending ? 'opacity-60' : ''}`}
                         >
                           <span className="text-xs">{emoji}</span>
                           <span>{count}</span>
@@ -278,6 +330,63 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
           );
         })}
       </div>
+
+      {/* 신고 사유 선택 팝업 */}
+      {reportReasonPopupPostId && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 px-8"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
+            <p className="text-sm font-semibold text-text-main mb-3 text-center">신고 사유를 선택해주세요</p>
+            <div className="flex flex-col gap-1.5 mb-4">
+              {REPORT_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  onClick={() => setSelectedReportReason(reason)}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium border transition-colors ${
+                    selectedReportReason === reason
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-slate-100 border-transparent text-text-sub hover:bg-slate-200'
+                  }`}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            {reportSong.isError && (
+              <p className="text-xs text-red-500 text-center mb-3">신고 접수에 실패했어요. 다시 시도해주세요.</p>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setReportReasonPopupPostId(null);
+                  setSelectedReportReason(null);
+                }}
+                className="flex-1 h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleConfirmReport}
+                disabled={!selectedReportReason || reportSong.isPending}
+                className={`flex-1 h-10 rounded-full text-sm font-bold active:scale-[0.97] transition-transform ${
+                  selectedReportReason && !reportSong.isPending ? 'text-white bg-red-500' : 'text-slate-300 bg-slate-100'
+                }`}
+              >
+                {reportSong.isPending ? '접수 중...' : '신고하기'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 신고 접수 완료 토스트 */}
+      {reportToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
+          {reportToast}
+        </div>
+      )}
     </div>
   );
 }

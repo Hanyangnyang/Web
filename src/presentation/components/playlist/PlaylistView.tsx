@@ -16,11 +16,11 @@ import { MySongsView } from './MySongsView';
 import { RecentSongCard } from './RecentSongCard';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
-import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS, filterSongsByGenre } from './playlistTypes';
+import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
 import { ChartView } from './ChartView';
-import { DUMMY_CHART } from './playlistDummyData';
+import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
-import { useRecentSongs, useRecordTrackPlay } from '../../hooks/useRecentSongs.js';
+import { useRecentSongs, useRecordTrackPlay, usePopularityChart } from '../../hooks/useRecentSongs.js';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_LIMIT = 10;
@@ -32,7 +32,6 @@ type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 
 export function PlaylistView({ onBack }: { onBack: () => void }) {
   const isApp = isNativeApp();
   const platform = getPlatform();
-  const [selectedGenre, setSelectedGenre] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   // 최근추가된곡은 /api/v1/playlist/songs에서 받아온 뒤 로컬 state로 옮겨 관리 —
   // 곡 등록 API가 아직 없어서, 등록 직후엔 서버 재조회 없이 로컬로만 맨 앞에 얹기 때문
@@ -41,7 +40,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (fetchedSongs) setSongs(fetchedSongs);
   }, [fetchedSongs]);
-  const [chart, setChart] = useState<Song[]>(DUMMY_CHART);
+  // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
+  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
+  const { data: chartData, isLoading: isChartLoading } = usePopularityChart(chartPeriod);
+  const chartTracks = chartData?.tracks ?? [];
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
   const recordTrackPlay = useRecordTrackPlay();
   // trackId별 마지막 재생기록 전송 시각 — 리렌더와 무관하게 유지돼야 해서 state가 아니라 ref
@@ -127,13 +129,13 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     pushScreen('trackPosts');
   }, [pushScreen]);
 
-  // 주간/월간 인기차트 리스트 클릭 — Song을 TrackResult 형태로 변환해 동일한 TrackPostsView로 이동
-  const handleSelectChartSong = useCallback((song: Song) => {
+  // 인기차트 리스트 클릭 — ChartTrack을 TrackResult 형태로 변환해 동일한 TrackPostsView로 이동
+  const handleSelectChartSong = useCallback((track: ChartTrack) => {
     setSelectedTrackForPosts({
-      trackId: song.trackId,
-      title: song.title,
-      artist: song.artist,
-      albumArtUrl: song.albumArtUrl,
+      trackId: track.trackId,
+      title: track.title,
+      artist: track.artist,
+      albumArtUrl: track.albumArtUrl,
     });
     pushScreen('trackPosts');
   }, [pushScreen]);
@@ -155,11 +157,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     pushScreen('recent');
   }, [pushScreen]);
 
-  // 최근 추가된 곡은 장르 필터와 무관하게 항상 그대로 노출, 주간 인기차트만 필터링됨
-  const filteredChart = filterSongsByGenre(chart, selectedGenre);
-
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
-  const visibleChart = filteredChart.slice(0, CHART_LIMIT);
+  const visibleChart = chartTracks.slice(0, CHART_LIMIT);
 
   const bottomSpace = playerHeight > 0 ? playerHeight + 4 : 4;
 
@@ -217,7 +216,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <PostDetailView onBack={popScreen} />
         ) : screen === 'chart' ? (
           <ChartView
-            chart={chart}
+            chart={chartTracks}
+            isLoading={isChartLoading}
+            chartPeriod={chartPeriod}
+            onChangePeriod={setChartPeriod}
             onBack={popScreen}
             onShowAddSong={() => pushScreen('addSong')}
             onPlay={handlePlay}
@@ -248,8 +250,9 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={onBack}
             visibleSongs={visibleSongs}
             visibleChart={visibleChart}
-            selectedGenre={selectedGenre}
-            setSelectedGenre={setSelectedGenre}
+            isChartLoading={isChartLoading}
+            chartPeriod={chartPeriod}
+            onChangeChartPeriod={setChartPeriod}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSubmitSearch={handleSearchSubmit}
@@ -282,9 +285,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
 interface PlaylistMainContentProps {
   onBack: () => void;
   visibleSongs: Song[];
-  visibleChart: Song[];
-  selectedGenre: string;
-  setSelectedGenre: (genre: string) => void;
+  visibleChart: ChartTrack[];
+  isChartLoading: boolean;
+  chartPeriod: ChartPeriod;
+  onChangeChartPeriod: (period: ChartPeriod) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSubmitSearch: () => void;
@@ -292,8 +296,8 @@ interface PlaylistMainContentProps {
   onSelectRecentSong: (song: Song) => void;
   onShowAllChart: () => void;
   onShowAddSong: () => void;
-  onPlay: (song: Song) => void;
-  onShowPosts: (song: Song) => void;
+  onPlay: (track: ChartTrack) => void;
+  onShowPosts: (track: ChartTrack) => void;
   onShowMyActivity: () => void;
 }
 
@@ -301,8 +305,9 @@ function PlaylistMainContent({
   onBack,
   visibleSongs,
   visibleChart,
-  selectedGenre,
-  setSelectedGenre,
+  isChartLoading,
+  chartPeriod,
+  onChangeChartPeriod,
   searchQuery,
   setSearchQuery,
   onSubmitSearch,
@@ -314,7 +319,6 @@ function PlaylistMainContent({
   onShowPosts,
   onShowMyActivity,
 }: PlaylistMainContentProps) {
-  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -401,7 +405,7 @@ function PlaylistMainContent({
           {CHART_PERIOD_OPTIONS.map((option) => (
             <button
               key={option.key}
-              onClick={() => setChartPeriod(option.key)}
+              onClick={() => onChangeChartPeriod(option.key)}
               className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
                 chartPeriod === option.key
                   ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
@@ -423,14 +427,15 @@ function PlaylistMainContent({
           </div>
 
           {/* 리스트 */}
-          {visibleChart.length === 0 ? (
+          {isChartLoading ? (
+            <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
+          ) : visibleChart.length === 0 ? (
             <EmptyGenreState onShowAddSong={onShowAddSong} />
           ) : (
-            visibleChart.map((song, index) => (
+            visibleChart.map((track) => (
               <ChartSongRow
-                key={song.trackId}
-                song={song}
-                rank={index + 1}
+                key={track.trackId}
+                track={track}
                 onPlay={onPlay}
                 onShowPosts={onShowPosts}
               />

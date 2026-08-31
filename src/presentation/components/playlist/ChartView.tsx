@@ -1,21 +1,22 @@
-import { useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from './EmptyGenreState';
-import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
+import { type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
+import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 
 interface ChartViewProps {
-  chart: Song[];
+  chart: ChartTrack[];
+  isLoading: boolean;
+  chartPeriod: ChartPeriod;
+  onChangePeriod: (period: ChartPeriod) => void;
   onBack: () => void;
   onShowAddSong: () => void;
-  onPlay: (song: Song) => void;
-  onShowPosts: (song: Song) => void;
+  onPlay: (track: ChartTrack) => void;
+  onShowPosts: (track: ChartTrack) => void;
 }
 
-// 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌. 기간별 재집계 로직은 추후 연동
-export function ChartView({ chart, onBack, onShowAddSong, onPlay, onShowPosts }: ChartViewProps) {
-  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('weekly');
-
+// 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
+export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBack, onShowAddSong, onPlay, onShowPosts }: ChartViewProps) {
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -30,7 +31,7 @@ export function ChartView({ chart, onBack, onShowAddSong, onPlay, onShowPosts }:
         {CHART_PERIOD_OPTIONS.map((option) => (
           <button
             key={option.key}
-            onClick={() => setChartPeriod(option.key)}
+            onClick={() => onChangePeriod(option.key)}
             className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
               chartPeriod === option.key
                 ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
@@ -52,14 +53,15 @@ export function ChartView({ chart, onBack, onShowAddSong, onPlay, onShowPosts }:
         </div>
 
         {/* 리스트 */}
-        {chart.length === 0 ? (
+        {isLoading ? (
+          <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
+        ) : chart.length === 0 ? (
           <EmptyGenreState onShowAddSong={onShowAddSong} />
         ) : (
-          chart.map((song, index) => (
+          chart.map((track) => (
             <ChartSongRow
-              key={song.trackId}
-              song={song}
-              rank={index + 1}
+              key={track.trackId}
+              track={track}
               onPlay={onPlay}
               onShowPosts={onShowPosts}
             />

@@ -1,4 +1,4 @@
-// 훅(ViewModel): 최근추가된곡 화면의 플레이리스트 피드 곡 목록 로딩 + 곡 추천/등록/신고/좋아요(북마크)/재생기록/이모지반응
+// 훅(ViewModel): 최근추가된곡 화면의 플레이리스트 피드 곡 목록 로딩 + 곡 추천/등록/신고/좋아요(북마크)/재생기록/이모지반응/곡별게시글모아보기
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getRecentSongsUseCase,
@@ -7,9 +7,12 @@ import {
   toggleBookmarkUseCase,
   recordTrackPlayUseCase,
   toggleReactionUseCase,
+  getTrackPostsUseCase,
+  getPopularityChartUseCase,
 } from '../../di.js';
 import { getOrCreateAnonymousUserId } from '../../lib/supabase.js';
-import { mapPlaylistSongToSong, type Song, type PlaylistReaction } from '../components/playlist/playlistTypes.js';
+import { mapPlaylistSongToSong, type Song, type PlaylistReaction, type ChartPeriod } from '../components/playlist/playlistTypes.js';
+import type { ChartType } from '../../domain/repositories/IPlaylistRepository.js';
 
 const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
 const RECENT_SONGS_SIZE = 50;
@@ -99,5 +102,59 @@ export function useToggleReaction() {
       const deviceId = await getOrCreateAnonymousUserId();
       return toggleReactionUseCase.execute({ ...input, deviceId });
     },
+  });
+}
+
+export type TrackPostsSort = 'latest' | 'popular';
+
+// TrackPostsView의 최신/인기 칩이 쓰는 값 → 백엔드 sort 파라미터 형식으로 변환
+const TRACK_POSTS_SORT_PARAM: Record<TrackPostsSort, string> = {
+  latest: 'createdAt,desc',
+  popular: 'heartCount,desc',
+};
+
+const TRACK_POSTS_SIZE = 50;
+
+// 특정 곡(trackId)에 달린 추천 게시글 모아보기 — 정렬(sort)이 바뀌면 queryKey가 달라져서 자동으로 다시 불러옴
+export function useTrackPosts(trackId: string, sort: TrackPostsSort) {
+  return useQuery({
+    queryKey: ['playlist', 'track-posts', trackId, sort],
+    queryFn: async () => {
+      const deviceId = await getOrCreateAnonymousUserId();
+      const result = await getTrackPostsUseCase.execute({
+        trackId,
+        deviceId,
+        sort: TRACK_POSTS_SORT_PARAM[sort],
+        size: TRACK_POSTS_SIZE,
+      });
+      return {
+        trackId: result.trackId,
+        title: result.title,
+        artist: result.artist,
+        albumArtUrl: result.albumArtUrl,
+        totalSongsCount: result.totalSongsCount,
+        posts: result.posts.map(mapPlaylistSongToSong),
+      };
+    },
+    enabled: !!trackId,
+  });
+}
+
+// 홈 미리보기의 CHART_PERIOD_OPTIONS 키('실시간' 등) → 백엔드 차트 유형 파라미터
+const CHART_PERIOD_TO_TYPE: Record<ChartPeriod, ChartType> = {
+  popular: 'RISING',
+  weekly: 'WEEKLY',
+  monthly: 'MONTHLY',
+};
+
+// 자주 갱신될 필요는 없어서 전역 기본값(15분)보다 좀 더 여유 있게 둠
+const CHART_STALE_TIME = 5 * 60 * 1000;
+
+// 인기 차트(실시간 급상승/주간/월간) — period가 바뀌면 queryKey가 달라져서 자동으로 다시 불러옴
+export function usePopularityChart(period: ChartPeriod) {
+  return useQuery({
+    queryKey: ['playlist', 'chart', period],
+    queryFn: () => getPopularityChartUseCase.execute({ type: CHART_PERIOD_TO_TYPE[period] }),
+    staleTime: CHART_STALE_TIME,
   });
 }

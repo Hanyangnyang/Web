@@ -1,5 +1,7 @@
-// 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요(북마크)/재생기록/이모지반응 계약 (구현은 data 레이어의 PlaylistRepository)
+// 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요(북마크)/재생기록/이모지반응/곡별게시글모아보기/인기차트 계약 (구현은 data 레이어의 PlaylistRepository)
 import type { PlaylistSong, PlaylistReaction } from '../entities/PlaylistSong.js';
+import type { TrackPosts } from '../entities/TrackPosts.js';
+import type { PopularityChart } from '../entities/PopularityChart.js';
 
 export interface GetPlaylistSongsParams {
   genre?: string;
@@ -36,6 +38,21 @@ export interface ToggleReactionParams {
   reactionType: string;
 }
 
+export interface GetTrackPostsParams {
+  trackId: string;
+  deviceId?: string;
+  // 백엔드 정렬 파라미터 형식 그대로 (예: 'createdAt,desc', 'heartCount,desc')
+  sort?: string;
+  page?: number;
+  size?: number;
+}
+
+export type ChartType = 'RISING' | 'WEEKLY' | 'MONTHLY';
+
+export interface GetPopularityChartParams {
+  type?: ChartType;
+}
+
 export interface PlaylistRepository {
   getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;
@@ -47,4 +64,8 @@ export interface PlaylistRepository {
   recordTrackPlay: (trackId: string) => Promise<void>;
   // 서버가 토글 후 그 곡의 9종 반응 전체 최신 카운트를 내려줘서, 화면 상태를 통째로 그걸로 맞추면 됨
   toggleReaction: (params: ToggleReactionParams) => Promise<PlaylistReaction[]>;
+  // 특정 곡(trackId)에 달린 추천 게시글 모아보기 — 곡 단위 게시글 목록 화면(TrackPostsView)용
+  getTrackPosts: (params: GetTrackPostsParams) => Promise<TrackPosts>;
+  // 인기 차트(실시간 급상승/주간/월간) 조회
+  getPopularityChart: (params?: GetPopularityChartParams) => Promise<PopularityChart>;
 }

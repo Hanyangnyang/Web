@@ -165,6 +165,8 @@ src/
 | `POST /api/v1/playlist/songs/{id}/like` | 좋아요(=서비스 내 "북마크") 토글 | 해당없음 (뮤테이션) | 북마크 배지 클릭 시. 낙관적 업데이트 + 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
 | `POST /api/v1/playlist/songs/tracks/{trackId}/play` | 곡 재생수 기록 (인기차트 집계용) | 해당없음 (뮤테이션) | 재생 버튼 클릭 시(모든 재생 버튼이 `PlaylistView`의 `handlePlay` 한 곳으로 모임). 같은 trackId는 10초 스로틀 — 연타로 재생수가 부풀지 않게 프론트에서 직접 제한 |
 | `POST /api/v1/playlist/songs/{id}/reactions` | 이모지 리액션 토글 (9종) | 해당없음 (뮤테이션) | 이모지 반응 버튼 클릭 시. 응답으로 온 9종 전체 최신 카운트로 로컬 상태를 통째로 동기화, 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
+| `/api/v1/playlist/songs/tracks/{trackId}` | 특정 곡(trackId)에 달린 추천 게시글 모아보기 | 15분(전역 기본값) | 인기차트/검색결과에서 곡 선택 시, 최신·인기 정렬(sort) 전환 시(queryKey에 sort 포함돼 자동 재조회) |
+| `/api/v1/playlist/songs/charts` | 인기 차트 순위 조회 (실시간 급상승/주간/월간) | 5분(FE staleTime, BE 캐시 주기 미확인) | 콜드스타트 fetch, 기간 필터 칩(실시간/주간/월간) 전환 시(queryKey에 기간 포함돼 자동 재조회) |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage

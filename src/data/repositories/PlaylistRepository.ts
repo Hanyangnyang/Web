@@ -1,6 +1,8 @@
-// 레포지토리: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요/재생기록/이모지반응(새 백엔드)을 도메인 엔티티로 변환해 제공
+// 레포지토리: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요/재생기록/이모지반응/곡별게시글모아보기/인기차트(새 백엔드)를 도메인 엔티티로 변환해 제공
 import { apiError } from '../../infrastructure/http/HttpClient.js';
 import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '../../domain/entities/PlaylistSong.js';
+import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
+import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
 
@@ -29,7 +31,8 @@ function toReactions(dtos?: PlaylistReactionDto[]): PlaylistReaction[] {
   return (dtos ?? []).map((r) => ({ type: r.type, emoji: r.emoji, count: r.count, isReacted: r.isReacted }));
 }
 
-function toPlaylistSong(d: PlaylistSongDto): PlaylistSong {
+// myDeviceId: 이 요청을 보낸 기기 자신의 id — d.deviceId(게시글 등록자)와 비교해 isMine을 판단
+function toPlaylistSong(d: PlaylistSongDto, myDeviceId?: string): PlaylistSong {
   return createPlaylistSong({
     id: d.id,
     trackId: d.trackId,
@@ -39,6 +42,7 @@ function toPlaylistSong(d: PlaylistSongDto): PlaylistSong {
     comment: d.comment,
     genres: (d.genres ?? []).map((g) => GENRE_LABEL[g] ?? g),
     isBookmarked: d.isLiked,
+    isMine: !!myDeviceId && d.deviceId === myDeviceId,
     reactions: toReactions(d.reactions),
     createdAt: d.createdAt,
   });
@@ -57,7 +61,7 @@ export const createPlaylistRepository = (
       throw apiError(`playlist songs API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
 
     // 등록된 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
-    return res.data.content.map(toPlaylistSong);
+    return res.data.content.map((d) => toPlaylistSong(d, params?.deviceId));
   },
 
   submitSong: async (params) => {
@@ -84,7 +88,7 @@ export const createPlaylistRepository = (
     if (!res.data?.id)
       throw apiError(`playlist song submit API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
 
-    return toPlaylistSong(res.data);
+    return toPlaylistSong(res.data, params.deviceId);
   },
 
   reportSong: async (params) => {
@@ -129,5 +133,40 @@ export const createPlaylistRepository = (
       throw apiError(`playlist reaction API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
 
     return toReactions(res.data.reactions);
+  },
+
+  getTrackPosts: async (params) => {
+    const res = await playlistApiDataSource.getTrackPosts(params);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `track posts API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.songs?.content))
+      throw apiError(`track posts API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    return createTrackPosts({
+      trackId: res.data.trackId,
+      title: res.data.title,
+      artist: res.data.artist,
+      albumArtUrl: res.data.albumArtUrl,
+      totalSongsCount: res.data.totalSongsCount,
+      posts: res.data.songs.content.map((d) => toPlaylistSong(d, params.deviceId)),
+    });
+  },
+
+  getPopularityChart: async (params) => {
+    const res = await playlistApiDataSource.getCharts(params?.type);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist charts API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.tracks))
+      throw apiError(`playlist charts API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    return createPopularityChart({
+      chartType: res.data.chartType,
+      displayTitle: res.data.displayTitle,
+      tracks: res.data.tracks,
+    });
   },
 });

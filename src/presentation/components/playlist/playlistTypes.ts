@@ -1,4 +1,5 @@
 import type { PlaylistSong, PlaylistReaction } from '../../../domain/entities/PlaylistSong.js';
+import { type ReactionKey } from './postReactions';
 
 export type { PlaylistReaction };
 
@@ -13,6 +14,8 @@ export interface Song {
   comment: string;
   genres: string[];
   isBookmarked?: boolean;
+  // 지금 이 기기가 등록한 게시글인지 — 북마크/신고 아이콘을 숨길지 판단하는 데 씀
+  isMine?: boolean;
   reactions?: PlaylistReaction[];
   previewUrl: string;
   // react-query 캐시에 그대로 들어가 localStorage에 직렬화되므로 Date 인스턴스가 아니라 ISO 문자열로 유지 —
@@ -31,6 +34,7 @@ export function mapPlaylistSongToSong(song: PlaylistSong): Song {
     comment: song.comment,
     genres: song.genres,
     isBookmarked: song.isBookmarked,
+    isMine: song.isMine,
     reactions: song.reactions,
     previewUrl: '',
     createdAt: song.createdAt,
@@ -83,4 +87,16 @@ export function formatTimeAgo(date: Date | string): string {
   if (diffMs < MONTH_MS) return `${Math.floor(diffMs / DAY_MS)}일 전`;
   if (diffMs < YEAR_MS) return `${Math.floor(diffMs / MONTH_MS)}달 전`;
   return `${Math.floor(diffMs / YEAR_MS)}년 전`;
+}
+
+// 이모지 반응 카드(PostDetailCard/TrackPostsView)가 공용으로 쓰는 로컬 반응 상태
+export type ReactionState = Partial<Record<ReactionKey, { count: number; mine: boolean }>>;
+
+// 서버가 내려준 반응 목록을 이모지 키 기준 상태로 변환 — reaction.type이 ReactionKey와 동일한 문자열이라는 전제(예: 'FIRE')
+export function toReactionState(reactions?: PlaylistReaction[]): ReactionState {
+  const state: ReactionState = {};
+  for (const r of reactions ?? []) {
+    state[r.type as ReactionKey] = { count: r.count, mine: r.isReacted };
+  }
+  return state;
 }

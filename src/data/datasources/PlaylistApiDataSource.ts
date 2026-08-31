@@ -22,7 +22,10 @@ export interface PlaylistSongDto {
   isLiked: boolean; // 서비스 내 명칭은 "북마크"지만 API 필드명은 isLiked
   reactions: PlaylistReactionDto[];
   createdAt: string; // ISO 8601
-  // heartCount, totalPlayCount, deviceId, updatedAt도 응답에 있지만 화면에 표기하지 않아 그대로 버림
+  // 이 곡을 추천 등록한 기기 — 화면에 직접 표기하진 않지만, 요청 기기의 deviceId와 비교해서
+  // "내가 등록한 게시글인지"(isMine)를 판단하는 데 씀 (신고/북마크 아이콘 노출 여부 결정)
+  deviceId: string;
+  // heartCount, totalPlayCount, updatedAt도 응답에 있지만 화면에 표기하지 않아 그대로 버림
 }
 
 export interface PagedPlaylistSongsDto {
@@ -89,6 +92,43 @@ export interface ToggleReactionDto {
   reactions: PlaylistReactionDto[];
 }
 
+// 특정 곡(trackId)에 달린 추천 게시글 모아보기 응답
+export interface TrackPostsDto {
+  trackId: string;
+  title: string;
+  artist: string;
+  albumArtUrl: string;
+  totalSongsCount: number;
+  songs: PagedPlaylistSongsDto;
+  // totalHeartCount도 응답에 있지만 화면에 표기하지 않아 그대로 버림
+}
+
+export interface GetTrackPostsDataSourceParams {
+  trackId: string;
+  deviceId?: string;
+  sort?: string;
+  page?: number;
+  size?: number;
+}
+
+// 백엔드 차트 유형 — RISING(실시간 급상승, 기본값), WEEKLY(주간), MONTHLY(월간)
+export type ChartTypeDto = 'RISING' | 'WEEKLY' | 'MONTHLY';
+
+export interface ChartTrackDto {
+  rank: number;
+  trackId: string;
+  title: string;
+  artist: string;
+  albumArtUrl: string;
+}
+
+export interface ChartDto {
+  chartType: ChartTypeDto;
+  displayTitle: string;
+  tracks: ChartTrackDto[];
+  // snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀
+}
+
 export interface PlaylistApiDataSource {
   getSongs: (params?: GetPlaylistSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
@@ -97,6 +137,8 @@ export interface PlaylistApiDataSource {
   // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 응답 data는 빈 객체라 성공 여부만 확인
   postTrackPlay: (trackId: string) => Promise<ApiResponse<Record<string, never>>>;
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
+  getTrackPosts: (params: GetTrackPostsDataSourceParams) => Promise<ApiResponse<TrackPostsDto>>;
+  getCharts: (type?: ChartTypeDto) => Promise<ApiResponse<ChartDto>>;
 }
 
 const DEFAULT_PAGE = 0;
@@ -125,4 +167,18 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
 
   postReaction: async (songId, body) =>
     parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/reactions`, body)),
+
+  getTrackPosts: async (params) => {
+    const { trackId, deviceId, sort, page = DEFAULT_PAGE, size = DEFAULT_SIZE } = params;
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (deviceId) query.set('deviceId', deviceId);
+    if (sort) query.set('sort', sort);
+
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/tracks/${trackId}?${query.toString()}`));
+  },
+
+  getCharts: async (type) => {
+    const query = type ? `?type=${type}` : '';
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/charts${query}`));
+  },
 });
