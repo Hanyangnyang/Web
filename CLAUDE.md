@@ -21,7 +21,7 @@
 - **Android**: Capacitor + Java (Kotlin 전환 예정)
 - **iOS**: Capacitor (Codemagic으로 빌드)
 - **BFF / API**: Vercel Serverless Functions — 학식 스크래핑, 지하철·날씨·도서관 프록시, Instagram 프록시 (CORS 차단·API Key 보호 역할)
-- **DB / Auth**: Supabase — 익명 Auth, FCM 구독·알림 설정(subscriptions·devices), 배너, 피드백, app_config
+- **DB / Auth**: Supabase — 익명 Auth, FCM 구독·알림 설정(subscriptions·devices), 배너, app_config(다가오는 시간표 변경 배너용 period_schedule만 남음 — 나머지 셔틀 설정은 새 백엔드 `/api/v1/academic/status`로 이전)
 - **푸시 알림**: Firebase Cloud Messaging (FCM) — Capacitor 네이티브(Android/iOS) + Web 동시 지원
 - **에러 모니터링**: Sentry (@sentry/capacitor + @sentry/react, 프로덕션 빌드에서만 활성화)
 - **사용자 분석**: PostHog
@@ -87,7 +87,7 @@ graph TD
             Subscriptions["subscriptions\n알림 구독 설정"]
             Banners["banners\n앱 내 배너"]
             Feedbacks["feedbacks\n피드백 수집"]
-            AppConfig["app_config\n앱 설정값"]
+            AppConfig["app_config\n다가오는 시간표 변경 배너용\nperiod_schedule만 보관"]
         end
         RPC["RPC Functions\nupsert_alarm_subscription\nget_alarm_subscription"]
     end

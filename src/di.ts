@@ -13,7 +13,6 @@ import { createPartnerStoreApiDataSource } from './data/datasources/PartnerStore
 import { createCampusBuildingApiDataSource } from './data/datasources/CampusBuildingApiDataSource.js';
 import { createSmokingSpotApiDataSource } from './data/datasources/SmokingSpotApiDataSource.js';
 import { createAcademicStatusApiDataSource } from './data/datasources/AcademicStatusApiDataSource.js';
-import { createDateInfoApiDataSource } from './data/datasources/DateInfoApiDataSource.js';
 
 import { createMenuRepository } from './data/repositories/MenuRepository.js';
 import { createWeatherRepository } from './data/repositories/WeatherRepository.js';
@@ -27,7 +26,6 @@ import { createPartnerStoreRepository } from './data/repositories/PartnerStoreRe
 import { createCampusBuildingRepository } from './data/repositories/CampusBuildingRepository.js';
 import { createSmokingSpotRepository } from './data/repositories/SmokingSpotRepository.js';
 import { createAcademicStatusRepository } from './data/repositories/AcademicStatusRepository.js';
-import { createDateInfoRepository } from './data/repositories/DateInfoRepository.js';
 
 import { createGetMenuForPeriodUseCase } from './domain/usecases/GetMenuForPeriodUseCase.js';
 import { createGetShuttleDataUseCase } from './domain/usecases/GetShuttleDataUseCase.js';
@@ -43,7 +41,6 @@ import { createGetPartnerStoresUseCase } from './domain/usecases/GetPartnerStore
 import { createGetCampusBuildingsUseCase } from './domain/usecases/GetCampusBuildingsUseCase.js';
 import { createGetSmokingSpotsUseCase } from './domain/usecases/GetSmokingSpotsUseCase.js';
 import { createGetAcademicStatusUseCase } from './domain/usecases/GetAcademicStatusUseCase.js';
-import { createGetDateInfoUseCase } from './domain/usecases/GetDateInfoUseCase.js';
 
 import { createShuttleApiDataSource } from './data/datasources/ShuttleApiDataSource.js';
 import { createSubwayApiDataSource } from './data/datasources/SubwayApiDataSource.js';
@@ -72,7 +69,6 @@ const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: 
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
 const smokingSpotApiDataSource = createSmokingSpotApiDataSource({ httpClient });
 const academicStatusApiDataSource = createAcademicStatusApiDataSource({ httpClient: apiHttpClient });
-const dateInfoApiDataSource = createDateInfoApiDataSource({ httpClient: apiHttpClient });
 
 // Repositories
 export const menuRepository = createMenuRepository({ menuApiDataSource });
@@ -89,7 +85,6 @@ export const partnerStoreRepository = createPartnerStoreRepository({ partnerStor
 export const campusBuildingRepository = createCampusBuildingRepository({ campusBuildingApiDataSource });
 export const smokingSpotRepository = createSmokingSpotRepository({ smokingSpotApiDataSource });
 export const academicStatusRepository = createAcademicStatusRepository({ academicStatusApiDataSource });
-export const dateInfoRepository = createDateInfoRepository({ dateInfoApiDataSource });
 
 // Use Cases
 export const getMenuForPeriodUseCase = createGetMenuForPeriodUseCase({ menuRepository });
@@ -106,4 +101,3 @@ export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerSt
 export const getCampusBuildingsUseCase = createGetCampusBuildingsUseCase({ campusBuildingRepository });
 export const getSmokingSpotsUseCase = createGetSmokingSpotsUseCase({ smokingSpotRepository });
 export const getAcademicStatusUseCase = createGetAcademicStatusUseCase({ academicStatusRepository });
-export const getDateInfoUseCase = createGetDateInfoUseCase({ dateInfoRepository });
