@@ -392,8 +392,13 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         style={{ bottom: `calc(${buttonBase} + 68px)` }}
         className="absolute right-3 z-30 h-11 px-3.5 flex items-center gap-1.5 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform"
       >
-        <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>🎲</span>
-        <span className="text-[13px] font-extrabold text-[#334155]">{diceLabel}</span>
+        <span className={`text-[18px] leading-none ${rolling ? 'inline-block [animation:drumRollShake_0.25s_ease-in-out_infinite]' : ''}`}>
+          {rolling ? '🥁' : '🎲'}
+        </span>
+        <span className="text-[13px] font-extrabold text-[#334155]">{rolling ? '두구두구' : diceLabel}</span>
+        {rolling && (
+          <span className="text-[18px] leading-none inline-block [animation:drumRollShake_0.25s_ease-in-out_infinite_0.1s]">🥁</span>
+        )}
       </button>
 
       {/* 내 위치 버튼 — 시트 높이를 따라 항상 시트 가장자리 위에 떠 있는다 */}

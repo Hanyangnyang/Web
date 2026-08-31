@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 import { visibleStores, type CategoryFilter, type PartnerStore, type StoreCategory } from '../../../domain/entities/PartnerStore.js';
 
 // 주사위가 잠깐 굴러가는 연출 후 결과 공개
-const ROLL_DELAY_MS = 500;
+const ROLL_DELAY_MS = 300;
 
 // 이 카테고리들이 활성 칩일 땐 "점메추" 대신 "어디가지"로, 그 카테고리 안에서 뽑는다
 const NON_FOOD_CATEGORIES = new Set<StoreCategory>(['cafe', 'pub', 'play', 'life']);
