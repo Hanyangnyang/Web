@@ -166,9 +166,10 @@ export default function CampusMapView({ isActive }: Props) {
     selectBuilding(building, 'search');
   };
 
-  const { rolling, rollRandom, diceLabel } = usePartnerRandomPick({
+  const { rolling, rollRandom, diceLabel, diceEmoji } = usePartnerRandomPick({
     stores,
     excludeId: selectedStore?.id ?? null,
+    activeCategory: storeCategory,
     onPick: (store) => pickStore(store, 'random'),
     posthog,
   });
@@ -334,16 +335,17 @@ export default function CampusMapView({ isActive }: Props) {
         )}
       </KakaoMap>
 
-      {/* 점메추 🎲 — 라벨이 곧 설명(항상 식당 랜덤), 내 위치 버튼 위에 스택.
+      {/* 점메추/저메추/어디가지 🎲 — 라벨이 곧 설명. 카페/주점/여가/생활 칩일 땐 "어디가지"로 바뀌고
+          그 카테고리에서 뽑는다(usePartnerRandomPick 참고), 그 외엔 항상 식당 랜덤. 내 위치 버튼 위에 스택.
           bottom은 활성 시트 높이에서 파생되므로 Tailwind 클래스가 아닌 inline style로 준다 */}
       <button
         onClick={rollRandom}
         disabled={rolling}
-        aria-label="랜덤 식당 추천"
+        aria-label="랜덤 추천"
         style={{ bottom: `calc(${buttonBase} + 68px)` }}
         className="absolute right-3 z-30 h-11 px-3.5 flex items-center gap-1.5 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform"
       >
-        <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>🎲</span>
+        <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>{diceEmoji}</span>
         <span className="text-[13px] font-extrabold text-[#334155]">{diceLabel}</span>
       </button>
 
