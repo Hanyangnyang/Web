@@ -160,9 +160,11 @@ src/
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
 | `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 1분(FE staleTime, BE 캐시 주기 미확인) — 실시간성이 중요해 전역 기본값보다 짧게 지정 | 콜드스타트 fetch, 최근추가된곡 화면 진입 시 명시적 refetch(화면 전환은 컴포넌트 재마운트가 아니라서 staleTime만으론 재조회 안 됨) |
-| `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 15분(전역 기본값) | 게시글 목록(TrackPostsView 등)에서 항목 클릭 시 상세화면(PostDetailView) 진입. `id`가 없는(BE 게시글 검색 미연동) 경로는 호출하지 않고 더미로 대체 |
+| `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 15분(전역 기본값) | 게시글 목록(TrackPostsView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostDetailView) 진입 |
 | `/api/v1/playlist/songs/creation-status` | 곡 작성 전 사용자 기기 상태 조회 (오늘 남은 등록 횟수, 최근 7일 중복 추천곡) | 0(항상 최신값) | 곡추천하기 화면 진입(컴포넌트 재마운트)마다. 헤더에 남은 횟수 표시, 최근 7일 내 추천한 곡은 검색 결과에서 선택 자체를 막음 |
 | `/api/v1/playlist/songs/liked` | 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 조회 | 0(항상 최신값) | 북마크한 곡 화면 진입(컴포넌트 재마운트)마다 — 북마크 토글이 여러 화면에서 흩어져 일어나서 캐시 대신 매번 최신값을 불러옴 |
+| `/api/v1/playlist/songs/search` | 추천글 가중치 통합 검색 (제목/가수/코멘트) | 15분(전역 기본값) | 검색 결과 화면의 "게시글" 섹션 — 검색어(query)가 바뀔 때마다(queryKey에 포함돼 자동 재조회), 2자 미만이면 호출 안 함 |
+| `/api/v1/playlist/songs/tracks/search` | 음원 트랙(Spotify 곡) 검색 결과별 게시글수/북마크수 조회 | 15분(전역 기본값) | 검색 결과 화면 상단 "곡" 섹션(Spotify 검색) — trackId로 매칭해 카드 하단에 표시, 검색어 바뀔 때마다 자동 재조회, 2자 미만이면 호출 안 함 |
 | `POST /api/v1/playlist/songs` | 곡 추천 및 등록 | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록 확인 팝업에서 최종 확정 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영. `isPending` 동안 버튼 비활성화로 중복 제출 방지 |
 | `POST /api/v1/playlist/songs/{id}/reports` | 곡 게시글 신고하기 | 해당없음 (뮤테이션) | 더보기 메뉴 → 사유 선택 → 신고하기 클릭 시 |
 | `POST /api/v1/playlist/songs/{id}/like` | 좋아요(=서비스 내 "북마크") 토글 | 해당없음 (뮤테이션) | 북마크 배지 클릭 시. 낙관적 업데이트 + 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |

@@ -7,7 +7,7 @@ import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlay
 import { AddSongFab } from './AddSongFab';
 import { AddSongView } from './AddSongView';
 import { RecentSongsView } from './RecentSongsView';
-import { SearchResultsView, type TrackResult, type SongPostResult } from './SearchResultsView';
+import { SearchResultsView, type TrackResult } from './SearchResultsView';
 import { TrackPostsView } from './TrackPostsView';
 import { PostDetailView } from './PostDetailView';
 import { MyActivityView } from './MyActivityView';
@@ -142,10 +142,9 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     pushScreen('trackPosts');
   }, [pushScreen]);
 
-  // 게시글 목록(TrackPostsView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동.
-  // SearchResultsView의 게시글 섹션은 아직 BE 검색 API 연결 전이라 id가 없는 더미라서, 그 경로는 id 없이 넘어올 수 있음
-  const handleSelectPost = useCallback((post: Song | SongPostResult) => {
-    setSelectedPostId('id' in post ? post.id ?? null : null);
+  // 게시글 목록(TrackPostsView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동
+  const handleSelectPost = useCallback((post: Song) => {
+    setSelectedPostId(post.id ?? null);
     pushScreen('postDetail');
   }, [pushScreen]);
 
@@ -216,7 +215,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onPlay={() => handlePlay(selectedTrackForPosts)}
             isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
           />
-        ) : screen === 'postDetail' ? (
+        ) : screen === 'postDetail' && selectedPostId ? (
           <PostDetailView postId={selectedPostId} onBack={popScreen} />
         ) : screen === 'chart' ? (
           <ChartView

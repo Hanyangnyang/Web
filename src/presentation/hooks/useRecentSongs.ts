@@ -5,6 +5,8 @@ import {
   getSongByIdUseCase,
   getSongCreationStatusUseCase,
   getBookmarkedSongsUseCase,
+  searchSongsUseCase,
+  searchTrackStatsUseCase,
   submitSongUseCase,
   reportSongUseCase,
   toggleBookmarkUseCase,
@@ -16,6 +18,7 @@ import {
 import { getOrCreateAnonymousUserId } from '../../lib/supabase.js';
 import { mapPlaylistSongToSong, type Song, type PlaylistReaction, type ChartPeriod } from '../components/playlist/playlistTypes.js';
 import type { ChartType } from '../../domain/repositories/IPlaylistRepository.js';
+import type { TrackStats } from '../../domain/entities/TrackStats.js';
 
 const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
 const RECENT_SONGS_SIZE = 50;
@@ -74,6 +77,38 @@ export function useBookmarkedSongs() {
       return songs.map(mapPlaylistSongToSong);
     },
     staleTime: 0,
+  });
+}
+
+const SONG_SEARCH_SIZE = 20;
+// SearchResultsView의 곡(Spotify) 검색과 동일한 최소 글자 수 — 이보다 짧으면 호출하지 않음
+const SONG_SEARCH_MIN_LENGTH = 2;
+
+// 검색 결과 화면의 "게시글" 섹션 — 제목/가수명/코멘트 가중치 통합 검색
+export function useSongSearch(keyword: string) {
+  const trimmed = keyword.trim();
+
+  return useQuery<Song[]>({
+    queryKey: ['playlist', 'song-search', trimmed],
+    queryFn: async () => {
+      const deviceId = await getOrCreateAnonymousUserId();
+      const songs = await searchSongsUseCase.execute({ keyword: trimmed, deviceId, size: SONG_SEARCH_SIZE });
+      return songs.map(mapPlaylistSongToSong);
+    },
+    enabled: trimmed.length >= SONG_SEARCH_MIN_LENGTH,
+  });
+}
+
+const TRACK_STATS_SEARCH_SIZE = 10;
+
+// 검색 결과 화면 상단 "곡" 섹션 — Spotify 검색 결과 카드에 붙일 게시글수/북마크수 통계
+export function useTrackStatsSearch(keyword: string) {
+  const trimmed = keyword.trim();
+
+  return useQuery<TrackStats[]>({
+    queryKey: ['playlist', 'track-stats-search', trimmed],
+    queryFn: () => searchTrackStatsUseCase.execute({ keyword: trimmed, size: TRACK_STATS_SEARCH_SIZE }),
+    enabled: trimmed.length >= SONG_SEARCH_MIN_LENGTH,
   });
 }
 

@@ -4,6 +4,7 @@ import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '..
 import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
 import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
 import { createSongCreationStatus } from '../../domain/entities/SongCreationStatus.js';
+import { createTrackStats } from '../../domain/entities/TrackStats.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
 
@@ -88,6 +89,34 @@ export const createPlaylistRepository = (
 
     // 북마크한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
     return res.data.content.map((d) => toPlaylistSong(d, params.deviceId));
+  },
+
+  searchSongs: async (params) => {
+    const res = await playlistApiDataSource.searchSongs(params);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist song search API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.content))
+      throw apiError(`playlist song search API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    // 검색 결과가 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
+    return res.data.content.map((d) => toPlaylistSong(d, params.deviceId));
+  },
+
+  searchTrackStats: async (params) => {
+    const res = await playlistApiDataSource.searchTrackStats(params);
+
+    if (!res.success)
+      throw apiError(res.error?.message || `playlist track search API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
+
+    if (!res.data || !Array.isArray(res.data.content))
+      throw apiError(`playlist track search API returned invalid shaped 'data': ${JSON.stringify(res.data)}`, { area: AREA, endpoint: res._requestUrl });
+
+    // 아직 아무도 추천하지 않은 트랙일 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
+    return res.data.content.map((d) =>
+      createTrackStats({ trackId: d.trackId, totalSongsCount: d.totalSongsCount, totalHeartCount: d.totalHeartCount })
+    );
   },
 
   getSongCreationStatus: async (params) => {

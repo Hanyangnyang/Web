@@ -1,12 +1,14 @@
-import { ArrowRight, Play, Search } from 'lucide-react';
+import { ArrowRight, Bookmark, MessageSquare, Play, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
+import { type Song } from './playlistTypes';
+import { useSongSearch, useTrackStatsSearch } from '../../hooks/useRecentSongs.js';
 
 interface SearchResultsViewProps {
   query: string;
   onBack: () => void;
   onSelectTrack: (track: TrackResult) => void;
-  onSelectPost: (post: SongPostResult) => void;
+  onSelectPost: (post: Song) => void;
   // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
   onPlay: (track: TrackResult) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
@@ -20,43 +22,13 @@ export interface TrackResult {
   albumArtUrl: string;
 }
 
-export interface SongPostResult {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-  body: string;
-}
-
 const MIN_QUERY_LENGTH = 2;
 
-// UI 디자인용 임시 더미 — 실제로는 BE에 등록된 게시글 조회 API 응답으로 교체될 예정
-const DUMMY_POST_RESULTS: SongPostResult[] = [
-  {
-    trackId: 'p1',
-    title: 'Busy Boy',
-    artist: '주혜린',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273951f05b855b09c8b4d7d2ee5',
-    body: '이 노래 진짜 좋아! 베이스 라인이 미쳤어, 이런 감성의 R&B는 진짜 오랜만이에요 ㅠㅠ',
-  },
-  {
-    trackId: 'p2',
-    title: '다큐멘터리',
-    artist: '윤마치',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b2734c02aacdf6281db79169e115',
-    body: '가사도 멜로디도 감성 만렙이라 듣자마자 바로 플레이리스트 맨 위에 올려놨어요 💯',
-  },
-  {
-    trackId: 'p3',
-    title: '마음으로',
-    artist: '유다빈밴드',
-    albumArtUrl: 'https://i.scdn.co/image/ab67616d0000b273598f97c45eee469199fd0733',
-    body: '아침에 일어나서부터 밤에 잠들 때까지 하루종일 이 노래만 듣고 있는 것 같아요',
-  },
-];
-
-// 검색 결과 화면 — 곡 검색은 Spotify 검색 API(/api/music-search) 연동 완료. BE 게시글 조회는 추후 연결
+// 검색 결과 화면 — 곡 검색은 Spotify 검색 API(/api/music-search), 게시글 검색은 BE 추천글 통합 검색 API 연동 완료
 export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId }: SearchResultsViewProps) {
+  const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(query);
+  const { data: trackStats } = useTrackStatsSearch(query);
+  const trackStatsByTrackId = new Map((trackStats ?? []).map((stats) => [stats.trackId, stats]));
   const [localQuery, setLocalQuery] = useState(query);
   const [trackResults, setTrackResults] = useState<TrackResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -150,43 +122,59 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             ) : trackResults.length === 0 ? (
               <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
             ) : (
-              trackResults.map((track) => (
-                <div
-                  key={track.trackId}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onSelectTrack(track)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
-                  }}
-                  aria-label={`${track.title} 추천 게시글 보기`}
-                  className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform cursor-pointer"
-                >
-                  <div className="relative">
-                    <img
-                      src={track.albumArtUrl}
-                      alt={track.title}
-                      className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
-                    />
-                    {track.trackId !== currentTrackId && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPlay(track);
-                        }}
-                        aria-label={`${track.title} 재생`}
-                        className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
-                      >
-                        <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                          <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
+              trackResults.map((track) => {
+                const stats = trackStatsByTrackId.get(track.trackId);
+                return (
+                  <div
+                    key={track.trackId}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onSelectTrack(track)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
+                    }}
+                    aria-label={`${track.title} 추천 게시글 보기`}
+                    className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform cursor-pointer"
+                  >
+                    <div className="relative">
+                      <img
+                        src={track.albumArtUrl}
+                        alt={track.title}
+                        className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
+                      />
+                      {track.trackId !== currentTrackId && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onPlay(track);
+                          }}
+                          aria-label={`${track.title} 재생`}
+                          className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
+                        >
+                          <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
+                            <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                    <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
+                    <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                    {/* 이 곡에 달린 추천글수/북마크수 — 아직 아무도 추천 안 한 곡은 API 결과에 없어서 아예 표시 안 함 */}
+                    {stats && stats.totalSongsCount > 0 && (
+                      <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-text-hint">
+                        <span className="flex items-center gap-0.5">
+                          <MessageSquare size={10} />
+                          {stats.totalSongsCount}
                         </span>
-                      </button>
+                        <span className="flex items-center gap-0.5">
+                          <Bookmark size={10} />
+                          {stats.totalHeartCount}
+                        </span>
+                      </div>
                     )}
                   </div>
-                  <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
-                  <div className="text-xs text-text-sub truncate">{track.artist}</div>
-                </div>
-              ))
+                );
+              })
             )}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
           </div>
@@ -199,30 +187,46 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
       <section>
         <h3 className="text-lg font-bold text-text-main mb-2">게시글</h3>
         <div className="flex flex-col gap-1">
-          {DUMMY_POST_RESULTS.map((post) => (
-            <div
-              key={post.trackId}
-              role="button"
-              tabIndex={0}
-              onClick={() => onSelectPost(post)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') onSelectPost(post);
-              }}
-              aria-label="게시글 상세 보기"
-              className="flex items-center gap-3 px-3 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
-            >
-              <img
-                src={post.albumArtUrl}
-                alt={post.title}
-                className="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-slate-100"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-text-main truncate">{post.title}</div>
-                <div className="text-xs text-text-sub truncate">{post.artist}</div>
-                <p className="mt-1 text-xs text-text-sub line-clamp-2">{post.body}</p>
+          {isSearchingPosts ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-3 bg-white rounded-card border border-slate-200">
+                <div className="w-14 h-14 rounded-lg bg-slate-200 animate-pulse flex-shrink-0" />
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="h-3.5 w-2/3 rounded-full bg-slate-200 animate-pulse" />
+                  <div className="h-3 w-1/3 rounded-full bg-slate-200 animate-pulse" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : query.trim().length < MIN_QUERY_LENGTH ? (
+            <p className="text-xs text-text-hint py-2">최소 {MIN_QUERY_LENGTH}자 이상 입력해주세요!</p>
+          ) : !postResults || postResults.length === 0 ? (
+            <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
+          ) : (
+            postResults.map((post) => (
+              <div
+                key={post.id ?? post.trackId}
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelectPost(post)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') onSelectPost(post);
+                }}
+                aria-label="게시글 상세 보기"
+                className="flex items-center gap-3 px-3 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <img
+                  src={post.albumArtUrl}
+                  alt={post.title}
+                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-slate-100"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-text-main truncate">{post.title}</div>
+                  <div className="text-xs text-text-sub truncate">{post.artist}</div>
+                  <p className="mt-1 text-xs text-text-sub line-clamp-2">{post.comment}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
     </div>
