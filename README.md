@@ -159,18 +159,18 @@ src/
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
-| `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 1분(FE staleTime, BE 캐시 주기 미확인) — 실시간성이 중요해 전역 기본값보다 짧게 지정 | 콜드스타트 fetch, 최근추가된곡 화면 진입 시 명시적 refetch(화면 전환은 컴포넌트 재마운트가 아니라서 staleTime만으론 재조회 안 됨) |
-| `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 15분(전역 기본값) | 게시글 목록(TrackPostsView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostDetailView) 진입 |
+| `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 0(항상 최신값) — 여러 사용자가 실시간으로 올리는 피드라 캐싱 안 함 | 콜드스타트 fetch, 최근추가된곡 화면 진입마다 |
+| `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 0(항상 최신값) | 게시글 목록(TrackPostsView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostDetailView) 진입 |
 | `/api/v1/playlist/songs/creation-status` | 곡 작성 전 사용자 기기 상태 조회 (오늘 남은 등록 횟수, 최근 7일 중복 추천곡) | 0(항상 최신값) | 곡추천하기 화면 진입(컴포넌트 재마운트)마다. 헤더에 남은 횟수 표시, 최근 7일 내 추천한 곡은 검색 결과에서 선택 자체를 막음 |
-| `/api/v1/playlist/songs/liked` | 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 조회 | 0(항상 최신값) | 북마크한 곡 화면 진입(컴포넌트 재마운트)마다 — 북마크 토글이 여러 화면에서 흩어져 일어나서 캐시 대신 매번 최신값을 불러옴 |
-| `/api/v1/playlist/songs/search` | 추천글 가중치 통합 검색 (제목/가수/코멘트) | 15분(전역 기본값) | 검색 결과 화면의 "게시글" 섹션 — 검색어(query)가 바뀔 때마다(queryKey에 포함돼 자동 재조회), 2자 미만이면 호출 안 함 |
+| `/api/v1/playlist/songs/liked` | 내가 좋아요(=서비스 내 "저장") 누른 곡 목록 조회 | 0(항상 최신값) | 저장한 곡 화면 진입(컴포넌트 재마운트)마다 |
+| `/api/v1/playlist/songs/search` | 추천글 가중치 통합 검색 (제목/가수/코멘트) | 0(항상 최신값) | 검색 결과 화면의 "게시글" 섹션 — 검색어(query)가 바뀔 때마다(queryKey에 포함돼 자동 재조회), 2자 미만이면 호출 안 함 |
 | `POST /api/v1/playlist/songs` | 곡 추천 및 등록 | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록 확인 팝업에서 최종 확정 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영. `isPending` 동안 버튼 비활성화로 중복 제출 방지 |
 | `POST /api/v1/playlist/songs/{id}/reports` | 곡 게시글 신고하기 | 해당없음 (뮤테이션) | 더보기 메뉴 → 사유 선택 → 신고하기 클릭 시 |
-| `POST /api/v1/playlist/songs/{id}/like` | 좋아요(=서비스 내 "북마크") 토글 | 해당없음 (뮤테이션) | 북마크 배지 클릭 시. 낙관적 업데이트 + 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
+| `POST /api/v1/playlist/songs/{id}/like` | 좋아요(=서비스 내 "저장") 토글 | 해당없음 (뮤테이션) | 저장 배지 클릭 시. 낙관적 업데이트 + 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
 | `POST /api/v1/playlist/songs/tracks/{trackId}/play` | 곡 재생수 기록 (인기차트 집계용) | 해당없음 (뮤테이션) | 재생 버튼 클릭 시(모든 재생 버튼이 `PlaylistView`의 `handlePlay` 한 곳으로 모임). 같은 trackId는 10초 스로틀 — 연타로 재생수가 부풀지 않게 프론트에서 직접 제한 |
 | `POST /api/v1/playlist/songs/{id}/reactions` | 이모지 리액션 토글 (9종) | 해당없음 (뮤테이션) | 이모지 반응 버튼 클릭 시. 응답으로 온 9종 전체 최신 카운트로 로컬 상태를 통째로 동기화, 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |
-| `/api/v1/playlist/songs/tracks/{trackId}` | 특정 곡(trackId)에 달린 추천 게시글 모아보기 | 15분(전역 기본값) | 인기차트/검색결과에서 곡 선택 시, 최신·인기 정렬(sort) 전환 시(queryKey에 sort 포함돼 자동 재조회) |
-| `/api/v1/playlist/songs/charts` | 인기 차트 순위 조회 (실시간 급상승/주간/월간) | 5분(FE staleTime, BE 캐시 주기 미확인) | 콜드스타트 fetch, 기간 필터 칩(실시간/주간/월간) 전환 시(queryKey에 기간 포함돼 자동 재조회) |
+| `/api/v1/playlist/songs/tracks/{trackId}` | 특정 곡(trackId)에 달린 추천 게시글 모아보기 | 0(항상 최신값) | 인기차트/검색결과에서 곡 선택 시, 최신·인기 정렬(sort) 전환 시(queryKey에 sort 포함돼 자동 재조회) |
+| `/api/v1/playlist/songs/charts` | 인기 차트 순위 조회 (실시간 급상승/주간/월간) | 0(항상 최신값) | 콜드스타트 fetch, 기간 필터 칩(실시간/주간/월간) 전환 시(queryKey에 기간 포함돼 자동 재조회) |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage

@@ -15,7 +15,7 @@ export function BookmarkedSongsView({ onBack, onPlay, onShowAddSong, currentTrac
 
   return (
     <SongListScreen
-      title="북마크한 곡"
+      title="저장한 곡"
       emoji="🔖"
       subtitle=""
       songs={songs ?? []}

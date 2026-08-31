@@ -8,11 +8,11 @@ interface MyActivityViewProps {
 }
 
 const MENU_ITEMS = [
-  { key: 'bookmarked', emoji: '🔖', title: '북마크한 곡', subtitle: '내가 저장한 곡 게시글 모음' },
+  { key: 'bookmarked', emoji: '🔖', title: '저장한 곡', subtitle: '내가 저장한 곡 게시글 모음' },
   { key: 'mySongs', emoji: '🎤', title: '내가 추천한 곡', subtitle: '내가 등록한 곡 모음' },
 ] as const;
 
-// 홈 화면 우측 상단 사람 아이콘에서 진입하는 내 활동 허브 — 북마크한 곡/내가 추천한 곡으로 이동
+// 홈 화면 우측 상단 사람 아이콘에서 진입하는 내 활동 허브 — 저장한 곡/내가 추천한 곡으로 이동
 export function MyActivityView({ onBack, onShowBookmarked, onShowMySongs }: MyActivityViewProps) {
   const handleSelect = (key: (typeof MENU_ITEMS)[number]['key']) => {
     if (key === 'bookmarked') onShowBookmarked();

@@ -20,8 +20,6 @@ import type { ChartType } from '../../domain/repositories/IPlaylistRepository.js
 
 const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
 const RECENT_SONGS_SIZE = 50;
-// 다른 사용자가 방금 추천한 곡이 바로 보여야 하는 실시간성 있는 피드라, 전역 기본값(15분)보다 훨씬 짧게 둠
-const RECENT_SONGS_STALE_TIME = 60 * 1000;
 
 export function useRecentSongs() {
   return useQuery<Song[]>({
@@ -31,7 +29,7 @@ export function useRecentSongs() {
       const songs = await getRecentSongsUseCase.execute({ deviceId, size: RECENT_SONGS_SIZE });
       return songs.map(mapPlaylistSongToSong);
     },
-    staleTime: RECENT_SONGS_STALE_TIME,
+    staleTime: 0,
   });
 }
 
@@ -46,11 +44,11 @@ export function usePostDetail(postId: string | null) {
       return mapPlaylistSongToSong(song);
     },
     enabled: !!postId,
+    staleTime: 0,
   });
 }
 
-// 곡추천하기 화면 진입 시 1일 3곡 제한/최근 7일 중복 추천 사전 확인. 등록 후 다시 들어오면
-// 값이 바뀌어있을 수 있어서(예: 1곡 등록 후 재진입) staleTime 0으로 화면 진입마다 최신값을 다시 불러옴
+// 곡추천하기 화면 진입 시 1일 3곡 제한/최근 7일 중복 추천 사전 확인
 export function useSongCreationStatus() {
   return useQuery({
     queryKey: ['playlist', 'creation-status'],
@@ -64,8 +62,7 @@ export function useSongCreationStatus() {
 
 const BOOKMARKED_SONGS_SIZE = 50;
 
-// 북마크한 곡 화면용 — 북마크 토글은 여러 화면(최근추가된곡/곡별게시글모아보기 등)에서 흩어져 일어나서
-// 이 목록 자체를 실시간으로 갱신 대상에 넣기보단, 화면 진입(컴포넌트 재마운트)마다 최신값을 다시 불러옴
+// 저장한 곡 화면용
 export function useBookmarkedSongs() {
   return useQuery<Song[]>({
     queryKey: ['playlist', 'bookmarked-songs'],
@@ -94,6 +91,7 @@ export function useSongSearch(keyword: string) {
       return songs.map(mapPlaylistSongToSong);
     },
     enabled: trimmed.length >= SONG_SEARCH_MIN_LENGTH,
+    staleTime: 0,
   });
 }
 
@@ -203,6 +201,7 @@ export function useTrackPosts(trackId: string, sort: TrackPostsSort) {
       };
     },
     enabled: !!trackId,
+    staleTime: 0,
   });
 }
 
@@ -213,14 +212,11 @@ const CHART_PERIOD_TO_TYPE: Record<ChartPeriod, ChartType> = {
   monthly: 'MONTHLY',
 };
 
-// 자주 갱신될 필요는 없어서 전역 기본값(15분)보다 좀 더 여유 있게 둠
-const CHART_STALE_TIME = 5 * 60 * 1000;
-
 // 인기 차트(실시간 급상승/주간/월간) — period가 바뀌면 queryKey가 달라져서 자동으로 다시 불러옴
 export function usePopularityChart(period: ChartPeriod) {
   return useQuery({
     queryKey: ['playlist', 'chart', period],
     queryFn: () => getPopularityChartUseCase.execute({ type: CHART_PERIOD_TO_TYPE[period] }),
-    staleTime: CHART_STALE_TIME,
+    staleTime: 0,
   });
 }

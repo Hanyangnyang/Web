@@ -35,7 +35,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   // 최근추가된곡은 /api/v1/playlist/songs에서 받아온 뒤 로컬 state로 옮겨 관리 —
   // 곡 등록 API가 아직 없어서, 등록 직후엔 서버 재조회 없이 로컬로만 맨 앞에 얹기 때문
-  const { data: fetchedSongs, refetch: refetchRecentSongs } = useRecentSongs();
+  const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const [songs, setSongs] = useState<Song[]>([]);
   useEffect(() => {
     if (fetchedSongs) setSongs(fetchedSongs);
@@ -252,6 +252,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
           <PlaylistMainContent
             onBack={onBack}
             visibleSongs={visibleSongs}
+            isRecentSongsLoading={isRecentSongsLoading}
             visibleChart={visibleChart}
             isChartLoading={isChartLoading}
             chartPeriod={chartPeriod}
@@ -288,6 +289,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
 interface PlaylistMainContentProps {
   onBack: () => void;
   visibleSongs: Song[];
+  isRecentSongsLoading: boolean;
   visibleChart: ChartTrack[];
   isChartLoading: boolean;
   chartPeriod: ChartPeriod;
@@ -307,6 +309,7 @@ interface PlaylistMainContentProps {
 function PlaylistMainContent({
   onBack,
   visibleSongs,
+  isRecentSongsLoading,
   visibleChart,
   isChartLoading,
   chartPeriod,
@@ -378,13 +381,19 @@ function PlaylistMainContent({
 
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
-            {visibleSongs.map((song) => (
-              <RecentSongCard
-                key={song.id ?? song.trackId}
-                song={song}
-                onClick={() => onSelectRecentSong(song)}
-              />
-            ))}
+            {isRecentSongsLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-44 aspect-[4/5] rounded-xl bg-slate-200 animate-pulse" />
+              ))
+            ) : (
+              visibleSongs.map((song) => (
+                <RecentSongCard
+                  key={song.id ?? song.trackId}
+                  song={song}
+                  onClick={() => onSelectRecentSong(song)}
+                />
+              ))
+            )}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
           </div>
         </div>
