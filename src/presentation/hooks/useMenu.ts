@@ -5,7 +5,7 @@ import { getMenuForPeriodUseCase } from '../../di.js';
 import { getKSTDateUnsafe, toDateKey } from '../../utils/kstTime.js';
 import { createEmptyCafes, type Cafe } from '../../domain/entities/Cafe.js';
 
-const MENU_STALE_TIME = 12 * 60 * 60 * 1000;  // 12시간 — 백엔드 Menu 캐시 TTL과 동일 (매일 오전 1시 스크래핑 시 evict)
+const MENU_STALE_TIME = 60 * 60 * 1000;  // 1시간 — 백엔드 Menu 캐시 TTL(12시간)보다 짧게 재검증. 대부분은 백엔드도 같은 캐시값을 그대로 돌려줌
 const MENU_FOR_PERIOD_QUERY_KEY = ['menu-period'] as const;
 
 function getInitialDate(): Date {

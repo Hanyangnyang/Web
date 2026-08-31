@@ -147,17 +147,17 @@ src/
 ### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
 (Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 2번, 그래서 총 3번 호출함. staleTime이 지났는데 트리거가 있을 경우 SWR. localStorage는 maxAge 24시간으로 설정함. maxAge는 캐싱된 값을 불러올지 말지를 결정하는 기준.)
 
-| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
+| 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 콜드스타트 prefetch, "다시 시도" 버튼 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼 |
-| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
-| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 콜드스타트 prefetch, 소식탭 진입 |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 콜드스타트 prefetch |
-| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
-| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 / 1시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼 |
+| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
+| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 / 1시간 | 콜드스타트 prefetch |
+| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 / 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
+| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
 | `POST /api/v1/feedbacks` | 통합 피드백 접수 (기능별 category/feedbackType 태깅) | 해당없음 (뮤테이션, 캐싱 대상 아님) | 기타탭 > 피드백 보내기(`FeedbackView`, category `GENERAL`), 캠퍼스맵 제보 모달(`CampusFeedbackModal`, category `CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보(`SearchOverlay`, category `PARTNERSHIP`)에서 씀. 기존 Supabase 직접 연결 피드백 스택(`useFeedback` 등)은 전 화면 이전 완료 후 제거함 |
 | `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 (날짜별 달력/공휴일, 학사 일정, 셔틀 운행 기준) | 5분(FE staleTime, BE 캐시 주기 미확인) — Supabase `app_config`(현재기간·공휴일·강제주말·미운행 오버라이드)를 완전히 대체하는 자리라, 관리자가 긴급 미운행 등을 바꿔도 앱 재시작 없이 비교적 빨리 반영되도록 짧게 잡음 | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상 — 실패해도 markReady는 호출) + 셔틀탭(`useShuttle`)이 `calendar`/`academic`/`shuttle` 필드로 기간·평일/주말·운행여부를 직접 판정. `date-info`는 완전히 대체되어 삭제함 |
 

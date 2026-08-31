@@ -3,10 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getPartnerStoresUseCase } from '../../../di.js';
 import type { PartnerStore } from '../../../domain/entities/PartnerStore.js';
 
-// 12시간 — 백엔드 제휴매장 캐시(Redis) TTL과 동일. 그보다 자주 물어봐도 더 최신 데이터를 못 받는다.
+// 1시간 — 백엔드 제휴매장 캐시(Redis) TTL(12시간)보다 짧게 재검증. 대부분은 같은 캐시값을 그대로 돌려받는다.
 // 예전엔 손으로 관리하던 partnerships.json이라 createStaticDataQuery(24h 고정)를 같이 썼는데,
 // 이제 실제 백엔드 API가 됐으니 다른 마이그레이션된 도메인(gym·menu·banner 등)처럼 전용 staleTime을 둔다.
-const PARTNERSHIP_STALE_TIME = 12 * 60 * 60 * 1000;
+const PARTNERSHIP_STALE_TIME = 60 * 60 * 1000;
 const PARTNERSHIP_QUERY_KEY = ['partnership', 'stores'];
 
 export interface UsePartnerStoresResult {

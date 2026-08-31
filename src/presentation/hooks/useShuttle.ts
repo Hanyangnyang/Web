@@ -11,8 +11,8 @@ import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
 import { useAcademicStatus } from './useAcademicStatus.js';
 
-const BUS_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드가 셔틀버스 시간표를 정확히 이 주기로 캐싱한다고 확인함(관리자가 시간표 CRUD할 때만 캐시 삭제)
-const SUBWAY_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드가 지하철 시간표를 정확히 이 주기로 캐싱한다고 확인함(station:line:direction:dayType 키), 그보다 더 길게 잡으면 백엔드가 이미 갱신한 데이터를 우리만 늦게 받게 됨
+const BUS_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 셔틀버스 캐시 TTL(12시간)보다 짧게 재검증. 관리자가 시간표 CRUD할 때만 백엔드 캐시가 지워지므로 대부분은 같은 값을 그대로 돌려받음
+const SUBWAY_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 지하철 시간표 캐시 TTL(12시간, station:line:direction:dayType 키)보다 짧게 재검증
 
 const SCHEDULE_QUERY_KEY = ['shuttle', 'schedule'];
 const SUBWAY_SCHEDULE_QUERY_KEY = ['shuttle', 'subway-schedule'];
