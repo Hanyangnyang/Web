@@ -73,35 +73,36 @@ export function StoreSheet({ stores, loading, error, onRetry, title, college, on
     return (
       // 단과대 카드 1개 + 다음 카드 절반쯤 보이는 높이 — 지도가 주인공으로 남는다
       <StandardBottomSheet height={toCssHeight(STORE_DETAIL_FRACTION)}>
-        {/* 헤더 */}
+        {/* 헤더 — 업체명·단과대명 모두 최소 4글자는 보이도록(min-w) 보호. 카카오맵 버튼·단과대 드롭다운은
+            공간이 부족하면 먼저 줄어들고(flex-shrink 허용 + 내부 라벨 truncate), 둘을 한 그룹으로 묶어서
+            그 사이 간격만 따로(gap-1.5) 좁게 줄 수 있게 함 */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">{selected.emoji || CATEGORY_META[selected.category].emoji}</span>
-          <div className="flex-1 min-w-0 flex items-center gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[16px] font-extrabold text-text-main truncate">{selected.name}</span>
-              <span className="text-[11px] font-bold text-text-hint flex-shrink-0">{CATEGORY_META[selected.category].label}</span>
-            </div>
+          <div className="flex-1 min-w-0 flex items-center">
+            <span className="min-w-[64px] text-[16px] font-extrabold text-text-main truncate">{selected.name}</span>
+          </div>
+          <div className="min-w-0 flex items-center gap-1.5">
             {kakaoMapUrl && (
               <a
                 href={kakaoMapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-auto flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-[#3C1E1E] bg-[#FEE500]/25 rounded-lg px-2 py-1.5 active:bg-[#FEE500]/40 transition-colors [-webkit-tap-highlight-color:transparent]"
+                className="min-w-0 flex items-center gap-1 text-[11px] font-bold text-[#3C1E1E] bg-[#FEE500]/25 rounded-lg px-2 py-1.5 active:bg-[#FEE500]/40 transition-colors [-webkit-tap-highlight-color:transparent]"
               >
-                카카오맵
-                <ExternalLink size={11} />
+                <span className="truncate">카카오맵</span>
+                <ExternalLink size={11} className="flex-shrink-0" />
               </a>
             )}
+            <CollegeWheelPicker
+              options={COLLEGE_OPTIONS}
+              value={college}
+              onChange={onCollegeChange}
+              triggerClassName="min-w-[64px] max-w-[76px] flex items-center gap-1 text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1.5 py-1.5"
+            />
           </div>
-          <CollegeWheelPicker
-            options={COLLEGE_OPTIONS}
-            value={college}
-            onChange={onCollegeChange}
-            triggerClassName="flex-shrink-0 flex items-center gap-1 max-w-[110px] text-[11px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1.5 py-1.5"
-          />
           <button
             onClick={onClose}
-            className="p-1 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
+            className="flex-shrink-0 p-1 [-webkit-tap-highlight-color:transparent] active:scale-90 transition-transform"
             aria-label="상세 닫기"
           >
             <X size={18} className="text-text-hint" />
