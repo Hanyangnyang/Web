@@ -1,5 +1,5 @@
 // 레포지토리: 도서관 API 응답을 LibraryRoom 엔티티로 변환
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import { createLibraryRoom } from '../../domain/entities/LibraryRoom.js';
 import type { LibraryApiDataSource, ReadingRoomDto } from '../datasources/LibraryApiDataSource.js';
 import type { LibraryRepository } from '../../domain/repositories/ILibraryRepository.js';
@@ -22,7 +22,7 @@ const sortIndex = (room: ReadingRoomDto['room']) => {
 export const createLibraryRepository = (
   { libraryApiDataSource }: { libraryApiDataSource: LibraryApiDataSource }
 ): LibraryRepository => ({
-  getStatus: async () => {
+  getStatus: () => withAreaTag(AREA, async () => {
     const res = await libraryApiDataSource.getStatus();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -50,5 +50,5 @@ export const createLibraryRepository = (
       }));
 
     return { list, updatedAt: res.data.updatedAt };
-  },
+  }),
 });

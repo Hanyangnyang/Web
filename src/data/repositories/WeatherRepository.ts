@@ -1,5 +1,5 @@
 // 레포지토리: 날씨 API 응답(DTO)을 Weather 엔티티로 변환
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import {
   toWeatherCondition,
   toPmGrade,
@@ -7,7 +7,7 @@ import {
   type HourlyForecast,
   type CurrentWeather,
 } from '../../domain/entities/Weather.js';
-import { toEpoch } from '../../utils/time.js';
+import { toEpoch } from '../../utils/kstTime.js';
 import type {
   WeatherApiDataSource,
   HourlyForecastDto,
@@ -48,18 +48,18 @@ const toCurrent = (dto: CurrentWeatherDto): CurrentWeather => ({
 export const createWeatherRepository = (
   { weatherApiDataSource }: { weatherApiDataSource: WeatherApiDataSource }
 ): WeatherRepository => ({
-  getWeather: async () => {
+  getWeather: () => withAreaTag(AREA, async () => {
     const res = await weatherApiDataSource.getWeather();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
       throw apiError(res.error?.message || `weather API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
 
-    // 2. data 중 current/현재 날씨가 없거나 기온이 숫자가 아닐때, Error 반환 
+    // 2. data 중 current/현재 날씨가 없거나 기온이 숫자가 아닐때, Error 반환
     const current = res.data?.current;
     if (!current || typeof current.temperature !== 'number')
       throw apiError(`weather API returned invalid shaped 'current': ${JSON.stringify(current)}`, { area: AREA, endpoint: res._requestUrl });
 
-    // 2. data 중 hourly/시간별 날씨가 비어서왔을때 
+    // 2. data 중 hourly/시간별 날씨가 비어서왔을때
     const hourlyRaw = Array.isArray(res.data.hourly) ? res.data.hourly : [];
     const hourly = hourlyRaw
       .map(toHourly)
@@ -67,5 +67,5 @@ export const createWeatherRepository = (
       .sort((a, b) => a.epoch - b.epoch);
 
     return { current: toCurrent(current), hourly };
-  },
+  }),
 });

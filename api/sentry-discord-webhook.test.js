@@ -34,8 +34,12 @@ describe('buildDiscordPayload', () => {
           culprit: '?(<anonymous>)',
           level: 'error',
           web_url: 'https://sentry.io/organizations/hanyangnyang/issues/123/',
+          tags: [
+            ['browser', 'Chrome 75.0.3770'],
+            ['area', '학식'],
+            ['endpoint', 'https://api.hanyang.life/api/v1/menu'],
+          ],
         },
-        triggered_rule: '프론트 에러 발생 시 알림',
       },
     };
 
@@ -45,7 +49,25 @@ describe('buildDiscordPayload', () => {
     expect(result.embeds[0].url).toBe('https://sentry.io/organizations/hanyangnyang/issues/123/');
     expect(result.embeds[0].description).toBe('`?(<anonymous>)`');
     expect(result.embeds[0].color).toBe(0xe03e3e);
-    expect(result.embeds[0].fields).toEqual([{ name: '알림 규칙', value: '프론트 에러 발생 시 알림', inline: true }]);
+    // browser 태그는 RELEVANT_TAGS에 없어서 안 뽑히고, area/endpoint만 순서대로 뽑힌다
+    expect(result.embeds[0].fields).toEqual([
+      { name: 'area', value: '학식', inline: true },
+      { name: 'endpoint', value: 'https://api.hanyang.life/api/v1/menu', inline: true },
+    ]);
+  });
+
+  it('ErrorBoundary가 잡은 크래시는 boundary 태그만 뽑는다', () => {
+    const result = buildDiscordPayload({
+      data: { event: { title: 'TypeError: Importing a module script failed.', tags: [['boundary', 'weather-alarm-settings']] } },
+    });
+    expect(result.embeds[0].fields).toEqual([{ name: 'boundary', value: 'weather-alarm-settings', inline: true }]);
+  });
+
+  it('뮤테이션 실패는 mutationKey 태그만 뽑는다', () => {
+    const result = buildDiscordPayload({
+      data: { event: { title: 'TypeError: Failed to fetch', tags: [['mutationKey', '["feedback-api","submit"]']] } },
+    });
+    expect(result.embeds[0].fields).toEqual([{ name: 'mutationKey', value: '["feedback-api","submit"]', inline: true }]);
   });
 
   it('level이 없으면 error 색상을 기본값으로 쓴다', () => {

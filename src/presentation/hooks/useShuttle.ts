@@ -1,15 +1,19 @@
 // 훅(ViewModel): 셔틀 시간표 로딩·정류장 선택·지하철 연동 상태 관리
-import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
-import { computeSchedule, computeFullSchedule, curMin, dayType, pickClosestStop, SUBWAY_CONNECTED_STOPS, type ScheduleItem } from '../../domain/entities/Shuttle.js';
+import {
+  computeSchedule, computeFullSchedule, curMin, pickClosestStop, SUBWAY_CONNECTED_STOPS,
+  mapServerDayType, mapServerPeriodType, localWeekdayFallback, type ScheduleItem,
+} from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayScheduleUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
-import { useHoliday } from './useHoliday.js';
+import { useAcademicStatus } from './useAcademicStatus.js';
+import { useDateInfo } from './useDateInfo.js';
 
-const BUS_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드가 셔틀버스 시간표를 정확히 이 주기로 캐싱한다고 확인함(관리자가 시간표 CRUD할 때만 캐시 삭제)
-const SUBWAY_STALE_TIME = 12 * 60 * 60 * 1000; // 12시간 — 백엔드가 지하철 시간표를 정확히 이 주기로 캐싱한다고 확인함(station:line:direction:dayType 키), 그보다 더 길게 잡으면 백엔드가 이미 갱신한 데이터를 우리만 늦게 받게 됨
+const BUS_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 셔틀버스 캐시 TTL(12시간)보다 짧게 재검증. 관리자가 시간표 CRUD할 때만 백엔드 캐시가 지워지므로 대부분은 같은 값을 그대로 돌려받음
+const SUBWAY_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 지하철 시간표 캐시 TTL(12시간, station:line:direction:dayType 키)보다 짧게 재검증
 
 const SCHEDULE_QUERY_KEY = ['shuttle', 'schedule'];
 const SUBWAY_SCHEDULE_QUERY_KEY = ['shuttle', 'subway-schedule'];
@@ -24,24 +28,64 @@ export function prefetchShuttleSchedule() {
 }
 
 export function useShuttle(isActive = false) {
-  const { appConfig } = useBoot();
+  const { appConfig } = useBoot(); // 이제 period_schedule(다가오는 시간표 변경 배너용)만 담고 있음
   const [stop, setStopState] = useState(() => localStorage.getItem('shuttle_stop') || '한대앞');
   const [lineId, setLineIdState] = useState(() => localStorage.getItem('shuttle_lineId') || 'line4-bulam');
   const [now, setNow] = useState(curMin);
   const [visibleCount, setVisibleCount] = useState(5);
   const [isFullMode, setIsFullMode] = useState(false);
   const [fullDayType, setFullDayType] = useState('평일');
-  const [fullPeriod, setFullPeriod] = useState(appConfig.current_period);
+
+  // 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕)에서만 전체 시간표를 받아옴
+  const needsSubway = SUBWAY_CONNECTED_STOPS.includes(stop);
+
+  // 오늘의 학사/셔틀 통합 운영 상태 — 예전엔 Supabase app_config(현재기간·공휴일·강제주말·미운행 오버라이드)를
+  // 프론트에서 직접 조합해서 판정했는데, 이제 이 값 하나로 백엔드가 전부 계산해서 내려준다.
+  // 모드와 무관하게 항상 필요(전체 모드 진입 시 기본값 동기화에도 씀)
+  const { data: academicStatus } = useAcademicStatus();
+  const currentPeriod = academicStatus ? mapServerPeriodType(academicStatus.academic.periodType) : '학기중';
+  const shuttleDayType = academicStatus ? mapServerDayType(academicStatus.shuttle.dayType) : localWeekdayFallback();
+  const isShuttleOperating = academicStatus ? academicStatus.shuttle.isOperating : true;
+
+  // 지하철 연결편 조회는 셔틀 전용 오버라이드(학교 자체 기념일 등)와 무관하게 항상 실제 공휴일 달력 기준을
+  // 따른다 — 학교 기념일이어도 열차는 평일대로 다니므로. academic/status.calendar는 학교 자체 공휴일까지
+  // 섞여 내려와서 못 쓰고, 순수 공공기념일 기준인 date-info를 따로 조회한다. 지하철 연결정보가 필요할 때만 요청.
+  const { data: dateInfo } = useDateInfo(undefined, needsSubway && isActive);
+  const trainDayType = dateInfo ? mapServerDayType(dateInfo.dayType) : localWeekdayFallback();
+
+  // 학기/기간·dayType이 실제로 "바뀌는 순간"에만 셔틀·지하철 시간표를 강제로 다시 받아온다.
+  // staleTime(1시간)만 믿으면, 관리자가 전환 시점 직전에 새 기간 데이터를 올려도 캐시가 안 지났다는
+  // 이유로 옛 내용을 계속 보여줄 수 있음 — 그 확률적인 갭을 없애기 위해 실제 전환 이벤트에 직접 반응한다.
+  const prevShuttleKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!academicStatus) return;
+    const key = `${currentPeriod}:${shuttleDayType}:${isShuttleOperating}`;
+    if (prevShuttleKey.current !== null && prevShuttleKey.current !== key) {
+      queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEY });
+    }
+    prevShuttleKey.current = key;
+  }, [academicStatus, currentPeriod, shuttleDayType, isShuttleOperating]);
+
+  const prevTrainDayType = useRef<string | null>(null);
+  useEffect(() => {
+    if (!dateInfo) return;
+    if (prevTrainDayType.current !== null && prevTrainDayType.current !== trainDayType) {
+      queryClient.invalidateQueries({ queryKey: SUBWAY_SCHEDULE_QUERY_KEY });
+    }
+    prevTrainDayType.current = trainDayType;
+  }, [dateInfo, trainDayType]);
+
+  const [fullPeriod, setFullPeriod] = useState(currentPeriod);
 
   const { coords, isLocating: isGpsLoading } = useLocation(isActive);
 
   useEffect(() => {
-    if (appConfig.current_period) {
+    if (currentPeriod) {
       setTimeout(() => {
-        setFullPeriod(appConfig.current_period);
+        setFullPeriod(currentPeriod);
       }, 0);
     }
-  }, [appConfig.current_period]);
+  }, [currentPeriod]);
 
   // 좌표가 준비되면 가장 가까운 셔틀 정류장 자동 선택.
   // 프리페치된 좌표는 탭 진입 렌더에서 동기로 도착하므로, useLayoutEffect로 페인트 전에
@@ -76,13 +120,6 @@ export function useShuttle(isActive = false) {
     return () => clearInterval(id);
   }, []);
 
-  // 지하철 연결정보가 필요한 정류장(기숙사·셔틀콕)에서만 전체 시간표를 받아옴
-  const needsSubway = SUBWAY_CONNECTED_STOPS.includes(stop);
-
-  // 오늘이 법정공휴일인지 (새 백엔드는 셔틀·지하철 둘 다 이 값을 직접 안 내려주므로 별도 조회) — 모드와 무관하게 항상 필요
-  const { isHoliday: isHolidayServer, isLoading: isHolidayLoading } = useHoliday();
-  const customHols = appConfig.custom_holidays || [];
-
   // 지하철 전체 시간표 (새 백엔드 — 정적 데이터, 폴링 없음. 백엔드 캐시 TTL(12시간)에 맞춤)
   const subwayScheduleQuery = useQuery({
     queryKey: SUBWAY_SCHEDULE_QUERY_KEY,
@@ -91,15 +128,11 @@ export function useShuttle(isActive = false) {
     enabled: needsSubway && isActive,
   });
 
-  // 지하철 연결편 조회는 셔틀의 custom_holidays(학교 자체 기념일) 미리보기와 무관하게
-  // 항상 실제 요일/법정공휴일 기준을 따른다 — 학교 기념일이어도 열차는 평일대로 다니므로
-  const trainDayType = dayType(isHolidayServer, [], !!appConfig.force_weekend);
-
-  // 일반 모드에서만 셔틀 dayType(custom_holidays 포함)을 fullDayType에 동기화 (전체 모드 진입 시엔 사용자가 직접 고름)
+  // 일반 모드에서만 셔틀 dayType을 fullDayType에 동기화 (전체 모드 진입 시엔 사용자가 직접 고름)
   useEffect(() => {
-    if (isFullMode || isHolidayLoading) return;
-    setFullDayType(dayType(isHolidayServer, customHols, !!appConfig.force_weekend));
-  }, [isFullMode, isHolidayLoading, isHolidayServer, appConfig]); // eslint-disable-line react-hooks/exhaustive-deps -- customHols는 appConfig에서 매 렌더 파생되는 값이라 appConfig 의존성으로 충분
+    if (isFullMode || !academicStatus) return;
+    setFullDayType(shuttleDayType);
+  }, [isFullMode, academicStatus, shuttleDayType]);
 
   // 전체 정적 시간표에서 오늘(실제) dayType에 해당하는 열차만 남김 — 특정 노선/방향/시각 필터링은 TimetableRow의 connectingTrains()가 담당
   const subwayArrivals = (subwayScheduleQuery.data ?? []).filter(r => r.dayType === trainDayType);
@@ -117,16 +150,16 @@ export function useShuttle(isActive = false) {
 
   if (allData) {
     if (isFullMode) {
-      schedule = computeFullSchedule(allData, stop, fullDayType, appConfig, fullPeriod);
+      schedule = computeFullSchedule(allData, stop, fullDayType, currentPeriod, fullPeriod);
       nextIdx = -1; // 전체 모드에서는 다음 셔틀 하이라이트 안 함
     } else {
-      schedule = computeSchedule(allData, stop, now, isHolidayServer, lookback, appConfig);
+      schedule = computeSchedule(allData, stop, now, shuttleDayType, isShuttleOperating, lookback, currentPeriod);
       nextIdx = schedule.findIndex(r => r.depMin >= now);
     }
   }
 
-  // isWeekend: dayType() 판정 결과(force_weekend/isHolidayServer/custom_holidays/요일 모두 반영)와 동일
-  const isWeekend = dayType(isHolidayServer, customHols, !!appConfig.force_weekend) === '주말';
+  // isWeekend: shuttleDayType(academic/status.shuttle.dayType 판정 결과)과 동일
+  const isWeekend = shuttleDayType === '주말';
 
   return {
     stop, setStop,
@@ -150,6 +183,6 @@ export function useShuttle(isActive = false) {
     setFullDayType,
     fullPeriod,
     setFullPeriod,
-    appConfig,
+    appConfig: { current_period: currentPeriod, period_schedule: appConfig.period_schedule },
   };
 }
