@@ -1,0 +1,1124 @@
+[
+  {
+    "id": "building-101",
+    "buildingNumber": "101",
+    "name": "본관",
+    "englishName": "Administration Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.298978643926,
+      "longitude": 126.833096442588
+    },
+    "description": "",
+    "primaryColleges": [
+      "대학본부"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-102",
+    "buildingNumber": "102",
+    "name": "학생복지관",
+    "englishName": "Student Welfare Building",
+    "aliases": [
+      "복지관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2979595559148,
+      "longitude": 126.834367540313
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [
+      {
+        "id": "openspace-01",
+        "floor": "3층",
+        "name": "오픈스페이스",
+        "hint": "국제처와 카페ING 사이"
+      }
+    ],
+    "facilities": [
+      "학생식당",
+      "교직원식당",
+      "푸드코트",
+      "편의점",
+      "중앙동아리방",
+      "국제처",
+      "카페"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-103",
+    "buildingNumber": "103",
+    "name": "학생회관",
+    "englishName": "Student Center (Uni-Center)",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2974781131389,
+      "longitude": 126.834805076207
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "중앙동아리방"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-104",
+    "buildingNumber": "104",
+    "name": "제2공학관",
+    "englishName": "Engineering Building No. 2",
+    "aliases": [
+      "2공",
+      "2공학관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2970972549089,
+      "longitude": 126.833078042554
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-105",
+    "buildingNumber": "105",
+    "name": "건축디자인관",
+    "englishName": "Architecture & Design Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2969634880565,
+      "longitude": 126.832785097606
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-106",
+    "buildingNumber": "106",
+    "name": "초대형구조실험동",
+    "englishName": "Large-Scale Structure Test Center",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.296825988615,
+      "longitude": 126.83240193428
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-107",
+    "buildingNumber": "107",
+    "name": "풍환경실험관",
+    "englishName": "Wind Tunnel Laboratory",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2963929682106,
+      "longitude": 126.832032963574
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-108",
+    "buildingNumber": "108",
+    "name": "스마트컨스트럭션교육관",
+    "englishName": "Smart Construction Education Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": null,
+      "longitude": null
+    },
+    "description": "착공중",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-109",
+    "buildingNumber": "109",
+    "name": "디자인문화관",
+    "englishName": "Design & Culture Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2967816633674,
+      "longitude": 126.83164412046
+    },
+    "description": "",
+    "primaryColleges": [
+      "디자인대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-110",
+    "buildingNumber": "110",
+    "name": "디자인교육관",
+    "englishName": "Design Education Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2969865271405,
+      "longitude": 126.831242149807
+    },
+    "description": "",
+    "primaryColleges": [
+      "디자인대학"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-02",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": null
+      }
+    ],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-111",
+    "buildingNumber": "111",
+    "name": "디자인연구관",
+    "englishName": "Design Research Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2973011713366,
+      "longitude": 126.832003875666
+    },
+    "description": "",
+    "primaryColleges": [
+      "디자인대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-112",
+    "buildingNumber": "112",
+    "name": "스마트건축관",
+    "englishName": "Smart Architecture Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2962073185126,
+      "longitude": 126.832007436116
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-201",
+    "buildingNumber": "201",
+    "name": "경상관",
+    "englishName": "Business & Economics Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2998395222405,
+      "longitude": 126.83595261656995
+    },
+    "description": "",
+    "primaryColleges": [
+      "경상대학"
+    ],
+    "openSpaces": [],
+    "facilities": [
+      "카페"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-202",
+    "buildingNumber": "202",
+    "name": "솔성관 (글로벌문화통상관)",
+    "englishName": "International Culture Building",
+    "aliases": [
+      "솔성관",
+      "글로벌문화통상관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.299503918868,
+      "longitude": 126.835003665291
+    },
+    "description": "",
+    "primaryColleges": [
+      "글로벌문화통상대학"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-03",
+        "floor": "1층",
+        "name": "꿈의둥지",
+        "hint": null
+      }
+    ],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-203",
+    "buildingNumber": "203",
+    "name": "사회교육관 및 학군단",
+    "englishName": "Continuing Education & ROTC Building",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.3000256483911,
+      "longitude": 126.834379928137
+    },
+    "description": "",
+    "primaryColleges": [
+      "사회교육원",
+      "학군단"
+    ],
+    "openSpaces": [],
+    "facilities": [
+      "학생군사교육단(ROTC) 본부"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-204",
+    "buildingNumber": "204",
+    "name": "일신재 (언론정보관)",
+    "englishName": "Communication & Social Sciences Building",
+    "aliases": [
+      "일신재",
+      "언론정보관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.300282323264135,
+      "longitude": 126.83493880262213
+    },
+    "description": "",
+    "primaryColleges": [
+      "커뮤니케이션&컬쳐대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-205",
+    "buildingNumber": "205",
+    "name": "제1과학기술관",
+    "englishName": "Science & Technology Building No. 1",
+    "aliases": [
+      "1과기",
+      "1과학기술관",
+      "과기대"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2987878696406,
+      "longitude": 126.835848880277
+    },
+    "description": "",
+    "primaryColleges": [
+      "첨단융합대학"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-04",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": "정문 들어가자마자"
+      }
+    ],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-206",
+    "buildingNumber": "206",
+    "name": "컨퍼런스홀",
+    "englishName": "Conference Hall",
+    "aliases": [
+      "컨퍼"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2990920202906,
+      "longitude": 126.836863311339
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-207",
+    "buildingNumber": "207",
+    "name": "제2과학기술관",
+    "englishName": "Science & Technology Building No. 2",
+    "aliases": [
+      "2과기",
+      "2과학기술관",
+      "과기대"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29864389573509,
+      "longitude": 126.83729287104882
+    },
+    "description": "",
+    "primaryColleges": [
+      "첨단융합대학"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-05",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": "정문 들어가서 왼쪽"
+      }
+    ],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-208",
+    "buildingNumber": "208",
+    "name": "한양맞춤의약연구원",
+    "englishName": "Hanyang Precision Medicine Research Institute",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2984605652031,
+      "longitude": 126.836334575922
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-209",
+    "buildingNumber": "209",
+    "name": "제1학술관",
+    "englishName": "Academic Hall No. 1",
+    "aliases": [
+      "학술관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2982364248091,
+      "longitude": 126.835841055706
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-301",
+    "buildingNumber": "301",
+    "name": "제1공학관",
+    "englishName": "Engineering Building No. 1",
+    "aliases": [
+      "1공",
+      "1공학관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.297607911982,
+      "longitude": 126.837443979787
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-06",
+        "floor": "1층",
+        "name": "해동열람실",
+        "hint": "정문 들어가서 오른쪽"
+      },
+      {
+        "id": "openspace-07",
+        "floor": "3층",
+        "name": "한자공열람실",
+        "hint": null
+      }
+    ],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-302",
+    "buildingNumber": "302",
+    "name": "폐수처리장관리동",
+    "englishName": "Wastewater Treatment Facility",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29698041292171,
+      "longitude": 126.83651541901213
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-303",
+    "buildingNumber": "303",
+    "name": "제3공학관",
+    "englishName": "Engineering Building No. 3",
+    "aliases": [
+      "3공",
+      "3공학관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2974873088304,
+      "longitude": 126.836235177592
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-304",
+    "buildingNumber": "304",
+    "name": "제4공학관",
+    "englishName": "Engineering Building No. 4",
+    "aliases": [
+      "4공",
+      "4공학관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2969430846488,
+      "longitude": 126.836236357429
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-305",
+    "buildingNumber": "305",
+    "name": "제5공학관",
+    "englishName": "Engineering Building No. 5",
+    "aliases": [
+      "5공",
+      "5공학관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29695000724375,
+      "longitude": 126.83733599428632
+    },
+    "description": "",
+    "primaryColleges": [
+      "공학대학"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-08",
+        "floor": "1층",
+        "name": "해동열람실",
+        "hint": null
+      }
+    ],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-306",
+    "buildingNumber": "306",
+    "name": "셔틀콕",
+    "englishName": "Shuttlecock",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.298761958435456,
+      "longitude": 126.8379693418157
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "카페",
+      "편의점"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-307",
+    "buildingNumber": "307",
+    "name": "ERICA컨벤션센터",
+    "englishName": "ERICA Convention Center",
+    "aliases": [
+      "컨벤션센터",
+      "에리카컨벤션센터"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.298285535083,
+      "longitude": 126.838793707439
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "카페",
+      "식당"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-308",
+    "buildingNumber": "308",
+    "name": "창업보육센터",
+    "englishName": "Business Incubator Center",
+    "aliases": [
+      "창보"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2955821777804,
+      "longitude": 126.837294954307
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "카페"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-309",
+    "buildingNumber": "309",
+    "name": "약학관",
+    "englishName": "College of Pharmacy",
+    "aliases": [
+      "약학대"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2965380905718,
+      "longitude": 126.837888395975
+    },
+    "description": "",
+    "primaryColleges": [
+      "약학대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-310",
+    "buildingNumber": "310",
+    "name": "실험동물센터",
+    "englishName": "Laboratory Animal Center",
+    "aliases": [
+      "동물실험동"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29602507314854,
+      "longitude": 126.83797803188384
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-311",
+    "buildingNumber": "311",
+    "name": "학연산클러스터지원센터",
+    "englishName": "ERICA Cluster Support Center",
+    "aliases": [
+      "학연산"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2963916701478,
+      "longitude": 126.838876697815
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-312",
+    "buildingNumber": "312",
+    "name": "산학연협력관",
+    "englishName": "Industry-University-Research Cooperation Center",
+    "aliases": [
+      "산학연"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2966285684882,
+      "longitude": 126.839485227915
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-313",
+    "buildingNumber": "313",
+    "name": "포장가속실험동",
+    "englishName": "Pavement Accelerated Testing Center",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29681840871967,
+      "longitude": 126.83994498575555
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-314",
+    "buildingNumber": "314",
+    "name": "퓨전전기기술응용연구센터",
+    "englishName": "Fusion Electrical Technology Application Center",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2963570123611,
+      "longitude": 126.839896338419
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-315",
+    "buildingNumber": "315",
+    "name": "BMR센터",
+    "englishName": "BMR Center",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29641484431182,
+      "longitude": 126.84068683177954
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-316",
+    "buildingNumber": "316",
+    "name": "라이언스홀",
+    "englishName": "Lion's Hall",
+    "aliases": [
+      "라홀"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29576608518209,
+      "longitude": 126.84134798076572
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-317",
+    "buildingNumber": "317",
+    "name": "융합교육관",
+    "englishName": "Convergence Education Building",
+    "aliases": [
+      "융교"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.295703586448305,
+      "longitude": 126.83844169539408
+    },
+    "description": "",
+    "primaryColleges": [
+      "소프트웨어융합대학",
+      "LIONS칼리지"
+    ],
+    "openSpaces": [
+      {
+        "id": "openspace-09",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": null
+      },
+      {
+        "id": "openspace-10",
+        "floor": "2층",
+        "name": "오픈스페이스",
+        "hint": null
+      },
+      {
+        "id": "openspace-11",
+        "floor": "5층",
+        "name": "오픈스페이스",
+        "hint": null
+      }
+    ],
+    "facilities": [
+      "카페"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-401",
+    "buildingNumber": "401",
+    "name": "학술정보관",
+    "englishName": "Academic Information Center (Library)",
+    "aliases": [
+      "학정",
+      "도서관"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2967794521197,
+      "longitude": 126.835194582921
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [
+      {
+        "id": "openspace-12",
+        "floor": null,
+        "name": "열람실",
+        "hint": null
+      }
+    ],
+    "facilities": [
+      "무인인쇄/프린트기",
+      "자판기형매점",
+      "카페"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-402",
+    "buildingNumber": "402",
+    "name": "체육관",
+    "englishName": "Gymnasium",
+    "aliases": [
+      "체대"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2959014131015,
+      "longitude": 126.833599487833
+    },
+    "description": "",
+    "primaryColleges": [
+      "예체능대학"
+    ],
+    "openSpaces": [],
+    "facilities": [
+      "헬스장"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-403",
+    "buildingNumber": "403",
+    "name": "뮤즈홀",
+    "englishName": "Muse Hall",
+    "aliases": [
+      "음대"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2960084436689,
+      "longitude": 126.832823302314
+    },
+    "description": "",
+    "primaryColleges": [
+      "예체능대학"
+    ],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-404",
+    "buildingNumber": "404",
+    "name": "대운동장",
+    "englishName": "Main Stadium",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2947437872999,
+      "longitude": 126.83310579905
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-405",
+    "buildingNumber": "405",
+    "name": "테니스장",
+    "englishName": "Tennis Court",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29404592354147,
+      "longitude": 126.83470318431881
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-501",
+    "buildingNumber": "501",
+    "name": "창의관",
+    "englishName": "Changui Dormitory",
+    "aliases": [
+      "창의인재원"
+    ],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.291254159408126,
+      "longitude": 126.83639529787789
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [
+      {
+        "id": "openspace-13",
+        "floor": "1층",
+        "name": "오픈스페이스",
+        "hint": "기숙사식당 왼쪽"
+      }
+    ],
+    "facilities": [
+      "기숙사식당",
+      "편의점",
+      "문구점",
+      "카페",
+      "식당",
+      "체력단련실"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-502",
+    "buildingNumber": "502",
+    "name": "인재관",
+    "englishName": "Injae Dormitory",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2924833357097,
+      "longitude": 126.835212976896
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "체력단련실"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-503",
+    "buildingNumber": "503",
+    "name": "행복관",
+    "englishName": "Haengbok Dormitory",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2931914608325,
+      "longitude": 126.836447492351
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "체력단련실"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-504",
+    "buildingNumber": "504",
+    "name": "창의인재원 교육관",
+    "englishName": "Changui-Injae Education Center",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.292696732025,
+      "longitude": 126.837057566997
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [
+      "편의점"
+    ],
+    "imageUrl": []
+  },
+  {
+    "id": "building-C01",
+    "buildingNumber": "C01",
+    "name": "경기테크노파크",
+    "englishName": "Gyeonggi Technology Park",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2908359167465,
+      "longitude": 126.829889047134
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-C02",
+    "buildingNumber": "C02",
+    "name": "한국산업기술시험원",
+    "englishName": "Korea Testing Laboratory",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2914265471128,
+      "longitude": 126.832098137776
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-C03",
+    "buildingNumber": "C03",
+    "name": "한국생산기술연구원",
+    "englishName": "Korea Institute of Industrial Technology",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2927948704335,
+      "longitude": 126.841649700225
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-C04",
+    "buildingNumber": "C04",
+    "name": "한국전기연구원",
+    "englishName": "Korea Electrotechnology Research Institute",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2907162101502,
+      "longitude": 126.842348753833
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  },
+  {
+    "id": "building-C05",
+    "buildingNumber": "C05",
+    "name": "LG이노텍 안산 R&D연구소",
+    "englishName": "LG Innotek Ansan R&D Research Center",
+    "aliases": [],
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2974127020682,
+      "longitude": 126.842339290656
+    },
+    "description": "",
+    "primaryColleges": [],
+    "openSpaces": [],
+    "facilities": [],
+    "imageUrl": []
+  }
+]

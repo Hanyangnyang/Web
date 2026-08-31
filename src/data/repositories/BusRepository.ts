@@ -1,7 +1,10 @@
 // 레포지토리: 일반버스 API 원시 응답을 정류소별 정규화 도착정보로 변환
+import { withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import { ALLOWED_BUSES_BY_STOP, STATION_IDS, type BusArrival } from '../../domain/entities/PublicBus.js';
 import type { BusApiDataSource, BusArrivalListItem } from '../datasources/BusApiDataSource.js';
 import type { BusRepository } from '../../domain/repositories/IBusRepository.js';
+
+const AREA = '공공버스'; // Sentry 태그용 — 이 레포지토리가 던지는 모든 에러(HTTP 실패 포함)에 공통으로 붙는 한글 이름표
 
 const CROWD_LABELS: Record<string, string> = { '1': '여유', '2': '보통', '3': '혼잡' };
 
@@ -43,7 +46,7 @@ function toArrival(
 }
 
 export const createBusRepository = ({ busApiDataSource }: { busApiDataSource: BusApiDataSource }): BusRepository => ({
-  getArrivals: async (stopName: string) => {
+  getArrivals: (stopName: string) => withAreaTag(AREA, async () => {
     const stationId = STATION_IDS[stopName];
     if (!stationId) return [];
 
@@ -65,5 +68,5 @@ export const createBusRepository = ({ busApiDataSource }: { busApiDataSource: Bu
     });
 
     return parsed;
-  },
+  }),
 });

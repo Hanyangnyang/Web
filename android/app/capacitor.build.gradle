@@ -13,8 +13,10 @@ dependencies {
     implementation project(':capacitor-app')
     implementation project(':capacitor-browser')
     implementation project(':capacitor-geolocation')
+    implementation project(':capacitor-network')
     implementation project(':capacitor-push-notifications')
     implementation project(':capacitor-share')
+    implementation project(':sentry-capacitor')
     implementation project(':capacitor-secure-storage-plugin')
 
 }

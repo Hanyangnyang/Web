@@ -37,10 +37,29 @@ const LEVEL_COLORS = {
   info: 0x4a90d9,
 };
 
+// 프론트가 Sentry.captureException(error, { tags }) 로 직접 붙이는 태그 중, 어디서 터졌는지 알아내는 데
+// 실제로 쓸모있는 것들만 Discord에 노출한다 — 에러 종류에 따라 이 중 일부만 존재한다
+// (예: ErrorBoundary가 잡은 렌더 크래시 → boundary만, API 검증 실패 → area+endpoint(+queryKey/mutationKey))
+const RELEVANT_TAGS = [
+  ['boundary', 'boundary'],   // 어느 ErrorBoundary가 잡았는지 (예: weather-alarm-settings)
+  ['area', 'area'],           // 어느 기능/API인지 한글 이름표 (예: 학식, 셔틀 시간표)
+  ['endpoint', 'endpoint'],   // 실제로 요청이 나간 URL
+  ['queryKey', 'queryKey'],   // 실패한 TanStack Query의 쿼리 키
+  ['mutationKey', 'mutationKey'], // 실패한 TanStack Mutation의 키
+];
+
+// Sentry 웹훅의 tags는 [key, value] 쌍의 배열로 온다 — 그중 RELEVANT_TAGS에 있고 실제로 존재하는 것만 뽑는다
+function extractRelevantTagFields(tags) {
+  if (!Array.isArray(tags)) return [];
+  const tagMap = new Map(tags);
+  return RELEVANT_TAGS
+    .filter(([key]) => tagMap.has(key))
+    .map(([key, label]) => ({ name: label, value: String(tagMap.get(key)).slice(0, 1024), inline: true }));
+}
+
 // Sentry Issue Alert 웹훅 페이로드 → Discord 웹훅 메시지 형식 변환 (순수 함수, 유닛 테스트 대상)
 export function buildDiscordPayload(sentryPayload) {
   const event = sentryPayload?.data?.event ?? {};
-  const rule = sentryPayload?.data?.triggered_rule;
   const level = event.level || 'error';
   const title = event.title || '(제목 없음)';
 
@@ -51,7 +70,7 @@ export function buildDiscordPayload(sentryPayload) {
         url: event.web_url,
         description: event.culprit ? `\`${event.culprit}\`` : undefined,
         color: LEVEL_COLORS[level] ?? LEVEL_COLORS.error,
-        fields: rule ? [{ name: '알림 규칙', value: rule, inline: true }] : [],
+        fields: extractRelevantTagFields(event.tags),
       },
     ],
   };

@@ -1,5 +1,5 @@
 // 순수 함수: 학식 메뉴를 끼니(type)별로 묶고, 표시 순서와 기본 펼침 상태를 결정
-import { toDateKey } from '../../../utils/time.js';
+import { toDateKey } from '../../../utils/kstTime.js';
 import type { MenuWithCafe } from './cafeteriaTypes.js';
 
 const MEAL_ORDER = ['조식', '중식', '석식'];

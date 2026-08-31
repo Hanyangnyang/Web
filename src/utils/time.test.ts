@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatKSTHourMinute } from './time.js';
+import { formatKSTHourMinute } from './kstTime.js';
 
 describe('formatKSTHourMinute', () => {
   it("서버가 준 UTC 시각('YYYY-MM-DD HH:mm:ss', 오프셋 없음)을 KST(+9)로 변환한다", () => {

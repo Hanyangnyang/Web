@@ -1,6 +1,7 @@
 // 도메인 엔티티: 셔틀 노선 상수 및 순수 시간표 계산 함수
-import { getKSTParts, getKSTDateKey } from '../../utils/time.js';
-import { getDistanceKm } from '../utils/geo.js';
+import { getKSTParts } from '../../utils/kstTime.js';
+import { getDistanceKm } from '../utils/haversine.js';
+import type { DayType, PeriodType } from './AcademicStatus.js';
 
 export interface Coords {
   latitude: number;
@@ -71,10 +72,6 @@ export interface FullScheduleItem extends ScheduleItem {
 
 export interface ShuttleAppConfig {
   current_period?: string;
-  custom_holidays?: string[];
-  force_weekend?: boolean;
-  no_operation_days?: string[];
-  force_no_operation?: boolean;
 }
 
 // 화면에 표시되는 정류장 목록
@@ -146,19 +143,32 @@ export const SUBWAY_CONNECTED_STOPS = [...new Set(
 export const toMin  = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 export const curMin = () => { const { hours, minutes } = getKSTParts(); return hours * 60 + minutes; };
 
-export const dayType = (isHolidayServer: boolean | null, customHolidays: string[] = [], forceWeekend = false) => {
-  if (forceWeekend) return '주말';
-  if (isHolidayServer === true) return '주말';
+// academic/status.{calendar,shuttle}.dayType(서버 판정값) → 셔틀 시간표 데이터가 쓰는 로컬 라벨로 변환
+const SERVER_DAY_TYPE_TO_LOCAL: Record<DayType, '평일' | '주말'> = {
+  WEEKDAY: '평일',
+  WEEKEND: '주말',
+  HOLIDAY: '주말',
+  NO_OPERATION: '주말', // 호출부가 isOperating으로 미운행을 먼저 걸러내므로 이 값 자체는 실질적으로 안 쓰인다
+};
+export const mapServerDayType = (serverDayType: DayType): '평일' | '주말' => SERVER_DAY_TYPE_TO_LOCAL[serverDayType];
 
+// academic/status.academic.periodType(서버 판정값) → 셔틀 시간표 데이터의 period 필드가 쓰는 로컬 라벨로 변환
+const SERVER_PERIOD_TYPE_TO_LOCAL: Record<PeriodType, string> = {
+  SEMESTER: '학기중',
+  SEASONAL: '계절학기',
+  VACATION: '방학중',
+};
+export const mapServerPeriodType = (periodType: PeriodType): string => SERVER_PERIOD_TYPE_TO_LOCAL[periodType];
+
+// academic/status가 아직 로딩 중이거나 실패했을 때 쓰는 안전한 로컬 폴백 — 공휴일·미운행 정보는 없지만
+// 최소 평일/주말만큼은 실제 요일로 판정한다
+export const localWeekdayFallback = (): '평일' | '주말' => {
   const { day } = getKSTParts();
-  if (customHolidays.includes(getKSTDateKey())) return '주말';
-
   return (day === 0 || day === 6) ? '주말' : '평일';
 };
 
 const pad2      = (n: number) => String(n).padStart(2, '0');
 const intToHHMM = (h: number, m: number) => `${pad2(h)}:${pad2(m)}`;
-const getYYYYMMDD = () => getKSTDateKey();
 
 // 공통: allData를 displayStop 기준 시간 목록으로 매핑 
 function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleItem[] {
@@ -190,17 +200,12 @@ export function computeSchedule(
   allData: ShuttleRow[],
   displayStop: string,
   nowMinutes: number,
-  isHolidayServer: boolean | null,
+  currentDay: '평일' | '주말',
+  isOperating: boolean,
   lookbackMinutes = 0,
-  appConfig: ShuttleAppConfig = {},
+  period = '학기중',
 ): ScheduleItem[] {
-  const noOpDays = appConfig.no_operation_days || [];
-  if (appConfig.force_no_operation || noOpDays.includes(getYYYYMMDD())) return [];
-
-  const period       = appConfig.current_period || '학기중';
-  const customHols   = appConfig.custom_holidays || [];
-  const forceWeekend = appConfig.force_weekend || false;
-  const currentDay   = dayType(isHolidayServer, customHols, forceWeekend);
+  if (!isOperating) return [];
 
   const filtered = allData.filter(d => d.period === period && d.dayType === currentDay);
   const allMapped = mapToScheduleItems(filtered, displayStop);
@@ -232,13 +237,13 @@ export function computeFullSchedule(
   allData: ShuttleRow[],
   displayStop: string,
   dayTypeStr: string,
-  appConfig: ShuttleAppConfig = {},
+  period = '학기중',
   overridePeriod: string | null = null,
 ): FullScheduleItem[] {
-  const period           = overridePeriod || appConfig.current_period || '학기중';
+  const effectivePeriod   = overridePeriod || period;
   const normalizedDayType = dayTypeStr === '주말/공휴일' ? '주말' : dayTypeStr;
 
-  const filtered = allData.filter(d => d.period === period && d.dayType === normalizedDayType);
+  const filtered = allData.filter(d => d.period === effectivePeriod && d.dayType === normalizedDayType);
   const allMapped = mapToScheduleItems(filtered, displayStop);
 
   const lastMin = allMapped.length > 0 ? allMapped[allMapped.length - 1].depMin : -1;
