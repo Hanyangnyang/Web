@@ -1,5 +1,5 @@
 // 훅(ViewModel): 셔틀 시간표 로딩·정류장 선택·지하철 연동 상태 관리
-import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import {
@@ -52,6 +52,28 @@ export function useShuttle(isActive = false) {
   // 섞여 내려와서 못 쓰고, 순수 공공기념일 기준인 date-info를 따로 조회한다. 지하철 연결정보가 필요할 때만 요청.
   const { data: dateInfo } = useDateInfo(undefined, needsSubway && isActive);
   const trainDayType = dateInfo ? mapServerDayType(dateInfo.dayType) : localWeekdayFallback();
+
+  // 학기/기간·dayType이 실제로 "바뀌는 순간"에만 셔틀·지하철 시간표를 강제로 다시 받아온다.
+  // staleTime(1시간)만 믿으면, 관리자가 전환 시점 직전에 새 기간 데이터를 올려도 캐시가 안 지났다는
+  // 이유로 옛 내용을 계속 보여줄 수 있음 — 그 확률적인 갭을 없애기 위해 실제 전환 이벤트에 직접 반응한다.
+  const prevShuttleKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!academicStatus) return;
+    const key = `${currentPeriod}:${shuttleDayType}:${isShuttleOperating}`;
+    if (prevShuttleKey.current !== null && prevShuttleKey.current !== key) {
+      queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEY });
+    }
+    prevShuttleKey.current = key;
+  }, [academicStatus, currentPeriod, shuttleDayType, isShuttleOperating]);
+
+  const prevTrainDayType = useRef<string | null>(null);
+  useEffect(() => {
+    if (!dateInfo) return;
+    if (prevTrainDayType.current !== null && prevTrainDayType.current !== trainDayType) {
+      queryClient.invalidateQueries({ queryKey: SUBWAY_SCHEDULE_QUERY_KEY });
+    }
+    prevTrainDayType.current = trainDayType;
+  }, [dateInfo, trainDayType]);
 
   const [fullPeriod, setFullPeriod] = useState(currentPeriod);
 

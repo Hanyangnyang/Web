@@ -150,8 +150,8 @@ src/
 | 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
 | `/api/v1/menu` | 학식 메뉴 조회 | 12시간 / 1시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status의 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`) — staleTime만으로는 "전환 직후 관리자가 새 기간 데이터를 올려도 옛 캐시를 계속 쓰는" 확률적 갭이 남아서 이벤트 기반으로 보강 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼, **date-info의 dayType이 바뀌는 순간 강제 재요청**(위와 동일한 이유) |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
 | `/api/v1/banners` | 홈 배너 조회 | 12시간 / 1시간 | 콜드스타트 prefetch |
@@ -160,7 +160,7 @@ src/
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
 | `POST /api/v1/feedbacks` | 통합 피드백 접수 | 해당없음 | 기타탭 > 피드백 보내기(category `GENERAL`), 캠퍼스맵 화면 상단에 제보 버튼(`CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보 버튼(`PARTNERSHIP`) |
 | `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `academic`/`shuttle` 필드로 기간·셔틀 dayType·운행여부를 판정. `calendar` 필드는 학교 자체 공휴일까지 섞여 있어 지하철엔 안 씀(아래 date-info 참고) |
-| `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 1시간 | 지하철 연결정보가 필요한 정류장에서만 조회 |
+| `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 1시간(FE staleTime, BE 캐시 주기 미확인) | 지하철 연결정보가 필요한 정류장에서만 조회 |
 
 
 ### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
