@@ -10,6 +10,7 @@ import { CardFallback } from '../../common/CardFallback.js';
 import { CollegeWheelPicker } from '../../ui/CollegeWheelPicker';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { SheetHandle } from './SheetHandle';
+import { openKakaoMap } from '../../../../lib/openKakaoMap.js';
 import {
   STORE_DETAIL_FRACTION, STORE_LIST_EXPANDED_FRACTION, LIST_COLLAPSED_CSS,
   NAV_CLEARANCE_CLASS, toCssHeight,
@@ -83,15 +84,14 @@ export function StoreSheet({ stores, loading, error, onRetry, title, college, on
           </div>
           <div className="min-w-0 flex items-center gap-1.5">
             {kakaoMapUrl && (
-              <a
-                href={kakaoMapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => { void openKakaoMap(kakaoMapUrl); }}
                 className="min-w-0 flex items-center gap-1 text-[11px] font-bold text-[#3C1E1E] bg-[#FEE500]/25 rounded-lg px-2 py-1.5 active:bg-[#FEE500]/40 transition-colors [-webkit-tap-highlight-color:transparent]"
               >
                 <span className="truncate">카카오맵</span>
                 <ExternalLink size={11} className="flex-shrink-0" />
-              </a>
+              </button>
             )}
             <CollegeWheelPicker
               options={COLLEGE_OPTIONS}
