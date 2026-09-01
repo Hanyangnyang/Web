@@ -212,7 +212,6 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
   const canSubmit =
     !!selectedTrack &&
     selectedGenres.length >= MIN_GENRES &&
-    comment.trim().length > 0 &&
     creationStatus?.canCreate !== false &&
     !submitSong.isPending;
 
@@ -461,9 +460,11 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         </div>
       </section>
 
-      {/* 3. 곡에 대한 한마디 */}
+      {/* 3. 곡에 대한 한마디 (선택) */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
+        <h3 className="text-lg font-bold text-text-main mb-2">
+          곡에 대한 한마디 <span className="text-text-hint font-normal text-sm">(선택)</span>
+        </h3>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
           <textarea
             value={comment}

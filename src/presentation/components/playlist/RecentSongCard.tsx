@@ -41,7 +41,7 @@ export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
           <span className="text-sm font-bold">{song.title}</span>
           <span className="text-[10px] font-medium opacity-90 ml-1">{song.artist}</span>
         </div>
-        <div className="text-[10px] truncate">"{song.comment}"</div>
+        {song.comment && <div className="text-[10px] truncate">"{song.comment}"</div>}
 
         <div className="border-t border-white/20 my-1" />
 
