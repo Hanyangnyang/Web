@@ -52,6 +52,11 @@ export interface SubwayArrivalLike {
   arrTime: string;
 }
 
+// 수인분당선 시간표 개정 미반영으로 임시로 연결편 표시를 막을 때 사용 (연결 시각 숨김 + 공지 배너 노출 트리거)
+export function isSuinBundangLine(lineId: string): boolean {
+  return SUBWAY_OPTS.find(o => o.id === lineId)?.line === '수인분당선';
+}
+
 export function connectingTrains<T extends SubwayArrivalLike>(subwayArrivals: T[], shuttleArrTime: string, lineId: string): T[] {
   if (!subwayArrivals?.length) return [];
   const opt = SUBWAY_OPTS.find(o => o.id === lineId);
