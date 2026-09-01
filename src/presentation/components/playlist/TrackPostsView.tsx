@@ -29,6 +29,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
   const { data, isLoading } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
   const totalCount = data?.totalSongsCount ?? posts.length;
+  const totalHeartCount = data?.totalHeartCount ?? 0;
+  const totalPlayCount = data?.totalPlayCount ?? 0;
 
   const [bookmarkedByPost, setBookmarkedByPost] = useState<Record<string, boolean>>({});
   const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
@@ -128,52 +130,64 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
         onBack={onBack}
       />
 
-      {/* 곡 정보 — 하얀색 카드로 감싸 아래 정렬 칩과 구분 */}
-      <div className="flex items-stretch gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
-        <div className="relative w-1/2 flex-shrink-0">
-          <img
-            src={track.albumArtUrl}
-            alt={track.title}
-            className="w-full aspect-square rounded-xl object-cover bg-slate-100"
-          />
-          {/* 앨범커버 우측 상단 공유하기 배지 — PostDetailCard 북마크 배지와 같은 스타일 */}
-          <button
-            onClick={() => setShareModalOpen(true)}
-            aria-label="공유하기"
-            className="absolute top-[4%] right-[4%] z-10 w-[clamp(40px,20%,72px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
-          >
-            <Share2 className="w-1/2 h-1/2 text-white" strokeWidth={2} />
-          </button>
-        </div>
-        <div className="min-w-0 flex-1 flex flex-col justify-between py-1">
+      {/* 곡 정보 — 앨범아트:정보 = 1:1 비율. 정보 쪽은 통계를 색깔 있는 뱃지로 다양하게 채워서
+          큰 앨범아트 옆이 휑해 보이지 않게 함 */}
+      <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
+        <img
+          src={track.albumArtUrl}
+          alt={track.title}
+          className="w-1/2 aspect-square rounded-xl object-cover bg-slate-100 flex-shrink-0"
+        />
+        <div className="min-w-0 flex-1 flex flex-col gap-2.5">
           <div>
             <div className="text-lg font-bold text-text-main truncate">{track.title}</div>
-            <div className="text-sm text-text-sub truncate">{track.artist}</div>
+            <div className="text-[13px] text-text-sub truncate">{track.artist}</div>
+          </div>
+          <div className="border-t border-slate-300" />
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-rose-50 text-[11px] font-bold text-rose-500">
+              <span className="text-xs">🔖</span>
+              북마크 {totalHeartCount.toLocaleString()}
+            </span>
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-sky-50 text-[11px] font-bold text-sky-600">
+              <span className="text-xs">🎧</span>
+              재생 {totalPlayCount.toLocaleString()}
+            </span>
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-600">
+              <span className="text-xs">💬</span>
+              게시글 {totalCount.toLocaleString()}
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-text-sub">게시글 {totalCount}개</span>
             {!isPlaying && (
               <button
                 onClick={onPlay}
                 aria-label={`${track.title} 재생`}
-                className="w-7 h-7 rounded-full bg-[#618CE9] text-white flex items-center justify-center active:scale-90 transition-transform"
+                className="w-9 h-9 rounded-full bg-slate-800 text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] flex items-center justify-center active:scale-90 transition-transform"
               >
-                <Play size={13} fill="white" stroke="white" strokeWidth={1} />
+                <Play size={16} fill="white" stroke="white" strokeWidth={1} />
               </button>
             )}
+            <button
+              onClick={() => setShareModalOpen(true)}
+              aria-label="공유하기"
+              className="w-9 h-9 rounded-full bg-slate-800 text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] flex items-center justify-center active:scale-90 transition-transform"
+            >
+              <Share2 size={16} strokeWidth={2} />
+            </button>
           </div>
         </div>
       </div>
 
       {/* 정렬 칩 */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-2 mb-3 pl-2">
         {SORT_OPTIONS.map((option) => (
           <button
             key={option.key}
             onClick={() => setSort(option.key)}
-            className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
               sort === option.key
-                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_2px_6px_rgba(15,23,42,0.35)]'
+                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
                 : 'bg-white text-[#618CE9] border-[#618CE9]'
             }`}
           >
@@ -220,7 +234,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
             >
               {/* 본문 + 북마크/더보기 */}
               <div className="flex items-start gap-3">
-                <p className="min-w-0 flex-1 text-sm text-text-main leading-snug line-clamp-2">{post.comment}</p>
+                <p className="min-w-0 flex-1 text-[15px] text-text-main leading-snug line-clamp-2">{post.comment}</p>
 
                 {!post.isMine && (
                   <div className="flex items-start gap-3 flex-shrink-0">
@@ -234,7 +248,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                     >
                       <Bookmark
                         size={18}
-                        className={bookmarked ? 'text-primary' : 'text-text-sub'}
+                        className={bookmarked ? 'text-text-main' : 'text-text-sub'}
                         fill={bookmarked ? 'currentColor' : 'none'}
                         strokeWidth={2}
                       />
@@ -273,10 +287,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                 )}
               </div>
 
-              {/* 시간 + 이모지 반응 — 카드 전체 너비를 다 활용 */}
+              {/* 시간 + 이모지 반응 — 카드 전체 너비를 다 활용. 시간은 ml-auto로 항상 맨 오른쪽 끝에 고정 */}
               <div className="flex items-center gap-1.5">
-                <span className="flex-shrink-0 text-xs text-text-hint">{formatTimeAgo(post.createdAt)}</span>
-
                 {/* 이모지 추가 버튼 — 다른 모양의 이모지도 고를 수 있도록 */}
                 <div className="relative inline-block flex-shrink-0">
                   <button
@@ -342,6 +354,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                     })}
                   </div>
                 )}
+
+                <span className="flex-shrink-0 text-xs text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>
               </div>
             </div>
           );

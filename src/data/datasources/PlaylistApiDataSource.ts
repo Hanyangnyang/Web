@@ -25,7 +25,10 @@ export interface PlaylistSongDto {
   // 이 곡을 추천 등록한 기기 — 화면에 직접 표기하진 않지만, 요청 기기의 deviceId와 비교해서
   // "내가 등록한 게시글인지"(isMine)를 판단하는 데 씀 (신고/북마크 아이콘 노출 여부 결정)
   deviceId: string;
-  // heartCount, totalPlayCount, updatedAt도 응답에 있지만 화면에 표기하지 않아 그대로 버림
+  // 이 게시글이 속한 곡(trackId) 전체의 누적 재생수 — 재생 기록 API가 게시글이 아니라
+  // 트랙 단위(POST /tracks/{trackId}/play)라, 같은 곡의 모든 게시글에 동일한 값이 실려옴
+  totalPlayCount: number;
+  // heartCount, updatedAt도 응답에 있지만 화면에 표기하지 않아 그대로 버림
 }
 
 export interface PagedPlaylistSongsDto {
@@ -99,8 +102,9 @@ export interface TrackPostsDto {
   artist: string;
   albumArtUrl: string;
   totalSongsCount: number;
+  // 이 곡에 달린 모든 추천 게시글의 공감(북마크) 수 합계
+  totalHeartCount: number;
   songs: PagedPlaylistSongsDto;
-  // totalHeartCount도 응답에 있지만 화면에 표기하지 않아 그대로 버림
 }
 
 export interface GetTrackPostsDataSourceParams {
