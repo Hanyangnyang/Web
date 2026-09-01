@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { Music } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface AddSongFabProps {
@@ -7,9 +7,8 @@ interface AddSongFabProps {
   playerHeight?: number;
 }
 
-// 열림/닫힘 상태 관계없이 화면 끝에서 항상 1rem 여백
-const FAB_RIGHT = 'right-[max(1rem,calc((100vw-440px)/2+1rem))]';
-const CLOSED_BOTTOM = 'calc(8px + env(safe-area-inset-bottom))';
+const FAB_RIGHT = 'right-[max(1.25rem,calc((100vw-440px)/2+1.25rem))]';
+const CLOSED_BOTTOM = 'calc(1.25rem + env(safe-area-inset-bottom))';
 const PLAYER_GAP = 16;
 
 // 이 FAB은 앱 전역 스크롤 컨테이너(App.tsx)를 prop으로 전달받을 방법이 없어서,
@@ -46,12 +45,12 @@ export function AddSongFab({ onClick, playerHeight = 0 }: AddSongFabProps) {
       ref={buttonRef}
       onClick={onClick}
       aria-label="곡 추천하기"
-      className={`fixed ${FAB_RIGHT} z-40 h-12 rounded-full bg-[#2B3B52] text-white border border-transparent flex items-center justify-center overflow-hidden shadow-[0_6px_20px_rgba(43,59,82,0.35)] hover:shadow-[0_8px_24px_rgba(43,59,82,0.45)] transition-[width,bottom,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-90 ${
+      className={`fixed ${FAB_RIGHT} z-40 h-12 rounded-full bg-[#8B5CF6] text-white border border-transparent flex items-center justify-center overflow-hidden shadow-[0_6px_20px_rgba(139,92,246,0.35)] hover:shadow-[0_8px_24px_rgba(139,92,246,0.45)] transition-[width,bottom,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-90 ${
         collapsed ? 'w-12' : 'w-[128px]'
       }`}
       style={{ bottom }}
     >
-      <Plus size={22} strokeWidth={2.5} className="flex-shrink-0" />
+      <Music size={20} strokeWidth={2.2} className="flex-shrink-0" />
       <span
         className={`overflow-hidden whitespace-nowrap text-sm font-bold transition-[max-width,opacity,margin-left] duration-200 ease-out ${
           collapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[90px] opacity-100 ml-1.5'
