@@ -25,7 +25,8 @@ export function BookmarkedSongsView({ onBack, onPlay, onShowAddSong, onShowRecen
       songs={songs ?? []}
       isLoading={isLoading}
       emptyStateMessage="이런 곡들은 어때요?"
-      emptyStateButtonLabel="최근 등록된 곡 보러가기"
+      emptyStateButtonLabel="최근 추가된 곡 보러가기"
+      emptyStateButtonIcon={<span>🎵</span>}
       onEmptyStateAction={onShowRecent}
       onBack={onBack}
       onPlay={onPlay}

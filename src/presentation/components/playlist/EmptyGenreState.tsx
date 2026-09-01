@@ -13,7 +13,7 @@ interface EmptyGenreStateProps {
   boxed?: boolean;
 }
 
-const DEFAULT_MESSAGE = '아직 이 장르엔 등록된 곡이 없어요';
+const DEFAULT_MESSAGE = '아직 이 장르엔 추천된 곡이 없어요';
 const DEFAULT_BUTTON_LABEL = '첫 곡 추천하러 가기';
 
 // 곡 목록이 0개일 때 공통으로 쓰는 안내 + 유도 버튼. 문구/동작은 화면마다 오버라이드 가능

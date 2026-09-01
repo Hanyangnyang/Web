@@ -160,7 +160,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
         </button>
 
         {/* 공유 대상 곡 미리보기 — 앨범커버를 크게 가운데 배치 */}
-        <div className="flex flex-col items-center px-3 pt-6 pb-6">
+        <div className="flex flex-col items-center px-3 pt-12 pb-8">
           <img
             src={song.albumArtUrl}
             alt={song.title}
@@ -170,6 +170,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
             <div className="text-sm font-bold text-text-main truncate">{song.title}</div>
             <div className="text-xs text-text-sub truncate">{song.artist}</div>
           </div>
+          <p className="mt-3 text-[11px] text-text-hint">친구에게 곡을 공유하여 함께 즐겨봐요!</p>
         </div>
 
         <div className="border-t border-slate-100" />

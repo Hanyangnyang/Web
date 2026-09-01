@@ -124,7 +124,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
-        subtitle="에리카생들에게 곡을 추천해주세요!"
+        subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
         onBack={onBack}
       />
 
@@ -195,7 +195,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
       )}
 
       {!isLoading && posts.length === 0 && (
-        <p className="py-10 text-center text-sm text-text-sub">아직 이 곡에 등록된 게시글이 없어요</p>
+        <p className="py-10 text-center text-sm text-text-sub">아직 이 곡을 추천한 게시글이 없어요</p>
       )}
 
       {/* 게시글 리스트 — 카드 사이 간격을 둬서 항목마다 분리된 느낌 */}

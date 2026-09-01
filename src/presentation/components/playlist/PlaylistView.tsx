@@ -235,7 +235,12 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
           />
         ) : screen === 'postDetail' && selectedPostId ? (
-          <PostDetailView postId={selectedPostId} onBack={popScreen} />
+          <PostDetailView
+            postId={selectedPostId}
+            onBack={popScreen}
+            onPlay={handlePlay}
+            currentTrackId={currentTrack?.trackId}
+          />
         ) : screen === 'chart' ? (
           <ChartView
             chart={chartTracks}
@@ -243,7 +248,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             chartPeriod={chartPeriod}
             onChangePeriod={setChartPeriod}
             onBack={popScreen}
-            onShowAddSong={() => pushScreen('addSong')}
+            onShowRecent={handleShowAllRecent}
             onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
           />
@@ -283,7 +288,6 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onShowAllRecent={handleShowAllRecent}
             onSelectRecentSong={handleSelectRecentSong}
             onShowAllChart={() => pushScreen('chart')}
-            onShowAddSong={() => pushScreen('addSong')}
             onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
@@ -322,7 +326,6 @@ interface PlaylistMainContentProps {
   onShowAllRecent: () => void;
   onSelectRecentSong: (song: Song) => void;
   onShowAllChart: () => void;
-  onShowAddSong: () => void;
   onPlay: (track: ChartTrack) => void;
   onShowPosts: (track: ChartTrack) => void;
   onShowMyActivity: () => void;
@@ -345,7 +348,6 @@ function PlaylistMainContent({
   onShowAllRecent,
   onSelectRecentSong,
   onShowAllChart,
-  onShowAddSong,
   onPlay,
   onShowPosts,
   onShowMyActivity,
@@ -366,7 +368,7 @@ function PlaylistMainContent({
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
-        subtitle="에리카생들에게 곡을 추천해주세요!"
+        subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
         onBack={onBack}
         rightAction={
           <button
@@ -393,7 +395,7 @@ function PlaylistMainContent({
           onKeyDown={(e) => {
             if (e.key === 'Enter') onSubmitSearch();
           }}
-          placeholder="어떤 곡이 궁금해요?"
+          placeholder="듣고 싶은 곡을 검색해보세요!"
           className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
         />
         <button
@@ -452,13 +454,13 @@ function PlaylistMainContent({
           </button>
         </div>
 
-        {/* 기간 필터 칩 */}
-        <div className="flex gap-1.5 mb-2 pl-1">
+        {/* 기간 필터 칩 — 멜론 차트 탭(TOP100/HOT100)처럼 알약형으로 크게 */}
+        <div className="flex gap-2 mb-2 pl-1">
           {CHART_PERIOD_OPTIONS.map((option) => (
             <button
               key={option.key}
               onClick={() => onChangeChartPeriod(option.key)}
-              className={`px-2 py-1 rounded-[16px] text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+              className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
                 chartPeriod === option.key
                   ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
                   : 'bg-white text-[#618CE9] border-[#618CE9]'
@@ -486,8 +488,8 @@ function PlaylistMainContent({
             <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
           ) : visibleChart.length === 0 ? (
             <EmptyChartState
-              onShowAddSong={onShowAddSong}
               periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
+              onShowRecent={onShowAllRecent}
             />
           ) : (
             visibleChart.map((track) => (

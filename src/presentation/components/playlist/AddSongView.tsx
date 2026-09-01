@@ -63,7 +63,7 @@ const TOAST_ERROR_MESSAGES: Record<string, string> = {
   PL002: '최근 7일 이내에 이미 추천하신 곡이에요. 다른 곡을 추천해주세요!',
 };
 const INLINE_ERROR_MESSAGES: Record<string, string> = {
-  PL003: '부적절하거나 비속어가 포함된 코멘트는 등록할 수 없어요.',
+  PL003: '부적절하거나 비속어가 포함된 코멘트는 추천할 수 없어요.',
   C001: '장르는 최소 1개, 최대 3개까지 선택하고 코멘트는 200자 이내로 입력해주세요.',
 };
 const RETRY_ERROR_CODE = 'C004';
@@ -268,7 +268,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
 
           setSubmitInlineError(
             (code && INLINE_ERROR_MESSAGES[code]) ||
-              (error instanceof Error ? error.message : '곡 등록에 실패했어요. 다시 시도해주세요.')
+              (error instanceof Error ? error.message : '곡 추천에 실패했어요. 다시 시도해주세요.')
           );
         },
       }
@@ -294,8 +294,8 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
         subtitle={
           creationStatus
             ? creationStatus.canCreate
-              ? `오늘 ${creationStatus.remainingCount}곡 더 등록할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
-              : '오늘 등록 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
+              ? `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
+              : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
             : ''
         }
         onBack={handleBackRequest}
@@ -487,7 +487,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
         </p>
       )}
 
-      {/* 등록하기 버튼 */}
+      {/* 추천하기 버튼 */}
       <button
         onClick={handleRegisterClick}
         disabled={!canSubmit}
@@ -504,15 +504,15 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
           transition: 'bottom 300ms ease-out',
         }}
       >
-        {submitSong.isPending ? '등록 중...' : '등록하기'}
+        {submitSong.isPending ? '추천 중...' : '추천하기'}
       </button>
 
-      {/* 등록 요청 중 화면 전체를 잠가서 중복 탭/다른 조작을 막고, 진행 상태를 눈에 띄게 보여줌 */}
+      {/* 추천 요청 중 화면 전체를 잠가서 중복 탭/다른 조작을 막고, 진행 상태를 눈에 띄게 보여줌 */}
       {submitSong.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="flex flex-col items-center gap-3 bg-white rounded-2xl shadow-xl px-8 py-6">
             <Loader2 size={28} className="animate-spin text-primary" />
-            <p className="text-sm font-semibold text-text-main">등록 중이에요...</p>
+            <p className="text-sm font-semibold text-text-main">추천 중이에요...</p>
           </div>
         </div>
       )}
@@ -558,15 +558,15 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
         </div>
       )}
 
-      {/* 등록 전 안내 — 삭제·수정 불가, 1일 3곡 제한 */}
+      {/* 추천 전 안내 — 삭제·수정 불가, 1일 3곡 제한 */}
       {showRegisterNoticePopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8">
           <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
-            <p className="text-sm font-semibold text-text-main mb-3 text-center">등록 전에 확인해주세요!</p>
+            <p className="text-sm font-semibold text-text-main mb-3 text-center">추천 전에 확인해주세요!</p>
             <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
-              <li>한 번 등록한 곡은 삭제하거나 수정할 수 없어요.</li>
+              <li>한 번 추천한 곡은 삭제하거나 수정할 수 없어요.</li>
               <li>
-                하루에 최대 3곡까지만 등록할 수 있어요
+                하루에 최대 3곡까지만 추천할 수 있어요
                 {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
               </li>
             </ul>
@@ -584,7 +584,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
                 }}
                 className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
               >
-                등록하기
+                추천하기
               </button>
             </div>
           </div>

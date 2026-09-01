@@ -17,12 +17,14 @@ export function MySongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: M
 
   return (
     <SongListScreen
-      title="내가 등록한 곡"
+      title="추천한 곡"
       emoji="🎤"
       subtitle=""
       songs={songs ?? []}
       isLoading={isLoading}
       emptyStateMessage="아직 이 장르로 추천한 곡이 없어요"
+      emptyStateButtonLabel="곡 추천하러 가기"
+      emptyStateButtonIcon={<span>✏️</span>}
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}

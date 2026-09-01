@@ -57,9 +57,9 @@ export const GENRES = [
 
 // 인기차트 상단 기간 필터 칩 — 홈 미리보기와 인기차트 상세 화면이 공용으로 사용. 실제 기간별 재집계 로직은 추후 연동
 export const CHART_PERIOD_OPTIONS = [
-  { key: 'popular', label: '실시간' },
-  { key: 'weekly', label: '주간' },
-  { key: 'monthly', label: '월간' },
+  { key: 'popular', label: 'TOP 10' },
+  { key: 'weekly', label: 'WEEK 10' },
+  { key: 'monthly', label: 'MONTH 10' },
 ] as const;
 
 export type ChartPeriod = (typeof CHART_PERIOD_OPTIONS)[number]['key'];

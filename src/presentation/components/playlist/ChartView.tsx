@@ -10,13 +10,13 @@ interface ChartViewProps {
   chartPeriod: ChartPeriod;
   onChangePeriod: (period: ChartPeriod) => void;
   onBack: () => void;
-  onShowAddSong: () => void;
+  onShowRecent: () => void;
   onPlay: (track: ChartTrack) => void;
   onShowPosts: (track: ChartTrack) => void;
 }
 
 // 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
-export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBack, onShowAddSong, onPlay, onShowPosts }: ChartViewProps) {
+export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBack, onShowRecent, onPlay, onShowPosts }: ChartViewProps) {
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -26,13 +26,13 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
         onBack={onBack}
       />
 
-      {/* 기간 필터 칩 */}
-      <div className="flex gap-1 mb-2 pl-2">
+      {/* 기간 필터 칩 — 멜론 차트 탭(TOP100/HOT100)처럼 알약형으로 크게 */}
+      <div className="flex gap-2 mb-2 pl-2">
         {CHART_PERIOD_OPTIONS.map((option) => (
           <button
             key={option.key}
             onClick={() => onChangePeriod(option.key)}
-            className={`px-3 py-1 rounded-[16px] text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
               chartPeriod === option.key
                 ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
                 : 'bg-white text-[#618CE9] border-[#618CE9]'
@@ -60,8 +60,8 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
           <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
         ) : chart.length === 0 ? (
           <EmptyChartState
-            onShowAddSong={onShowAddSong}
             periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
+            onShowRecent={onShowRecent}
           />
         ) : (
           chart.map((track) => (

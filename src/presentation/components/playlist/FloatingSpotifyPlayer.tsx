@@ -1,7 +1,8 @@
-import { Play, X } from 'lucide-react';
+import { Play, Share2, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 import { isIOSDevice } from '../../../lib/platform.js';
+import { SongShareModal } from './SongShareModal';
 
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
 // "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요 — Android/데스크톱은 이 정책이 없어서 해당 없음.
@@ -11,6 +12,7 @@ export interface PlayableTrack {
   trackId: string;
   title: string;
   artist: string;
+  albumArtUrl: string;
 }
 
 interface FloatingSpotifyPlayerProps {
@@ -27,6 +29,8 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareCopiedToast, setShareCopiedToast] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
@@ -141,7 +145,10 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
   if (!displaySong) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center">
+    // z-40이 아니라 z-[150]인 이유: 화면 상단 sticky 헤더가 z-[100]이라, 이 안에 있는
+    // 공유 팝업(z-[200])이 그보다 낮으면 fixed+z-index로 생기는 자체 stacking context에 갇혀서
+    // 팝업이 헤더 뒤로 깔려버림 — 바깥 래퍼 자체를 헤더보다 높여야 안쪽 z-index가 의미가 있음
+    <div className="fixed inset-x-0 bottom-0 z-[150] flex justify-center">
       <div className="w-full max-w-app">
         <div
           ref={sheetRef}
@@ -156,8 +163,16 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
               {displaySong.title} <span className="font-normal">- {displaySong.artist}</span>
             </div>
             <button
-              onClick={onClose}
+              onClick={() => setShareModalOpen(true)}
+              aria-label="공유하기"
               className="ml-2 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
+            >
+              <Share2 size={18} className="text-black" />
+            </button>
+            <button
+              onClick={onClose}
+              aria-label="닫기"
+              className="ml-1 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
             >
               <X size={18} className="text-black" />
             </button>
@@ -200,6 +215,23 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
           </div>
         </div>
       </div>
+
+      {shareModalOpen && (
+        <SongShareModal
+          song={{ title: displaySong.title, artist: displaySong.artist, albumArtUrl: displaySong.albumArtUrl }}
+          onClose={() => setShareModalOpen(false)}
+          onCopied={() => {
+            setShareCopiedToast(true);
+            setTimeout(() => setShareCopiedToast(false), 1800);
+          }}
+        />
+      )}
+
+      {shareCopiedToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
+          링크 복사됨!
+        </div>
+      )}
     </div>
   );
 }
