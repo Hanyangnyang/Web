@@ -27,15 +27,15 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
       />
 
       {/* 기간 필터 칩 */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-1 mb-2 pl-2">
         {CHART_PERIOD_OPTIONS.map((option) => (
           <button
             key={option.key}
             onClick={() => onChangePeriod(option.key)}
-            className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+            className={`px-3 py-1 rounded-[16px] text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
               chartPeriod === option.key
-                ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
-                : 'bg-white text-[#2B3B52] border-[#2B3B52]'
+                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
+                : 'bg-white text-[#618CE9] border-[#618CE9]'
             }`}
           >
             {option.label}
@@ -44,7 +44,7 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
       </div>
 
       {/* 차트 리스트 */}
-      <div className="bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+      <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
         {/* 헤더 */}
         <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
           <span className="w-7 text-center">순위</span>

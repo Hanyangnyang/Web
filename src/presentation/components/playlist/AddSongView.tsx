@@ -101,6 +101,8 @@ async function searchTracks(query: string): Promise<SearchTrack[]> {
 
 interface AddSongViewProps {
   onBack: () => void;
+  // 등록 성공 시 호출 — 사용자가 자기 곡이 잘 올라갔는지 바로 확인할 수 있게 "최근 추가된 곡" 화면으로 이동시킴
+  onSubmitSuccess: () => void;
   // 플레이어가 떠 있으면 등록하기 버튼이 그 위로 뜨도록 — 0이면 플레이어 닫힘
   playerHeight?: number;
   // 선택한 곡을 미리 들어볼 수 있게 하단 플레이어를 띄우는 콜백
@@ -115,7 +117,7 @@ const PLAYER_GAP = 16;
 const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
-export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
+export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
   // 화면 진입 시 임시저장된 초안이 있으면 한 번만 불러와서 초기값으로 씀
   const [initialDraft] = useState(() => loadDraft());
   const [query, setQuery] = useState('');
@@ -248,7 +250,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
       {
         onSuccess: () => {
           clearDraft();
-          onBack();
+          onSubmitSuccess();
         },
         onError: (error) => {
           const code = (error as HttpError).code;

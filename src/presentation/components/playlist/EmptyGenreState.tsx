@@ -24,7 +24,7 @@ export function EmptyGenreState({ onAction, message = DEFAULT_MESSAGE, buttonLab
     >
       <span className="text-2xl">🎵</span>
       <p className="text-sm font-semibold text-text-main">{message}</p>
-      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-[#2B3B52] text-white shadow-[0_4px_10px_rgba(43,59,82,0.3)] text-xs font-bold">
+      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-[#618CE9] text-white shadow-[0_4px_10px_rgba(15,23,42,0.3)] text-xs font-bold">
         <Plus size={14} strokeWidth={2.5} />
         {buttonLabel}
       </span>

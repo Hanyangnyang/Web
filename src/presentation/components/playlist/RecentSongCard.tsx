@@ -33,7 +33,7 @@ export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
       />
 
       {/* 가독성용 그라데이션 오버레이 */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
       {/* 하단 정보 */}
       <div className="absolute bottom-0 inset-x-0 z-10 p-3 text-white">

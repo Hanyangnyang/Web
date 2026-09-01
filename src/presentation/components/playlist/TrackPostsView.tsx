@@ -71,9 +71,9 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [reportMenuOpenPostId]);
 
-  // 낙관적으로 먼저 뒤집고, 서버 응답의 실제 isLiked로 맞추거나 실패 시 되돌림. 연타는 무시
+  // 낙관적으로 먼저 뒤집고, 서버 응답의 실제 isLiked로 맞추거나 실패 시 되돌림.
+  // 로딩 표시로 막지 않고 연타도 그대로 받아서 매번 뒤집음 — 순수 낙관적 UI
   const handleToggleBookmark = (postId: string) => {
-    if (toggleBookmark.isPending) return;
     const optimistic = !(bookmarkedByPost[postId] ?? false);
     setBookmarkedByPost((prev) => ({ ...prev, [postId]: optimistic }));
     toggleBookmark.mutate(postId, {
@@ -156,7 +156,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
               <button
                 onClick={onPlay}
                 aria-label={`${track.title} 재생`}
-                className="w-7 h-7 rounded-full bg-slate-700 text-white flex items-center justify-center active:scale-90 transition-transform"
+                className="w-7 h-7 rounded-full bg-[#618CE9] text-white flex items-center justify-center active:scale-90 transition-transform"
               >
                 <Play size={13} fill="white" stroke="white" strokeWidth={1} />
               </button>
@@ -173,8 +173,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
             onClick={() => setSort(option.key)}
             className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
               sort === option.key
-                ? 'bg-slate-700 text-white border-transparent shadow-[0_2px_6px_rgba(51,65,85,0.25)]'
-                : 'bg-slate-200 text-slate-800 border-slate-400'
+                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_2px_6px_rgba(15,23,42,0.35)]'
+                : 'bg-white text-[#618CE9] border-[#618CE9]'
             }`}
           >
             {option.label}
@@ -229,9 +229,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                         e.stopPropagation();
                         if (postId) handleToggleBookmark(postId);
                       }}
-                      disabled={toggleBookmark.isPending}
                       aria-label="이 게시글 북마크"
-                      className={`active:scale-90 transition-transform ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
+                      className="active:scale-90 transition-transform"
                     >
                       <Bookmark
                         size={18}

@@ -10,8 +10,8 @@ interface GenreFilterChipsProps {
 
 const ALL_CHIP_STYLES = {
   main: {
-    active: 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]',
-    inactive: 'bg-white text-[#2B3B52] border-[#2B3B52]',
+    active: 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]',
+    inactive: 'bg-white text-[#618CE9] border-[#618CE9]',
   },
   list: {
     active: 'bg-slate-700 text-white border-transparent shadow-[0_2px_6px_rgba(51,65,85,0.25)]',

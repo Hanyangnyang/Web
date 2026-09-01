@@ -91,6 +91,14 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     setScreenStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
   }, []);
 
+  // 곡추천하기 등록 성공 — 어느 화면에서 곡추천하기로 들어왔든, 자기 곡이 잘 올라갔는지 바로
+  // 볼 수 있게 최근추가된곡으로 보냄. addSong 프레임을 그대로 recent로 바꿔치기해서(push가 아님)
+  // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음
+  const handleAddSongSuccess = useCallback(() => {
+    setRecentScrollTarget(null);
+    setScreenStack((prev) => [...prev.slice(0, -1), 'recent']);
+  }, []);
+
   const handleBack = useCallback(() => {
     if (screenStack.length > 1) {
       popScreen();
@@ -197,6 +205,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
         ) : screen === 'addSong' ? (
           <AddSongView
             onBack={popScreen}
+            onSubmitSuccess={handleAddSongSuccess}
             playerHeight={playerHeight}
             onPlay={handlePlay}
             currentTrackId={currentTrack?.trackId}
@@ -347,11 +356,11 @@ function PlaylistMainContent({
         }
       />
 
-      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동. 밋밋한 흰 배경 대신
-          은은한 primary 톤 + 아이콘 배지로 "눌러볼 만한" 느낌을 주려는 의도 */}
-      <div className="mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-gradient-to-r from-primary/[0.06] to-primary/0 border border-primary/15 rounded-full shadow-[0_2px_8px_rgba(14,74,132,0.06)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.12)] transition-all">
-        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <Search size={15} className="text-primary" />
+      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동. 그라데이션 없이
+          단색 브랜드 블루 톤 + 아이콘 배지로 심플하게 "눌러볼 만한" 느낌만 남김 */}
+      <div className="mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-[#618CE9]/[0.06] border border-[#618CE9]/20 rounded-full focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
+        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#618CE9]/15 flex items-center justify-center">
+          <Search size={15} className="text-[#618CE9]" />
         </span>
         <input
           type="text"
@@ -360,14 +369,14 @@ function PlaylistMainContent({
           onKeyDown={(e) => {
             if (e.key === 'Enter') onSubmitSearch();
           }}
-          placeholder="🎵 어떤 곡이 궁금해요?"
+          placeholder="어떤 곡이 궁금해요?"
           className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
         />
         <button
           onClick={onSubmitSearch}
           disabled={!searchQuery.trim()}
           aria-label="검색"
-          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-primary text-white shadow-[0_2px_6px_rgba(14,74,132,0.3)] disabled:bg-slate-200 disabled:text-text-hint disabled:shadow-none transition-all active:scale-90"
+          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#618CE9] text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
         >
           <ArrowRight size={14} />
         </button>
@@ -376,7 +385,7 @@ function PlaylistMainContent({
       {/* 최근 추가된 곡 섹션 */}
       <section className="mb-4">
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡 🎵</h3>
+          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
           <button
             onClick={onShowAllRecent}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
@@ -409,7 +418,7 @@ function PlaylistMainContent({
       {/* 인기차트 섹션 */}
       <section>
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">인기차트 🔥</h3>
+          <h3 className="text-lg font-bold text-text-main">인기차트</h3>
           <button
             onClick={onShowAllChart}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
@@ -420,15 +429,15 @@ function PlaylistMainContent({
         </div>
 
         {/* 기간 필터 칩 */}
-        <div className="flex gap-2 mb-2">
+        <div className="flex gap-1.5 mb-2 pl-1">
           {CHART_PERIOD_OPTIONS.map((option) => (
             <button
               key={option.key}
               onClick={() => onChangeChartPeriod(option.key)}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+              className={`px-2 py-1 rounded-[16px] text-[11px] font-bold border transition-all duration-200 active:scale-[0.96] ${
                 chartPeriod === option.key
-                  ? 'bg-[#2B3B52] text-white border-transparent shadow-[0_4px_10px_rgba(43,59,82,0.35)]'
-                  : 'bg-white text-[#2B3B52] border-[#2B3B52]'
+                  ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
+                  : 'bg-white text-[#618CE9] border-[#618CE9]'
               }`}
             >
               {option.label}
@@ -437,7 +446,7 @@ function PlaylistMainContent({
         </div>
 
         {/* 차트 리스트 */}
-        <div className="bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+        <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
           {/* 헤더 */}
           <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
             <span className="w-7 text-center">순위</span>

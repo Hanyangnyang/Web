@@ -121,10 +121,8 @@ export function PostDetailCard({
   };
 
   // 서버 응답이 오기 전에 먼저 눈에 보이게 뒤집고(낙관적 업데이트), 응답 오면 실제 값으로 맞추거나
-  // 실패 시 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글.
-  // 이전 요청이 처리 중이면 연타 무시(같은 이유로 이모지 반응과 동일하게 가드)
+  // 실패 시 원래 상태로 되돌림. 로딩 표시로 막지 않고 연타도 그대로 받아서 매번 뒤집음 — 순수 낙관적 UI
   const toggleBookmarked = () => {
-    if (toggleBookmark.isPending) return;
     if (!post.id) {
       setBookmarked((prev) => !prev);
       return;
@@ -266,9 +264,8 @@ export function PostDetailCard({
               e.stopPropagation();
               toggleBookmarked();
             }}
-            disabled={toggleBookmark.isPending}
             aria-label="북마크"
-            className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass} ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
+            className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass}`}
           >
             <Bookmark className="w-1/2 h-1/2 text-white" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
           </button>
