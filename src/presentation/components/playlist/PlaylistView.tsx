@@ -73,6 +73,9 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
+  // "어떤 곡을 추천해볼까요?" 클릭 시 검색 결과 화면(빈 검색어라 보여줄 게 없음) 대신
+  // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistMainContent가 마운트될 때 한 번 소비
+  const [autoFocusSearch, setAutoFocusSearch] = useState(false);
 
   // PlaylistView 자체는 최근추가된곡 화면을 드나들어도 마운트가 유지돼서, react-query의
   // staleTime이 지나 있어도 "새로 마운트되는 시점" 트리거가 없어 자동으로 재조회되지 않았음.
@@ -199,6 +202,10 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onBack={popScreen}
             onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
+            onShowSearch={() => {
+              setAutoFocusSearch(true);
+              setScreenStack(['main']);
+            }}
             scrollToTrackId={recentScrollTarget}
             currentTrackId={currentTrack?.trackId}
           />
@@ -280,6 +287,8 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
+            autoFocusSearch={autoFocusSearch}
+            onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
           />
         )}
       </div>
@@ -317,6 +326,9 @@ interface PlaylistMainContentProps {
   onPlay: (track: ChartTrack) => void;
   onShowPosts: (track: ChartTrack) => void;
   onShowMyActivity: () => void;
+  // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
+  autoFocusSearch?: boolean;
+  onAutoFocusSearchConsumed?: () => void;
 }
 
 function PlaylistMainContent({
@@ -337,7 +349,18 @@ function PlaylistMainContent({
   onPlay,
   onShowPosts,
   onShowMyActivity,
+  autoFocusSearch = false,
+  onAutoFocusSearchConsumed,
 }: PlaylistMainContentProps) {
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!autoFocusSearch) return;
+    searchInputRef.current?.focus();
+    onAutoFocusSearchConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -363,6 +386,7 @@ function PlaylistMainContent({
           <Search size={15} className="text-[#618CE9]" />
         </span>
         <input
+          ref={searchInputRef}
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

@@ -1,3 +1,4 @@
+import { Play } from 'lucide-react';
 import { type Song, GENRES } from './playlistTypes';
 
 interface RecentSongCardProps {
@@ -23,7 +24,7 @@ export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
         if (e.key === 'Enter' || e.key === ' ') onClick();
       }}
       aria-label="최근 추가된 곡 전체보기"
-      className="flex-shrink-0 w-44 aspect-[4/5] rounded-xl overflow-hidden shadow-lg relative cursor-pointer"
+      className="flex-shrink-0 w-44 aspect-square rounded-xl overflow-hidden shadow-lg relative cursor-pointer"
     >
       {/* 앨범커버 전체 배경 */}
       <img
@@ -34,6 +35,12 @@ export function RecentSongCard({ song, onClick }: RecentSongCardProps) {
 
       {/* 가독성용 그라데이션 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+
+      {/* 재생 아이콘 — 우측 상단 코너. 하단은 텍스트로 붐비고, 중앙/좌상단은 앨범아트 인물·얼굴을
+          가리기 쉬워서 대부분 비어있는 우상단에 고정 배치 */}
+      <div className="absolute top-2 right-2 z-10 pointer-events-none">
+        <Play size={24} className="ml-0.5" fill="white" stroke="white" strokeWidth={1} />
+      </div>
 
       {/* 하단 정보 */}
       <div className="absolute bottom-0 inset-x-0 z-10 p-3 text-white">

@@ -157,8 +157,8 @@ export function PostDetailCard({
   // 2열(hideReactions, 요약 카드)에서는 제목/가수명을 세로로 쌓고, 1열에서는 "제목 · 가수명" 한 줄로 표시
   const titleBlock = hideReactions ? (
     <div className="min-w-0">
-      <div className="text-base font-bold text-text-main truncate">{post.title}</div>
-      <div className="text-sm font-medium text-text-sub truncate">{post.artist}</div>
+      <div className="text-sm font-bold text-text-main truncate">{post.title}</div>
+      <div className="text-xs font-medium text-text-sub truncate">{post.artist}</div>
     </div>
   ) : (
     <div className="truncate">
@@ -199,10 +199,12 @@ export function PostDetailCard({
     </div>
   );
 
-  // 공유/북마크 배지 크기 — 1열은 32px 그대로, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
+  // 공유/북마크 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
   // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 북마크가 그 왼쪽
-  const actionBadgeSizeClass = hideReactions ? 'w-7' : 'w-8';
-  const bookmarkBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_42px)]';
+  const actionBadgeSizeClass = hideReactions ? 'w-7' : 'w-9';
+  const bookmarkBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
+  // 2열(요약 카드)의 재생 버튼은 카드 폭 자체가 좁아서 같은 16%라도 절대 크기가 작아 보임 — 더 큰 비율로 보정
+  const playButtonSizeClass = hideReactions ? 'w-[22%]' : 'w-[16%]';
 
   return (
     <div
@@ -236,9 +238,9 @@ export function PostDetailCard({
               onPlay();
             }}
             aria-label={`${post.title} 재생`}
-            className="absolute inset-0 m-auto w-[16%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-95 transition-transform"
+            className={`absolute inset-0 m-auto ${playButtonSizeClass} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center active:scale-95 transition-transform`}
           >
-            <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
+            <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
           </button>
         )}
 
@@ -253,9 +255,9 @@ export function PostDetailCard({
             setShareModalOpen(true);
           }}
           aria-label="공유하기"
-          className={`absolute bottom-[4%] right-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
+          className={`absolute bottom-[4%] right-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
         >
-          <Share2 className="w-1/2 h-1/2 text-white" strokeWidth={2} />
+          <Share2 className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} />
         </button>
 
         {!post.isMine && (
@@ -265,9 +267,9 @@ export function PostDetailCard({
               toggleBookmarked();
             }}
             aria-label="북마크"
-            className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass}`}
+            className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass}`}
           >
-            <Bookmark className="w-1/2 h-1/2 text-white" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
+            <Bookmark className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
@@ -359,33 +361,35 @@ export function PostDetailCard({
 
         {/* 본문 */}
         {post.body && (
-          <p className="text-sm text-text-main leading-relaxed mb-2 whitespace-pre-line">{post.body}</p>
+          <p className={`${hideReactions ? 'text-xs' : 'text-sm'} text-text-main leading-relaxed mb-2 whitespace-pre-line`}>{post.body}</p>
         )}
 
-        <div className="border-t border-slate-100 mb-3" />
-
-        {/* 장르 — 최대 3개까지 함께 표시. 시간은 1열(리액션 있는) 모드에서만 카드 우측 끝에 같이 표시.
-            mt-auto로 카드 하단에 고정 — 2열 그리드에서 같은 행 카드끼리 높이가 늘어나도(flex-1) 본문 길이와 무관하게 정렬됨 */}
-        <div className="flex items-center justify-between gap-2 mt-auto">
-          <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs font-medium text-text-sub">
-            {post.genres.flatMap((label, index) => {
-              const genre = GENRES.find((g) => g.label === label);
-              const chip = (
-                <span key={label} className="flex items-center">
-                  {genre?.emoji && <span>{genre.emoji}</span>}
-                  <span>{label}</span>
-                </span>
-              );
-              if (index === 0) return [chip];
-              return [
-                <span key={`${label}-dot`} className="text-text-hint" aria-hidden="true">·</span>,
-                chip,
-              ];
-            })}
+        {/* 구분선 + 장르(최대 3개) — 묶어서 mt-auto로 카드 하단에 고정. 구분선을 장르 행과
+            분리해두면 2열 그리드에서 카드 높이가 늘어날 때(본문이 짧은 카드) 구분선만 본문
+            바로 아래 뜨고 장르는 저 밑에 떨어져 보였어서, 항상 장르 바로 위에 붙도록 묶음 */}
+        <div className="mt-auto">
+          <div className="border-t border-slate-100 mb-3" />
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs font-medium text-text-sub">
+              {post.genres.flatMap((label, index) => {
+                const genre = GENRES.find((g) => g.label === label);
+                const chip = (
+                  <span key={label} className="flex items-center">
+                    {genre?.emoji && <span>{genre.emoji}</span>}
+                    <span>{label}</span>
+                  </span>
+                );
+                if (index === 0) return [chip];
+                return [
+                  <span key={`${label}-dot`} className="text-text-hint" aria-hidden="true">·</span>,
+                  chip,
+                ];
+              })}
+            </div>
+            {!hideReactions && (
+              <span className="flex-shrink-0 text-xs text-text-hint">{formatTimeAgo(post.createdAt)}</span>
+            )}
           </div>
-          {!hideReactions && (
-            <span className="flex-shrink-0 text-xs text-text-hint">{formatTimeAgo(post.createdAt)}</span>
-          )}
         </div>
       </div>
 

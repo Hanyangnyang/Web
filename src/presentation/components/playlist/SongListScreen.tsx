@@ -1,5 +1,5 @@
 import { LayoutGrid, Rows3 } from 'lucide-react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, filterSongsByGenre } from './playlistTypes';
 import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
@@ -19,6 +19,7 @@ interface SongListScreenProps {
   // 빈 상태 문구/버튼/동작을 화면마다 다르게 하고 싶을 때 오버라이드 — 없으면 장르 안내 문구 + 곡추천하기로 기본 동작
   emptyStateMessage?: string;
   emptyStateButtonLabel?: string;
+  emptyStateButtonIcon?: ReactNode;
   onEmptyStateAction?: () => void;
   // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
@@ -44,6 +45,7 @@ export function SongListScreen({
   onShowAddSong,
   emptyStateMessage,
   emptyStateButtonLabel,
+  emptyStateButtonIcon,
   onEmptyStateAction,
   enableViewToggle = false,
   hideMoreButton = false,
@@ -140,6 +142,7 @@ export function SongListScreen({
             onAction={onEmptyStateAction ?? onShowAddSong}
             message={emptyStateMessage}
             buttonLabel={emptyStateButtonLabel}
+            buttonIcon={emptyStateButtonIcon}
             boxed={emptyStateBoxed}
           />
         ) : (
