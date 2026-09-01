@@ -22,7 +22,10 @@ export default async function handler(req, res) {
     const response = await fetch(
       `https://api.spotify.com/v1/search?q=${encodedQuery}&type=track&limit=${RESULT_LIMIT}&market=KR`,
       {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept-Language': 'ko-KR,ko;q=0.9'
+        }
       }
     );
 
