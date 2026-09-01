@@ -290,7 +290,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
     >
       <MiscSubViewHeader
         title="곡 추천하기"
-        emoji="🤔"
+        emoji="✏️"
         subtitle={
           creationStatus
             ? creationStatus.canCreate
@@ -305,7 +305,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">곡 검색</h3>
         <div
-          className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all ${
+          className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all ${
             isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
           }`}
         >
@@ -324,7 +324,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
               onClick={handleSearchClick}
               disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
               aria-label="곡 검색"
-              className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-primary disabled:text-text-hint hover:bg-primary/10 transition-colors active:scale-90"
+              className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-[#618CE9] disabled:text-text-hint hover:bg-[#618CE9]/10 transition-colors active:scale-90"
             >
               {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
             </button>
@@ -405,7 +405,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
 
         {/* 선택된 곡 */}
         {selectedTrack && (
-          <div className="mt-2 flex items-center gap-3 bg-white border border-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
+          <div className="mt-2 flex items-center gap-3 bg-white border border-[#618CE9]/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
             <img
               src={selectedTrack.albumArtUrl}
               alt={selectedTrack.title}
@@ -449,7 +449,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
                 disabled={isDisabled}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
                   isSelected
-                    ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
+                    ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(15,23,42,0.25)]`
                     : isDisabled
                       ? 'bg-slate-100 text-slate-300 border-transparent'
                       : `${genre.light} text-gray-800 border-transparent`
@@ -466,7 +466,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
       {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
-        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
+        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
           <textarea
             value={comment}
             maxLength={COMMENT_MAX_LENGTH}
@@ -493,7 +493,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
         disabled={!canSubmit}
         className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold border transition-all active:scale-[0.97] z-40 ${
           canSubmit
-            ? 'bg-primary text-white border-transparent shadow-[0_6px_20px_rgba(14,74,132,0.35)]'
+            ? 'bg-[#618CE9] text-white border-transparent shadow-[0_6px_20px_rgba(15,23,42,0.35)]'
             : 'bg-slate-100 text-slate-300 border-transparent'
         }`}
         style={{
@@ -511,7 +511,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
       {submitSong.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="flex flex-col items-center gap-3 bg-white rounded-2xl shadow-xl px-8 py-6">
-            <Loader2 size={28} className="animate-spin text-primary" />
+            <Loader2 size={28} className="animate-spin text-[#618CE9]" />
             <p className="text-sm font-semibold text-text-main">추천 중이에요...</p>
           </div>
         </div>
@@ -549,7 +549,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
                   setShowSubmitRetryPopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
               >
                 다시 시도
               </button>
@@ -582,7 +582,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
                   setShowRegisterNoticePopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
               >
                 추천하기
               </button>
@@ -604,7 +604,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
                   setShowLeaveConfirmPopup(false);
                   onBack();
                 }}
-                className="h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+                className="h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
               >
                 임시저장하고 나가기
               </button>
