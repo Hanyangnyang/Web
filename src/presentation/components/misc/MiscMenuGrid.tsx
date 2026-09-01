@@ -1,7 +1,7 @@
 // 컴포넌트: 체대 헬스장·인스타그램 등 기타 서비스 진입 그리드
-import { Dumbbell, CalendarDays, ExternalLink, Laugh } from 'lucide-react';
+import { Dumbbell, CalendarDays, ExternalLink, Laugh, UsersRound } from 'lucide-react';
 
-export type MiscBoxKey = 'gym' | 'insta' | 'calendar' | 'feedback';
+export type MiscBoxKey = 'gym' | 'insta' | 'clubs' | 'calendar' | 'feedback';
 
 const InstagramIcon = ({ size = 24, color = 'currentColor' }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,6 +41,16 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">학교 인스타그램</span>
             <span className="text-[0.8rem] text-text-sub">에리카 &amp; 단과대 계정</span>
+          </div>
+        </div>
+
+        <div className={`${cardClass} col-span-2 aspect-auto min-h-[112px] flex-row justify-start text-left px-5`} onClick={() => onBoxClick('clubs')}>
+          <div className="w-14 h-14 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
+            <UsersRound size={28} color="#0E4A84" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[0.95rem] font-extrabold text-text-main">중앙동아리</span>
+            <span className="text-[0.8rem] text-text-sub">활동·인스타그램·회비·동아리방</span>
           </div>
         </div>
 

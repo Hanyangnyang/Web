@@ -26,6 +26,15 @@ const loadFeedbackView = () => {
 const LazyInstagramView = lazy(loadInstagramView);
 const LazyFeedbackView = lazy(loadFeedbackView);
 
+let clubViewPromise: Promise<{ default: SubViewComponent }> | null = null;
+const loadClubView = () => {
+  if (!clubViewPromise) {
+    clubViewPromise = import('./ClubView.jsx').then(m => ({ default: m.ClubView }));
+  }
+  return clubViewPromise;
+};
+const LazyClubView = lazy(loadClubView);
+
 type SubView = 'list' | MiscBoxKey;
 
 function AccordionGroupShimmer() {
@@ -98,6 +107,7 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
   const [FeedbackViewComp, setFeedbackViewComp] = useState<SubViewComponent | null>(null);
+  const [ClubViewComp, setClubViewComp] = useState<SubViewComponent | null>(null);
 
   useEffect(() => {
     setSubView('list');
@@ -114,6 +124,7 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
     if (!isActive) return;
     loadInstagramView().then(m => setInstagramViewComp(() => m.default));
     loadFeedbackView().then(m => setFeedbackViewComp(() => m.default));
+    loadClubView().then(m => setClubViewComp(() => m.default));
   }, [isActive]);
 
   const handleBoxClick = (box: MiscBoxKey) => {
@@ -147,6 +158,18 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
     return (
       <Suspense fallback={<FeedbackViewFallback onBack={onBack} />}>
         <LazyFeedbackView onBack={onBack} />
+      </Suspense>
+    );
+  }
+  if (subView === 'clubs') {
+    const onBack = () => setSubView('list');
+    if (ClubViewComp) {
+      const Comp = ClubViewComp;
+      return <Comp onBack={onBack} />;
+    }
+    return (
+      <Suspense fallback={<InstagramViewFallback onBack={onBack} />}>
+        <LazyClubView onBack={onBack} />
       </Suspense>
     );
   }
