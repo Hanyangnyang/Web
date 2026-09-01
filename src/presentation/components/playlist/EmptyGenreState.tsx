@@ -19,9 +19,7 @@ export function EmptyGenreState({ onAction, message = DEFAULT_MESSAGE, buttonLab
     <button
       onClick={onAction}
       className={`w-full flex flex-col items-center justify-center gap-1.5 py-10 px-4 text-center transition-colors active:scale-[0.98] ${
-        boxed
-          ? 'bg-white rounded-xl border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50'
-          : 'hover:bg-slate-50'
+        boxed ? 'bg-white rounded-xl border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50' : ''
       }`}
     >
       <span className="text-2xl">🎵</span>

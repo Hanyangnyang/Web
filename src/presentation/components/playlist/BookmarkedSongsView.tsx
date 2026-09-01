@@ -30,6 +30,7 @@ export function BookmarkedSongsView({ onBack, onPlay, onShowAddSong, onShowRecen
       onShowAddSong={onShowAddSong}
       enableViewToggle
       currentTrackId={currentTrackId}
+      emptyStateBoxed={false}
     />
   );
 }

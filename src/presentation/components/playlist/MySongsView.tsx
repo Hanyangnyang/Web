@@ -27,6 +27,7 @@ export function MySongsView({ onBack, onPlay, onShowAddSong, currentTrackId }: M
       enableViewToggle
       hideMoreButton
       currentTrackId={currentTrackId}
+      emptyStateBoxed={false}
     />
   );
 }

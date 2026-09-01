@@ -1,10 +1,11 @@
-import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
+import { Bookmark, MoreVertical, Play, Share2, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
 import { type Song, type ReactionState, formatTimeAgo, toReactionState } from './playlistTypes';
 import { useToggleBookmark, useReportSong, useToggleReaction, useTrackPosts, type TrackPostsSort } from '../../hooks/useRecentSongs.js';
+import { SongShareModal } from './SongShareModal';
 
 interface TrackPostsViewProps {
   track: TrackResult;
@@ -50,6 +51,8 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
   const [reportReasonPopupPostId, setReportReasonPopupPostId] = useState<string | null>(null);
   const [selectedReportReason, setSelectedReportReason] = useState<string | null>(null);
   const [reportToast, setReportToast] = useState('');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareCopiedToast, setShareCopiedToast] = useState(false);
   const reportMenuRef = useRef<HTMLDivElement>(null);
 
   const toggleBookmark = useToggleBookmark();
@@ -127,11 +130,21 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
 
       {/* 곡 정보 — 하얀색 카드로 감싸 아래 정렬 칩과 구분 */}
       <div className="flex items-stretch gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
-        <img
-          src={track.albumArtUrl}
-          alt={track.title}
-          className="w-1/2 aspect-square rounded-xl object-cover bg-slate-100 flex-shrink-0"
-        />
+        <div className="relative w-1/2 flex-shrink-0">
+          <img
+            src={track.albumArtUrl}
+            alt={track.title}
+            className="w-full aspect-square rounded-xl object-cover bg-slate-100"
+          />
+          {/* 앨범커버 우측 상단 공유하기 배지 — PostDetailCard 북마크 배지와 같은 스타일 */}
+          <button
+            onClick={() => setShareModalOpen(true)}
+            aria-label="공유하기"
+            className="absolute top-[4%] right-[4%] z-10 w-[clamp(40px,20%,72px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+          >
+            <Share2 className="w-1/2 h-1/2 text-white" strokeWidth={2} />
+          </button>
+        </div>
         <div className="min-w-0 flex-1 flex flex-col justify-between py-1">
           <div>
             <div className="text-lg font-bold text-text-main truncate">{track.title}</div>
@@ -390,6 +403,23 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
       {reportToast && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
           {reportToast}
+        </div>
+      )}
+
+      {shareModalOpen && (
+        <SongShareModal
+          song={{ title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl }}
+          onClose={() => setShareModalOpen(false)}
+          onCopied={() => {
+            setShareCopiedToast(true);
+            setTimeout(() => setShareCopiedToast(false), 1800);
+          }}
+        />
+      )}
+
+      {shareCopiedToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
+          링크 복사됨!
         </div>
       )}
     </div>

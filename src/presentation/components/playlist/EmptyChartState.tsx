@@ -13,7 +13,7 @@ export function EmptyChartState({ onShowAddSong, periodLabel }: EmptyChartStateP
       onClick={onShowAddSong}
       className="w-full flex flex-col items-center justify-center gap-1.5 py-10 px-4 text-center transition-colors hover:bg-slate-50 active:scale-[0.98]"
     >
-      <span className="text-2xl">🔥</span>
+      <span className="text-2xl">📊</span>
       <p className="text-sm font-semibold text-text-main">아직 {periodLabel} 차트가 집계되지 않았어요</p>
       <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-[#2B3B52] text-white shadow-[0_4px_10px_rgba(43,59,82,0.3)] text-xs font-bold">
         <Plus size={14} strokeWidth={2.5} />

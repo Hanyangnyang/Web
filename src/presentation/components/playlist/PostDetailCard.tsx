@@ -1,8 +1,9 @@
-import { Bookmark, MoreVertical, Play, Smile } from 'lucide-react';
+import { Bookmark, MoreVertical, Play, Share2, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, GENRES, formatTimeAgo, toReactionState } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
 import { useReportSong, useToggleBookmark, useToggleReaction } from '../../hooks/useRecentSongs.js';
+import { SongShareModal } from './SongShareModal';
 
 export interface PostDetailCardData {
   // 신고하기 등 서버에 곡 id가 필요한 액션에 씀 — 실제 API 연동 전 더미 게시글엔 없을 수 있어서 옵셔널
@@ -65,6 +66,8 @@ export function PostDetailCard({
   onSelect,
 }: PostDetailCardProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareCopiedToast, setShareCopiedToast] = useState(false);
   const [reactions, setReactions] = useState<ReactionState>(() => toReactionState(post.reactions));
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const [reportReasonPopupOpen, setReportReasonPopupOpen] = useState(false);
@@ -149,7 +152,8 @@ export function PostDetailCard({
     );
   };
 
-  // count가 0보다 큰 이모지만 표시
+
+  // count가 0보다 큰 이모지만 표시 — 하나도 없으면 칩 대신 유도 배너를 보여줌
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
   // 2열(hideReactions, 요약 카드)에서는 제목/가수명을 세로로 쌓고, 1열에서는 "제목 · 가수명" 한 줄로 표시
@@ -197,6 +201,11 @@ export function PostDetailCard({
     </div>
   );
 
+  // 공유/북마크 배지 크기 — 1열은 32px 그대로, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
+  // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 북마크가 그 왼쪽
+  const actionBadgeSizeClass = hideReactions ? 'w-7' : 'w-8';
+  const bookmarkBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_42px)]';
+
   return (
     <div
       onClick={onSelect}
@@ -221,23 +230,36 @@ export function PostDetailCard({
         />
 
         {onPlay && !isPlaying && (
+          // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원(카드 폭 대비 %)만큼만 잡아서,
+          // 그 바깥을 누르면 카드 자체의 onSelect(상세로 전환/게시글 보기)로 넘어가게 함
           <button
             onClick={(e) => {
               e.stopPropagation();
               onPlay();
             }}
             aria-label={`${post.title} 재생`}
-            className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
+            className="absolute inset-0 m-auto w-[16%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-95 transition-transform"
           >
-            {/* 버튼/아이콘을 카드 폭 대비 %로 지정해서 2열이든 1열이든 항상 같은 비율로 보이게 함 */}
-            <span className="w-[16%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-              <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
-            </span>
+            <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
           </button>
         )}
 
-        {/* 앨범커버 우측 하단 북마크 배지 — 1열/2열 공통, 크기를 카드 폭 대비 %로 지정해서 항상 같은 비율로 보이게 함.
-            본인이 등록한 게시글은 자기 글을 북마크할 이유가 없어서 숨김 */}
+        {/* 앨범커버 우측 하단 공유하기/북마크 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서
+            서로 멀리 떨어져 있어 공유 버튼을 놓치는 일이 없게 함. 북마크는 자기 글을 북마크할 이유가
+            없는 본인 게시글에서만 숨김. 공유 클릭 동작(카카오톡/링크 공유 시트)은 다음 단계에서 연결
+            (각 배지를 .relative 앨범커버 컨테이너에 직접 매다는 이유: flex 래퍼로 한 번 더 감싸면
+            그 래퍼가 width:auto라 안의 w-[20%]가 기준으로 삼을 폭이 없어져 버튼이 찌그러들었음) */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShareModalOpen(true);
+          }}
+          aria-label="공유하기"
+          className={`absolute bottom-[4%] right-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
+        >
+          <Share2 className="w-1/2 h-1/2 text-white" strokeWidth={2} />
+        </button>
+
         {!post.isMine && (
           <button
             onClick={(e) => {
@@ -246,9 +268,9 @@ export function PostDetailCard({
             }}
             disabled={toggleBookmark.isPending}
             aria-label="북마크"
-            className={`absolute bottom-[4%] right-[4%] z-10 w-[min(16%,32px)] aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
+            className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass} ${toggleBookmark.isPending ? 'opacity-60' : ''}`}
           >
-            <Bookmark className={`w-1/2 h-1/2 ${bookmarked ? 'text-primary' : 'text-white'}`} strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
+            <Bookmark className="w-1/2 h-1/2 text-white" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
@@ -294,44 +316,56 @@ export function PostDetailCard({
               )}
             </div>
 
-            {/* 이미 달린 리액션 칩 — 9종까지 늘어날 수 있어서 가로 스크롤 */}
-            <div
-              className="flex items-center gap-1.5 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {displayedReactions.map(({ key, emoji }) => {
-                const { count, mine } = reactions[key] ?? { count: 0, mine: false };
-                return (
-                  <button
-                    key={key}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleReaction(key);
-                    }}
-                    disabled={toggleReactionMutation.isPending}
-                    aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
-                    className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
-                      mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                    }`}
-                  >
-                    <span className="text-xs">{emoji}</span>
-                    <span>{count}</span>
-                  </button>
-                );
-              })}
-            </div>
+            {displayedReactions.length > 0 ? (
+              /* 이미 달린 리액션 칩 — 9종까지 늘어날 수 있어서 가로 스크롤 */
+              <div
+                className="flex items-center gap-1.5 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {displayedReactions.map(({ key, emoji }) => {
+                  const { count, mine } = reactions[key] ?? { count: 0, mine: false };
+                  return (
+                    <button
+                      key={key}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleReaction(key);
+                      }}
+                      disabled={toggleReactionMutation.isPending}
+                      aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
+                      className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
+                        mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
+                      }`}
+                    >
+                      <span className="text-xs">{emoji}</span>
+                      <span>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              /* 반응이 하나도 없을 때 — 배경 없는 안내 문구만 살짝 얹음. 클릭 가능한 건 왼쪽 이모지
+                 추가 버튼 하나로 충분해서, 여기는 버튼처럼 보이지 않게 배경/클릭 이벤트 없이 텍스트로만 둠 */
+              <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
+                ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
+              </span>
+            )}
 
             {!shouldHideMoreButton && moreButton}
           </div>
         )}
 
-        <div className={`mb-2 ${hideReactions ? 'flex items-center gap-2' : ''}`}>
+        <div className={`mb-1 ${hideReactions ? 'flex items-center gap-2' : ''}`}>
           <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
           {hideReactions && !shouldHideMoreButton && moreButton}
         </div>
 
         {/* 본문 */}
-        <p className="text-sm text-text-main leading-relaxed mb-3 whitespace-pre-line">{post.body}</p>
+        {post.body && (
+          <p className="text-sm text-text-main leading-relaxed mb-2 whitespace-pre-line">{post.body}</p>
+        )}
+
+        <div className="border-t border-slate-100 mb-3" />
 
         {/* 장르 — 최대 3개까지 함께 표시. 시간은 1열(리액션 있는) 모드에서만 카드 우측 끝에 같이 표시.
             mt-auto로 카드 하단에 고정 — 2열 그리드에서 같은 행 카드끼리 높이가 늘어나도(flex-1) 본문 길이와 무관하게 정렬됨 */}
@@ -416,6 +450,23 @@ export function PostDetailCard({
       {reportToast && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
           {reportToast}
+        </div>
+      )}
+
+      {shareModalOpen && (
+        <SongShareModal
+          song={{ title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl }}
+          onClose={() => setShareModalOpen(false)}
+          onCopied={() => {
+            setShareCopiedToast(true);
+            setTimeout(() => setShareCopiedToast(false), 1800);
+          }}
+        />
+      )}
+
+      {shareCopiedToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
+          링크 복사됨!
         </div>
       )}
     </div>

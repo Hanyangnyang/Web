@@ -175,9 +175,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
       ref={scrollContainerRef}
       className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app px-4 py-4"
       style={{
-        backgroundColor: '#F8F9FA',
-        backgroundImage:
-          'radial-gradient(circle at 10% 20%, rgba(14, 74, 132, 0.05), transparent 30%), radial-gradient(circle at 90% 80%, rgba(14, 74, 132, 0.03), transparent 30%)',
+        backgroundColor: '#FFFFFF',
         animation: 'fadeIn 0.25s ease-out',
         ...(isApp ? {
           paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
@@ -349,9 +347,12 @@ function PlaylistMainContent({
         }
       />
 
-      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동 */}
-      <div className="mb-4 flex items-center gap-2 px-3.5 h-11 bg-white border border-slate-200 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
-        <Search size={16} className="text-text-hint flex-shrink-0" />
+      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동. 밋밋한 흰 배경 대신
+          은은한 primary 톤 + 아이콘 배지로 "눌러볼 만한" 느낌을 주려는 의도 */}
+      <div className="mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-gradient-to-r from-primary/[0.06] to-primary/0 border border-primary/15 rounded-full shadow-[0_2px_8px_rgba(14,74,132,0.06)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.12)] transition-all">
+        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+          <Search size={15} className="text-primary" />
+        </span>
         <input
           type="text"
           value={searchQuery}
@@ -359,23 +360,23 @@ function PlaylistMainContent({
           onKeyDown={(e) => {
             if (e.key === 'Enter') onSubmitSearch();
           }}
-          placeholder="곡 제목이나 아티스트로 검색해보세요"
+          placeholder="🎵 어떤 곡이 궁금해요?"
           className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
         />
         <button
           onClick={onSubmitSearch}
           disabled={!searchQuery.trim()}
           aria-label="검색"
-          className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full text-text-sub disabled:text-text-hint hover:bg-slate-100 transition-colors active:scale-90"
+          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-primary text-white shadow-[0_2px_6px_rgba(14,74,132,0.3)] disabled:bg-slate-200 disabled:text-text-hint disabled:shadow-none transition-all active:scale-90"
         >
-          <ArrowRight size={16} />
+          <ArrowRight size={14} />
         </button>
       </div>
 
       {/* 최근 추가된 곡 섹션 */}
       <section className="mb-4">
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">🎵 최근 추가된 곡</h3>
+          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡 🎵</h3>
           <button
             onClick={onShowAllRecent}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
@@ -408,7 +409,7 @@ function PlaylistMainContent({
       {/* 인기차트 섹션 */}
       <section>
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">🔥 인기차트</h3>
+          <h3 className="text-lg font-bold text-text-main">인기차트 🔥</h3>
           <button
             onClick={onShowAllChart}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
@@ -441,7 +442,10 @@ function PlaylistMainContent({
           <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
             <span className="w-7 text-center">순위</span>
             <div className="flex-1">곡정보</div>
-            <div className="w-6 text-center">듣기</div>
+            <div className="flex items-center gap-3">
+              <span className="w-6 text-center">듣기</span>
+              <span className="w-6 text-center">공유</span>
+            </div>
           </div>
 
           {/* 리스트 */}

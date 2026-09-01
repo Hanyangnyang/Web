@@ -212,6 +212,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
   const canSubmit =
     !!selectedTrack &&
     selectedGenres.length >= MIN_GENRES &&
+    comment.trim().length > 0 &&
     creationStatus?.canCreate !== false &&
     !submitSong.isPending;
 
@@ -368,17 +369,17 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                             className="w-full h-full object-cover"
                           />
                           {onPlay && (
+                            // 앨범커버 전체가 아니라 눈에 보이는 원형 아이콘 크기만큼만 클릭 영역을 잡아서,
+                            // 그 바깥(앨범커버 나머지 영역)을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onPlay(track);
                               }}
                               aria-label={`${track.title} 재생`}
-                              className="absolute inset-0 flex items-center justify-center"
+                              className="absolute inset-0 m-auto w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
                             >
-                              <span className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
-                                <Play size={16} className="text-white" fill="white" />
-                              </span>
+                              <Play size={16} className="text-white" fill="white" />
                             </button>
                           )}
                         </div>
@@ -460,11 +461,9 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         </div>
       </section>
 
-      {/* 3. 곡에 대한 한마디 (선택) */}
+      {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-2">
-          곡에 대한 한마디 <span className="text-text-hint font-normal text-sm">(선택)</span>
-        </h3>
+        <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
           <textarea
             value={comment}

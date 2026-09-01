@@ -28,6 +28,9 @@ interface SongListScreenProps {
   scrollToTrackId?: string | null;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
   currentTrackId?: string | null;
+  // 빈 상태를 흰 카드 박스로 감쌀지 — 최근추가된곡의 카드 그리드와 톤을 맞추려는 화면(기본값)용.
+  // 저장한 곡/내가 등록한 곡처럼 배경이 이미 흰 화면에서는 굳이 박스가 필요 없어 false로 끔
+  emptyStateBoxed?: boolean;
 }
 
 export function SongListScreen({
@@ -46,6 +49,7 @@ export function SongListScreen({
   hideMoreButton = false,
   scrollToTrackId,
   currentTrackId,
+  emptyStateBoxed = true,
 }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(enableViewToggle ? 'list' : 'grid');
@@ -136,7 +140,7 @@ export function SongListScreen({
             onAction={onEmptyStateAction ?? onShowAddSong}
             message={emptyStateMessage}
             buttonLabel={emptyStateButtonLabel}
-            boxed
+            boxed={emptyStateBoxed}
           />
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>

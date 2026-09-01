@@ -1,5 +1,7 @@
-import { Play } from 'lucide-react';
+import { Play, Share2 } from 'lucide-react';
+import { useState } from 'react';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
+import { SongShareModal } from './SongShareModal';
 
 interface ChartSongRowProps {
   track: ChartTrack;
@@ -10,6 +12,9 @@ interface ChartSongRowProps {
 }
 
 export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) {
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareCopiedToast, setShareCopiedToast] = useState(false);
+
   return (
     <div
       onClick={() => onShowPosts(track)}
@@ -52,6 +57,35 @@ export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) 
       >
         <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
+
+      {/* 공유 버튼 — 재생 버튼과 같은 자리, row 클릭과 별개 동작이라 전파를 막음 */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setShareModalOpen(true);
+        }}
+        aria-label={`${track.title} 공유하기`}
+        className="w-6 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+      >
+        <Share2 size={16} strokeWidth={2} />
+      </button>
+
+      {shareModalOpen && (
+        <SongShareModal
+          song={{ title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl }}
+          onClose={() => setShareModalOpen(false)}
+          onCopied={() => {
+            setShareCopiedToast(true);
+            setTimeout(() => setShareCopiedToast(false), 1800);
+          }}
+        />
+      )}
+
+      {shareCopiedToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
+          링크 복사됨!
+        </div>
+      )}
     </div>
   );
 }

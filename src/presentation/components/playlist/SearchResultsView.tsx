@@ -153,17 +153,17 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                       className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
                     />
                     {track.trackId !== currentTrackId && (
+                      // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원만큼만 잡아서,
+                      // 그 바깥을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onPlay(track);
                         }}
                         aria-label={`${track.title} 재생`}
-                        className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
+                        className="absolute inset-0 m-auto w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-95 transition-transform"
                       >
-                        <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                          <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
-                        </span>
+                        <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
                       </button>
                     )}
                   </div>
