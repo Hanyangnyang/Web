@@ -1,20 +1,19 @@
 // 앱 루트 컴포넌트: 탭 라우팅 및 인증 상태 관리만 담당
-// Triggering redeploy
-import React, { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect, useRef, Suspense, lazy } from 'react';
 import './index.css';
 import { useMenu } from './presentation/hooks/useMenu.js';
 import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView.jsx';
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
-import { PartnershipView } from './presentation/components/partnership/PartnershipView.jsx';
+const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
 import { OfflineModal } from './presentation/components/common/OfflineModal';
-import { prefetchIsHoliday }     from './presentation/hooks/useHoliday.js';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
+import { prefetchKakaoMapSdk }   from './lib/kakaoMap';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -79,7 +78,11 @@ function MainLayout() {
     } catch {}
     return false;
   });
+  // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
+  const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
+  // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
+  const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const { isOnline } = useNetwork();
   const posthog = usePostHog();
@@ -105,9 +108,13 @@ function MainLayout() {
   // 2. 학식 데이터 - 학식탭이 활성 탭일 때만 요청(다른 탭 진입 시 불필요한 백엔드 호출 방지)
   const { menuDate, cafes, menuLoading, menuRevalidating, changeDate, refetchMenu } = useMenu(activeTab === 'cafe');
   useEffect(() => {
-    prefetchIsHoliday();
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
   }, []);
+
+  // 2-1. 캠퍼스맵 SDK 프리페치 - 스플래시 종료 직후(크리티컬 패스 이후) 카카오맵 스크립트를 미리 받아둔다.
+  useEffect(() => {
+    if (splashDone) prefetchKakaoMapSdk();
+  }, [splashDone]);
 
   // 3. 딥링크 로더 - 학식 딥링크 로더가 활성화되면 메인 스플래시를 즉시 제거
   // 학식 로더가 화면을 덮고 있으므로 사용자에게는 보이지 않고, 로더 페이드아웃 시 하냥냥 마스코트가 잠깐 비치는 현상 방지
@@ -125,6 +132,12 @@ function MainLayout() {
     if (tab === 'weather') {
       setActiveTab('portal');
       localStorage.setItem('lastActiveTab', 'portal');
+      return;
+    }
+    if (tab === 'partner') {
+      setPartnerVisited(true);
+      setActiveTab('partner');
+      localStorage.setItem('lastActiveTab', 'partner');
       return;
     }
     if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
@@ -176,8 +189,11 @@ function MainLayout() {
     return () => { handle?.remove(); };
   }, [isApp, routeFromParams]);
 
-  // 4. 탭 클릭 핸들러
-  const handleTabChange = useCallback((tab: string) => {
+  // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정하고 싶을 때만 넘어온다.
+  // 이미 캠퍼스맵 탭에 있는 상태에서 다시 눌러도 칩은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
+  const handleTabChange = useCallback((tab: string, chip?: string) => {
+    if (chip && tab === 'partner') setPendingMapChip(chip);
+
     // 1. 같은 탭 재클릭 처리
     if (tab === activeTab) {
       if (tab === 'misc') setMiscResetSignal(s => s + 1);
@@ -189,6 +205,8 @@ function MainLayout() {
     posthog?.capture('tab_time_spent', { tab: activeTab, duration_seconds: duration });
     posthog?.capture('tab_clicked', { tab, previous_tab: activeTab });
     tabStartTime.current = Date.now();
+
+    if (tab === 'partner') setPartnerVisited(true);
 
     // 3. 스크롤 위치 저장 + 실제 전환
     saveScrollPosition();
@@ -226,7 +244,7 @@ function MainLayout() {
         } : {}}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle' || activeTab === 'partner') ? 'pb-6' : 'py-6'}`}>
+        <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}
@@ -243,13 +261,22 @@ function MainLayout() {
             <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
           <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
-            <PortalView isActive={activeTab === 'portal'} />
+            <PortalView isActive={activeTab === 'portal'} onNavigateToTab={handleTabChange} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView resetSignal={miscResetSignal} isActive={activeTab === 'misc'} />
           </div>
-          <div style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
-            <PartnershipView isActive={activeTab === 'partner'} />
+          {/* 지도는 px-4 패딩을 -mx-4로 상쇄해 전체 폭을 사용 */}
+          <div className="-mx-4 h-full" style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
+            {partnerVisited && (
+              <Suspense fallback={<div className="h-full flex items-center justify-center"><span className="text-sm font-bold text-text-hint animate-pulse">지도 불러오는 중…</span></div>}>
+                <CampusMapView
+                  isActive={activeTab === 'partner'}
+                  deepLinkChip={pendingMapChip}
+                  onDeepLinkChipHandled={() => setPendingMapChip(null)}
+                />
+              </Suspense>
+            )}
           </div>
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />

@@ -131,16 +131,15 @@ src/
 
 ## 🔌서드파티와 💾캐싱정책
 
-학식·날씨·도서관 혼잡도·배너·지하철·셔틀 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스·공휴일 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
-**Supabase**는 익명 Auth·피드백 저장·앱설정 조회·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
+학식·날씨·도서관 혼잡도·배너·지하철·셔틀·학사달력/공휴일·통합피드백 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
+**Supabase**는 익명 Auth·앱설정(다가오는 시간표 변경 배너용 `period_schedule`만)·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
 푸시 알림은 **Firebase Cloud** Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
 
 ### Supabase 테이블 - Supabase 로그인 되면 수정해야함
 
 | 테이블 | 용도 |
 |--------|------|
-| `feedbacks` | 사용자 피드백 저장 (익명 user_id) |
-| `app_config` | 앱 레벨 설정 조회 (학기 정보, 휴일/주말 오버라이드, 운영일 플래그 등) |
+| `app_config` | 다가오는 시간표 변경 배너용 `period_schedule`만 조회 — 현재기간·공휴일·강제주말·미운행 오버라이드 등 나머지 필드는 `/api/v1/academic/status`로 이전 완료, 더 이상 조회 안 함 |
 
 `devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
@@ -148,17 +147,23 @@ src/
 ### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
 (Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 2번, 그래서 총 3번 호출함. staleTime이 지났는데 트리거가 있을 경우 SWR. localStorage는 maxAge 24시간으로 설정함. maxAge는 캐싱된 값을 불러올지 말지를 결정하는 기준.)
 
-| 엔드포인트 | 역할 | Redis TTL(=TanStackQuery staleTime) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
+| 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
-| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 | 콜드스타트 prefetch, "다시 시도" 버튼 |
-| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼 |
-| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
-| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) | 콜드스타트 prefetch, 소식탭 진입 |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 | 콜드스타트 prefetch |
-| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
-| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 | 헬스장 화면 진입시, "다시 시도" 버튼 |
-| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 | (예정) |
+| `/api/v1/menu` | 학식 메뉴 조회 | 12시간 / 1시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`). academic/status 자체는 셔틀화면이 열릴 때 낡았으면 재검증 + 화면이 켜져있는 동안만 10초마다 KST 날짜 확인해서 자정 넘으면 재요청 — 화면을 계속 띄워둔 채로 자정을 넘겨도(예: 11:50pm부터 보고 있다가) 뱃지(학기중/평일)가 자동으로 갱신됨 |
+| `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼, **date-info의 dayType이 바뀌는 순간 강제 재요청**(위와 동일한 이유) |
+| `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
+| `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 / 1시간 | 콜드스타트 prefetch |
+
+배너 `clickUrl`이 `https://www.hanyang.life/?tab=<cafe\|shuttle\|portal\|partner\|misc>` 형태로 우리 도메인 + `tab` 파라미터를 가리키면, 새 창을 열지 않고 앱 내부에서 바로 그 탭으로 전환됩니다(`BannerCarousel.tsx`) — SPA라 페이지 경로가 하나뿐이라, 카카오 딥링크·푸시알림과 동일한 `?tab=` 쿼리 컨벤션을 재사용한 것. 그 외(다른 도메인 등)는 기존처럼 `window.open`으로 외부 링크 취급.
+**⚠️ 반드시 `www.hanyang.life`로 입력할 것** — `BannerCarousel.tsx`의 판정 로직이 `url.origin === window.location.origin`으로 완전 일치를 요구하는데, `capacitor.config.json`의 `server.url`이 `https://www.hanyang.life`라 앱이 실제로 로딩되는 origin이 `www.` 포함이다. `www.` 없이 `https://hanyang.life/?tab=partner`로 주면 origin이 안 맞아 판정에 실패하고, 그냥 `window.open`으로 새 창이 열려버린다(내부 탭 전환 안 됨).
+| `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 / 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
+| `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼, **KST 날짜(자정)가 바뀌는 순간 강제 재요청**(`useGymSchedule`이 1분마다 날짜 확인). 셔틀과 달리 academic/status를 안 쓰고 `GymPeriod.startDate/endDate`로 직접 오늘과 비교해 기간을 고르는 구조라, "기간이 바뀌는 순간"이 아니라 "날짜가 바뀌는 순간"을 감지함. `GymView`도 자동판별을 매 gymData 갱신마다 다시 하도록 고쳐서(예전엔 최초 1회만) 화면을 계속 띄워놓은 채로 날짜가 바뀌어도 새 기간으로 따라감(사용자가 드롭다운으로 직접 고른 뒤엔 안 덮어씀) |
+| `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
+| `POST /api/v1/feedbacks` | 통합 피드백 접수 | 해당없음 | 기타탭 > 피드백 보내기(category `GENERAL`), 캠퍼스맵 화면 상단에 제보 버튼(`CAMPUS_MAP`), 캠퍼스맵 검색 결과 없음 제보 버튼(`PARTNERSHIP`) |
+| `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `academic`/`shuttle` 필드로 기간·셔틀 dayType·운행여부를 판정. `calendar` 필드는 학교 자체 공휴일까지 섞여 있어 지하철엔 안 씀(아래 date-info 참고) |
+| `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 1시간(FE staleTime, BE 캐시 주기 미확인) | 지하철 연결정보가 필요한 정류장에서만 조회 |
 | `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 0(항상 최신값) — 여러 사용자가 실시간으로 올리는 피드라 캐싱 안 함 | 콜드스타트 fetch, 최근추가된곡 화면 진입마다 |
 | `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 0(항상 최신값) | 게시글 목록(TrackPostsView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostDetailView) 진입 |
 | `/api/v1/playlist/songs/creation-status` | 곡 작성 전 사용자 기기 상태 조회 (오늘 남은 등록 횟수, 최근 7일 중복 추천곡) | 0(항상 최신값) | 곡추천하기 화면 진입(컴포넌트 재마운트)마다. 헤더에 남은 횟수 표시, 최근 7일 내 추천한 곡은 검색 결과에서 선택 자체를 막음 |
@@ -180,20 +185,23 @@ src/
 |---|---|---|---|---|---|
 | `/api/cron/refresh-insta-profiles`* | 인스타 계정 프로필 사진 정적 이미지 갱신 | Instagram API(스크래핑) + GitHub Contents API(커밋) | 해당없음 | 해당없음 | Vercel Cron이 4개월마다 1회만 서버에서 실행, 클라이언트는 API 호출 안 하고 정적 이미지만 읽음 |
 | `/api/bus` | 공공버스 도착 정보 조회 | 공공데이터포털-경기도 버스정보시스템 | 40초 (메모리 캐시) | 기본 15분 (화면 활성 중엔 30초 간격 강제 폴링, 탭 비활성·유휴 시 중단) | "공공버스" 모드 + 화면보임 + 사용자 조작중일 때 30초 간격 자동 폴링, 새로고침 버튼 수동 refetch |
-| `/api/holidays` | 법정공휴일 여부 조회 - 셔틀·지하철 dayType 판정용 | 공공데이터포털 | 7일 | 24시간 | 앱부팅 시 prefetch + 마운트시 자동 |
+
+**프론트는 안 쓰지만 아직 살아있는 Vercel 함수** — `api/menu.js`, `api/portal.js`(weather+library 통합), `api/holidays.js` 3개는 전부 새 백엔드로 완전히 대체되어 프론트엔드 어디에서도 더 이상 호출하지 않음. 하지만 Supabase Edge Function `menu-alerts`(1분마다 도는 푸시 발송 로직)가 `/api/menu`, `/api/portal?type=weather`, `/api/holidays`를 직접 `fetch()`하고 있어서 세 함수 다 삭제하면 안 됨. 단, `/api/portal?type=library`는 Edge Function도 호출하지 않아 완전히 죽은 라우트 — `api/portal.js` 리팩토링/삭제 시 이 부분만은 안전하게 정리 가능.
+
+**`/api/sentry-discord-webhook`** — 위 표들과 달리 앱이 호출하는 게 아니라 **Sentry가 호출하는 인바운드 웹훅**. Sentry Internal Integration의 Issue Alert(`event_alert`)를 받아서 `sentry-hook-signature` 헤더로 HMAC-SHA256 서명 검증(비교는 `crypto.timingSafeEqual`) 후, Discord 임베드 메시지 형식으로 변환해 `DISCORD_WEBHOOK_URL`로 재전송함. Sentry 무료(Developer) 플랜엔 네이티브 Discord 연동이 없어서(유료 Slack 연동을 억지로 꽂는 방식뿐) 만든 중계 함수. 캐싱 대상이 아니고 staleTime 개념도 없음. title/culprit뿐 아니라 `event.tags`(`boundary`/`area`/`endpoint`/`queryKey`/`mutationKey` — 존재하는 것만) 도 Discord embed 필드로 같이 보내서, 어느 API·어느 ErrorBoundary에서 터졌는지 Sentry를 열지 않고도 바로 알 수 있음.
 
 ### 💾localStorage (디스크)
 
 | 키 | 내용 | 언제 생성되나 |
 |---|---|---|
-| `app_config_cache` | Supabase의 app_config 테이블 데이터 - 학기·휴일 등 앱설정 스냅샷 | 콜드스타트시 즉시 (TTL 없이 조회 성공 시에만 덮어씀) |
+| `period_schedule_cache` | Supabase app_config.period_schedule(다가오는 시간표 변경 배너용 미래 일정 테이블)만 캐싱 | 콜드스타트시 즉시 (TTL 없이 조회 성공 시에만 덮어씀) |
 | `lastActiveTab` | 마지막으로 선택한 탭 | 콜드스타트 시 즉시 + 탭 전환마다 갱신 |
 | `sb-<project>-auth-token` | Supabase 인증 세션 토큰 (Supabase SDK가 자체관리) | `getOrCreateAnonymousUserId()`가 처음 호출될 때(피드백 전송, 알림 구독 등) — 네이티브는 Keychain/Keystore, 웹은 localStorage |
 | `alarm_settings`, `weather_alarm_settings` | 학식·날씨 알림구독 설정값 | 알림 바텀시트를 닫을 때만 |
 | `partnerCollegeFilter` | 마지막으로 선택한 제휴단과대 칩 | 제휴탭에서 단과대 칩을 누르면 |
 | `shuttle_stop`, `shuttle_lineId` | 마지막으로 선택한 셔틀 정류장·노선 | 사용자가 직접 정류장/노선을 바꿔야 (GPS 자동 선택은 저장 안 함) |
 | `public_bus_favorites` | 즐겨찾기한 버스 정류장 | 셔틀탭 '일반 버스' 모드에서 즐겨찾기 토글 시 |
-| `hyu_rq_cache_v1` | TanStack Query 캐시 영속화본 | 항상 |
+| `hyu_rq_cache` | TanStack Query 캐시 영속화본 | 항상 |
 | `ph_phc_<프로젝트키>_posthog` | PostHog device/distinct ID | 앱 코드가 아니라 PostHog JS SDK가 초기화 시 자동 생성 |
 
 ### 💾sessionStorage (탭 단위)

@@ -66,7 +66,10 @@ body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: #F8F9FA;
   color: #212529;
-  min-height: 100vh;
+  /* 100vh가 아니라 100dvh여야 한다. 모바일 브라우저에서 100vh는 '주소창이 접혔다고 가정한'
+     최대 높이라, 주소창이 떠 있는 동안 body가 앱 컨테이너(App.tsx의 h-[100dvh])보다
+     주소창 높이만큼 커진다. 그 초과분이 문서 스크롤이 되어 화면이 통째로 밀린다. */
+  min-height: 100dvh;
   min-width: 360px;
   overflow-x: hidden;
   background-image:
@@ -75,6 +78,28 @@ body {
 }
 
 /* ═══ Keyframes ═══ */
+@keyframes drumRollShake {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  20% {
+    transform: rotate(-18deg) translateY(-1px);
+  }
+
+  40% {
+    transform: rotate(14deg) translateY(0);
+  }
+
+  60% {
+    transform: rotate(-14deg) translateY(-1px);
+  }
+
+  80% {
+    transform: rotate(10deg) translateY(0);
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

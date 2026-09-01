@@ -1,16 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { supabase } from '../../lib/supabase.js';
-import { getKSTDateKey } from '../../utils/time.js';
-import { initSentry } from '../../lib/sentry.js';
+import { prefetchAcademicStatus } from '../hooks/useAcademicStatus.js';
 
 export interface AppConfig {
-  current_period: string;
-  current_period_override?: string;
-  custom_holidays: string[];
-  force_weekend: boolean;
+  // 다가오는 시간표 변경 안내 배너용 미래 일정 테이블 — academic/status는 "오늘" 스냅샷만 줘서
+  // 여긴 아직 Supabase(app_config.period_schedule) 직접 조회를 유지한다
   period_schedule: { start: string; name: string }[];
-  no_operation_days: string[];
-  force_no_operation: boolean;
 }
 
 interface BootContextValue {
@@ -34,14 +29,8 @@ export function BootProvider({ children }: { children: React.ReactNode }) {
     config: false,
   });
 
-  // 앱 설정 (Remote Config) 상태
   const [appConfig, setAppConfig] = useState<AppConfig>({
-    current_period: '학기중',
-    custom_holidays: [],
-    force_weekend: false,
     period_schedule: [],
-    no_operation_days: [],
-    force_no_operation: false
   });
 
   // 스플래시를 한번만 보여주기 위한 플래그
@@ -57,65 +46,42 @@ export function BootProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // 오늘 날짜 기준 현재 기간 산출 함수
-  const calculatePeriod = (schedule: AppConfig['period_schedule'], override?: string) => {
-    if (override) return override;
-    if (!schedule || schedule.length === 0) return '학기중';
-
-    const todayStr = getKSTDateKey();
-
-    // 시작일 기준 내림차순 정렬 (최신순)
-    const sorted = [...schedule].sort((a, b) => b.start.localeCompare(a.start));
-
-    // 오늘 날짜보다 시작일이 이전이거나 같은 첫 번째 항목 찾기
-    const found = sorted.find(item => item.start <= todayStr);
-    return found ? found.name : '학기중';
-  };
-
-  // Remote Config 로딩 및 캐싱 로직
+  // 오늘의 학사/셔틀 통합 운영 상태(academic/status) — 셔틀 시간표가 학기중/방학이나 평일/주말을
+  // 잘못 판단하면 여러 화면에서 눈에 띄게 이상해지므로 스플래시를 막는 boot 필수 데이터로 등록한다.
+  // 실패해도(오프라인 등) 반드시 markReady를 불러야 무한 스플래시를 피할 수 있다 — 실패 시 useShuttle이
+  // localWeekdayFallback으로 안전하게 대체함. 에러는 apiError를 통해 queryClient의 전역 Sentry 훅이 이미 태깅한다.
   React.useEffect(() => {
-    async function fetchConfig() {
-      const cached = localStorage.getItem('app_config_cache');
+    prefetchAcademicStatus().catch(() => {}).finally(() => markReady('config'));
+  }, [markReady]);
+
+  // 다가오는 시간표 변경 배너용 미래 일정 테이블 — 이 배너 하나만 안 뜨는 수준이라 스플래시를 막지 않는다
+  React.useEffect(() => {
+    async function fetchPeriodSchedule() {
+      const cached = localStorage.getItem('period_schedule_cache');
       if (cached) {
         try {
-          const parsed = JSON.parse(cached);
-          const period = calculatePeriod(parsed.period_schedule, parsed.current_period_override);
-          setAppConfig({ ...parsed, current_period: period });
-        } catch(e){}
+          setAppConfig({ period_schedule: JSON.parse(cached) });
+        } catch (e) {}
       }
 
       try {
         const { data, error } = await supabase
           .from('app_config')
-          .select('*')
+          .select('period_schedule')
           .limit(1)
           .single();
 
         if (data && !error) {
-          const period = calculatePeriod(data.period_schedule, data.current_period_override);
-          const configData: AppConfig = {
-            current_period: period,
-            current_period_override: data.current_period_override,
-            period_schedule: data.period_schedule || [],
-            custom_holidays: data.custom_holidays || [],
-            force_weekend: data.force_weekend || false,
-            no_operation_days: data.no_operation_days || [],
-            force_no_operation: data.force_no_operation || false
-          };
-          setAppConfig(configData);
-          localStorage.setItem('app_config_cache', JSON.stringify(configData));
+          const schedule = data.period_schedule || [];
+          setAppConfig({ period_schedule: schedule });
+          localStorage.setItem('period_schedule_cache', JSON.stringify(schedule));
         }
       } catch (e) {
-        console.error('[Boot] Failed to fetch app config:', e);
-        initSentry().then(Sentry => {
-          Sentry.captureException(e, { tags: { source: 'boot-app-config' } });
-        });
-      } finally {
-        markReady('config');
+        console.error('[Boot] Failed to fetch period schedule:', e);
       }
     }
-    fetchConfig();
-  }, [markReady]);
+    fetchPeriodSchedule();
+  }, []);
 
   // 스플래시 내려도 되는지 판단하는 최종 기준 - 모든 서비스가 준비되었는지 확인
   const isAppReady = useMemo(() => {
