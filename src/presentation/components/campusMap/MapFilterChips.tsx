@@ -9,16 +9,14 @@ interface Props {
 }
 
 const categoryChips = CATEGORY_ORDER.map((key) => ({ key, label: CATEGORY_META[key].label, emoji: CATEGORY_META[key].emoji }));
-// '교내시설' 칩만 매장 카테고리 사이(주점과 여가 사이)에 끼워 넣는다
-const PUB_INDEX = CATEGORY_ORDER.indexOf('pub');
 
 const CHIPS: { key: MapChip; label: string; emoji?: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'openspace', label: '오픈스페이스', emoji: '📚' },
   { key: 'smoking', label: '흡연장', emoji: '🚬' },
-  ...categoryChips.slice(0, PUB_INDEX + 1),
+  ...categoryChips,
+  // '교내시설'은 매장 카테고리 전부 다음, 맨 마지막 칩으로 둔다
   { key: 'building', label: '교내시설', emoji: '🏢' },
-  ...categoryChips.slice(PUB_INDEX + 1),
 ];
 
 export function MapFilterChips({ value, onChange }: Props) {
