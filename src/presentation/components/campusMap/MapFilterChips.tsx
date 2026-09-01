@@ -8,12 +8,17 @@ interface Props {
   onChange: (next: MapChip | null) => void;
 }
 
+const categoryChips = CATEGORY_ORDER.map((key) => ({ key, label: CATEGORY_META[key].label, emoji: CATEGORY_META[key].emoji }));
+// '교내시설' 칩만 매장 카테고리 사이(주점과 여가 사이)에 끼워 넣는다
+const PUB_INDEX = CATEGORY_ORDER.indexOf('pub');
+
 const CHIPS: { key: MapChip; label: string; emoji?: string }[] = [
   { key: 'all', label: '전체' },
-  { key: 'building', label: '교내시설', emoji: '🏢' },
   { key: 'openspace', label: '오픈스페이스', emoji: '📚' },
   { key: 'smoking', label: '흡연장', emoji: '🚬' },
-  ...CATEGORY_ORDER.map((key) => ({ key, label: CATEGORY_META[key].label, emoji: CATEGORY_META[key].emoji })),
+  ...categoryChips.slice(0, PUB_INDEX + 1),
+  { key: 'building', label: '교내시설', emoji: '🏢' },
+  ...categoryChips.slice(PUB_INDEX + 1),
 ];
 
 export function MapFilterChips({ value, onChange }: Props) {
@@ -40,13 +45,13 @@ export function MapFilterChips({ value, onChange }: Props) {
             ref={(el) => { chipRefs.current[chip.key] = el; }}
             onClick={() => onChange(active ? null : chip.key)}
             aria-pressed={active}
-            className={`flex items-center gap-1 px-3 py-[7px] rounded-full text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] shadow-[0_2px_6px_rgba(0,0,0,0.08)] [-webkit-tap-highlight-color:transparent] ${
+            className={`flex items-center gap-1 px-2 py-[7px] rounded-full text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] shadow-[0_2px_6px_rgba(0,0,0,0.08)] [-webkit-tap-highlight-color:transparent] ${
               active
                 ? 'bg-[#0E4A84] text-white border-[#0E4A84]'
                 : 'bg-white text-[#334155] border-[#e2e8f0]'
             }`}
           >
-            {chip.emoji && <span className="text-[13px]">{chip.emoji}</span>}
+            {chip.emoji && <span className="text-[12px]">{chip.emoji}</span>}
             {chip.label}
           </button>
         );

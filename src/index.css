@@ -78,6 +78,28 @@ body {
 }
 
 /* ═══ Keyframes ═══ */
+@keyframes drumRollShake {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  20% {
+    transform: rotate(-18deg) translateY(-1px);
+  }
+
+  40% {
+    transform: rotate(14deg) translateY(0);
+  }
+
+  60% {
+    transform: rotate(-14deg) translateY(-1px);
+  }
+
+  80% {
+    transform: rotate(10deg) translateY(0);
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

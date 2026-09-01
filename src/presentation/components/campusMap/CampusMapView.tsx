@@ -50,6 +50,9 @@ const INITIAL_CENTER = { lat: 37.3008, lng: 126.8385 } as const;
 // 몇십 미터 단위로 붙어 있어서, 기본 배율에서는 핀이 겹쳐 보여 "정확히 어디로 가야 하는지"가 안 나온다.
 const SMOKING_FOCUS_LEVEL = 2;
 
+// 뭐먹지(랜덤 추천) 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다
+const DICE_COACHMARK_SEEN_KEY = 'diceCoachmarkSeen';
+
 interface Props {
   // 탭이 숨겨져도 컴포넌트는 마운트된 채 남아서, 뒤로가기를 가로챌지 판단하려면 이 값이 필요하다
   isActive: boolean;
@@ -186,6 +189,21 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     onPick: (store) => pickStore(store, 'random'),
     posthog,
   });
+
+  // 뭐먹지 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다(실험: 이 기능이 있다는 걸 알려주기 위함)
+  const [diceCoachmark, setDiceCoachmark] = useState<'hidden' | 'visible' | 'leaving'>(() => {
+    try {
+      return localStorage.getItem(DICE_COACHMARK_SEEN_KEY) ? 'hidden' : 'visible';
+    } catch {
+      return 'hidden';
+    }
+  });
+  useEffect(() => {
+    if (diceCoachmark !== 'visible') return;
+    try { localStorage.setItem(DICE_COACHMARK_SEEN_KEY, '1'); } catch {}
+    const t = setTimeout(() => setDiceCoachmark('leaving'), 3000);
+    return () => clearTimeout(t);
+  }, [diceCoachmark]);
 
   // 매장 로딩 실패는 StoreSheet 안에서 알리지만, '전체' 칩에서는 시트가 아예 안 뜬다.
   // 그때 마커만 조용히 사라지면 사용자는 원인을 알 수 없으므로 토스트로 한 번 알린다.
@@ -348,6 +366,22 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         )}
       </KakaoMap>
 
+      {/* 뭐먹지 코치마크 — 처음 온 사람에게 버튼 존재를 알려주려고 3초만 떴다 사라진다.
+          버튼 라벨 길이가 칩에 따라 달라져(점메추/저메추/어디가지) 꼬리를 정확히 버튼 중앙에 맞추긴 어려워
+          같은 right-3 기준으로만 맞추고, 클릭을 막지 않도록 pointer-events-none을 둔다 */}
+      {diceCoachmark !== 'hidden' && (
+        <div
+          className={`absolute right-3 z-40 w-max pointer-events-none ${diceCoachmark === 'visible' ? '[animation:fadeIn_0.3s_ease-out]' : '[animation:fadeOut_0.4s_ease-in_forwards]'}`}
+          style={{ bottom: `calc(${buttonBase} + 128px)` }}
+          onAnimationEnd={() => { if (diceCoachmark === 'leaving') setDiceCoachmark('hidden'); }}
+        >
+          <div className="relative whitespace-nowrap bg-gradient-to-br from-amber-300 to-orange-400 text-[#5b3a00] text-[12.5px] font-extrabold leading-snug px-3.5 py-2.5 rounded-2xl shadow-[0_6px_18px_rgba(217,119,6,0.35)]">
+            오늘 뭐 먹을지 고민된다면? 눌러봐! 🎲
+            <span className="absolute -bottom-1.5 right-7 w-3 h-3 bg-orange-400 rotate-45 rounded-[2px]" />
+          </div>
+        </div>
+      )}
+
       {/* 점메추/저메추/어디가지 🎲 — 라벨이 곧 설명. 카페/주점/여가/생활 칩일 땐 "어디가지"로 바뀌고
           그 카테고리에서 뽑는다(usePartnerRandomPick 참고), 그 외엔 항상 식당 랜덤. 내 위치 버튼 위에 스택.
           bottom은 활성 시트 높이에서 파생되므로 Tailwind 클래스가 아닌 inline style로 준다 */}
@@ -358,8 +392,13 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         style={{ bottom: `calc(${buttonBase} + 68px)` }}
         className="absolute right-3 z-30 h-11 px-3.5 flex items-center gap-1.5 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-95 transition-transform"
       >
-        <span className={`text-[18px] leading-none ${rolling ? 'inline-block animate-spin' : ''}`}>🎲</span>
-        <span className="text-[13px] font-extrabold text-[#334155]">{diceLabel}</span>
+        <span className={`text-[18px] leading-none ${rolling ? 'inline-block [animation:drumRollShake_0.25s_ease-in-out_infinite]' : ''}`}>
+          {rolling ? '🥁' : '🎲'}
+        </span>
+        <span className="text-[13px] font-extrabold text-[#334155]">{rolling ? '두구두구' : diceLabel}</span>
+        {rolling && (
+          <span className="text-[18px] leading-none inline-block [animation:drumRollShake_0.25s_ease-in-out_infinite_0.1s]">🥁</span>
+        )}
       </button>
 
       {/* 내 위치 버튼 — 시트 높이를 따라 항상 시트 가장자리 위에 떠 있는다 */}
