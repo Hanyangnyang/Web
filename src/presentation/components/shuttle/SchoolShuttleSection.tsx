@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { ScheduleItem, ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
-import type { SubwayScheduleRow } from '../../../domain/entities/Subway.js';
+import { isSuinBundangLine, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
 import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { CardFallback } from '../common/CardFallback.js';
@@ -83,6 +83,9 @@ export function SchoolShuttleSection({
 
   // needsSubway(지하철 연동 필요 정류장)의 여집합 — SUBWAY_CONNECTED_STOPS(Shuttle.ts)에서 파생
   const hideSubwayCol = !needsSubway;
+
+  // 수인분당선 시간표 개정 미반영 — 선택 시 연결편은 숨기고 안내 배너로 대체
+  const isSuinBundangSelected = isSuinBundangLine(lineId);
 
   // 스크롤 동기화 만료 처리 효과
   useEffect(() => {
@@ -171,9 +174,16 @@ export function SchoolShuttleSection({
           onToggleFullMode={handleToggleFullMode}
         />
 
+        {/* 수인분당선 시간표 개정 미반영 안내 — 연결편 표시를 막는 대신 여기 한 번만 안내 */}
+        <NoticeBanner
+          shouldShow={needsSubway && !hideSubwayCol && isSuinBundangSelected}
+          message="수인분당선 시간표를 업데이트 중이에요! 당분간 카카오 지하철을 이용해주세요"
+          delayMs={0}
+        />
+
         {/* 지하철 연결편 조회 실패 안내 — 행마다 반복 표시하면 스팸이라 여기 한 번만. 다른 공지 배너와 동일한 UI + 재시도 버튼만 추가 */}
         <NoticeBanner
-          shouldShow={needsSubway && !hideSubwayCol && isSubwayError}
+          shouldShow={needsSubway && !hideSubwayCol && isSubwayError && !isSuinBundangSelected}
           message="지하철 연결 정보를 불러오지 못했습니다"
           delayMs={0}
           variant="error"

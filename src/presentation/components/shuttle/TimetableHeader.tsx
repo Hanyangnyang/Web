@@ -55,7 +55,7 @@ export function TimetableHeader({
           needsSubway ? (
             <button
               onClick={onOpenSubway}
-              className="ml-auto flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-[#56657a] bg-[#eaeff5] rounded-lg px-2 py-1.5 active:bg-[#e2e8f0] transition-colors [-webkit-tap-highlight-color:transparent]"
+              className="ml-auto flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-white border border-primary/25 rounded-lg px-2 py-1.5 active:bg-primary/5 transition-colors [-webkit-tap-highlight-color:transparent]"
             >
               카카오 지하철
               <ExternalLink size={11} strokeWidth={2.2} />
