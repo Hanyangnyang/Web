@@ -88,9 +88,12 @@ function FeedbackViewFallback({ onBack }: { onBack: () => void }) {
 interface MiscViewProps {
   resetSignal: number;
   isActive?: boolean;
+  // 배너 등에서 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 App.tsx가 한 번만 내려줌
+  deepLinkBox?: string | null;
+  onDeepLinkBoxHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
@@ -99,6 +102,13 @@ export function MiscView({ resetSignal, isActive = false }: MiscViewProps) {
   useEffect(() => {
     setSubView('list');
   }, [resetSignal]);
+
+  // 배너 등 딥링크로 넘어온 서브뷰를 한 번 적용하고 부모에 소비 완료를 알린다 (CampusMapView의 deepLinkChip과 동일한 방식)
+  useEffect(() => {
+    if (!deepLinkBox) return;
+    setSubView(deepLinkBox as SubView);
+    onDeepLinkBoxHandled?.();
+  }, [deepLinkBox]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isActive) return;
