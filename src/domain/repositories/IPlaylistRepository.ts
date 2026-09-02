@@ -105,7 +105,7 @@ export interface PlaylistRepository {
   recordTrackPlay: (trackId: string) => Promise<void>;
   // 서버가 토글 후 그 곡의 9종 반응 전체 최신 카운트를 내려줘서, 화면 상태를 통째로 그걸로 맞추면 됨
   toggleReaction: (params: ToggleReactionParams) => Promise<PlaylistReaction[]>;
-  // 특정 곡(trackId)에 달린 추천 게시글 모아보기 — 곡 단위 게시글 목록 화면(TrackPostsView)용
+  // 특정 곡(trackId)에 달린 추천 게시글 모아보기 — 곡 단위 게시글 모음 화면(TrackPostCollectionView)용
   getTrackPosts: (params: GetTrackPostsParams) => Promise<TrackPosts>;
   // 인기 차트(실시간 급상승/주간/월간) 조회
   getPopularityChart: (params?: GetPopularityChartParams) => Promise<PopularityChart>;

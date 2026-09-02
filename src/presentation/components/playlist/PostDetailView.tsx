@@ -9,22 +9,22 @@ interface PostDetailViewProps {
   postId: string;
   onBack: () => void;
   onPlay: (song: Song) => void;
-  // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostsView)으로 이동
+  // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
   onSelectTrack?: (track: TrackResult) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 이 게시글의 곡과 같으면 재생 버튼을 숨김
   currentTrackId?: string | null;
 }
 
-// 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일
+// 게시글 조회(단건) 화면
 export function PostDetailView({ postId, onBack, onPlay, onSelectTrack, currentTrackId }: PostDetailViewProps) {
   const { data: post, isLoading } = usePostDetail(postId);
 
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
-        title="에리카 플레이리스트"
-        emoji="🕺"
-        subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
+        title="게시글"
+        emoji="💬"
+        subtitle={post ? `'${post.title} · ${post.artist}' 를 추천하는 글이에요!` : ''}
         onBack={onBack}
       />
 

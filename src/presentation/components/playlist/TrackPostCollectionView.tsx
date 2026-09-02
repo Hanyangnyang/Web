@@ -7,7 +7,7 @@ import { type Song, type ReactionState, formatTimeAgo, toReactionState } from '.
 import { useToggleBookmark, useReportSong, useToggleReaction, useTrackPosts, type TrackPostsSort } from '../../hooks/useRecentSongs.js';
 import { SongShareModal } from './SongShareModal';
 
-interface TrackPostsViewProps {
+interface TrackPostCollectionViewProps {
   track: TrackResult;
   onBack: () => void;
   onSelectPost: (post: Song) => void;
@@ -27,8 +27,8 @@ const SORT_OPTIONS = [
 
 const REPORT_REASONS = ['부적절하거나 선정적인 표현', '욕설·비속어 포함', '스팸/광고성 게시글', '기타'];
 
-// 곡 단위 게시글 목록 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
-export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying = false, searchQuery, setSearchQuery, onSubmitSearch }: TrackPostsViewProps) {
+// 곡 단위 게시글 모음 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
+export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, searchQuery, setSearchQuery, onSubmitSearch }: TrackPostCollectionViewProps) {
   const [sort, setSort] = useState<TrackPostsSort>('latest');
   const { data, isLoading } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
@@ -128,9 +128,9 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
-        title="에리카 플레이리스트"
-        emoji="🕺"
-        subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
+        title="게시글 모음"
+        emoji="💬"
+        subtitle={`'${track.title} · ${track.artist}' 의 추천 게시글을 다 모았어요!`}
         onBack={onBack}
       />
 
@@ -146,7 +146,7 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
           onKeyDown={(e) => {
             if (e.key === 'Enter') onSubmitSearch();
           }}
-          placeholder="듣고 싶은 곡을 검색해보세요!"
+          placeholder="다른 곡도 추천됐는지 검색해보세요!"
           className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
         />
         <button

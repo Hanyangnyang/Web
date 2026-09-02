@@ -21,7 +21,7 @@ interface SongListScreenProps {
   onBack: () => void;
   onPlay: (song: Song) => void;
   onShowAddSong: () => void;
-  // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostsView)으로 이동
+  // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
   onSelectTrack?: (track: TrackResult) => void;
   // 빈 상태 문구/버튼/동작을 화면마다 다르게 하고 싶을 때 오버라이드 — 없으면 장르 안내 문구 + 곡추천하기로 기본 동작
   emptyStateMessage?: string;

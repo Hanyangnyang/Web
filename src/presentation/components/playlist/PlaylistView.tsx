@@ -8,7 +8,7 @@ import { AddSongFab } from './AddSongFab';
 import { AddSongView } from './AddSongView';
 import { RecentSongsView } from './RecentSongsView';
 import { SearchResultsView, type TrackResult } from './SearchResultsView';
-import { TrackPostsView } from './TrackPostsView';
+import { TrackPostCollectionView } from './TrackPostCollectionView';
 import { PostDetailView } from './PostDetailView';
 import { MyActivityView } from './MyActivityView';
 import { BookmarkedSongsView } from './BookmarkedSongsView';
@@ -66,7 +66,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   // 하단 화면들의 여백(--playlist-bottom-space)과 AddSongFab 위치 계산에 함께 쓰임.
   const [playerHeight, setPlayerHeight] = useState(0);
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
-  // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostsView(곡 단위 게시글 목록)로 이동
+  // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostCollectionView(곡 단위 게시글 모음)로 이동
   const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
   // 게시글 목록에서 눌러 선택된 게시글 id — 값이 있으면 PostDetailView가 GET /api/v1/playlist/songs/{id}로 상세 조회
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -155,7 +155,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     pushScreen('trackPosts');
   }, [pushScreen]);
 
-  // 인기차트 리스트 클릭 — ChartTrack을 TrackResult 형태로 변환해 동일한 TrackPostsView로 이동
+  // 인기차트 리스트 클릭 — ChartTrack을 TrackResult 형태로 변환해 동일한 TrackPostCollectionView로 이동
   const handleSelectChartSong = useCallback((track: ChartTrack) => {
     setSelectedTrackForPosts({
       trackId: track.trackId,
@@ -166,7 +166,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     pushScreen('trackPosts');
   }, [pushScreen]);
 
-  // 게시글 목록(TrackPostsView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동
+  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동
   const handleSelectPost = useCallback((post: Song) => {
     setSelectedPostId(post.id ?? null);
     pushScreen('postDetail');
@@ -238,7 +238,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'trackPosts' && selectedTrackForPosts ? (
-          <TrackPostsView
+          <TrackPostCollectionView
             track={selectedTrackForPosts}
             onBack={popScreen}
             onSelectPost={handleSelectPost}

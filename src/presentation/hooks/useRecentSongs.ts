@@ -34,7 +34,7 @@ export function useRecentSongs() {
   });
 }
 
-// 게시글 단건 상세 조회 — 게시글 목록(TrackPostsView 등)에서 하나를 눌러 상세화면(PostDetailView)으로 이동할 때 사용.
+// 게시글 단건 상세 조회 — 게시글 목록(TrackPostCollectionView 등)에서 하나를 눌러 상세화면(PostDetailView)으로 이동할 때 사용.
 // postId가 없으면(딥링크 대상이 아직 없는 화면 등) 호출하지 않음
 export function usePostDetail(postId: string | null) {
   return useQuery({
@@ -218,7 +218,7 @@ export function useToggleReaction() {
 
 export type TrackPostsSort = 'latest' | 'popular';
 
-// TrackPostsView의 최신/인기 칩이 쓰는 값 → 백엔드 sort 파라미터 형식으로 변환
+// TrackPostCollectionView의 최신/인기 칩이 쓰는 값 → 백엔드 sort 파라미터 형식으로 변환
 const TRACK_POSTS_SORT_PARAM: Record<TrackPostsSort, string> = {
   latest: 'createdAt,desc',
   popular: 'heartCount,desc',

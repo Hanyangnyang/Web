@@ -92,7 +92,7 @@ export function formatTimeAgo(date: Date | string | null | undefined): string {
   return `${Math.floor(diffMs / YEAR_MS)}년 전`;
 }
 
-// 이모지 반응 카드(PostDetailCard/TrackPostsView)가 공용으로 쓰는 로컬 반응 상태
+// 이모지 반응 카드(PostDetailCard/TrackPostCollectionView)가 공용으로 쓰는 로컬 반응 상태
 export type ReactionState = Partial<Record<ReactionKey, { count: number; mine: boolean }>>;
 
 // 서버가 내려준 반응 목록을 이모지 키 기준 상태로 변환 — reaction.type이 ReactionKey와 동일한 문자열이라는 전제(예: 'FIRE')

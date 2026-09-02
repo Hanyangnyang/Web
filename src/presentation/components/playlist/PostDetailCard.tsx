@@ -39,7 +39,7 @@ interface PostDetailCardProps {
   hideMoreButton?: boolean;
   // 넘겨주면 카드 전체가 클릭 가능해짐 — 요약 목록(2열)에서 눌러 상세(1열)로 전환할 때 사용
   onSelect?: () => void;
-  // 넘겨주면 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostsView)으로 이동 — 카드 자체의
+  // 넘겨주면 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동 — 카드 자체의
   // onSelect(게시글 상세 보기)와는 별개 동작이라 화살표 아이콘으로 구분해서 보여줌
   onSelectTrack?: (track: TrackResult) => void;
 }
@@ -161,7 +161,7 @@ export function PostDetailCard({
   // count가 0보다 큰 이모지만 표시 — 하나도 없으면 칩 대신 유도 배너를 보여줌
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
-  // 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostsView)으로 이동 — 카드 전체 클릭(onSelect)과
+  // 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동 — 카드 전체 클릭(onSelect)과
   // 별개 동작이라 전파를 막음. 단, 카드 자체가 이미 onSelect로 클릭 가능한 요약 목록(2열)에서는
   // 카드 전체가 게시글 상세로 가는 단일 탭 영역이어야 해서 제목만 따로 분리하지 않음
   const showTrackLink = !!onSelectTrack && !onSelect;
