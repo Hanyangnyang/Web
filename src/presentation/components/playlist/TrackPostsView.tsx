@@ -1,4 +1,4 @@
-import { Bookmark, MoreVertical, Play, Share2, Smile } from 'lucide-react';
+import { ArrowRight, Bookmark, MoreVertical, Play, Search, Share2, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
@@ -14,6 +14,10 @@ interface TrackPostsViewProps {
   onPlay: () => void;
   // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 버튼을 숨김
   isPlaying?: boolean;
+  // 홈 검색바와 동일한 로직(Enter/화살표 → 검색 결과 화면) — 상태는 PlaylistView가 들고 있음
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  onSubmitSearch: () => void;
 }
 
 const SORT_OPTIONS = [
@@ -24,7 +28,7 @@ const SORT_OPTIONS = [
 const REPORT_REASONS = ['부적절하거나 선정적인 표현', '욕설·비속어 포함', '스팸/광고성 게시글', '기타'];
 
 // 곡 단위 게시글 목록 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
-export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying = false }: TrackPostsViewProps) {
+export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying = false, searchQuery, setSearchQuery, onSubmitSearch }: TrackPostsViewProps) {
   const [sort, setSort] = useState<TrackPostsSort>('latest');
   const { data, isLoading } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
@@ -129,6 +133,31 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
         subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
         onBack={onBack}
       />
+
+      {/* 검색바: 홈 검색바와 동일한 UI·로직 — Enter 또는 화살표를 누르면 검색 결과 화면으로 이동 */}
+      <div className="mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-[#618CE9]/[0.06] border border-[#618CE9]/20 rounded-full focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
+        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#618CE9]/15 flex items-center justify-center">
+          <Search size={15} className="text-[#618CE9]" />
+        </span>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onSubmitSearch();
+          }}
+          placeholder="듣고 싶은 곡을 검색해보세요!"
+          className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+        />
+        <button
+          onClick={onSubmitSearch}
+          disabled={!searchQuery.trim()}
+          aria-label="검색"
+          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#618CE9] text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
+        >
+          <ArrowRight size={14} />
+        </button>
+      </div>
 
       {/* 곡 정보 — 앨범아트:정보 = 1:1 비율. 정보 쪽은 통계를 색깔 있는 뱃지로 다양하게 채워서
           큰 앨범아트 옆이 휑해 보이지 않게 함 */}
@@ -315,14 +344,14 @@ export function TrackPostsView({ track, onBack, onSelectPost, onPlay, isPlaying 
                               setOpenPickerPostId(null);
                             }}
                             aria-label={`${emoji} 남기기`}
-                            className="w-6 h-6 flex items-center justify-center text-xs rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
+                            className="w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
                           >
                             {emoji}
                           </button>
                         ))}
                       </div>
                       {/* 말풍선 꼬리 */}
-                      <div className="w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />
+                      <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />
                     </div>
                   )}
                 </div>

@@ -1,13 +1,15 @@
-import { Bookmark, MoreVertical, Play, Share2, Smile } from 'lucide-react';
+import { Bookmark, ChevronRight, MoreVertical, Play, Share2, Smile } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, GENRES, formatTimeAgo, toReactionState } from './playlistTypes';
 import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
 import { useReportSong, useToggleBookmark, useToggleReaction } from '../../hooks/useRecentSongs.js';
 import { SongShareModal } from './SongShareModal';
+import { type TrackResult } from './SearchResultsView';
 
 export interface PostDetailCardData {
   // 신고하기 등 서버에 곡 id가 필요한 액션에 씀 — 실제 API 연동 전 더미 게시글엔 없을 수 있어서 옵셔널
   id?: string;
+  trackId: string;
   albumArtUrl: string;
   title: string;
   artist: string;
@@ -37,12 +39,16 @@ interface PostDetailCardProps {
   hideMoreButton?: boolean;
   // 넘겨주면 카드 전체가 클릭 가능해짐 — 요약 목록(2열)에서 눌러 상세(1열)로 전환할 때 사용
   onSelect?: () => void;
+  // 넘겨주면 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostsView)으로 이동 — 카드 자체의
+  // onSelect(게시글 상세 보기)와는 별개 동작이라 화살표 아이콘으로 구분해서 보여줌
+  onSelectTrack?: (track: TrackResult) => void;
 }
 
 // 리스트/캐러셀에서 쓰는 Song 엔티티를 PostDetailCard가 받는 형태로 변환 (본문=comment)
 export function songToPostDetailCardData(song: Song): PostDetailCardData {
   return {
     id: song.id,
+    trackId: song.trackId,
     albumArtUrl: song.albumArtUrl,
     title: song.title,
     artist: song.artist,
@@ -64,6 +70,7 @@ export function PostDetailCard({
   hideReactions = false,
   hideMoreButton = false,
   onSelect,
+  onSelectTrack,
 }: PostDetailCardProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -154,16 +161,42 @@ export function PostDetailCard({
   // count가 0보다 큰 이모지만 표시 — 하나도 없으면 칩 대신 유도 배너를 보여줌
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
+  // 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostsView)으로 이동 — 카드 전체 클릭(onSelect)과
+  // 별개 동작이라 전파를 막음. 단, 카드 자체가 이미 onSelect로 클릭 가능한 요약 목록(2열)에서는
+  // 카드 전체가 게시글 상세로 가는 단일 탭 영역이어야 해서 제목만 따로 분리하지 않음
+  const showTrackLink = !!onSelectTrack && !onSelect;
+  const handleSelectTrackClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    onSelectTrack?.({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
+  };
+  const titleInteractiveProps = showTrackLink
+    ? {
+        onClick: handleSelectTrackClick,
+        role: 'button' as const,
+        tabIndex: 0,
+        onKeyDown: (e: { key: string; stopPropagation: () => void }) => {
+          if (e.key === 'Enter' || e.key === ' ') handleSelectTrackClick(e);
+        },
+        'aria-label': `${post.title} 게시글 모음 보기`,
+      }
+    : {};
+
   // 2열(hideReactions, 요약 카드)에서는 제목/가수명을 세로로 쌓고, 1열에서는 "제목 · 가수명" 한 줄로 표시
   const titleBlock = hideReactions ? (
-    <div className="min-w-0">
-      <div className="text-sm font-bold text-text-main truncate">{post.title}</div>
+    <div className={`min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
+      <div className="flex items-center gap-0.5">
+        <span className="text-sm font-bold text-text-main truncate">{post.title}</span>
+        {showTrackLink && <ChevronRight size={16} className="flex-shrink-0 text-text-sub" />}
+      </div>
       <div className="text-xs font-medium text-text-sub truncate">{post.artist}</div>
     </div>
   ) : (
-    <div className="truncate">
-      <span className="text-base font-bold text-text-main">{post.title}</span>
-      <span className="text-sm font-medium text-text-sub"> · {post.artist}</span>
+    <div className={`flex items-center gap-0.5 min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
+      <span className="truncate min-w-0">
+        <span className="text-base font-bold text-text-main">{post.title}</span>
+        <span className="text-sm font-medium text-text-sub"> · {post.artist}</span>
+      </span>
+      {showTrackLink && <ChevronRight size={19} className="flex-shrink-0 text-text-sub" />}
     </div>
   );
 
@@ -307,14 +340,14 @@ export function PostDetailCard({
                         }}
                         disabled={toggleReactionMutation.isPending}
                         aria-label={`${emoji} 남기기`}
-                        className="w-6 h-6 flex items-center justify-center text-xs rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
+                        className="w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
                       >
                         {emoji}
                       </button>
                     ))}
                   </div>
                   {/* 말풍선 꼬리 */}
-                  <div className="w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />
+                  <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />
                 </div>
               )}
             </div>
@@ -365,7 +398,11 @@ export function PostDetailCard({
 
         {/* 본문 */}
         {post.body && (
-          <p className={`${hideReactions ? 'text-xs' : 'text-sm'} text-text-main leading-relaxed mb-2 whitespace-pre-line`}>{post.body}</p>
+          <p
+            className={`${hideReactions ? 'text-xs line-clamp-3' : 'text-sm'} text-text-main leading-relaxed mb-2 whitespace-pre-line`}
+          >
+            {post.body}
+          </p>
         )}
 
         {/* 구분선 + 장르(최대 3개) — 묶어서 mt-auto로 카드 하단에 고정. 구분선을 장르 행과

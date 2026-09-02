@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Smile } from 'lucide-react';
 import { type Song, toReactionState, formatTimeAgo } from './playlistTypes';
 import { EMOJI_REACTIONS } from './postReactions';
 
@@ -62,6 +62,14 @@ export function RecentSongRow({ song, onSelect }: RecentSongRowProps) {
                 );
               })}
             </div>
+          )}
+          {displayedReactions.length === 0 && (
+            <span className="flex items-center gap-1.5 min-w-0 text-[10px] text-text-hint">
+              <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <Smile size={11} className="text-text-sub" strokeWidth={2} />
+              </span>
+              <span className="truncate">반응하러 가자~!</span>
+            </span>
           )}
           {/* 올린 시각 — 리액션이 있든 없든 오른쪽 끝에 고정 */}
           <span className="ml-auto flex-shrink-0 text-[10px] text-text-hint">

@@ -72,6 +72,12 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
   const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
+  // 최근추가된곡/저장한곡/추천한곡 화면의 그리드·리스트 뷰 모드 — 이 화면들은 게시글 상세로 갔다가
+  // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
+  // 마지막으로 보던 모드를 그대로 복원함
+  const [recentViewMode, setRecentViewMode] = useState<'grid' | 'list'>('list');
+  const [bookmarkedViewMode, setBookmarkedViewMode] = useState<'grid' | 'list'>('list');
+  const [mySongsViewMode, setMySongsViewMode] = useState<'grid' | 'list'>('list');
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
@@ -208,8 +214,11 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
               setAutoFocusSearch(true);
               setScreenStack(['main']);
             }}
+            onSelectTrack={handleSelectSearchTrack}
             scrollToTrackId={recentScrollTarget}
             currentTrackId={currentTrack?.trackId}
+            viewMode={recentViewMode}
+            onViewModeChange={setRecentViewMode}
           />
         ) : screen === 'addSong' ? (
           <AddSongView
@@ -235,12 +244,16 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onSelectPost={handleSelectPost}
             onPlay={() => handlePlay(selectedTrackForPosts)}
             isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSubmitSearch={handleSearchSubmit}
           />
         ) : screen === 'postDetail' && selectedPostId ? (
           <PostDetailView
             postId={selectedPostId}
             onBack={popScreen}
             onPlay={handlePlay}
+            onSelectTrack={handleSelectSearchTrack}
             currentTrackId={currentTrack?.trackId}
           />
         ) : screen === 'chart' ? (
@@ -266,14 +279,20 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
             onShowRecent={handleShowAllRecent}
+            onSelectTrack={handleSelectSearchTrack}
             currentTrackId={currentTrack?.trackId}
+            viewMode={bookmarkedViewMode}
+            onViewModeChange={setBookmarkedViewMode}
           />
         ) : screen === 'mySongs' ? (
           <MySongsView
             onBack={popScreen}
             onPlay={handlePlay}
             onShowAddSong={() => pushScreen('addSong')}
+            onSelectTrack={handleSelectSearchTrack}
             currentTrackId={currentTrack?.trackId}
+            viewMode={mySongsViewMode}
+            onViewModeChange={setMySongsViewMode}
           />
         ) : (
           <PlaylistMainContent

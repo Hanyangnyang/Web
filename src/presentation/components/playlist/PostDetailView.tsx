@@ -2,18 +2,21 @@ import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
 import { usePostDetail } from '../../hooks/useRecentSongs.js';
 import { type Song } from './playlistTypes';
+import { type TrackResult } from './SearchResultsView';
 
 interface PostDetailViewProps {
   // 게시글 목록에서 눌러서 들어온 게시글 id — GET /api/v1/playlist/songs/{id}로 상세 조회
   postId: string;
   onBack: () => void;
   onPlay: (song: Song) => void;
+  // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostsView)으로 이동
+  onSelectTrack?: (track: TrackResult) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 이 게시글의 곡과 같으면 재생 버튼을 숨김
   currentTrackId?: string | null;
 }
 
 // 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일
-export function PostDetailView({ postId, onBack, onPlay, currentTrackId }: PostDetailViewProps) {
+export function PostDetailView({ postId, onBack, onPlay, onSelectTrack, currentTrackId }: PostDetailViewProps) {
   const { data: post, isLoading } = usePostDetail(postId);
 
   return (
@@ -44,6 +47,7 @@ export function PostDetailView({ postId, onBack, onPlay, currentTrackId }: PostD
           post={songToPostDetailCardData(post)}
           onPlay={() => onPlay(post)}
           isPlaying={post.trackId === currentTrackId}
+          onSelectTrack={onSelectTrack}
         />
       )}
     </div>
