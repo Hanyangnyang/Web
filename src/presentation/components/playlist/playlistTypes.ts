@@ -3,6 +3,16 @@ import { type ReactionKey } from './postReactions';
 
 export type { PlaylistReaction };
 
+// 곡 하나를 식별하는 데 필요한 최소 정보 — TrackResult(SearchResultsView)/SearchTrack(AddSongView)/
+// PlayableTrack(FloatingSpotifyPlayer)/SongShareModalSong(SongShareModal)이 전부 이 모양과 동일해서,
+// 각 파일에서 이 타입의 별칭으로 재정의해 씀(기존 import 경로는 그대로 유지)
+export interface TrackSummary {
+  trackId: string;
+  title: string;
+  artist: string;
+  albumArtUrl: string;
+}
+
 export interface Song {
   // 게시글 자체의 id — 실제 API 연동 전 로컬 더미/임시 추가 곡은 없을 수 있어서 옵셔널.
   // 여러 게시글이 같은 trackId(스포티파이 곡)를 가리킬 수 있어서 리스트 key로는 이 값을 우선 써야 함
@@ -17,7 +27,6 @@ export interface Song {
   // 지금 이 기기가 등록한 게시글인지 — 북마크/신고 아이콘을 숨길지 판단하는 데 씀
   isMine?: boolean;
   reactions?: PlaylistReaction[];
-  previewUrl: string;
   // react-query 캐시에 그대로 들어가 localStorage에 직렬화되므로 Date 인스턴스가 아니라 ISO 문자열로 유지 —
   // Date로 저장하면 새로고침 후 복원 시 문자열로 풀리면서 formatTimeAgo가 크래시남 (Gym.ts 등 다른 엔티티와 동일한 이유)
   createdAt: string;
@@ -36,7 +45,6 @@ export function mapPlaylistSongToSong(song: PlaylistSong): Song {
     isBookmarked: song.isBookmarked,
     isMine: song.isMine,
     reactions: song.reactions,
-    previewUrl: '',
     createdAt: song.createdAt,
   };
 }
@@ -52,14 +60,18 @@ export const GENRES = [
   { key: 'ballad', label: '발라드', emoji: '🎻', light: 'bg-[rgba(187,247,208,0.6)]', active: 'bg-[rgba(34,197,94,1)]' },
   { key: 'pop', label: 'POP', emoji: '🗽', light: 'bg-[rgba(153,246,228,0.6)]', active: 'bg-[rgba(20,184,166,1)]' },
   { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]' },
+  // 다른 장르에서 안 쓴 색상 계열로 — Tailwind orange-600(진한 주황)은 K-POP의 톤 다운된
+  // 커스텀 오렌지(230,140,60)보다 훨씬 채도 높고 진해서 구분되고, light도 200이 아닌 300 계열로
+  // 밝기를 달리 잡아 K-POP light(254,215,170)와 안 겹치게 함
+  { key: 'ost', label: 'OST', emoji: '🎬', light: 'bg-[rgba(253,186,116,0.6)]', active: 'bg-[rgba(234,88,12,1)]' },
   { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]' },
 ];
 
 // 인기차트 상단 기간 필터 칩 — 홈 미리보기와 인기차트 상세 화면이 공용으로 사용. 실제 기간별 재집계 로직은 추후 연동
 export const CHART_PERIOD_OPTIONS = [
-  { key: 'popular', label: 'TOP 10' },
-  { key: 'weekly', label: 'WEEK 10' },
-  { key: 'monthly', label: 'MONTH 10' },
+  { key: 'popular', label: '실시간' },
+  { key: 'weekly', label: '주간' },
+  { key: 'monthly', label: '월간' },
 ] as const;
 
 export type ChartPeriod = (typeof CHART_PERIOD_OPTIONS)[number]['key'];

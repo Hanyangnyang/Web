@@ -8,8 +8,12 @@ interface AddSongFabProps {
 }
 
 const FAB_RIGHT = 'right-[max(1.25rem,calc((100vw-440px)/2+1.25rem))]';
-const CLOSED_BOTTOM = 'calc(1.25rem + env(safe-area-inset-bottom))';
-const PLAYER_GAP = 16;
+// 다른 화면들(AddSongView의 등록하기 버튼, PlaylistView의 하단 여백 계산 등)도 이 FAB의 실제
+// 크기/위치와 겹치지 않으려면 같은 값을 알아야 해서 export — 값이 바뀌면 여기 한 곳만 고치면 됨
+export const FAB_HEIGHT_PX = 48; // h-12
+export const FAB_CLOSED_BOTTOM_PX = 20; // 1.25rem
+export const PLAYER_GAP_PX = 16; // 플레이어 카드 위 간격
+const CLOSED_BOTTOM = `calc(${FAB_CLOSED_BOTTOM_PX}px + env(safe-area-inset-bottom))`;
 
 // 이 FAB은 앱 전역 스크롤 컨테이너(App.tsx)를 prop으로 전달받을 방법이 없어서,
 // DOM에서 가장 가까운 스크롤 가능한 조상을 직접 찾아 스크롤 여부를 감지한다.
@@ -27,7 +31,7 @@ export function AddSongFab({ onClick, playerHeight = 0 }: AddSongFabProps) {
   const [collapsed, setCollapsed] = useState(false);
   const bottom =
     playerHeight > 0
-      ? `calc(${playerHeight}px + ${PLAYER_GAP}px + env(safe-area-inset-bottom))`
+      ? `calc(${playerHeight}px + ${PLAYER_GAP_PX}px + env(safe-area-inset-bottom))`
       : CLOSED_BOTTOM;
 
   useEffect(() => {

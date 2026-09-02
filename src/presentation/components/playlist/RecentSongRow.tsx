@@ -53,17 +53,15 @@ export function RecentSongRow({ song, onSelect }: RecentSongRowProps) {
                   key={key}
                   className="flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-slate-100 border-transparent text-text-sub"
                 >
-                  <span className="text-[10px] grayscale opacity-70">{emoji}</span>
+                  <span className="text-[10px]">{emoji}</span>
                   <span>{reactions[key]?.count ?? 0}</span>
                 </span>
               ))}
             </div>
           )}
           {displayedReactions.length === 0 && (
-            <span className="flex items-center gap-1.5 min-w-0 text-[10px] text-text-hint">
-              <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                <Smile size={11} className="text-text-sub" strokeWidth={2} />
-              </span>
+            <span className="flex items-center gap-1 min-w-0 pl-1 pr-2 py-0.5 rounded-full bg-slate-100 text-[10px] text-text-sub">
+              <Smile size={11} className="text-text-sub flex-shrink-0" strokeWidth={2} />
               <span className="truncate">반응하러 가자~!</span>
             </span>
           )}

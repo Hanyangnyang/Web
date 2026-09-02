@@ -2,18 +2,14 @@ import { Play, Share2, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 import { isIOSDevice } from '../../../lib/platform.js';
-import { SongShareModal } from './SongShareModal';
+import { useShareModal } from './useShareModal';
+import { type TrackSummary } from './playlistTypes';
 
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
 // "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요 — Android/데스크톱은 이 정책이 없어서 해당 없음.
 const AUTOPLAY_CHECK_MS = 1500;
 
-export interface PlayableTrack {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-}
+export type PlayableTrack = TrackSummary;
 
 interface FloatingSpotifyPlayerProps {
   song: PlayableTrack | null;
@@ -29,8 +25,9 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);
-  const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [shareCopiedToast, setShareCopiedToast] = useState(false);
+  // displaySong이 null(닫힘 상태)이어도 훅은 항상 호출돼야 해서 빈 값으로 대체 — 실제로는
+  // displaySong이 있을 때만 공유 버튼이 렌더링되므로 open()이 빈 값으로 호출될 일은 없음
+  const share = useShareModal(displaySong ?? { trackId: '', title: '', artist: '', albumArtUrl: '' });
   const containerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
@@ -163,7 +160,7 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
               {displaySong.title} <span className="font-normal">- {displaySong.artist}</span>
             </div>
             <button
-              onClick={() => setShareModalOpen(true)}
+              onClick={() => share.open()}
               aria-label="공유하기"
               className="ml-2 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
             >
@@ -216,22 +213,7 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
         </div>
       </div>
 
-      {shareModalOpen && (
-        <SongShareModal
-          song={{ trackId: displaySong.trackId, title: displaySong.title, artist: displaySong.artist, albumArtUrl: displaySong.albumArtUrl }}
-          onClose={() => setShareModalOpen(false)}
-          onCopied={() => {
-            setShareCopiedToast(true);
-            setTimeout(() => setShareCopiedToast(false), 1800);
-          }}
-        />
-      )}
-
-      {shareCopiedToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
-          링크 복사됨!
-        </div>
-      )}
+      {share.node}
     </div>
   );
 }

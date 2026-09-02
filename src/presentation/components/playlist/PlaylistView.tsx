@@ -1,10 +1,10 @@
-import { ArrowRight, ChevronRight, Search, User } from 'lucide-react';
+import { ChevronRight, User } from 'lucide-react';
 import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlayer';
-import { AddSongFab } from './AddSongFab';
+import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './AddSongFab';
 import { AddSongView } from './AddSongView';
 import { RecentSongsView } from './RecentSongsView';
 import { SearchResultsView, type TrackResult } from './SearchResultsView';
@@ -15,7 +15,9 @@ import { BookmarkedSongsView } from './BookmarkedSongsView';
 import { MySongsView } from './MySongsView';
 import { ChartTopCard } from './ChartTopCard';
 import { RecentSongRow } from './RecentSongRow';
-import { EmptyChartState } from './EmptyChartState';
+import { EmptyGenreState } from './EmptyGenreState';
+import { ChartPeriodChips } from './ChartPeriodChips';
+import { PlaylistSearchBar } from './PlaylistSearchBar';
 import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
 import { ChartView } from './ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
@@ -103,6 +105,14 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const pushScreen = useCallback((next: PlaylistScreen) => {
     setScreenStack((prev) => [...prev, next]);
   }, []);
+
+  // 게시글 모음의 "이 곡 추천하러 가기" 버튼처럼 특정 곡이 미리 채워진 채로 곡추천하기 화면에 들어갈 때 씀.
+  // prefill 없이 부르는 모든 진입점(FAB 등)에서는 매번 null로 초기화해서, 이전에 넣어뒀던 값이 새는 걸 막음
+  const [addSongPrefillTrack, setAddSongPrefillTrack] = useState<TrackResult | null>(null);
+  const pushAddSong = useCallback((prefill?: TrackResult) => {
+    setAddSongPrefillTrack(prefill ?? null);
+    pushScreen('addSong');
+  }, [pushScreen]);
 
   // 뒤로가기는 스택을 한 단계씩 pop — 어느 화면에서 들어왔는지와 무관하게 항상 바로 이전 화면으로 돌아감
   const popScreen = useCallback(() => {
@@ -203,7 +213,16 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = chartTracks.slice(0, CHART_PREVIEW_LIMIT);
 
-  const bottomSpace = playerHeight > 0 ? playerHeight + 4 : 4;
+  // AddSongFab은 곡추천하기 화면(screen === 'addSong')만 빼고 항상 떠 있어서, 그 화면이 아니면
+  // 여백 계산에 FAB의 실제 크기·간격(AddSongFab.tsx가 export하는 값과 항상 일치)까지 더해야
+  // 목록 마지막 항목이 FAB에 가려지지 않는다
+  const FAB_GAP_ABOVE_CONTENT = 12;
+  const isFabVisible = screen !== 'addSong';
+  const bottomSpace = isFabVisible
+    ? playerHeight > 0
+      ? playerHeight + PLAYER_GAP_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT // 플레이어 위에 뜬 FAB까지 감안
+      : FAB_CLOSED_BOTTOM_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT // FAB 기본 위치(플레이어 없을 때)까지 감안
+    : playerHeight > 0 ? playerHeight + 4 : 4;
 
   return (
     <div
@@ -225,7 +244,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             songs={songs}
             onBack={popScreen}
             onPlay={handlePlay}
-            onShowAddSong={() => pushScreen('addSong')}
+            onShowAddSong={() => pushAddSong()}
             onShowSearch={() => {
               setAutoFocusSearch(true);
               setScreenStack(['main']);
@@ -243,6 +262,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             playerHeight={playerHeight}
             onPlay={handlePlay}
             currentTrackId={currentTrack?.trackId}
+            prefillTrack={addSongPrefillTrack}
           />
         ) : screen === 'search' ? (
           <SearchResultsView
@@ -260,9 +280,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSelectPost={handleSelectPost}
             onPlay={() => handlePlay(selectedTrackForPosts)}
             isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onSubmitSearch={handleSearchSubmit}
+            onRecommendTrack={pushAddSong}
           />
         ) : screen === 'postDetail' && selectedPostId ? (
           <PostDetailView
@@ -293,7 +311,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
           <BookmarkedSongsView
             onBack={popScreen}
             onPlay={handlePlay}
-            onShowAddSong={() => pushScreen('addSong')}
+            onShowAddSong={() => pushAddSong()}
             onShowRecent={handleShowAllRecent}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={currentTrack?.trackId}
@@ -304,7 +322,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
           <MySongsView
             onBack={popScreen}
             onPlay={handlePlay}
-            onShowAddSong={() => pushScreen('addSong')}
+            onShowAddSong={() => pushAddSong()}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={currentTrack?.trackId}
             viewMode={mySongsViewMode}
@@ -335,7 +353,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
       {screen !== 'addSong' && (
-        <AddSongFab onClick={() => pushScreen('addSong')} playerHeight={playerHeight} />
+        <AddSongFab onClick={() => pushAddSong()} playerHeight={playerHeight} />
       )}
 
       {/* 플로팅 Spotify 플레이어*/}
@@ -402,7 +420,7 @@ function PlaylistMainContent({
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
-        subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
+        subtitle="에리카생들의 추천곡을 들어보고, 나도 추천해봐요!"
         onBack={onBack}
         rightAction={
           <button
@@ -415,32 +433,14 @@ function PlaylistMainContent({
         }
       />
 
-      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동. 그라데이션 없이
-          단색 브랜드 블루 톤 + 아이콘 배지로 심플하게 "눌러볼 만한" 느낌만 남김 */}
-      <div className="mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-[#618CE9]/[0.06] border border-[#618CE9]/20 rounded-full focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
-        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#618CE9]/15 flex items-center justify-center">
-          <Search size={15} className="text-[#618CE9]" />
-        </span>
-        <input
-          ref={searchInputRef}
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') onSubmitSearch();
-          }}
-          placeholder="듣고 싶은 곡을 검색해보세요!"
-          className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
-        />
-        <button
-          onClick={onSubmitSearch}
-          disabled={!searchQuery.trim()}
-          aria-label="검색"
-          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#618CE9] text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
-        >
-          <ArrowRight size={14} />
-        </button>
-      </div>
+      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동 */}
+      <PlaylistSearchBar
+        ref={searchInputRef}
+        value={searchQuery}
+        onChange={setSearchQuery}
+        onSubmit={onSubmitSearch}
+        placeholder="듣고 싶은 곡을 검색해보세요!"
+      />
 
       {/* 인기차트 섹션 — 최대 10위까지 큰 카드를 가로 스크롤로 노출 */}
       <section className="mb-4">
@@ -455,22 +455,7 @@ function PlaylistMainContent({
           </button>
         </div>
 
-        {/* 기간 필터 칩 — 멜론 차트 탭(TOP100/HOT100)처럼 알약형으로 크게 */}
-        <div className="flex gap-2 mb-2 pl-1">
-          {CHART_PERIOD_OPTIONS.map((option) => (
-            <button
-              key={option.key}
-              onClick={() => onChangeChartPeriod(option.key)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
-                chartPeriod === option.key
-                  ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
-                  : 'bg-white text-[#618CE9] border-[#618CE9]'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangeChartPeriod} />
 
         {/* 카드 가로 스크롤 — 최대 10개 */}
         {isChartLoading ? (
@@ -483,9 +468,11 @@ function PlaylistMainContent({
           </div>
         ) : visibleChart.length === 0 ? (
           <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
-            <EmptyChartState
-              periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
-              onShowRecent={onShowAllRecent}
+            <EmptyGenreState
+              message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
+              buttonLabel="최근 추가된 곡 보러가기"
+              buttonIcon={<span>🎵</span>}
+              onAction={onShowAllRecent}
             />
           </div>
         ) : (

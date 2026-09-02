@@ -3,25 +3,13 @@ import { GENRES } from './playlistTypes';
 interface GenreFilterChipsProps {
   selectedGenre: string;
   onSelectGenre: (key: string) => void;
-  // '전체' 칩의 색상만 화면마다 다르게 써서(홈: 진남색/화이트, 리스트화면: slate) variant로 분기
-  variant?: 'main' | 'list';
   className?: string;
 }
 
-const ALL_CHIP_STYLES = {
-  main: {
-    active: 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]',
-    inactive: 'bg-white text-[#618CE9] border-[#618CE9]',
-  },
-  list: {
-    active: 'bg-slate-700 text-white border-transparent shadow-[0_2px_6px_rgba(51,65,85,0.25)]',
-    inactive: 'bg-slate-200 text-slate-800 border-slate-400',
-  },
-};
+const ALL_CHIP_ACTIVE = 'bg-slate-700 text-white border-transparent shadow-[0_2px_6px_rgba(51,65,85,0.25)]';
+const ALL_CHIP_INACTIVE = 'bg-slate-200 text-slate-800 border-slate-400';
 
-export function GenreFilterChips({ selectedGenre, onSelectGenre, variant = 'main', className = '' }: GenreFilterChipsProps) {
-  const allChipStyles = ALL_CHIP_STYLES[variant];
-
+export function GenreFilterChips({ selectedGenre, onSelectGenre, className = '' }: GenreFilterChipsProps) {
   return (
     <div
       className={`flex gap-2 overflow-x-auto px-4 ml-[-1rem] [&::-webkit-scrollbar]:hidden ${className}`}
@@ -35,7 +23,7 @@ export function GenreFilterChips({ selectedGenre, onSelectGenre, variant = 'main
             selectedGenre === genre.key && genre.key !== 'all'
               ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
               : genre.key === 'all'
-                ? (selectedGenre === 'all' ? allChipStyles.active : allChipStyles.inactive)
+                ? (selectedGenre === 'all' ? ALL_CHIP_ACTIVE : ALL_CHIP_INACTIVE)
                 : `${genre.light} text-gray-800 border-transparent`
           }`}
         >

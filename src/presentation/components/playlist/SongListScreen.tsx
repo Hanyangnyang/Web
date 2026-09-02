@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, filterSongsByGenre } from './playlistTypes';
 import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
+import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips } from './GenreFilterChips';
 import { type TrackResult } from './SearchResultsView';
@@ -35,8 +36,6 @@ interface SongListScreenProps {
   // 보던 모드가 그대로 유지됨. 안 넘기면 이 화면 내부 state로만 관리(항상 1열로 시작)
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
-  // true면 카드의 더보기(신고하기) 버튼을 숨김 — 본인이 등록한 곡 목록처럼 자기 자신을 신고할 수 없는 화면용
-  hideMoreButton?: boolean;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
@@ -61,7 +60,6 @@ export function SongListScreen({
   emptyStateButtonIcon,
   onEmptyStateAction,
   enableViewToggle = false,
-  hideMoreButton = false,
   scrollToTrackId,
   currentTrackId,
   emptyStateBoxed = true,
@@ -154,7 +152,6 @@ export function SongListScreen({
         <GenreFilterChips
           selectedGenre={selectedGenre}
           onSelectGenre={setSelectedGenre}
-          variant="list"
           className="pb-3"
         />
       </div>
@@ -162,33 +159,9 @@ export function SongListScreen({
       <div ref={listContainerRef} className="-mx-4 px-2">
         {isLoading ? (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
-            {Array.from({ length: viewMode === 'grid' ? 4 : 3 }).map((_, i) =>
-              viewMode === 'grid' ? (
-                <div key={i} className="h-full flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                  <div className="w-full aspect-square skeleton-shimmer" />
-                  <div className="px-4 pt-3 pb-4 flex-1 flex flex-col gap-2">
-                    <div className="h-4 w-3/4 rounded-full skeleton-shimmer" />
-                    <div className="h-3 w-1/2 rounded-full skeleton-shimmer" />
-                    <div className="h-3 w-full rounded-full skeleton-shimmer" />
-                    <div className="h-3 w-16 rounded-full skeleton-shimmer mt-auto" />
-                  </div>
-                </div>
-              ) : (
-                <div key={i} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                  <div className="w-full aspect-square skeleton-shimmer" />
-                  <div className="px-4 pt-3 pb-4">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <div className="w-6 h-6 rounded-full skeleton-shimmer flex-shrink-0" />
-                      <div className="h-5 w-14 rounded-full skeleton-shimmer" />
-                    </div>
-                    <div className="h-4 w-1/2 rounded-full skeleton-shimmer mb-2" />
-                    <div className="h-3.5 w-full rounded-full skeleton-shimmer mb-1.5" />
-                    <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer mb-3" />
-                    <div className="h-3 w-24 rounded-full skeleton-shimmer" />
-                  </div>
-                </div>
-              )
-            )}
+            {Array.from({ length: viewMode === 'grid' ? 4 : 3 }).map((_, i) => (
+              <PostDetailCardSkeleton key={i} variant={viewMode === 'grid' ? 'grid' : 'card'} />
+            ))}
           </div>
         ) : filteredSongs.length === 0 ? (
           <EmptyGenreState
@@ -209,7 +182,6 @@ export function SongListScreen({
                   onPlay={() => onPlay(song)}
                   isPlaying={song.trackId === currentTrackId}
                   hideReactions={isSummaryMode}
-                  hideMoreButton={hideMoreButton}
                   onSelect={isSummaryMode ? () => handleSelectSummary(song) : undefined}
                   onSelectTrack={onSelectTrack}
                 />

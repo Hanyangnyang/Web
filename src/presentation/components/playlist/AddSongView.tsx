@@ -1,52 +1,16 @@
 import { Loader2, Play, Search, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
-import { GENRES } from './playlistTypes';
+import { GENRES, type TrackSummary } from './playlistTypes';
 import { type PlayableTrack } from './FloatingSpotifyPlayer';
+import { AlbumArtPlayButton } from './AlbumArtPlayButton';
+import { PLAYER_GAP_PX } from './AddSongFab';
+import { useAddSongDraft } from './useAddSongDraft';
 import { useSubmitSong, useSongCreationStatus } from '../../hooks/useRecentSongs.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { type HttpError } from '../../../infrastructure/http/HttpClient.js';
 
-interface SearchTrack {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-}
-
-// 뒤로가기 시 임시저장한 곡추천하기 초안 — 기기(브라우저)당 1개만 유지
-const DRAFT_STORAGE_KEY = 'hyu_add_song_draft_v1';
-
-interface AddSongDraft {
-  track: SearchTrack | null;
-  selectedGenres: string[];
-  comment: string;
-}
-
-function loadDraft(): AddSongDraft | null {
-  try {
-    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as AddSongDraft) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveDraft(draft: AddSongDraft) {
-  try {
-    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
-  } catch {
-    // 시크릿 모드 등 localStorage 접근 불가 시 임시저장은 부가 기능이라 조용히 무시
-  }
-}
-
-function clearDraft() {
-  try {
-    localStorage.removeItem(DRAFT_STORAGE_KEY);
-  } catch {
-    // 위와 동일
-  }
-}
+type SearchTrack = TrackSummary;
 
 const COMMENT_MAX_LENGTH = 200;
 const SEARCH_COOLDOWN_MS = 600;
@@ -109,27 +73,26 @@ interface AddSongViewProps {
   onPlay?: (track: PlayableTrack) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 선택한 곡과 같으면 재생 버튼을 숨김
   currentTrackId?: string | null;
+  // 게시글 모음 화면의 "이 곡 추천하러 가기" 버튼 등으로 특정 곡이 미리 정해진 채로 진입할 때 씀.
+  // 임시저장된 초안이 있으면 그걸 더 우선함(사용자가 쓰던 다른 곡 내용을 이걸로 덮어쓰지 않기 위해)
+  prefillTrack?: SearchTrack | null;
 }
 
-// 플레이어 카드 위 16px 간격을 두고 뜨도록 — AddSongFab과 동일한 값
-const PLAYER_GAP = 16;
 // 등록하기 버튼 자체의 높이(h-12)와, 그 위 마지막 섹션(곡에 대한 한마디)이 버튼에 가리지 않도록 두는 여유 간격
 const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
-export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
-  // 화면 진입 시 임시저장된 초안이 있으면 한 번만 불러와서 초기값으로 씀
-  const [initialDraft] = useState(() => loadDraft());
+export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId, prefillTrack }: AddSongViewProps) {
+  const { initialDraft, restoredToast: draftRestoredToast, saveDraft, clearDraft } = useAddSongDraft();
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchTrack[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(null);
   const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
-  const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(initialDraft?.track ?? null);
+  const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(initialDraft?.track ?? prefillTrack ?? null);
   const [selectedGenres, setSelectedGenres] = useState<string[]>(initialDraft?.selectedGenres ?? []);
   const [comment, setComment] = useState(initialDraft?.comment ?? '');
-  const [draftRestoredToast, setDraftRestoredToast] = useState(initialDraft ? '작성 중이던 내용을 불러왔어요' : '');
   const [submitToast, setSubmitToast] = useState('');
   const [submitInlineError, setSubmitInlineError] = useState<string | null>(null);
   const [showSubmitRetryPopup, setShowSubmitRetryPopup] = useState(false);
@@ -138,13 +101,6 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
   const submitSong = useSubmitSong();
   const { data: creationStatus } = useSongCreationStatus();
   const recentlyRecommendedTrackIds = new Set(creationStatus?.recentTrackIdsIn7Days ?? []);
-
-  useEffect(() => {
-    if (!draftRestoredToast) return;
-    const timer = setTimeout(() => setDraftRestoredToast(''), 2500);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 마운트 시 초안 복원 여부만 한 번 확인하면 됨
-  }, []);
 
   // 곡/장르/코멘트 중 하나라도 채워져 있으면 뒤로가기 시 확인 팝업을 거침
   const hasUnsavedContent = !!selectedTrack || selectedGenres.length > 0 || comment.trim().length > 0;
@@ -280,7 +236,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
   const registerButtonClearance = REGISTER_BUTTON_HEIGHT + REGISTER_BUTTON_CLEARANCE_GAP;
   const contentBottomPadding =
     playerHeight > 0
-      ? `calc(${playerHeight}px + ${PLAYER_GAP}px + ${registerButtonClearance}px + env(safe-area-inset-bottom))`
+      ? `calc(${playerHeight}px + ${PLAYER_GAP_PX}px + ${registerButtonClearance}px + env(safe-area-inset-bottom))`
       : `calc(24px + ${registerButtonClearance}px + env(safe-area-inset-bottom))`;
 
   return (
@@ -370,19 +326,10 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
                             alt={track.title}
                             className="w-full h-full object-cover"
                           />
-                          {onPlay && (
+                          {onPlay && track.trackId !== currentTrackId && (
                             // 앨범커버 전체가 아니라 눈에 보이는 원형 아이콘 크기만큼만 클릭 영역을 잡아서,
                             // 그 바깥(앨범커버 나머지 영역)을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onPlay(track);
-                              }}
-                              aria-label={`${track.title} 재생`}
-                              className="absolute inset-0 m-auto w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
-                            >
-                              <Play size={16} className="text-white" fill="white" />
-                            </button>
+                            <AlbumArtPlayButton onPlay={() => onPlay(track)} label={`${track.title} 재생`} />
                           )}
                         </div>
                         <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
@@ -499,7 +446,7 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
         style={{
           bottom:
             playerHeight > 0
-              ? `calc(${playerHeight}px + ${PLAYER_GAP}px + env(safe-area-inset-bottom))`
+              ? `calc(${playerHeight}px + ${PLAYER_GAP_PX}px + env(safe-area-inset-bottom))`
               : 'calc(24px + env(safe-area-inset-bottom))',
           transition: 'bottom 300ms ease-out',
         }}

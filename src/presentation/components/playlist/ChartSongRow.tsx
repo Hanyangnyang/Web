@@ -1,7 +1,6 @@
 import { Play, Share2 } from 'lucide-react';
-import { useState } from 'react';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
-import { SongShareModal } from './SongShareModal';
+import { useShareModal } from './useShareModal';
 
 interface ChartSongRowProps {
   track: ChartTrack;
@@ -12,8 +11,7 @@ interface ChartSongRowProps {
 }
 
 export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) {
-  const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [shareCopiedToast, setShareCopiedToast] = useState(false);
+  const share = useShareModal({ trackId: track.trackId, title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl });
 
   return (
     <div
@@ -62,7 +60,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) 
       <button
         onClick={(e) => {
           e.stopPropagation();
-          setShareModalOpen(true);
+          share.open();
         }}
         aria-label={`${track.title} 공유하기`}
         className="w-6 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
@@ -70,22 +68,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) 
         <Share2 size={16} strokeWidth={2} />
       </button>
 
-      {shareModalOpen && (
-        <SongShareModal
-          song={{ trackId: track.trackId, title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl }}
-          onClose={() => setShareModalOpen(false)}
-          onCopied={() => {
-            setShareCopiedToast(true);
-            setTimeout(() => setShareCopiedToast(false), 1800);
-          }}
-        />
-      )}
-
-      {shareCopiedToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-[200] whitespace-pre-line text-center copy-toast">
-          링크 복사됨!
-        </div>
-      )}
+      {share.node}
     </div>
   );
 }

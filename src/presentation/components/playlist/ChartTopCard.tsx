@@ -8,8 +8,8 @@ interface ChartTopCardProps {
   onShowPosts: (track: ChartTrack) => void;
 }
 
-// 인기차트 홈 미리보기 카드(최대 10위) — RecentSongCard와 동일한 카드 스타일(앨범아트 전체 배경 +
-// 우상단 재생 아이콘 + 하단 텍스트)에 거대 순위 숫자만 얹음
+// 인기차트 홈 미리보기 카드(최대 10위) — 앨범아트 전체 배경 + 우상단 재생 아이콘 + 하단 텍스트 위에
+// 거대 순위 숫자만 얹은 카드
 export function ChartTopCard({ track, onShowPosts }: ChartTopCardProps) {
   return (
     <div
@@ -32,7 +32,7 @@ export function ChartTopCard({ track, onShowPosts }: ChartTopCardProps) {
       {/* 가독성용 그라데이션 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
-      {/* 재생 아이콘 — RecentSongCard와 동일하게 클릭 동작 없는 장식용, 우측 상단 코너 고정 */}
+      {/* 재생 아이콘 — 클릭 동작 없는 장식용, 우측 상단 코너 고정 */}
       <div className="absolute top-2 right-2 z-10 pointer-events-none">
         <Play size={24} className="ml-0.5" fill="white" stroke="white" strokeWidth={1} />
       </div>

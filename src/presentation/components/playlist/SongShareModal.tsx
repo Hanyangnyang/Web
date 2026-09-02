@@ -2,6 +2,7 @@ import { Share2, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { loadKakaoSdk } from '../../../lib/kakaoShare.js';
 import { initSentry } from '../../../lib/sentry.js';
+import { type TrackSummary } from './playlistTypes';
 
 declare global {
   interface Window {
@@ -24,12 +25,7 @@ const KakaoIcon = () => (
   </svg>
 );
 
-export interface SongShareModalSong {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-}
+export type SongShareModalSong = TrackSummary;
 
 interface SongShareModalProps {
   song: SongShareModalSong;

@@ -1,8 +1,11 @@
-import { ArrowRight, Play, Search } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
-import { type Song } from './playlistTypes';
+import { type Song, type TrackSummary } from './playlistTypes';
 import { useSongSearch } from '../../hooks/useRecentSongs.js';
+import { RecentSongRow } from './RecentSongRow';
+import { PlaylistSearchBar } from './PlaylistSearchBar';
+import { AlbumArtPlayButton } from './AlbumArtPlayButton';
 
 interface SearchResultsViewProps {
   query: string;
@@ -15,12 +18,7 @@ interface SearchResultsViewProps {
   currentTrackId?: string | null;
 }
 
-export interface TrackResult {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-}
+export type TrackResult = TrackSummary;
 
 const MIN_QUERY_LENGTH = 2;
 
@@ -88,47 +86,33 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         <MiscSubViewHeader
           title="검색 결과"
           emoji="🔍"
-          subtitle={`"${activeQuery}"`}
+          subtitle={`"${activeQuery}"에 대한 검색 결과`}
           onBack={onBack}
         />
       </div>
 
-      {/* 검색바: 검색어를 수정하고 Enter나 화살표 버튼을 누르면 이 화면 안에서 재검색. 홈 검색바와 동일한 브랜드 블루 톤 + 아이콘 배지 스타일 */}
-      <div className="mt-4 mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-[#618CE9]/[0.06] border border-[#618CE9]/20 rounded-full focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
-        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#618CE9]/15 flex items-center justify-center">
-          <Search size={15} className="text-[#618CE9]" />
-        </span>
-        <input
-          type="text"
-          value={localQuery}
-          onChange={(e) => setLocalQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleResearch();
-          }}
-          placeholder="곡 제목이나 아티스트로 검색해보세요"
-          className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
-        />
-        <button
-          onClick={handleResearch}
-          disabled={!localQuery.trim()}
-          aria-label="검색"
-          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#618CE9] text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
-        >
-          <ArrowRight size={14} />
-        </button>
-      </div>
+      {/* 검색바: 검색어를 수정하고 Enter나 화살표 버튼을 누르면 이 화면 안에서 재검색 */}
+      <PlaylistSearchBar
+        value={localQuery}
+        onChange={setLocalQuery}
+        onSubmit={handleResearch}
+        placeholder="곡 제목이나 아티스트로 검색해보세요"
+        className="mt-4 mb-4"
+      />
 
       {/* 1. Spotify 곡 검색 결과 — 가로 스크롤 */}
-      <section className="mb-5">
+      <section className="mb-3">
         <h3 className="text-lg font-bold text-text-main mb-2">곡</h3>
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
             {isSearching ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-28">
-                  <div className="w-28 aspect-square rounded-lg bg-slate-200 animate-pulse" />
-                  <div className="mt-1.5 h-3.5 w-20 rounded-full bg-slate-200 animate-pulse" />
-                  <div className="mt-1.5 h-3 w-14 rounded-full bg-slate-200 animate-pulse" />
+                <div key={i} className="flex-shrink-0 w-36 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  <div className="w-full aspect-square bg-slate-200 animate-pulse" />
+                  <div className="px-2 py-1.5">
+                    <div className="h-3.5 w-24 rounded-full bg-slate-200 animate-pulse" />
+                    <div className="mt-1.5 h-3 w-16 rounded-full bg-slate-200 animate-pulse" />
+                  </div>
                 </div>
               ))
             ) : searchError ? (
@@ -146,31 +130,29 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                     if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
                   }}
                   aria-label={`${track.title} 추천 게시글 보기`}
-                  className="flex-shrink-0 w-28 text-left active:scale-95 transition-transform cursor-pointer"
+                  // 앨범커버 좌우 모서리를 그대로 내려그은 것처럼, 카드 전체를 앨범커버 폭에 맞춰 테두리로 감쌈
+                  className="flex-shrink-0 w-36 text-left rounded-xl border border-slate-200 bg-white overflow-hidden active:scale-95 transition-transform cursor-pointer"
                 >
                   <div className="relative">
                     <img
                       src={track.albumArtUrl}
                       alt={track.title}
-                      className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
+                      className="w-full aspect-square object-cover bg-slate-100"
                     />
                     {track.trackId !== currentTrackId && (
                       // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원만큼만 잡아서,
                       // 그 바깥을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPlay(track);
-                        }}
-                        aria-label={`${track.title} 재생`}
-                        className="absolute inset-0 m-auto w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-95 transition-transform"
-                      >
-                        <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
-                      </button>
+                      <AlbumArtPlayButton onPlay={() => onPlay(track)} label={`${track.title} 재생`} />
                     )}
                   </div>
-                  <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
-                  <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                  <div className="px-2 py-1.5 flex items-center gap-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
+                      <div className="text-xs text-text-sub truncate">{track.artist}</div>
+                    </div>
+                    {/* 곡명/가수명 옆 빈 공간에 카드를 누르면 게시글 모음으로 넘어간다는 걸 알려주는 화살표 */}
+                    <ChevronRight size={14} className="text-text-hint flex-shrink-0" strokeWidth={2.5} />
+                  </div>
                 </div>
               ))
             )}
@@ -179,16 +161,16 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         </div>
       </section>
 
-      <div className="border-t border-slate-200 mb-5" />
+      <div className="border-t border-slate-200 mb-3" />
 
       {/* 2. 우리 서비스에 등록된 게시글 — 세로 스크롤 */}
       <section>
         <h3 className="text-lg font-bold text-text-main mb-2">게시글</h3>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           {isSearchingPosts ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-3 bg-white rounded-card border border-slate-200">
-                <div className="w-14 h-14 rounded-lg bg-slate-200 animate-pulse flex-shrink-0" />
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
+                <div className="w-12 h-12 rounded bg-slate-200 animate-pulse flex-shrink-0" />
                 <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="h-3.5 w-2/3 rounded-full bg-slate-200 animate-pulse" />
                   <div className="h-3 w-1/3 rounded-full bg-slate-200 animate-pulse" />
@@ -201,28 +183,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
           ) : (
             postResults.map((post) => (
-              <div
-                key={post.id ?? post.trackId}
-                role="button"
-                tabIndex={0}
-                onClick={() => onSelectPost(post)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') onSelectPost(post);
-                }}
-                aria-label="게시글 상세 보기"
-                className="flex items-center gap-3 px-3 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
-              >
-                <img
-                  src={post.albumArtUrl}
-                  alt={post.title}
-                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-slate-100"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-text-main truncate">{post.title}</div>
-                  <div className="text-xs text-text-sub truncate">{post.artist}</div>
-                  <p className="mt-1 text-xs text-text-sub line-clamp-2">{post.comment}</p>
-                </div>
-              </div>
+              <RecentSongRow key={post.id ?? post.trackId} song={post} onSelect={onSelectPost} />
             ))
           )}
         </div>

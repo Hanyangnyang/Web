@@ -1,6 +1,7 @@
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { ChartSongRow } from './ChartSongRow';
-import { EmptyChartState } from './EmptyChartState';
+import { EmptyGenreState } from './EmptyGenreState';
+import { ChartPeriodChips } from './ChartPeriodChips';
 import { type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 
@@ -26,22 +27,7 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
         onBack={onBack}
       />
 
-      {/* 기간 필터 칩 — 멜론 차트 탭(TOP100/HOT100)처럼 알약형으로 크게 */}
-      <div className="flex gap-2 mb-2 pl-2">
-        {CHART_PERIOD_OPTIONS.map((option) => (
-          <button
-            key={option.key}
-            onClick={() => onChangePeriod(option.key)}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
-              chartPeriod === option.key
-                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
-                : 'bg-white text-[#618CE9] border-[#618CE9]'
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
+      <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="pl-2" />
 
       {/* 차트 리스트 */}
       <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
@@ -59,9 +45,11 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
         {isLoading ? (
           <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
         ) : chart.length === 0 ? (
-          <EmptyChartState
-            periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
-            onShowRecent={onShowRecent}
+          <EmptyGenreState
+            message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
+            buttonLabel="최근 추가된 곡 보러가기"
+            buttonIcon={<span>🎵</span>}
+            onAction={onShowRecent}
           />
         ) : (
           chart.map((track) => (
