@@ -10,15 +10,21 @@ const VALID_TABS = ['cafe', 'shuttle', 'portal', 'partner', 'misc'];
 // chip 파라미터에 오타/미지원 값이 오면 걸러서 CampusMapView에 잘못된 칩 상태가 전달되는 걸 막는다
 const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food', 'cafe', 'pub', 'play', 'life'];
 
+// 기타탭(MiscView)이 실제로 진입 가능한 하위 화면 값 목록 — clickUrl의 box 파라미터에
+// 오타/미지원 값이 오면 걸러서 MiscView에 잘못된 서브뷰 상태가 전달되는 걸 막는다.
+// 'calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외
+const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist'];
+
 interface BannerCarouselProps {
   banners: Banner[];
   loading: boolean;
   error?: Error | null;
   // 소식 탭이 비활성(다른 탭 표시 중)일 때 자동 슬라이드 타이머를 멈추기 위해 씀
   isActive?: boolean;
-  // 배너가 앱 내부 탭(예: 캠퍼스맵)으로 이동하는 링크일 때 새 창을 열지 않고 바로 탭을 전환하기 위해 씀.
-  // clickUrl에 chip 파라미터(예: ?tab=partner&chip=openspace)가 있으면 그 탭 안의 특정 칩까지 지정한다
-  onNavigateToTab?: (tab: string, chip?: string) => void;
+  // 배너가 앱 내부 탭(예: 캠퍼스맵/기타탭)으로 이동하는 링크일 때 새 창을 열지 않고 바로 탭을 전환하기 위해 씀.
+  // clickUrl에 chip 파라미터(예: ?tab=partner&chip=openspace)가 있으면 캠퍼스맵의 특정 칩까지,
+  // box 파라미터(예: ?tab=misc&box=gym)가 있으면 기타탭의 특정 서브뷰까지 지정한다
+  onNavigateToTab?: (tab: string, chip?: string, box?: string) => void;
 }
 
 export function BannerCarousel({ banners, loading, isActive = true, onNavigateToTab }: BannerCarouselProps) {
@@ -149,7 +155,12 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
       const tab = url.searchParams.get('tab');
       if (onNavigateToTab && tab && VALID_TABS.includes(tab) && url.origin === window.location.origin) {
         const chip = url.searchParams.get('chip');
-        onNavigateToTab(tab, chip && VALID_MAP_CHIPS.includes(chip) ? chip : undefined);
+        const box = url.searchParams.get('box');
+        onNavigateToTab(
+          tab,
+          chip && VALID_MAP_CHIPS.includes(chip) ? chip : undefined,
+          box && VALID_MISC_BOXES.includes(box) ? box : undefined
+        );
         return;
       }
     } catch {

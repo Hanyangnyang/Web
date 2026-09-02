@@ -83,6 +83,8 @@ function MainLayout() {
   const [miscResetSignal, setMiscResetSignal] = useState(0);
   // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
   const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
+  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
+  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(null);
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const { isOnline } = useNetwork();
   const posthog = usePostHog();
@@ -189,14 +191,16 @@ function MainLayout() {
     return () => { handle?.remove(); };
   }, [isApp, routeFromParams]);
 
-  // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정하고 싶을 때만 넘어온다.
-  // 이미 캠퍼스맵 탭에 있는 상태에서 다시 눌러도 칩은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
-  const handleTabChange = useCallback((tab: string, chip?: string) => {
+  // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지, box는 기타탭의
+  // 특정 서브뷰(예: 헬스장)까지 지정하고 싶을 때만 넘어온다.
+  // 이미 그 탭에 있는 상태에서 다시 눌러도 값은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
+  const handleTabChange = useCallback((tab: string, chip?: string, box?: string) => {
     if (chip && tab === 'partner') setPendingMapChip(chip);
+    if (box && tab === 'misc') setPendingMiscBox(box);
 
-    // 1. 같은 탭 재클릭 처리
+    // 1. 같은 탭 재클릭 처리 — box로 특정 서브뷰를 지정한 딥링크라면 그리드로 리셋하지 않고 그 서브뷰로 바로 이동
     if (tab === activeTab) {
-      if (tab === 'misc') setMiscResetSignal(s => s + 1);
+      if (tab === 'misc' && !box) setMiscResetSignal(s => s + 1);
       return;
     }
 
@@ -264,7 +268,12 @@ function MainLayout() {
             <PortalView isActive={activeTab === 'portal'} onNavigateToTab={handleTabChange} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
-            <MiscView resetSignal={miscResetSignal} isActive={activeTab === 'misc'} />
+            <MiscView
+              resetSignal={miscResetSignal}
+              isActive={activeTab === 'misc'}
+              deepLinkBox={pendingMiscBox}
+              onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
+            />
           </div>
           {/* 지도는 px-4 패딩을 -mx-4로 상쇄해 전체 폭을 사용 */}
           <div className="-mx-4 h-full" style={{ display: activeTab === 'partner' ? 'block' : 'none' }}>
