@@ -14,10 +14,12 @@ import {
   toggleReactionUseCase,
   getTrackPostsUseCase,
   getPopularityChartUseCase,
+  searchMusicTracksUseCase,
 } from '../../di.js';
 import { getOrCreateAnonymousUserId } from '../../lib/supabase.js';
-import { mapPlaylistSongToSong, type Song, type PlaylistReaction, type ChartPeriod } from '../components/playlist/playlistTypes.js';
+import { mapPlaylistSongToSong, type Song, type PlaylistReaction, type ChartPeriod, type TrackSummary } from '../components/playlist/playlistTypes.js';
 import type { ChartType } from '../../domain/repositories/IPlaylistRepository.js';
+import type { MusicSearchRateLimitError } from '../../domain/entities/MusicSearchTrack.js';
 
 const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
 const RECENT_SONGS_SIZE = 50;
@@ -34,7 +36,7 @@ export function useRecentSongs() {
   });
 }
 
-// 게시글 단건 상세 조회 — 게시글 목록(TrackPostCollectionView 등)에서 하나를 눌러 상세화면(PostDetailView)으로 이동할 때 사용.
+// 게시글 단건 상세 조회 — 게시글 목록(TrackPostCollectionView 등)에서 하나를 눌러 상세화면(PostView)으로 이동할 때 사용.
 // postId가 없으면(딥링크 대상이 아직 없는 화면 등) 호출하지 않음
 export function usePostDetail(postId: string | null) {
   return useQuery({
@@ -92,7 +94,7 @@ export function useMySongs() {
 }
 
 const SONG_SEARCH_SIZE = 20;
-// SearchResultsView의 곡(Spotify) 검색과 동일한 최소 글자 수 — 이보다 짧으면 호출하지 않음
+// useMusicSearch(Spotify 곡 검색)와 공유하는 최소 글자 수 — 이보다 짧으면 호출하지 않음
 const SONG_SEARCH_MIN_LENGTH = 2;
 
 // 검색 결과 화면의 "게시글" 섹션 — 제목/가수명/코멘트 가중치 통합 검색
@@ -108,6 +110,25 @@ export function useSongSearch(keyword: string) {
     },
     enabled: trimmed.length >= SONG_SEARCH_MIN_LENGTH,
     staleTime: 0,
+  });
+}
+
+// Spotify 검색 결과는 잠깐 사이에 잘 안 바뀌니, 같은 검색어를 다시 눌러도(예: 곡추천하기에서
+// 검색 버튼 연타) 이 시간 안엔 네트워크를 다시 안 태우고 캐시를 그대로 씀
+const MUSIC_SEARCH_STALE_TIME_MS = 30 * 1000;
+
+// 곡추천하기/검색결과 화면의 곡(Spotify) 검색 — 429(요청 제한) 등 실패 시 자체 백오프 UX(버튼 비활성화)를
+// 호출부가 직접 만들므로, react-query의 기본 자동 재시도(defaultOptions.queries.retry: 2)는 꺼둠
+export function useMusicSearch(query: string) {
+  // 연속 공백은 한 칸으로 접어서, 같은 의미의 검색어가 다른 캐시 키로 흩어지는 걸 막음
+  const trimmed = query.trim().replace(/\s+/g, ' ');
+
+  return useQuery<TrackSummary[], MusicSearchRateLimitError>({
+    queryKey: ['playlist', 'music-search', trimmed],
+    queryFn: () => searchMusicTracksUseCase.execute(trimmed),
+    enabled: trimmed.length >= SONG_SEARCH_MIN_LENGTH,
+    staleTime: MUSIC_SEARCH_STALE_TIME_MS,
+    retry: false,
   });
 }
 

@@ -1,41 +1,31 @@
-import { ChevronRight, User } from 'lucide-react';
 import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
-import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlayer';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './AddSongFab';
-import { AddSongView } from './AddSongView';
+import { RecommendSongView } from './RecommendSongView';
 import { RecentSongsView } from './RecentSongsView';
 import { SearchResultsView, type TrackResult } from './SearchResultsView';
 import { TrackPostCollectionView } from './TrackPostCollectionView';
-import { PostDetailView } from './PostDetailView';
-import { MyActivityView } from './MyActivityView';
+import { PostView } from './PostView';
+import { MyPageView } from './MyPageView';
 import { BookmarkedSongsView } from './BookmarkedSongsView';
 import { MySongsView } from './MySongsView';
-import { ChartTopCard } from './ChartTopCard';
-import { RecentSongRow } from './RecentSongRow';
-import { EmptyGenreState } from './EmptyGenreState';
-import { ChartPeriodChips } from './ChartPeriodChips';
-import { PlaylistSearchBar } from './PlaylistSearchBar';
-import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
+import { PlaylistHomeView } from './PlaylistHomeView';
+import { type Song, type ChartPeriod } from './playlistTypes';
 import { ChartView } from './ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs, useRecordTrackPlay, usePopularityChart } from '../../hooks/useRecentSongs.js';
 
 const RECENT_SONGS_LIMIT = 7;
-// 홈 화면 인기차트 미리보기는 TOP10/WEEK10/MONTH10 라벨에 맞춰 최대 10개를 3열 카드 그리드로,
-// 세로 스크롤로 보여줌 (전체 목록은 인기차트 전체보기에서)
 const CHART_PREVIEW_LIMIT = 10;
-// 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
-const TRACK_PLAY_THROTTLE_MS = 10 * 1000;
+const TRACK_PLAY_THROTTLE_MS = 10 * 1000; // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
 
 interface PlaylistViewProps {
   onBack: () => void;
-  // 카카오 공유 등 딥링크로 특정 곡의 게시글 모음까지 지정해 진입시킬 때 App.tsx가 한 번만 내려줌
   deepLinkTrackId?: string | null;
   onDeepLinkTrackIdHandled?: () => void;
 }
@@ -44,8 +34,6 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const isApp = isNativeApp();
   const platform = getPlatform();
   const [searchQuery, setSearchQuery] = useState('');
-  // 최근추가된곡은 /api/v1/playlist/songs에서 받아온 뒤 로컬 state로 옮겨 관리 —
-  // 곡 등록 API가 아직 없어서, 등록 직후엔 서버 재조회 없이 로컬로만 맨 앞에 얹기 때문
   const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const [songs, setSongs] = useState<Song[]>([]);
   useEffect(() => {
@@ -72,12 +60,11 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     recordTrackPlay.mutate(track.trackId);
   }, [recordTrackPlay.mutate]);
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
-  // 하단 화면들의 여백(--playlist-bottom-space)과 AddSongFab 위치 계산에 함께 쓰임.
   const [playerHeight, setPlayerHeight] = useState(0);
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
   // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostCollectionView(곡 단위 게시글 모음)로 이동
   const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
-  // 게시글 목록에서 눌러 선택된 게시글 id — 값이 있으면 PostDetailView가 GET /api/v1/playlist/songs/{id}로 상세 조회
+  // 게시글 목록에서 눌러 선택된 게시글 id — 값이 있으면 PostView가 GET /api/v1/playlist/songs/{id}로 상세 조회
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
   const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
@@ -91,7 +78,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
   // "어떤 곡을 추천해볼까요?" 클릭 시 검색 결과 화면(빈 검색어라 보여줄 게 없음) 대신
-  // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistMainContent가 마운트될 때 한 번 소비
+  // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistHomeView가 마운트될 때 한 번 소비
   const [autoFocusSearch, setAutoFocusSearch] = useState(false);
 
   // PlaylistView 자체는 최근추가된곡 화면을 드나들어도 마운트가 유지돼서, react-query의
@@ -192,7 +179,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     pushScreen('trackPosts');
   }, [pushScreen]);
 
-  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostDetailView로 이동
+  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostView로 이동
   const handleSelectPost = useCallback((post: Song) => {
     setSelectedPostId(post.id ?? null);
     pushScreen('postDetail');
@@ -256,7 +243,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onViewModeChange={setRecentViewMode}
           />
         ) : screen === 'addSong' ? (
-          <AddSongView
+          <RecommendSongView
             onBack={popScreen}
             onSubmitSuccess={handleAddSongSuccess}
             playerHeight={playerHeight}
@@ -283,7 +270,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onRecommendTrack={pushAddSong}
           />
         ) : screen === 'postDetail' && selectedPostId ? (
-          <PostDetailView
+          <PostView
             postId={selectedPostId}
             onBack={popScreen}
             onPlay={handlePlay}
@@ -302,7 +289,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowPosts={handleSelectChartSong}
           />
         ) : screen === 'myActivity' ? (
-          <MyActivityView
+          <MyPageView
             onBack={popScreen}
             onShowBookmarked={() => pushScreen('bookmarked')}
             onShowMySongs={() => pushScreen('mySongs')}
@@ -329,7 +316,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onViewModeChange={setMySongsViewMode}
           />
         ) : (
-          <PlaylistMainContent
+          <PlaylistHomeView
             onBack={onBack}
             visibleSongs={visibleSongs}
             isRecentSongsLoading={isRecentSongsLoading}
@@ -345,6 +332,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowAllChart={() => pushScreen('chart')}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
+            onShowAddSong={() => pushAddSong()}
             autoFocusSearch={autoFocusSearch}
             onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
           />
@@ -362,189 +350,6 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
         onClose={() => setCurrentTrack(null)}
         onHeightChange={handlePlayerHeightChange}
       />
-    </div>
-  );
-}
-
-interface PlaylistMainContentProps {
-  onBack: () => void;
-  visibleSongs: Song[];
-  isRecentSongsLoading: boolean;
-  visibleChart: ChartTrack[];
-  isChartLoading: boolean;
-  chartPeriod: ChartPeriod;
-  onChangeChartPeriod: (period: ChartPeriod) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  onSubmitSearch: () => void;
-  onShowAllRecent: () => void;
-  onSelectRecentSong: (song: Song) => void;
-  onShowAllChart: () => void;
-  onShowPosts: (track: ChartTrack) => void;
-  onShowMyActivity: () => void;
-  // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
-  autoFocusSearch?: boolean;
-  onAutoFocusSearchConsumed?: () => void;
-}
-
-function PlaylistMainContent({
-  onBack,
-  visibleSongs,
-  isRecentSongsLoading,
-  visibleChart,
-  isChartLoading,
-  chartPeriod,
-  onChangeChartPeriod,
-  searchQuery,
-  setSearchQuery,
-  onSubmitSearch,
-  onShowAllRecent,
-  onSelectRecentSong,
-  onShowAllChart,
-  onShowPosts,
-  onShowMyActivity,
-  autoFocusSearch = false,
-  onAutoFocusSearchConsumed,
-}: PlaylistMainContentProps) {
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!autoFocusSearch) return;
-    searchInputRef.current?.focus();
-    onAutoFocusSearchConsumed?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
-      <MiscSubViewHeader
-        title="에리카 플레이리스트"
-        emoji="🕺"
-        subtitle="에리카생들의 추천곡을 들어보고, 나도 추천해봐요!"
-        onBack={onBack}
-        rightAction={
-          <button
-            onClick={onShowMyActivity}
-            aria-label="내 활동 보기"
-            className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
-          >
-            <User size={16} strokeWidth={2} />
-          </button>
-        }
-      />
-
-      {/* 검색바: Enter 또는 오른쪽 화살표를 누르면 검색 결과 화면으로 이동 */}
-      <PlaylistSearchBar
-        ref={searchInputRef}
-        value={searchQuery}
-        onChange={setSearchQuery}
-        onSubmit={onSubmitSearch}
-        placeholder="듣고 싶은 곡을 검색해보세요!"
-      />
-
-      {/* 인기차트 섹션 — 최대 10위까지 큰 카드를 가로 스크롤로 노출 */}
-      <section className="mb-4">
-        <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">인기차트</h3>
-          <button
-            onClick={onShowAllChart}
-            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
-            aria-label="인기차트 전체보기"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-
-        <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangeChartPeriod} />
-
-        {/* 카드 가로 스크롤 — 최대 10개 */}
-        {isChartLoading ? (
-          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="flex gap-2 pb-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-32 aspect-[27/50] rounded-xl bg-slate-200 animate-pulse" />
-              ))}
-            </div>
-          </div>
-        ) : visibleChart.length === 0 ? (
-          <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
-            <EmptyGenreState
-              message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
-              buttonLabel="최근 추가된 곡 보러가기"
-              buttonIcon={<span>🎵</span>}
-              onAction={onShowAllRecent}
-            />
-          </div>
-        ) : (
-          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="flex gap-2 pb-2">
-              {visibleChart.map((track) => (
-                <ChartTopCard
-                  key={track.trackId}
-                  track={track}
-                  onShowPosts={onShowPosts}
-                />
-              ))}
-              <div className="w-1 flex-shrink-0" aria-hidden="true" />
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* 최근 추가된 곡 섹션 */}
-      <section>
-        <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
-          <button
-            onClick={onShowAllRecent}
-            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
-            aria-label="최근 추가된 곡 전체보기"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-
-        {/* 각 행이 개별 게시글이라는 걸 드러내려고 하나의 표가 아니라 카드마다 살짝 떨어뜨려 배치 */}
-        {isRecentSongsLoading ? (
-          <div className="flex flex-col gap-1.5">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
-                <div className="w-12 h-12 rounded bg-slate-200 animate-pulse flex-shrink-0" />
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="h-3.5 w-2/3 rounded-full bg-slate-200 animate-pulse" />
-                  <div className="h-3 w-1/3 rounded-full bg-slate-200 animate-pulse" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : visibleSongs.length === 0 ? (
-          <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
-            <p className="text-xs text-text-hint text-center py-10">아직 추가된 곡이 없어요</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-1.5">
-            {visibleSongs.map((song) => (
-              <RecentSongRow
-                key={song.id ?? song.trackId}
-                song={song}
-                onSelect={onSelectRecentSong}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* 더보기 — 최근 추가된 곡 전체보기로 이동 */}
-        {!isRecentSongsLoading && visibleSongs.length > 0 && (
-          <div className="flex justify-center mt-3">
-            <button
-              onClick={onShowAllRecent}
-              className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
-            >
-              더보기
-            </button>
-          </div>
-        )}
-      </section>
     </div>
   );
 }

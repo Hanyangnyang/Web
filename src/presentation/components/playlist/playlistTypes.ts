@@ -3,7 +3,7 @@ import { type ReactionKey } from './postReactions';
 
 export type { PlaylistReaction };
 
-// 곡 하나를 식별하는 데 필요한 최소 정보 — TrackResult(SearchResultsView)/SearchTrack(AddSongView)/
+// 곡 하나를 식별하는 데 필요한 최소 정보 — TrackResult(SearchResultsView)/SearchTrack(RecommendSongView)/
 // PlayableTrack(FloatingSpotifyPlayer)/SongShareModalSong(SongShareModal)이 전부 이 모양과 동일해서,
 // 각 파일에서 이 타입의 별칭으로 재정의해 씀(기존 import 경로는 그대로 유지)
 export interface TrackSummary {
@@ -11,6 +11,22 @@ export interface TrackSummary {
   title: string;
   artist: string;
   albumArtUrl: string;
+}
+
+// RecentSongsView/BookmarkedSongsView/MySongsView(전부 SongListScreen 위에 얇게 얹힌 화면들)가
+// 공통으로 받는 prop — 각 화면은 이걸 extends하고 자기만의 prop(데이터 소스, 빈 상태 문구 등)만 추가
+export interface SongListViewBaseProps {
+  onBack: () => void;
+  onPlay: (song: Song) => void;
+  onShowAddSong: () => void;
+  // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
+  onSelectTrack?: (track: TrackSummary) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡
+  currentTrackId?: string | null;
+  // 뷰 모드(그리드/리스트)를 상위(PlaylistView)에서 제어 — 게시글 상세로 갔다가 뒤로가기로 돌아와도
+  // 마지막으로 보던 모드가 유지되게 하기 위함
+  viewMode?: 'grid' | 'list';
+  onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
 
 export interface Song {

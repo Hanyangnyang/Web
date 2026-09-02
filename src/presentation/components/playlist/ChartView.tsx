@@ -41,9 +41,20 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
           </div>
         </div>
 
-        {/* 리스트 */}
+        {/* 리스트 — 로딩 중엔 ChartSongRow와 동일한 레이아웃(순위/앨범아트/곡정보/듣기/공유)의 스켈레톤을 보여줌 */}
         {isLoading ? (
-          <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
+          Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-3 py-2.5 border-b border-slate-200">
+              <div className="w-7 h-4 rounded-full skeleton-shimmer flex-shrink-0" />
+              <div className="w-12 h-12 rounded skeleton-shimmer flex-shrink-0" />
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer" />
+                <div className="h-3 w-1/3 rounded-full skeleton-shimmer" />
+              </div>
+              <div className="w-5 h-5 rounded-full skeleton-shimmer flex-shrink-0" />
+              <div className="w-5 h-5 rounded-full skeleton-shimmer flex-shrink-0" />
+            </div>
+          ))
         ) : chart.length === 0 ? (
           <EmptyGenreState
             message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}

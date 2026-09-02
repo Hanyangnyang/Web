@@ -1,11 +1,12 @@
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from './playlistTypes';
-import { useSongSearch } from '../../hooks/useRecentSongs.js';
+import { useSongSearch, useMusicSearch } from '../../hooks/useRecentSongs.js';
 import { RecentSongRow } from './RecentSongRow';
 import { PlaylistSearchBar } from './PlaylistSearchBar';
 import { AlbumArtPlayButton } from './AlbumArtPlayButton';
+import { EmptyMessageCard } from './EmptyMessageCard';
 
 interface SearchResultsViewProps {
   query: string;
@@ -29,9 +30,9 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
   const [activeQuery, setActiveQuery] = useState(query);
   const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(activeQuery);
   const [localQuery, setLocalQuery] = useState(query);
-  const [trackResults, setTrackResults] = useState<TrackResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
+  const { data: trackResultsData, isFetching: isSearching, error: musicSearchError } = useMusicSearch(activeQuery);
+  const trackResults: TrackResult[] = trackResultsData ?? [];
+  const searchError = musicSearchError?.message ?? null;
 
   // 검색바에서 Enter를 치거나 화살표 버튼을 누르면 재검색
   const handleResearch = () => {
@@ -39,45 +40,6 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
     if (!trimmed) return;
     setActiveQuery(trimmed);
   };
-
-  useEffect(() => {
-    const trimmed = activeQuery.trim();
-    if (trimmed.length < MIN_QUERY_LENGTH) {
-      setTrackResults([]);
-      setSearchError(null);
-      return;
-    }
-
-    let cancelled = false;
-    setIsSearching(true);
-    setSearchError(null);
-
-    fetch(`/api/music-search?q=${encodeURIComponent(trimmed)}`)
-      .then(async (response) => {
-        if (!response.ok) {
-          const body = await response.json().catch(() => null);
-          throw new Error(body?.error || '검색 중 문제가 생겼어요. 다시 시도해주세요.');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (cancelled) return;
-        setTrackResults((data.tracks ?? []) as TrackResult[]);
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        console.error('[SearchResultsView] 곡 검색 실패:', error);
-        setTrackResults([]);
-        setSearchError(error instanceof Error ? error.message : '검색 중 문제가 생겼어요. 다시 시도해주세요.');
-      })
-      .finally(() => {
-        if (!cancelled) setIsSearching(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activeQuery]);
 
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
@@ -108,17 +70,17 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             {isSearching ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex-shrink-0 w-36 rounded-xl border border-slate-200 bg-white overflow-hidden">
-                  <div className="w-full aspect-square bg-slate-200 animate-pulse" />
+                  <div className="w-full aspect-square skeleton-shimmer" />
                   <div className="px-2 py-1.5">
-                    <div className="h-3.5 w-24 rounded-full bg-slate-200 animate-pulse" />
-                    <div className="mt-1.5 h-3 w-16 rounded-full bg-slate-200 animate-pulse" />
+                    <div className="h-3.5 w-24 rounded-full skeleton-shimmer" />
+                    <div className="mt-1.5 h-3 w-16 rounded-full skeleton-shimmer" />
                   </div>
                 </div>
               ))
             ) : searchError ? (
-              <p className="text-xs text-text-hint py-2">{searchError}</p>
+              <EmptyMessageCard message={searchError} />
             ) : trackResults.length === 0 ? (
-              <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
+              <EmptyMessageCard message="검색 결과가 없어요" />
             ) : (
               trackResults.map((track) => (
                 <div
@@ -170,17 +132,17 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
           {isSearchingPosts ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
-                <div className="w-12 h-12 rounded bg-slate-200 animate-pulse flex-shrink-0" />
+                <div className="w-12 h-12 rounded skeleton-shimmer flex-shrink-0" />
                 <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="h-3.5 w-2/3 rounded-full bg-slate-200 animate-pulse" />
-                  <div className="h-3 w-1/3 rounded-full bg-slate-200 animate-pulse" />
+                  <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer" />
+                  <div className="h-3 w-1/3 rounded-full skeleton-shimmer" />
                 </div>
               </div>
             ))
           ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
-            <p className="text-xs text-text-hint py-2">최소 {MIN_QUERY_LENGTH}자 이상 입력해주세요!</p>
+            <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
           ) : !postResults || postResults.length === 0 ? (
-            <p className="text-xs text-text-hint py-2">검색 결과가 없어요</p>
+            <EmptyMessageCard message="검색 결과가 없어요" />
           ) : (
             postResults.map((post) => (
               <RecentSongRow key={post.id ?? post.trackId} song={post} onSelect={onSelectPost} />

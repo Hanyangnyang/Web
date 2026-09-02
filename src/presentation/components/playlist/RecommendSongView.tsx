@@ -1,12 +1,12 @@
 import { Loader2, Play, Search, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { GENRES, type TrackSummary } from './playlistTypes';
 import { type PlayableTrack } from './FloatingSpotifyPlayer';
 import { AlbumArtPlayButton } from './AlbumArtPlayButton';
 import { PLAYER_GAP_PX } from './AddSongFab';
 import { useAddSongDraft } from './useAddSongDraft';
-import { useSubmitSong, useSongCreationStatus } from '../../hooks/useRecentSongs.js';
+import { useSubmitSong, useSongCreationStatus, useMusicSearch } from '../../hooks/useRecentSongs.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { type HttpError } from '../../../infrastructure/http/HttpClient.js';
 
@@ -32,38 +32,7 @@ const INLINE_ERROR_MESSAGES: Record<string, string> = {
 };
 const RETRY_ERROR_CODE = 'C004';
 
-function normalizeQuery(query: string): string {
-  return query.trim().replace(/\s+/g, ' ');
-}
-
-class SearchApiError extends Error {
-  status: number;
-  retryAfterSeconds?: number;
-
-  constructor(message: string, status: number, retryAfterSeconds?: number) {
-    super(message);
-    this.status = status;
-    this.retryAfterSeconds = retryAfterSeconds;
-  }
-}
-
-async function searchTracks(query: string): Promise<SearchTrack[]> {
-  const normalized = normalizeQuery(query);
-  const response = await fetch(`/api/music-search?q=${encodeURIComponent(normalized)}`);
-  if (!response.ok) {
-    const body = await response.json().catch(() => null);
-    const retryAfterHeader = response.headers.get('Retry-After');
-    throw new SearchApiError(
-      body?.error || '검색 중 문제가 생겼어요. 다시 시도해주세요.',
-      response.status,
-      retryAfterHeader ? Number(retryAfterHeader) : undefined
-    );
-  }
-  const data = await response.json();
-  return data.tracks as SearchTrack[];
-}
-
-interface AddSongViewProps {
+interface RecommendSongViewProps {
   onBack: () => void;
   // 등록 성공 시 호출 — 사용자가 자기 곡이 잘 올라갔는지 바로 확인할 수 있게 "최근 추가된 곡" 화면으로 이동시킴
   onSubmitSuccess: () => void;
@@ -82,14 +51,31 @@ interface AddSongViewProps {
 const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
-export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId, prefillTrack }: AddSongViewProps) {
+export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId, prefillTrack }: RecommendSongViewProps) {
   const { initialDraft, restoredToast: draftRestoredToast, saveDraft, clearDraft } = useAddSongDraft();
   const [query, setQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  // 검색 버튼을 눌러야만 바뀌는 "실제로 검색한 검색어" — query(입력창 타이핑)와 분리해서,
+  // 타이핑 중엔 재검색이 안 나가고 버튼/Enter를 눌렀을 때만 useMusicSearch가 다시 호출됨
+  const [committedQuery, setCommittedQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
-  const [searchResults, setSearchResults] = useState<SearchTrack[]>([]);
-  const [searchErrorMessage, setSearchErrorMessage] = useState<string | null>(null);
+  // 글자 수 미달 등 API를 부르기도 전에 걸러내는 입력값 검증 에러 — 네트워크 에러(searchError)와 구분
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
+  const { data: searchResultsData, isFetching: isSearching, error: musicSearchError } = useMusicSearch(committedQuery);
+  const searchResults: SearchTrack[] = searchResultsData ?? [];
+  const searchErrorMessage = validationError ?? musicSearchError?.message ?? null;
+
+  // 429(요청 제한) 응답이면 Retry-After만큼 재시도를 막고, 약간의 지터를 더해 동시에 몰린 여러 기기가
+  // 같은 순간에 다시 몰리지 않게 함
+  useEffect(() => {
+    if (!musicSearchError?.retryAfterSeconds) return;
+    const jitterMs = Math.random() * 1000;
+    const waitMs = musicSearchError.retryAfterSeconds * 1000 + jitterMs;
+    setRetryBlockedUntil(Date.now() + waitMs);
+    const timer = setTimeout(() => setRetryBlockedUntil(0), waitMs);
+    return () => clearTimeout(timer);
+  }, [musicSearchError]);
+
   const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(initialDraft?.track ?? prefillTrack ?? null);
   const [selectedGenres, setSelectedGenres] = useState<string[]>(initialDraft?.selectedGenres ?? []);
   const [comment, setComment] = useState(initialDraft?.comment ?? '');
@@ -124,8 +110,8 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
   const handleSearchClick = () => {
     if (query.trim().length < MIN_QUERY_LENGTH) {
       setSelectedTrack(null);
-      setSearchResults([]);
-      setSearchErrorMessage(`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`);
+      setCommittedQuery('');
+      setValidationError(`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`);
       setHasSearched(true);
       return;
     }
@@ -135,32 +121,10 @@ export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay,
     if (isSearching || retryBlockedUntil > 0) return;
     lastSearchAtRef.current = now;
 
-    setIsSearching(true);
-    setSearchErrorMessage(null);
+    setValidationError(null);
     setSelectedTrack(null);
-    searchTracks(query)
-      .then((results) => {
-        setSearchResults(results);
-        setHasSearched(true);
-      })
-      .catch((error) => {
-        console.error('[AddSongView] search failed:', error);
-        setSearchResults([]);
-        setHasSearched(true);
-        setSearchErrorMessage(
-          error instanceof SearchApiError ? error.message : '검색 중 문제가 생겼어요. 다시 시도해주세요'
-        );
-
-        if (error instanceof SearchApiError && error.retryAfterSeconds) {
-          const jitterMs = Math.random() * 1000;
-          const waitMs = error.retryAfterSeconds * 1000 + jitterMs;
-          setRetryBlockedUntil(Date.now() + waitMs);
-          setTimeout(() => setRetryBlockedUntil(0), waitMs);
-        }
-      })
-      .finally(() => {
-        setIsSearching(false);
-      });
+    setHasSearched(true);
+    setCommittedQuery(query); // useMusicSearch가 이 값으로 다시 조회(같은 검색어 30초 내 재검색이면 캐시 재사용)
   };
 
   const isResultsPanelOpen = !selectedTrack && hasSearched && !isSearching;

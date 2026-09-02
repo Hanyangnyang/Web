@@ -1,12 +1,13 @@
-import { Bookmark, MoreVertical, Music, Play, Share2, Smile } from 'lucide-react';
+import { Bookmark, MoreVertical, Music, Play, Share2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type TrackResult } from './SearchResultsView';
-import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
+import { type ReactionKey } from './postReactions';
 import { type Song, type ReactionState, formatTimeAgo, toReactionState } from './playlistTypes';
 import { useToggleBookmark, useToggleReaction, useTrackPosts, type TrackPostsSort } from '../../hooks/useRecentSongs.js';
 import { EmptyGenreState } from './EmptyGenreState';
 import { AlbumArtPlayButton } from './AlbumArtPlayButton';
+import { EmojiReactionBar } from './EmojiReactionBar';
 import { useSongReport } from './useSongReport';
 import { ReportReasonPopup } from './ReportReasonPopup';
 import { useShareModal } from './useShareModal';
@@ -222,7 +223,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           const postId = post.id;
           const bookmarked = postId ? bookmarkedByPost[postId] ?? false : false;
           const reactions = (postId ? reactionsByPost[postId] : undefined) ?? {};
-          const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
           return (
             <div
@@ -292,71 +292,17 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
 
               {/* 시간 + 이모지 반응 — 카드 전체 너비를 다 활용. 시간은 ml-auto로 항상 맨 오른쪽 끝에 고정 */}
               <div className="flex items-center gap-1.5">
-                {/* 이모지 추가 버튼 — 다른 모양의 이모지도 고를 수 있도록 */}
-                <div className="relative inline-block flex-shrink-0">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenPickerPostId((prev) => (prev === postId ? null : postId ?? null));
-                    }}
-                    disabled={toggleReactionMutation.isPending}
-                    aria-label="이모지 추가"
-                    className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform"
-                  >
-                    <Smile size={11} className="text-text-sub" strokeWidth={2} />
-                  </button>
-
-                  {openPickerPostId === postId && (
-                    <div className="absolute bottom-full left-0 mb-2 z-10">
-                      <div className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-full shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
-                        {EMOJI_REACTIONS.map(({ key, emoji }) => (
-                          <button
-                            key={key}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (postId) handleToggleReaction(postId, key);
-                              setOpenPickerPostId(null);
-                            }}
-                            aria-label={`${emoji} 남기기`}
-                            className="w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                      {/* 말풍선 꼬리 */}
-                      <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />
-                    </div>
-                  )}
-                </div>
-
-                {displayedReactions.length > 0 && (
-                  <div
-                    className="flex items-center gap-1 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                  >
-                    {displayedReactions.map(({ key, emoji }) => {
-                      const { count, mine } = reactions[key] ?? { count: 0, mine: false };
-                      return (
-                        <button
-                          key={key}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (postId) handleToggleReaction(postId, key);
-                          }}
-                          disabled={toggleReactionMutation.isPending}
-                          aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
-                          className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
-                            mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                          }`}
-                        >
-                          <span className="text-xs">{emoji}</span>
-                          <span>{count}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                <EmojiReactionBar
+                  reactions={reactions}
+                  onToggleReaction={(key) => {
+                    if (postId) handleToggleReaction(postId, key);
+                  }}
+                  disabled={toggleReactionMutation.isPending}
+                  pickerOpen={openPickerPostId === postId}
+                  onTogglePicker={() => setOpenPickerPostId((prev) => (prev === postId ? null : postId ?? null))}
+                  size="compact"
+                  className="flex-1 min-w-0"
+                />
 
                 <span className="flex-shrink-0 text-xs text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>
               </div>

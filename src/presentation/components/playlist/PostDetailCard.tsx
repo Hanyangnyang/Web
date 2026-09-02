@@ -1,9 +1,10 @@
-import { Bookmark, ChevronRight, MoreVertical, Share2, Smile } from 'lucide-react';
+import { Bookmark, ChevronRight, MoreVertical, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, GENRES, formatTimeAgo, toReactionState } from './playlistTypes';
-import { type ReactionKey, EMOJI_REACTIONS } from './postReactions';
+import { type ReactionKey } from './postReactions';
 import { useToggleBookmark, useToggleReaction } from '../../hooks/useRecentSongs.js';
 import { AlbumArtPlayButton } from './AlbumArtPlayButton';
+import { EmojiReactionBar } from './EmojiReactionBar';
 import { useSongReport } from './useSongReport';
 import { ReportReasonPopup } from './ReportReasonPopup';
 import { useShareModal } from './useShareModal';
@@ -61,7 +62,7 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
   };
 }
 
-// 인스타그램 게시물처럼 앨범커버와 하단 콘텐츠가 하나의 카드로 이어지는 게시글 조회 카드. PostDetailView에서 사용
+// 인스타그램 게시물처럼 앨범커버와 하단 콘텐츠가 하나의 카드로 이어지는 게시글 조회 카드. PostView에서 사용
 export function PostDetailCard({
   post,
   className = '',
@@ -119,9 +120,6 @@ export function PostDetailCard({
       onError: () => setBookmarked(!optimistic),
     });
   };
-
-  // count가 0보다 큰 이모지만 표시 — 하나도 없으면 칩 대신 유도 배너를 보여줌
-  const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
 
   // 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동 — 카드 전체 클릭(onSelect)과
   // 별개 동작이라 전파를 막음. 단, 카드 자체가 이미 onSelect로 클릭 가능한 요약 목록(2열)에서는
@@ -266,78 +264,21 @@ export function PostDetailCard({
       <div className="px-4 pt-3 pb-4 flex-1 flex flex-col">
         {!hideReactions && (
           <div className="flex items-center gap-1.5 mb-2">
-            {/* 이모지 추가 버튼 — 스크롤 영역 밖에 고정, 위로 뜨는 팝오버가 잘리지 않게 함 */}
-            <div className="relative inline-block flex-shrink-0">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPickerOpen((prev) => !prev);
-                }}
-                aria-label="이모지 추가"
-                className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform"
-              >
-                <Smile size={13} className="text-text-sub" strokeWidth={2} />
-              </button>
-
-              {pickerOpen && (
-                <div className="absolute bottom-full left-0 mb-2 z-10">
-                  <div className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-full shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
-                    {EMOJI_REACTIONS.map(({ key, emoji }) => (
-                      <button
-                        key={key}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleReaction(key);
-                          setPickerOpen(false);
-                        }}
-                        disabled={toggleReactionMutation.isPending}
-                        aria-label={`${emoji} 남기기`}
-                        className="w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                  {/* 말풍선 꼬리 */}
-                  <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />
-                </div>
-              )}
-            </div>
-
-            {displayedReactions.length > 0 ? (
-              /* 이미 달린 리액션 칩 — 9종까지 늘어날 수 있어서 가로 스크롤 */
-              <div
-                className="flex items-center gap-1.5 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
-                {displayedReactions.map(({ key, emoji }) => {
-                  const { count, mine } = reactions[key] ?? { count: 0, mine: false };
-                  return (
-                    <button
-                      key={key}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleReaction(key);
-                      }}
-                      disabled={toggleReactionMutation.isPending}
-                      aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
-                      className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
-                        mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
-                      }`}
-                    >
-                      <span className="text-xs">{emoji}</span>
-                      <span>{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              /* 반응이 하나도 없을 때 — 배경 없는 안내 문구만 살짝 얹음. 클릭 가능한 건 왼쪽 이모지
-                 추가 버튼 하나로 충분해서, 여기는 버튼처럼 보이지 않게 배경/클릭 이벤트 없이 텍스트로만 둠 */
-              <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
-                ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
-              </span>
-            )}
+            <EmojiReactionBar
+              reactions={reactions}
+              onToggleReaction={toggleReaction}
+              disabled={toggleReactionMutation.isPending}
+              pickerOpen={pickerOpen}
+              onTogglePicker={() => setPickerOpen((prev) => !prev)}
+              className="flex-1 min-w-0"
+              emptyFallback={
+                // 배경 없는 안내 문구만 살짝 얹음. 클릭 가능한 건 왼쪽 이모지 추가 버튼 하나로 충분해서,
+                // 여기는 버튼처럼 보이지 않게 배경/클릭 이벤트 없이 텍스트로만 둠
+                <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
+                  ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
+                </span>
+              }
+            />
 
             {!post.isMine && moreButton}
           </div>

@@ -34,7 +34,7 @@ interface SongShareModalProps {
 }
 
 // 곡/게시글 공유 팝업 — 학식 공유(ShareSheet)의 바텀시트 대신, 플레이리스트 카드들과 톤을 맞춰
-// 화면 중앙 팝업(AddSongView/PostDetailCard의 안내 팝업과 동일한 패턴)으로 구성
+// 화면 중앙 팝업(RecommendSongView/PostDetailCard의 안내 팝업과 동일한 패턴)으로 구성
 export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

@@ -52,6 +52,8 @@ import { createSubwayRepository } from './data/repositories/SubwayRepository.js'
 
 import { createPlaylistApiDataSource } from './data/datasources/PlaylistApiDataSource.js';
 import { createPlaylistRepository } from './data/repositories/PlaylistRepository.js';
+import { createMusicSearchApiDataSource } from './data/datasources/MusicSearchApiDataSource.js';
+import { createMusicSearchRepository } from './data/repositories/MusicSearchRepository.js';
 import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
 import { createGetSongByIdUseCase } from './domain/usecases/GetSongByIdUseCase.js';
 import { createGetSongCreationStatusUseCase } from './domain/usecases/GetSongCreationStatusUseCase.js';
@@ -65,6 +67,7 @@ import { createRecordTrackPlayUseCase } from './domain/usecases/RecordTrackPlayU
 import { createToggleReactionUseCase } from './domain/usecases/ToggleReactionUseCase.js';
 import { createGetTrackPostsUseCase } from './domain/usecases/GetTrackPostsUseCase.js';
 import { createGetPopularityChartUseCase } from './domain/usecases/GetPopularityChartUseCase.js';
+import { createSearchMusicTracksUseCase } from './domain/usecases/SearchMusicTracksUseCase.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
@@ -84,6 +87,8 @@ const bannerApiDataSource = createBannerApiDataSource({ httpClient: apiHttpClien
 const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const playlistApiDataSource = createPlaylistApiDataSource({ httpClient: apiHttpClient });
+// Spotify 곡 검색은 새 백엔드가 아니라 기존 Vercel BFF(/api/music-search)를 그대로 씀
+const musicSearchApiDataSource = createMusicSearchApiDataSource({ httpClient });
 const feedbackApiDataSource = createFeedbackApiDataSource({ httpClient: apiHttpClient });
 const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: apiHttpClient });
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
@@ -102,6 +107,7 @@ export const bannerRepository = createBannerRepository({ bannerApiDataSource });
 export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
 export const playlistRepository = createPlaylistRepository({ playlistApiDataSource });
+export const musicSearchRepository = createMusicSearchRepository({ musicSearchApiDataSource });
 export const feedbackApiRepository = createFeedbackApiRepository({ feedbackApiDataSource });
 export const partnerStoreRepository = createPartnerStoreRepository({ partnerStoreApiDataSource });
 export const campusBuildingRepository = createCampusBuildingRepository({ campusBuildingApiDataSource });
@@ -132,6 +138,7 @@ export const recordTrackPlayUseCase = createRecordTrackPlayUseCase({ playlistRep
 export const toggleReactionUseCase = createToggleReactionUseCase({ playlistRepository });
 export const getTrackPostsUseCase = createGetTrackPostsUseCase({ playlistRepository });
 export const getPopularityChartUseCase = createGetPopularityChartUseCase({ playlistRepository });
+export const searchMusicTracksUseCase = createSearchMusicTracksUseCase({ musicSearchRepository });
 export const submitFeedbackApiUseCase = createSubmitFeedbackApiUseCase({ feedbackApiRepository });
 export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerStoreRepository });
 export const getCampusBuildingsUseCase = createGetCampusBuildingsUseCase({ campusBuildingRepository });

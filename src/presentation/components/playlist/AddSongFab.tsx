@@ -8,7 +8,7 @@ interface AddSongFabProps {
 }
 
 const FAB_RIGHT = 'right-[max(1.25rem,calc((100vw-440px)/2+1.25rem))]';
-// 다른 화면들(AddSongView의 등록하기 버튼, PlaylistView의 하단 여백 계산 등)도 이 FAB의 실제
+// 다른 화면들(RecommendSongView의 등록하기 버튼, PlaylistView의 하단 여백 계산 등)도 이 FAB의 실제
 // 크기/위치와 겹치지 않으려면 같은 값을 알아야 해서 export — 값이 바뀌면 여기 한 곳만 고치면 됨
 export const FAB_HEIGHT_PX = 48; // h-12
 export const FAB_CLOSED_BOTTOM_PX = 20; // 1.25rem

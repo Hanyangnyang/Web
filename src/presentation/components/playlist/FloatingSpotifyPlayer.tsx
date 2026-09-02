@@ -179,15 +179,15 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
           <div className="relative bg-white h-[80px]">
             <div
               className={`absolute inset-0 px-3 flex items-center gap-3 bg-white transition-opacity duration-200 ${
-                iframeLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-pulse'
+                iframeLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
               }`}
             >
-              <div className="w-12 h-12 rounded bg-slate-200 flex-shrink-0" />
+              <div className="w-12 h-12 rounded skeleton-shimmer flex-shrink-0" />
               <div className="flex-1 min-w-0 flex flex-col gap-2">
-                <div className="h-3 w-32 rounded-full bg-slate-200" />
-                <div className="h-3 w-20 rounded-full bg-slate-200" />
+                <div className="h-3 w-32 rounded-full skeleton-shimmer" />
+                <div className="h-3 w-20 rounded-full skeleton-shimmer" />
               </div>
-              <div className="w-9 h-9 rounded-full bg-slate-300 flex-shrink-0" />
+              <div className="w-9 h-9 rounded-full skeleton-shimmer flex-shrink-0" />
             </div>
             <div
               ref={containerRef}

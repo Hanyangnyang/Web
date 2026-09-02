@@ -5,7 +5,7 @@ import { usePostDetail } from '../../hooks/useRecentSongs.js';
 import { type Song } from './playlistTypes';
 import { type TrackResult } from './SearchResultsView';
 
-interface PostDetailViewProps {
+interface PostViewProps {
   // 게시글 목록에서 눌러서 들어온 게시글 id — GET /api/v1/playlist/songs/{id}로 상세 조회
   postId: string;
   onBack: () => void;
@@ -17,7 +17,7 @@ interface PostDetailViewProps {
 }
 
 // 게시글 조회(단건) 화면
-export function PostDetailView({ postId, onBack, onPlay, onSelectTrack, currentTrackId }: PostDetailViewProps) {
+export function PostView({ postId, onBack, onPlay, onSelectTrack, currentTrackId }: PostViewProps) {
   const { data: post, isLoading } = usePostDetail(postId);
 
   return (
