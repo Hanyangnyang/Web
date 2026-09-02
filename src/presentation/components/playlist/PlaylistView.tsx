@@ -1,22 +1,24 @@
 import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
-import { FloatingSpotifyPlayer, type PlayableTrack } from './FloatingSpotifyPlayer';
-import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './AddSongFab';
-import { RecommendSongView } from './RecommendSongView';
-import { RecentSongsView } from './RecentSongsView';
-import { SearchResultsView, type TrackResult } from './SearchResultsView';
-import { TrackPostCollectionView } from './TrackPostCollectionView';
-import { PostView } from './PostView';
-import { MyPageView } from './MyPageView';
-import { BookmarkedSongsView } from './BookmarkedSongsView';
-import { MySongsView } from './MySongsView';
-import { PlaylistHomeView } from './PlaylistHomeView';
-import { type Song, type ChartPeriod } from './playlistTypes';
-import { ChartView } from './ChartView';
+import { FloatingSpotifyPlayer, type PlayableTrack } from './shared/FloatingSpotifyPlayer';
+import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
+import { RecommendSongView } from './recommendSong/RecommendSongView';
+import { RecentSongsView } from './recentSongs/RecentSongsView';
+import { SearchResultsView } from './searchResults/SearchResultsView';
+import { TrackPostCollectionView } from './trackPostCollection/TrackPostCollectionView';
+import { PostView } from './post/PostView';
+import { MyPageView } from './myPage/MyPageView';
+import { BookmarkedSongsView } from './bookmarkedSongs/BookmarkedSongsView';
+import { MySongsView } from './mySongs/MySongsView';
+import { PlaylistHomeView } from './home/PlaylistHomeView';
+import { type Song, type ChartPeriod, type TrackSummary } from './playlistTypes';
+import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
-import { useRecentSongs, useRecordTrackPlay, usePopularityChart } from '../../hooks/useRecentSongs.js';
+import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
+import { useRecordTrackPlay } from '../../hooks/playlist/useRecordTrackPlay.js';
+import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 
 const RECENT_SONGS_LIMIT = 7;
 const CHART_PREVIEW_LIMIT = 10;
@@ -63,7 +65,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const [playerHeight, setPlayerHeight] = useState(0);
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
   // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostCollectionView(곡 단위 게시글 모음)로 이동
-  const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackResult | null>(null);
+  const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackSummary | null>(null);
   // 게시글 목록에서 눌러 선택된 게시글 id — 값이 있으면 PostView가 GET /api/v1/playlist/songs/{id}로 상세 조회
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
@@ -95,8 +97,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
   // 게시글 모음의 "이 곡 추천하러 가기" 버튼처럼 특정 곡이 미리 채워진 채로 곡추천하기 화면에 들어갈 때 씀.
   // prefill 없이 부르는 모든 진입점(FAB 등)에서는 매번 null로 초기화해서, 이전에 넣어뒀던 값이 새는 걸 막음
-  const [addSongPrefillTrack, setAddSongPrefillTrack] = useState<TrackResult | null>(null);
-  const pushAddSong = useCallback((prefill?: TrackResult) => {
+  const [addSongPrefillTrack, setAddSongPrefillTrack] = useState<TrackSummary | null>(null);
+  const pushAddSong = useCallback((prefill?: TrackSummary) => {
     setAddSongPrefillTrack(prefill ?? null);
     pushScreen('addSong');
   }, [pushScreen]);
@@ -154,7 +156,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     pushScreen('search');
   }, [searchQuery, pushScreen]);
 
-  const handleSelectSearchTrack = useCallback((track: TrackResult) => {
+  const handleSelectSearchTrack = useCallback((track: TrackSummary) => {
     setSelectedTrackForPosts(track);
     pushScreen('trackPosts');
   }, [pushScreen]);
@@ -168,7 +170,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     onDeepLinkTrackIdHandled?.();
   }, [deepLinkTrackId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 인기차트 리스트 클릭 — ChartTrack을 TrackResult 형태로 변환해 동일한 TrackPostCollectionView로 이동
+  // 인기차트 리스트 클릭 — ChartTrack을 TrackSummary 형태로 변환해 동일한 TrackPostCollectionView로 이동
   const handleSelectChartSong = useCallback((track: ChartTrack) => {
     setSelectedTrackForPosts({
       trackId: track.trackId,

@@ -3,9 +3,9 @@ import { type ReactionKey } from './postReactions';
 
 export type { PlaylistReaction };
 
-// 곡 하나를 식별하는 데 필요한 최소 정보 — TrackResult(SearchResultsView)/SearchTrack(RecommendSongView)/
-// PlayableTrack(FloatingSpotifyPlayer)/SongShareModalSong(SongShareModal)이 전부 이 모양과 동일해서,
-// 각 파일에서 이 타입의 별칭으로 재정의해 씀(기존 import 경로는 그대로 유지)
+// 곡 하나를 식별하는 데 필요한 최소 정보 — SearchTrack(RecommendSongView)/PlayableTrack(FloatingSpotifyPlayer)/
+// SongShareModalSong(SongShareModal)이 전부 이 모양과 동일해서, 각 파일에서 이 타입의 별칭으로 재정의해 씀
+// (기존 import 경로는 그대로 유지)
 export interface TrackSummary {
   trackId: string;
   title: string;
