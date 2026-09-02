@@ -1,15 +1,19 @@
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
 import { usePostDetail } from '../../hooks/useRecentSongs.js';
+import { type Song } from './playlistTypes';
 
 interface PostDetailViewProps {
   // 게시글 목록에서 눌러서 들어온 게시글 id — GET /api/v1/playlist/songs/{id}로 상세 조회
   postId: string;
   onBack: () => void;
+  onPlay: (song: Song) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 이 게시글의 곡과 같으면 재생 버튼을 숨김
+  currentTrackId?: string | null;
 }
 
 // 게시글 조회(단건) 화면 — 헤더는 항상 홈과 동일
-export function PostDetailView({ postId, onBack }: PostDetailViewProps) {
+export function PostDetailView({ postId, onBack, onPlay, currentTrackId }: PostDetailViewProps) {
   const { data: post, isLoading } = usePostDetail(postId);
 
   return (
@@ -17,7 +21,7 @@ export function PostDetailView({ postId, onBack }: PostDetailViewProps) {
       <MiscSubViewHeader
         title="에리카 플레이리스트"
         emoji="🕺"
-        subtitle="에리카생들에게 곡을 추천해주세요!"
+        subtitle="에리카생들의 추천곡을 모아보고, 나도 추천해봐요!"
         onBack={onBack}
       />
 
@@ -36,7 +40,11 @@ export function PostDetailView({ postId, onBack }: PostDetailViewProps) {
           </div>
         </div>
       ) : (
-        <PostDetailCard post={songToPostDetailCardData(post)} />
+        <PostDetailCard
+          post={songToPostDetailCardData(post)}
+          onPlay={() => onPlay(post)}
+          isPlaying={post.trackId === currentTrackId}
+        />
       )}
     </div>
   );

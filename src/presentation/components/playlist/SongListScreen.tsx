@@ -1,5 +1,5 @@
 import { LayoutGrid, Rows3 } from 'lucide-react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { MiscSubViewHeader } from '../misc/MiscSubViewHeader';
 import { type Song, filterSongsByGenre } from './playlistTypes';
 import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
@@ -19,6 +19,7 @@ interface SongListScreenProps {
   // 빈 상태 문구/버튼/동작을 화면마다 다르게 하고 싶을 때 오버라이드 — 없으면 장르 안내 문구 + 곡추천하기로 기본 동작
   emptyStateMessage?: string;
   emptyStateButtonLabel?: string;
+  emptyStateButtonIcon?: ReactNode;
   onEmptyStateAction?: () => void;
   // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
@@ -28,6 +29,9 @@ interface SongListScreenProps {
   scrollToTrackId?: string | null;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
   currentTrackId?: string | null;
+  // 빈 상태를 흰 카드 박스로 감쌀지 — 최근추가된곡의 카드 그리드와 톤을 맞추려는 화면(기본값)용.
+  // 저장한 곡/내가 등록한 곡처럼 배경이 이미 흰 화면에서는 굳이 박스가 필요 없어 false로 끔
+  emptyStateBoxed?: boolean;
 }
 
 export function SongListScreen({
@@ -41,11 +45,13 @@ export function SongListScreen({
   onShowAddSong,
   emptyStateMessage,
   emptyStateButtonLabel,
+  emptyStateButtonIcon,
   onEmptyStateAction,
   enableViewToggle = false,
   hideMoreButton = false,
   scrollToTrackId,
   currentTrackId,
+  emptyStateBoxed = true,
 }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(enableViewToggle ? 'list' : 'grid');
@@ -74,7 +80,7 @@ export function SongListScreen({
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       {/* 고정 헤더 */}
-      <div className="sticky -top-6 -mt-6 z-[100] bg-surface/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky -top-6 -mt-6 z-[100] bg-white/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader
           title={title}
           emoji={emoji}
@@ -136,7 +142,8 @@ export function SongListScreen({
             onAction={onEmptyStateAction ?? onShowAddSong}
             message={emptyStateMessage}
             buttonLabel={emptyStateButtonLabel}
-            boxed
+            buttonIcon={emptyStateButtonIcon}
+            boxed={emptyStateBoxed}
           />
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>

@@ -63,7 +63,7 @@ const TOAST_ERROR_MESSAGES: Record<string, string> = {
   PL002: '최근 7일 이내에 이미 추천하신 곡이에요. 다른 곡을 추천해주세요!',
 };
 const INLINE_ERROR_MESSAGES: Record<string, string> = {
-  PL003: '부적절하거나 비속어가 포함된 코멘트는 등록할 수 없어요.',
+  PL003: '부적절하거나 비속어가 포함된 코멘트는 추천할 수 없어요.',
   C001: '장르는 최소 1개, 최대 3개까지 선택하고 코멘트는 200자 이내로 입력해주세요.',
 };
 const RETRY_ERROR_CODE = 'C004';
@@ -101,6 +101,8 @@ async function searchTracks(query: string): Promise<SearchTrack[]> {
 
 interface AddSongViewProps {
   onBack: () => void;
+  // 등록 성공 시 호출 — 사용자가 자기 곡이 잘 올라갔는지 바로 확인할 수 있게 "최근 추가된 곡" 화면으로 이동시킴
+  onSubmitSuccess: () => void;
   // 플레이어가 떠 있으면 등록하기 버튼이 그 위로 뜨도록 — 0이면 플레이어 닫힘
   playerHeight?: number;
   // 선택한 곡을 미리 들어볼 수 있게 하단 플레이어를 띄우는 콜백
@@ -115,7 +117,7 @@ const PLAYER_GAP = 16;
 const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
-export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
+export function AddSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId }: AddSongViewProps) {
   // 화면 진입 시 임시저장된 초안이 있으면 한 번만 불러와서 초기값으로 씀
   const [initialDraft] = useState(() => loadDraft());
   const [query, setQuery] = useState('');
@@ -212,6 +214,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
   const canSubmit =
     !!selectedTrack &&
     selectedGenres.length >= MIN_GENRES &&
+    comment.trim().length > 0 &&
     creationStatus?.canCreate !== false &&
     !submitSong.isPending;
 
@@ -247,7 +250,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
       {
         onSuccess: () => {
           clearDraft();
-          onBack();
+          onSubmitSuccess();
         },
         onError: (error) => {
           const code = (error as HttpError).code;
@@ -265,7 +268,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
 
           setSubmitInlineError(
             (code && INLINE_ERROR_MESSAGES[code]) ||
-              (error instanceof Error ? error.message : '곡 등록에 실패했어요. 다시 시도해주세요.')
+              (error instanceof Error ? error.message : '곡 추천에 실패했어요. 다시 시도해주세요.')
           );
         },
       }
@@ -287,12 +290,12 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
     >
       <MiscSubViewHeader
         title="곡 추천하기"
-        emoji="🤔"
+        emoji="✏️"
         subtitle={
           creationStatus
             ? creationStatus.canCreate
-              ? `오늘 ${creationStatus.remainingCount}곡 더 등록할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
-              : '오늘 등록 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
+              ? `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
+              : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
             : ''
         }
         onBack={handleBackRequest}
@@ -302,7 +305,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">곡 검색</h3>
         <div
-          className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all ${
+          className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all ${
             isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
           }`}
         >
@@ -321,7 +324,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
               onClick={handleSearchClick}
               disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
               aria-label="곡 검색"
-              className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-primary disabled:text-text-hint hover:bg-primary/10 transition-colors active:scale-90"
+              className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-[#618CE9] disabled:text-text-hint hover:bg-[#618CE9]/10 transition-colors active:scale-90"
             >
               {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
             </button>
@@ -368,17 +371,17 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                             className="w-full h-full object-cover"
                           />
                           {onPlay && (
+                            // 앨범커버 전체가 아니라 눈에 보이는 원형 아이콘 크기만큼만 클릭 영역을 잡아서,
+                            // 그 바깥(앨범커버 나머지 영역)을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onPlay(track);
                               }}
                               aria-label={`${track.title} 재생`}
-                              className="absolute inset-0 flex items-center justify-center"
+                              className="absolute inset-0 m-auto w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
                             >
-                              <span className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
-                                <Play size={16} className="text-white" fill="white" />
-                              </span>
+                              <Play size={16} className="text-white" fill="white" />
                             </button>
                           )}
                         </div>
@@ -402,7 +405,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
 
         {/* 선택된 곡 */}
         {selectedTrack && (
-          <div className="mt-2 flex items-center gap-3 bg-white border border-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
+          <div className="mt-2 flex items-center gap-3 bg-white border border-[#618CE9]/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
             <img
               src={selectedTrack.albumArtUrl}
               alt={selectedTrack.title}
@@ -446,7 +449,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                 disabled={isDisabled}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
                   isSelected
-                    ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
+                    ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(15,23,42,0.25)]`
                     : isDisabled
                       ? 'bg-slate-100 text-slate-300 border-transparent'
                       : `${genre.light} text-gray-800 border-transparent`
@@ -460,12 +463,10 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         </div>
       </section>
 
-      {/* 3. 곡에 대한 한마디 (선택) */}
+      {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-2">
-          곡에 대한 한마디 <span className="text-text-hint font-normal text-sm">(선택)</span>
-        </h3>
-        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
+        <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
+        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
           <textarea
             value={comment}
             maxLength={COMMENT_MAX_LENGTH}
@@ -486,13 +487,13 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         </p>
       )}
 
-      {/* 등록하기 버튼 */}
+      {/* 추천하기 버튼 */}
       <button
         onClick={handleRegisterClick}
         disabled={!canSubmit}
         className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold border transition-all active:scale-[0.97] z-40 ${
           canSubmit
-            ? 'bg-primary text-white border-transparent shadow-[0_6px_20px_rgba(14,74,132,0.35)]'
+            ? 'bg-[#618CE9] text-white border-transparent shadow-[0_6px_20px_rgba(15,23,42,0.35)]'
             : 'bg-slate-100 text-slate-300 border-transparent'
         }`}
         style={{
@@ -503,15 +504,15 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
           transition: 'bottom 300ms ease-out',
         }}
       >
-        {submitSong.isPending ? '등록 중...' : '등록하기'}
+        {submitSong.isPending ? '추천 중...' : '추천하기'}
       </button>
 
-      {/* 등록 요청 중 화면 전체를 잠가서 중복 탭/다른 조작을 막고, 진행 상태를 눈에 띄게 보여줌 */}
+      {/* 추천 요청 중 화면 전체를 잠가서 중복 탭/다른 조작을 막고, 진행 상태를 눈에 띄게 보여줌 */}
       {submitSong.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="flex flex-col items-center gap-3 bg-white rounded-2xl shadow-xl px-8 py-6">
-            <Loader2 size={28} className="animate-spin text-primary" />
-            <p className="text-sm font-semibold text-text-main">등록 중이에요...</p>
+            <Loader2 size={28} className="animate-spin text-[#618CE9]" />
+            <p className="text-sm font-semibold text-text-main">추천 중이에요...</p>
           </div>
         </div>
       )}
@@ -548,7 +549,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                   setShowSubmitRetryPopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
               >
                 다시 시도
               </button>
@@ -557,15 +558,15 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
         </div>
       )}
 
-      {/* 등록 전 안내 — 삭제·수정 불가, 1일 3곡 제한 */}
+      {/* 추천 전 안내 — 삭제·수정 불가, 1일 3곡 제한 */}
       {showRegisterNoticePopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8">
           <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
-            <p className="text-sm font-semibold text-text-main mb-3 text-center">등록 전에 확인해주세요!</p>
+            <p className="text-sm font-semibold text-text-main mb-3 text-center">추천 전에 확인해주세요!</p>
             <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
-              <li>한 번 등록한 곡은 삭제하거나 수정할 수 없어요.</li>
+              <li>한 번 추천한 곡은 삭제하거나 수정할 수 없어요.</li>
               <li>
-                하루에 최대 3곡까지만 등록할 수 있어요
+                하루에 최대 3곡까지만 추천할 수 있어요
                 {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
               </li>
             </ul>
@@ -581,9 +582,9 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                   setShowRegisterNoticePopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
               >
-                등록하기
+                추천하기
               </button>
             </div>
           </div>
@@ -603,7 +604,7 @@ export function AddSongView({ onBack, playerHeight = 0, onPlay, currentTrackId }
                   setShowLeaveConfirmPopup(false);
                   onBack();
                 }}
-                className="h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
+                className="h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
               >
                 임시저장하고 나가기
               </button>

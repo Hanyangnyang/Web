@@ -216,6 +216,9 @@ export const createPlaylistRepository = (
       artist: res.data.artist,
       albumArtUrl: res.data.albumArtUrl,
       totalSongsCount: res.data.totalSongsCount,
+      totalHeartCount: res.data.totalHeartCount,
+      // 재생수는 게시글 단위가 아니라 트랙 단위라 모든 게시글에 같은 값이 실려있음 — 첫 게시글에서만 꺼내 씀
+      totalPlayCount: res.data.songs.content[0]?.totalPlayCount ?? 0,
       posts: res.data.songs.content.map((d) => toPlaylistSong(d, params.deviceId)),
     });
   },

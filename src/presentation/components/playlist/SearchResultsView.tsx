@@ -93,9 +93,11 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         />
       </div>
 
-      {/* 검색바: 검색어를 수정하고 Enter나 화살표 버튼을 누르면 이 화면 안에서 재검색 */}
-      <div className="mt-4 mb-4 flex items-center gap-2 px-3.5 h-11 bg-white border border-slate-200 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)] transition-all">
-        <Search size={16} className="text-text-hint flex-shrink-0" />
+      {/* 검색바: 검색어를 수정하고 Enter나 화살표 버튼을 누르면 이 화면 안에서 재검색. 홈 검색바와 동일한 브랜드 블루 톤 + 아이콘 배지 스타일 */}
+      <div className="mt-4 mb-4 flex items-center gap-2 pl-2 pr-2.5 h-12 bg-[#618CE9]/[0.06] border border-[#618CE9]/20 rounded-full focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
+        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#618CE9]/15 flex items-center justify-center">
+          <Search size={15} className="text-[#618CE9]" />
+        </span>
         <input
           type="text"
           value={localQuery}
@@ -110,9 +112,9 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
           onClick={handleResearch}
           disabled={!localQuery.trim()}
           aria-label="검색"
-          className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full text-text-sub disabled:text-text-hint hover:bg-slate-100 transition-colors active:scale-90"
+          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#618CE9] text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
         >
-          <ArrowRight size={16} />
+          <ArrowRight size={14} />
         </button>
       </div>
 
@@ -153,17 +155,17 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                       className="w-28 aspect-square rounded-lg object-cover shadow-md bg-slate-100"
                     />
                     {track.trackId !== currentTrackId && (
+                      // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원만큼만 잡아서,
+                      // 그 바깥을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onPlay(track);
                         }}
                         aria-label={`${track.title} 재생`}
-                        className="absolute inset-0 flex items-center justify-center active:scale-95 transition-transform"
+                        className="absolute inset-0 m-auto w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center active:scale-95 transition-transform"
                       >
-                        <span className="w-[34%] aspect-square rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                          <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
-                        </span>
+                        <Play className="w-1/2 h-1/2 text-white" fill="white" stroke="white" strokeWidth={1} />
                       </button>
                     )}
                   </div>

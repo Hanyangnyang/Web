@@ -244,6 +244,8 @@ export function useTrackPosts(trackId: string, sort: TrackPostsSort) {
         artist: result.artist,
         albumArtUrl: result.albumArtUrl,
         totalSongsCount: result.totalSongsCount,
+        totalHeartCount: result.totalHeartCount,
+        totalPlayCount: result.totalPlayCount,
         posts: result.posts.map(mapPlaylistSongToSong),
       };
     },

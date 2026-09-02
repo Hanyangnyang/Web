@@ -13,6 +13,8 @@ interface BookmarkedSongsViewProps {
 }
 
 export function BookmarkedSongsView({ onBack, onPlay, onShowAddSong, onShowRecent, currentTrackId }: BookmarkedSongsViewProps) {
+  // 최근추가된곡/인기차트와 동일하게 SWR로 통일 — 재방문 땐 캐시를 바로 보여주고 조용히
+  // 백그라운드에서 갱신함(isLoading은 캐시가 아예 없는 최초 진입에만 true)
   const { data: songs, isLoading } = useBookmarkedSongs();
 
   return (
@@ -23,13 +25,15 @@ export function BookmarkedSongsView({ onBack, onPlay, onShowAddSong, onShowRecen
       songs={songs ?? []}
       isLoading={isLoading}
       emptyStateMessage="이런 곡들은 어때요?"
-      emptyStateButtonLabel="최근 등록된 곡 보러가기"
+      emptyStateButtonLabel="최근 추가된 곡 보러가기"
+      emptyStateButtonIcon={<span>🎵</span>}
       onEmptyStateAction={onShowRecent}
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}
       enableViewToggle
       currentTrackId={currentTrackId}
+      emptyStateBoxed={false}
     />
   );
 }

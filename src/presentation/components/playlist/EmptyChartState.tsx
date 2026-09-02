@@ -1,23 +1,22 @@
-import { Plus } from 'lucide-react';
-
 interface EmptyChartStateProps {
-  onShowAddSong: () => void;
   // '실시간'/'주간'/'월간' 등 지금 보고 있는 기간 칩의 라벨 — 아직 그 기간 차트가 집계되지 않았다는 문맥을 보여주는 데 씀
   periodLabel: string;
+  // 차트가 비어도 최근 추가된 곡은 있을 가능성이 높아서(집계만 아직 안 된 것뿐), 그쪽으로 유도
+  onShowRecent: () => void;
 }
 
-// 인기차트가 0개일 때 쓰는 안내 — 장르 필터 결과가 없는 것과는 다른 상황(집계 주기가 아직 안 돼서)이라 EmptyGenreState와 문구를 구분함
-export function EmptyChartState({ onShowAddSong, periodLabel }: EmptyChartStateProps) {
+// 인기차트가 0개일 때 쓰는 안내 — "곡이 없다"가 아니라 "재생 집계가 아직 안 됐다"는 뜻이라,
+// 곡추천하기 대신 실제로 곡이 있을 최근추가된곡 화면으로 유도
+export function EmptyChartState({ periodLabel, onShowRecent }: EmptyChartStateProps) {
   return (
     <button
-      onClick={onShowAddSong}
-      className="w-full flex flex-col items-center justify-center gap-1.5 py-10 px-4 text-center transition-colors hover:bg-slate-50 active:scale-[0.98]"
+      onClick={onShowRecent}
+      className="w-full flex flex-col items-center justify-center gap-1.5 py-10 px-4 text-center transition-colors active:scale-[0.98]"
     >
-      <span className="text-2xl">🔥</span>
-      <p className="text-sm font-semibold text-text-main">아직 {periodLabel} 차트가 집계되지 않았어요</p>
-      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-[#2B3B52] text-white shadow-[0_4px_10px_rgba(43,59,82,0.3)] text-xs font-bold">
-        <Plus size={14} strokeWidth={2.5} />
-        첫 곡 추천하러 가기
+      <p className="text-[12px] font-semibold text-text-sub">아직 '{periodLabel}' 차트가 집계되지 않았어요</p>
+      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-white text-text-main border border-slate-200 shadow-sm text-xs font-bold">
+        <span>🎵</span>
+        최근 추가된 곡 보러가기
       </span>
     </button>
   );
