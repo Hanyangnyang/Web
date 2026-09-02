@@ -72,7 +72,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) 
 
       {shareModalOpen && (
         <SongShareModal
-          song={{ title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl }}
+          song={{ trackId: track.trackId, title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl }}
           onClose={() => setShareModalOpen(false)}
           onCopied={() => {
             setShareCopiedToast(true);

@@ -6,6 +6,7 @@ import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
+import { VALID_MISC_BOXES, VALID_MAP_CHIPS } from './presentation/components/portal/BannerCarousel.jsx';
 const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
@@ -36,6 +37,19 @@ interface CafeDeepLink {
   type: string | null;
 }
 
+// 콜드 스타트(앱이 꺼진 상태에서 tab=... 딥링크 URL로 새로 열리는 경우)에 tab/chip/box/trackId를 읽기 위한 헬퍼.
+// 학식 딥링크(date/cafe/type)와 동일하게 웹은 현재 페이지 쿼리스트링을, 네이티브는 OS가 넘겨준 초기
+// 딥링크 파라미터를 본다 — 이 둘 중 하나로 카카오 공유·배너 링크를 웹/앱 모두에서 cold start로 열 수 있게 함
+function resolveInitialDeepLinkParams(): URLSearchParams {
+  const webParams = new URLSearchParams(window.location.search);
+  if (webParams.has('tab')) return webParams;
+  try {
+    const native = window.__NativeDeepLink?.getParams?.();
+    if (native) return new URLSearchParams(native);
+  } catch {}
+  return webParams;
+}
+
 export default function App() {
   return (
     <NetworkProvider>
@@ -57,6 +71,9 @@ function MainLayout() {
       const native = window.__NativeDeepLink?.getParams?.();
       if (native) { const np = new URLSearchParams(native); if (np.has('date') || np.has('cafe') || np.has('type')) return 'cafe'; }
     } catch {}
+    const dlTab = resolveInitialDeepLinkParams().get('tab');
+    if (dlTab === 'weather') return 'portal';
+    if (dlTab === 'partner' || dlTab === 'misc') return dlTab;
     let lastTab = localStorage.getItem('lastActiveTab') || 'cafe';
     if (lastTab === 'qr') lastTab = 'cafe';
     return lastTab;
@@ -81,10 +98,29 @@ function MainLayout() {
   // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
   const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
-  // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
-  const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
-  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
-  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(null);
+  // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달.
+  // 콜드 스타트로 tab=partner&chip=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
+  const [pendingMapChip, setPendingMapChip] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'partner') return null;
+    const chip = dl.get('chip');
+    return chip && VALID_MAP_CHIPS.includes(chip) ? chip : null;
+  });
+  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 MiscView에 한 번만 전달.
+  // 콜드 스타트로 tab=misc&box=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
+  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'misc') return null;
+    const box = dl.get('box');
+    return box && VALID_MISC_BOXES.includes(box) ? box : null;
+  });
+  // 카카오 공유 등에서 플레이리스트의 특정 곡 게시글 모음까지 지정해 이동시킬 때 PlaylistView에 한 번만 전달.
+  // 콜드 스타트로 tab=misc&box=playlist&trackId=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
+  const [pendingPlaylistTrackId, setPendingPlaylistTrackId] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'misc' || dl.get('box') !== 'playlist') return null;
+    return dl.get('trackId');
+  });
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const { isOnline } = useNetwork();
   const posthog = usePostHog();
@@ -140,6 +176,15 @@ function MainLayout() {
       setPartnerVisited(true);
       setActiveTab('partner');
       localStorage.setItem('lastActiveTab', 'partner');
+      return;
+    }
+    if (tab === 'misc') {
+      const box = params.get('box');
+      const trackId = params.get('trackId');
+      if (box && VALID_MISC_BOXES.includes(box)) setPendingMiscBox(box);
+      if (trackId && box === 'playlist') setPendingPlaylistTrackId(trackId);
+      setActiveTab('misc');
+      localStorage.setItem('lastActiveTab', 'misc');
       return;
     }
     if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
@@ -273,6 +318,8 @@ function MainLayout() {
               isActive={activeTab === 'misc'}
               deepLinkBox={pendingMiscBox}
               onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
+              deepLinkTrackId={pendingPlaylistTrackId}
+              onDeepLinkTrackIdHandled={() => setPendingPlaylistTrackId(null)}
             />
           </div>
           {/* 지도는 px-4 패딩을 -mx-4로 상쇄해 전체 폭을 사용 */}

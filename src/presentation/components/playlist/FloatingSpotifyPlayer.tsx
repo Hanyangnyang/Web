@@ -218,7 +218,7 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
 
       {shareModalOpen && (
         <SongShareModal
-          song={{ title: displaySong.title, artist: displaySong.artist, albumArtUrl: displaySong.albumArtUrl }}
+          song={{ trackId: displaySong.trackId, title: displaySong.title, artist: displaySong.artist, albumArtUrl: displaySong.albumArtUrl }}
           onClose={() => setShareModalOpen(false)}
           onCopied={() => {
             setShareCopiedToast(true);

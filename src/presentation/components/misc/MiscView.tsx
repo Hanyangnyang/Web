@@ -92,9 +92,13 @@ interface MiscViewProps {
   // 배너 등에서 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 App.tsx가 한 번만 내려줌
   deepLinkBox?: string | null;
   onDeepLinkBoxHandled?: () => void;
+  // 카카오 공유 등에서 플레이리스트의 특정 곡 게시글 모음까지 지정해 이동시킬 때 App.tsx가 내려줌 —
+  // subView를 'playlist'로 바꾸는 건 위 deepLinkBox가 처리하므로, 여기선 PlaylistView로 그대로 전달만 함
+  deepLinkTrackId?: string | null;
+  onDeepLinkTrackIdHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
@@ -127,7 +131,15 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
   };
 
   if (subView === 'gym') return <GymView onBack={() => setSubView('list')} />;
-  if (subView === 'playlist') return <PlaylistView onBack={() => setSubView('list')} />;
+  if (subView === 'playlist') {
+    return (
+      <PlaylistView
+        onBack={() => setSubView('list')}
+        deepLinkTrackId={deepLinkTrackId}
+        onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
+      />
+    );
+  }
   if (subView === 'insta') {
     const onBack = () => setSubView('list');
     if (InstagramViewComp) {

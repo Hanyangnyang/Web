@@ -31,7 +31,14 @@ const TRACK_PLAY_THROTTLE_MS = 10 * 1000;
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
 
-export function PlaylistView({ onBack }: { onBack: () => void }) {
+interface PlaylistViewProps {
+  onBack: () => void;
+  // 카카오 공유 등 딥링크로 특정 곡의 게시글 모음까지 지정해 진입시킬 때 App.tsx가 한 번만 내려줌
+  deepLinkTrackId?: string | null;
+  onDeepLinkTrackIdHandled?: () => void;
+}
+
+export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled }: PlaylistViewProps) {
   const isApp = isNativeApp();
   const platform = getPlatform();
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,6 +161,15 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
     setSelectedTrackForPosts(track);
     pushScreen('trackPosts');
   }, [pushScreen]);
+
+  // 카카오 공유 등 딥링크로 넘어온 trackId를 한 번 적용해 그 곡의 게시글 모음으로 바로 이동시키고,
+  // 부모(App.tsx)에 소비 완료를 알린다 (CampusMapView의 deepLinkChip과 동일한 방식). 아직 제목/가수명/
+  // 앨범아트를 모르므로 빈 값으로 넘기고, TrackPostCollectionView가 useTrackPosts로 받아온 실제 값으로 채움
+  useEffect(() => {
+    if (!deepLinkTrackId) return;
+    handleSelectSearchTrack({ trackId: deepLinkTrackId, title: '', artist: '', albumArtUrl: '' });
+    onDeepLinkTrackIdHandled?.();
+  }, [deepLinkTrackId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 인기차트 리스트 클릭 — ChartTrack을 TrackResult 형태로 변환해 동일한 TrackPostCollectionView로 이동
   const handleSelectChartSong = useCallback((track: ChartTrack) => {

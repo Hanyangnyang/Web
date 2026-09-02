@@ -25,6 +25,7 @@ const KakaoIcon = () => (
 );
 
 export interface SongShareModalSong {
+  trackId: string;
   title: string;
   artist: string;
   albumArtUrl: string;
@@ -51,8 +52,8 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
     loadKakaoSdk().catch(() => {});
   }, []);
 
-  // 아직 곡/게시글 단위 딥링크가 없어서, 우선 플레이리스트가 있는 "기타" 탭으로 진입시킴
-  const shareUrl = `${window.location.origin}/?tab=misc`;
+  // 기타탭 > 플레이리스트로 진입시킨 뒤, trackId로 바로 그 곡의 게시글 모음(TrackPostCollectionView)까지 열게 함
+  const shareUrl = `${window.location.origin}/?tab=misc&box=playlist&trackId=${encodeURIComponent(song.trackId)}`;
   const shareTitle = `${song.title} · ${song.artist}`;
 
   const handleKakao = async () => {

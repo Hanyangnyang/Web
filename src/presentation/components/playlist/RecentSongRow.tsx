@@ -48,19 +48,15 @@ export function RecentSongRow({ song, onSelect }: RecentSongRowProps) {
               className="flex items-center gap-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {displayedReactions.map(({ key, emoji }) => {
-                const mine = reactions[key]?.mine ?? false;
-                return (
-                  <span
-                    key={key}
-                    className="flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-slate-100 border-transparent text-text-sub"
-                  >
-                    {/* 내가 남긴 반응이 아니면 흑백(2D) 톤으로 살짝 죽여서 구분 */}
-                    <span className={`text-[10px] ${mine ? '' : 'grayscale opacity-70'}`}>{emoji}</span>
-                    <span>{reactions[key]?.count ?? 0}</span>
-                  </span>
-                );
-              })}
+              {displayedReactions.map(({ key, emoji }) => (
+                <span
+                  key={key}
+                  className="flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border bg-slate-100 border-transparent text-text-sub"
+                >
+                  <span className="text-[10px] grayscale opacity-70">{emoji}</span>
+                  <span>{reactions[key]?.count ?? 0}</span>
+                </span>
+              ))}
             </div>
           )}
           {displayedReactions.length === 0 && (

@@ -8,12 +8,12 @@ const VALID_TABS = ['cafe', 'shuttle', 'portal', 'partner', 'misc'];
 
 // 캠퍼스맵(useCampusMapFilters.ts의 MapChip)이 실제로 받아들이는 칩 값 목록 — clickUrl의
 // chip 파라미터에 오타/미지원 값이 오면 걸러서 CampusMapView에 잘못된 칩 상태가 전달되는 걸 막는다
-const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food', 'cafe', 'pub', 'play', 'life'];
+export const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food', 'cafe', 'pub', 'play', 'life'];
 
 // 기타탭(MiscView)이 실제로 진입 가능한 하위 화면 값 목록 — clickUrl의 box 파라미터에
 // 오타/미지원 값이 오면 걸러서 MiscView에 잘못된 서브뷰 상태가 전달되는 걸 막는다.
 // 'calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외
-const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist'];
+export const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist'];
 
 interface BannerCarouselProps {
   banners: Banner[];

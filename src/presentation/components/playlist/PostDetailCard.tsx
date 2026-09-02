@@ -497,7 +497,7 @@ export function PostDetailCard({
 
       {shareModalOpen && (
         <SongShareModal
-          song={{ title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl }}
+          song={{ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl }}
           onClose={() => setShareModalOpen(false)}
           onCopied={() => {
             setShareCopiedToast(true);

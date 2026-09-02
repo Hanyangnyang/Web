@@ -35,6 +35,16 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   const totalCount = data?.totalSongsCount ?? posts.length;
   const totalHeartCount = data?.totalHeartCount ?? 0;
   const totalPlayCount = data?.totalPlayCount ?? 0;
+  // 딥링크(카카오 공유 등)로 trackId만 가지고 들어오면 track.title 등이 빈 문자열이라, useTrackPosts가
+  // 받아온 값으로 채움 — 검색/차트 등에서 정상적으로 곡 정보를 들고 들어온 경우엔 이미 있는 track 값을 그대로 씀
+  const displayTrack = {
+    trackId: track.trackId,
+    title: data?.title || track.title,
+    artist: data?.artist || track.artist,
+    albumArtUrl: data?.albumArtUrl || track.albumArtUrl,
+  };
+  // 딥링크로 들어와서 아직 곡 정보를 하나도 못 받은 상태 — 이때만 곡 정보 카드에 스켈레톤을 보여줌
+  const isTrackInfoLoading = isLoading && !track.title && !data;
 
   const [bookmarkedByPost, setBookmarkedByPost] = useState<Record<string, boolean>>({});
   const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
@@ -130,7 +140,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       <MiscSubViewHeader
         title="게시글 모음"
         emoji="💬"
-        subtitle={`'${track.title} · ${track.artist}' 의 추천 게시글을 다 모았어요!`}
+        subtitle={displayTrack.title ? `'${displayTrack.title} · ${displayTrack.artist}' 의 추천 게시글을 다 모았어요!` : ''}
         onBack={onBack}
       />
 
@@ -161,52 +171,66 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
 
       {/* 곡 정보 — 앨범아트:정보 = 1:1 비율. 정보 쪽은 통계를 색깔 있는 뱃지로 다양하게 채워서
           큰 앨범아트 옆이 휑해 보이지 않게 함 */}
-      <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
-        <img
-          src={track.albumArtUrl}
-          alt={track.title}
-          className="w-1/2 aspect-square rounded-xl object-cover bg-slate-100 flex-shrink-0"
-        />
-        <div className="min-w-0 flex-1 flex flex-col gap-2.5">
-          <div>
-            <div className="text-lg font-bold text-text-main truncate">{track.title}</div>
-            <div className="text-[13px] text-text-sub truncate">{track.artist}</div>
-          </div>
-          <div className="border-t border-slate-300" />
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-rose-50 text-[11px] font-bold text-rose-500">
-              <span className="text-xs">🔖</span>
-              북마크 {totalHeartCount.toLocaleString()}
-            </span>
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-sky-50 text-[11px] font-bold text-sky-600">
-              <span className="text-xs">🎧</span>
-              재생 {totalPlayCount.toLocaleString()}
-            </span>
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-600">
-              <span className="text-xs">💬</span>
-              게시글 {totalCount.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {!isPlaying && (
-              <button
-                onClick={onPlay}
-                aria-label={`${track.title} 재생`}
-                className="w-9 h-9 rounded-full bg-slate-800 text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] flex items-center justify-center active:scale-90 transition-transform"
-              >
-                <Play size={16} fill="white" stroke="white" strokeWidth={1} />
-              </button>
-            )}
-            <button
-              onClick={() => setShareModalOpen(true)}
-              aria-label="공유하기"
-              className="w-9 h-9 rounded-full bg-slate-800 text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] flex items-center justify-center active:scale-90 transition-transform"
-            >
-              <Share2 size={16} strokeWidth={2} />
-            </button>
+      {isTrackInfoLoading ? (
+        <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
+          <div className="w-1/2 aspect-square rounded-xl skeleton-shimmer flex-shrink-0" />
+          <div className="min-w-0 flex-1 flex flex-col gap-2.5">
+            <div className="space-y-1.5">
+              <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
+              <div className="h-3 w-1/3 skeleton-shimmer rounded-full" />
+            </div>
+            <div className="border-t border-slate-300" />
+            <div className="h-5 w-full skeleton-shimmer rounded-full" />
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
+          <img
+            src={displayTrack.albumArtUrl}
+            alt={displayTrack.title}
+            className="w-1/2 aspect-square rounded-xl object-cover bg-slate-100 flex-shrink-0"
+          />
+          <div className="min-w-0 flex-1 flex flex-col gap-2.5">
+            <div>
+              <div className="text-lg font-bold text-text-main truncate">{displayTrack.title}</div>
+              <div className="text-[13px] text-text-sub truncate">{displayTrack.artist}</div>
+            </div>
+            <div className="border-t border-slate-300" />
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-rose-50 text-[11px] font-bold text-rose-500">
+                <span className="text-xs">🔖</span>
+                북마크 {totalHeartCount.toLocaleString()}
+              </span>
+              <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-sky-50 text-[11px] font-bold text-sky-600">
+                <span className="text-xs">🎧</span>
+                재생 {totalPlayCount.toLocaleString()}
+              </span>
+              <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-600">
+                <span className="text-xs">💬</span>
+                게시글 {totalCount.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {!isPlaying && (
+                <button
+                  onClick={onPlay}
+                  aria-label={`${displayTrack.title} 재생`}
+                  className="w-9 h-9 rounded-full bg-slate-800 text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] flex items-center justify-center active:scale-90 transition-transform"
+                >
+                  <Play size={16} fill="white" stroke="white" strokeWidth={1} />
+                </button>
+              )}
+              <button
+                onClick={() => setShareModalOpen(true)}
+                aria-label="공유하기"
+                className="w-9 h-9 rounded-full bg-slate-800 text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] flex items-center justify-center active:scale-90 transition-transform"
+              >
+                <Share2 size={16} strokeWidth={2} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 정렬 칩 */}
       <div className="flex gap-2 mb-3 pl-2">
@@ -450,7 +474,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
 
       {shareModalOpen && (
         <SongShareModal
-          song={{ title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl }}
+          song={displayTrack}
           onClose={() => setShareModalOpen(false)}
           onCopied={() => {
             setShareCopiedToast(true);
