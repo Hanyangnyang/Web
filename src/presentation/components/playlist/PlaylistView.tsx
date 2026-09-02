@@ -13,8 +13,8 @@ import { PostDetailView } from './PostDetailView';
 import { MyActivityView } from './MyActivityView';
 import { BookmarkedSongsView } from './BookmarkedSongsView';
 import { MySongsView } from './MySongsView';
-import { RecentSongCard } from './RecentSongCard';
-import { ChartSongRow } from './ChartSongRow';
+import { ChartTopCard } from './ChartTopCard';
+import { RecentSongRow } from './RecentSongRow';
 import { EmptyChartState } from './EmptyChartState';
 import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from './playlistTypes';
 import { ChartView } from './ChartView';
@@ -23,7 +23,8 @@ import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs, useRecordTrackPlay, usePopularityChart } from '../../hooks/useRecentSongs.js';
 
 const RECENT_SONGS_LIMIT = 7;
-const CHART_LIMIT = 10;
+// 홈 화면 인기차트 미리보기는 1~3위만 큰 카드 3열 그리드로 강조 노출 (전체 목록은 인기차트 전체보기에서)
+const CHART_PREVIEW_LIMIT = 3;
 // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 const TRACK_PLAY_THROTTLE_MS = 10 * 1000;
 
@@ -177,7 +178,7 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
   }, [pushScreen]);
 
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
-  const visibleChart = chartTracks.slice(0, CHART_LIMIT);
+  const visibleChart = chartTracks.slice(0, CHART_PREVIEW_LIMIT);
 
   const bottomSpace = playerHeight > 0 ? playerHeight + 4 : 4;
 
@@ -326,7 +327,8 @@ interface PlaylistMainContentProps {
   onShowAllRecent: () => void;
   onSelectRecentSong: (song: Song) => void;
   onShowAllChart: () => void;
-  onPlay: (track: ChartTrack) => void;
+  // 최근추가된곡 행과 인기차트 카드가 공용으로 씀 — 둘 다 PlayableTrack(trackId/title/artist/albumArtUrl)을 만족함
+  onPlay: (track: PlayableTrack) => void;
   onShowPosts: (track: ChartTrack) => void;
   onShowMyActivity: () => void;
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
@@ -408,41 +410,8 @@ function PlaylistMainContent({
         </button>
       </div>
 
-      {/* 최근 추가된 곡 섹션 */}
+      {/* 인기차트 섹션 — 1~3위만 큰 카드 3열 그리드로 강조 노출 */}
       <section className="mb-4">
-        <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
-          <button
-            onClick={onShowAllRecent}
-            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
-            aria-label="최근 추가된 곡 전체보기"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-
-        <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <div className="flex gap-3 pb-2">
-            {isRecentSongsLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-44 aspect-[4/5] rounded-xl bg-slate-200 animate-pulse" />
-              ))
-            ) : (
-              visibleSongs.map((song) => (
-                <RecentSongCard
-                  key={song.id ?? song.trackId}
-                  song={song}
-                  onClick={() => onSelectRecentSong(song)}
-                />
-              ))
-            )}
-            <div className="w-1 flex-shrink-0" aria-hidden="true" />
-          </div>
-        </div>
-      </section>
-
-      {/* 인기차트 섹션 */}
-      <section>
         <div className="flex items-center gap-1 mb-2">
           <h3 className="text-lg font-bold text-text-main">인기차트</h3>
           <button
@@ -471,11 +440,49 @@ function PlaylistMainContent({
           ))}
         </div>
 
-        {/* 차트 리스트 */}
+        {/* 1~3위 카드 그리드 */}
+        {isChartLoading ? (
+          <div className="grid grid-cols-3 gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="aspect-[27/50] rounded-xl bg-slate-200 animate-pulse" />
+            ))}
+          </div>
+        ) : visibleChart.length === 0 ? (
+          <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+            <EmptyChartState
+              periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
+              onShowRecent={onShowAllRecent}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2">
+            {visibleChart.map((track) => (
+              <ChartTopCard
+                key={track.trackId}
+                track={track}
+                onShowPosts={onShowPosts}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* 최근 추가된 곡 섹션 */}
+      <section>
+        <div className="flex items-center gap-1 mb-2">
+          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
+          <button
+            onClick={onShowAllRecent}
+            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
+            aria-label="최근 추가된 곡 전체보기"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
         <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
           {/* 헤더 */}
           <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
-            <span className="w-7 text-center">순위</span>
             <div className="flex-1">곡정보</div>
             <div className="flex items-center gap-3">
               <span className="w-6 text-center">듣기</span>
@@ -484,36 +491,21 @@ function PlaylistMainContent({
           </div>
 
           {/* 리스트 */}
-          {isChartLoading ? (
+          {isRecentSongsLoading ? (
             <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
-          ) : visibleChart.length === 0 ? (
-            <EmptyChartState
-              periodLabel={CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}
-              onShowRecent={onShowAllRecent}
-            />
+          ) : visibleSongs.length === 0 ? (
+            <p className="text-xs text-text-hint text-center py-10">아직 추가된 곡이 없어요</p>
           ) : (
-            visibleChart.map((track) => (
-              <ChartSongRow
-                key={track.trackId}
-                track={track}
+            visibleSongs.map((song) => (
+              <RecentSongRow
+                key={song.id ?? song.trackId}
+                song={song}
                 onPlay={onPlay}
-                onShowPosts={onShowPosts}
+                onSelect={onSelectRecentSong}
               />
             ))
           )}
         </div>
-
-        {/* 더보기 — 인기차트 전체보기로 이동 */}
-        {visibleChart.length > 0 && (
-          <div className="flex justify-center mt-3">
-            <button
-              onClick={onShowAllChart}
-              className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
-            >
-              더보기
-            </button>
-          </div>
-        )}
       </section>
     </div>
   );
