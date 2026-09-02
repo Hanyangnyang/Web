@@ -23,8 +23,9 @@ import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs, useRecordTrackPlay, usePopularityChart } from '../../hooks/useRecentSongs.js';
 
 const RECENT_SONGS_LIMIT = 7;
-// 홈 화면 인기차트 미리보기는 1~3위만 큰 카드 3열 그리드로 강조 노출 (전체 목록은 인기차트 전체보기에서)
-const CHART_PREVIEW_LIMIT = 3;
+// 홈 화면 인기차트 미리보기는 TOP10/WEEK10/MONTH10 라벨에 맞춰 최대 10개를 3열 카드 그리드로,
+// 세로 스크롤로 보여줌 (전체 목록은 인기차트 전체보기에서)
+const CHART_PREVIEW_LIMIT = 10;
 // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 const TRACK_PLAY_THROTTLE_MS = 10 * 1000;
 
@@ -289,7 +290,6 @@ export function PlaylistView({ onBack }: { onBack: () => void }) {
             onShowAllRecent={handleShowAllRecent}
             onSelectRecentSong={handleSelectRecentSong}
             onShowAllChart={() => pushScreen('chart')}
-            onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
             autoFocusSearch={autoFocusSearch}
@@ -327,8 +327,6 @@ interface PlaylistMainContentProps {
   onShowAllRecent: () => void;
   onSelectRecentSong: (song: Song) => void;
   onShowAllChart: () => void;
-  // 최근추가된곡 행과 인기차트 카드가 공용으로 씀 — 둘 다 PlayableTrack(trackId/title/artist/albumArtUrl)을 만족함
-  onPlay: (track: PlayableTrack) => void;
   onShowPosts: (track: ChartTrack) => void;
   onShowMyActivity: () => void;
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
@@ -350,7 +348,6 @@ function PlaylistMainContent({
   onShowAllRecent,
   onSelectRecentSong,
   onShowAllChart,
-  onPlay,
   onShowPosts,
   onShowMyActivity,
   autoFocusSearch = false,
@@ -410,7 +407,7 @@ function PlaylistMainContent({
         </button>
       </div>
 
-      {/* 인기차트 섹션 — 1~3위만 큰 카드 3열 그리드로 강조 노출 */}
+      {/* 인기차트 섹션 — 최대 10위까지 큰 카드를 가로 스크롤로 노출 */}
       <section className="mb-4">
         <div className="flex items-center gap-1 mb-2">
           <h3 className="text-lg font-bold text-text-main">인기차트</h3>
@@ -440,12 +437,14 @@ function PlaylistMainContent({
           ))}
         </div>
 
-        {/* 1~3위 카드 그리드 */}
+        {/* 카드 가로 스크롤 — 최대 10개 */}
         {isChartLoading ? (
-          <div className="grid grid-cols-3 gap-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="aspect-[27/50] rounded-xl bg-slate-200 animate-pulse" />
-            ))}
+          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex gap-2 pb-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-32 aspect-[27/50] rounded-xl bg-slate-200 animate-pulse" />
+              ))}
+            </div>
           </div>
         ) : visibleChart.length === 0 ? (
           <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
@@ -455,14 +454,17 @@ function PlaylistMainContent({
             />
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
-            {visibleChart.map((track) => (
-              <ChartTopCard
-                key={track.trackId}
-                track={track}
-                onShowPosts={onShowPosts}
-              />
-            ))}
+          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex gap-2 pb-2">
+              {visibleChart.map((track) => (
+                <ChartTopCard
+                  key={track.trackId}
+                  track={track}
+                  onShowPosts={onShowPosts}
+                />
+              ))}
+              <div className="w-1 flex-shrink-0" aria-hidden="true" />
+            </div>
           </div>
         )}
       </section>
@@ -480,32 +482,46 @@ function PlaylistMainContent({
           </button>
         </div>
 
-        <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
-          {/* 헤더 */}
-          <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
-            <div className="flex-1">곡정보</div>
-            <div className="flex items-center gap-3">
-              <span className="w-6 text-center">듣기</span>
-              <span className="w-6 text-center">공유</span>
-            </div>
+        {/* 각 행이 개별 게시글이라는 걸 드러내려고 하나의 표가 아니라 카드마다 살짝 떨어뜨려 배치 */}
+        {isRecentSongsLoading ? (
+          <div className="flex flex-col gap-1.5">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
+                <div className="w-12 h-12 rounded bg-slate-200 animate-pulse flex-shrink-0" />
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="h-3.5 w-2/3 rounded-full bg-slate-200 animate-pulse" />
+                  <div className="h-3 w-1/3 rounded-full bg-slate-200 animate-pulse" />
+                </div>
+              </div>
+            ))}
           </div>
-
-          {/* 리스트 */}
-          {isRecentSongsLoading ? (
-            <div className="py-10 text-center text-sm text-text-hint">불러오는 중...</div>
-          ) : visibleSongs.length === 0 ? (
+        ) : visibleSongs.length === 0 ? (
+          <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
             <p className="text-xs text-text-hint text-center py-10">아직 추가된 곡이 없어요</p>
-          ) : (
-            visibleSongs.map((song) => (
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            {visibleSongs.map((song) => (
               <RecentSongRow
                 key={song.id ?? song.trackId}
                 song={song}
-                onPlay={onPlay}
                 onSelect={onSelectRecentSong}
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {/* 더보기 — 최근 추가된 곡 전체보기로 이동 */}
+        {!isRecentSongsLoading && visibleSongs.length > 0 && (
+          <div className="flex justify-center mt-3">
+            <button
+              onClick={onShowAllRecent}
+              className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+            >
+              더보기
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );

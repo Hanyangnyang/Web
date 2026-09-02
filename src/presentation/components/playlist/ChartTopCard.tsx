@@ -8,7 +8,7 @@ interface ChartTopCardProps {
   onShowPosts: (track: ChartTrack) => void;
 }
 
-// 인기차트 홈 미리보기 1~3위 전용 카드 — RecentSongCard와 동일한 카드 스타일(앨범아트 전체 배경 +
+// 인기차트 홈 미리보기 카드(최대 10위) — RecentSongCard와 동일한 카드 스타일(앨범아트 전체 배경 +
 // 우상단 재생 아이콘 + 하단 텍스트)에 거대 순위 숫자만 얹음
 export function ChartTopCard({ track, onShowPosts }: ChartTopCardProps) {
   return (
@@ -20,7 +20,7 @@ export function ChartTopCard({ track, onShowPosts }: ChartTopCardProps) {
         if (e.key === 'Enter' || e.key === ' ') onShowPosts(track);
       }}
       aria-label={`${track.rank}위 ${track.title} 추천 게시글 보기`}
-      className="aspect-[27/50] rounded-xl overflow-hidden shadow-lg relative cursor-pointer"
+      className="flex-shrink-0 w-32 aspect-[27/50] rounded-xl overflow-hidden shadow-lg relative cursor-pointer"
     >
       {/* 앨범커버 전체 배경 */}
       <img
