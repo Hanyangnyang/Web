@@ -20,17 +20,20 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
   const isPlaying = song.trackId === currentTrackId;
 
   return (
-    <div className="flex items-stretch min-h-[64px] bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
-      {/* 앨범 커버 — 가로 비율을 2.5:7.5로 나눔(flex-[25]/flex-[75]), 눌러서 바로 재생 */}
+    <div className="flex items-stretch bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
+      {/* 앨범 커버 — 가로 폭이 이 행 전체 너비의 정확히 20%(반응형)가 되도록 w-1/5로 고정하고,
+          aspect-square로 그 폭에서 높이를 역산함. 즉 앨범커버의 "폭"이 행 전체 높이를 결정하는
+          기준이 되고(예전엔 반대로 높이가 폭을 역산했음), 오른쪽 정보 영역은 그 높이에 맞춰 늘어남.
+          눌러서 바로 재생 */}
       <button
         onClick={() => onPlay(song)}
         aria-label={isPlaying ? `${song.title} 일시정지` : `${song.title} 재생`}
-        className="relative flex-[25] min-w-0 flex justify-start active:opacity-80 transition-opacity"
+        className="relative w-1/5 flex-shrink-0 aspect-square active:opacity-80 transition-opacity"
       >
         <img
           src={song.albumArtUrl}
           alt={song.title}
-          className="h-full aspect-square object-cover bg-slate-100"
+          className="w-full h-full object-cover bg-slate-100"
         />
         {/* 재생/일시정지 아이콘 — 재생 중엔 일시정지 아이콘으로 바뀌고, 눌러서 그대로 멈출 수 있음 */}
         <span className="absolute inset-0 m-auto w-[34%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
@@ -46,10 +49,12 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
       <button
         onClick={() => onSelect(song)}
         aria-label={`${song.title} 전체보기`}
-        className="flex flex-[75] min-w-0 items-center gap-1 pl-2.5 pr-2 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        className="flex flex-1 min-w-0 gap-1 pl-2.5 pr-2 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
       >
-        {/* 곡명·가수명 + 한마디 코멘트 + 리액션 요약  */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
+        {/* 곡명·가수명 + 한마디 코멘트 + 리액션 요약 — justify-evenly로 맨 위 여백, 줄과 줄 사이 여백들,
+            맨 아래 여백까지 전부 똑같은 간격이 되게 함(justify-between은 양 끝 여백 없이 사이만 분배돼서
+            원하는 것과 달랐음) */}
+        <div className="flex-1 min-w-0 flex flex-col justify-evenly">
           <div className="min-w-0 truncate leading-tight">
             <span className="font-semibold text-text-main text-sm">{song.title}</span>
             <span className="text-xs text-text-sub"> · {song.artist}</span>
@@ -92,7 +97,7 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
           </div>
         </div>
 
-        <ChevronRight size={24} className="text-text-hint flex-shrink-0" />
+        <ChevronRight size={24} className="text-text-hint flex-shrink-0 self-center" />
       </button>
     </div>
   );

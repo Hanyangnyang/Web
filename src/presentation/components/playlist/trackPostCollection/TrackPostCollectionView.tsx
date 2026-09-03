@@ -114,11 +114,12 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         onBack={onBack}
       />
 
-      {/* 곡 정보 — 앨범아트는 항상 정사각형(카드 높이에서 폭을 역산). 재생/북마크 수는 칩이 아니라
-          아이콘+숫자로 담백하게, 게시글 수는 여기가 아니라 아래 게시글 목록 바로 위에 표기 */}
+      {/* 곡 정보 — 앨범아트는 카드 폭의 40%(w-2/5)로 고정, 거기서 정사각형 높이를 역산해서 카드
+          전체 높이를 결정함. 재생/북마크 수는 칩이 아니라 아이콘+숫자로 담백하게, 게시글 수는
+          여기가 아니라 아래 게시글 목록 바로 위에 표기 */}
       {isTrackInfoLoading ? (
-        <div className="flex items-stretch h-[160px] gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
-          <div className="aspect-square h-full flex-shrink-0 skeleton-shimmer" />
+        <div className="flex items-stretch gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="w-2/5 flex-shrink-0 aspect-square skeleton-shimmer" />
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
             <div className="space-y-1.5">
               <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
@@ -129,10 +130,11 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           </div>
         </div>
       ) : (
-        <div className="flex items-stretch h-[160px] gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
-          {/* 앨범커버 — 항상 1:1 정사각형(aspect-square + h-full로 카드 높이에서 폭을 역산), 카드
-              왼쪽/위/아래 테두리에 여백 없이 꽉 차게(overflow-hidden으로 왼쪽 모서리만 카드 라운딩에 맞춰 클립) */}
-          <div className="relative aspect-square h-full flex-shrink-0">
+        <div className="flex items-stretch gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+          {/* 앨범커버 — 폭이 카드 전체 너비의 정확히 40%(반응형)가 되도록 w-2/5로 고정하고 aspect-square로
+              그 폭에서 높이를 역산(카드 전체 높이도 이 앨범커버 높이를 따라감). 카드 왼쪽/위/아래 테두리에
+              여백 없이 꽉 차게(overflow-hidden으로 왼쪽 모서리만 카드 라운딩에 맞춰 클립) */}
+          <div className="relative w-2/5 flex-shrink-0 aspect-square">
             <img
               src={displayTrack.albumArtUrl}
               alt={displayTrack.title}
