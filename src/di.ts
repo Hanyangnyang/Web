@@ -50,6 +50,25 @@ import { createSubwayApiDataSource } from './data/datasources/SubwayApiDataSourc
 import { createShuttleRepository } from './data/repositories/ShuttleRepository.js';
 import { createSubwayRepository } from './data/repositories/SubwayRepository.js';
 
+import { createPlaylistApiDataSource } from './data/datasources/PlaylistApiDataSource.js';
+import { createPlaylistRepository } from './data/repositories/PlaylistRepository.js';
+import { createMusicSearchApiDataSource } from './data/datasources/MusicSearchApiDataSource.js';
+import { createMusicSearchRepository } from './data/repositories/MusicSearchRepository.js';
+import { createGetRecentSongsUseCase } from './domain/usecases/GetRecentSongsUseCase.js';
+import { createGetSongByIdUseCase } from './domain/usecases/GetSongByIdUseCase.js';
+import { createGetSongCreationStatusUseCase } from './domain/usecases/GetSongCreationStatusUseCase.js';
+import { createGetBookmarkedSongsUseCase } from './domain/usecases/GetBookmarkedSongsUseCase.js';
+import { createGetMySongsUseCase } from './domain/usecases/GetMySongsUseCase.js';
+import { createSearchSongsUseCase } from './domain/usecases/SearchSongsUseCase.js';
+import { createSubmitSongUseCase } from './domain/usecases/SubmitSongUseCase.js';
+import { createReportSongUseCase } from './domain/usecases/ReportSongUseCase.js';
+import { createToggleBookmarkUseCase } from './domain/usecases/ToggleBookmarkUseCase.js';
+import { createRecordTrackPlayUseCase } from './domain/usecases/RecordTrackPlayUseCase.js';
+import { createToggleReactionUseCase } from './domain/usecases/ToggleReactionUseCase.js';
+import { createGetTrackPostsUseCase } from './domain/usecases/GetTrackPostsUseCase.js';
+import { createGetPopularityChartUseCase } from './domain/usecases/GetPopularityChartUseCase.js';
+import { createSearchMusicTracksUseCase } from './domain/usecases/SearchMusicTracksUseCase.js';
+
 // 기존 Vercel BFF(/api/*) 전용 
 const httpClient = createHttpClient();
 // 새 백엔드 전용 
@@ -67,6 +86,9 @@ const libraryApiDataSource = createLibraryApiDataSource({ httpClient: apiHttpCli
 const bannerApiDataSource = createBannerApiDataSource({ httpClient: apiHttpClient });
 const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
+const playlistApiDataSource = createPlaylistApiDataSource({ httpClient: apiHttpClient });
+// Spotify 카탈로그 곡 검색 — 기존 Vercel BFF(/api/music-search)에서 새 백엔드로 이관 완료
+const musicSearchApiDataSource = createMusicSearchApiDataSource({ httpClient: apiHttpClient });
 const feedbackApiDataSource = createFeedbackApiDataSource({ httpClient: apiHttpClient });
 const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: apiHttpClient });
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
@@ -84,6 +106,8 @@ export const libraryRepository = createLibraryRepository({ libraryApiDataSource 
 export const bannerRepository = createBannerRepository({ bannerApiDataSource });
 export const busRepository = createBusRepository({ busApiDataSource });
 export const gymRepository = createGymRepository({ gymApiDataSource });
+export const playlistRepository = createPlaylistRepository({ playlistApiDataSource });
+export const musicSearchRepository = createMusicSearchRepository({ musicSearchApiDataSource });
 export const feedbackApiRepository = createFeedbackApiRepository({ feedbackApiDataSource });
 export const partnerStoreRepository = createPartnerStoreRepository({ partnerStoreApiDataSource });
 export const campusBuildingRepository = createCampusBuildingRepository({ campusBuildingApiDataSource });
@@ -101,6 +125,20 @@ export const getLibraryStatusUseCase = createGetLibraryStatusUseCase({ libraryRe
 export const getBannersUseCase = createGetBannersUseCase({ bannerRepository });
 export const getBusArrivalsUseCase = createGetBusArrivalsUseCase({ busRepository });
 export const getGymScheduleUseCase = createGetGymScheduleUseCase({ gymRepository });
+export const getRecentSongsUseCase = createGetRecentSongsUseCase({ playlistRepository });
+export const getSongByIdUseCase = createGetSongByIdUseCase({ playlistRepository });
+export const getSongCreationStatusUseCase = createGetSongCreationStatusUseCase({ playlistRepository });
+export const getBookmarkedSongsUseCase = createGetBookmarkedSongsUseCase({ playlistRepository });
+export const getMySongsUseCase = createGetMySongsUseCase({ playlistRepository });
+export const searchSongsUseCase = createSearchSongsUseCase({ playlistRepository });
+export const submitSongUseCase = createSubmitSongUseCase({ playlistRepository });
+export const reportSongUseCase = createReportSongUseCase({ playlistRepository });
+export const toggleBookmarkUseCase = createToggleBookmarkUseCase({ playlistRepository });
+export const recordTrackPlayUseCase = createRecordTrackPlayUseCase({ playlistRepository });
+export const toggleReactionUseCase = createToggleReactionUseCase({ playlistRepository });
+export const getTrackPostsUseCase = createGetTrackPostsUseCase({ playlistRepository });
+export const getPopularityChartUseCase = createGetPopularityChartUseCase({ playlistRepository });
+export const searchMusicTracksUseCase = createSearchMusicTracksUseCase({ musicSearchRepository });
 export const submitFeedbackApiUseCase = createSubmitFeedbackApiUseCase({ feedbackApiRepository });
 export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerStoreRepository });
 export const getCampusBuildingsUseCase = createGetCampusBuildingsUseCase({ campusBuildingRepository });
