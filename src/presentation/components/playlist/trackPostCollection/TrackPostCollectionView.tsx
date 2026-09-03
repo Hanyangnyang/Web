@@ -309,6 +309,12 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                   onTogglePicker={() => setOpenPickerPostId((prev) => (prev === postId ? null : postId ?? null))}
                   size="compact"
                   className="flex-1 min-w-0"
+                  emptyFallback={
+                    // 배경 없는 안내 문구만 살짝 얹음 — PostDetailCard와 동일한 문구/스타일
+                    <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
+                      ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
+                    </span>
+                  }
                 />
 
                 <span className="flex-shrink-0 text-xs text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>
