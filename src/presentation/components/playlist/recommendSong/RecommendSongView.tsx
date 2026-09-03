@@ -229,69 +229,74 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {/* 1. 곡 검색 */}
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">곡 검색</h3>
-        <div
-          className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all ${
-            isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
-          }`}
-        >
-          <div className="flex items-center gap-2 px-3.5 py-2.5">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSearchClick();
-              }}
-              placeholder="곡 제목이나 아티스트를 검색해보세요"
-              className="flex-1 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
-            />
-            <button
-              onClick={handleSearchClick}
-              disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
-              aria-label="곡 검색"
-              className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-[#618CE9] disabled:text-text-hint hover:bg-[#618CE9]/10 transition-colors active:scale-90"
-            >
-              {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-            </button>
+        {/* 검색창 + 아래 결과 패널을 한 group으로 묶어서, 입력창에 포커스가 가 있는 동안엔
+            둘 다 같은 파란 테두리로 보이게 함(포커스 여부와 무관하게 결과 패널만 회색으로 남아 어긋나 보이던 문제) */}
+        <div className="group">
+          <div
+            className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] group-focus-within:border-[#618CE9]/40 transition-all ${
+              isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
+            }`}
+          >
+            <div className="flex items-center gap-2 px-3.5 py-2.5">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSearchClick();
+                }}
+                placeholder="곡 제목이나 아티스트를 검색해보세요"
+                className="flex-1 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+              />
+              <button
+                onClick={handleSearchClick}
+                disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
+                aria-label="곡 검색"
+                className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-[#618CE9] disabled:text-text-hint hover:bg-[#618CE9]/10 transition-colors active:scale-90"
+              >
+                {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* 검색 결과 — 검색창과 이어진 아코디언 패널 */}
-        <div
-          className={`grid transition-[grid-template-rows] duration-300 ease-out ${
-            isResultsPanelOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-          }`}
-        >
-          <div className="overflow-hidden">
-            <div className="bg-white border border-t-0 border-slate-200 rounded-b-card py-3">
-              {searchResults.length > 0 ? (
-                <div
-                  className="flex gap-3 px-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  {searchResults.map((track) => {
-                    // 최근 7일 이내에 이미 추천한 곡은 검색 결과에서 바로 골라내지 못하게 막음(어차피 서버가 PL002로 거절함)
-                    const alreadyRecommended = recentlyRecommendedTrackIds.has(track.trackId);
-                    return (
-                      <MusicSearchResultCard
-                        key={track.trackId}
-                        track={track}
-                        onPlay={onPlay}
-                        isPlaying={track.trackId === currentTrackId}
-                        onSelect={setSelectedTrack}
-                        selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
-                        disabled={alreadyRecommended}
-                        disabledMessage="최근 추천함"
-                        className="w-[123px]"
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-sm text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
-                  {searchErrorMessage || '검색 결과가 없어요'}
-                </p>
-              )}
+          {/* 검색 결과 — 검색창과 이어진 아코디언 패널 */}
+          <div
+            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+              isResultsPanelOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="bg-white border border-t-0 border-slate-200 group-focus-within:border-[#618CE9]/40 transition-colors rounded-b-card py-3">
+                {searchResults.length > 0 ? (
+                  <div
+                    className="flex gap-3 px-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {searchResults.map((track) => {
+                      // 최근 7일 이내에 이미 추천한 곡은 검색 결과에서 바로 골라내지 못하게 막음(어차피 서버가 PL002로 거절함)
+                      const alreadyRecommended = recentlyRecommendedTrackIds.has(track.trackId);
+                      return (
+                        <MusicSearchResultCard
+                          key={track.trackId}
+                          track={track}
+                          onPlay={onPlay}
+                          isPlaying={track.trackId === currentTrackId}
+                          onSelect={setSelectedTrack}
+                          selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
+                          disabled={alreadyRecommended}
+                          disabledMessage="최근 추천함"
+                          showChevron={false}
+                          className="w-[123px]"
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
+                    {searchErrorMessage || '검색 결과가 없어요'}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>

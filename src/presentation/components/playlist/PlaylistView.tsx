@@ -348,6 +348,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
             onShowAddSong={() => pushAddSong()}
+            onRecommendTrack={pushAddSong}
           />
         ) : screen === 'trackPosts' && selectedTrackForPosts ? (
           <TrackPostCollectionView
