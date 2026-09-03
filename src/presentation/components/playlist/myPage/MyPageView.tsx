@@ -8,7 +8,7 @@ interface MyPageViewProps {
 }
 
 const MENU_ITEMS = [
-  { key: 'bookmarked', emoji: '🔖', title: '저장한 곡', subtitle: '내가 저장한 곡 게시글 모음' },
+  { key: 'bookmarked', emoji: '❤️', title: '저장한 곡', subtitle: '내가 저장한 곡 게시글 모음' },
   { key: 'mySongs', emoji: '🎤', title: '추천한 곡', subtitle: '내가 추천한 곡 모음' },
 ] as const;
 

@@ -1,4 +1,4 @@
-import { Bookmark, MoreVertical, Music, Play, Share2 } from 'lucide-react';
+import { Heart, MoreVertical, Music, Play, Share2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type ReactionKey } from '../postReactions';
@@ -151,7 +151,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                 {totalPlayCount.toLocaleString()}회
               </span>
               <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
-                <Bookmark size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
+                <Heart size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
                 {totalHeartCount.toLocaleString()}회
               </span>
             </div>
@@ -251,7 +251,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                       aria-label="이 게시글 북마크"
                       className="active:scale-90 transition-transform"
                     >
-                      <Bookmark
+                      <Heart
                         size={18}
                         className={bookmarked ? 'text-text-main' : 'text-text-sub'}
                         fill={bookmarked ? 'currentColor' : 'none'}

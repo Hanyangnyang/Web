@@ -1,4 +1,4 @@
-import { Bookmark, ChevronRight, MoreVertical, Share2 } from 'lucide-react';
+import { Heart, ChevronRight, MoreVertical, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, type TrackSummary, GENRES, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { type ReactionKey } from '../postReactions';
@@ -256,7 +256,7 @@ export function PostDetailCard({
             aria-label="북마크"
             className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass}`}
           >
-            <Bookmark className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
+            <Heart className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>
