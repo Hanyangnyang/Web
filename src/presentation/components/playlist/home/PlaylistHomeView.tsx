@@ -8,6 +8,7 @@ import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
+import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
 interface PlaylistHomeViewProps {
   onBack: () => void;
@@ -20,8 +21,11 @@ interface PlaylistHomeViewProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSubmitSearch: () => void;
-  onShowAllRecent: () => void;
+  // true면 홈 미리보기의 마지막 곡 위치까지 부드럽게 내려간 뒤 전체 목록을 보여줌(더보기 버튼용). 헤더 화살표는 항상 맨 위부터
+  onShowAllRecent: (scrollToLastPreview?: boolean) => void;
   onSelectRecentSong: (song: Song) => void;
+  // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정값 — RecentSongRow에 그대로 전달 (docs/playlist-recent-songs-ab-test.md 참고)
+  recentSongsVariant?: RecentSongsTapAreaVariant;
   // 인기차트/최근 추가된 곡 카드의 앨범아트 클릭 — 바로 재생
   onPlayTrack: (track: TrackSummary) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
@@ -50,6 +54,7 @@ export function PlaylistHomeView({
   onSubmitSearch,
   onShowAllRecent,
   onSelectRecentSong,
+  recentSongsVariant = 'control',
   onPlayTrack,
   currentTrackId,
   onShowAllChart,
@@ -160,7 +165,7 @@ export function PlaylistHomeView({
         <div className="flex items-center gap-1 mb-2">
           <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
           <button
-            onClick={onShowAllRecent}
+            onClick={() => onShowAllRecent()}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
             aria-label="최근 추가된 곡 전체보기"
           >
@@ -199,6 +204,7 @@ export function PlaylistHomeView({
                 onSelect={onSelectRecentSong}
                 onPlay={onPlayTrack}
                 currentTrackId={currentTrackId}
+                variant={recentSongsVariant}
               />
             ))}
           </div>
@@ -208,7 +214,7 @@ export function PlaylistHomeView({
         {!isRecentSongsLoading && visibleSongs.length > 0 && (
           <div className="flex justify-center mt-3">
             <button
-              onClick={onShowAllRecent}
+              onClick={() => onShowAllRecent(true)}
               className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
             >
               더보기

@@ -1,9 +1,10 @@
-import { Heart, ChevronRight, MoreVertical, Share2 } from 'lucide-react';
+import { Heart, ChevronRight, MoreVertical, Pause, Play, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, type TrackSummary, GENRES, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { type ReactionKey } from '../postReactions';
 import { useToggleBookmark } from '../../../hooks/playlist/useToggleBookmark.js';
 import { useToggleReaction } from '../../../hooks/playlist/useToggleReaction.js';
+import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { AlbumArtPlayButton } from './AlbumArtPlayButton';
 import { EmojiReactionBar } from './EmojiReactionBar';
 import { useSongReport } from './useSongReport';
@@ -43,6 +44,10 @@ interface PostDetailCardProps {
   // 넘겨주면 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동 — 카드 자체의
   // onSelect(게시글 상세 보기)와는 별개 동작이라 화살표 아이콘으로 구분해서 보여줌
   onSelectTrack?: (track: TrackSummary) => void;
+  // "최근 추가된 곡" 재생 인터랙션 A/B 테스트에서 재생 버튼 위치/히트영역만 바꾸는 배정값
+  // (docs/playlist-recent-songs-ab-test.md 참고). 안 넘기면 기존(control: 정중앙 원형 버튼) 동작 — 최근추가된곡
+  // 화면 외의 다른 화면(게시글 상세/게시글 모음 등)은 이 prop을 넘기지 않아 항상 control로 유지됨
+  playButtonVariant?: RecentSongsTapAreaVariant;
 }
 
 // 리스트/캐러셀에서 쓰는 Song 엔티티를 PostDetailCard가 받는 형태로 변환 (본문=comment)
@@ -71,7 +76,9 @@ export function PostDetailCard({
   hideReactions = false,
   onSelect,
   onSelectTrack,
+  playButtonVariant = 'control',
 }: PostDetailCardProps) {
+  const isTestPlayButton = playButtonVariant === 'test';
   const [pickerOpen, setPickerOpen] = useState(false);
   const [reactions, setReactions] = useState<ReactionState>(() => toReactionState(post.reactions));
   const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
@@ -79,6 +86,11 @@ export function PostDetailCard({
   const share = useShareModal({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
   const toggleBookmark = useToggleBookmark();
   const toggleReactionMutation = useToggleReaction();
+
+  const handleAlbumArtPlay = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    onPlay?.();
+  };
 
   // 먼저 로컬 카운트를 낙관적으로 증감시켜 바로 반응이 보이게 하고(서버가 내려준 count엔 이미 내 반응이
   // 포함돼 있어 +1/-1로 계산), 서버 응답이 오면 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤.
@@ -221,10 +233,34 @@ export function PostDetailCard({
           className="w-full aspect-square object-cover bg-slate-100"
         />
 
-        {onPlay && (
-          // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원(카드 폭 대비 %)만큼만 잡아서,
+        {onPlay && !isTestPlayButton && (
+          // control: 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원(카드 폭 대비 %)만큼만 잡아서,
           // 그 바깥을 누르면 카드 자체의 onSelect(상세로 전환/게시글 보기)로 넘어가게 함
           <AlbumArtPlayButton onPlay={onPlay} label={`${post.title} 재생`} sizeClass={playButtonSizeClass} isPlaying={isPlaying} />
+        )}
+
+        {onPlay && isTestPlayButton && (
+          // test: 앨범커버 전체가 재생 버튼 — 눌리는 순간 카드 자체의 onSelect로는 전파되지 않게 막음
+          <button
+            onClick={handleAlbumArtPlay}
+            aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
+            className="absolute inset-0 z-[1] cursor-pointer"
+          />
+        )}
+
+        {onPlay && isTestPlayButton && (
+          // test: 재생 가능함을 바로 알 수 있도록 우측 상단에 작게 표시. 앨범커버 어느 곳을 눌러도 같은 토글 동작
+          <button
+            onClick={handleAlbumArtPlay}
+            aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
+            className="absolute top-[4%] right-[4%] z-10 w-10 aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+          >
+            {isPlaying ? (
+              <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+            ) : (
+              <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+            )}
+          </button>
         )}
 
         {/* 앨범커버 우측 하단 공유하기/북마크 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서

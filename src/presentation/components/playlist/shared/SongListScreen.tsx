@@ -6,6 +6,7 @@ import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
 import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips } from './GenreFilterChips';
+import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
 // 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다
 // (캠퍼스맵의 '뭐먹지' 코치마크와 동일한 방식)
@@ -42,6 +43,9 @@ interface SongListScreenProps {
   // 빈 상태를 흰 카드 박스로 감쌀지 — 최근추가된곡의 카드 그리드와 톤을 맞추려는 화면(기본값)용.
   // 저장한 곡/내가 등록한 곡처럼 배경이 이미 흰 화면에서는 굳이 박스가 필요 없어 false로 끔
   emptyStateBoxed?: boolean;
+  // "최근 추가된 곡" 재생 인터랙션 A/B 테스트에서 카드 재생 버튼 배정값 — RecentSongsView만 넘겨줌.
+  // 안 넘기면 PostDetailCard가 기존(control) 동작으로 렌더링됨
+  playButtonVariant?: RecentSongsTapAreaVariant;
 }
 
 export function SongListScreen({
@@ -64,6 +68,7 @@ export function SongListScreen({
   emptyStateBoxed = true,
   viewMode: viewModeProp,
   onViewModeChange,
+  playButtonVariant,
 }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>(enableViewToggle ? 'list' : 'grid');
@@ -183,6 +188,7 @@ export function SongListScreen({
                   hideReactions={isSummaryMode}
                   onSelect={isSummaryMode ? () => handleSelectSummary(song) : undefined}
                   onSelectTrack={onSelectTrack}
+                  playButtonVariant={playButtonVariant}
                 />
               </div>
             ))}

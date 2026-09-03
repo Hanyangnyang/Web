@@ -1,5 +1,6 @@
 import { type Song, type SongListViewBaseProps } from '../playlistTypes';
 import { SongListScreen } from '../shared/SongListScreen';
+import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
 interface RecentSongsViewProps extends SongListViewBaseProps {
   songs: Song[];
@@ -7,9 +8,11 @@ interface RecentSongsViewProps extends SongListViewBaseProps {
   onShowSearch: () => void;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;
+  // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정값 (docs/playlist-recent-songs-ab-test.md 참고)
+  playButtonVariant?: RecentSongsTapAreaVariant;
 }
 
-export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, currentTrackId, viewMode, onViewModeChange }: RecentSongsViewProps) {
+export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, currentTrackId, viewMode, onViewModeChange, playButtonVariant }: RecentSongsViewProps) {
   return (
     <SongListScreen
       title="최근 추가된 곡"
@@ -28,6 +31,7 @@ export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSe
       currentTrackId={currentTrackId}
       viewMode={viewMode}
       onViewModeChange={onViewModeChange}
+      playButtonVariant={playButtonVariant}
     />
   );
 }

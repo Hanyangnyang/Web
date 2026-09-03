@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer, type PlayableTrack, type FloatingSpotifyPlayerHandle } from './shared/FloatingSpotifyPlayer';
@@ -19,8 +20,10 @@ import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useRecordTrackPlay } from '../../hooks/playlist/useRecordTrackPlay.js';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
+import { useRecentSongsTapAreaVariant, type RecentSongsPlaySurface } from '../../hooks/playlist/usePlaylistExperiment';
 
 const RECENT_SONGS_LIMIT = 7;
+const SUSTAINED_PLAY_THRESHOLD_MS = 3000; // 재생 시작 후 이만큼 지속돼야 "진짜 재생"으로 집계(오탭 걸러내기 — docs/playlist-recent-songs-ab-test.md 참고)
 const CHART_PREVIEW_LIMIT = 10;
 const TRACK_PLAY_THROTTLE_MS = 10 * 1000; // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 
@@ -35,6 +38,9 @@ interface PlaylistViewProps {
 export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled }: PlaylistViewProps) {
   const isApp = isNativeApp();
   const platform = getPlatform();
+  const posthog = usePostHog();
+  // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고
+  const recentSongsVariant = useRecentSongsTapAreaVariant();
   const [searchQuery, setSearchQuery] = useState('');
   const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const [songs, setSongs] = useState<Song[]>([]);
@@ -56,9 +62,18 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const recordTrackPlay = useRecordTrackPlay();
   // trackId별 마지막 재생기록 전송 시각 — 리렌더와 무관하게 유지돼야 해서 state가 아니라 ref
   const lastPlayRecordedAtRef = useRef<Map<string, number>>(new Map());
+  // 재생이 3초 이상 지속됐는지 검사할 때 최신 재생 상태를 읽기 위한 ref — setTimeout 콜백은 handlePlay가
+  // 만들어진 시점의 state를 그대로 들고 있어서(클로저), 그 사이 다른 곡을 누르거나 멈춘 최신 상태를 못 봄
+  const isPausedRef = useRef(isPaused);
+  useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
+  const currentTrackRef = useRef(currentTrack);
+  useEffect(() => { currentTrackRef.current = currentTrack; }, [currentTrack]);
+  const sustainedPlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // 재생 버튼이 어디서 눌리든(최근추가곡/인기차트/검색/게시글 등) 이 함수 하나로 모임 — 같은 곡이 이미
-  // 로드돼 있으면 재생/일시정지만 토글하고, 다른 곡이면 새로 로드해서 재생 + 재생수 기록(트랙별 스로틀 적용)
-  const handlePlay = useCallback((track: PlayableTrack) => {
+  // 로드돼 있으면 재생/일시정지만 토글하고, 다른 곡이면 새로 로드해서 재생 + 재생수 기록(트랙별 스로틀 적용).
+  // surface를 넘기면 "최근 추가된 곡" A/B 테스트 지표(재생 시작/3초 이상 지속)를 표면별로 캡처함
+  // (docs/playlist-recent-songs-ab-test.md 참고) — 다른 화면(검색/인기차트/게시글 등)에서 부를 땐 surface를 안 넘겨서 캡처 안 함
+  const handlePlay = useCallback((track: PlayableTrack, surface?: RecentSongsPlaySurface) => {
     if (currentTrack?.trackId === track.trackId) {
       if (isPaused) {
         playerRef.current?.resume();
@@ -70,6 +85,16 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
       return;
     }
 
+    if (surface) {
+      posthog?.capture('playlist_recent_song_play', { surface, variant: recentSongsVariant, track_id: track.trackId });
+      if (sustainedPlayTimeoutRef.current) clearTimeout(sustainedPlayTimeoutRef.current);
+      sustainedPlayTimeoutRef.current = setTimeout(() => {
+        if (currentTrackRef.current?.trackId === track.trackId && !isPausedRef.current) {
+          posthog?.capture('playlist_recent_song_play_sustained', { surface, variant: recentSongsVariant, track_id: track.trackId });
+        }
+      }, SUSTAINED_PLAY_THRESHOLD_MS);
+    }
+
     setCurrentTrack(track);
     setIsPaused(false); // 새 곡은 바로 재생을 시도하므로 낙관적으로 반영 — 실제 상태는 playback_update가 뒤이어 보정함
 
@@ -79,7 +104,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
     lastPlayRecordedAtRef.current.set(track.trackId, now);
     recordTrackPlay.mutate(track.trackId);
-  }, [currentTrack, isPaused, recordTrackPlay.mutate]);
+  }, [currentTrack, isPaused, recordTrackPlay.mutate, posthog, recentSongsVariant]);
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
   const [playerHeight, setPlayerHeight] = useState(0);
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
@@ -153,12 +178,30 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollPositionsRef = useRef<Partial<Record<PlaylistScreen, number>>>({});
   const prevScreenRef = useRef<PlaylistScreen>(screen);
+  // 홈/최근추가된곡 화면 체류시간 측정용 — 이 화면에 들어온 시각. A/B 테스트 지표(체류시간)라 이 두 화면만 잰다
+  const screenEnteredAtRef = useRef<number>(Date.now());
+  // 언마운트 시(뒤로가기로 플레이리스트 탭 자체를 나갈 때) 최신 화면/뷰모드를 읽기 위한 ref —
+  // 언마운트 클린업은 컴포넌트가 처음 마운트될 때의 클로저를 그대로 쓰기 때문에 state를 직접 참조하면 항상 초기값만 보게 됨
+  const currentScreenRef = useRef(screen);
+  useEffect(() => { currentScreenRef.current = screen; }, [screen]);
+  const recentViewModeRef = useRef(recentViewMode);
+  useEffect(() => { recentViewModeRef.current = recentViewMode; }, [recentViewMode]);
 
   useLayoutEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
     const prevScreen = prevScreenRef.current;
     if (prevScreen === screen) return;
+
+    if (prevScreen === 'main' || prevScreen === 'recent') {
+      posthog?.capture('playlist_screen_dwell', {
+        screen: prevScreen,
+        duration_ms: Date.now() - screenEnteredAtRef.current,
+        variant: recentSongsVariant,
+        ...(prevScreen === 'recent' ? { view_mode: recentViewMode } : {}),
+      });
+    }
+    screenEnteredAtRef.current = Date.now();
 
     scrollPositionsRef.current[prevScreen] = container.scrollTop;
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
@@ -168,7 +211,24 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
       container.scrollTop = scrollPositionsRef.current[screen] ?? 0;
     }
     prevScreenRef.current = screen;
-  }, [screen, recentScrollTarget]);
+  }, [screen, recentScrollTarget, posthog, recentSongsVariant, recentViewMode]);
+
+  // 뒤로가기로 플레이리스트 탭 자체를 나가는 경우(화면 전환 없이 바로 언마운트) — 위 효과는 화면이
+  // "바뀔 때"만 캡처하므로, 나가는 순간의 체류시간은 언마운트 클린업에서 별도로 잡아야 함
+  useEffect(() => {
+    return () => {
+      const exitScreen = currentScreenRef.current;
+      if (exitScreen === 'main' || exitScreen === 'recent') {
+        posthog?.capture('playlist_screen_dwell', {
+          screen: exitScreen,
+          duration_ms: Date.now() - screenEnteredAtRef.current,
+          variant: recentSongsVariant,
+          exit: true,
+          ...(exitScreen === 'recent' ? { view_mode: recentViewModeRef.current } : {}),
+        });
+      }
+    };
+  }, [posthog, recentSongsVariant]);
 
   const handleSearchSubmit = useCallback(() => {
     if (!searchQuery.trim()) return;
@@ -206,17 +266,23 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     pushScreen('postDetail');
   }, [pushScreen]);
 
-  // "전체보기" 화살표 클릭 — 특정 곡으로 스크롤할 필요 없이 맨 위부터 보여줌
-  const handleShowAllRecent = useCallback(() => {
-    setRecentScrollTarget(null);
+  // 홈의 하단 "더보기"는 미리보기 마지막 곡 위치까지 부드럽게 내려간 뒤 이어서 목록을 보게 한다.
+  // 헤더 화살표·빈 상태 등 다른 진입점은 기존처럼 목록 맨 위부터 보여준다.
+  // A안/B안 사이 이견 없이 병합하는 개선이라 A/B 테스트 대상은 아니지만, "홈 → 최근추가된곡 진입" CTR 지표는 여기서 같이 캡처함
+  const handleShowAllRecent = useCallback((scrollToLastPreview = false) => {
+    posthog?.capture('playlist_recent_show_all_clicked', { variant: recentSongsVariant, trigger: scrollToLastPreview ? 'more_button' : 'header_arrow' });
+    const previewSongs = songs.slice(0, RECENT_SONGS_LIMIT);
+    const lastPreviewTrackId = previewSongs[previewSongs.length - 1]?.trackId ?? null;
+    setRecentScrollTarget(scrollToLastPreview ? lastPreviewTrackId : null);
     pushScreen('recent');
-  }, [pushScreen]);
+  }, [pushScreen, songs, posthog, recentSongsVariant]);
 
   // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤
   const handleSelectRecentSong = useCallback((song: Song) => {
+    posthog?.capture('playlist_recent_preview_navigate', { variant: recentSongsVariant, track_id: song.trackId });
     setRecentScrollTarget(song.trackId);
     pushScreen('recent');
-  }, [pushScreen]);
+  }, [pushScreen, posthog, recentSongsVariant]);
 
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = chartTracks.slice(0, CHART_PREVIEW_LIMIT);
@@ -251,7 +317,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
           <RecentSongsView
             songs={songs}
             onBack={popScreen}
-            onPlay={handlePlay}
+            onPlay={(song) => handlePlay(song, 'recent_full_list')}
             onShowAddSong={() => pushAddSong()}
             onShowSearch={() => {
               setAutoFocusSearch(true);
@@ -262,6 +328,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             currentTrackId={playingTrackId}
             viewMode={recentViewMode}
             onViewModeChange={setRecentViewMode}
+            playButtonVariant={recentSongsVariant}
           />
         ) : screen === 'addSong' ? (
           <RecommendSongView
@@ -352,7 +419,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSubmitSearch={handleSearchSubmit}
             onShowAllRecent={handleShowAllRecent}
             onSelectRecentSong={handleSelectRecentSong}
-            onPlayTrack={handlePlay}
+            recentSongsVariant={recentSongsVariant}
+            onPlayTrack={(track) => handlePlay(track, 'home_preview')}
             currentTrackId={playingTrackId}
             onShowAllChart={() => pushScreen('chart')}
             onShowPosts={handleSelectChartSong}
