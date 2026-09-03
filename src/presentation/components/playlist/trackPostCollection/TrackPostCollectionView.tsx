@@ -1,16 +1,16 @@
-import { Heart, MessageCircle, MoreVertical, PenLine, Play, Share2 } from 'lucide-react';
+import { Heart, MessageCircle, PenLine, Play, Share2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type ReactionKey } from '../postReactions';
 import { type Song, type ReactionState, type TrackSummary, formatTimeAgo, toReactionState } from '../playlistTypes';
-import { useToggleBookmark } from '../../../hooks/playlist/useToggleBookmark.js';
-import { useToggleReaction } from '../../../hooks/playlist/useToggleReaction.js';
+import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
 import { useTrackPosts, type TrackPostsSort } from '../../../hooks/playlist/useTrackPosts.js';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
 import { EmojiReactionBar } from '../shared/EmojiReactionBar';
 import { useSongReport } from '../shared/useSongReport';
 import { ReportReasonPopup } from '../shared/ReportReasonPopup';
+import { PostMoreMenu } from '../shared/PostMoreMenu';
 import { useShareModal } from '../shared/useShareModal';
 import { Toast } from '../shared/Toast';
 
@@ -68,8 +68,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   const report = useSongReport();
   const share = useShareModal(displayTrack);
 
-  const toggleBookmark = useToggleBookmark();
-  const toggleReactionMutation = useToggleReaction();
+  const { toggleBookmark, toggleReactionMutation } = usePostInteractionMutations();
 
   // 낙관적으로 먼저 뒤집고, 서버 응답의 실제 isLiked로 맞추거나 실패 시 되돌림.
   // 로딩 표시로 막지 않고 연타도 그대로 받아서 매번 뒤집음 — 순수 낙관적 UI
@@ -86,13 +85,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   const handleToggleReaction = (postId: string, key: ReactionKey) => {
     if (toggleReactionMutation.isPending) return;
     const previous = reactionsByPost[postId] ?? {};
-    setReactionsByPost((prev) => {
-      const current = prev[postId] ?? {};
-      const currentReaction = current[key] ?? { count: 0, mine: false };
-      const mine = !currentReaction.mine;
-      const count = Math.max(0, currentReaction.count + (mine ? 1 : -1));
-      return { ...prev, [postId]: { ...current, [key]: { count, mine } } };
-    });
+    setReactionsByPost((prev) => ({ ...prev, [postId]: nextOptimisticReaction(prev[postId] ?? {}, key) }));
 
     toggleReactionMutation.mutate(
       { songId: postId, reactionType: key },
@@ -193,8 +186,8 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             onClick={() => setSort(option.key)}
             className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
               sort === option.key
-                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
-                : 'bg-white text-[#618CE9] border-[#618CE9]'
+                ? 'bg-playlist-primary text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
+                : 'bg-white text-playlist-primary border-playlist-primary'
             }`}
           >
             {option.label}
@@ -267,35 +260,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                         strokeWidth={2}
                       />
                     </button>
-                    <div
-                      ref={report.openMenuKey === (postId ?? '') ? report.menuRef : undefined}
-                      className="relative inline-block flex-shrink-0"
-                    >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          report.toggleMenu(postId ?? '');
-                        }}
-                        aria-label="더보기"
-                        className="active:scale-90 transition-transform"
-                      >
-                        <MoreVertical size={18} className="text-text-sub" />
-                      </button>
-
-                      {report.openMenuKey === (postId ?? '') && (
-                        <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              report.openReasonPopup(postId);
-                            }}
-                            className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
-                          >
-                            신고하기
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <PostMoreMenu report={report} menuKey={postId ?? ''} reportTargetId={postId} />
                   </div>
                 )}
               </div>

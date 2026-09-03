@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
@@ -21,6 +21,7 @@ import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useRecordTrackPlay } from '../../hooks/playlist/useRecordTrackPlay.js';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 import { useRecentSongsTapAreaVariant, type RecentSongsPlaySurface } from '../../hooks/playlist/usePlaylistExperiment';
+import { useScreenDwellTracking } from '../../hooks/playlist/useScreenDwellTracking.js';
 
 const RECENT_SONGS_LIMIT = 7;
 const SUSTAINED_PLAY_THRESHOLD_MS = 3000; // 재생 시작 후 이만큼 지속돼야 "진짜 재생"으로 집계(오탭 걸러내기 — docs/playlist-recent-songs-ab-test.md 참고)
@@ -28,6 +29,8 @@ const CHART_PREVIEW_LIMIT = 10;
 const TRACK_PLAY_THROTTLE_MS = 10 * 1000; // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
+// 홈/최근추가된곡 화면만 체류시간(A/B 테스트 지표)을 잰다 — useScreenDwellTracking 참고
+const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = ['main', 'recent'];
 
 interface PlaylistViewProps {
   onBack: () => void;
@@ -174,61 +177,20 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     getOrCreateAnonymousUserId().catch((err) => console.error('[PlaylistView] anonymous auth failed:', err));
   }, []);
 
-  // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollPositionsRef = useRef<Partial<Record<PlaylistScreen, number>>>({});
-  const prevScreenRef = useRef<PlaylistScreen>(screen);
-  // 홈/최근추가된곡 화면 체류시간 측정용 — 이 화면에 들어온 시각. A/B 테스트 지표(체류시간)라 이 두 화면만 잰다
-  const screenEnteredAtRef = useRef<number>(Date.now());
-  // 언마운트 시(뒤로가기로 플레이리스트 탭 자체를 나갈 때) 최신 화면/뷰모드를 읽기 위한 ref —
-  // 언마운트 클린업은 컴포넌트가 처음 마운트될 때의 클로저를 그대로 쓰기 때문에 state를 직접 참조하면 항상 초기값만 보게 됨
-  const currentScreenRef = useRef(screen);
-  useEffect(() => { currentScreenRef.current = screen; }, [screen]);
-  const recentViewModeRef = useRef(recentViewMode);
-  useEffect(() => { recentViewModeRef.current = recentViewMode; }, [recentViewMode]);
-
-  useLayoutEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    const prevScreen = prevScreenRef.current;
-    if (prevScreen === screen) return;
-
-    if (prevScreen === 'main' || prevScreen === 'recent') {
-      posthog?.capture('playlist_screen_dwell', {
-        screen: prevScreen,
-        duration_ms: Date.now() - screenEnteredAtRef.current,
-        variant: recentSongsVariant,
-        ...(prevScreen === 'recent' ? { view_mode: recentViewMode } : {}),
-      });
-    }
-    screenEnteredAtRef.current = Date.now();
-
-    scrollPositionsRef.current[prevScreen] = container.scrollTop;
+  // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원 + 홈/최근추가된곡
+  // 체류시간(A/B 테스트 지표)을 PostHog로 캡처 — 로직 전체는 useScreenDwellTracking 참고
+  const { scrollContainerRef } = useScreenDwellTracking({
+    screen,
+    trackedScreens: DWELL_TRACKED_SCREENS,
+    dwellProps: {
+      variant: recentSongsVariant,
+      ...(screen === 'recent' ? { view_mode: recentViewMode } : {}),
+    },
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
-    // 여기서 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
-    // 안 그러면 이 효과가 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
-    if (!(screen === 'recent' && recentScrollTarget)) {
-      container.scrollTop = scrollPositionsRef.current[screen] ?? 0;
-    }
-    prevScreenRef.current = screen;
-  }, [screen, recentScrollTarget, posthog, recentSongsVariant, recentViewMode]);
-
-  // 뒤로가기로 플레이리스트 탭 자체를 나가는 경우(화면 전환 없이 바로 언마운트) — 위 효과는 화면이
-  // "바뀔 때"만 캡처하므로, 나가는 순간의 체류시간은 언마운트 클린업에서 별도로 잡아야 함
-  useEffect(() => {
-    return () => {
-      const exitScreen = currentScreenRef.current;
-      if (exitScreen === 'main' || exitScreen === 'recent') {
-        posthog?.capture('playlist_screen_dwell', {
-          screen: exitScreen,
-          duration_ms: Date.now() - screenEnteredAtRef.current,
-          variant: recentSongsVariant,
-          exit: true,
-          ...(exitScreen === 'recent' ? { view_mode: recentViewModeRef.current } : {}),
-        });
-      }
-    };
-  }, [posthog, recentSongsVariant]);
+    // 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
+    // 안 그러면 이 훅이 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
+    skipScrollRestore: screen === 'recent' && !!recentScrollTarget,
+  });
 
   const handleSearchSubmit = useCallback(() => {
     if (!searchQuery.trim()) return;

@@ -14,14 +14,6 @@ export interface PopularityChart {
   tracks: ChartTrack[];
 }
 
-export function createPopularityChart(raw: {
-  chartType: string;
-  displayTitle: string;
-  tracks: ChartTrack[];
-}): PopularityChart {
-  return {
-    chartType: raw.chartType,
-    displayTitle: raw.displayTitle,
-    tracks: raw.tracks,
-  };
+export function createPopularityChart(raw: PopularityChart): PopularityChart {
+  return { ...raw };
 }

@@ -1,14 +1,14 @@
-import { Heart, ChevronRight, MoreVertical, Pause, Play, Share2 } from 'lucide-react';
+import { Heart, ChevronRight, Pause, Play, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, type TrackSummary, GENRES, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { type ReactionKey } from '../postReactions';
-import { useToggleBookmark } from '../../../hooks/playlist/useToggleBookmark.js';
-import { useToggleReaction } from '../../../hooks/playlist/useToggleReaction.js';
+import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { AlbumArtPlayButton } from './AlbumArtPlayButton';
 import { EmojiReactionBar } from './EmojiReactionBar';
 import { useSongReport } from './useSongReport';
 import { ReportReasonPopup } from './ReportReasonPopup';
+import { PostMoreMenu } from './PostMoreMenu';
 import { useShareModal } from './useShareModal';
 import { Toast } from './Toast';
 
@@ -84,8 +84,7 @@ export function PostDetailCard({
   const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
   const report = useSongReport();
   const share = useShareModal({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
-  const toggleBookmark = useToggleBookmark();
-  const toggleReactionMutation = useToggleReaction();
+  const { toggleBookmark, toggleReactionMutation } = usePostInteractionMutations();
 
   const handleAlbumArtPlay = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -100,12 +99,7 @@ export function PostDetailCard({
   const toggleReaction = (key: ReactionKey) => {
     if (toggleReactionMutation.isPending) return;
     const previous = reactions;
-    setReactions((prev) => {
-      const current = prev[key] ?? { count: 0, mine: false };
-      const mine = !current.mine;
-      const count = Math.max(0, current.count + (mine ? 1 : -1));
-      return { ...prev, [key]: { count, mine } };
-    });
+    setReactions((prev) => nextOptimisticReaction(prev, key));
 
     if (!post.id) return;
 
@@ -174,34 +168,7 @@ export function PostDetailCard({
 
   // 더보기 버튼: 앨범 커버 바로 아래 첫 행의 맨 오른쪽에 위치 —
   // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류
-  const moreButton = (
-    <div ref={report.menuRef} className="relative inline-block flex-shrink-0">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          report.toggleMenu('more');
-        }}
-        aria-label="더보기"
-        className="active:scale-90 transition-transform"
-      >
-        <MoreVertical size={18} className="text-text-sub" />
-      </button>
-
-      {report.openMenuKey === 'more' && (
-        <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              report.openReasonPopup(post.id);
-            }}
-            className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
-          >
-            신고하기
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  const moreButton = <PostMoreMenu report={report} menuKey="more" reportTargetId={post.id} />;
 
   // 공유/북마크 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
   // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 북마크가 그 왼쪽

@@ -5,6 +5,7 @@ import { GENRES, type TrackSummary } from '../playlistTypes';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
 import { type PlayableTrack } from '../shared/FloatingSpotifyPlayer';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
+import { ConfirmPopup } from '../shared/ConfirmPopup';
 import { PLAYER_GAP_PX } from '../shared/AddSongFab';
 import { useAddSongDraft } from './useAddSongDraft';
 import { useSubmitSong } from '../../../hooks/playlist/useSubmitSong.js';
@@ -233,7 +234,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             둘 다 같은 파란 테두리로 보이게 함(포커스 여부와 무관하게 결과 패널만 회색으로 남아 어긋나 보이던 문제) */}
         <div className="group">
           <div
-            className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] group-focus-within:border-[#618CE9]/40 transition-all ${
+            className={`bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] group-focus-within:border-playlist-primary/40 transition-all ${
               isResultsPanelOpen ? 'rounded-t-card' : 'rounded-card'
             }`}
           >
@@ -252,7 +253,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 onClick={handleSearchClick}
                 disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
                 aria-label="곡 검색"
-                className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-[#618CE9] disabled:text-text-hint hover:bg-[#618CE9]/10 transition-colors active:scale-90"
+                className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
               >
                 {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
               </button>
@@ -266,7 +267,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             }`}
           >
             <div className="overflow-hidden">
-              <div className="bg-white border border-t-0 border-slate-200 group-focus-within:border-[#618CE9]/40 transition-colors rounded-b-card py-3">
+              <div className="bg-white border border-t-0 border-slate-200 group-focus-within:border-playlist-primary/40 transition-colors rounded-b-card py-3">
                 {searchResults.length > 0 ? (
                   <div
                     className="flex gap-3 px-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
@@ -303,7 +304,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
         {/* 선택된 곡 */}
         {selectedTrack && (
-          <div className="mt-2 flex items-center gap-3 bg-white border border-[#618CE9]/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
+          <div className="mt-2 flex items-center gap-3 bg-white border border-playlist-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
             <img
               src={selectedTrack.albumArtUrl}
               alt={selectedTrack.title}
@@ -371,7 +372,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
-        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
+        <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-playlist-primary focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
           <textarea
             value={comment}
             maxLength={COMMENT_MAX_LENGTH}
@@ -398,7 +399,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         disabled={!canSubmit}
         className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold border transition-all active:scale-[0.97] z-40 ${
           canSubmit
-            ? 'bg-[#618CE9] text-white border-transparent shadow-[0_6px_20px_rgba(15,23,42,0.35)]'
+            ? 'bg-playlist-primary text-white border-transparent shadow-[0_6px_20px_rgba(15,23,42,0.35)]'
             : 'bg-slate-100 text-slate-300 border-transparent'
         }`}
         style={{
@@ -416,7 +417,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {submitSong.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="flex flex-col items-center gap-3 bg-white rounded-2xl shadow-xl px-8 py-6">
-            <Loader2 size={28} className="animate-spin text-[#618CE9]" />
+            <Loader2 size={28} className="animate-spin text-playlist-primary" />
             <p className="text-sm font-semibold text-text-main">추천 중이에요...</p>
           </div>
         </div>
@@ -438,10 +439,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
       {/* 서버 일시 장애(C004) 재시도 유도 팝업 */}
       {showSubmitRetryPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8">
-          <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5 text-center">
-            <p className="text-sm font-semibold text-text-main mb-1">일시적인 오류가 발생했어요</p>
-            <p className="text-xs text-text-sub mb-4">잠시 후 다시 시도해주세요.</p>
+        <ConfirmPopup
+          buttons={
             <div className="flex gap-2">
               <button
                 onClick={() => setShowSubmitRetryPopup(false)}
@@ -454,27 +453,22 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowSubmitRetryPopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
+                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 다시 시도
               </button>
             </div>
-          </div>
-        </div>
+          }
+        >
+          <p className="text-sm font-semibold text-text-main mb-1 text-center">일시적인 오류가 발생했어요</p>
+          <p className="text-xs text-text-sub mb-4 text-center">잠시 후 다시 시도해주세요.</p>
+        </ConfirmPopup>
       )}
 
       {/* 추천 전 안내 — 삭제·수정 불가, 1일 3곡 제한 */}
       {showRegisterNoticePopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8">
-          <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
-            <p className="text-sm font-semibold text-text-main mb-3 text-center">추천 전에 확인해주세요!</p>
-            <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
-              <li>한 번 추천한 곡은 삭제하거나 수정할 수 없어요.</li>
-              <li>
-                하루에 최대 3곡까지만 추천할 수 있어요
-                {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
-              </li>
-            </ul>
+        <ConfirmPopup
+          buttons={
             <div className="flex gap-2">
               <button
                 onClick={() => setShowRegisterNoticePopup(false)}
@@ -487,21 +481,28 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowRegisterNoticePopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
+                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 추천하기
               </button>
             </div>
-          </div>
-        </div>
+          }
+        >
+          <p className="text-sm font-semibold text-text-main mb-3 text-center">추천 전에 확인해주세요!</p>
+          <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
+            <li>한 번 추천한 곡은 삭제하거나 수정할 수 없어요.</li>
+            <li>
+              하루에 최대 3곡까지만 추천할 수 있어요
+              {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
+            </li>
+          </ul>
+        </ConfirmPopup>
       )}
 
       {/* 뒤로가기 시 작성 중인 내용이 있으면 확인 — 임시저장/저장 안 함/계속 작성 3가지 중 선택 */}
       {showLeaveConfirmPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-8">
-          <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-xl px-5 py-5">
-            <p className="text-sm font-semibold text-text-main mb-1 text-center">작성 중인 내용이 있어요</p>
-            <p className="text-xs text-text-sub mb-4 text-center">나가기 전에 어떻게 할까요?</p>
+        <ConfirmPopup
+          buttons={
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => {
@@ -509,7 +510,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowLeaveConfirmPopup(false);
                   onBack();
                 }}
-                className="h-10 rounded-full text-sm font-bold text-white bg-[#618CE9] active:scale-[0.97] transition-transform"
+                className="h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 임시저장하고 나가기
               </button>
@@ -530,8 +531,11 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 계속 작성하기
               </button>
             </div>
-          </div>
-        </div>
+          }
+        >
+          <p className="text-sm font-semibold text-text-main mb-1 text-center">작성 중인 내용이 있어요</p>
+          <p className="text-xs text-text-sub mb-4 text-center">나가기 전에 어떻게 할까요?</p>
+        </ConfirmPopup>
       )}
     </div>
   );

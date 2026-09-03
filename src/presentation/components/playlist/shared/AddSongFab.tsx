@@ -49,7 +49,7 @@ export function AddSongFab({ onClick, playerHeight = 0 }: AddSongFabProps) {
       ref={buttonRef}
       onClick={onClick}
       aria-label="곡 추천하기"
-      className={`fixed ${FAB_RIGHT} z-40 h-12 rounded-full bg-[#8B5CF6] text-white border border-transparent flex items-center justify-center overflow-hidden shadow-[0_6px_20px_rgba(139,92,246,0.35)] hover:shadow-[0_8px_24px_rgba(139,92,246,0.45)] transition-[width,bottom,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-90 ${
+      className={`fixed ${FAB_RIGHT} z-40 h-12 rounded-full bg-playlist-accent text-white border border-transparent flex items-center justify-center overflow-hidden shadow-[0_6px_20px_rgba(139,92,246,0.35)] hover:shadow-[0_8px_24px_rgba(139,92,246,0.45)] transition-[width,bottom,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-90 ${
         collapsed ? 'w-12' : 'w-[128px]'
       }`}
       style={{ bottom }}

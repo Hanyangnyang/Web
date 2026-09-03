@@ -15,10 +15,10 @@ export const PlaylistSearchBar = forwardRef<HTMLInputElement, PlaylistSearchBarP
   function PlaylistSearchBar({ value, onChange, onSubmit, placeholder, className = 'mb-4' }, ref) {
     return (
       <div
-        className={`flex items-center gap-2 pl-2 pr-2.5 h-12 bg-[#618CE9]/[0.06] border border-[#618CE9]/20 rounded-full focus-within:border-[#618CE9] focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all ${className}`}
+        className={`flex items-center gap-2 pl-2 pr-2.5 h-12 bg-playlist-primary/[0.06] border border-playlist-primary/20 rounded-full focus-within:border-playlist-primary focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all ${className}`}
       >
-        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#618CE9]/15 flex items-center justify-center">
-          <Search size={15} className="text-[#618CE9]" />
+        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-playlist-primary/15 flex items-center justify-center">
+          <Search size={15} className="text-playlist-primary" />
         </span>
         <input
           ref={ref}
@@ -35,7 +35,7 @@ export const PlaylistSearchBar = forwardRef<HTMLInputElement, PlaylistSearchBarP
           onClick={onSubmit}
           disabled={!value.trim()}
           aria-label="검색"
-          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#618CE9] text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
+          className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-playlist-primary text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
         >
           <ArrowRight size={14} />
         </button>

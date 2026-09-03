@@ -17,8 +17,8 @@ export function ChartPeriodChips({ chartPeriod, onChangePeriod, className = '' }
           onClick={() => onChangePeriod(option.key)}
           className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
             chartPeriod === option.key
-              ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
-              : 'bg-white text-[#618CE9] border-[#618CE9]'
+              ? 'bg-playlist-primary text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
+              : 'bg-white text-playlist-primary border-playlist-primary'
           }`}
         >
           {option.label}

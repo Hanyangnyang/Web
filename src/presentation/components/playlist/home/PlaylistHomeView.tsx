@@ -4,6 +4,7 @@ import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartTopCard } from './ChartTopCard';
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
+import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
@@ -126,7 +127,7 @@ export function PlaylistHomeView({
             </div>
           </div>
         ) : visibleChart.length === 0 ? (
-          <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden h-[203px] flex items-center justify-center">
+          <div className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden h-[203px] flex items-center justify-center">
             <EmptyGenreState
               message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
               buttonLabel="최근 추가된 곡 보러가기"
@@ -177,13 +178,7 @@ export function PlaylistHomeView({
         {isRecentSongsLoading ? (
           <div className="flex flex-col gap-1.5">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
-                <div className="w-12 h-12 rounded skeleton-shimmer flex-shrink-0" />
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer" />
-                  <div className="h-3 w-1/3 rounded-full skeleton-shimmer" />
-                </div>
-              </div>
+              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
             ))}
           </div>
         ) : visibleSongs.length === 0 ? (

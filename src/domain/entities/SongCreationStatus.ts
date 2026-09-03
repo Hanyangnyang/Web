@@ -8,18 +8,6 @@ export interface SongCreationStatus {
   recentTrackIdsIn7Days: string[];
 }
 
-export function createSongCreationStatus(raw: {
-  canCreate: boolean;
-  dailyCount: number;
-  dailyMaxLimit: number;
-  remainingCount: number;
-  recentTrackIdsIn7Days: string[];
-}): SongCreationStatus {
-  return {
-    canCreate: raw.canCreate,
-    dailyCount: raw.dailyCount,
-    dailyMaxLimit: raw.dailyMaxLimit,
-    remainingCount: raw.remainingCount,
-    recentTrackIdsIn7Days: raw.recentTrackIdsIn7Days,
-  };
+export function createSongCreationStatus(raw: SongCreationStatus): SongCreationStatus {
+  return { ...raw };
 }

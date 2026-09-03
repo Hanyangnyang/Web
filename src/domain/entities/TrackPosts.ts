@@ -14,24 +14,6 @@ export interface TrackPosts {
   posts: PlaylistSong[];
 }
 
-export function createTrackPosts(raw: {
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-  totalSongsCount: number;
-  totalHeartCount: number;
-  totalPlayCount: number;
-  posts: PlaylistSong[];
-}): TrackPosts {
-  return {
-    trackId: raw.trackId,
-    title: raw.title,
-    artist: raw.artist,
-    albumArtUrl: raw.albumArtUrl,
-    totalSongsCount: raw.totalSongsCount,
-    totalHeartCount: raw.totalHeartCount,
-    totalPlayCount: raw.totalPlayCount,
-    posts: raw.posts,
-  };
+export function createTrackPosts(raw: TrackPosts): TrackPosts {
+  return { ...raw };
 }

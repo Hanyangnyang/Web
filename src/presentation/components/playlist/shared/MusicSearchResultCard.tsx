@@ -22,10 +22,6 @@ interface MusicSearchResultCardProps {
   className?: string;
 }
 
-// 카드 아래 분리된 곡 추천하기 버튼(구버전) 노출 여부 — 카드 안에 이어붙인 버전으로 바뀌면서 꺼둠.
-// boolean으로 명시 타입을 줘야 아래 `onRecommend && ... &&` 체인에서 literal false로 인한 미도달 코드 취급을 피함
-const SHOW_OLD_STANDALONE_RECOMMEND_BUTTON: boolean = false;
-
 // Spotify 카탈로그 검색 결과 카드 — 검색결과 화면·곡추천하기 화면이 공유하는 스타일
 export function MusicSearchResultCard({
   track,
@@ -104,24 +100,10 @@ export function MusicSearchResultCard({
           onClick={() => onRecommend(track)}
           disabled={disabled}
           aria-label={`${track.title} 곡 추천하기`}
-          className="w-full h-7 border-t border-slate-100 bg-[#ffffff] text-[#8B5CF6]/80 flex items-center justify-center gap-1 hover:bg-[#8B5CF6]/5 active:bg-[#8B5CF6]/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          className="w-full h-7 border-t border-slate-100 bg-[#ffffff] text-playlist-accent/80 flex items-center justify-center gap-1 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
         >
           <PenLine size={10} strokeWidth={2.2} className="flex-shrink-0" />
           <span className="text-[10px] font-bold">이 곡 추천하러 가기</span>
-        </button>
-      )}
-
-      {/* 카드 밖으로 분리된 이전 버전(카드 아래 별도 버튼) — 삭제 대신 비활성화만 해둠.
-          다시 쓰게 되면 아래 카드 div를 flex flex-col gap-1.5로 감싸는 wrapper를 복원해야 함 */}
-      {onRecommend && SHOW_OLD_STANDALONE_RECOMMEND_BUTTON && (
-        <button
-          onClick={() => onRecommend(track)}
-          disabled={disabled}
-          aria-label={`${track.title} 곡 추천하기`}
-          className="w-full h-6 rounded-full bg-[#8B5CF6]/20 text-black/80 flex items-center justify-center gap-1 active:scale-95 transition-transform disabled:opacity-40 disabled:pointer-events-none"
-        >
-          <PenLine size={10} strokeWidth={2.2} className="flex-shrink-0" />
-          <span className="text-[10px] font-bold">곡 추천하기</span>
         </button>
       )}
     </div>

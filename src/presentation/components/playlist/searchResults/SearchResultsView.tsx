@@ -9,6 +9,7 @@ import { RecentSongRow } from '../shared/RecentSongRow';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
+import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { EmptyMessageCard } from './EmptyMessageCard';
 
 interface SearchResultsViewProps {
@@ -121,13 +122,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         <div className="flex flex-col gap-1.5">
           {isSearchingPosts ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]">
-                <div className="w-12 h-12 rounded skeleton-shimmer flex-shrink-0" />
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer" />
-                  <div className="h-3 w-1/3 rounded-full skeleton-shimmer" />
-                </div>
-              </div>
+              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
             ))
           ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
             <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
