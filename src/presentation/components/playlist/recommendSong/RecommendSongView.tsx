@@ -288,7 +288,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
+                <p className="text-sm text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
                   {searchErrorMessage || '검색 결과가 없어요'}
                 </p>
               )}

@@ -16,7 +16,9 @@ export function EmptyMessageCard({ message, className = '', minHeight }: EmptyMe
       className={`w-full px-4 rounded-xl border border-dashed border-slate-200 text-center flex items-center justify-center ${minHeight ? '' : 'py-8'} ${className}`}
       style={minHeight ? { minHeight: `${minHeight}px` } : undefined}
     >
-      <p className="text-xs text-text-hint">{message}</p>
+      {/* EmptyGenreState(버튼 포함 빈 상태)의 안내 문구와 같은 text-sm — 버튼 유무로 같은 "결과 없음"
+          메시지가 화면마다 다른 크기로 보이지 않게 맞춤 */}
+      <p className="text-sm text-text-hint">{message}</p>
     </div>
   );
 }

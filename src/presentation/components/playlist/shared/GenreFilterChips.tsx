@@ -19,7 +19,7 @@ export function GenreFilterChips({ selectedGenre, onSelectGenre, className = '' 
         <button
           key={genre.key}
           onClick={() => onSelectGenre(genre.key)}
-          className={`flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] ${
             selectedGenre === genre.key && genre.key !== 'all'
               ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(14,74,132,0.25)]`
               : genre.key === 'all'
