@@ -1,11 +1,14 @@
-import { ChevronRight, Pause, Play } from 'lucide-react';
+import { Music } from 'lucide-react';
 import { useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
+import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
 import { useSongSearch } from '../../../hooks/playlist/useSongSearch.js';
 import { useMusicSearch } from '../../../hooks/playlist/useMusicSearch.js';
 import { RecentSongRow } from '../shared/RecentSongRow';
+import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
+import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { EmptyMessageCard } from './EmptyMessageCard';
 
 interface SearchResultsViewProps {
@@ -17,19 +20,21 @@ interface SearchResultsViewProps {
   onPlay: (track: TrackSummary) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
+  // 게시글 검색 결과가 없을 때 "곡 추천하러 가기" 버튼 — 곡추천하기 화면으로 이동
+  onShowAddSong: () => void;
 }
 
 const MIN_QUERY_LENGTH = 2;
 
-// 검색 결과 화면 — 곡 검색은 Spotify 검색 API(/api/music-search), 게시글 검색은 BE 추천글 통합 검색 API 연동 완료
-export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId }: SearchResultsViewProps) {
+// 검색 결과 화면 — 곡 검색은 BE 카탈로그 검색 API(/api/v1/playlist/catalog/tracks/search), 게시글 검색은 BE 추천글 통합 검색 API 연동 완료
+export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId, onShowAddSong }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
   const [activeQuery, setActiveQuery] = useState(query);
   const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(activeQuery);
   const [localQuery, setLocalQuery] = useState(query);
   const { data: trackResultsData, isFetching: isSearching, error: musicSearchError } = useMusicSearch(activeQuery);
-  const trackResults: TrackSummary[] = trackResultsData ?? [];
+  const trackResults: MusicSearchTrack[] = trackResultsData ?? [];
   const searchError = musicSearchError?.message ?? null;
 
   // 검색바에서 Enter를 치거나 화살표 버튼을 누르면 재검색
@@ -66,7 +71,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
             {activeQuery.trim().length < MIN_QUERY_LENGTH ? (
-              <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
+              <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} minHeight={208} />
             ) : isSearching ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex-shrink-0 w-36 rounded-xl border border-slate-200 bg-white overflow-hidden">
@@ -78,50 +83,19 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                 </div>
               ))
             ) : searchError ? (
-              <EmptyMessageCard message={searchError} />
+              <EmptyMessageCard message={searchError} minHeight={208} />
             ) : trackResults.length === 0 ? (
-              <EmptyMessageCard message="검색 결과가 없어요" />
+              <EmptyMessageCard message="검색 결과가 없어요" minHeight={208} />
             ) : (
               trackResults.map((track) => (
-                <div
+                <MusicSearchResultCard
                   key={track.trackId}
-                  // 앨범커버 좌우 모서리를 그대로 내려그은 것처럼, 카드 전체를 앨범커버 폭에 맞춰 테두리로 감쌈
-                  className="flex-shrink-0 w-36 rounded-xl border border-slate-200 bg-white overflow-hidden"
-                >
-                  {/* 앨범커버 — 눌러서 바로 재생 */}
-                  <button
-                    onClick={() => onPlay(track)}
-                    aria-label={track.trackId === currentTrackId ? `${track.title} 일시정지` : `${track.title} 재생`}
-                    className="relative block w-full active:scale-95 transition-transform"
-                  >
-                    <img
-                      src={track.albumArtUrl}
-                      alt={track.title}
-                      className="w-full aspect-square object-cover bg-slate-100"
-                    />
-                    {/* 재생/일시정지 아이콘 — 버튼이 이미 앨범커버 전체를 감싸고 있어 별도 버튼이 아니라 장식용 오버레이임 */}
-                    <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
-                      {track.trackId === currentTrackId ? (
-                        <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
-                      ) : (
-                        <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
-                      )}
-                    </span>
-                  </button>
-                  {/* 하단 흰색 영역 — 눌러서 이 곡의 게시글 모음으로 이동 */}
-                  <button
-                    onClick={() => onSelectTrack(track)}
-                    aria-label={`${track.title} 추천 게시글 보기`}
-                    className="w-full px-2 py-1.5 flex items-center gap-1 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
-                      <div className="text-xs text-text-sub truncate">{track.artist}</div>
-                    </div>
-                    {/* 곡명/가수명 옆 빈 공간에 카드를 누르면 게시글 모음으로 넘어간다는 걸 알려주는 화살표 */}
-                    <ChevronRight size={14} className="text-text-hint flex-shrink-0" strokeWidth={2.5} />
-                  </button>
-                </div>
+                  track={track}
+                  onPlay={onPlay}
+                  isPlaying={track.trackId === currentTrackId}
+                  onSelect={onSelectTrack}
+                  selectLabel={`${track.title} 추천 게시글 보기`}
+                />
               ))
             )}
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
@@ -148,7 +122,13 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
           ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
             <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
           ) : !postResults || postResults.length === 0 ? (
-            <EmptyMessageCard message="검색 결과가 없어요" />
+            <EmptyGenreState
+              message="검색 결과가 없어요"
+              buttonLabel="곡 추천하러 가기"
+              buttonIcon={<Music size={14} strokeWidth={2.5} />}
+              onAction={onShowAddSong}
+              boxed
+            />
           ) : (
             postResults.map((post) => (
               <RecentSongRow

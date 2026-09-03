@@ -2,8 +2,9 @@ import { Loader2, Pause, Play, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { GENRES, type TrackSummary } from '../playlistTypes';
+import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
 import { type PlayableTrack } from '../shared/FloatingSpotifyPlayer';
-import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
+import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PLAYER_GAP_PX } from '../shared/AddSongFab';
 import { useAddSongDraft } from './useAddSongDraft';
 import { useSubmitSong } from '../../../hooks/playlist/useSubmitSong.js';
@@ -64,7 +65,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const [validationError, setValidationError] = useState<string | null>(null);
   const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
   const { data: searchResultsData, isFetching: isSearching, error: musicSearchError } = useMusicSearch(committedQuery);
-  const searchResults: SearchTrack[] = searchResultsData ?? [];
+  const searchResults: MusicSearchTrack[] = searchResultsData ?? [];
   const searchErrorMessage = validationError ?? musicSearchError?.message ?? null;
 
   // 429(요청 제한) 응답이면 Retry-After만큼 재시도를 막고, 약간의 지터를 더해 동시에 몰린 여러 기기가
@@ -272,45 +273,22 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                     // 최근 7일 이내에 이미 추천한 곡은 검색 결과에서 바로 골라내지 못하게 막음(어차피 서버가 PL002로 거절함)
                     const alreadyRecommended = recentlyRecommendedTrackIds.has(track.trackId);
                     return (
-                      <div
+                      <MusicSearchResultCard
                         key={track.trackId}
-                        role="button"
-                        tabIndex={alreadyRecommended ? -1 : 0}
-                        onClick={() => {
-                          if (!alreadyRecommended) setSelectedTrack(track);
-                        }}
-                        onKeyDown={(e) => {
-                          if (alreadyRecommended) return;
-                          if (e.key === 'Enter' || e.key === ' ') setSelectedTrack(track);
-                        }}
-                        aria-label={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
-                        className={`flex-shrink-0 w-28 text-left transition-transform ${
-                          alreadyRecommended ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer active:scale-[0.97]'
-                        }`}
-                      >
-                        <div className="relative w-28 aspect-square rounded-lg overflow-hidden bg-slate-100">
-                          <img
-                            src={track.albumArtUrl}
-                            alt={track.title}
-                            className="w-full h-full object-cover"
-                          />
-                          {onPlay && (
-                            // 앨범커버 전체가 아니라 눈에 보이는 원형 아이콘 크기만큼만 클릭 영역을 잡아서,
-                            // 그 바깥(앨범커버 나머지 영역)을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
-                            <AlbumArtPlayButton onPlay={() => onPlay(track)} label={`${track.title} 재생`} isPlaying={track.trackId === currentTrackId} />
-                          )}
-                        </div>
-                        <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
-                        <div className="text-xs text-text-sub truncate">{track.artist}</div>
-                        {alreadyRecommended && (
-                          <div className="text-[10px] font-semibold text-red-400">최근 추천함</div>
-                        )}
-                      </div>
+                        track={track}
+                        onPlay={onPlay}
+                        isPlaying={track.trackId === currentTrackId}
+                        onSelect={setSelectedTrack}
+                        selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
+                        disabled={alreadyRecommended}
+                        disabledMessage="최근 추천함"
+                        className="w-[123px]"
+                      />
                     );
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-text-hint text-center px-3 min-h-[60px] flex items-center justify-center whitespace-pre-line">
+                <p className="text-xs text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
                   {searchErrorMessage || '검색 결과가 없어요'}
                 </p>
               )}

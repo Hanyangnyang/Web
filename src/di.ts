@@ -87,8 +87,8 @@ const bannerApiDataSource = createBannerApiDataSource({ httpClient: apiHttpClien
 const busApiDataSource = createBusApiDataSource({ httpClient });
 const gymApiDataSource = createGymApiDataSource({ httpClient: apiHttpClient });
 const playlistApiDataSource = createPlaylistApiDataSource({ httpClient: apiHttpClient });
-// Spotify 곡 검색은 새 백엔드가 아니라 기존 Vercel BFF(/api/music-search)를 그대로 씀
-const musicSearchApiDataSource = createMusicSearchApiDataSource({ httpClient });
+// Spotify 카탈로그 곡 검색 — 기존 Vercel BFF(/api/music-search)에서 새 백엔드로 이관 완료
+const musicSearchApiDataSource = createMusicSearchApiDataSource({ httpClient: apiHttpClient });
 const feedbackApiDataSource = createFeedbackApiDataSource({ httpClient: apiHttpClient });
 const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: apiHttpClient });
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
