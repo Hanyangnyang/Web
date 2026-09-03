@@ -1,4 +1,4 @@
-import { ChevronRight, Play, Smile } from 'lucide-react';
+import { ChevronRight, Pause, Play, Smile } from 'lucide-react';
 import { type Song, toReactionState, formatTimeAgo } from '../playlistTypes';
 import { EMOJI_REACTIONS } from '../postReactions';
 
@@ -8,7 +8,7 @@ interface RecentSongRowProps {
   onSelect: (song: Song) => void;
   // 세로 구분선 왼쪽(앨범커버+곡 정보) 클릭 — 바로 재생
   onPlay: (song: Song) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 앨범커버의 재생 아이콘을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 앨범커버의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
 }
 
@@ -24,7 +24,7 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
       {/* 왼쪽: 앨범커버 + 곡 정보 전체가 하나의 재생 버튼 */}
       <button
         onClick={() => onPlay(song)}
-        aria-label={`${song.title} 재생`}
+        aria-label={isPlaying ? `${song.title} 일시정지` : `${song.title} 재생`}
         className="flex flex-1 min-w-0 gap-2.5 text-left active:bg-slate-50 transition-colors"
       >
         {/* 앨범 커버 — 가로 비율을 2.5:7.5로 나눔(flex-[25]/flex-[75]) */}
@@ -34,12 +34,14 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
             alt={song.title}
             className="h-full aspect-square object-cover bg-slate-100"
           />
-          {/* 재생 아이콘 */}
-          {!isPlaying && (
-            <span className="absolute inset-0 m-auto w-[34%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
+          {/* 재생/일시정지 아이콘 — 재생 중엔 일시정지 아이콘으로 바뀌고, 눌러서 그대로 멈출 수 있음 */}
+          <span className="absolute inset-0 m-auto w-[34%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
+            {isPlaying ? (
+              <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+            ) : (
               <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
-            </span>
-          )}
+            )}
+          </span>
         </div>
 
         {/* 곡명·가수명 + 한마디 코멘트 + 리액션 요약  */}

@@ -24,7 +24,7 @@ interface PlaylistHomeViewProps {
   onSelectRecentSong: (song: Song) => void;
   // 인기차트/최근 추가된 곡 카드의 앨범아트 클릭 — 바로 재생
   onPlayTrack: (track: TrackSummary) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   onShowAllChart: () => void;
   onShowPosts: (track: ChartTrack) => void;

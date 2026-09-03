@@ -1,4 +1,4 @@
-import { Loader2, Play, Search, X } from 'lucide-react';
+import { Loader2, Pause, Play, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { GENRES, type TrackSummary } from '../playlistTypes';
@@ -42,7 +42,7 @@ interface RecommendSongViewProps {
   playerHeight?: number;
   // 선택한 곡을 미리 들어볼 수 있게 하단 플레이어를 띄우는 콜백
   onPlay?: (track: PlayableTrack) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 선택한 곡과 같으면 재생 버튼을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 선택한 곡과 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 게시글 모음 화면의 "이 곡 추천하러 가기" 버튼 등으로 특정 곡이 미리 정해진 채로 진입할 때 씀.
   // 임시저장된 초안이 있으면 그걸 더 우선함(사용자가 쓰던 다른 곡 내용을 이걸로 덮어쓰지 않기 위해)
@@ -294,10 +294,10 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                             alt={track.title}
                             className="w-full h-full object-cover"
                           />
-                          {onPlay && track.trackId !== currentTrackId && (
+                          {onPlay && (
                             // 앨범커버 전체가 아니라 눈에 보이는 원형 아이콘 크기만큼만 클릭 영역을 잡아서,
                             // 그 바깥(앨범커버 나머지 영역)을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
-                            <AlbumArtPlayButton onPlay={() => onPlay(track)} label={`${track.title} 재생`} />
+                            <AlbumArtPlayButton onPlay={() => onPlay(track)} label={`${track.title} 재생`} isPlaying={track.trackId === currentTrackId} />
                           )}
                         </div>
                         <div className="mt-1.5 text-sm font-semibold text-text-main truncate">{track.title}</div>
@@ -330,13 +330,17 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               <div className="text-sm font-semibold text-text-main truncate">{selectedTrack.title}</div>
               <div className="text-xs text-text-sub truncate">{selectedTrack.artist}</div>
             </div>
-            {onPlay && selectedTrack.trackId !== currentTrackId && (
+            {onPlay && (
               <button
                 onClick={() => onPlay(selectedTrack)}
-                aria-label={`${selectedTrack.title} 재생`}
+                aria-label={selectedTrack.trackId === currentTrackId ? `${selectedTrack.title} 일시정지` : `${selectedTrack.title} 재생`}
                 className="flex-shrink-0 p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
               >
-                <Play size={16} className="text-text-sub" fill="currentColor" />
+                {selectedTrack.trackId === currentTrackId ? (
+                  <Pause size={16} className="text-text-sub" fill="currentColor" />
+                ) : (
+                  <Play size={16} className="text-text-sub" fill="currentColor" />
+                )}
               </button>
             )}
             <button

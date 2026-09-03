@@ -1,4 +1,4 @@
-import { ChevronRight, Play } from 'lucide-react';
+import { ChevronRight, Pause, Play } from 'lucide-react';
 import { useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
@@ -15,7 +15,7 @@ interface SearchResultsViewProps {
   onSelectPost: (post: Song) => void;
   // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
   onPlay: (track: TrackSummary) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
 }
 
@@ -91,7 +91,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                   {/* 앨범커버 — 눌러서 바로 재생 */}
                   <button
                     onClick={() => onPlay(track)}
-                    aria-label={`${track.title} 재생`}
+                    aria-label={track.trackId === currentTrackId ? `${track.title} 일시정지` : `${track.title} 재생`}
                     className="relative block w-full active:scale-95 transition-transform"
                   >
                     <img
@@ -99,12 +99,14 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                       alt={track.title}
                       className="w-full aspect-square object-cover bg-slate-100"
                     />
-                    {/* 재생 아이콘 — 버튼이 이미 앨범커버 전체를 감싸고 있어 별도 버튼이 아니라 장식용 오버레이임 */}
-                    {track.trackId !== currentTrackId && (
-                      <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
+                    {/* 재생/일시정지 아이콘 — 버튼이 이미 앨범커버 전체를 감싸고 있어 별도 버튼이 아니라 장식용 오버레이임 */}
+                    <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
+                      {track.trackId === currentTrackId ? (
+                        <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+                      ) : (
                         <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
-                      </span>
-                    )}
+                      )}
+                    </span>
                   </button>
                   {/* 하단 흰색 영역 — 눌러서 이 곡의 게시글 모음으로 이동 */}
                   <button

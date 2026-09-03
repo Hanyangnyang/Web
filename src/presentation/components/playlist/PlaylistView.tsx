@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
-import { FloatingSpotifyPlayer, type PlayableTrack } from './shared/FloatingSpotifyPlayer';
+import { FloatingSpotifyPlayer, type PlayableTrack, type FloatingSpotifyPlayerHandle } from './shared/FloatingSpotifyPlayer';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
 import { RecommendSongView } from './recommendSong/RecommendSongView';
 import { RecentSongsView } from './recentSongs/RecentSongsView';
@@ -46,13 +46,32 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const { data: chartData, isLoading: isChartLoading } = usePopularityChart(chartPeriod);
   const chartTracks = chartData?.tracks ?? [];
   const [currentTrack, setCurrentTrack] = useState<PlayableTrack | null>(null);
+  // FloatingSpotifyPlayer(Spotify iframe)가 실제로 보고하는 재생/일시정지 상태 — currentTrack은
+  // "어떤 곡이 로드돼 있는지"만 알려주고 재생 중인지는 몰라서 별도로 들고 있어야 함
+  const [isPaused, setIsPaused] = useState(true);
+  const playerRef = useRef<FloatingSpotifyPlayerHandle>(null);
+  // 카드들에 "지금 이 트랙이 재생 중"이라고 넘겨줄 값 — 로드만 돼 있고 일시정지 상태면 null로 취급해서,
+  // 그 카드의 재생 버튼이 계속 재생 아이콘(▶)으로 보이고 다시 누르면 이어재생되게 함
+  const playingTrackId = isPaused ? null : (currentTrack?.trackId ?? null);
   const recordTrackPlay = useRecordTrackPlay();
   // trackId별 마지막 재생기록 전송 시각 — 리렌더와 무관하게 유지돼야 해서 state가 아니라 ref
   const lastPlayRecordedAtRef = useRef<Map<string, number>>(new Map());
-  // 재생 버튼이 어디서 눌리든(최근추가곡/인기차트/검색/게시글 등) 이 함수 하나로 모여서
-  // 플레이어를 띄우는 것과 별개로 재생수 기록 API를 함께 호출함 — 단, 같은 트랙은 스로틀 시간 안엔 다시 안 보냄
+  // 재생 버튼이 어디서 눌리든(최근추가곡/인기차트/검색/게시글 등) 이 함수 하나로 모임 — 같은 곡이 이미
+  // 로드돼 있으면 재생/일시정지만 토글하고, 다른 곡이면 새로 로드해서 재생 + 재생수 기록(트랙별 스로틀 적용)
   const handlePlay = useCallback((track: PlayableTrack) => {
+    if (currentTrack?.trackId === track.trackId) {
+      if (isPaused) {
+        playerRef.current?.resume();
+        setIsPaused(false);
+      } else {
+        playerRef.current?.pause();
+        setIsPaused(true);
+      }
+      return;
+    }
+
     setCurrentTrack(track);
+    setIsPaused(false); // 새 곡은 바로 재생을 시도하므로 낙관적으로 반영 — 실제 상태는 playback_update가 뒤이어 보정함
 
     const now = Date.now();
     const lastRecordedAt = lastPlayRecordedAtRef.current.get(track.trackId) ?? 0;
@@ -60,7 +79,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
     lastPlayRecordedAtRef.current.set(track.trackId, now);
     recordTrackPlay.mutate(track.trackId);
-  }, [recordTrackPlay.mutate]);
+  }, [currentTrack, isPaused, recordTrackPlay.mutate]);
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
   const [playerHeight, setPlayerHeight] = useState(0);
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
@@ -240,7 +259,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             }}
             onSelectTrack={handleSelectSearchTrack}
             scrollToTrackId={recentScrollTarget}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
             viewMode={recentViewMode}
             onViewModeChange={setRecentViewMode}
           />
@@ -250,7 +269,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSubmitSuccess={handleAddSongSuccess}
             playerHeight={playerHeight}
             onPlay={handlePlay}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
             prefillTrack={addSongPrefillTrack}
           />
         ) : screen === 'search' ? (
@@ -260,7 +279,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSelectTrack={handleSelectSearchTrack}
             onSelectPost={handleSelectPost}
             onPlay={handlePlay}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
           />
         ) : screen === 'trackPosts' && selectedTrackForPosts ? (
           <TrackPostCollectionView
@@ -268,7 +287,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onBack={popScreen}
             onSelectPost={handleSelectPost}
             onPlay={() => handlePlay(selectedTrackForPosts)}
-            isPlaying={selectedTrackForPosts.trackId === currentTrack?.trackId}
+            isPlaying={selectedTrackForPosts.trackId === playingTrackId}
             onRecommendTrack={pushAddSong}
           />
         ) : screen === 'postDetail' && selectedPostId ? (
@@ -277,7 +296,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onBack={popScreen}
             onPlay={handlePlay}
             onSelectTrack={handleSelectSearchTrack}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
           />
         ) : screen === 'chart' ? (
           <ChartView
@@ -289,6 +308,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowRecent={handleShowAllRecent}
             onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
+            currentTrackId={playingTrackId}
           />
         ) : screen === 'myActivity' ? (
           <MyPageView
@@ -303,7 +323,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowAddSong={() => pushAddSong()}
             onShowRecent={handleShowAllRecent}
             onSelectTrack={handleSelectSearchTrack}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
             viewMode={bookmarkedViewMode}
             onViewModeChange={setBookmarkedViewMode}
           />
@@ -313,7 +333,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onPlay={handlePlay}
             onShowAddSong={() => pushAddSong()}
             onSelectTrack={handleSelectSearchTrack}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
             viewMode={mySongsViewMode}
             onViewModeChange={setMySongsViewMode}
           />
@@ -332,7 +352,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowAllRecent={handleShowAllRecent}
             onSelectRecentSong={handleSelectRecentSong}
             onPlayTrack={handlePlay}
-            currentTrackId={currentTrack?.trackId}
+            currentTrackId={playingTrackId}
             onShowAllChart={() => pushScreen('chart')}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
@@ -350,10 +370,15 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
       {/* 플로팅 Spotify 플레이어*/}
       <FloatingSpotifyPlayer
+        ref={playerRef}
         song={currentTrack}
-        onClose={() => setCurrentTrack(null)}
+        onClose={() => {
+          setCurrentTrack(null);
+          setIsPaused(true);
+        }}
         onHeightChange={handlePlayerHeightChange}
         onSelectTrack={handleSelectSearchTrack}
+        onPlaybackStateChange={setIsPaused}
       />
     </div>
   );

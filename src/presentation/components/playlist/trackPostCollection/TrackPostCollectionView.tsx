@@ -19,7 +19,7 @@ interface TrackPostCollectionViewProps {
   onBack: () => void;
   onSelectPost: (post: Song) => void;
   onPlay: () => void;
-  // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 버튼을 숨김
+  // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 아이콘이 일시정지 아이콘으로 바뀜
   isPlaying?: boolean;
   // 게시글이 하나도 없을 때 뜨는 "이 곡 추천하러 가기" 버튼 — 지금 곡이 미리 채워진 채로 곡추천하기 화면으로 이동
   onRecommendTrack: (track: TrackSummary) => void;
@@ -138,8 +138,8 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               alt={displayTrack.title}
               className="w-full h-full object-cover bg-slate-100"
             />
-            {/* 재생 중엔 버튼을 숨기고(일시정지 아이콘으로 바꾸지 않음), 다른 화면들과 동일한 스타일 */}
-            {!isPlaying && <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} />}
+            {/* 재생 중엔 일시정지 아이콘으로 바뀌어서 그대로 눌러 멈출 수 있음 */}
+            <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} />
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
             <div className="leading-tight">

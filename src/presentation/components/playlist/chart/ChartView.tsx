@@ -14,10 +14,12 @@ interface ChartViewProps {
   onShowRecent: () => void;
   onPlay: (track: ChartTrack) => void;
   onShowPosts: (track: ChartTrack) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 행의 재생 아이콘이 일시정지 아이콘으로 바뀜
+  currentTrackId?: string | null;
 }
 
 // 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
-export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBack, onShowRecent, onPlay, onShowPosts }: ChartViewProps) {
+export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -69,6 +71,7 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
               track={track}
               onPlay={onPlay}
               onShowPosts={onShowPosts}
+              currentTrackId={currentTrackId}
             />
           ))
         )}

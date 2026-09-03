@@ -11,7 +11,7 @@ interface PostViewProps {
   onPlay: (song: Song) => void;
   // 넘겨주면 카드의 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
   onSelectTrack?: (track: TrackSummary) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 이 게시글의 곡과 같으면 재생 버튼을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 이 게시글의 곡과 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
 }
 

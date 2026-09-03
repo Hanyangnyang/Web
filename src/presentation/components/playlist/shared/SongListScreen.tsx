@@ -37,7 +37,7 @@ interface SongListScreenProps {
   onViewModeChange?: (mode: 'grid' | 'list') => void;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 빈 상태를 흰 카드 박스로 감쌀지 — 최근추가된곡의 카드 그리드와 톤을 맞추려는 화면(기본값)용.
   // 저장한 곡/내가 등록한 곡처럼 배경이 이미 흰 화면에서는 굳이 박스가 필요 없어 false로 끔

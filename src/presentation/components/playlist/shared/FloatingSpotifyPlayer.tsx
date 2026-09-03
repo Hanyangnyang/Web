@@ -1,5 +1,5 @@
 import { ChevronRight, Play, Share2, X } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 import { isIOSDevice } from '../../../../lib/platform.js';
 import { useShareModal } from './useShareModal';
@@ -11,6 +11,13 @@ const AUTOPLAY_CHECK_MS = 1500;
 
 export type PlayableTrack = TrackSummary;
 
+// 상위(PlaylistView)가 현재 로드된 곡을 재생/일시정지 시키기 위해 ref로 노출하는 최소 인터페이스 —
+// controller가 이 컴포넌트 내부에서만 만들어지고 관리돼서, 재생 제어는 imperative handle로 열어줌
+export interface FloatingSpotifyPlayerHandle {
+  pause: () => void;
+  resume: () => void;
+}
+
 interface FloatingSpotifyPlayerProps {
   song: PlayableTrack | null;
   onClose: () => void;
@@ -18,11 +25,15 @@ interface FloatingSpotifyPlayerProps {
   onHeightChange?: (height: number) => void;
   // 헤더의 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
   onSelectTrack?: (track: PlayableTrack) => void;
+  // Spotify iframe이 보고하는 실제 재생/일시정지 상태가 바뀔 때마다 상위로 올림 — 앨범커버 재생 버튼들이
+  // 재생 중엔 일시정지 아이콘으로 바뀌어야 해서, 이 상태를 알아야 함
+  onPlaybackStateChange?: (isPaused: boolean) => void;
 }
 
 const CLOSE_ANIMATION_MS = 250;
 
-export function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectTrack }: FloatingSpotifyPlayerProps) {
+export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, FloatingSpotifyPlayerProps>(
+  function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectTrack, onPlaybackStateChange }, ref) {
   const [displaySong, setDisplaySong] = useState<PlayableTrack | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -35,6 +46,12 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectT
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
   const isPausedRef = useRef(true);
   const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 카드들의 재생/일시정지 버튼이 이 컴포넌트 안에서만 존재하는 controller를 직접 조작할 수 있게 노출
+  useImperativeHandle(ref, () => ({
+    pause: () => controllerRef.current?.pause(),
+    resume: () => controllerRef.current?.resume(),
+  }), []);
 
   // 재생 시작 후 일정 시간 안에 실제로 재생이 시작되지 않으면 자동재생이 막힌 것으로 보고 "탭해서 재생하기" 버튼을 띄운다.
   // 이 자동재생 차단은 iOS Safari 정책이라 iOS 기기가 아니면 애초에 검사할 필요가 없음
@@ -101,6 +118,7 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectT
           controller.addListener('ready', () => setIframeLoaded(true));
           controller.addListener('playback_update', (e: { data: { isPaused: boolean } }) => {
             isPausedRef.current = e.data.isPaused;
+            onPlaybackStateChange?.(e.data.isPaused);
             if (!e.data.isPaused) setShowTapToPlay(false);
           });
           controller.play();
@@ -233,4 +251,5 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectT
       {share.node}
     </div>
   );
-}
+  }
+);

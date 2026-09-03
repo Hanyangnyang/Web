@@ -1,4 +1,4 @@
-import { ChevronRight, Play } from 'lucide-react';
+import { ChevronRight, Pause, Play } from 'lucide-react';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { type TrackSummary } from '../playlistTypes';
 
@@ -9,7 +9,7 @@ interface ChartTopCardProps {
   onShowPosts: (track: ChartTrack) => void;
   // 앨범아트(흰 구분선 위쪽) 클릭 — 바로 재생
   onPlay: (track: TrackSummary) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 재생 아이콘을 숨김
+  // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
 }
 
@@ -35,14 +35,16 @@ export function ChartTopCard({ track, onShowPosts, onPlay, currentTrackId }: Cha
         {/* 위쪽: 순위 + 재생 아이콘 — 누르면 바로 재생 */}
         <button
           onClick={() => onPlay(track)}
-          aria-label={`${track.rank}위 ${track.title} 재생`}
+          aria-label={isPlaying ? `${track.rank}위 ${track.title} 일시정지` : `${track.rank}위 ${track.title} 재생`}
           className="relative flex-1 min-h-0 active:scale-[0.98] transition-transform"
         >
-          {!isPlaying && (
-            <span className="absolute top-2 right-2">
+          <span className="absolute top-2 right-2">
+            {isPlaying ? (
+              <Pause size={24} fill="white" stroke="white" strokeWidth={1} />
+            ) : (
               <Play size={24} className="ml-0.5" fill="white" stroke="white" strokeWidth={1} />
-            </span>
-          )}
+            )}
+          </span>
           <span className="absolute bottom-1 left-3 text-4xl font-black italic leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
             {track.rank}
           </span>

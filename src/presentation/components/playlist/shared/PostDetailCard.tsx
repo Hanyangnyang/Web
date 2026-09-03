@@ -34,7 +34,7 @@ interface PostDetailCardProps {
   className?: string;
   // 넘겨줄 때만 앨범커버 중앙에 재생 버튼이 뜸
   onPlay?: () => void;
-  // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 버튼을 숨김
+  // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 아이콘이 일시정지 아이콘으로 바뀜
   isPlaying?: boolean;
   // true면 이모지 리액션을 숨김 — 빠르게 훑어보는 요약 목록(2열)용
   hideReactions?: boolean;
@@ -221,10 +221,10 @@ export function PostDetailCard({
           className="w-full aspect-square object-cover bg-slate-100"
         />
 
-        {onPlay && !isPlaying && (
+        {onPlay && (
           // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원(카드 폭 대비 %)만큼만 잡아서,
           // 그 바깥을 누르면 카드 자체의 onSelect(상세로 전환/게시글 보기)로 넘어가게 함
-          <AlbumArtPlayButton onPlay={onPlay} label={`${post.title} 재생`} sizeClass={playButtonSizeClass} />
+          <AlbumArtPlayButton onPlay={onPlay} label={`${post.title} 재생`} sizeClass={playButtonSizeClass} isPlaying={isPlaying} />
         )}
 
         {/* 앨범커버 우측 하단 공유하기/북마크 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서
