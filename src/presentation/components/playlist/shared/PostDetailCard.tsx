@@ -1,10 +1,9 @@
-import { Heart, ChevronRight, MoreVertical, Share2 } from 'lucide-react';
+import { Heart, ChevronRight, MoreVertical, Pause, Play, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, type TrackSummary, GENRES, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { type ReactionKey } from '../postReactions';
 import { useToggleBookmark } from '../../../hooks/playlist/useToggleBookmark.js';
 import { useToggleReaction } from '../../../hooks/playlist/useToggleReaction.js';
-import { AlbumArtPlayButton } from './AlbumArtPlayButton';
 import { EmojiReactionBar } from './EmojiReactionBar';
 import { useSongReport } from './useSongReport';
 import { ReportReasonPopup } from './ReportReasonPopup';
@@ -32,7 +31,7 @@ export interface PostDetailCardData {
 interface PostDetailCardProps {
   post: PostDetailCardData;
   className?: string;
-  // 넘겨줄 때만 앨범커버 중앙에 재생 버튼이 뜸
+  // 넘겨줄 때만 앨범커버 전체를 눌러 재생/일시정지할 수 있음
   onPlay?: () => void;
   // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 아이콘이 일시정지 아이콘으로 바뀜
   isPlaying?: boolean;
@@ -79,6 +78,11 @@ export function PostDetailCard({
   const share = useShareModal({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
   const toggleBookmark = useToggleBookmark();
   const toggleReactionMutation = useToggleReaction();
+
+  const handleAlbumArtPlay = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    onPlay?.();
+  };
 
   // 먼저 로컬 카운트를 낙관적으로 증감시켜 바로 반응이 보이게 하고(서버가 내려준 count엔 이미 내 반응이
   // 포함돼 있어 +1/-1로 계산), 서버 응답이 오면 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤.
@@ -195,9 +199,6 @@ export function PostDetailCard({
   // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 북마크가 그 왼쪽
   const actionBadgeSizeClass = hideReactions ? 'w-7' : 'w-9';
   const bookmarkBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
-  // 2열(요약 카드)의 재생 버튼은 카드 폭 자체가 좁아서 같은 16%라도 절대 크기가 작아 보임 — 더 큰 비율로 보정
-  const playButtonSizeClass = hideReactions ? 'w-[22%]' : 'w-[16%]';
-
   return (
     <div
       onClick={onSelect}
@@ -222,9 +223,26 @@ export function PostDetailCard({
         />
 
         {onPlay && (
-          // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원(카드 폭 대비 %)만큼만 잡아서,
-          // 그 바깥을 누르면 카드 자체의 onSelect(상세로 전환/게시글 보기)로 넘어가게 함
-          <AlbumArtPlayButton onPlay={onPlay} label={`${post.title} 재생`} sizeClass={playButtonSizeClass} isPlaying={isPlaying} />
+          <button
+            onClick={handleAlbumArtPlay}
+            aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
+            className="absolute inset-0 z-[1] cursor-pointer"
+          />
+        )}
+
+        {/* 재생 가능함을 바로 알 수 있도록 우측 상단에 작게 표시. 앨범커버 어느 곳을 눌러도 같은 토글 동작을 한다. */}
+        {onPlay && (
+          <button
+            onClick={handleAlbumArtPlay}
+            aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
+            className="absolute top-[4%] right-[4%] z-10 w-10 aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+          >
+            {isPlaying ? (
+              <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+            ) : (
+              <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+            )}
+          </button>
         )}
 
         {/* 앨범커버 우측 하단 공유하기/북마크 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서

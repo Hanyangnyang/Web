@@ -20,7 +20,8 @@ interface PlaylistHomeViewProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSubmitSearch: () => void;
-  onShowAllRecent: () => void;
+  // true면 홈 미리보기의 마지막 곡 위치까지 부드럽게 내려간 뒤 전체 목록을 보여줌
+  onShowAllRecent: (scrollToLastPreview?: boolean) => void;
   onSelectRecentSong: (song: Song) => void;
   // 인기차트/최근 추가된 곡 카드의 앨범아트 클릭 — 바로 재생
   onPlayTrack: (track: TrackSummary) => void;
@@ -160,7 +161,7 @@ export function PlaylistHomeView({
         <div className="flex items-center gap-1 mb-2">
           <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
           <button
-            onClick={onShowAllRecent}
+            onClick={() => onShowAllRecent()}
             className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
             aria-label="최근 추가된 곡 전체보기"
           >
@@ -208,7 +209,7 @@ export function PlaylistHomeView({
         {!isRecentSongsLoading && visibleSongs.length > 0 && (
           <div className="flex justify-center mt-3">
             <button
-              onClick={onShowAllRecent}
+              onClick={() => onShowAllRecent(true)}
               className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
             >
               더보기

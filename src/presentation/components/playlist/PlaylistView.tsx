@@ -206,11 +206,14 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     pushScreen('postDetail');
   }, [pushScreen]);
 
-  // "전체보기" 화살표 클릭 — 특정 곡으로 스크롤할 필요 없이 맨 위부터 보여줌
-  const handleShowAllRecent = useCallback(() => {
-    setRecentScrollTarget(null);
+  // 홈의 하단 "더보기"는 미리보기 마지막 곡 위치까지 부드럽게 내려간 뒤 이어서 목록을 보게 한다.
+  // 헤더 화살표·빈 상태 등 다른 진입점은 기존처럼 목록 맨 위부터 보여준다.
+  const handleShowAllRecent = useCallback((scrollToLastPreview = false) => {
+    const previewSongs = songs.slice(0, RECENT_SONGS_LIMIT);
+    const lastPreviewTrackId = previewSongs[previewSongs.length - 1]?.trackId ?? null;
+    setRecentScrollTarget(scrollToLastPreview ? lastPreviewTrackId : null);
     pushScreen('recent');
-  }, [pushScreen]);
+  }, [pushScreen, songs]);
 
   // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤
   const handleSelectRecentSong = useCallback((song: Song) => {
