@@ -114,12 +114,12 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         onBack={onBack}
       />
 
-      {/* 곡 정보 — 앨범아트:정보 = 1:1 비율. 재생/북마크 수는 칩이 아니라 아이콘+숫자로 담백하게,
-          게시글 수는 여기가 아니라 아래 게시글 목록 바로 위에 표기 */}
+      {/* 곡 정보 — 앨범아트는 항상 정사각형(카드 높이에서 폭을 역산). 재생/북마크 수는 칩이 아니라
+          아이콘+숫자로 담백하게, 게시글 수는 여기가 아니라 아래 게시글 목록 바로 위에 표기 */}
       {isTrackInfoLoading ? (
-        <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
-          <div className="w-1/2 aspect-square rounded-xl skeleton-shimmer flex-shrink-0" />
-          <div className="min-w-0 flex-1 flex flex-col gap-2.5">
+        <div className="flex items-stretch h-[128px] gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="aspect-square h-full flex-shrink-0 skeleton-shimmer" />
+          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
             <div className="space-y-1.5">
               <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
               <div className="h-3 w-1/3 skeleton-shimmer rounded-full" />
@@ -129,18 +129,20 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]">
-          <div className="relative w-1/2 flex-shrink-0">
+        <div className="flex items-stretch h-[128px] gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+          {/* 앨범커버 — 항상 1:1 정사각형(aspect-square + h-full로 카드 높이에서 폭을 역산), 카드
+              왼쪽/위/아래 테두리에 여백 없이 꽉 차게(overflow-hidden으로 왼쪽 모서리만 카드 라운딩에 맞춰 클립) */}
+          <div className="relative aspect-square h-full flex-shrink-0">
             <img
               src={displayTrack.albumArtUrl}
               alt={displayTrack.title}
-              className="w-full aspect-square rounded-xl object-cover bg-slate-100"
+              className="w-full h-full object-cover bg-slate-100"
             />
             {/* 재생 중엔 버튼을 숨기고(일시정지 아이콘으로 바꾸지 않음), 다른 화면들과 동일한 스타일 */}
             {!isPlaying && <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} />}
           </div>
-          <div className="min-w-0 flex-1 flex flex-col gap-2.5">
-            <div>
+          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
+            <div className="leading-tight">
               <div className="text-lg font-bold text-text-main truncate">{displayTrack.title}</div>
               <div className="text-[13px] text-text-sub truncate">{displayTrack.artist}</div>
             </div>
@@ -159,7 +161,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               <button
                 onClick={() => onRecommendTrack(displayTrack)}
                 aria-label="이 곡 추천하러 가기"
-                className="h-8 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-main border border-slate-200 flex items-center gap-1 active:scale-95 transition-transform"
+                className="h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-main border border-slate-200 flex items-center gap-1 active:scale-95 transition-transform"
               >
                 <Music size={13} strokeWidth={2.2} />
                 <span className="text-[11px] font-bold">곡추천하기</span>
@@ -167,7 +169,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               <button
                 onClick={() => share.open()}
                 aria-label="공유하기"
-                className="h-8 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-main border border-slate-200 flex items-center gap-1 active:scale-95 transition-transform"
+                className="h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-main border border-slate-200 flex items-center gap-1 active:scale-95 transition-transform"
               >
                 <Share2 size={13} strokeWidth={2} />
                 <span className="text-[11px] font-bold">공유하기</span>

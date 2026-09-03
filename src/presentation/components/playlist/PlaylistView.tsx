@@ -353,6 +353,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
         song={currentTrack}
         onClose={() => setCurrentTrack(null)}
         onHeightChange={handlePlayerHeightChange}
+        onSelectTrack={handleSelectSearchTrack}
       />
     </div>
   );

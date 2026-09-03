@@ -1,4 +1,4 @@
-import { Play, Share2, X } from 'lucide-react';
+import { ChevronRight, Play, Share2, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 import { isIOSDevice } from '../../../../lib/platform.js';
@@ -16,11 +16,13 @@ interface FloatingSpotifyPlayerProps {
   onClose: () => void;
   // 실제 렌더링된 플레이어 카드 높이(safe-area 포함)를 전달 — 닫히면 0
   onHeightChange?: (height: number) => void;
+  // 헤더의 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
+  onSelectTrack?: (track: PlayableTrack) => void;
 }
 
 const CLOSE_ANIMATION_MS = 250;
 
-export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: FloatingSpotifyPlayerProps) {
+export function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectTrack }: FloatingSpotifyPlayerProps) {
   const [displaySong, setDisplaySong] = useState<PlayableTrack | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -156,9 +158,24 @@ export function FloatingSpotifyPlayer({ song, onClose, onHeightChange }: Floatin
           }}
         >
           <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-white/10">
-            <div className="flex-1 min-w-0 text-sm font-semibold text-black truncate">
-              {displaySong.title} <span className="font-normal">- {displaySong.artist}</span>
-            </div>
+            {onSelectTrack ? (
+              <button
+                onClick={() => onSelectTrack(displaySong)}
+                aria-label={`${displaySong.title} 게시글 모음 보기`}
+                className="flex-1 min-w-0 flex items-center gap-0.5 text-left"
+              >
+                <span className="min-w-0 truncate">
+                  <span className="text-sm font-bold text-text-main">{displaySong.title}</span>
+                  <span className="text-sm text-text-sub"> · {displaySong.artist}</span>
+                </span>
+                <ChevronRight size={16} className="flex-shrink-0 text-text-sub" />
+              </button>
+            ) : (
+              <div className="flex-1 min-w-0 truncate">
+                <span className="text-sm font-bold text-text-main">{displaySong.title}</span>
+                <span className="text-sm text-text-sub"> · {displaySong.artist}</span>
+              </div>
+            )}
             <button
               onClick={() => share.open()}
               aria-label="공유하기"
