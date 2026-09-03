@@ -1,4 +1,5 @@
 import { ChevronRight, Pause, Smile } from 'lucide-react';
+import { useState } from 'react';
 import { type Song, toReactionState, formatTimeAgo } from '../playlistTypes';
 import { EMOJI_REACTIONS } from '../postReactions';
 
@@ -18,15 +19,24 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
   const reactions = toReactionState(song.reactions);
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
   const isPlaying = song.trackId === currentTrackId;
+  // 재생 영역을 누르는 동안 행 전체에 같은 눌림 피드백을 줘, 좌우가 별도 칸처럼 보이는 걸 막는다.
+  const [isPlaybackPressed, setIsPlaybackPressed] = useState(false);
+  const playbackPressHandlers = {
+    onPointerDown: () => setIsPlaybackPressed(true),
+    onPointerUp: () => setIsPlaybackPressed(false),
+    onPointerCancel: () => setIsPlaybackPressed(false),
+    onPointerLeave: () => setIsPlaybackPressed(false),
+  };
 
   return (
-    <div className="flex items-stretch bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
+    <div className="relative flex items-stretch bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
       {/* 앨범 커버 — 가로 폭이 이 행 전체 너비의 정확히 20%(반응형)가 되도록 w-1/5로 고정하고,
           aspect-square로 그 폭에서 높이를 역산함. 즉 앨범커버의 "폭"이 행 전체 높이를 결정하는
           기준이 되고(예전엔 반대로 높이가 폭을 역산했음), 오른쪽 정보 영역은 그 높이에 맞춰 늘어남.
           눌러서 바로 재생 */}
       <button
         onClick={() => onPlay(song)}
+        {...playbackPressHandlers}
         aria-label={isPlaying ? `${song.title} 일시정지` : `${song.title} 재생`}
         className="relative w-1/5 flex-shrink-0 aspect-square active:opacity-80 transition-opacity"
       >
@@ -46,8 +56,9 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
       {/* 곡 정보 — 앨범커버와 동일하게 눌러서 바로 재생 */}
       <button
         onClick={() => onPlay(song)}
+        {...playbackPressHandlers}
         aria-label={isPlaying ? `${song.title} 일시정지` : `${song.title} 재생`}
-        className="flex flex-1 min-w-0 pl-2.5 py-1 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        className="flex flex-1 min-w-0 pl-2.5 pr-10 py-1 text-left"
       >
         {/* 곡명·가수명 + 한마디 코멘트 + 리액션 요약 — justify-evenly로 맨 위 여백, 줄과 줄 사이 여백들,
             맨 아래 여백까지 전부 똑같은 간격이 되게 함(justify-between은 양 끝 여백 없이 사이만 분배돼서
@@ -96,14 +107,20 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId }: Recent
 
       </button>
 
-      {/* 화살표만 곡 상세/전체보기 이동을 담당 — 정보 영역의 재생 동작과 분리 */}
+      {/* 화살표만 곡 상세/전체보기 이동을 담당하되, 별도 칸처럼 보이지 않도록 정보 영역 위에 얹는다. */}
       <button
         onClick={() => onSelect(song)}
         aria-label={`${song.title} 전체보기`}
-        className="flex w-10 flex-shrink-0 items-center justify-center text-text-hint hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        className="absolute inset-y-0 right-0 z-10 flex w-10 items-center justify-center text-text-hint active:scale-90 transition-transform"
       >
         <ChevronRight size={24} />
       </button>
+
+      {/* 재생 영역을 누를 때만 카드 전체에 얇게 덮여, 왼쪽만 눌린 듯한 인상을 없앤다. */}
+      <span
+        aria-hidden="true"
+        className={`absolute inset-0 z-20 pointer-events-none bg-black/10 transition-opacity duration-100 ${isPlaybackPressed ? 'opacity-100' : 'opacity-0'}`}
+      />
     </div>
   );
 }
