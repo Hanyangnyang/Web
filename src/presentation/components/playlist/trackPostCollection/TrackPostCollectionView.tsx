@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, MoreVertical, Music, Play, Share2 } from 'lucide-react';
+import { Heart, MessageCircle, MoreVertical, PenLine, Play, Share2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type ReactionKey } from '../postReactions';
@@ -157,14 +157,28 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                 {totalPlayCount.toLocaleString()}회
               </span>
             </div>
-            <div className="flex items-center gap-1.5">
+            {/* 버튼이 늘어서 좁은 화면에서 잘리지 않도록, 줄바꿈 대신 EmojiReactionBar와 같은 방식의
+                가로 스크롤로 처리(각 버튼은 flex-shrink-0으로 폭을 그대로 유지) */}
+            <div
+              className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {/* 곡 추천하기/곡 공유하기 — 위 게시글 N개·재생 N회와 같은 색(text-text-sub)으로 맞춤 */}
+              <button
+                onClick={() => onRecommendTrack(displayTrack)}
+                aria-label="곡 추천하기"
+                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-sub flex items-center gap-1 active:scale-95 active:bg-slate-200 transition-all"
+              >
+                <PenLine size={13} strokeWidth={2} />
+                <span className="text-xs font-bold whitespace-nowrap">곡 추천하기</span>
+              </button>
               <button
                 onClick={() => share.open()}
                 aria-label="곡 공유하기"
-                className="h-7 pl-2.5 pr-3 rounded-full bg-[#618CE9]/10 text-[#618CE9] border border-[#618CE9]/20 flex items-center gap-1 active:scale-95 transition-transform"
+                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-sub flex items-center gap-1 active:scale-95 active:bg-slate-200 transition-all"
               >
                 <Share2 size={13} strokeWidth={2} />
-                <span className="text-xs font-bold">곡 공유하기</span>
+                <span className="text-xs font-bold whitespace-nowrap">곡 공유하기</span>
               </button>
             </div>
           </div>
@@ -204,7 +218,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         <EmptyGenreState
           message="아직 이 곡을 추천한 게시글이 없어요"
           buttonLabel="이 곡 추천하러 가기"
-          buttonIcon={<Music size={14} strokeWidth={2.5} />}
+          buttonIcon={<PenLine size={14} strokeWidth={2.5} />}
           onAction={() => onRecommendTrack(displayTrack)}
         />
       )}
