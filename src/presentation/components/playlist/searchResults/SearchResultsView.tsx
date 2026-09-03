@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Play } from 'lucide-react';
 import { useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
@@ -6,7 +6,6 @@ import { useSongSearch } from '../../../hooks/playlist/useSongSearch.js';
 import { useMusicSearch } from '../../../hooks/playlist/useMusicSearch.js';
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
-import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
 import { EmptyMessageCard } from './EmptyMessageCard';
 
 interface SearchResultsViewProps {
@@ -66,7 +65,9 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         <h3 className="text-lg font-bold text-text-main mb-2">곡</h3>
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
-            {isSearching ? (
+            {activeQuery.trim().length < MIN_QUERY_LENGTH ? (
+              <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
+            ) : isSearching ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex-shrink-0 w-36 rounded-xl border border-slate-200 bg-white overflow-hidden">
                   <div className="w-full aspect-square skeleton-shimmer" />
@@ -84,36 +85,40 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
               trackResults.map((track) => (
                 <div
                   key={track.trackId}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onSelectTrack(track)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') onSelectTrack(track);
-                  }}
-                  aria-label={`${track.title} 추천 게시글 보기`}
                   // 앨범커버 좌우 모서리를 그대로 내려그은 것처럼, 카드 전체를 앨범커버 폭에 맞춰 테두리로 감쌈
-                  className="flex-shrink-0 w-36 text-left rounded-xl border border-slate-200 bg-white overflow-hidden active:scale-95 transition-transform cursor-pointer"
+                  className="flex-shrink-0 w-36 rounded-xl border border-slate-200 bg-white overflow-hidden"
                 >
-                  <div className="relative">
+                  {/* 앨범커버 — 눌러서 바로 재생 */}
+                  <button
+                    onClick={() => onPlay(track)}
+                    aria-label={`${track.title} 재생`}
+                    className="relative block w-full active:scale-95 transition-transform"
+                  >
                     <img
                       src={track.albumArtUrl}
                       alt={track.title}
                       className="w-full aspect-square object-cover bg-slate-100"
                     />
+                    {/* 재생 아이콘 — 버튼이 이미 앨범커버 전체를 감싸고 있어 별도 버튼이 아니라 장식용 오버레이임 */}
                     {track.trackId !== currentTrackId && (
-                      // 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원만큼만 잡아서,
-                      // 그 바깥을 누르면 카드 자체의 onClick(곡 선택)으로 넘어가게 함
-                      <AlbumArtPlayButton onPlay={() => onPlay(track)} label={`${track.title} 재생`} />
+                      <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
+                        <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+                      </span>
                     )}
-                  </div>
-                  <div className="px-2 py-1.5 flex items-center gap-1">
+                  </button>
+                  {/* 하단 흰색 영역 — 눌러서 이 곡의 게시글 모음으로 이동 */}
+                  <button
+                    onClick={() => onSelectTrack(track)}
+                    aria-label={`${track.title} 추천 게시글 보기`}
+                    className="w-full px-2 py-1.5 flex items-center gap-1 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors"
+                  >
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
                       <div className="text-xs text-text-sub truncate">{track.artist}</div>
                     </div>
                     {/* 곡명/가수명 옆 빈 공간에 카드를 누르면 게시글 모음으로 넘어간다는 걸 알려주는 화살표 */}
                     <ChevronRight size={14} className="text-text-hint flex-shrink-0" strokeWidth={2.5} />
-                  </div>
+                  </button>
                 </div>
               ))
             )}
@@ -144,7 +149,13 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             <EmptyMessageCard message="검색 결과가 없어요" />
           ) : (
             postResults.map((post) => (
-              <RecentSongRow key={post.id ?? post.trackId} song={post} onSelect={onSelectPost} />
+              <RecentSongRow
+                key={post.id ?? post.trackId}
+                song={post}
+                onSelect={onSelectPost}
+                onPlay={onPlay}
+                currentTrackId={currentTrackId}
+              />
             ))
           )}
         </div>

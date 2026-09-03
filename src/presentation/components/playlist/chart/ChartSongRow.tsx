@@ -51,7 +51,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) 
           onPlay(track);
         }}
         aria-label={`${track.title} 재생`}
-        className="w-6 flex items-center justify-center text-black hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+        className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
       >
         <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
@@ -63,7 +63,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts }: ChartSongRowProps) 
           share.open();
         }}
         aria-label={`${track.title} 공유하기`}
-        className="w-6 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+        className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
       >
         <Share2 size={16} strokeWidth={2} />
       </button>

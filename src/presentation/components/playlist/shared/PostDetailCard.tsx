@@ -211,11 +211,7 @@ export function PostDetailCard({
           : undefined
       }
       aria-label={onSelect ? `${post.title} 상세 보기` : undefined}
-      className={`flex flex-col bg-white rounded-2xl border overflow-hidden transition-[transform,box-shadow,border-color] duration-200 ${
-        isPlaying
-          ? 'border-[#618CE9]/30 scale-[1.02] z-10 shadow-[0_14px_28px_-6px_rgba(0,0,0,0.12)]'
-          : 'border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]'
-      } ${onSelect ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] ${onSelect ? 'cursor-pointer' : ''} ${className}`}
     >
       {/* 앨범 커버 */}
       <div className="relative">
@@ -294,7 +290,9 @@ export function PostDetailCard({
           <p
             className={`${hideReactions ? 'text-xs line-clamp-3' : 'text-sm'} text-text-main leading-relaxed mb-2 whitespace-pre-line`}
           >
+            <span className="mr-[1px]">"</span>
             {post.body}
+            <span className="ml-[1px]">"</span>
           </p>
         )}
 

@@ -6,7 +6,7 @@ import { RecentSongRow } from '../shared/RecentSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
-import { type Song, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
+import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 
 interface PlaylistHomeViewProps {
@@ -22,6 +22,10 @@ interface PlaylistHomeViewProps {
   onSubmitSearch: () => void;
   onShowAllRecent: () => void;
   onSelectRecentSong: (song: Song) => void;
+  // 인기차트/최근 추가된 곡 카드의 앨범아트 클릭 — 바로 재생
+  onPlayTrack: (track: TrackSummary) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 버튼을 숨김
+  currentTrackId?: string | null;
   onShowAllChart: () => void;
   onShowPosts: (track: ChartTrack) => void;
   onShowMyActivity: () => void;
@@ -46,6 +50,8 @@ export function PlaylistHomeView({
   onSubmitSearch,
   onShowAllRecent,
   onSelectRecentSong,
+  onPlayTrack,
+  currentTrackId,
   onShowAllChart,
   onShowPosts,
   onShowMyActivity,
@@ -110,12 +116,12 @@ export function PlaylistHomeView({
           <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex gap-2 pb-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-32 aspect-[27/50] rounded-xl skeleton-shimmer" />
+                <div key={i} className="flex-shrink-0 w-[152px] aspect-[3/4] rounded-xl skeleton-shimmer" />
               ))}
             </div>
           </div>
         ) : visibleChart.length === 0 ? (
-          <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden h-[245px] flex items-center justify-center">
+          <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden h-[203px] flex items-center justify-center">
             <EmptyGenreState
               message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
               buttonLabel="최근 추가된 곡 보러가기"
@@ -131,8 +137,18 @@ export function PlaylistHomeView({
                   key={track.trackId}
                   track={track}
                   onShowPosts={onShowPosts}
+                  onPlay={onPlayTrack}
+                  currentTrackId={currentTrackId}
                 />
               ))}
+              {/* 더보기 — 카드 캐러셀 맨 끝까지 스크롤하면 나오는 버튼(최근 추가된 곡 더보기 버튼과 동일한 디자인), 인기차트 전체보기로 이동 */}
+              <button
+                onClick={onShowAllChart}
+                aria-label="인기차트 전체보기"
+                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+              >
+                더보기
+              </button>
               <div className="w-1 flex-shrink-0" aria-hidden="true" />
             </div>
           </div>
@@ -181,6 +197,8 @@ export function PlaylistHomeView({
                 key={song.id ?? song.trackId}
                 song={song}
                 onSelect={onSelectRecentSong}
+                onPlay={onPlayTrack}
+                currentTrackId={currentTrackId}
               />
             ))}
           </div>

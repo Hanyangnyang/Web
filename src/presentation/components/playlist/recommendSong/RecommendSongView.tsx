@@ -216,7 +216,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         subtitle={
           creationStatus
             ? creationStatus.canCreate
-              ? `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
+              ? creationStatus.recentTrackIdsIn7Days.length === 0
+                ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요!`
+                : `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요! (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
               : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
             : ''
         }
@@ -350,7 +352,10 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
       {/* 2. 장르 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-2">장르</h3>
+        <div className="flex items-center gap-1 mb-2">
+          <h3 className="text-lg font-bold text-text-main">장르</h3>
+          <span className="text-xs font-semibold text-text-hint">({selectedGenres.length}/{MAX_GENRES})</span>
+        </div>
         <div className="bg-white border border-slate-200 rounded-card p-2 shadow-[0_2px_4px_rgba(0,0,0,0.03)] flex flex-wrap justify-center gap-2">
           {GENRE_OPTIONS.map((genre) => {
             const isSelected = selectedGenres.includes(genre.key);

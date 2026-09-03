@@ -36,8 +36,8 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
           <span className="w-7 text-center">순위</span>
           <div className="flex-1">곡정보</div>
           <div className="flex items-center gap-3">
-            <span className="w-6 text-center">듣기</span>
-            <span className="w-6 text-center">공유</span>
+            <span className="w-9 text-center">듣기</span>
+            <span className="w-9 text-center">공유</span>
           </div>
         </div>
 

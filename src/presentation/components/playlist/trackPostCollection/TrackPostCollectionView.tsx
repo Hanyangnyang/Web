@@ -239,7 +239,11 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             >
               {/* 본문 + 북마크/더보기 */}
               <div className="flex items-start gap-3">
-                <p className="min-w-0 flex-1 text-[15px] text-text-main leading-snug line-clamp-2">{post.comment}</p>
+                <p className="min-w-0 flex-1 text-[15px] text-text-main leading-snug line-clamp-2">
+                  <span className="mr-[1px]">"</span>
+                  {post.comment}
+                  <span className="ml-[1px]">"</span>
+                </p>
 
                 {!post.isMine && (
                   <div className="flex items-start gap-3 flex-shrink-0">

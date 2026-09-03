@@ -1,4 +1,4 @@
-import { Music } from 'lucide-react';
+import { PenLine } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface AddSongFabProps {
@@ -54,7 +54,7 @@ export function AddSongFab({ onClick, playerHeight = 0 }: AddSongFabProps) {
       }`}
       style={{ bottom }}
     >
-      <Music size={20} strokeWidth={2.2} className="flex-shrink-0" />
+      <PenLine size={20} strokeWidth={2.2} className="flex-shrink-0" />
       <span
         className={`overflow-hidden whitespace-nowrap text-sm font-bold transition-[max-width,opacity,margin-left] duration-200 ease-out ${
           collapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[90px] opacity-100 ml-1.5'

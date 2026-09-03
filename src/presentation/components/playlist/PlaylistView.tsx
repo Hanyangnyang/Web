@@ -331,6 +331,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSubmitSearch={handleSearchSubmit}
             onShowAllRecent={handleShowAllRecent}
             onSelectRecentSong={handleSelectRecentSong}
+            onPlayTrack={handlePlay}
+            currentTrackId={currentTrack?.trackId}
             onShowAllChart={() => pushScreen('chart')}
             onShowPosts={handleSelectChartSong}
             onShowMyActivity={() => pushScreen('myActivity')}
