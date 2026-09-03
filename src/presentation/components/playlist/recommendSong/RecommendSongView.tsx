@@ -220,7 +220,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               ? creationStatus.recentTrackIdsIn7Days.length === 0
                 ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요!`
                 : `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요! (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
-              : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요'
+              : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요 :)'
             : ''
         }
         onBack={handleBackRequest}

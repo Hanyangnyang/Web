@@ -29,7 +29,7 @@ export function ChartView({ chart, isLoading, chartPeriod, onChangePeriod, onBac
         onBack={onBack}
       />
 
-      <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="pl-2" />
+      <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} />
 
       {/* 차트 리스트 */}
       <div className="bg-white rounded-card border border-[#618CE9]/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">

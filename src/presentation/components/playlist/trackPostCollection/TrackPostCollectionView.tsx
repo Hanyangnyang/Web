@@ -1,4 +1,4 @@
-import { Heart, MoreVertical, Music, Play, Share2 } from 'lucide-react';
+import { Heart, MessageCircle, MoreVertical, Music, Play, Share2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type ReactionKey } from '../postReactions';
@@ -36,7 +36,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   const { data, isLoading } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
   const totalCount = data?.totalSongsCount ?? posts.length;
-  const totalHeartCount = data?.totalHeartCount ?? 0;
   const totalPlayCount = data?.totalPlayCount ?? 0;
   // 딥링크(카카오 공유 등)로 trackId만 가지고 들어오면 track.title 등이 빈 문자열이라, useTrackPosts가
   // 받아온 값으로 채움 — 검색/차트 등에서 정상적으로 곡 정보를 들고 들어온 경우엔 이미 있는 track 값을 그대로 씀
@@ -115,8 +114,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       />
 
       {/* 곡 정보 — 앨범아트는 카드 폭의 40%(w-2/5)로 고정, 거기서 정사각형 높이를 역산해서 카드
-          전체 높이를 결정함. 재생/북마크 수는 칩이 아니라 아이콘+숫자로 담백하게, 게시글 수는
-          여기가 아니라 아래 게시글 목록 바로 위에 표기 */}
+          전체 높이를 결정함. 게시글 수/재생수는 칩이 아니라 아이콘+숫자로 담백하게 표기 */}
       {isTrackInfoLoading ? (
         <div className="flex items-stretch gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
           <div className="w-2/5 flex-shrink-0 aspect-square skeleton-shimmer" />
@@ -151,54 +149,43 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             <div className="border-t border-slate-300" />
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
-                <Play size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
-                {totalPlayCount.toLocaleString()}회
+                <MessageCircle size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
+                {totalCount.toLocaleString()}개
               </span>
               <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
-                <Heart size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
-                {totalHeartCount.toLocaleString()}회
+                <Play size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
+                {totalPlayCount.toLocaleString()}회
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <button
-                onClick={() => onRecommendTrack(displayTrack)}
-                aria-label="이 곡 추천하러 가기"
-                className="h-7 pl-2.5 pr-3 rounded-full bg-[#618CE9]/10 text-[#618CE9] border border-[#618CE9]/20 flex items-center gap-1 active:scale-95 transition-transform"
-              >
-                <Music size={13} strokeWidth={2.2} />
-                <span className="text-xs font-bold">곡 추천하기</span>
-              </button>
-              <button
                 onClick={() => share.open()}
-                aria-label="공유하기"
+                aria-label="곡 공유하기"
                 className="h-7 pl-2.5 pr-3 rounded-full bg-[#618CE9]/10 text-[#618CE9] border border-[#618CE9]/20 flex items-center gap-1 active:scale-95 transition-transform"
               >
                 <Share2 size={13} strokeWidth={2} />
-                <span className="text-xs font-bold">공유하기</span>
+                <span className="text-xs font-bold">곡 공유하기</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 정렬 칩 + 게시글 수 — 곡 정보 카드가 아니라 게시글 목록 바로 위에 표기 */}
-      <div className="flex items-center justify-between mb-3 pl-2 pr-1">
-        <div className="flex gap-2">
-          {SORT_OPTIONS.map((option) => (
-            <button
-              key={option.key}
-              onClick={() => setSort(option.key)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
-                sort === option.key
-                  ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
-                  : 'bg-white text-[#618CE9] border-[#618CE9]'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-        <span className="text-xs font-semibold text-text-sub">게시글 {totalCount.toLocaleString()}개</span>
+      {/* 정렬 칩 — 게시글 수는 위 곡 정보 카드로 옮김 */}
+      <div className="flex gap-2 mb-3">
+        {SORT_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            onClick={() => setSort(option.key)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
+              sort === option.key
+                ? 'bg-[#618CE9] text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
+                : 'bg-white text-[#618CE9] border-[#618CE9]'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
 
       {isLoading && (
