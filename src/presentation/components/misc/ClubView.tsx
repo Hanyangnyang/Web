@@ -1,5 +1,5 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·동아리방·인스타그램·회비를 빠르게 확인
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
@@ -112,6 +112,40 @@ function ClubItem({ club }: { club: ClubInfo }) {
   );
 }
 
+function ClubSpotlight({ club }: { club: ClubInfo }) {
+  const style = categoryStyles[club.category];
+  const [imageFailed, setImageFailed] = useState(false);
+
+  return (
+    <article className="club-spotlight-roll mb-4 flex items-center gap-3 py-2">
+      <div className="h-[62px] w-[62px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
+        {!imageFailed ? (
+          <img
+            src={`/assets/club-profiles/${club.id}.jpg`}
+            alt={`${club.name} 로고`}
+            onError={() => setImageFailed(true)}
+            className="h-full w-full object-contain"
+          />
+        ) : (
+          <div className={`flex h-full w-full items-center justify-center text-[28px] ${style.icon}`} aria-hidden="true">{getActivityEmoji(club.activityType)}</div>
+        )}
+      </div>
+      <p className="min-w-0 flex-1 whitespace-nowrap text-[13px] text-text-sub">
+        <strong className="font-extrabold text-text-main">{club.activityType}</strong> 동아리 <strong className="font-extrabold text-text-main">{club.name}</strong> 어때요?
+      </p>
+      <button
+        type="button"
+        onClick={() => openInsta(club.instagram!)}
+        className="ml-auto inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-[#E4405F] px-3 py-2 text-[11px] font-extrabold text-white transition-colors hover:bg-[#D62E50] active:bg-[#B92543]"
+        aria-label={`${club.name} 인스타그램 열기`}
+      >
+        <InstagramIcon />
+        인스타 바로가기
+      </button>
+    </article>
+  );
+}
+
 interface ClubViewProps {
   onBack: () => void;
 }
@@ -120,6 +154,19 @@ export function ClubView({ onBack }: ClubViewProps) {
   useBackHandler(onBack);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('전체');
   const [query, setQuery] = useState('');
+  const [spotlightClub, setSpotlightClub] = useState<ClubInfo>(() => {
+    const clubsWithInstagram = CLUBS.filter((club) => club.instagram);
+    return clubsWithInstagram[Math.floor(Math.random() * clubsWithInstagram.length)];
+  });
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSpotlightClub((currentClub) => {
+        const candidates = CLUBS.filter((club) => club.instagram && club.id !== currentClub.id);
+        return candidates[Math.floor(Math.random() * candidates.length)];
+      });
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, []);
   const filteredClubs = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ko-KR');
     return CLUBS.filter((club) => {
@@ -173,6 +220,7 @@ export function ClubView({ onBack }: ClubViewProps) {
       </div>
 
       <div className="pt-3 [animation:slideUp_0.4s_ease-out]">
+        <ClubSpotlight key={spotlightClub.id} club={spotlightClub} />
         {filteredClubs.length > 0 ? (
           <div className="space-y-2.5">
             {filteredClubs.map(club => <ClubItem key={club.id} club={club} />)}
