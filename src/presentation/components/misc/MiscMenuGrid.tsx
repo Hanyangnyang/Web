@@ -45,8 +45,8 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
         </div>
 
         <div className={cardClass} onClick={() => onBoxClick('clubs')}>
-          <div className="w-14 h-14 bg-primary/10 rounded-card flex items-center justify-center">
-            <UsersRound size={28} color="#0E4A84" />
+          <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
+            <UsersRound size={28} color="#F39C12" />
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">중앙동아리</span>
