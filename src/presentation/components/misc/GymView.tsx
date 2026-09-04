@@ -247,7 +247,7 @@ export function GymView({ onBack }: GymViewProps) {
                 <table className="w-full border-collapse table-fixed">
                   <thead>
                     <tr>
-                      <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-slate-200 text-center" style={{ width: '12%' }} />
+                      <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub text-center" style={{ width: '12%' }} />
                       {['월', '화', '수', '목', '금'].map(d => (
                         <th key={d} className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-slate-200 text-center" style={{ width: '17.6%' }}>{d}</th>
                       ))}
@@ -258,7 +258,9 @@ export function GymView({ onBack }: GymViewProps) {
                       const isClosedRow = closingHour !== null && row.hour >= closingHour;
                       return (
                         <tr key={i}>
-                          <td className="py-2 px-1 text-[0.65rem] font-bold text-text-sub text-center border-r border-slate-200">{row.label}</td>
+                          <td className={`${styles.timeCell} border-r border-slate-200`}>
+                            <span className={styles.timeLabel}>{row.label}</span>
+                          </td>
                           {isClosedRow ? (
                             <td colSpan={5} className="bg-slate-50 text-text-hint text-[0.65rem] font-bold text-center py-2 h-10 border-b border-slate-200">
                               운영 종료

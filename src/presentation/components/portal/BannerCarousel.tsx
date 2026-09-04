@@ -15,6 +15,11 @@ export const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food
 // 'calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외
 export const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist'];
 
+// 기타탭(MiscView)이 실제로 진입 가능한 하위 화면 값 목록 — clickUrl의 box 파라미터에
+// 오타/미지원 값이 오면 걸러서 MiscView에 잘못된 서브뷰 상태가 전달되는 걸 막는다.
+// 'calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외
+const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist'];
+
 interface BannerCarouselProps {
   banners: Banner[];
   loading: boolean;
