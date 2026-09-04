@@ -72,7 +72,7 @@ export function PortalChartPromoCard({ isActive = true, onNavigate }: PortalChar
                 onPlay={onNavigate}
                 onShowPosts={onNavigate}
                 rankClassName="font-black text-xl text-gray-900 italic -skew-x-6"
-                thumbnailClassName="w-12 h-12"
+                thumbnailClassName="w-14 h-14"
               />
             ))}
           </div>
