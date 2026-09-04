@@ -11,10 +11,11 @@ const CHART_PERIOD_TO_TYPE: Record<ChartPeriod, ChartType> = {
   monthly: 'MONTHLY',
 };
 
-export function usePopularityChart(period: ChartPeriod) {
+export function usePopularityChart(period: ChartPeriod, isActive = true) {
   return useQuery({
     queryKey: ['playlist', 'chart', period],
     queryFn: () => getPopularityChartUseCase.execute({ type: CHART_PERIOD_TO_TYPE[period] }),
     staleTime: 0,
+    enabled: isActive,
   });
 }

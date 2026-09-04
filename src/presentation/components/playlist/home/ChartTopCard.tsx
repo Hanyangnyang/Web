@@ -11,15 +11,21 @@ interface ChartTopCardProps {
   onPlay: (track: TrackSummary) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
+  // 카드 너비 — 기본은 홈 미리보기의 가로 스크롤용 고정폭(152px). 소식탭 홍보 카드처럼 부모가 폭을
+  // 나눠줄 때는 예) "w-full flex-1"을 넘겨서 덮어쓴다 (Tailwind 클래스 병합 충돌을 피하려고 별도 prop으로 분리)
+  widthClassName?: string;
+  // 카드 높이 — 기본은 3:4 비율로 폭에 맞춰 자동 계산. 부모가 높이를 이미 정해준 상황(예: 소식탭
+  // 캐러셀에서 다른 슬라이드 높이에 맞춰야 할 때)에는 "h-full"을 넘겨서 비율 대신 그 높이를 그대로 채운다
+  heightClassName?: string;
 }
 
 // 인기차트 홈 미리보기 카드(최대 10위) — 배경은 앨범아트 하나로 카드 전체를 채우고, 그 위에 흰
 // 구분선으로 나눈 두 클릭 영역(위: 재생, 아래: 곡명·가수명 눌러 게시글 모음)만 얹음
-export function ChartTopCard({ track, onShowPosts, onPlay, currentTrackId }: ChartTopCardProps) {
+export function ChartTopCard({ track, onShowPosts, onPlay, currentTrackId, widthClassName = 'w-[152px] flex-shrink-0', heightClassName = 'aspect-[3/4]' }: ChartTopCardProps) {
   const isPlaying = track.trackId === currentTrackId;
 
   return (
-    <div className="relative flex-shrink-0 w-[152px] aspect-[3/4] rounded-xl overflow-hidden shadow-lg">
+    <div className={`relative ${widthClassName} ${heightClassName} rounded-xl overflow-hidden shadow-lg`}>
       {/* 앨범커버 전체 배경 — 카드 전체를 채우는 유일한 배경 */}
       <img
         src={track.albumArtUrl}

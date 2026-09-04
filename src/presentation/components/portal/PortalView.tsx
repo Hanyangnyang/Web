@@ -8,6 +8,8 @@ import { useBanners } from '../../hooks/useBanners.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
+import { PortalHeroCarousel } from './PortalHeroCarousel.jsx';
+import { PortalChartPromoCard } from './PortalChartPromoCard.jsx';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
@@ -16,6 +18,9 @@ const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').the
 
 // 날씨 알림 기능 자체는 그대로 두고, 진입 버튼만 사용자에게 안 보이게 내림 — 다시 노출하려면 이 값만 true로
 const SHOW_WEATHER_ALARM_BUTTON = false;
+
+// 인기차트 캐러셀 개발 중이라 자동 재생만 잠깐 꺼둠(스와이프는 그대로 동작) — 완성되면 이 값만 true로
+const AUTO_PLAY_HERO_CAROUSEL = false;
 
 interface PortalViewProps {
   isActive?: boolean;
@@ -68,10 +73,19 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
       )}
     
       <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
-        {/* 1. 에리카 날씨 섹션 */}
-        <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
-          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
-        </ErrorBoundary>
+        {/* 1. 인기차트 홍보 + 에리카 날씨 캐러셀 — 첫 슬라이드는 플레이리스트 인기차트 홍보, 둘째는 날씨 */}
+        <PortalHeroCarousel
+          isActive={isActive}
+          autoPlay={AUTO_PLAY_HERO_CAROUSEL}
+          slides={[
+            <ErrorBoundary key="chart" name="portal-chart-promo">
+              <PortalChartPromoCard isActive={isActive} onNavigate={() => onNavigateToTab?.('misc', undefined, 'playlist')} />
+            </ErrorBoundary>,
+            <ErrorBoundary key="weather" name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
+              <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
+            </ErrorBoundary>,
+          ]}
+        />
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
         <ErrorBoundary name="portal-banner">

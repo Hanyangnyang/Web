@@ -10,9 +10,22 @@ interface ChartSongRowProps {
   onShowPosts: (track: ChartTrack) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
+  // 순위 숫자 타이포그래피 — 기본은 인기차트 전체보기(ChartView)의 담백한 스타일. 소식탭 홍보 카드처럼
+  // 강조하고 싶은 곳에서만 예) "font-black text-base text-gray-900 italic -skew-x-6"로 덮어쓴다
+  rankClassName?: string;
+  // 앨범 커버 크기 — 기본은 ChartView 목록의 48px(w-12 h-12). 소식탭 홍보 카드처럼 더 크게 보이고
+  // 싶은 곳에서만 예) "w-14 h-14"로 덮어쓴다
+  thumbnailClassName?: string;
 }
 
-export function ChartSongRow({ track, onPlay, onShowPosts, currentTrackId }: ChartSongRowProps) {
+export function ChartSongRow({
+  track,
+  onPlay,
+  onShowPosts,
+  currentTrackId,
+  rankClassName = 'font-bold text-sm text-gray-900',
+  thumbnailClassName = 'w-12 h-12',
+}: ChartSongRowProps) {
   const isPlaying = track.trackId === currentTrackId;
   const share = useShareModal({ trackId: track.trackId, title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl });
 
@@ -28,7 +41,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts, currentTrackId }: Cha
       className="flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
     >
       {/* 순위 */}
-      <span className="font-bold text-sm text-gray-900 w-7 text-center flex-shrink-0">
+      <span className={`${rankClassName} w-7 text-center flex-shrink-0`}>
         {track.rank}
       </span>
 
@@ -37,7 +50,7 @@ export function ChartSongRow({ track, onPlay, onShowPosts, currentTrackId }: Cha
         <img
           src={track.albumArtUrl}
           alt={track.title}
-          className="w-12 h-12 object-cover rounded flex-shrink-0"
+          className={`${thumbnailClassName} object-cover rounded flex-shrink-0`}
         />
       )}
 

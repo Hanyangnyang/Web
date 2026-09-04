@@ -110,12 +110,12 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
 
   // 1. 첫 로딩 — 스켈레톤
   if (loading) {
-    return <section className="-mt-3"><WeatherSkeleton /></section>;
+    return <section className="h-full"><WeatherSkeleton /></section>;
   }
 
   // 2. 조회 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
   if (error && !current) {
-    return <section className="-mt-3"><CardFallback message="날씨 정보를 불러오지 못했습니다" onRetry={onRetry} className="min-h-[320px]" /></section>;
+    return <section className="h-full"><CardFallback message="날씨 정보를 불러오지 못했습니다" onRetry={onRetry} className="min-h-[320px] h-full" /></section>;
   }
 
   // 3. 아직 아무것도 못 받음 — 실패도 아니므로 자리를 비워둔다
@@ -129,8 +129,8 @@ export function WeatherCard({ weather, loading, isVisible = true, briefing = nul
   ];
 
   return (
-    <section className="-mt-3">
-      <div className="rounded-card p-4 text-white relative overflow-hidden min-h-[180px] flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
+    <section className="h-full">
+      <div className="rounded-card p-4 text-white relative overflow-hidden min-h-[180px] h-full flex flex-col justify-start shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] transition-all duration-300" style={{
         background: weatherTheme.bg
       }}>
         <div className="relative z-10 w-full">
