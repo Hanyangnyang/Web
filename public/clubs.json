@@ -10,7 +10,11 @@
       "room": "412호",
       "instagram": "hema_1991_",
       "aliases": [
-        "헤마"
+        "헤마",
+        "일렉",
+        "기타",
+        "밴드",
+        "음악"
       ],
       "fees": [
         {
@@ -82,7 +86,13 @@
       "activityType": "밴드",
       "room": "420호",
       "instagram": "moonge_cloud",
-      "aliases": [],
+      "aliases": [
+        "인디",
+        "인디밴드",
+        "노래",
+        "음악",
+        "기타"
+      ],
       "fees": [
         {
           "label": "신규",
@@ -152,7 +162,11 @@
       "room": "414호",
       "instagram": "viva.erica",
       "aliases": [
-        "비바"
+        "비바",
+        "노래",
+        "음악",
+        "춤",
+        "댄스"
       ],
       "fees": [
         {
@@ -261,7 +275,9 @@
       "room": "434호",
       "instagram": null,
       "aliases": [
-        "핀"
+        "핀",
+        "볼링동아리",
+        "운동"
       ],
       "fees": [
         {
@@ -286,7 +302,8 @@
       "room": "448호",
       "instagram": "doh.official",
       "aliases": [
-        "디오에이치"
+        "디오에이치",
+        "댄스"
       ],
       "fees": [
         {
@@ -310,7 +327,10 @@
       "activityType": "연극",
       "room": "416호",
       "instagram": "muppy_hy",
-      "aliases": [],
+      "aliases": [
+        "무대밖의삐에로",
+        "연극동아리"
+      ],
       "fees": [
         {
           "label": "신규",
@@ -334,7 +354,9 @@
       "room": "435호",
       "instagram": "hy__pass",
       "aliases": [
-        "하이패스"
+        "하이패스",
+        "축구동아리",
+        "운동"
       ],
       "fees": [
         {
@@ -386,7 +408,12 @@
       "room": "443호",
       "instagram": "mcpc_hanyang",
       "aliases": [
-        "엠씨피씨"
+        "엠씨피씨",
+        "유학",
+        "교환학생",
+        "국제교류",
+        "영어",
+        "영어회화"
       ],
       "fees": [
         {
@@ -407,7 +434,11 @@
       "room": "447호",
       "instagram": "herc.official",
       "aliases": [
-        "헐크"
+        "헐크",
+        "달리기",
+        "러닝크루",
+        "런닝",
+        "운동"
       ],
       "fees": [
         {
@@ -427,7 +458,11 @@
       "activityType": "코딩",
       "room": "425호",
       "instagram": "hycora_hanyang",
-      "aliases": [],
+      "aliases": [
+        "개발",
+        "AI",
+        "컴퓨터"
+      ],
       "fees": [
         {
           "label": "신규",
@@ -557,7 +592,10 @@
       "activityType": "배드민턴",
       "room": "433호",
       "instagram": null,
-      "aliases": [],
+      "aliases": [
+        "배드민턴동아리",
+        "운동"
+      ],
       "fees": [],
       "feeNote": "미정",
       "recruitmentPeriod": null,
@@ -620,7 +658,10 @@
       "room": "409호",
       "instagram": "hyc_hy_climb",
       "aliases": [
-        "하이클라임"
+        "하이클라임",
+        "암벽",
+        "볼더링",
+        "클라이밍"
       ],
       "fees": [
         {
@@ -663,7 +704,11 @@
       "activityType": "밴드",
       "room": "404호",
       "instagram": "hany__baram",
-      "aliases": [],
+      "aliases": [
+        "노래",
+        "음악",
+        "밴드"
+      ],
       "fees": [
         {
           "label": "신규",
@@ -829,7 +874,9 @@
       "room": "407호",
       "instagram": "hytec_tennis",
       "aliases": [
-        "하이텍"
+        "하이텍",
+        "HY-TeC",
+        "테니스"
       ],
       "fees": [
         {
@@ -895,7 +942,10 @@
       "activityType": "탁구",
       "room": "411호",
       "instagram": "powerdrive_hanyang",
-      "aliases": [],
+      "aliases": [
+        "핑퐁",
+        "pingpong"
+      ],
       "fees": [
         {
           "label": null,
@@ -914,7 +964,11 @@
       "activityType": "흑인음악",
       "room": "415호",
       "instagram": "feelsooooooooooogood",
-      "aliases": [],
+      "aliases": [
+        "힙합",
+        "R&B",
+        "랩"
+      ],
       "fees": [
         {
           "label": "신규",
@@ -1062,7 +1116,11 @@
       "activityType": "야구부 서포터즈",
       "room": null,
       "instagram": "hy_hanya",
-      "aliases": [],
+      "aliases": [
+        "야구응원",
+        "라이온즈",
+        "야구"
+      ],
       "fees": [],
       "feeNote": null,
       "recruitmentPeriod": null,
