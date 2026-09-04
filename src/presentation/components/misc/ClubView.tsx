@@ -53,7 +53,7 @@ const getActivityEmoji = (activityType: string) => {
 
 function ClubBadge({ club }: { club: ClubInfo }) {
   const style = categoryStyles[club.category];
-  const [imageFailed, setImageFailed] = useState(!club.instagram);
+  const [imageFailed, setImageFailed] = useState(false);
 
   return (
     <div className={`w-[52px] h-[52px] rounded-card flex items-center justify-center flex-shrink-0 overflow-hidden ring-1 ring-black/[0.04] ${style.icon}`}>

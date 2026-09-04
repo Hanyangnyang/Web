@@ -1,0 +1,1101 @@
+{
+  "semester": "2026-2",
+  "campus": "ERICA",
+  "clubs": [
+    {
+      "id": "hema",
+      "name": "HEMA",
+      "category": "예술",
+      "activityType": "밴드",
+      "room": "412호",
+      "instagram": "hema_1991_",
+      "aliases": [
+        "헤마"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "40,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "typhoon",
+      "name": "타이푼",
+      "category": "체육",
+      "activityType": "농구",
+      "room": "427호",
+      "instagram": "typhoon_hanyang",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "25,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "weflix",
+      "name": "WEFLIX",
+      "category": "예술",
+      "activityType": "영화 관람",
+      "room": "430호",
+      "instagram": "weflix2026",
+      "aliases": [
+        "위플릭스"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "moonge-cloud",
+      "name": "뭉게구름",
+      "category": "예술",
+      "activityType": "밴드",
+      "room": "420호",
+      "instagram": "moonge_cloud",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "25,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "martini",
+      "name": "마티니",
+      "category": "학술교양",
+      "activityType": "칵테일",
+      "room": "502호",
+      "instagram": "hy_martini",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "35,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "30,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "grim-ul",
+      "name": "그림얼",
+      "category": "예술",
+      "activityType": "만화·서브컬처",
+      "room": "442호",
+      "instagram": "grimul_erica",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "25,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "viva",
+      "name": "VIVA",
+      "category": "예술",
+      "activityType": "뮤지컬",
+      "room": "414호",
+      "instagram": "viva.erica",
+      "aliases": [
+        "비바"
+      ],
+      "fees": [
+        {
+          "label": null,
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "e-rica",
+      "name": "E-리카",
+      "category": "학술교양",
+      "activityType": "e스포츠",
+      "room": "423호",
+      "instagram": "esports_erica",
+      "aliases": [
+        "이리카"
+      ],
+      "fees": [
+        {
+          "label": null,
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "manchwi",
+      "name": "만취",
+      "category": "예술",
+      "activityType": "종합예술댄스",
+      "room": "422호",
+      "instagram": "maaaaaaanchui",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "ccc",
+      "name": "CCC",
+      "category": "종교",
+      "activityType": "기독교",
+      "room": "405호",
+      "instagram": "hyuerica_ccc",
+      "aliases": [
+        "씨씨씨"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "tal",
+      "name": "탈",
+      "category": "예술",
+      "activityType": "풍물패",
+      "room": "410호",
+      "instagram": "tal_pungmul",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "10,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "pin",
+      "name": "PIN",
+      "category": "체육",
+      "activityType": "볼링",
+      "room": "434호",
+      "instagram": null,
+      "aliases": [
+        "핀"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "doh",
+      "name": "DOH",
+      "category": "예술",
+      "activityType": "댄스",
+      "room": "448호",
+      "instagram": "doh.official",
+      "aliases": [
+        "디오에이치"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "10,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "muppy",
+      "name": "무삐",
+      "category": "예술",
+      "activityType": "연극",
+      "room": "416호",
+      "instagram": "muppy_hy",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hy-pass",
+      "name": "HY-PASS",
+      "category": "체육",
+      "activityType": "축구",
+      "room": "435호",
+      "instagram": "hy__pass",
+      "aliases": [
+        "하이패스"
+      ],
+      "fees": [
+        {
+          "label": "남자",
+          "amount": "20,000원"
+        },
+        {
+          "label": "여자",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hyu-hiba",
+      "name": "하이바",
+      "category": "체육",
+      "activityType": "야구",
+      "room": "421호",
+      "instagram": "hyu_hiba",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "30,000원"
+        },
+        {
+          "label": "선수",
+          "amount": "40,000원"
+        },
+        {
+          "label": "매니저",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "mcpc",
+      "name": "MCPC",
+      "category": "학술교양",
+      "activityType": "유학·교환학생",
+      "room": "443호",
+      "instagram": "mcpc_hanyang",
+      "aliases": [
+        "엠씨피씨"
+      ],
+      "fees": [
+        {
+          "label": null,
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "herc",
+      "name": "HERC",
+      "category": "체육",
+      "activityType": "러닝",
+      "room": "447호",
+      "instagram": "herc.official",
+      "aliases": [
+        "헐크"
+      ],
+      "fees": [
+        {
+          "label": null,
+          "amount": "8,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hycora",
+      "name": "하이코라",
+      "category": "학술교양",
+      "activityType": "코딩",
+      "room": "425호",
+      "instagram": "hycora_hanyang",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "husa",
+      "name": "HUSA",
+      "category": "봉사",
+      "activityType": "봉사",
+      "room": "417호",
+      "instagram": "hy_husa_official",
+      "aliases": [
+        "후사"
+      ],
+      "fees": [
+        {
+          "label": null,
+          "amount": "9,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hyco",
+      "name": "HYCO",
+      "category": "학술교양",
+      "activityType": "천문관측",
+      "room": "441호",
+      "instagram": "hyco_erica",
+      "aliases": [
+        "하이코"
+      ],
+      "fees": [
+        {
+          "label": "신입생",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재학생",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "salpan",
+      "name": "살판",
+      "category": "예술",
+      "activityType": "창작극",
+      "room": "438호",
+      "instagram": "salpan_hyu",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "pichinyang",
+      "name": "피치냥",
+      "category": "예술",
+      "activityType": "피아노",
+      "room": "413호",
+      "instagram": null,
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "sonagi",
+      "name": "소나기",
+      "category": "예술",
+      "activityType": "영화 감상·제작",
+      "room": "428호",
+      "instagram": "sonagi_1985",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hiclear",
+      "name": "하이클리어",
+      "category": "체육",
+      "activityType": "배드민턴",
+      "room": "433호",
+      "instagram": null,
+      "aliases": [],
+      "fees": [],
+      "feeNote": "미정",
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "ourim",
+      "name": "어우림",
+      "category": "예술",
+      "activityType": "합창·아카펠라",
+      "room": "431호",
+      "instagram": "ourim2026",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "kusa",
+      "name": "KUSA",
+      "category": "학술교양",
+      "activityType": "토론",
+      "room": "445호",
+      "instagram": "kusa.hy",
+      "aliases": [
+        "쿠사"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "5,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "7,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hy-climb",
+      "name": "HY-CLIMB",
+      "category": "체육",
+      "activityType": "클라이밍",
+      "room": "409호",
+      "instagram": "hyc_hy_climb",
+      "aliases": [
+        "하이클라임"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "rotaract",
+      "name": "로타랙트",
+      "category": "봉사",
+      "activityType": "봉사",
+      "room": "432호",
+      "instagram": "hy_rotaract",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hany-baram",
+      "name": "하늬바람",
+      "category": "예술",
+      "activityType": "밴드",
+      "room": "404호",
+      "instagram": "hany__baram",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "25,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "scuba",
+      "name": "스킨스쿠버",
+      "category": "체육",
+      "activityType": "스쿠버다이빙",
+      "room": "444호",
+      "instagram": "hyu.scuba",
+      "aliases": [],
+      "fees": [],
+      "feeNote": "미정",
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "joy",
+      "name": "JOY",
+      "category": "예술",
+      "activityType": "핑거스타일 기타",
+      "room": "424호",
+      "instagram": "joy_official.ac",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "giwoo",
+      "name": "기우회",
+      "category": "학술교양",
+      "activityType": "보드게임",
+      "room": "429호",
+      "instagram": "hyuboardgame",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "blue-sound",
+      "name": "파랑소래",
+      "category": "예술",
+      "activityType": "클래식 기타",
+      "room": "504호",
+      "instagram": "hyu_bluesound_e",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "arori",
+      "name": "아로리",
+      "category": "학술교양",
+      "activityType": "독서",
+      "room": "437호",
+      "instagram": "arori_story",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hyride",
+      "name": "HYRIDE",
+      "category": "체육",
+      "activityType": "자전거",
+      "room": "402호",
+      "instagram": "hy_ride",
+      "aliases": [
+        "하이라이드"
+      ],
+      "fees": [
+        {
+          "label": null,
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": "자전거 거치·보관비 10,000원 (희망자)",
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "arosaegim",
+      "name": "아로새김",
+      "category": "예술",
+      "activityType": "전시예술기획",
+      "room": "426호",
+      "instagram": "aro__saegim",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "18,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "14,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hytec",
+      "name": "하이텍",
+      "category": "체육",
+      "activityType": "테니스",
+      "room": "407호",
+      "instagram": "hytec_tennis",
+      "aliases": [
+        "하이텍"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "40,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "30,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hacs",
+      "name": "HACS",
+      "category": "봉사",
+      "activityType": "봉사",
+      "room": "436호",
+      "instagram": "hacs_hyu",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "8,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "maha",
+      "name": "MAHA",
+      "category": "체육",
+      "activityType": "보드",
+      "room": "449호",
+      "instagram": "maha_hanyang",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "25,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "15,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "powderive",
+      "name": "탁우회",
+      "category": "체육",
+      "activityType": "탁구",
+      "room": "411호",
+      "instagram": "powerdrive_hanyang",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "25,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "feel-so-good",
+      "name": "필소굿",
+      "category": "예술",
+      "activityType": "흑인음악",
+      "room": "415호",
+      "instagram": "feelsooooooooooogood",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "15,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "20,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "ebs",
+      "name": "EBS",
+      "category": "종교",
+      "activityType": "영어 성경 공부",
+      "room": "408호",
+      "instagram": "hyu_ebs_erica",
+      "aliases": [
+        "이비에스"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "5,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "yacht",
+      "name": "요트부",
+      "category": "체육",
+      "activityType": "요트",
+      "room": "403호",
+      "instagram": "hyyc_official",
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "60,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hy-focus",
+      "name": "HY-FOCUS",
+      "category": "예술",
+      "activityType": "사진",
+      "room": "505호",
+      "instagram": "hy_focus",
+      "aliases": [
+        "하이포커스"
+      ],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "28,000원"
+        },
+        {
+          "label": "재가입(재학생)",
+          "amount": "20,000원"
+        },
+        {
+          "label": "재가입(휴학생)",
+          "amount": "10,000원"
+        }
+      ],
+      "feeNote": "1년 이상 활동한 4학년은 무료",
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "navigator",
+      "name": "네비게이토",
+      "category": "종교",
+      "activityType": "기독교",
+      "room": "440호",
+      "instagram": null,
+      "aliases": [],
+      "fees": [
+        {
+          "label": null,
+          "amount": "무료"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "uniform",
+      "name": "유니폼",
+      "category": "예술",
+      "activityType": "패션",
+      "room": "406호",
+      "instagram": "uniform_erica",
+      "aliases": [],
+      "fees": [
+        {
+          "label": "신규",
+          "amount": "10,000원"
+        },
+        {
+          "label": "재가입",
+          "amount": "8,000원"
+        }
+      ],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hy-fly",
+      "name": "HY-FLY",
+      "category": "학술교양",
+      "activityType": "드론",
+      "room": null,
+      "instagram": null,
+      "aliases": [],
+      "fees": [],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "hanya",
+      "name": "한야",
+      "category": "체육",
+      "activityType": "야구부 서포터즈",
+      "room": null,
+      "instagram": "hy_hanya",
+      "aliases": [],
+      "fees": [],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "sfc",
+      "name": "학생신앙운동(SFC)",
+      "category": "종교",
+      "activityType": "기독교",
+      "room": null,
+      "instagram": "hanyang_erica_sfc",
+      "aliases": [],
+      "fees": [],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    },
+    {
+      "id": "lux-mundi",
+      "name": "LUX-MUNDI",
+      "category": "종교",
+      "activityType": "가톨릭",
+      "room": null,
+      "instagram": null,
+      "aliases": [],
+      "fees": [],
+      "feeNote": null,
+      "recruitmentPeriod": null,
+      "activityDays": null,
+      "openingMeeting": null
+    }
+  ]
+}
