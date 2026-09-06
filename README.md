@@ -209,3 +209,26 @@ src/
 |---|---|---|
 | `ph_phc_<프로젝트키>_posthog` | device_id/distinct_id (사용자 식별) | 쿠키·로컬스토리지 이중 저장 |
 
+---
+
+## 🔗딥링크와 라우팅
+
+카카오 공유 링크, 푸시 알림 클릭, 배너 클릭 — 앱으로 들어오는 경로가 여러 개지만, 네이티브(Android/iOS)에서는 전부 `hanyang-deeplink` 커스텀 이벤트 → `App.tsx`의 `routeFromParams()`라는 단일 진입점으로 모인다. 배너 클릭만 유일하게 이 파이프라인을 안 타는데, 클릭 시점에 이미 앱이 떠 있어서 딥링크 파싱 자체가 필요 없기 때문(`BannerCarousel.tsx`가 직접 처리).
+
+| 진입 경로 | URL 형식 | 처리 위치 | 도착 화면 |
+|---|---|---|---|
+| 카카오톡 공유 (학식) | `?date=YYYY-MM-DD&cafe=<cafeId>&type=<조식\|중식\|석식\|천원...>` | `App.tsx` 최초 마운트 시 `date`/`cafe`/`type` 파라미터 체크(`activeTab`/`isCafeteriaLink`/`showCafeDeepLinkLoader` 초기값) → 네이티브는 `MainActivity`(커스텀 스킴 `kakao{key}://kakaolink?...`)/`AppDelegate`가 가로채 `routeFromParams()`까지 전달 | 학식탭 + 학식 딥링크 전용 로더 스플래시 |
+| 푸시 알림 - 학식 | `?tab=cafe&date=...&cafe=...` (끼니별 알림은 `&type=...`도 추가) | 네이티브: `PushNotifications`의 `pushNotificationActionPerformed` 리스너 → `routeFromParams()`. 콜드스타트로 인해 리스너 등록 전에 이벤트가 드랍될 수 있어, Android는 `MainActivity.onCreate()`에서 Intent extra(`link`)를 직접 읽어 같은 경로로 주입 | 학식탭 + 학식 딥링크 전용 로더 스플래시 |
+| 푸시 알림 - 날씨 | `?tab=weather` | 위와 동일한 `routeFromParams()` 파이프라인 | 소식탭(portal) |
+| 배너 클릭 (내부 링크) | `?tab=<cafe\|shuttle\|portal\|partner\|misc>&chip=<...>&box=<...>` | `BannerCarousel.tsx`의 `handleClick()` — `url.origin === window.location.origin`이 완전히 일치할 때만 `onNavigateToTab()`을 직접 호출. 딥링크 이벤트나 `routeFromParams`는 안 거침 | tab 전환 + (`chip`이면 캠퍼스맵 특정 칩, `box`면 기타탭 특정 서브뷰까지 지정) |
+| 배너 클릭 (외부 링크) | 그 외 모든 URL | `window.open(url, '_blank')` | 외부 브라우저 |
+
+푸시 알림 링크는 Supabase Edge Function `menu-alerts`가 발송 시점에 만든다(`buildFCMMessage`가 `data.link` 필드에 담아 FCM 페이로드로 전송).
+
+**`chip`/`box` 파라미터는 배너 전용** — 카카오 공유·푸시 알림 딥링크(`routeFromParams`)는 `tab`/`date`/`cafe`/`type`만 처리하고 `chip`/`box`는 안 읽는다. "캠퍼스맵 특정 칩으로 바로 진입하는 카카오 공유 링크" 같은 건 지금 구조에서 못 만든다 — 필요해지면 `routeFromParams`에 `chip`/`box` 케이스를 추가해야 함.
+
+**딥링크 진입 시 앱 내부 상태 전달 방식**:
+- Android 콜드스타트 시 `MainActivity`가 React 마운트 전에 도착한 파라미터를 `window.__pendingDeepLinkParams`에 동기 저장 → `App.tsx`가 마운트되며 즉시 소비.
+- 앱이 이미 실행 중일 때(`onNewIntent`)는 `hanyang-deeplink` CustomEvent로 전달.
+- `App.addListener('appUrlOpen', ...)` 같은 Capacitor 표준 URL-open 리스너는 안 씀 — Universal Links(iOS)/App Links(Android) 둘 다 각 네이티브 레이어(`AppDelegate.swift`/`MainActivity.java`)에서 직접 가로채 위 커스텀 브릿지로 흘려보내는 자체 구현.
+
