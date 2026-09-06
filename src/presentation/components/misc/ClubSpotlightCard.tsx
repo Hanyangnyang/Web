@@ -24,7 +24,7 @@ export function ClubSpotlightCard({ club, actionLabel, actionIcon, iconPosition 
               src={`/assets/club-profiles/${club.id}.jpg`}
               alt={`${club.name} 로고`}
               onError={() => setImageFailed(true)}
-              className="h-full w-full object-contain"
+              className="h-full w-full object-cover"
               style={clubImageTransform[club.id] ? { transform: clubImageTransform[club.id] } : undefined}
             />
           ) : (
