@@ -16,7 +16,7 @@ export function ClubSpotlightCard({ club, actionLabel, actionIcon, iconPosition 
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <article className="club-spotlight-roll mb-2 rounded-2xl border border-[#E4405F]/5 bg-[linear-gradient(120deg,rgba(255,107,107,0.16),rgba(255,190,92,0.16),rgba(255,230,110,0.16),rgba(110,220,150,0.16),rgba(100,180,255,0.16),rgba(180,140,255,0.16))] px-3.5 py-3 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+    <article className="club-spotlight-roll mb-2 rounded-2xl border border-[#E4405F]/5 bg-[linear-gradient(120deg,rgba(100,180,255,0.16),rgba(140,150,255,0.08),rgba(180,140,255,0.08))] px-3.5 py-3 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
       <div className="flex items-center gap-3">
         <div className="h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
           {!imageFailed ? (

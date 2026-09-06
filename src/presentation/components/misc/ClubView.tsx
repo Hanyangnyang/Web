@@ -1,5 +1,5 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
@@ -48,9 +48,12 @@ function ClubBadge({ club }: { club: ClubInfo }) {
   );
 }
 
-function ClubItem({ club }: { club: ClubInfo }) {
+function ClubItem({ club, highlighted }: { club: ClubInfo; highlighted?: boolean }) {
   return (
-    <article className="bg-white border border-slate-200/90 rounded-2xl px-3.5 py-3 shadow-[0_3px_10px_rgba(15,23,42,0.035)] transition-all duration-200 hover:border-slate-300 hover:shadow-[0_6px_16px_rgba(15,23,42,0.06)]">
+    <article
+      id={`club-item-${club.id}`}
+      className={`bg-white border border-slate-200/90 rounded-2xl px-3.5 py-3 shadow-[0_3px_10px_rgba(15,23,42,0.035)] transition-all duration-200 hover:border-slate-300 hover:shadow-[0_6px_16px_rgba(15,23,42,0.06)] ${highlighted ? 'club-item-highlight' : ''}`}
+    >
       <div className="flex items-center gap-3">
         <ClubBadge club={club} />
 
@@ -82,15 +85,19 @@ function ClubItem({ club }: { club: ClubInfo }) {
 
 interface ClubViewProps {
   onBack: () => void;
+  // 소식탭 오늘의 동아리 추천에서 "보러가기"로 넘어왔을 때, 그 동아리 위치로 한 번만 자동 스크롤
+  scrollToClubId?: string | null;
+  onScrollToClubIdHandled?: () => void;
 }
 
-export function ClubView({ onBack }: ClubViewProps) {
+export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: ClubViewProps) {
   useBackHandler(onBack);
   const isApp = isNativeApp();
   const platform = getPlatform();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('전체');
   const [query, setQuery] = useState('');
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [highlightedClubId, setHighlightedClubId] = useState<string | null>(null);
   const spotlightClub = useClubSpotlight();
   const filteredClubs = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ko-KR');
@@ -104,6 +111,23 @@ export function ClubView({ onBack }: ClubViewProps) {
       })
       .sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'));
   }, [query, activeCategory]);
+
+  // 딥링크로 넘어온 동아리 위치로 자동 스크롤 + 도착한 카드를 잠깐 반짝여서 눈에 띄게 함
+  // (목록이 실제로 그려진 뒤여야 하므로 rAF를 두 번 거친다)
+  useEffect(() => {
+    if (!scrollToClubId) return;
+    let raf2 = 0;
+    let highlightTimer = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        document.getElementById(`club-item-${scrollToClubId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setHighlightedClubId(scrollToClubId);
+        highlightTimer = window.setTimeout(() => setHighlightedClubId(null), 1800);
+        onScrollToClubIdHandled?.();
+      });
+    });
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); window.clearTimeout(highlightTimer); };
+  }, [scrollToClubId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="fixed inset-0 z-[1001] bg-surface">
@@ -185,7 +209,9 @@ export function ClubView({ onBack }: ClubViewProps) {
           />
           {filteredClubs.length > 0 ? (
             <div className="space-y-2">
-              {filteredClubs.map(club => <ClubItem key={club.id} club={club} />)}
+              {filteredClubs.map(club => (
+                <ClubItem key={club.id} club={club} highlighted={club.id === highlightedClubId} />
+              ))}
             </div>
           ) : (
             <div className="rounded-2xl border border-slate-200 bg-white px-5 py-12 text-center shadow-sm">

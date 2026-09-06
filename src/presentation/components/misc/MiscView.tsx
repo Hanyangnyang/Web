@@ -6,6 +6,12 @@ import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
 import { MiscSubViewHeader } from './MiscSubViewHeader.jsx';
 
 type SubViewComponent = ComponentType<{ onBack: () => void }>;
+// ClubView는 소식탭 딥링크로 넘어온 클럽 id로 자동 스크롤하는 추가 props를 받는다
+type ClubViewComponent = ComponentType<{
+  onBack: () => void;
+  scrollToClubId?: string | null;
+  onScrollToClubIdHandled?: () => void;
+}>;
 
 let instagramViewPromise: Promise<{ default: SubViewComponent }> | null = null;
 const loadInstagramView = () => {
@@ -26,7 +32,7 @@ const loadFeedbackView = () => {
 const LazyInstagramView = lazy(loadInstagramView);
 const LazyFeedbackView = lazy(loadFeedbackView);
 
-let clubViewPromise: Promise<{ default: SubViewComponent }> | null = null;
+let clubViewPromise: Promise<{ default: ClubViewComponent }> | null = null;
 const loadClubView = () => {
   if (!clubViewPromise) {
     clubViewPromise = import('./ClubView.jsx').then(m => ({ default: m.ClubView }));
@@ -100,14 +106,17 @@ interface MiscViewProps {
   // 배너 등에서 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 App.tsx가 한 번만 내려줌
   deepLinkBox?: string | null;
   onDeepLinkBoxHandled?: () => void;
+  // 소식탭 오늘의 동아리 추천에서 넘어왔을 때, 중앙동아리 목록의 그 동아리 위치로 자동 스크롤하기 위해 넘어옴
+  deepLinkClubId?: string | null;
+  onDeepLinkClubIdHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
   const [FeedbackViewComp, setFeedbackViewComp] = useState<SubViewComponent | null>(null);
-  const [ClubViewComp, setClubViewComp] = useState<SubViewComponent | null>(null);
+  const [ClubViewComp, setClubViewComp] = useState<ClubViewComponent | null>(null);
 
   useEffect(() => {
     setSubView('list');
@@ -165,11 +174,11 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
     const onBack = () => setSubView('list');
     if (ClubViewComp) {
       const Comp = ClubViewComp;
-      return <Comp onBack={onBack} />;
+      return <Comp onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />;
     }
     return (
       <Suspense fallback={<InstagramViewFallback onBack={onBack} />}>
-        <LazyClubView onBack={onBack} />
+        <LazyClubView onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />
       </Suspense>
     );
   }

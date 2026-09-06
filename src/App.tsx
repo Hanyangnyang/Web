@@ -85,6 +85,9 @@ function MainLayout() {
   const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
   // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
   const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(null);
+  // 소식탭 오늘의 동아리 추천에서 "보러가기"를 눌렀을 때, 중앙동아리 목록에서 그 동아리 위치로
+  // 자동 스크롤하기 위해 ClubView에 한 번만 전달
+  const [pendingClubId, setPendingClubId] = useState<string | null>(null);
   const { isAppReady, splashDone, completeSplash } = useBoot();
   const { isOnline } = useNetwork();
   const posthog = usePostHog();
@@ -194,9 +197,10 @@ function MainLayout() {
   // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지, box는 기타탭의
   // 특정 서브뷰(예: 헬스장)까지 지정하고 싶을 때만 넘어온다.
   // 이미 그 탭에 있는 상태에서 다시 눌러도 값은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
-  const handleTabChange = useCallback((tab: string, chip?: string, box?: string) => {
+  const handleTabChange = useCallback((tab: string, chip?: string, box?: string, clubId?: string) => {
     if (chip && tab === 'partner') setPendingMapChip(chip);
     if (box && tab === 'misc') setPendingMiscBox(box);
+    if (clubId && tab === 'misc' && box === 'clubs') setPendingClubId(clubId);
 
     // 1. 같은 탭 재클릭 처리 — box로 특정 서브뷰를 지정한 딥링크라면 그리드로 리셋하지 않고 그 서브뷰로 바로 이동
     if (tab === activeTab) {
@@ -273,6 +277,8 @@ function MainLayout() {
               isActive={activeTab === 'misc'}
               deepLinkBox={pendingMiscBox}
               onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
+              deepLinkClubId={pendingClubId}
+              onDeepLinkClubIdHandled={() => setPendingClubId(null)}
             />
           </div>
           {/* 지도는 px-4 패딩을 -mx-4로 상쇄해 전체 폭을 사용 */}
