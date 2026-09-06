@@ -116,23 +116,25 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
 
   // 특정 동아리 위치로 자동 스크롤 + 도착한 카드를 잠깐 반짝여서 눈에 띄게 함
   // (목록이 실제로 그려진 뒤여야 하므로 rAF를 두 번 거친다)
-  const scrollAndHighlightClub = useCallback((clubId: string) => {
+  const scrollAndHighlightClub = useCallback((clubId: string, onDone?: () => void) => {
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
         document.getElementById(`club-item-${clubId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         setHighlightedClubId(clubId);
         window.setTimeout(() => setHighlightedClubId(null), 1800);
+        onDone?.();
       });
     });
     return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
   }, []);
 
-  // 딥링크(소식탭 "보러가기")로 넘어온 경우
+  // 딥링크(소식탭 "보러가기")로 넘어온 경우 — "소비 완료" 알림은 스크롤이 실제로 끝난 뒤(rAF 콜백 안)에
+  // 보내야 한다. 예약과 동시에 보내면 부모의 scrollToClubId가 곧바로 null로 내려와 이 effect가 재실행되고,
+  // cleanup이 아직 발화 전인 rAF를 취소해버려 스크롤이 통째로 무산되는 경우가 있었다(주로 콜드스타트 첫 진입).
   useEffect(() => {
     if (!scrollToClubId) return;
-    const cancel = scrollAndHighlightClub(scrollToClubId);
-    onScrollToClubIdHandled?.();
+    const cancel = scrollAndHighlightClub(scrollToClubId, onScrollToClubIdHandled);
     return cancel;
   }, [scrollToClubId]); // eslint-disable-line react-hooks/exhaustive-deps
 
