@@ -124,7 +124,7 @@ export function ClubView({ onBack }: ClubViewProps) {
                   type="button"
                   onClick={() => setFeedbackOpen(true)}
                   aria-label="중앙동아리 정보 제보하기"
-                  className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-white border border-slate-200 px-3 py-2 text-[12px] font-bold text-text-main shadow-[0_1px_2px_rgba(14,74,132,0.08)] transition-colors hover:bg-surface active:bg-surface"
+                  className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-white border border-slate-200 px-3 py-2 text-[12px] font-bold text-text-main transition-colors hover:bg-surface active:bg-surface"
                 >
                   <span className="text-[13px] leading-none" aria-hidden="true">📢</span>
                   제보하기

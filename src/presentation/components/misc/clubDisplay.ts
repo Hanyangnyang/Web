@@ -41,7 +41,12 @@ export const clubImageTransform: Record<string, string> = {
   hytec: 'scale(1.32)',
   hiclear: 'scale(1.17)',
   pichinyang: 'scale(1.19)',
-  giwoo: 'scale(1.37)',
+  // 3) 캔버스 자체가 정사각형이 아니거나(hy-focus, 세로로 긴 130x183), 로고가 이미
+  //    캔버스 한쪽 변에 꽉 붙어있어서(feel-so-good, 가로) object-cover crop만으로는
+  //    다 못 지운 여백이 남는 경우 — 추가로 살짝만 더 확대해서 남은 여백을 없앤다.
+  'feel-so-good': 'scale(1.50)',
+  'hy-focus': 'scale(1.08)',
+  // giwoo(기우회)는 실측상 여백이 아니라 원래 세로로 긴 디자인이라 확대하지 않는다.
 };
 
 export const getActivityEmoji = (activityType: string) => {

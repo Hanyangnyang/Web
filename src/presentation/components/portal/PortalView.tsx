@@ -81,7 +81,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           <ClubSpotlightCard
             key={spotlightClub.id}
             club={spotlightClub}
-            actionLabel="자세히 보러가기"
+            actionLabel="보러가기"
             actionIcon={<ChevronRight size={14} />}
             onAction={() => onNavigateToTab?.('misc', undefined, 'clubs')}
           />
