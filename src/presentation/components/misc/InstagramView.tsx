@@ -7,6 +7,14 @@ import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 
 type GroupKey = 'erica' | 'college';
 
+const InstagramIcon = ({ size = 13 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <circle cx="12" cy="12" r="4" />
+    <path d="M17.5 6.5h.01" />
+  </svg>
+);
+
 const openInsta = (username: string) => {
   const start = Date.now();
   window.location.href = `instagram://user?username=${username}`;
@@ -45,10 +53,11 @@ function AccountItem({ acc, isFirst }: AccountItemProps) {
           </div>
         </div>
         <button
-          className="flex-shrink-0 min-w-[64px] flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-primary/10 rounded-full text-primary text-[12px] cursor-pointer transition-all duration-150 hover:bg-primary/20 active:bg-primary active:text-white active:scale-95"
+          className="flex-shrink-0 min-w-[64px] flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-[#E4405F]/[0.1] rounded-full text-[#C13557] text-[12px] font-bold cursor-pointer transition-colors duration-150 hover:bg-[#E4405F]/[0.16] active:bg-[#E4405F]/[0.2]"
           onClick={() => openInsta(acc.username)}
         >
-          이동하기
+          <InstagramIcon size={12} />
+          바로가기
         </button>
       </div>
     </>
