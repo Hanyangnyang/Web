@@ -44,6 +44,13 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
 
   const slides = banners.length > 1 ? [...banners, banners[0]] : banners;
 
+  // 배너 이미지가 위에서부터 아래로 그려지며 로드되는 게 그대로 보이는 걸 막기 위해,
+  // 로드 완료 전까지는 shimmer 스켈레톤을 보여주고 로드되면 fade-in으로 전환한다
+  const [loadedKeys, setLoadedKeys] = useState<Set<string | number>>(new Set());
+  const markLoaded = (key: string | number) => {
+    setLoadedKeys((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
+  };
+
   const goForward = () => {
     setTransitionEnabled(true);
     // 복제본(clone) 위에 떠 있는 상태에서 또 넘기면(스냅백 전) 그다음 실제 슬라이드로 보낸다
@@ -195,16 +202,23 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
           className={`flex h-full ${transitionEnabled ? 'transition-transform duration-300 ease-in-out' : ''}`}
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          {slides.map((banner, i) => (
-            <img
-              key={i === banners.length ? `${banner.id ?? i}-clone` : (banner.id ?? i)}
-              src={banner.imageUrl}
-              alt={banner.altText || '배너'}
-              className={`w-full h-full object-cover flex-shrink-0 ${banner.clickUrl ? 'cursor-pointer' : ''}`}
-              draggable={false}
-              onClick={() => handleClick(banner)}
-            />
-          ))}
+          {slides.map((banner, i) => {
+            const key = i === banners.length ? `${banner.id ?? i}-clone` : (banner.id ?? i);
+            const loaded = loadedKeys.has(key);
+            return (
+              <div key={key} className="relative w-full h-full flex-shrink-0 overflow-hidden">
+                {!loaded && <div className="absolute inset-0 img-shimmer" aria-hidden="true" />}
+                <img
+                  src={banner.imageUrl}
+                  alt={banner.altText || '배너'}
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'} ${banner.clickUrl ? 'cursor-pointer' : ''}`}
+                  draggable={false}
+                  onLoad={() => markLoaded(key)}
+                  onClick={() => handleClick(banner)}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
