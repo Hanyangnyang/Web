@@ -389,6 +389,41 @@ body {
   }
 }
 
+@keyframes clubSpotlightRoll {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.club-spotlight-roll {
+  animation: clubSpotlightRoll 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 소식탭 오늘의 동아리 추천 → 중앙동아리로 자동 스크롤됐을 때, 도착한 카드가 눈에 띄도록 한 번만 반짝 */
+@keyframes clubItemHighlightFlash {
+  0% {
+    background-color: rgba(228, 64, 95, 0.06);
+  }
+
+  70% {
+    background-color: rgba(228, 64, 95, 0.06);
+  }
+
+  100% {
+    background-color: rgba(228, 64, 95, 0);
+  }
+}
+
+.club-item-highlight {
+  animation: clubItemHighlightFlash 1.8s ease-out;
+}
+
 @keyframes pulseHighlight {
   0% {
     background-color: rgba(14, 74, 132, 0.03);
