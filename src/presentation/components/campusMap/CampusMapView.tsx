@@ -14,9 +14,10 @@ import { StoreSheet } from './sheets/StoreSheet';
 import { PointMarkers } from './markers/PointMarkers';
 import { CampusBuildingSheet } from './sheets/CampusBuildingSheet';
 import { SmokingSpotSheet } from './sheets/SmokingSpotSheet';
+import { ParkingLotSheet } from './sheets/ParkingLotSheet';
 import { CampusFeedbackModal } from './CampusFeedbackModal';
 import {
-  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
+  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
 } from './sheets/sheetMetrics';
 
 import {
@@ -26,6 +27,7 @@ import {
 import { openSpaceBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
 import { collegeById } from '../../../domain/entities/College.js';
 import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
+import { PARKING_LOTS, visibleParkingLots, type PlottableParkingLot } from '../../../domain/entities/ParkingLot.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useSmokingSpots } from '../../hooks/campusMap/useSmokingSpots.js';
@@ -104,8 +106,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
 
   // 칩 하나에서 파생되는 화면 상태(어떤 레이어를 그릴지·어떤 시트를 띄울지)는 전부 이 훅이 계산한다
   const {
-    isOpenSpaceChip, isSmokingChip, isBuildingLayerChip,
-    showsBuildingLayer, showsSmokingLayer, storeCategory, sheetVisible,
+    isOpenSpaceChip, isSmokingChip, isParkingChip, isBuildingLayerChip,
+    showsBuildingLayer, showsSmokingLayer, showsParkingLayer, storeCategory, sheetVisible,
   } = useCampusMapLayers(chip);
 
   // 건물·흡연장은 각자의 칩이 켜졌을 때만 불러온다(RQ enabled).
@@ -113,6 +115,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   // 지도와 나머지 레이어는 계속 쓸 수 있어야 하고, "실패"와 "원래 없음"이 구분돼야 한다.
   const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: showsBuildingLayer });
   const { spots: smokingSpots, loading: smokingLoading, loadErr: smokingError } = useSmokingSpots({ enabled: showsSmokingLayer });
+  // 주차장은 아직 프로토타입 단계라 앱에 번들된 정적 데이터를 그대로 쓴다(백엔드/RQ 없음)
+  const parkingLots = useMemo(() => visibleParkingLots(PARKING_LOTS), []);
 
   // 오픈스페이스 칩이면 오픈스페이스가 있는 건물만 지도·목록에 올린다
   const layerBuildings = useMemo(
@@ -136,12 +140,15 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
       case 'smoking':
         focusMap(sel.spot.coordinates.latitude, sel.spot.coordinates.longitude, SMOKING_DETAIL_FRACTION, viewportHeight, SMOKING_FOCUS_LEVEL);
         break;
+      case 'parking':
+        focusMap(sel.lot.coordinates.latitude, sel.lot.coordinates.longitude, PARKING_DETAIL_FRACTION, viewportHeight);
+        break;
     }
   }, [focusMap, getViewportHeight]);
 
   const {
     selection, sheetExpanded, setSheetExpanded,
-    selectStore, selectBuilding, selectSmokingSpot,
+    selectStore, selectBuilding, selectSmokingSpot, selectParkingLot,
     closeDetail, clearSelection, browseCategory,
   } = useCampusMapSelection({
     onFocus: focusSelection,
@@ -155,6 +162,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const selectedStore = useMemo(() => selectedBy(selection, 'store', stores), [selection, stores]);
   const selectedBuilding = useMemo(() => selectedBy(selection, 'building', buildings), [selection, buildings]);
   const selectedSmokingSpot = useMemo(() => selectedBy(selection, 'smoking', smokingSpots), [selection, smokingSpots]);
+  const selectedParkingLot = useMemo(() => selectedBy(selection, 'parking', parkingLots), [selection, parkingLots]);
 
   // 무엇을 선택하든 그에 해당하는 칩으로 전환한다.
   // '전체'에서 마커를 눌렀을 때 그 종류의 칩이 켜지게 하는 게 주 목적이고, 덕분에
@@ -174,6 +182,11 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const pickSmokingSpot = (spot: PlottableSmokingSpot, source: SelectSource) => {
     if (!isSmokingChip) setChip('smoking');
     selectSmokingSpot(spot, source);
+  };
+
+  const pickParkingLot = (lot: PlottableParkingLot, source: SelectSource) => {
+    if (!isParkingChip) setChip('parking');
+    selectParkingLot(lot, source);
   };
 
   // 검색에서 건물을 고르면 교내시설 레이어로 확정한다 — 오픈스페이스 칩이 켜져 있어도
@@ -357,6 +370,15 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           />
         )}
 
+        {showsParkingLayer && (
+          <PointMarkers
+            items={parkingLots}
+            level={level}
+            selectedId={selectedParkingLot?.id ?? null}
+            onSelect={(p) => pickParkingLot(p, 'marker')}
+          />
+        )}
+
         {/* 현재 위치 파란 점 (+ 펄스) */}
         {userPos && (
           <CustomOverlayMap position={userPos} yAnchor={0.5} zIndex={30}>
@@ -504,6 +526,16 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           onToggleExpand={setSheetExpanded}
           selected={selectedSmokingSpot}
           onSelect={(s) => pickSmokingSpot(s, 'list')}
+          onClose={closeDetail}
+        />
+      ) : isParkingChip ? (
+        <ParkingLotSheet
+          lots={parkingLots}
+          origin={distanceOrigin}
+          expanded={sheetExpanded}
+          onToggleExpand={setSheetExpanded}
+          selected={selectedParkingLot}
+          onSelect={(p) => pickParkingLot(p, 'list')}
           onClose={closeDetail}
         />
       ) : null}

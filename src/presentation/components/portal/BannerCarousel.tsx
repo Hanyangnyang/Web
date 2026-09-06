@@ -8,7 +8,7 @@ const VALID_TABS = ['cafe', 'shuttle', 'portal', 'partner', 'misc'];
 
 // 캠퍼스맵(useCampusMapFilters.ts의 MapChip)이 실제로 받아들이는 칩 값 목록 — clickUrl의
 // chip 파라미터에 오타/미지원 값이 오면 걸러서 CampusMapView에 잘못된 칩 상태가 전달되는 걸 막는다
-const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food', 'cafe', 'pub', 'play', 'life'];
+const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'parking', 'food', 'cafe', 'pub', 'play', 'life'];
 
 // 기타탭(MiscView)이 실제로 진입 가능한 하위 화면 값 목록 — clickUrl의 box 파라미터에
 // 오타/미지원 값이 오면 걸러서 MiscView에 잘못된 서브뷰 상태가 전달되는 걸 막는다.
