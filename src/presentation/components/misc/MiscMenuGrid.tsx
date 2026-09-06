@@ -50,7 +50,7 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">중앙동아리</span>
-            <span className="text-[0.8rem] text-text-sub">활동·회비·동아리방</span>
+            <span className="text-[0.8rem] text-text-sub">활동·동아리방·인스타</span>
           </div>
         </div>
 
