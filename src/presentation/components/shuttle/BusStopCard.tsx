@@ -1,6 +1,6 @@
 // 컴포넌트: 일반버스 정류소 하나의 아코디언 카드 (버스별 도착정보 목록 포함)
 import { useState } from 'react';
-import { Star, ChevronDown, Loader2, BusFront, MapPinned } from 'lucide-react';
+import { Star, ChevronDown, Loader2, BusFront, MapPinned, WifiOff } from 'lucide-react';
 import { ALLOWED_BUSES_BY_STOP, DEFAULT_DIRECTIONS, type TickingBusArrival } from '../../../domain/entities/PublicBus.js';
 import { BusArrivalSlot } from './BusArrivalSlot.jsx';
 import { BusStopLocationSheet } from './BusStopLocationSheet.jsx';
@@ -27,13 +27,14 @@ interface BusStopCardProps {
   isClosest: boolean;
   arrivals: TickingBusArrival[];
   isLoading: boolean;
+  isError: boolean;
   hasLoadedOnce: boolean;
   userCoords: { latitude: number; longitude: number } | null;
   onToggleExpand: (stopName: string) => void;
   onToggleFavorite: (stopName: string) => void;
 }
 
-export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, isLoading, hasLoadedOnce, userCoords, onToggleExpand, onToggleFavorite }: BusStopCardProps) {
+export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, isLoading, isError, hasLoadedOnce, userCoords, onToggleExpand, onToggleFavorite }: BusStopCardProps) {
   const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const direction = DIR_MAP[stopName] || '';
@@ -78,6 +79,9 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
           {isLoading && (
             <Loader2 size={14} className="text-text-hint animate-spin" />
           )}
+          {!isLoading && isError && !hasLoadedOnce && (
+            <WifiOff size={14} className="text-text-hint" />
+          )}
           <button
             type="button"
             aria-label={`${stopName} 정류장 위치 보기`}
@@ -112,6 +116,10 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
           {targetBuses.length === 0 ? (
             <p className="text-center text-xs font-semibold text-text-hint py-4">
               운행 정보가 없습니다.
+            </p>
+          ) : isError && !hasLoadedOnce ? (
+            <p className="text-center text-xs font-semibold text-text-hint py-4">
+              버스 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.
             </p>
           ) : targetBuses.map((busId, idx) => {
             const busArrivalsForId = arrivals.filter(arr => arr.busId === busId);
