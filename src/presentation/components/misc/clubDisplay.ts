@@ -11,7 +11,7 @@ export const categoryStyles: Record<ClubCategory, { icon: string }> = {
 
 export const categoryEmoji: Record<ClubCategory, string> = {
   예술: '🎨',
-  체육: '🏅',
+  체육: '🤸‍♂️',
   학술교양: '📚',
   봉사: '🤝',
   종교: '✝️',

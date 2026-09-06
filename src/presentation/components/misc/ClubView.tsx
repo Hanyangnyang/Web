@@ -1,12 +1,13 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
 import { useMemo, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Megaphone } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 import { ClubSpotlightCard } from './ClubSpotlightCard.js';
+import { ClubFeedbackModal } from './ClubFeedbackModal.js';
 import { categoryStyles, categoryEmoji, getActivityEmoji } from './clubDisplay.js';
 
 type CategoryFilter = '전체' | ClubCategory;
@@ -88,6 +89,7 @@ export function ClubView({ onBack }: ClubViewProps) {
   const platform = getPlatform();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('전체');
   const [query, setQuery] = useState('');
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const spotlightClub = useClubSpotlight();
   const filteredClubs = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ko-KR');
@@ -111,7 +113,20 @@ export function ClubView({ onBack }: ClubViewProps) {
       >
         <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
           <div className="-mb-4 pb-2">
-            <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
+            <MiscSubViewHeader
+              title="중앙동아리"
+              onBack={onBack}
+              rightAction={(
+                <button
+                  type="button"
+                  onClick={() => setFeedbackOpen(true)}
+                  aria-label="중앙동아리 정보 제보하기"
+                  className="w-10 h-10 rounded-card bg-white border border-slate-200 flex items-center justify-center cursor-pointer text-text-main transition-all duration-200 hover:bg-surface"
+                >
+                  <Megaphone size={18} />
+                </button>
+              )}
+            />
           </div>
           <div className="flex items-center gap-2.5 mb-2 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)]">
             <Search size={16} className="text-text-hint flex-shrink-0" />
@@ -177,6 +192,7 @@ export function ClubView({ onBack }: ClubViewProps) {
           )}
         </div>
       </div>
+      {feedbackOpen && <ClubFeedbackModal onClose={() => setFeedbackOpen(false)} />}
     </div>
   );
 }
