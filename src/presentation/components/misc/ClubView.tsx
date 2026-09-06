@@ -1,5 +1,6 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
@@ -32,7 +33,7 @@ function ClubBadge({ club }: { club: ClubInfo }) {
   const style = categoryStyles[club.category];
   const [imageFailed, setImageFailed] = useState(false);
 
-  return (
+  return createPortal(
     <div className={`w-[52px] h-[52px] rounded-card flex items-center justify-center flex-shrink-0 overflow-hidden ring-1 ring-black/[0.04] ${style.icon}`}>
       {!imageFailed && (
         <img
@@ -43,12 +44,13 @@ function ClubBadge({ club }: { club: ClubInfo }) {
         />
       )}
       {imageFailed && <span className="text-[23px] leading-none" aria-hidden="true">{getActivityEmoji(club.activityType)}</span>}
-    </div>
+    </div>,
+    document.body,
   );
 }
 
 function ClubItem({ club, highlighted }: { club: ClubInfo; highlighted?: boolean }) {
-  return (
+  return createPortal(
     <article
       id={`club-item-${club.id}`}
       className={`bg-white border border-slate-200/90 rounded-2xl px-3.5 py-3 shadow-[0_3px_10px_rgba(15,23,42,0.035)] transition-all duration-200 hover:border-slate-300 hover:shadow-[0_6px_16px_rgba(15,23,42,0.06)] ${highlighted ? 'club-item-highlight' : ''}`}
@@ -222,6 +224,7 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
         </div>
       </div>
       {feedbackOpen && <ClubFeedbackModal onClose={() => setFeedbackOpen(false)} />}
-    </div>
+    </div>,
+    document.body
   );
 }
