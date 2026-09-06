@@ -7,16 +7,24 @@ import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 
 type CategoryFilter = '전체' | ClubCategory;
 
-const categoryStyles: Record<ClubCategory, { icon: string; badge: string }> = {
-  예술: { icon: 'bg-violet-50 text-violet-600', badge: 'bg-violet-50 text-violet-600' },
-  체육: { icon: 'bg-emerald-50 text-emerald-600', badge: 'bg-emerald-50 text-emerald-700' },
-  학술교양: { icon: 'bg-blue-50 text-blue-600', badge: 'bg-blue-50 text-blue-700' },
-  봉사: { icon: 'bg-rose-50 text-rose-600', badge: 'bg-rose-50 text-rose-600' },
-  종교: { icon: 'bg-amber-50 text-amber-600', badge: 'bg-amber-50 text-amber-700' },
+const categoryStyles: Record<ClubCategory, { icon: string }> = {
+  예술: { icon: 'bg-violet-50 text-violet-600' },
+  체육: { icon: 'bg-emerald-50 text-emerald-600' },
+  학술교양: { icon: 'bg-blue-50 text-blue-600' },
+  봉사: { icon: 'bg-rose-50 text-rose-600' },
+  종교: { icon: 'bg-amber-50 text-amber-600' },
 };
 
-const InstagramIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+const categoryEmoji: Record<ClubCategory, string> = {
+  예술: '🎨',
+  체육: '🏅',
+  학술교양: '📚',
+  봉사: '🤝',
+  종교: '✝️',
+};
+
+const InstagramIcon = ({ size = 13 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
     <circle cx="12" cy="12" r="4" />
     <path d="M17.5 6.5h.01" />
@@ -29,12 +37,6 @@ const openInsta = (username: string) => {
   setTimeout(() => {
     if (Date.now() - start < 2000) window.open(`https://www.instagram.com/${username}/`, '_blank');
   }, 500);
-};
-
-const getPrimaryFee = (club: ClubInfo) => {
-  if (club.fees.length === 0) return club.feeNote ?? '미정';
-  const primary = club.fees.find(entry => entry.label?.includes('신규') || entry.label?.includes('신입')) ?? club.fees[0];
-  return primary.amount;
 };
 
 const getActivityEmoji = (activityType: string) => {
@@ -71,41 +73,32 @@ function ClubBadge({ club }: { club: ClubInfo }) {
 }
 
 function ClubItem({ club }: { club: ClubInfo }) {
-  const style = categoryStyles[club.category];
   return (
     <article className="bg-white border border-slate-200/90 rounded-2xl px-3.5 py-3 shadow-[0_3px_10px_rgba(15,23,42,0.035)] transition-all duration-200 hover:border-slate-300 hover:shadow-[0_6px_16px_rgba(15,23,42,0.06)]">
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         <ClubBadge club={club} />
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-extrabold text-[14px] leading-5 text-text-main truncate">{club.name}</h3>
-            <span className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[10px] font-extrabold ${style.badge}`}>{club.category}</span>
-          </div>
-
-          <p className="mt-0.5 text-[12px] leading-5 text-text-sub truncate">
-            <span className="font-bold text-slate-600">{club.activityType}</span>
-            {club.room && <span className="text-text-hint"> · {club.room}</span>}
-          </p>
-
-          <div className="mt-2 flex items-center justify-between gap-2 min-w-0">
-            {club.instagram ? (
+          <div className="flex items-baseline gap-1.5">
+            <h3 className="flex-shrink-0 font-extrabold text-[14px] leading-5 text-text-main truncate">{club.name}</h3>
+            <p className="min-w-0 flex-1 text-[12px] leading-5 text-text-sub truncate">
+              <span className="font-bold text-text-sub">{club.activityType}</span>
+              {club.room && <span className="text-text-hint"> · {club.room}</span>}
+            </p>
+            {club.instagram && (
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 min-w-0 rounded-full bg-[#E4405F]/[0.07] px-2.5 py-1.5 text-[11px] font-bold text-[#C13557] transition-colors hover:bg-[#E4405F]/[0.12] active:bg-[#E4405F]/[0.17]"
+                className="flex-shrink-0 inline-flex items-center gap-1 min-w-0 max-w-[38%] rounded-full bg-[#E4405F]/[0.1] px-2 py-0.5 text-[10px] font-bold text-[#C13557] shadow-[0_1px_3px_rgba(228,64,95,0.22)] transition-colors hover:bg-[#E4405F]/[0.16] active:bg-[#E4405F]/[0.2]"
                 onClick={() => openInsta(club.instagram!)}
                 aria-label={`${club.name} 인스타그램 열기`}
               >
-                <InstagramIcon />
+                <InstagramIcon size={11} />
                 <span className="truncate">@{club.instagram}</span>
               </button>
-            ) : (
-              <span className="text-[11px] font-medium text-text-hint">인스타 정보 없음</span>
             )}
-            <span className="flex-shrink-0 rounded-full bg-slate-100 px-2.5 py-1.5 text-[11px] font-extrabold text-slate-600">
-              회비 {getPrimaryFee(club)}
-            </span>
           </div>
+
+          <p className="mt-1 truncate text-[12px] leading-5 text-text-sub">&quot;{club.description}&quot;</p>
         </div>
       </div>
     </article>
@@ -117,31 +110,38 @@ function ClubSpotlight({ club }: { club: ClubInfo }) {
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <article className="club-spotlight-roll mb-4 flex items-center gap-3 py-2">
-      <div className="h-[62px] w-[62px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
-        {!imageFailed ? (
-          <img
-            src={`/assets/club-profiles/${club.id}.jpg`}
-            alt={`${club.name} 로고`}
-            onError={() => setImageFailed(true)}
-            className="h-full w-full object-contain"
-          />
-        ) : (
-          <div className={`flex h-full w-full items-center justify-center text-[28px] ${style.icon}`} aria-hidden="true">{getActivityEmoji(club.activityType)}</div>
-        )}
+    <article className="club-spotlight-roll mb-2 rounded-2xl border border-slate-200/70 bg-[linear-gradient(120deg,rgba(255,107,107,0.07),rgba(255,190,92,0.07),rgba(255,230,110,0.07),rgba(110,220,150,0.07),rgba(100,180,255,0.07),rgba(180,140,255,0.07))] px-3.5 py-3 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+      <div className="flex items-center gap-3">
+        <div className="h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
+          {!imageFailed ? (
+            <img
+              src={`/assets/club-profiles/${club.id}.jpg`}
+              alt={`${club.name} 로고`}
+              onError={() => setImageFailed(true)}
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className={`flex h-full w-full items-center justify-center text-[24px] ${style.icon}`} aria-hidden="true">{getActivityEmoji(club.activityType)}</div>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-extrabold tracking-tight text-primary">🎲 오늘의 동아리 추천 </p>
+          <p className="mt-0.5 truncate text-[13px] text-text-sub">
+            <strong className="font-extrabold text-text-main">{club.activityType}</strong> 동아리, <strong className="font-extrabold text-text-main">{club.name}</strong> 어때요?
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => openInsta(club.instagram!)}
+          className="ml-auto inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-[#E4405F] px-3 py-2 text-[11px] font-extrabold text-white transition-colors hover:bg-[#D62E50] active:bg-[#B92543]"
+          aria-label={`${club.name} 인스타그램 열기`}
+        >
+          <InstagramIcon />
+          바로가기
+        </button>
       </div>
-      <p className="min-w-0 flex-1 whitespace-nowrap text-[13px] text-text-sub">
-        <strong className="font-extrabold text-text-main">{club.activityType}</strong> 동아리 <strong className="font-extrabold text-text-main">{club.name}</strong> 어때요?
-      </p>
-      <button
-        type="button"
-        onClick={() => openInsta(club.instagram!)}
-        className="ml-auto inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-[#E4405F] px-3 py-2 text-[11px] font-extrabold text-white transition-colors hover:bg-[#D62E50] active:bg-[#B92543]"
-        aria-label={`${club.name} 인스타그램 열기`}
-      >
-        <InstagramIcon />
-        인스타 바로가기
-      </button>
     </article>
   );
 }
@@ -180,9 +180,9 @@ export function ClubView({ onBack }: ClubViewProps) {
 
   return (
     <div className="pb-20">
-      <div className="sticky -top-6 z-20 -mx-4 -mt-6 border-b border-slate-200/80 bg-[#F8F9FA] px-4 pt-6 pb-3 shadow-[0_8px_14px_-14px_rgba(15,23,42,0.32)]">
+      <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-3 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
-        <div className="flex items-center gap-2.5 mb-3 bg-white border border-slate-200 rounded-full px-4 py-2.5 shadow-[0_2px_8px_rgba(15,23,42,0.035)] transition-all focus-within:border-primary/60 focus-within:ring-4 focus-within:ring-primary/[0.08]">
+        <div className="flex items-center gap-2.5 mb-3 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)]">
           <Search size={16} className="text-text-hint flex-shrink-0" />
           <input
             type="search"
@@ -210,19 +210,24 @@ export function ClubView({ onBack }: ClubViewProps) {
               type="button"
               onClick={() => setActiveCategory(category)}
               aria-pressed={activeCategory === category}
-              className={`flex-shrink-0 px-3 py-[7px] rounded-full text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] shadow-[0_2px_6px_rgba(0,0,0,0.08)] [-webkit-tap-highlight-color:transparent] ${activeCategory === category ? 'bg-primary text-white border-primary' : 'bg-white text-text-sub border-slate-200 hover:border-primary hover:text-primary'}`}
+              className={`flex-shrink-0 flex items-center gap-1 px-3 py-[7px] rounded-xl text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] [-webkit-tap-highlight-color:transparent] ${activeCategory === category ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]' : 'bg-white text-[#334155] border-[#cbd5e1]'}`}
             >
+              {category !== '전체' && <span className="text-[12px] leading-none">{categoryEmoji[category]}</span>}
               {category}
             </button>
           ))}
         </div>
-        <p className="px-1 text-[12px] font-bold text-text-hint">{filteredClubs.length}개</p>
+        <p className="px-1 text-[12px] font-bold text-text-hint">
+          동아리 {filteredClubs.length}개
+          {activeCategory !== '전체' && <span className="text-primary"> · {activeCategory}</span>}
+          {query && <span className="text-primary"> · &quot;{query}&quot;</span>}
+        </p>
       </div>
 
       <div className="pt-3 [animation:slideUp_0.4s_ease-out]">
         <ClubSpotlight key={spotlightClub.id} club={spotlightClub} />
         {filteredClubs.length > 0 ? (
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {filteredClubs.map(club => <ClubItem key={club.id} club={club} />)}
           </div>
         ) : (
