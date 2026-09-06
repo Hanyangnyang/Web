@@ -1,13 +1,15 @@
 import React, { useState, lazy, Suspense } from 'react';
 
-import { Bell } from 'lucide-react';
+import { Bell, ChevronRight } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather.js';
 import { useWeatherBriefing } from '../../hooks/useWeatherBriefing.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
+import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
+import { ClubSpotlightCard } from '../misc/ClubSpotlightCard.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
@@ -30,6 +32,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const { briefing } = useWeatherBriefing(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
+  const spotlightClub = useClubSpotlight();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
 
@@ -71,6 +74,17 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
           <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
+        </ErrorBoundary>
+
+        {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동 */}
+        <ErrorBoundary name="portal-club-spotlight">
+          <ClubSpotlightCard
+            key={spotlightClub.id}
+            club={spotlightClub}
+            actionLabel="자세히 보러가기"
+            actionIcon={<ChevronRight size={14} />}
+            onAction={() => onNavigateToTab?.('misc', undefined, 'clubs')}
+          />
         </ErrorBoundary>
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}

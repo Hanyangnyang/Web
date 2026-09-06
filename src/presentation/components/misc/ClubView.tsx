@@ -1,28 +1,15 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
+import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
+import { ClubSpotlightCard } from './ClubSpotlightCard.js';
+import { categoryStyles, categoryEmoji, getActivityEmoji } from './clubDisplay.js';
 
 type CategoryFilter = '전체' | ClubCategory;
-
-const categoryStyles: Record<ClubCategory, { icon: string }> = {
-  예술: { icon: 'bg-violet-50 text-violet-600' },
-  체육: { icon: 'bg-emerald-50 text-emerald-600' },
-  학술교양: { icon: 'bg-blue-50 text-blue-600' },
-  봉사: { icon: 'bg-rose-50 text-rose-600' },
-  종교: { icon: 'bg-amber-50 text-amber-600' },
-};
-
-const categoryEmoji: Record<ClubCategory, string> = {
-  예술: '🎨',
-  체육: '🏅',
-  학술교양: '📚',
-  봉사: '🤝',
-  종교: '✝️',
-};
 
 const InstagramIcon = ({ size = 13 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
@@ -38,20 +25,6 @@ const openInsta = (username: string) => {
   setTimeout(() => {
     if (Date.now() - start < 2000) window.open(`https://www.instagram.com/${username}/`, '_blank');
   }, 500);
-};
-
-const getActivityEmoji = (activityType: string) => {
-  const emojiByActivity: Array<[string, string]> = [
-    ['밴드', '🎸'], ['농구', '🏀'], ['영화', '🎬'], ['공모전', '🏆'], ['칵테일', '🍸'],
-    ['만화', '🎨'], ['뮤지컬', '🎭'], ['e스포츠', '🎮'], ['힙합', '🕺'], ['기독교', '✝️'],
-    ['국악', '🥁'], ['볼링', '🎳'], ['댄스', '💃'], ['연극', '🎭'], ['축구', '⚽'],
-    ['야구', '⚾'], ['유학', '🌏'], ['러닝', '🏃'], ['코딩', '💻'], ['봉사', '🤝'],
-    ['천문', '🔭'], ['창작극', '🎭'], ['피아노', '🎹'], ['배드민턴', '🏸'], ['합창', '🎶'],
-    ['토론', '💬'], ['클라이밍', '🧗'], ['자전거', '🚲'], ['스쿠버', '🤿'], ['기타', '🎼'],
-    ['보드', '🎲'], ['독서', '📚'], ['테니스', '🎾'], ['탁구', '🏓'], ['흑인음악', '🎤'],
-    ['요트', '⛵'], ['사진', '📷'], ['패션', '👗'], ['성경', '📖'],
-  ];
-  return emojiByActivity.find(([keyword]) => activityType.includes(keyword))?.[1] ?? '✨';
 };
 
 function ClubBadge({ club }: { club: ClubInfo }) {
@@ -88,7 +61,7 @@ function ClubItem({ club }: { club: ClubInfo }) {
             {club.instagram && (
               <button
                 type="button"
-                className="flex-shrink-0 inline-flex items-center gap-1 min-w-0 max-w-[38%] rounded-full bg-[#E4405F]/[0.1] px-2 py-0.5 text-[10px] font-bold text-[#C13557] shadow-[0_1px_3px_rgba(228,64,95,0.22)] transition-colors hover:bg-[#E4405F]/[0.16] active:bg-[#E4405F]/[0.2]"
+                className="flex-shrink-0 inline-flex items-center gap-1 min-w-0 max-w-[38%] rounded-full bg-[#E4405F]/[0.1] px-2 py-1 text-[10px] font-bold text-[#C13557] shadow-[0_1px_1px_rgba(228,64,95,0.1)] transition-colors hover:bg-[#E4405F]/[0.16] active:bg-[#E4405F]/[0.2]"
                 onClick={() => openInsta(club.instagram!)}
                 aria-label={`${club.name} 인스타그램 열기`}
               >
@@ -105,47 +78,6 @@ function ClubItem({ club }: { club: ClubInfo }) {
   );
 }
 
-function ClubSpotlight({ club }: { club: ClubInfo }) {
-  const style = categoryStyles[club.category];
-  const [imageFailed, setImageFailed] = useState(false);
-
-  return (
-    <article className="club-spotlight-roll mb-2 rounded-2xl border border-slate-200/70 bg-[linear-gradient(120deg,rgba(255,107,107,0.07),rgba(255,190,92,0.07),rgba(255,230,110,0.07),rgba(110,220,150,0.07),rgba(100,180,255,0.07),rgba(180,140,255,0.07))] px-3.5 py-3 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
-      <div className="flex items-center gap-3">
-        <div className="h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
-          {!imageFailed ? (
-            <img
-              src={`/assets/club-profiles/${club.id}.jpg`}
-              alt={`${club.name} 로고`}
-              onError={() => setImageFailed(true)}
-              className="h-full w-full object-contain"
-            />
-          ) : (
-            <div className={`flex h-full w-full items-center justify-center text-[24px] ${style.icon}`} aria-hidden="true">{getActivityEmoji(club.activityType)}</div>
-          )}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-extrabold tracking-tight text-primary">🎲 오늘의 동아리 추천 </p>
-          <p className="mt-0.5 truncate text-[13px] text-text-sub">
-            <strong className="font-extrabold text-text-main">{club.activityType}</strong> 동아리, <strong className="font-extrabold text-text-main">{club.name}</strong> 어때요?
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => openInsta(club.instagram!)}
-          className="ml-auto inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-[#E4405F] px-3 py-2 text-[11px] font-extrabold text-white transition-colors hover:bg-[#D62E50] active:bg-[#B92543]"
-          aria-label={`${club.name} 인스타그램 열기`}
-        >
-          <InstagramIcon />
-          바로가기
-        </button>
-      </div>
-    </article>
-  );
-}
-
 interface ClubViewProps {
   onBack: () => void;
 }
@@ -156,19 +88,7 @@ export function ClubView({ onBack }: ClubViewProps) {
   const platform = getPlatform();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('전체');
   const [query, setQuery] = useState('');
-  const [spotlightClub, setSpotlightClub] = useState<ClubInfo>(() => {
-    const clubsWithInstagram = CLUBS.filter((club) => club.instagram);
-    return clubsWithInstagram[Math.floor(Math.random() * clubsWithInstagram.length)];
-  });
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setSpotlightClub((currentClub) => {
-        const candidates = CLUBS.filter((club) => club.instagram && club.id !== currentClub.id);
-        return candidates[Math.floor(Math.random() * candidates.length)];
-      });
-    }, 5000);
-    return () => window.clearInterval(timer);
-  }, []);
+  const spotlightClub = useClubSpotlight();
   const filteredClubs = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ko-KR');
     return CLUBS.filter((club) => {
@@ -181,72 +101,81 @@ export function ClubView({ onBack }: ClubViewProps) {
   }, [query, activeCategory]);
 
   return (
-    <div
-      className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app bg-surface px-4 pt-6 pb-20"
-      style={isApp ? {
-        paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
-        paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))',
-      } : undefined}
-    >
-      <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
-        <div className="-mb-4 pb-2">
-          <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
+    <div className="fixed inset-0 z-[1001] bg-surface">
+      <div
+        className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pt-6 pb-20"
+        style={isApp ? {
+          paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
+          paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))',
+        } : undefined}
+      >
+        <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+          <div className="-mb-4 pb-2">
+            <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
+          </div>
+          <div className="flex items-center gap-2.5 mb-2 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)]">
+            <Search size={16} className="text-text-hint flex-shrink-0" />
+            <input
+              type="search"
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              placeholder="동아리명이나 활동으로 검색"
+              className="flex-1 min-w-0 bg-transparent text-[13px] font-semibold text-text-main outline-none placeholder:text-text-hint"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="검색어 지우기"
+                className="flex-shrink-0 active:scale-90 transition-transform"
+              >
+                <X size={15} className="text-text-hint" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 no-scrollbar">
+            {(['전체', ...CLUB_CATEGORIES] as CategoryFilter[]).map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setActiveCategory(category)}
+                aria-pressed={activeCategory === category}
+                className={`flex-shrink-0 flex items-center gap-1 px-3 py-[7px] rounded-xl text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] [-webkit-tap-highlight-color:transparent] ${activeCategory === category ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]' : 'bg-white text-[#334155] border-[#cbd5e1]'}`}
+              >
+                {category !== '전체' && <span className="text-[12px] leading-none">{categoryEmoji[category]}</span>}
+                {category}
+              </button>
+            ))}
+          </div>
+          <p className="px-1 text-[12px] font-bold text-text-hint">
+            동아리 {filteredClubs.length}개
+            {activeCategory !== '전체' && <span className="text-primary"> · {activeCategory}</span>}
+            {query && <span className="text-primary"> · &quot;{query}&quot;</span>}
+          </p>
         </div>
-        <div className="flex items-center gap-2.5 mb-2 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)]">
-          <Search size={16} className="text-text-hint flex-shrink-0" />
-          <input
-            type="search"
-            value={query}
-            onChange={event => setQuery(event.target.value)}
-            placeholder="동아리명이나 활동으로 검색"
-            className="flex-1 min-w-0 bg-transparent text-[13px] font-semibold text-text-main outline-none placeholder:text-text-hint"
+
+        <div className="pt-2 [animation:slideUp_0.4s_ease-out]">
+          <ClubSpotlightCard
+            key={spotlightClub.id}
+            club={spotlightClub}
+            actionLabel="바로가기"
+            actionIcon={<InstagramIcon />}
+            iconPosition="start"
+            onAction={() => openInsta(spotlightClub.instagram!)}
           />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              aria-label="검색어 지우기"
-              className="flex-shrink-0 active:scale-90 transition-transform"
-            >
-              <X size={15} className="text-text-hint" />
-            </button>
+          {filteredClubs.length > 0 ? (
+            <div className="space-y-2">
+              {filteredClubs.map(club => <ClubItem key={club.id} club={club} />)}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
+              <Search size={24} className="mx-auto mb-2 text-slate-300" />
+              <p className="text-[14px] font-bold text-text-sub">검색 결과가 없어요</p>
+              <p className="mt-1 text-[12px] text-text-hint">동아리명이나 활동 종류를 다시 검색해 보세요.</p>
+            </div>
           )}
         </div>
-
-        <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 no-scrollbar">
-          {(['전체', ...CLUB_CATEGORIES] as CategoryFilter[]).map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => setActiveCategory(category)}
-              aria-pressed={activeCategory === category}
-              className={`flex-shrink-0 flex items-center gap-1 px-3 py-[7px] rounded-xl text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-[0.96] [-webkit-tap-highlight-color:transparent] ${activeCategory === category ? 'bg-primary text-white border-primary shadow-[0_2px_6px_rgba(14,74,132,0.25)]' : 'bg-white text-[#334155] border-[#cbd5e1]'}`}
-            >
-              {category !== '전체' && <span className="text-[12px] leading-none">{categoryEmoji[category]}</span>}
-              {category}
-            </button>
-          ))}
-        </div>
-        <p className="px-1 text-[12px] font-bold text-text-hint">
-          동아리 {filteredClubs.length}개
-          {activeCategory !== '전체' && <span className="text-primary"> · {activeCategory}</span>}
-          {query && <span className="text-primary"> · &quot;{query}&quot;</span>}
-        </p>
-      </div>
-
-      <div className="pt-2 [animation:slideUp_0.4s_ease-out]">
-        <ClubSpotlight key={spotlightClub.id} club={spotlightClub} />
-        {filteredClubs.length > 0 ? (
-          <div className="space-y-2">
-            {filteredClubs.map(club => <ClubItem key={club.id} club={club} />)}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-12 text-center shadow-sm">
-            <Search size={24} className="mx-auto mb-2 text-slate-300" />
-            <p className="text-[14px] font-bold text-text-sub">검색 결과가 없어요</p>
-            <p className="mt-1 text-[12px] text-text-hint">동아리명이나 활동 종류를 다시 검색해 보세요.</p>
-          </div>
-        )}
       </div>
     </div>
   );
