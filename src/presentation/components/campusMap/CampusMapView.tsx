@@ -24,6 +24,7 @@ import {
   type CategoryFilter, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
 import { openSpaceBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
+import { collegeById } from '../../../domain/entities/College.js';
 import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
@@ -167,7 +168,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const pickBuilding = (building: PlottableBuilding, source: SelectSource) => {
     // 이미 건물 계열 칩(교내시설/오픈스페이스)이면 그대로 둔다 — 오픈스페이스 탐색 흐름을 끊지 않기 위해
     if (!isBuildingLayerChip) setChip('building');
-    selectBuilding(building, source);
+    selectBuilding(building, source, isOpenSpaceChip ? 'openspace' : 'facility');
   };
 
   const pickSmokingSpot = (spot: PlottableSmokingSpot, source: SelectSource) => {
@@ -179,7 +180,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   // 검색 결과는 오픈스페이스가 없는 건물일 수 있어서, 그대로 두면 마커가 안 뜬다
   const selectBuildingFromSearch = (building: PlottableBuilding) => {
     setChip('building');
-    selectBuilding(building, 'search');
+    selectBuilding(building, 'search', 'facility');
   };
 
   const { rolling, rollRandom, diceLabel } = usePartnerRandomPick({
@@ -297,7 +298,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   // 상세 시트에서도 같은 드롭다운을 쓰므로 선택은 유지한다 (상세 혜택 필터링과 지도 필터가 함께 바뀜)
   const handleCollegeChange = (next: string) => {
     setCollege(next);
-    posthog?.capture('partner_map_college_selected', { college: next });
+    const collegeName = next === 'all' ? '전체' : collegeById(next)?.name ?? next;
+    posthog?.capture('partner_map_college_selected', { college_id: next, college_name: collegeName });
   };
 
   const openSearch = () => {
