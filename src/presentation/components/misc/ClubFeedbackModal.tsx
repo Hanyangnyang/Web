@@ -35,7 +35,7 @@ export function ClubFeedbackModal({ onClose }: ClubFeedbackModalProps) {
         {submitted ? (
           <div className="text-center py-2">
             <p className="text-2xl mb-2">📢</p>
-            <p className="text-sm font-semibold text-text-main mb-1">제보 감사합니다!</p>
+            <p className="text-base font-bold text-text-main mb-1">제보 감사합니다!</p>
             <p className="text-xs text-text-sub mb-4">확인 후 동아리 정보에 반영할게요.</p>
             <button
               onClick={onClose}
@@ -46,7 +46,7 @@ export function ClubFeedbackModal({ onClose }: ClubFeedbackModalProps) {
           </div>
         ) : (
           <>
-            <p className="text-sm font-semibold text-text-main mb-1 text-center">중앙동아리 정보 제보하기</p>
+            <p className="text-base font-bold text-text-main mb-1 text-center">중앙동아리 정보 제보하기</p>
             <p className="text-xs text-text-sub mb-3 text-center">
               동아리 정보가 실제와 다르거나 인스타그램 등 정보가 비어있다면 알려주세요!
             </p>

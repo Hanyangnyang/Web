@@ -35,7 +35,7 @@ export function CampusFeedbackModal({ onClose }: CampusFeedbackModalProps) {
         {submitted ? (
           <div className="text-center py-2">
             <p className="text-2xl mb-2">📢</p>
-            <p className="text-sm font-semibold text-text-main mb-1">제보 감사합니다!</p>
+            <p className="text-base font-bold text-text-main mb-1">제보 감사합니다!</p>
             <p className="text-xs text-text-sub mb-4">확인 후 지도에 반영할게요.</p>
             <button
               onClick={onClose}
@@ -46,7 +46,7 @@ export function CampusFeedbackModal({ onClose }: CampusFeedbackModalProps) {
           </div>
         ) : (
           <>
-            <p className="text-sm font-semibold text-text-main mb-1 text-center">캠퍼스맵 제보하기</p>
+            <p className="text-base font-bold text-text-main mb-1 text-center">캠퍼스맵 제보하기</p>
             <p className="text-xs text-text-sub mb-3 text-center">
               오픈스페이스·흡연장 등 지도 정보가 다르거나 빠졌다면 알려주세요!
             </p>
