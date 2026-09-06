@@ -29,6 +29,26 @@
   background-size: 8px 8px;
 }
 
+.timeCell {
+  height: 2.5rem;
+  padding: 0;
+  position: relative;
+}
+
+.timeLabel {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  padding: 0 0.2rem;
+  color: var(--color-text-sub, #64748b);
+  background: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
 @media (max-width: 375px) {
   .courseName {
     letter-spacing: -0.04em;
