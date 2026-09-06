@@ -135,7 +135,7 @@ src/
 **Supabase**는 익명 Auth·앱설정(다가오는 시간표 변경 배너용 `period_schedule`만)·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
 푸시 알림은 **Firebase Cloud** Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
 
-### Supabase 테이블 - Supabase 로그인 되면 수정해야함
+### 🔌Supabase 테이블 - Supabase 로그인 되면 수정해야함
 
 | 테이블 | 용도 |
 |--------|------|
@@ -144,7 +144,7 @@ src/
 `devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
-### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
+### 🔌백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
 (Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 2번, 그래서 총 3번 호출함. staleTime이 지났는데 트리거가 있을 경우 SWR. localStorage는 maxAge 24시간으로 설정함. maxAge는 캐싱된 값을 불러올지 말지를 결정하는 기준.)
 
 | 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
@@ -154,7 +154,7 @@ src/
 | `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼, **date-info의 dayType이 바뀌는 순간 강제 재요청**(위와 동일한 이유) |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 / 1시간 | 콜드스타트 prefetch |
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 / 5분 | 콜드스타트 prefetch (관리자 등록 시 백엔드가 즉시 evict하므로, 새 배너가 늦게 반영되는 답답함을 줄이려고 다른 엔드포인트보다 짧게 잡음) |
 
 배너 `clickUrl`이 `https://www.hanyang.life/?tab=<cafe\|shuttle\|portal\|partner\|misc>` 형태로 우리 도메인 + `tab` 파라미터를 가리키면, 새 창을 열지 않고 앱 내부에서 바로 그 탭으로 전환됩니다(`BannerCarousel.tsx`) — SPA라 페이지 경로가 하나뿐이라, 카카오 딥링크·푸시알림과 동일한 `?tab=` 쿼리 컨벤션을 재사용한 것. 그 외(다른 도메인 등)는 기존처럼 `window.open`으로 외부 링크 취급.
 **⚠️ 반드시 `www.hanyang.life`로 입력할 것** — `BannerCarousel.tsx`의 판정 로직이 `url.origin === window.location.origin`으로 완전 일치를 요구하는데, `capacitor.config.json`의 `server.url`이 `https://www.hanyang.life`라 앱이 실제로 로딩되는 origin이 `www.` 포함이다. `www.` 없이 `https://hanyang.life/?tab=partner`로 주면 origin이 안 맞아 판정에 실패하고, 그냥 `window.open`으로 새 창이 열려버린다(내부 탭 전환 안 됨).
@@ -166,7 +166,7 @@ src/
 | `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 1시간(FE staleTime, BE 캐시 주기 미확인) | 지하철 연결정보가 필요한 정류장에서만 조회 |
 
 
-### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
+### 🔌Vercel API 엔드포인트 + 💾TanStack Query + localStorage
 
 | 엔드포인트 | 역할 | 외부 호출 대상 | Vercel 캐시 TTL | 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
 |---|---|---|---|---|---|
