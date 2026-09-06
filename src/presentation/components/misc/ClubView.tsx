@@ -36,7 +36,7 @@ function ClubBadge({ club }: { club: ClubInfo }) {
     <div className={`w-[52px] h-[52px] rounded-card flex items-center justify-center flex-shrink-0 overflow-hidden ring-1 ring-black/[0.04] ${style.icon}`}>
       {!imageFailed && (
         <img
-          src={`/assets/club-profiles/${club.id}.jpg`}
+          src={`/assets/club-profiles/${club.id}.jpg?v=20260906`}
           alt={`${club.name} 프로필`}
           onError={() => setImageFailed(true)}
           className="w-full h-full object-cover"

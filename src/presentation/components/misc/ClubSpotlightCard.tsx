@@ -21,7 +21,7 @@ export function ClubSpotlightCard({ club, actionLabel, actionIcon, iconPosition 
         <div className="h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
           {!imageFailed ? (
             <img
-              src={`/assets/club-profiles/${club.id}.jpg`}
+              src={`/assets/club-profiles/${club.id}.jpg?v=20260906`}
               alt={`${club.name} 로고`}
               onError={() => setImageFailed(true)}
               className="h-full w-full object-cover"

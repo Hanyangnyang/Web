@@ -26,7 +26,6 @@ export const clubImageTransform: Record<string, string> = {
   typhoon: 'scaleX(1.42)',
   martini: 'scaleX(1.31)',
   'hy-pass': 'scaleX(1.47)',
-  rotaract: 'scaleX(1.44)',
   ebs: 'scaleX(1.39)',
   hanya: 'scaleX(1.36)',
   yacht: 'scaleX(1.40)',
