@@ -11,6 +11,18 @@ interface StoredState<TParams> {
   params: TParams;
 }
 
+// 한 번 거부되면 OS가 팝업을 다시 안 띄워주므로, 재요청 대신 시스템 설정으로 안내한다
+function getPermissionDeniedMessage(): string {
+  const platform = getPlatform();
+  if (platform === 'ios') {
+    return '알림이 꺼져 있어요.\n설정 앱 > 하냥냥 > 알림에서 알림을 허용해주세요.';
+  }
+  if (platform === 'android') {
+    return '알림이 꺼져 있어요.\n휴대폰 설정 > 앱 > 하냥냥 > 알림에서 알림을 허용해주세요.';
+  }
+  return '알림이 꺼져 있어요.\n브라우저 주소창의 자물쇠(사이트 정보) 아이콘을 눌러 알림을 허용해주세요.';
+}
+
 export interface UseAlarmSubscriptionOptions<TParams> {
   // Supabase subscriptions 테이블에 저장되는 알림 종류 (ex: 'CAFETERIA_KEYWORD' | 'WEATHER_ALERT')
   topic: string;
@@ -106,7 +118,7 @@ export function useAlarmSubscription<TParams>({
     if (!state.enabled) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
-        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        alert(getPermissionDeniedMessage());
         return false;
       }
       setState(prev => ({ ...prev, enabled: true }));
@@ -120,7 +132,7 @@ export function useAlarmSubscription<TParams>({
     if (turningOn) {
       const hasPerm = await checkNotificationPermission();
       if (!hasPerm) {
-        alert('알림 권한을 허용해야 기능을 사용할 수 있습니다.');
+        alert(getPermissionDeniedMessage());
         setState(prev => ({ ...prev, enabled: false }));
       }
     }
