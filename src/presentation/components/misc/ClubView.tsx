@@ -129,15 +129,15 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
   }, [scrollToClubId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="fixed inset-0 z-[1001] bg-surface">
-      <div
-        className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pt-6 pb-4"
-        style={isApp ? {
-          paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
-          paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))',
-        } : undefined}
-      >
-        <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+    <div
+      className="fixed inset-0 z-[1001] bg-surface"
+      style={isApp ? {
+        paddingTop: platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      } : undefined}
+    >
+      <div className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pt-6 pb-4">
+        <div className="sticky top-0 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
           <div className="-mb-4 pb-2">
             <MiscSubViewHeader
               title="중앙동아리"
