@@ -1,8 +1,9 @@
-// 컴포넌트: 중앙동아리 목록 — 활동 성격·동아리방·인스타그램·회비를 빠르게 확인
+// 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
 import { useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
+import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 
 type CategoryFilter = '전체' | ClubCategory;
@@ -83,7 +84,6 @@ function ClubItem({ club }: { club: ClubInfo }) {
             <h3 className="flex-shrink-0 font-extrabold text-[14px] leading-5 text-text-main truncate">{club.name}</h3>
             <p className="min-w-0 flex-1 text-[12px] leading-5 text-text-sub truncate">
               <span className="font-bold text-text-sub">{club.activityType}</span>
-              {club.room && <span className="text-text-hint"> · {club.room}</span>}
             </p>
             {club.instagram && (
               <button
@@ -152,6 +152,8 @@ interface ClubViewProps {
 
 export function ClubView({ onBack }: ClubViewProps) {
   useBackHandler(onBack);
+  const isApp = isNativeApp();
+  const platform = getPlatform();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('전체');
   const [query, setQuery] = useState('');
   const [spotlightClub, setSpotlightClub] = useState<ClubInfo>(() => {
@@ -179,7 +181,13 @@ export function ClubView({ onBack }: ClubViewProps) {
   }, [query, activeCategory]);
 
   return (
-    <div className="pb-20">
+    <div
+      className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app bg-surface px-4 pt-6 pb-20"
+      style={isApp ? {
+        paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
+        paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))',
+      } : undefined}
+    >
       <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <div className="-mb-4 pb-2">
           <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
