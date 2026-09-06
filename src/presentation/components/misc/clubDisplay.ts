@@ -17,37 +17,6 @@ export const categoryEmoji: Record<ClubCategory, string> = {
   종교: '✝️',
 };
 
-// 프로필 이미지 원본이 정사각형 썸네일에 그대로 맞지 않아 보정이 필요한 동아리들.
-// object-fit(cover/contain)만으로는 원본에 이미 baked-in된 문제를 못 없애서, 원인별로
-// 다른 transform을 직접 지정한다. 값은 각 이미지를 실측(배지 bbox 비율)해서 계산.
-export const clubImageTransform: Record<string, string> = {
-  // 1) 정사각형 캔버스인데 배지 자체가 원형이 아니라 세로로 긴 타원으로 그려져 있어,
-  //    작게 보면 눌린 것처럼 보이는 경우 — 가로로만 scaleX해서 다시 원형에 가깝게 편다.
-  typhoon: 'scaleX(1.42)',
-  martini: 'scaleX(1.31)',
-  'hy-pass': 'scaleX(1.47)',
-  ebs: 'scaleX(1.39)',
-  hanya: 'scaleX(1.36)',
-  yacht: 'scaleX(1.40)',
-  maha: 'scaleX(1.41)',
-  // 2) 로고/카드 자체는 세로로 긴 직사각형인데 정사각형 파일로 만들면서 좌우에 여백을
-  //    덧대놔서, 정사각형 배지에 넣으면 로고가 가운데로 쪼그라들어 보이는 경우 —
-  //    양옆 여백을 크롭하도록 균일하게(scaleX와 scaleY를 같은 값으로) 확대한다.
-  pin: 'scale(1.24)',
-  'hy-fly': 'scale(1.34)',
-  husa: 'scale(1.20)',
-  herc: 'scale(1.25)',
-  hytec: 'scale(1.32)',
-  hiclear: 'scale(1.17)',
-  pichinyang: 'scale(1.19)',
-  // 3) 캔버스 자체가 정사각형이 아니거나(hy-focus, 세로로 긴 130x183), 로고가 이미
-  //    캔버스 한쪽 변에 꽉 붙어있어서(feel-so-good, 가로) object-cover crop만으로는
-  //    다 못 지운 여백이 남는 경우 — 추가로 살짝만 더 확대해서 남은 여백을 없앤다.
-  'feel-so-good': 'scale(1.50)',
-  'hy-focus': 'scale(1.08)',
-  // giwoo(기우회)는 실측상 여백이 아니라 원래 세로로 긴 디자인이라 확대하지 않는다.
-};
-
 export const getActivityEmoji = (activityType: string) => {
   const emojiByActivity: Array<[string, string]> = [
     ['밴드', '🎸'], ['농구', '🏀'], ['영화', '🎬'], ['공모전', '🏆'], ['칵테일', '🍸'],

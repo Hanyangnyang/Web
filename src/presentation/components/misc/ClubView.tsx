@@ -8,7 +8,7 @@ import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 import { ClubSpotlightCard } from './ClubSpotlightCard.js';
 import { ClubFeedbackModal } from './ClubFeedbackModal.js';
-import { categoryStyles, categoryEmoji, getActivityEmoji, clubImageTransform } from './clubDisplay.js';
+import { categoryStyles, categoryEmoji, getActivityEmoji } from './clubDisplay.js';
 
 type CategoryFilter = '전체' | ClubCategory;
 
@@ -40,7 +40,6 @@ function ClubBadge({ club }: { club: ClubInfo }) {
           alt={`${club.name} 프로필`}
           onError={() => setImageFailed(true)}
           className="w-full h-full object-cover"
-          style={clubImageTransform[club.id] ? { transform: clubImageTransform[club.id] } : undefined}
         />
       )}
       {imageFailed && <span className="text-[23px] leading-none" aria-hidden="true">{getActivityEmoji(club.activityType)}</span>}

@@ -1,7 +1,7 @@
 // 컴포넌트: "오늘의 동아리 추천" 무지개 배너 — 중앙동아리 화면 상단, 소식탭 공용
 import { useState, type ReactNode } from 'react';
 import { type ClubInfo } from '../../../domain/entities/Club.js';
-import { categoryStyles, getActivityEmoji, clubImageTransform } from './clubDisplay.js';
+import { categoryStyles, getActivityEmoji } from './clubDisplay.js';
 
 interface ClubSpotlightCardProps {
   club: ClubInfo;
@@ -25,7 +25,6 @@ export function ClubSpotlightCard({ club, actionLabel, actionIcon, iconPosition 
               alt={`${club.name} 로고`}
               onError={() => setImageFailed(true)}
               className="h-full w-full object-cover"
-              style={clubImageTransform[club.id] ? { transform: clubImageTransform[club.id] } : undefined}
             />
           ) : (
             <div className={`flex h-full w-full items-center justify-center text-[24px] ${style.icon}`} aria-hidden="true">{getActivityEmoji(club.activityType)}</div>
