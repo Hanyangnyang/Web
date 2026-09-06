@@ -19,6 +19,7 @@ interface ClubSpotlightCardProps {
 export function ClubSpotlightCard({ club, actionLabel, actionIcon, iconPosition = 'end', onAction, fullCardClickable = false, onCardClick }: ClubSpotlightCardProps) {
   const style = categoryStyles[club.category];
   const [imageFailed, setImageFailed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const cardClickHandler = fullCardClickable ? onAction : onCardClick;
   const isCardClickable = !!cardClickHandler;
@@ -45,13 +46,15 @@ export function ClubSpotlightCard({ club, actionLabel, actionIcon, iconPosition 
       onKeyDown={isCardClickable ? handleCardKeyDown : undefined}
     >
       <div className="flex items-center gap-3">
-        <div className="h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
+        <div className="relative h-[54px] w-[54px] flex-shrink-0 overflow-hidden rounded-card bg-white ring-1 ring-black/[0.04]">
+          {!imageFailed && !imageLoaded && <div className="absolute inset-0 img-shimmer" aria-hidden="true" />}
           {!imageFailed ? (
             <img
               src={`/assets/club-profiles/${club.id}.jpg?v=20260906`}
               alt={`${club.name} 로고`}
+              onLoad={() => setImageLoaded(true)}
               onError={() => setImageFailed(true)}
-              className="h-full w-full object-cover"
+              className={`h-full w-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           ) : (
             <div className={`flex h-full w-full items-center justify-center text-[24px] ${style.icon}`} aria-hidden="true">{getActivityEmoji(club.activityType)}</div>

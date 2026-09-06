@@ -31,15 +31,18 @@ const openInsta = (username: string) => {
 function ClubBadge({ club }: { club: ClubInfo }) {
   const style = categoryStyles[club.category];
   const [imageFailed, setImageFailed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <div className={`w-[52px] h-[52px] rounded-card flex items-center justify-center flex-shrink-0 overflow-hidden ring-1 ring-black/[0.04] ${style.icon}`}>
+    <div className={`relative w-[52px] h-[52px] rounded-card flex items-center justify-center flex-shrink-0 overflow-hidden ring-1 ring-black/[0.04] ${style.icon}`}>
+      {!imageFailed && !imageLoaded && <div className="absolute inset-0 img-shimmer" aria-hidden="true" />}
       {!imageFailed && (
         <img
           src={`/assets/club-profiles/${club.id}.jpg?v=20260906`}
           alt={`${club.name} 프로필`}
+          onLoad={() => setImageLoaded(true)}
           onError={() => setImageFailed(true)}
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
       {imageFailed && <span className="text-[23px] leading-none" aria-hidden="true">{getActivityEmoji(club.activityType)}</span>}

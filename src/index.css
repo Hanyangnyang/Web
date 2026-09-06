@@ -424,6 +424,23 @@ body {
   animation: clubItemHighlightFlash 1.8s ease-out;
 }
 
+/* ═══ 동아리 프로필 사진 로딩 중 반짝이는 스켈레톤 (shimmer) ═══ */
+@keyframes imgShimmerSweep {
+  0% {
+    background-position: 150% 0;
+  }
+
+  100% {
+    background-position: -150% 0;
+  }
+}
+
+.img-shimmer {
+  background-image: linear-gradient(100deg, #eef1f4 30%, #f8fafc 50%, #eef1f4 70%);
+  background-size: 300% 100%;
+  animation: imgShimmerSweep 1.4s ease-in-out infinite;
+}
+
 @keyframes pulseHighlight {
   0% {
     background-color: rgba(14, 74, 132, 0.03);
