@@ -84,6 +84,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
             actionLabel="보러가기"
             actionIcon={<ChevronRight size={14} />}
             onAction={() => onNavigateToTab?.('misc', undefined, 'clubs', spotlightClub.id)}
+            fullCardClickable
           />
         </ErrorBoundary>
 

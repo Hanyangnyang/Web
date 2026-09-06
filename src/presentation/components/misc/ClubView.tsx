@@ -1,5 +1,5 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
@@ -111,33 +111,56 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
       .sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'));
   }, [query, activeCategory]);
 
-  // 딥링크로 넘어온 동아리 위치로 자동 스크롤 + 도착한 카드를 잠깐 반짝여서 눈에 띄게 함
+  // 특정 동아리 위치로 자동 스크롤 + 도착한 카드를 잠깐 반짝여서 눈에 띄게 함
   // (목록이 실제로 그려진 뒤여야 하므로 rAF를 두 번 거친다)
-  useEffect(() => {
-    if (!scrollToClubId) return;
+  const scrollAndHighlightClub = useCallback((clubId: string) => {
     let raf2 = 0;
-    let highlightTimer = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
-        document.getElementById(`club-item-${scrollToClubId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setHighlightedClubId(scrollToClubId);
-        highlightTimer = window.setTimeout(() => setHighlightedClubId(null), 1800);
-        onScrollToClubIdHandled?.();
+        document.getElementById(`club-item-${clubId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setHighlightedClubId(clubId);
+        window.setTimeout(() => setHighlightedClubId(null), 1800);
       });
     });
-    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); window.clearTimeout(highlightTimer); };
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
+  }, []);
+
+  // 딥링크(소식탭 "보러가기")로 넘어온 경우
+  useEffect(() => {
+    if (!scrollToClubId) return;
+    const cancel = scrollAndHighlightClub(scrollToClubId);
+    onScrollToClubIdHandled?.();
+    return cancel;
   }, [scrollToClubId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 상단 "오늘의 동아리 추천" 카드를 눌렀을 때: 필터/검색을 초기화해 목록에서 반드시 보이게 한 뒤 스크롤
+  const handleSpotlightCardClick = () => {
+    setActiveCategory('전체');
+    setQuery('');
+    scrollAndHighlightClub(spotlightClub.id);
+  };
+
+  // 스크롤 컨테이너의 top padding과 정확히 같은 값이어야, 아래 sticky 헤더가 그만큼 위로
+  // 파고들어(top/margin-top을 이 값의 음수로) 세이프에리어(노치)까지 완전히 덮을 수 있다.
+  // 이 값이 컨테이너 padding-top과 어긋나면 스크롤 시 노치 부분에 헤더 배경이 못 미쳐
+  // 뒤 콘텐츠가 잠깐 비쳐 보인다 (중앙동아리 화면에서만 나던 현상의 원인).
+  const scrollTopPadding = isApp
+    ? `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`
+    : '1.5rem';
 
   return (
     <div className="fixed inset-0 z-[1001] bg-surface">
       <div
-        className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pt-6 pb-4"
-        style={isApp ? {
-          paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
-          paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))',
-        } : undefined}
+        className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pb-4"
+        style={{
+          paddingTop: scrollTopPadding,
+          ...(isApp ? { paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' } : {}),
+        }}
       >
-        <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+        <div
+          className="sticky z-20 -mx-4 bg-surface/90 backdrop-blur-xl px-4 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]"
+          style={{ top: `calc(-1 * (${scrollTopPadding}))`, marginTop: `calc(-1 * (${scrollTopPadding}))`, paddingTop: scrollTopPadding }}
+        >
           <div className="-mb-4 pb-2">
             <MiscSubViewHeader
               title="중앙동아리"
@@ -205,6 +228,7 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
             actionIcon={<InstagramIcon />}
             iconPosition="start"
             onAction={() => openInsta(spotlightClub.instagram!)}
+            onCardClick={handleSpotlightCardClick}
           />
           {filteredClubs.length > 0 ? (
             <div className="space-y-2">
