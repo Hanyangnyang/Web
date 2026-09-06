@@ -180,9 +180,11 @@ export function ClubView({ onBack }: ClubViewProps) {
 
   return (
     <div className="pb-20">
-      <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-3 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
-        <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
-        <div className="flex items-center gap-2.5 mb-3 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)]">
+      <div className="sticky -top-6 z-20 -mx-4 -mt-6 bg-surface/90 backdrop-blur-xl px-4 pt-6 pb-2 rounded-b-xl border-b border-[#e2e8f0]/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+        <div className="-mb-4 pb-2">
+          <MiscSubViewHeader title="중앙동아리" onBack={onBack} />
+        </div>
+        <div className="flex items-center gap-2.5 mb-2 bg-white border border-[#e2e8f0] rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(14,74,132,0.1)]">
           <Search size={16} className="text-text-hint flex-shrink-0" />
           <input
             type="search"
@@ -203,7 +205,7 @@ export function ClubView({ onBack }: ClubViewProps) {
           )}
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-1 px-1 no-scrollbar">
+        <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 no-scrollbar">
           {(['전체', ...CLUB_CATEGORIES] as CategoryFilter[]).map((category) => (
             <button
               key={category}
@@ -224,7 +226,7 @@ export function ClubView({ onBack }: ClubViewProps) {
         </p>
       </div>
 
-      <div className="pt-3 [animation:slideUp_0.4s_ease-out]">
+      <div className="pt-2 [animation:slideUp_0.4s_ease-out]">
         <ClubSpotlight key={spotlightClub.id} club={spotlightClub} />
         {filteredClubs.length > 0 ? (
           <div className="space-y-2">
