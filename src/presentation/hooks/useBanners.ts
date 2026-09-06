@@ -5,7 +5,7 @@ import { getBannersUseCase } from '../../di.js';
 import { cacheBannersForSplash } from './useSplashBanner.js';
 import type { Banner } from '../../domain/entities/Banner.js';
 
-const BANNERS_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 Banner 캐시 TTL(12시간)보다 짧게 재검증 (관리자가 등록/수정/순서변경/삭제 시 백엔드는 즉시 evict함)
+const BANNERS_STALE_TIME = 5 * 60 * 1000; // 5분 — 관리자가 등록/수정/순서변경/삭제 시 백엔드는 즉시 evict하므로, 새 배너가 바로 반영 안 되는 답답함을 줄이려고 다른 엔드포인트(1시간)보다 짧게 잡음. 배너는 요청 자체가 가볍고 DAU도 적어 부하 영향 미미
 const BANNERS_QUERY_KEY = ['banners'];
 
 export function prefetchBanners() {

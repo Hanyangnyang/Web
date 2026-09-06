@@ -4,7 +4,7 @@
 import * as https from 'https';
 
 const USERNAMES = [
-  'hanyang_erica', 'hanyang_erica_stu', 'hanyang_erica_club_association', 'hyuerica', 'hanyangerica',
+  'hanyang_erica', 'hanyang_erica_stu', 'hanyang_erica_club_association', 'hyuerica', 'hanyangerica', 'hy_dorm_erica',
   'hyu_lions', 'hyu_soongan_', 'hyu_erica_eng', 'hypharmacy', 'design_hyu',
   'hanyang_gon', 'hyu_mood', 'hyu_computing', 'hyu_e_sports_and_arts_vibe', 'hyu_erica_atc',
 ];

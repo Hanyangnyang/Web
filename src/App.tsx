@@ -36,6 +36,18 @@ interface CafeDeepLink {
   type: string | null;
 }
 
+// 카카오 공유(date/cafe/type)·푸시 알림(tab=weather/partner) 딥링크가 가리키는 초기 탭을 계산.
+// 웹(PWA)은 알림 클릭 시 routeFromParams를 안 거치고 곧바로 이 URL로 새로 열리므로, 초기 탭
+// 계산 단계에서부터 tab 파라미터까지 봐야 소식탭 알림이 마지막 탭이 아니라 소식탭으로 열린다.
+function resolveInitialTab(search: string): string | null {
+  const p = new URLSearchParams(search);
+  const tab = p.get('tab');
+  if (tab === 'weather') return 'portal';
+  if (tab === 'partner') return 'partner';
+  if (tab === 'cafe' || p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
+  return null;
+}
+
 export default function App() {
   return (
     <NetworkProvider>
@@ -51,11 +63,11 @@ function MainLayout() {
   const isApp = isNativeApp();
   const platform = getPlatform(); // 'ios' | 'android' | 'web'
   const [activeTab, setActiveTab] = useState(() => {
-    const p = new URLSearchParams(window.location.search);
-    if (p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
+    const fromUrl = resolveInitialTab(window.location.search);
+    if (fromUrl) return fromUrl;
     try {
       const native = window.__NativeDeepLink?.getParams?.();
-      if (native) { const np = new URLSearchParams(native); if (np.has('date') || np.has('cafe') || np.has('type')) return 'cafe'; }
+      if (native) { const fromNative = resolveInitialTab(`?${native}`); if (fromNative) return fromNative; }
     } catch {}
     let lastTab = localStorage.getItem('lastActiveTab') || 'cafe';
     if (lastTab === 'qr') lastTab = 'cafe';

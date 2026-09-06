@@ -1,4 +1,5 @@
 import React, { useState, lazy, Suspense } from 'react';
+import { usePostHog } from 'posthog-js/react';
 
 import { Bell, ChevronRight } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather.js';
@@ -28,6 +29,7 @@ interface PortalViewProps {
 }
 
 export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
+  const posthog = usePostHog();
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
   const { briefing } = useWeatherBriefing(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
@@ -83,7 +85,10 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
             club={spotlightClub}
             actionLabel="보러가기"
             actionIcon={<ChevronRight size={14} />}
-            onAction={() => onNavigateToTab?.('misc', undefined, 'clubs', spotlightClub.id)}
+            onAction={() => {
+              posthog?.capture('club_spotlight_banner_clicked', { club_id: spotlightClub.id, club_name: spotlightClub.name });
+              onNavigateToTab?.('misc', undefined, 'clubs', spotlightClub.id);
+            }}
             fullCardClickable
           />
         </ErrorBoundary>
