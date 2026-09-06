@@ -13,9 +13,10 @@ const BusIcon = () => (
 interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  showMiscNew: boolean;
 }
 
-export function BottomNav({ activeTab, setActiveTab }: BottomNavProps) {
+export function BottomNav({ activeTab, setActiveTab, showMiscNew }: BottomNavProps) {
   const itemClass = (tab: string) =>
     `flex flex-col items-center gap-1 cursor-pointer transition-colors duration-300 flex-1 py-2 [-webkit-tap-highlight-color:transparent] ${
       activeTab === tab ? 'text-hyu-blue-light' : 'text-text-hint'
@@ -45,7 +46,8 @@ export function BottomNav({ activeTab, setActiveTab }: BottomNavProps) {
         <Map size={24} />
         <span className="text-[0.7rem] font-semibold">캠퍼스맵</span>
       </div>
-      <div className={itemClass('misc')} onClick={() => setActiveTab('misc')}>
+      <div className={`${itemClass('misc')} relative`} onClick={() => setActiveTab('misc')}>
+        {showMiscNew && <span className="pointer-events-none absolute -top-2 right-0 whitespace-nowrap rounded-full bg-red-500 px-2.5 py-[5px] text-[10px] font-extrabold leading-none text-white shadow-sm">NEW</span>}
         <LayoutGrid size={24} />
         <span className="text-[0.7rem] font-semibold">기타</span>
       </div>

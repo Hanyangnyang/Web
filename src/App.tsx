@@ -81,6 +81,7 @@ function MainLayout() {
   // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
   const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
+  const [showClubsNew, setShowClubsNew] = useState(() => localStorage.getItem('seenClubFeatures') !== '1');
   // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
   const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
   // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
@@ -201,6 +202,10 @@ function MainLayout() {
     if (chip && tab === 'partner') setPendingMapChip(chip);
     if (box && tab === 'misc') setPendingMiscBox(box);
     if (clubId && tab === 'misc' && box === 'clubs') setPendingClubId(clubId);
+    if (tab === 'misc' && showClubsNew) {
+      setShowClubsNew(false);
+      localStorage.setItem('seenClubFeatures', '1');
+    }
 
     // 1. 같은 탭 재클릭 처리 — box로 특정 서브뷰를 지정한 딥링크라면 그리드로 리셋하지 않고 그 서브뷰로 바로 이동
     if (tab === activeTab) {
@@ -220,7 +225,7 @@ function MainLayout() {
     saveScrollPosition();
     setActiveTab(tab);
     localStorage.setItem('lastActiveTab', tab);
-  }, [activeTab, posthog, saveScrollPosition]);
+  }, [activeTab, posthog, saveScrollPosition, showClubsNew]);
 
   return (
     <>
@@ -294,7 +299,7 @@ function MainLayout() {
             )}
           </div>
         </div>
-        <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
+        <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} showMiscNew={showClubsNew} />
       </div>
     </>
   );
