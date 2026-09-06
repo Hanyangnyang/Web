@@ -150,7 +150,7 @@ src/
 | 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
 | `/api/v1/menu` | 학식 메뉴 조회 | 12시간 / 1시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`). academic/status 자체는 셔틀화면이 열릴 때 낡았으면 재검증 + 화면이 켜져있는 동안만 10초마다 KST 날짜 확인해서 자정 넘으면 재요청 — 화면을 계속 띄워둔 채로 자정을 넘겨도(예: 11:50pm부터 보고 있다가) 뱃지(학기중/평일)가 자동으로 갱신됨 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`). academic/status 자체는 셔틀화면이 열릴 때 낡았으면 재검증 |
 | `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼, **date-info의 dayType이 바뀌는 순간 강제 재요청**(위와 동일한 이유) |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
