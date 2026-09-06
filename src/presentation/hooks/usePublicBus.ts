@@ -130,13 +130,18 @@ export function usePublicBus(isActive = false) {
       },
       enabled: shouldPoll,
       refetchInterval: shouldPoll ? POLL_INTERVAL : false,
+      // 30초마다 어차피 다시 폴링하므로, 재시도로 얻는 이득보다 무한 로딩처럼 보이는 손해가 더 큼
+      // (공공버스 API가 6초 타임아웃을 걸어서, 기본 retry:2였으면 실패 확정까지 20초 넘게 걸림)
+      retry: 0,
     })),
   });
 
-  // 정류소별 로딩 상태 
+  // 정류소별 로딩 상태
   const isBusLoading: Record<string, boolean> = {};
+  const isBusError: Record<string, boolean> = {};
   expandedStopNames.forEach((stopName, i) => {
     isBusLoading[stopName] = busQueries[i].isFetching;
+    isBusError[stopName] = busQueries[i].isError;
   });
 
   // 새 데이터가 도착한 정류소만 이전 프레임과 병합해 카운트다운(seconds)을 이어감
@@ -210,6 +215,7 @@ export function usePublicBus(isActive = false) {
     expandedStops, setExpandedStops,
     busArrivals,
     isBusLoading,
+    isBusError,
     isUserActive,
     isManualRefreshing,
     handleManualRefresh,
