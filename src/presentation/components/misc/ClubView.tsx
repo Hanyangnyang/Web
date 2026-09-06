@@ -1,6 +1,6 @@
 // 컴포넌트: 중앙동아리 목록 — 활동 성격·인스타그램·회비를 빠르게 확인
 import { useMemo, useState } from 'react';
-import { Search, X, Megaphone } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
@@ -8,7 +8,7 @@ import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 import { ClubSpotlightCard } from './ClubSpotlightCard.js';
 import { ClubFeedbackModal } from './ClubFeedbackModal.js';
-import { categoryStyles, categoryEmoji, getActivityEmoji } from './clubDisplay.js';
+import { categoryStyles, categoryEmoji, getActivityEmoji, clubImageTransform } from './clubDisplay.js';
 
 type CategoryFilter = '전체' | ClubCategory;
 
@@ -40,6 +40,7 @@ function ClubBadge({ club }: { club: ClubInfo }) {
           alt={`${club.name} 프로필`}
           onError={() => setImageFailed(true)}
           className="w-full h-full object-cover"
+          style={clubImageTransform[club.id] ? { transform: clubImageTransform[club.id] } : undefined}
         />
       )}
       {imageFailed && <span className="text-[23px] leading-none" aria-hidden="true">{getActivityEmoji(club.activityType)}</span>}
@@ -93,19 +94,21 @@ export function ClubView({ onBack }: ClubViewProps) {
   const spotlightClub = useClubSpotlight();
   const filteredClubs = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('ko-KR');
-    return CLUBS.filter((club) => {
-      if (activeCategory !== '전체' && club.category !== activeCategory) return false;
-      if (!normalizedQuery) return true;
-      return [club.name, club.activityType, club.room, club.instagram, ...club.aliases]
-        .filter(Boolean)
-        .some(value => value!.toLocaleLowerCase('ko-KR').includes(normalizedQuery));
-    });
+    return CLUBS
+      .filter((club) => {
+        if (activeCategory !== '전체' && club.category !== activeCategory) return false;
+        if (!normalizedQuery) return true;
+        return [club.name, club.activityType, club.room, club.instagram, ...club.aliases]
+          .filter(Boolean)
+          .some(value => value!.toLocaleLowerCase('ko-KR').includes(normalizedQuery));
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, 'ko-KR'));
   }, [query, activeCategory]);
 
   return (
     <div className="fixed inset-0 z-[1001] bg-surface">
       <div
-        className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pt-6 pb-20"
+        className="mx-auto h-full w-full max-w-app overflow-y-auto overflow-x-hidden px-4 pt-6 pb-4"
         style={isApp ? {
           paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
           paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))',
@@ -121,9 +124,10 @@ export function ClubView({ onBack }: ClubViewProps) {
                   type="button"
                   onClick={() => setFeedbackOpen(true)}
                   aria-label="중앙동아리 정보 제보하기"
-                  className="w-10 h-10 rounded-card bg-white border border-slate-200 flex items-center justify-center cursor-pointer text-text-main transition-all duration-200 hover:bg-surface"
+                  className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-white border border-slate-200 px-3 py-2 text-[12px] font-bold text-text-main shadow-[0_1px_2px_rgba(14,74,132,0.08)] transition-colors hover:bg-surface active:bg-surface"
                 >
-                  <Megaphone size={18} />
+                  <span className="text-[13px] leading-none" aria-hidden="true">📢</span>
+                  제보하기
                 </button>
               )}
             />
