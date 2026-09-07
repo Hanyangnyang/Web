@@ -44,6 +44,7 @@ function resolveInitialTab(search: string): string | null {
   const tab = p.get('tab');
   if (tab === 'weather') return 'portal';
   if (tab === 'partner') return 'partner';
+  if (tab === 'misc') return 'misc';
   if (tab === 'cafe' || p.has('date') || p.has('cafe') || p.has('type')) return 'cafe';
   return null;
 }
@@ -96,8 +97,20 @@ function MainLayout() {
   const [showClubsNew, setShowClubsNew] = useState(() => localStorage.getItem('seenClubFeatures') !== '1');
   // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
   const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
-  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
-  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(null);
+  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장, 중앙동아리)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
+  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(() => {
+    const p = new URLSearchParams(window.location.search);
+    const box = p.get('subView') || p.get('box');
+    if (box) return box;
+    try {
+      const native = window.__NativeDeepLink?.getParams?.();
+      if (native) {
+        const np = new URLSearchParams(native);
+        return np.get('subView') || np.get('box');
+      }
+    } catch {}
+    return null;
+  });
   // 소식탭 오늘의 동아리 추천에서 "보러가기"를 눌렀을 때, 중앙동아리 목록에서 그 동아리 위치로
   // 자동 스크롤하기 위해 ClubView에 한 번만 전달
   const [pendingClubId, setPendingClubId] = useState<string | null>(null);
@@ -156,6 +169,15 @@ function MainLayout() {
       setPartnerVisited(true);
       setActiveTab('partner');
       localStorage.setItem('lastActiveTab', 'partner');
+      return;
+    }
+    if (tab === 'misc') {
+      setActiveTab('misc');
+      localStorage.setItem('lastActiveTab', 'misc');
+      const box = params.get('subView') || params.get('box');
+      if (box) {
+        setPendingMiscBox(box);
+      }
       return;
     }
     if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
