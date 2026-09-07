@@ -418,7 +418,7 @@
     "name": "MCPC",
     "description": "한양대 ERICA 국제교류 동아리",
     "category": "학술교양",
-    "activityType": "유학·교환학생",
+    "activityType": "국제교류",
     "room": "443호",
     "instagram": "mcpc_hanyang",
     "aliases": [
@@ -1175,13 +1175,15 @@
   },
   {
     "id": "sfc",
-    "name": "학생신앙운동(SFC)",
+    "name": "SFC",
     "description": "하나님, 성경, 교회 중심의 삶을 실천하는 기독교 대학생들의 모임이에요!",
     "category": "종교",
     "activityType": "기독교",
     "room": null,
     "instagram": "hanyang_erica_sfc",
-    "aliases": [],
+    "aliases": [
+      "학생신앙운동"
+    ],
     "fees": [],
     "feeNote": null,
     "recruitmentPeriod": null,
