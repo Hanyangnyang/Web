@@ -1204,5 +1204,24 @@
     "recruitmentPeriod": null,
     "activityDays": null,
     "openingMeeting": null
+  },
+  {
+    "id": "angelus",
+    "name": "엔젤루스 (학생처)",
+    "description": "한양대학교 ERICA 학생처 산하 대학연합 아마추어 오케스트라 엔젤루스",
+    "category": "예술",
+    "activityType": "오케스트라",
+    "room": null,
+    "instagram": "angelus_orchestra",
+    "aliases": [
+      "ANGELUS",
+      "엔젤루스 오케스트라",
+      "오케스트라"
+    ],
+    "fees": [],
+    "feeNote": null,
+    "recruitmentPeriod": null,
+    "activityDays": null,
+    "openingMeeting": null
   }
 ]
