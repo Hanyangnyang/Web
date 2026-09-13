@@ -1,32 +1,9 @@
 // 데이터 소스: 체대 헬스장 시간표 새 백엔드(/api/v1/gym/gym-periods) 원시 호출
 import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
-export interface GymScheduleDto{
-    id: number;
-    dayOfWeek: "MON" | 'TUE' | 'WED' | 'THU' | 'FRI';
-    startTime: string;
-    endTime: string;
-    classId: number;
-    className: string;
-}
-
-export interface GymPeriodDto{
-    id: number;
-    year: number;
-    semester: "FIRST" | "SECOND";
-    periodType: 'SEMESTER' | 'SEASONAL' | 'VACATION';
-    title: string;
-    start_date: string;
-    end_date: string;
-    start_time: string;
-    end_time: string;
-    active_weekend: boolean;
-    timeStamp: string;
-    schedules: GymScheduleDto[];
-}
-
+// 응답 shape은 검증 전이라 unknown — 실제 파싱/타입 부여는 GymSchema.ts의 zod 스키마가 Repository에서 담당
 export interface GymApiDataSource{
-    getSchedule: () => Promise<ApiResponse<GymPeriodDto[]>>;
+    getSchedule: () => Promise<ApiResponse<unknown>>;
 }
 
 export const createGymApiDataSource = ({httpClient}:{httpClient: HttpClient}) : GymApiDataSource => ({
