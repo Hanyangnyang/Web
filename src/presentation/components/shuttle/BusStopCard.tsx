@@ -1,7 +1,9 @@
 // 컴포넌트: 일반버스 정류소 하나의 아코디언 카드 (버스별 도착정보 목록 포함)
-import { Star, ChevronDown, Loader2, BusFront } from 'lucide-react';
+import { useState } from 'react';
+import { Star, ChevronDown, Loader2, BusFront, MapPinned, WifiOff } from 'lucide-react';
 import { ALLOWED_BUSES_BY_STOP, DEFAULT_DIRECTIONS, type TickingBusArrival } from '../../../domain/entities/PublicBus.js';
 import { BusArrivalSlot } from './BusArrivalSlot.jsx';
+import { BusStopLocationSheet } from './BusStopLocationSheet.jsx';
 
 const DESC_MAP: Record<string, string> = {
   '기숙사': '기숙사 (한양대기숙사앞)',
@@ -25,13 +27,17 @@ interface BusStopCardProps {
   isClosest: boolean;
   arrivals: TickingBusArrival[];
   isLoading: boolean;
+  isError: boolean;
   hasLoadedOnce: boolean;
+  userCoords: { latitude: number; longitude: number } | null;
   onToggleExpand: (stopName: string) => void;
   onToggleFavorite: (stopName: string) => void;
 }
 
-export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, isLoading, hasLoadedOnce, onToggleExpand, onToggleFavorite }: BusStopCardProps) {
+export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, isLoading, isError, hasLoadedOnce, userCoords, onToggleExpand, onToggleFavorite }: BusStopCardProps) {
   const targetBuses = ALLOWED_BUSES_BY_STOP[stopName] || [];
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const direction = DIR_MAP[stopName] || '';
 
   return (
     <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
@@ -60,7 +66,7 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
             {DESC_MAP[stopName] || stopName}
           </span>
           <span className="text-[12px] font-medium text-text-sub ml-1 flex-shrink-0">
-            {DIR_MAP[stopName] || ''}
+            {direction}
           </span>
           {isClosest && (
             <span className="text-[10px] font-extrabold text-success bg-success/10 px-1.5 py-0.5 rounded flex-shrink-0">
@@ -73,6 +79,21 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
           {isLoading && (
             <Loader2 size={14} className="text-text-hint animate-spin" />
           )}
+          {!isLoading && isError && !hasLoadedOnce && (
+            <WifiOff size={14} className="text-text-hint" />
+          )}
+          <button
+            type="button"
+            aria-label={`${stopName} 정류장 위치 보기`}
+            title="정류장 위치 보기"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLocationOpen(true);
+            }}
+            className="w-10 h-10 -my-2 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors active:scale-90"
+          >
+            <MapPinned size={19} strokeWidth={2.25} />
+          </button>
           <ChevronDown
             size={16}
             className={`text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -80,12 +101,25 @@ export function BusStopCard({ stopName, isExpanded, isFav, isClosest, arrivals, 
         </div>
       </div>
 
+      {isLocationOpen && (
+        <BusStopLocationSheet
+          stopName={stopName}
+          direction={direction}
+          userCoords={userCoords}
+          onClose={() => setIsLocationOpen(false)}
+        />
+      )}
+
       {/* 아코디언 내용 */}
       <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
         <div className="accordion-inner border-t border-slate-100 bg-white">
           {targetBuses.length === 0 ? (
             <p className="text-center text-xs font-semibold text-text-hint py-4">
               운행 정보가 없습니다.
+            </p>
+          ) : isError && !hasLoadedOnce ? (
+            <p className="text-center text-xs font-semibold text-text-hint py-4">
+              버스 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.
             </p>
           ) : targetBuses.map((busId, idx) => {
             const busArrivalsForId = arrivals.filter(arr => arr.busId === busId);

@@ -1,6 +1,6 @@
 // 컴포넌트: QR·학식·셔틀·기타 탭 하단 내비게이션 바
 import React from 'react';
-import { BookOpen, Utensils, LayoutGrid, Megaphone, Handshake } from 'lucide-react';
+import { BookOpen, Utensils, LayoutGrid, Megaphone, Map } from 'lucide-react';
 
 const BusIcon = () => (
   <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -13,9 +13,10 @@ const BusIcon = () => (
 interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  showMiscNew: boolean;
 }
 
-export function BottomNav({ activeTab, setActiveTab }: BottomNavProps) {
+export function BottomNav({ activeTab, setActiveTab, showMiscNew }: BottomNavProps) {
   const itemClass = (tab: string) =>
     `flex flex-col items-center gap-1 cursor-pointer transition-colors duration-300 flex-1 py-2 [-webkit-tap-highlight-color:transparent] ${
       activeTab === tab ? 'text-hyu-blue-light' : 'text-text-hint'
@@ -42,10 +43,11 @@ export function BottomNav({ activeTab, setActiveTab }: BottomNavProps) {
         <span className="text-[0.7rem] font-semibold">소식</span>
       </div>
       <div className={itemClass('partner')} onClick={() => setActiveTab('partner')}>
-        <Handshake size={24} />
-        <span className="text-[0.7rem] font-semibold">제휴</span>
+        <Map size={24} />
+        <span className="text-[0.7rem] font-semibold">캠퍼스맵</span>
       </div>
-      <div className={itemClass('misc')} onClick={() => setActiveTab('misc')}>
+      <div className={`${itemClass('misc')} relative`} onClick={() => setActiveTab('misc')}>
+        {showMiscNew && <span className="pointer-events-none absolute -top-2 right-0 whitespace-nowrap rounded-full bg-red-500 px-2.5 py-[5px] text-[10px] font-extrabold leading-none text-white shadow-sm">NEW</span>}
         <LayoutGrid size={24} />
         <span className="text-[0.7rem] font-semibold">기타</span>
       </div>

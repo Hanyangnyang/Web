@@ -1,5 +1,5 @@
 // 레포지토리: 체대 헬스장 시간표(새 백엔드)를 도메인 엔티티로 변환해 제공
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import type { GymSchedule, GymPeriod } from '../../domain/entities/Gym.js';
 import type { GymApiDataSource } from '../datasources/GymApiDataSource.js';
 import type { GymRepository } from '../../domain/repositories/IGymRepository.js';
@@ -38,7 +38,7 @@ function toGymPeriod(dto: GymPeriodDto): GymPeriod {
 export const createGymRepository = (
   { gymApiDataSource }: { gymApiDataSource: GymApiDataSource }
 ): GymRepository => ({
-  getSchedule: async (): Promise<GymSchedule> => {
+  getSchedule: (): Promise<GymSchedule> => withAreaTag(AREA, async () => {
     const res = await gymApiDataSource.getSchedule();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -58,5 +58,5 @@ export const createGymRepository = (
       throw apiError('gym schedule API returned no periods', { area: AREA, endpoint: res._requestUrl });
 
     return { location: GYM_LOCATION, periods };
-  },
+  }),
 });

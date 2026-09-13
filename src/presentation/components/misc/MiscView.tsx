@@ -2,6 +2,7 @@
 import { useState, useEffect, lazy, Suspense, type ComponentType } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { GymView } from './GymView.jsx';
+import { ClubView } from './ClubView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
 import { MiscSubViewHeader } from './MiscSubViewHeader.jsx';
 
@@ -88,9 +89,15 @@ function FeedbackViewFallback({ onBack }: { onBack: () => void }) {
 interface MiscViewProps {
   resetSignal: number;
   isActive?: boolean;
+  // 배너 등에서 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 App.tsx가 한 번만 내려줌
+  deepLinkBox?: string | null;
+  onDeepLinkBoxHandled?: () => void;
+  // 소식탭 오늘의 동아리 추천에서 넘어왔을 때, 중앙동아리 목록의 그 동아리 위치로 자동 스크롤하기 위해 넘어옴
+  deepLinkClubId?: string | null;
+  onDeepLinkClubIdHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
@@ -99,6 +106,13 @@ export function MiscView({ resetSignal, isActive = false }: MiscViewProps) {
   useEffect(() => {
     setSubView('list');
   }, [resetSignal]);
+
+  // 배너 등 딥링크로 넘어온 서브뷰를 한 번 적용하고 부모에 소비 완료를 알린다 (CampusMapView의 deepLinkChip과 동일한 방식)
+  useEffect(() => {
+    if (!deepLinkBox) return;
+    setSubView(deepLinkBox as SubView);
+    onDeepLinkBoxHandled?.();
+  }, [deepLinkBox]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isActive) return;
@@ -139,6 +153,10 @@ export function MiscView({ resetSignal, isActive = false }: MiscViewProps) {
         <LazyFeedbackView onBack={onBack} />
       </Suspense>
     );
+  }
+  if (subView === 'clubs') {
+    const onBack = () => setSubView('list');
+    return <ClubView onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />;
   }
 
   return <MiscMenuGrid onBoxClick={handleBoxClick} />;

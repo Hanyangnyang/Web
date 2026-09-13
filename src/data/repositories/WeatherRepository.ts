@@ -1,5 +1,5 @@
 // 레포지토리: 날씨 API 응답(DTO)을 Weather 엔티티로 변환
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import {
   toWeatherCondition,
   toPmGrade,
@@ -7,7 +7,7 @@ import {
   type HourlyForecast,
   type CurrentWeather,
 } from '../../domain/entities/Weather.js';
-import { toEpoch } from '../../utils/time.js';
+import { toEpoch } from '../../utils/kstTime.js';
 import type { WeatherApiDataSource } from '../datasources/WeatherApiDataSource.js';
 import type { WeatherRepository } from '../../domain/repositories/IWeatherRepository.js';
 import {
@@ -45,7 +45,7 @@ const toCurrent = (dto: CurrentWeatherDto): CurrentWeather => ({
 export const createWeatherRepository = (
   { weatherApiDataSource }: { weatherApiDataSource: WeatherApiDataSource }
 ): WeatherRepository => ({
-  getWeather: async () => {
+  getWeather: () => withAreaTag(AREA, async () => {
     const res = await weatherApiDataSource.getWeather();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -70,5 +70,5 @@ export const createWeatherRepository = (
       .sort((a, b) => a.epoch - b.epoch);
 
     return { current: toCurrent(parsed.data.current), hourly };
-  },
+  }),
 });

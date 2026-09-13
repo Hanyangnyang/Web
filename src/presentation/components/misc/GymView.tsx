@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useGymSchedule } from '../../hooks/useGymSchedule.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
-import { getKSTDateKey, getKSTNow } from '../../../utils/time.js';
+import { getKSTDateKey, getKSTNow } from '../../../utils/kstTime.js';
 import { buildScheduleGrid, getMergedSchedule } from './gymScheduleFormat.js';
 import type { GymScheduleCell } from './gymScheduleFormat.js';
 import type { GymPeriod } from '../../../domain/entities/Gym.js';
@@ -71,15 +71,18 @@ export function GymView({ onBack }: GymViewProps) {
   const [currentTime, setCurrentTime] = useState(getKSTNow);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  // 사용자가 드롭다운에서 기간을 직접 골랐는지 — 골랐으면 gymData가 새로 갱신돼도 자동판별로 덮어쓰지 않음
+  const userPickedRef = React.useRef(false);
 
-  // 데이터 도착 후, 오늘 날짜 기준 현재 기간 최초 1회 자동 판별
+  // 오늘 날짜 기준 현재 기간을 자동 판별 — gymData가 새로 갱신될 때마다(자정 넘어 강제 재요청된 경우 포함)
+  // 다시 계산해야, 화면을 계속 띄워놓은 채로 날짜가 바뀌어도 새 기간으로 따라감
   useEffect(() => {
-    if (!gymData || activePeriodId) return;
+    if (!gymData || userPickedRef.current) return;
     const todayStr = getKSTDateKey();
     const matched = gymData.periods.find(p => p.startDate <= todayStr && todayStr <= p.endDate);
     const fallback = gymData.periods.find(p => p.periodType === 'semester') ?? gymData.periods[0];
     setActivePeriodId(matched ? matched.id : (fallback?.id ?? null));
-  }, [gymData, activePeriodId]);
+  }, [gymData]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(getKSTNow()), 60000);
@@ -185,6 +188,7 @@ export function GymView({ onBack }: GymViewProps) {
                       <div
                         key={p.id}
                         onClick={() => {
+                          userPickedRef.current = true;
                           setActivePeriodId(p.id);
                           setDropdownOpen(false);
                         }}
@@ -243,7 +247,7 @@ export function GymView({ onBack }: GymViewProps) {
                 <table className="w-full border-collapse table-fixed">
                   <thead>
                     <tr>
-                      <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-slate-200 text-center" style={{ width: '12%' }} />
+                      <th className="py-3 px-1 text-[0.7rem] font-bold text-text-sub text-center" style={{ width: '12%' }} />
                       {['월', '화', '수', '목', '금'].map(d => (
                         <th key={d} className="py-3 px-1 text-[0.7rem] font-bold text-text-sub border-b border-slate-200 text-center" style={{ width: '17.6%' }}>{d}</th>
                       ))}
@@ -254,7 +258,9 @@ export function GymView({ onBack }: GymViewProps) {
                       const isClosedRow = closingHour !== null && row.hour >= closingHour;
                       return (
                         <tr key={i}>
-                          <td className="py-2 px-1 text-[0.65rem] font-bold text-text-sub text-center border-r border-slate-200">{row.label}</td>
+                          <td className={`${styles.timeCell} border-r border-slate-200`}>
+                            <span className={styles.timeLabel}>{row.label}</span>
+                          </td>
                           {isClosedRow ? (
                             <td colSpan={5} className="bg-slate-50 text-text-hint text-[0.65rem] font-bold text-center py-2 h-10 border-b border-slate-200">
                               운영 종료

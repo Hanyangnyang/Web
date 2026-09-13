@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useAlarmSubscription } from '../../hooks/useAlarmSubscription.js';
 import { TimeDayWheelPicker } from '../ui/TimeDayWheelPicker.js';
-import { BottomSheet } from '../ui/BottomSheet.js';
+import { ModalBottomSheet } from '../ui/ModalBottomSheet.js';
 
 interface WeatherConditions {
   daily: boolean;
@@ -148,7 +148,7 @@ export function WeatherAlarmSettings({ onClose }: WeatherAlarmSettingsProps) {
   };
 
   return (
-    <BottomSheet
+    <ModalBottomSheet
       onRequestClose={commitOnClose}
       onClose={onClose}
       className="w-[calc(100%-48px)] max-w-[340px] rounded-card rounded-b-none px-5 pb-[calc(24px+env(safe-area-inset-bottom))] mb-0 no-scrollbar"
@@ -229,6 +229,6 @@ export function WeatherAlarmSettings({ onClose }: WeatherAlarmSettingsProps) {
         </div>
 
       </div>
-    </BottomSheet>
+    </ModalBottomSheet>
   );
 }

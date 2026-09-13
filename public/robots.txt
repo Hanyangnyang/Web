@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# BFF 엔드포인트는 JSON만 반환하므로 원시 JSON이 검색 결과에 노출되는 것을 막는다.
+# portal?type=library는 실시간성을 위해 무캐시라 크롤러 요청이 도서관 API로 그대로 전달된다.
+Disallow: /api/
+
+Sitemap: https://www.hanyang.life/sitemap.xml

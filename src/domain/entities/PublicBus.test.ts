@@ -6,7 +6,17 @@ import {
   mergeArrivals,
   tickArrivals,
   DEFAULT_PRIORITY,
+  ALLOWED_BUSES_BY_STOP,
+  DEFAULT_DIRECTIONS,
 } from './PublicBus.js';
+
+describe('상록수역 일반버스 설정', () => {
+  it('3100번과 3101번을 에리카 방면 노선으로 포함한다', () => {
+    expect(ALLOWED_BUSES_BY_STOP['상록수역']).toEqual(['3102', '3100', '3101', '10-1']);
+    expect(DEFAULT_DIRECTIONS['3100']['상록수역']).toBe('에리카 방면');
+    expect(DEFAULT_DIRECTIONS['3101']['상록수역']).toBe('에리카 방면');
+  });
+});
 
 describe('getDistanceStrToStop', () => {
   it('좌표가 없으면 null을 반환한다', () => {

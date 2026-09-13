@@ -1,9 +1,5 @@
 // 데이터 소스: 일반버스(공공데이터) 도착정보 API 원시 호출
-import { parseOrThrow } from '../../infrastructure/http/HttpClient.js';
-
-export interface HttpClient {
-  get: (path: string, headers?: Record<string, string>) => Promise<Response>;
-}
+import { parseOrThrow, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
 export interface BusArrivalListItem {
   routeName: string;

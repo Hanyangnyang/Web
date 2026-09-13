@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, Plus } from 'lucide-react';
 import { useAlarmSubscription } from '../../hooks/useAlarmSubscription.js';
 import { TimeDayWheelPicker } from '../ui/TimeDayWheelPicker.js';
-import { BottomSheet } from '../ui/BottomSheet.js';
+import { ModalBottomSheet } from '../ui/ModalBottomSheet.js';
 import { KNOWN_CAFES } from '../../../domain/entities/Cafe.js';
 
 type AlarmMode = 'cafe' | 'keyword' | null;
@@ -59,7 +59,7 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
   const isTimePickerActive = (params.mode === 'cafe' && params.selectedCafe !== null) || (params.mode === 'keyword' && params.keywords.length > 0);
 
   return (
-    <BottomSheet
+    <ModalBottomSheet
       onRequestClose={commitOnClose}
       onClose={onClose}
       className="w-[calc(100%-48px)] max-w-[340px] rounded-card rounded-b-none px-5 pb-[calc(24px+env(safe-area-inset-bottom))] mb-0"
@@ -222,6 +222,6 @@ export function CafeteriaAlarmSettings({ onClose }: CafeteriaAlarmSettingsProps)
           </div>
         </div>
       </div>
-    </BottomSheet>
+    </ModalBottomSheet>
   );
 }

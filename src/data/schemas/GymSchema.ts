@@ -4,13 +4,17 @@ import { z } from 'zod';
 const TIME_PATTERN = /^\d{2}:\d{2}/; // "HH:mm:ss..." — 최소 시:분만 있으면 허용
 
 // 요일별 개별 수업 세션. 배열 안에서 항목 하나가 이상해도 그 항목만 제외하고 싶어서
-// (전체를 무효화하지 않기 위해) 상위 스키마에 중첩하지 않고 Repository에서 항목별로 개별 parse한다
+// (전체를 무효화하지 않기 위해) 상위 스키마에 중첩하지 않고 Repository에서 항목별로 개별 parse한다.
+// dayOfWeek/시간 형식은 그리드에 배치하는 데 필수라 값이 이상하면 항목째 제외하는 게 맞지만(기존
+// toGymPeriod의 필터링과 동일), classId/className은 색상 매칭·라벨 표시용 부수 필드라 여기서
+// 항목을 통째로 지우면(구 develop 대비) 오히려 수업 자체가 안 보이는 더 나쁜 실패로 이어진다 —
+// 그래서 이 둘은 기본값으로 대체해 항목은 계속 표시되게 한다
 export const GymClassSessionDtoSchema = z.object({
   dayOfWeek: z.enum(['MON', 'TUE', 'WED', 'THU', 'FRI']),
   startTime: z.string().regex(TIME_PATTERN).transform(t => t.slice(0, 5)),
   endTime: z.string().regex(TIME_PATTERN).transform(t => t.slice(0, 5)),
-  classId: z.number(),
-  className: z.string(),
+  classId: z.number().catch(0),
+  className: z.string().catch(''),
 });
 
 // 기간(학기/계절/방학) 메타데이터. 필드 하나가 이상해도 기간 전체를 못 쓰게 만들지 않도록

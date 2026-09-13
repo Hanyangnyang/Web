@@ -44,3 +44,10 @@ export const createCafe = ({ id, name, menus = [], hasJeyuk = false, available =
   available,
   hours,
 });
+
+// 배치(period) 조회 응답에 그 날짜 자체가 없을 때 씀 — 백엔드가 그 날짜에 등록된 메뉴가
+// 없으면 날짜 키를 아예 빼고 응답하기로 확인됨. API 실패가 아니라 "그날 메뉴 없음"이라
+// 재조회 없이 바로 이 빈 4개 식당으로 취급한다
+export function createEmptyCafes(): Cafe[] {
+  return KNOWN_CAFES.map(({ id, name }) => createCafe({ id, name }));
+}

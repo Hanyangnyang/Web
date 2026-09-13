@@ -1,9 +1,8 @@
 // 레포지토리: 학식 API 응답을 Cafe 엔티티 배열로 변환
-import { apiError } from '../../infrastructure/http/HttpClient.js';
+import { apiError, withAreaTag } from '../../infrastructure/http/HttpClient.js';
 import { createCafe, KNOWN_CAFES } from '../../domain/entities/Cafe.js';
 import type { MenuApiDataSource } from '../datasources/MenuApiDataSource.js';
 import type { MenuRepository } from '../../domain/repositories/IMenuRepository.js';
-import { toDateKey } from '../../utils/time.js';
 import {
   MenuResponseDataSchema,
   CafeteriaListDataSchema,
@@ -72,19 +71,7 @@ function toCafes(cafeterias: CafeteriaDto[]) {
 export const createMenuRepository = (
   { menuApiDataSource }: { menuApiDataSource: MenuApiDataSource }
 ): MenuRepository => ({
-  getMenuForDate: async (date: Date) => {
-    const dateStr = toDateKey(date);
-    const res = await menuApiDataSource.getMenuForDate({ startDate: dateStr, endDate: dateStr });
-    // 1. success 실패했을때, Error 반환
-    if (!res.success)
-      throw apiError(res.error?.message || `menu API returned 'success:false'`, { area: AREA, endpoint: res._requestUrl });
-
-    const responseData = MenuResponseDataSchema.parse(res.data);
-    const cafeterias = parseCafeterias(responseData[dateStr] ?? [], res._requestUrl);
-    return toCafes(cafeterias);
-  },
-
-  getMenuForPeriod: async () => {
+  getMenuForPeriod: () => withAreaTag(AREA, async () => {
     const res = await menuApiDataSource.getMenuForPeriod();
     // 1. success 실패했을때, Error 반환
     if (!res.success)
@@ -97,5 +84,5 @@ export const createMenuRepository = (
         toCafes(parseCafeterias(cafeterias, res._requestUrl)),
       ])
     );
-  },
+  }),
 });

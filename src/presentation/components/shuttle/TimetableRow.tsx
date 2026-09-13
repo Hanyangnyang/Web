@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { ScheduleItem } from '../../../domain/entities/Shuttle.js';
-import { SUBWAY_OPTS, connectingTrains, isSubwayOffPeak, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
+import { SUBWAY_OPTS, connectingTrains, isSubwayOffPeak, isSuinBundangLine, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
 import { SubwayLineBadge } from './SubwayLineBadge.jsx';
 import styles from './TimetableRow.module.css';
 
@@ -67,10 +67,12 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
   const elementRef = useRef<HTMLDivElement>(null);
   // lineId가 SUBWAY_OPTS에 없을 수 있음(예: 노선 개편 후 남은 오래된 localStorage 값) — 못 찾으면 첫 옵션으로 대체
   const opt = SUBWAY_OPTS.find(o => o.id === lineId) ?? SUBWAY_OPTS[0];
-  const trains = row.subway ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
+  // 수인분당선은 시간표 개정 미반영으로 연결편 표시를 임시로 막음 (안내는 상단 공지 배너로 대체)
+  const isSuinBundang = isSuinBundangLine(lineId);
+  const trains = row.subway && !isSuinBundang ? connectingTrains(subwayArrivals, row.arr, lineId) : [];
   // 조회 실패일 땐 subwayArrivals가 빈 배열이라 "연결 열차 없음"과 구분이 안 되므로,
   // 없다고 단정하지 않는 중립적인 문구로 대체 (재시도 유도는 위쪽 배너 한 곳에서만)
-  const noTrainReason = row.subway && trains.length === 0
+  const noTrainReason = row.subway && !isSuinBundang && trains.length === 0
     ? (isSubwayError ? '확인 불가' : isSubwayOffPeak(subwayArrivals, row.arr, lineId) ? '운행 시간 외' : '연결 열차 없음') : null;
 
   const rLabel = ROUTE_LABEL[row.route] || row.route;
@@ -261,7 +263,9 @@ export function TimetableRow({ row, lineId, isNext, isLast, isPast, subwayArriva
           style={{ paddingTop: (isNext || isLast || isPast || (isFullMode && isActiveInFull)) ? 26 : 14, paddingBottom: 14 }}
         >
           {row.subway ? (
-            isSubwayLoading ? (
+            isSuinBundang ? (
+              <span className="text-xs text-slate-300 font-medium">-</span>
+            ) : isSubwayLoading ? (
               <div className="flex items-center justify-start pl-0.5 h-6">
                 <Loader2 className="text-slate-300 animate-[spin_1s_linear_infinite]" size={16} />
               </div>
