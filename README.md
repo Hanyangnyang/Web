@@ -131,11 +131,11 @@ src/
 
 ## 🔌서드파티와 💾캐싱정책
 
-학식·날씨·도서관 혼잡도·배너·지하철·셔틀·학사달력/공휴일·통합피드백 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
+학식·날씨·도서관 혼잡도·배너·지하철·셔틀·학사달력/공휴일·통합피드백 등 핵심 데이터는 자체 **백엔드 서버**(Spring Boot)를 거치고, 인스타그램 프로필·공공버스 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
 **Supabase**는 익명 Auth·앱설정(다가오는 시간표 변경 배너용 `period_schedule`만)·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
 푸시 알림은 **Firebase Cloud** Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
 
-### 🔌Supabase 테이블 - Supabase 로그인 되면 수정해야함
+### 🔌Supabase 테이블
 
 | 테이블 | 용도 |
 |--------|------|
@@ -144,7 +144,7 @@ src/
 `devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
-### 🔌백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
+### 🔌백엔드 서버 API 엔드포인트 + 💾TanStack Query + localStorage
 (Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 2번, 그래서 총 3번 호출함. staleTime이 지났는데 트리거가 있을 경우 SWR. localStorage는 maxAge 24시간으로 설정함. maxAge는 캐싱된 값을 불러올지 말지를 결정하는 기준.)
 
 | 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
@@ -172,7 +172,7 @@ src/
 
 **프론트는 안 쓰지만 아직 살아있는 Vercel 함수** — `api/menu.js`, `api/portal.js`(weather+library 통합), `api/holidays.js` 3개는 전부 새 백엔드로 완전히 대체되어 프론트엔드 어디에서도 더 이상 호출하지 않음. 하지만 Supabase Edge Function `menu-alerts`(1분마다 도는 푸시 발송 로직)가 `/api/menu`, `/api/portal?type=weather`, `/api/holidays`를 직접 `fetch()`하고 있어서 세 함수 다 삭제하면 안 됨. 단, `/api/portal?type=library`는 Edge Function도 호출하지 않아 완전히 죽은 라우트 — `api/portal.js` 리팩토링/삭제 시 이 부분만은 안전하게 정리 가능.
 
-**`/api/sentry-discord-webhook`** — 위 표들과 달리 앱이 호출하는 게 아니라 **Sentry가 호출하는 인바운드 웹훅**. Sentry Internal Integration의 Issue Alert(`event_alert`)를 받아서 `sentry-hook-signature` 헤더로 HMAC-SHA256 서명 검증(비교는 `crypto.timingSafeEqual`) 후, Discord 임베드 메시지 형식으로 변환해 `DISCORD_WEBHOOK_URL`로 재전송함. Sentry 무료(Developer) 플랜엔 네이티브 Discord 연동이 없어서(유료 Slack 연동을 억지로 꽂는 방식뿐) 만든 중계 함수. 캐싱 대상이 아니고 staleTime 개념도 없음. title/culprit뿐 아니라 `event.tags`(`boundary`/`area`/`endpoint`/`queryKey`/`mutationKey` — 존재하는 것만) 도 Discord embed 필드로 같이 보내서, 어느 API·어느 ErrorBoundary에서 터졌는지 Sentry를 열지 않고도 바로 알 수 있음.
+위 표들과 별도로, Sentry 이슈 알림을 Discord로 중계하는 내부 전용 인바운드 웹훅도 있음(앱이 호출하는 게 아니라 Sentry가 호출). Sentry 무료(Developer) 플랜엔 네이티브 Discord 연동이 없어서(유료 Slack 연동을 억지로 꽂는 방식뿐) 만든 중계 함수이며, 서명 검증을 거쳐 신뢰할 수 있는 요청만 처리함.
 
 ### 💾localStorage (디스크)
 
