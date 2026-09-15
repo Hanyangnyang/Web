@@ -4,6 +4,7 @@ import { INSTA_ACCOUNTS, type InstagramAccountInfo } from '../../../domain/entit
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { Accordion } from '../ui/Accordion.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
+import { openInstagram } from '../../../lib/instagram.js';
 
 type GroupKey = 'erica' | 'college';
 
@@ -14,16 +15,6 @@ const InstagramIcon = ({ size = 13 }: { size?: number }) => (
     <path d="M17.5 6.5h.01" />
   </svg>
 );
-
-const openInsta = (username: string) => {
-  const start = Date.now();
-  window.location.href = `instagram://user?username=${username}`;
-  setTimeout(() => {
-    if (Date.now() - start < 2000) {
-      window.open(`https://www.instagram.com/${username}/`, '_blank');
-    }
-  }, 500);
-};
 
 interface AccountItemProps {
   acc: InstagramAccountInfo;
@@ -54,7 +45,7 @@ function AccountItem({ acc, isFirst }: AccountItemProps) {
         </div>
         <button
           className="flex-shrink-0 min-w-[64px] flex items-center justify-center gap-1 h-7 px-2.5 border-none bg-[#E4405F]/[0.1] rounded-full text-[#C13557] text-[12px] font-bold cursor-pointer transition-colors duration-150 hover:bg-[#E4405F]/[0.16] active:bg-[#E4405F]/[0.2]"
-          onClick={() => openInsta(acc.username)}
+          onClick={() => openInstagram(acc.username)}
         >
           <InstagramIcon size={12} />
           바로가기

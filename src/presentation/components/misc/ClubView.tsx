@@ -9,6 +9,7 @@ import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 import { ClubSpotlightCard } from './ClubSpotlightCard.js';
 import { ClubFeedbackModal } from './ClubFeedbackModal.js';
 import { categoryStyles, categoryEmoji, getActivityEmoji } from './clubDisplay.js';
+import { openInstagram } from '../../../lib/instagram.js';
 
 type CategoryFilter = '전체' | ClubCategory;
 
@@ -19,14 +20,6 @@ const InstagramIcon = ({ size = 13 }: { size?: number }) => (
     <path d="M17.5 6.5h.01" />
   </svg>
 );
-
-const openInsta = (username: string) => {
-  const start = Date.now();
-  window.location.href = `instagram://user?username=${username}`;
-  setTimeout(() => {
-    if (Date.now() - start < 2000) window.open(`https://www.instagram.com/${username}/`, '_blank');
-  }, 500);
-};
 
 function ClubBadge({ club }: { club: ClubInfo }) {
   const style = categoryStyles[club.category];
@@ -69,7 +62,7 @@ function ClubItem({ club, highlighted }: { club: ClubInfo; highlighted?: boolean
               <button
                 type="button"
                 className="flex-shrink-0 inline-flex items-center gap-1 min-w-0 max-w-[38%] rounded-full bg-[#E4405F]/[0.1] px-2 py-1 text-[10px] font-bold text-[#C13557] shadow-[0_1px_1px_rgba(228,64,95,0.1)] transition-colors hover:bg-[#E4405F]/[0.16] active:bg-[#E4405F]/[0.2]"
-                onClick={() => openInsta(club.instagram!)}
+                onClick={() => openInstagram(club.instagram!)}
                 aria-label={`${club.name} 인스타그램 열기`}
               >
                 <InstagramIcon size={11} />
@@ -232,7 +225,7 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
             actionLabel="바로가기"
             actionIcon={<InstagramIcon />}
             iconPosition="start"
-            onAction={() => openInsta(spotlightClub.instagram!)}
+            onAction={() => openInstagram(spotlightClub.instagram!)}
             onCardClick={handleSpotlightCardClick}
           />
           {filteredClubs.length > 0 ? (

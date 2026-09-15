@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import type { Banner } from '../../../domain/entities/Banner.js';
+import { isInstagramUrl, openInstagram } from '../../../lib/instagram.js';
 
 // BottomNav가 실제로 그리는 탭 키 목록 — clickUrl의 tab 파라미터에 오타/미지원 값이 오면
 // 그대로 setActiveTab에 흘려보내 모든 탭이 안 그려지는 빈 화면이 되는 걸 막는다
@@ -174,7 +175,13 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
         return;
       }
     } catch {
-      // clickUrl이 URL로 파싱 안 되면 아래에서 그대로 외부 링크 취급
+      // clickUrl이 URL로 파싱 안 되면 아래에서 계속 진행
+    }
+
+    // 인스타그램 링크(웹 URL, 앱 스킴, @계정명 등)인 경우 앱 실행 시도 후 웹 폴백
+    if (isInstagramUrl(banner.clickUrl)) {
+      openInstagram(banner.clickUrl);
+      return;
     }
 
     window.open(banner.clickUrl, '_blank');
