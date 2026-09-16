@@ -7,6 +7,7 @@ import { PostHogProvider } from 'posthog-js/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient.js'
 import { initSentry } from './lib/sentry.js'
+import { getPlatform } from './lib/platform.js'
 import { ErrorBoundary } from './presentation/components/common/ErrorBoundary.jsx'
 import { AppCrashScreen } from './presentation/components/common/AppCrashScreen.jsx'
 
@@ -22,6 +23,7 @@ if (import.meta.env.VITE_POSTHOG_KEY) {
   posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
     api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
   })
+  posthog.register({ platform: getPlatform() })
 }
 
 // Kakao SDK는 더 이상 여기서 초기화하지 않음 — ShareSheet가 마운트될 때 lib/kakaoShare.js가 지연 로드함
