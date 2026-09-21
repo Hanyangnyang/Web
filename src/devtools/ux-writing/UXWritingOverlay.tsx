@@ -24,21 +24,44 @@ interface SelectedCopy {
   peerTexts: string[];
 }
 
+type CopySource =
+  | { kind: 'text'; element: HTMLElement; node: Text }
+  | { kind: 'placeholder'; element: HTMLInputElement | HTMLTextAreaElement };
+
 function directTextNode(element: HTMLElement): Text | null {
   const nodes = Array.from(element.childNodes);
   return nodes.find((node): node is Text => node.nodeType === Node.TEXT_NODE && Boolean(node.textContent?.trim())) ?? null;
 }
 
-function selectableTarget(target: EventTarget | null): { element: HTMLElement; node: Text } | null {
+function selectableTarget(target: EventTarget | null): CopySource | null {
   if (!(target instanceof HTMLElement) || target.closest('[data-ux-writing-tool]')) return null;
+
+  if ((target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) && target.placeholder.trim()) {
+    return { kind: 'placeholder', element: target };
+  }
 
   let element: HTMLElement | null = target;
   while (element && element !== document.body) {
     const node = directTextNode(element);
-    if (node) return { element, node };
+    if (node) return { kind: 'text', element, node };
     element = element.parentElement;
   }
   return null;
+}
+
+function readCopy(source: CopySource): string {
+  return source.kind === 'text'
+    ? source.node.textContent?.trim() ?? ''
+    : source.element.placeholder.trim();
+}
+
+function writeCopy(source: CopySource, text: string) {
+  if (source.kind === 'text') source.node.textContent = text;
+  else source.element.placeholder = text;
+}
+
+function sourceIsConnected(source: CopySource): boolean {
+  return source.kind === 'text' ? source.node.isConnected : source.element.isConnected;
 }
 
 function rectFor(element: HTMLElement): DOMRect {
@@ -52,7 +75,14 @@ function peerTextsFor(element: HTMLElement): string[] {
   return Array.from(parent.children)
     .filter((sibling): sibling is HTMLElement => sibling instanceof HTMLElement && sibling !== element)
     .filter((sibling) => !sibling.closest('[data-ux-writing-tool]'))
-    .map((sibling) => sibling.innerText.replace(/\s+/g, ' ').trim())
+    .map((sibling) => {
+      const visibleText = sibling.innerText.replace(/\s+/g, ' ').trim();
+      if (visibleText) return visibleText;
+      const field = sibling.matches('input, textarea')
+        ? sibling as HTMLInputElement | HTMLTextAreaElement
+        : sibling.querySelector<HTMLInputElement | HTMLTextAreaElement>('input, textarea');
+      return field?.placeholder.trim() ?? '';
+    })
     .filter(Boolean)
     .slice(0, 8)
     .map((text) => text.slice(0, 180));
@@ -74,7 +104,7 @@ export default function UXWritingOverlay() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const selectedRef = useRef<SelectedCopy | null>(null);
-  const selectedNodeRef = useRef<Text | null>(null);
+  const selectedSourceRef = useRef<CopySource | null>(null);
 
   useEffect(() => {
     selectedRef.current = selected;
@@ -99,7 +129,7 @@ export default function UXWritingOverlay() {
       event.stopPropagation();
       event.stopImmediatePropagation();
 
-      const text = target.node.textContent?.trim() ?? '';
+      const text = readCopy(target);
       const parentText = target.element.parentElement?.innerText?.trim() ?? target.element.innerText.trim();
       const next: SelectedCopy = {
         element: target.element,
@@ -108,7 +138,7 @@ export default function UXWritingOverlay() {
         nearbyText: parentText.slice(0, 500),
         peerTexts: peerTextsFor(target.element),
       };
-      selectedNodeRef.current = target.node;
+      selectedSourceRef.current = target;
       setSelected(next);
       setDraft(text);
       setResult(null);
@@ -129,14 +159,14 @@ export default function UXWritingOverlay() {
 
   useEffect(() => () => {
     const copy = selectedRef.current;
-    const node = selectedNodeRef.current;
-    if (copy && node?.isConnected) node.textContent = copy.originalText;
+    const source = selectedSourceRef.current;
+    if (copy && source && sourceIsConnected(source)) writeCopy(source, copy.originalText);
   }, []);
 
   const preview = useCallback((text: string) => {
-    const node = selectedNodeRef.current;
-    if (!node?.isConnected) return;
-    node.textContent = `${text}`;
+    const source = selectedSourceRef.current;
+    if (!source || !sourceIsConnected(source)) return;
+    writeCopy(source, text);
     setDraft(text);
     setSelected((copy) => copy ? { ...copy, currentText: text } : copy);
   }, []);

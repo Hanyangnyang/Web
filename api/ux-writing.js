@@ -1,6 +1,6 @@
 import { UX_WRITING_GUIDE } from '../src/devtools/ux-writing/guide.js';
 
-const MODEL = 'gemini-3.1-flash-lite';
+const MODEL = 'gemini-3.5-flash-lite';
 const MAX_TEXT_LENGTH = 1200;
 
 async function readBody(req) {
@@ -135,7 +135,7 @@ improvementNeeded가 false여도 UI 비교를 위한 후보 3개는 제공하세
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.65, maxOutputTokens: 1200, responseMimeType: 'application/json' },
+          generationConfig: { maxOutputTokens: 1200, responseMimeType: 'application/json' },
         }),
       },
     );
