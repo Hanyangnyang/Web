@@ -83,7 +83,8 @@ export default async function handler(req, res) {
   try {
     const body = await readBody(req);
     const currentText = clean(body.currentText, 300);
-    if (!currentText) return res.status(400).json({ error: '검토할 문구가 비어 있어요.' });
+    const context = clean(body.context, 1000);
+    if (!currentText && !context) return res.status(400).json({ error: '문구나 상황 설명을 입력해 주세요.' });
     const peerTexts = Array.isArray(body.peerTexts)
       ? body.peerTexts.map((text) => clean(text, 180)).filter(Boolean).slice(0, 8)
       : [];
@@ -94,13 +95,15 @@ export default async function handler(req, res) {
 
 - 현재 문구: ${JSON.stringify(currentText)}
 - 원래 문구: ${JSON.stringify(clean(body.originalText, 300))}
+- 사용자가 설명한 상황: ${JSON.stringify(context)}
 - 주변 문구: ${JSON.stringify(clean(body.nearbyText))}
 - 같은 DOM 레벨의 다른 컴포넌트 문구: ${JSON.stringify(peerTexts)}
 - HTML 요소: ${JSON.stringify(clean(body.tagName, 30))}
 - 접근성 이름: ${JSON.stringify(clean(body.ariaLabel, 200))}
 - 화면 경로: ${JSON.stringify(clean(body.route, 300))}
 
-현재 문구를 먼저 평가하고, 실제로 고칠 이유가 있는지 엄격하게 판단하세요.
+현재 문구가 없으면 사용자가 설명한 상황을 기준으로 처음부터 문구를 제안하세요.
+현재 문구가 있으면 먼저 평가하고, 실제로 고칠 이유가 있는지 엄격하게 판단하세요.
 문구가 이미 명확하고 자연스러우며 가이드와 주변 톤에 맞으면 improvementNeeded를 false로 지정하고, assessment에 현재 문구를 유지해도 좋다고 솔직하게 설명하세요.
 단지 다른 표현이 가능하다는 이유만으로 개선이 필요하다고 판정하지 마세요.
 오탈자, 어색한 표현, 불필요한 길이, 행동의 불명확함, 가이드 위반, 주변 문구와의 톤 불일치가 있을 때만 improvementNeeded를 true로 지정하세요.
