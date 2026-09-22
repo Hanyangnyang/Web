@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 import { WeatherCard } from './WeatherCard.jsx';
 import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudRain, Snowflake, CloudDrizzle, type LucideIcon } from 'lucide-react';
 import type { Weather, HourlyForecast, WeatherCondition, PmGrade } from '../../../domain/entities/Weather.js';
-import type { WeatherBriefing } from '../../../domain/entities/WeatherBriefing.js';
 
 // ── mock 데이터 생성기 ─────────────────────────────────────────────
 // 시간별 예보는 현재 시각 기준으로 생성한다 — 고정 epoch를 쓰면 시간이 지날수록
@@ -42,10 +41,6 @@ function makeWeather({ condition, temp, pmGrade = '보통' }: MakeWeatherArgs): 
     hourly: makeHourly(condition, temp),
   };
 }
-
-const BRIEFING: WeatherBriefing = {
-  content: '오늘도 좋은 하루 보내세요! 산책하기 좋은 날씨예요.',
-};
 
 // weatherTheme의 배경 분기와 1:1 대응하는 6종
 // (한파는 별도 배경/아이콘 없이 기온(-10°↓)에 따라 기존 카드 위에 "한파" 뱃지만 얹는 방식)
@@ -130,7 +125,6 @@ export const 전체매트릭스 = {
                 temp: col.coldSnapTemp !== undefined ? col.coldSnapTemp : bg.temp,
                 pmGrade: col.grade,
               })}
-              briefing={BRIEFING}
               loading={false}
             />
           )),
@@ -153,8 +147,7 @@ const HOURLY_ICONS = [
 ];
 
 // 실제 카드의 시간별 예보 칸과 동일한 마크업 재현.
-// isCurrent(지금 칸)일 때만 배경이 bg-white/90 필로 바뀌고, 아이콘 테두리 색이
-// text-white → text-black으로 반전된다 — fill(내부 채움색)은 두 상태에서 동일하다.
+// isCurrent(지금 칸)일 때만 흰색 테두리가 생기고 시 글자가 굵어진다 — 글자·아이콘·fill 색은 두 상태에서 동일하다.
 interface HourlyPillProps {
   Icon: LucideIcon;
   fill: string;
@@ -164,14 +157,14 @@ interface HourlyPillProps {
 function HourlyPill({ Icon, fill, isCurrent }: HourlyPillProps) {
   return (
     <div
-      className={`flex flex-col items-center gap-0.5 px-2.5 py-0.5 rounded-xl transition-all duration-300 ${
-        isCurrent ? 'bg-white/90 border border-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.15)]' : ''
+      className={`flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-xl border transition-all duration-300 ${
+        isCurrent ? 'border-white' : 'border-transparent'
       }`}
-      style={{ minWidth: '48px' }}
+      style={{ minWidth: '40px' }}
     >
-      <span className={`text-[11px] font-bold ${isCurrent ? 'text-slate-700 font-extrabold' : 'text-white'}`}>3시</span>
-      <Icon size={18} strokeWidth={2} fill={fill} className={`my-0.5 ${isCurrent ? 'text-black' : 'text-white'} weather-rain-icon`} />
-      <span className={`text-[14px] font-black ${isCurrent ? 'text-slate-800' : 'text-white'}`}>21°</span>
+      <span className={`text-[11px] leading-none text-white ${isCurrent ? 'font-extrabold' : 'font-bold'}`}>3시</span>
+      <Icon size={18} strokeWidth={2} fill={fill} className="my-0.5 text-white weather-rain-icon" />
+      <span className="text-[14px] leading-none font-black text-white">21°</span>
     </div>
   );
 }
@@ -202,11 +195,11 @@ export const 아이콘모음 = {
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <HourlyPill Icon={Icon} fill={fill} isCurrent={false} />
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)' }}>비활성 (text-white)</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)' }}>비활성</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               <HourlyPill Icon={Icon} fill={fill} isCurrent={true} />
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)' }}>활성 · 지금 (text-black)</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)' }}>활성 · 지금 (흰색 테두리)</span>
             </div>
           </div>
         </div>
@@ -218,7 +211,7 @@ export const 아이콘모음 = {
 // ── 배경 6종 개별 스토리 (미세먼지: 보통) ──────────────────────────
 const story = (bg: (typeof BACKGROUNDS)[number]) => ({
   decorators: [mobileFrame],
-  args: { weather: makeWeather({ condition: bg.condition, temp: bg.temp }), briefing: BRIEFING, loading: false },
+  args: { weather: makeWeather({ condition: bg.condition, temp: bg.temp }), loading: false },
 });
 
 export const 폭염맑음 = story(BACKGROUNDS[0]);
@@ -228,18 +221,11 @@ export const 흐림 = story(BACKGROUNDS[3]);
 export const 눈 = story(BACKGROUNDS[4]);
 export const 비 = story(BACKGROUNDS[5]);
 
-// 브리핑이 아직 안 왔거나 없는 경우 — AI 문구 줄 자체가 빠진다
-export const 브리핑없음 = {
-  decorators: [mobileFrame],
-  args: { weather: makeWeather({ condition: 'SUNNY', temp: 24 }), briefing: null, loading: false },
-};
-
 // 서버가 모르는 날씨 상태를 준 경우 — "정보 없음" + 기본 아이콘/배경으로 버틴다
 export const 상태알수없음 = {
   decorators: [mobileFrame],
   args: {
     weather: { ...makeWeather({ condition: 'SUNNY', temp: 24 }), current: { ...makeWeather({ condition: 'SUNNY', temp: 24 }).current, condition: null } },
-    briefing: BRIEFING,
     loading: false,
   },
 };

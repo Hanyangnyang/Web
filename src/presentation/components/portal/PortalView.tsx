@@ -3,7 +3,6 @@ import { usePostHog } from 'posthog-js/react';
 
 import { Bell, ChevronRight } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather.js';
-import { useWeatherBriefing } from '../../hooks/useWeatherBriefing.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
 import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
@@ -31,7 +30,6 @@ interface PortalViewProps {
 export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
   const posthog = usePostHog();
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
-  const { briefing } = useWeatherBriefing(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
   const spotlightClub = useClubSpotlight();
@@ -75,7 +73,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
       <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
-          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
+          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} error={weatherError} onRetry={refetchWeather} />
         </ErrorBoundary>
 
         {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동 */}
