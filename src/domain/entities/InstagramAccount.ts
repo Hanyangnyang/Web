@@ -14,6 +14,7 @@ export const INSTA_ACCOUNTS: { erica: InstagramAccountInfo[]; college: Instagram
     { username: 'hanyangerica',                    desc: '사랑한대', profilePicUrl: '/assets/insta-profiles/hanyangerica.jpg' },
     { username: 'hy_dorm_erica',                   desc: 'ERICA 기숙사 자치회', profilePicUrl: '/assets/insta-profiles/hy_dorm_erica.jpg' },
     { username: 'hanyang_rhooters',                desc: '한양대학교 응원단 루터스', profilePicUrl: '/assets/insta-profiles/hanyang_rhooters.jpg' },
+    { username: 'hanyang_erica_hcc',               desc: 'ERICA 상담센터', profilePicUrl: '/assets/insta-profiles/hanyang_erica_hcc.jpg' },
   ],
   college: [
     { username: 'hyu_lions',                    desc: 'LIONS 칼리지 학생회', profilePicUrl: '/assets/insta-profiles/hyu_lions.jpg' },
