@@ -52,9 +52,14 @@ export interface SubwayArrivalLike {
   arrTime: string;
 }
 
-// 수인분당선 시간표 개정 미반영으로 임시로 연결편 표시를 막을 때 사용 (연결 시각 숨김 + 공지 배너 노출 트리거)
-export function isSuinBundangLine(lineId: string): boolean {
-  return SUBWAY_OPTS.find(o => o.id === lineId)?.line === '수인분당선';
+// 조회 자체는 성공했는데(subwayArrivals가 비어있지 않음) 선택된 노선/방향의 시간표 행이 통째로 없는 경우 —
+// 시간표 개정 미반영 등 데이터 갭 예외 상황으로 간주해 안내 배너를 띄우기 위한 판별 함수.
+// 조회 자체가 실패한 경우(subwayArrivals가 비어있음)는 isSubwayError로 이미 별도 처리되므로 여기서는 제외한다.
+export function isSubwayScheduleMissing<T extends SubwayArrivalLike>(subwayArrivals: T[], lineId: string): boolean {
+  if (!subwayArrivals?.length) return false;
+  const opt = SUBWAY_OPTS.find(o => o.id === lineId);
+  if (!opt) return false;
+  return !subwayArrivals.some(tr => tr.subwayId === opt.subwayId && tr.updnLine === opt.updnLine);
 }
 
 export function connectingTrains<T extends SubwayArrivalLike>(subwayArrivals: T[], shuttleArrTime: string, lineId: string): T[] {

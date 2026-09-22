@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { connectingTrains, isSubwayOffPeak } from './Subway.js';
+import { connectingTrains, isSubwayOffPeak, isSubwayScheduleMissing } from './Subway.js';
 
 describe('connectingTrains', () => {
   const subwayArrivals = [
@@ -50,5 +50,28 @@ describe('isSubwayOffPeak', () => {
 
   it('존재하지 않는 lineId면 false를 반환한다', () => {
     expect(isSubwayOffPeak(subwayArrivals, '08:00', 'no-such-line')).toBe(false);
+  });
+});
+
+describe('isSubwayScheduleMissing', () => {
+  const subwayArrivals = [
+    { subwayId: '1004', updnLine: '상행', arrTime: '08:10' },
+    { subwayId: '1004', updnLine: '하행', arrTime: '08:12' },
+  ];
+
+  it('조회는 성공했는데 해당 노선/방향 데이터가 통째로 없으면 true', () => {
+    expect(isSubwayScheduleMissing(subwayArrivals, 'sb-wang')).toBe(true);
+  });
+
+  it('해당 노선/방향 데이터가 있으면 false', () => {
+    expect(isSubwayScheduleMissing(subwayArrivals, 'line4-bulam')).toBe(false);
+  });
+
+  it('조회 자체가 실패해 subwayArrivals가 비어있으면 false (isSubwayError로 별도 처리하는 영역이라 여기선 구분 안 함)', () => {
+    expect(isSubwayScheduleMissing([], 'sb-wang')).toBe(false);
+  });
+
+  it('존재하지 않는 lineId면 false를 반환한다', () => {
+    expect(isSubwayScheduleMissing(subwayArrivals, 'no-such-line')).toBe(false);
   });
 });
