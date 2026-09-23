@@ -7,6 +7,9 @@ import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
 const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
+const UXWritingOverlay = import.meta.env.DEV
+  ? lazy(() => import('./devtools/ux-writing/UXWritingOverlay'))
+  : null;
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
@@ -55,6 +58,11 @@ export default function App() {
     <NetworkProvider>
       <BootProvider>
         <MainLayout />
+        {UXWritingOverlay && (
+          <Suspense fallback={null}>
+            <UXWritingOverlay />
+          </Suspense>
+        )}
       </BootProvider>
     </NetworkProvider>
   );
