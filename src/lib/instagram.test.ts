@@ -71,7 +71,7 @@ describe('instagram utils', () => {
 
     afterEach(() => {
       vi.useRealTimers();
-      window.location = originalLocation;
+      window.location = originalLocation as Location & string;
       openSpy.mockRestore();
     });
 

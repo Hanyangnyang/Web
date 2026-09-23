@@ -16,6 +16,7 @@ describe('BannerCarousel Instagram Deeplink Integration', () => {
     clickUrl: 'https://www.instagram.com/hanyang_erica/',
     altText: '한양대 인스타 배너',
     displayOrder: 1,
+    placement: 'BANNER',
   };
 
   const sampleNormalBanner: Banner = {
@@ -24,6 +25,7 @@ describe('BannerCarousel Instagram Deeplink Integration', () => {
     clickUrl: 'https://hanyang.ac.kr',
     altText: '한양대 공지',
     displayOrder: 2,
+    placement: 'BANNER',
   };
 
   beforeEach(() => {

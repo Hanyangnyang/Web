@@ -7,12 +7,16 @@ import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
 const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
+const UXWritingOverlay = import.meta.env.DEV
+  ? lazy(() => import('./devtools/ux-writing/UXWritingOverlay'))
+  : null;
 import { BottomNav }     from './presentation/components/common/BottomNav.jsx';
 import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx';
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
 import { OfflineModal } from './presentation/components/common/OfflineModal';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
+import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { prefetchKakaoMapSdk }   from './lib/kakaoMap';
 import { usePostHog } from 'posthog-js/react';
 import { isNativeApp, getPlatform } from './lib/platform.js';
@@ -54,6 +58,11 @@ export default function App() {
     <NetworkProvider>
       <BootProvider>
         <MainLayout />
+        {UXWritingOverlay && (
+          <Suspense fallback={null}>
+            <UXWritingOverlay />
+          </Suspense>
+        )}
       </BootProvider>
     </NetworkProvider>
   );
@@ -139,6 +148,12 @@ function MainLayout() {
   const { menuDate, cafes, menuLoading, menuRevalidating, changeDate, refetchMenu } = useMenu(activeTab === 'cafe');
   useEffect(() => {
     prefetchLocation(); // 위치 권한이 이미 있는 사용자만 백그라운드 측위 (권한 팝업 없음)
+  }, []);
+
+  // 소식탭을 한 번도 안 들어간 사용자도 다음 부팅 스플래시 배너 캐시가 채워지도록,
+  // 탭 방문 여부와 무관하게 앱 진입 시 1회 배너 API를 미리 불러둔다
+  useEffect(() => {
+    prefetchBanners();
   }, []);
 
   // 2-1. 캠퍼스맵 SDK 프리페치 - 스플래시 종료 직후(크리티컬 패스 이후) 카카오맵 스크립트를 미리 받아둔다.

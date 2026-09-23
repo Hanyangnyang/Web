@@ -24,8 +24,8 @@ function mockFetch(impl: (url: string) => Promise<Response>) {
 
 function makeBanners() {
   return [
-    { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 1 },
-    { id: 2, imageUrl: 'https://example.com/b.png', altText: '광고 배너', clickUrl: 'https://example.com', displayOrder: 2 },
+    { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 1, placement: 'BOTH' },
+    { id: 2, imageUrl: 'https://example.com/b.png', altText: '광고 배너', clickUrl: 'https://example.com', displayOrder: 2, placement: 'BOTH' },
   ];
 }
 
@@ -62,9 +62,9 @@ describe('useBanners (React Query)', () => {
 
   it('서버가 뒤섞어 보내도 displayOrder 순서대로 정렬해서 돌려준다', async () => {
     mockFetch(() => Promise.resolve(jsonResponse(true, bannersResponse([
-      { id: 3, imageUrl: 'https://example.com/c.png', altText: '', clickUrl: '', displayOrder: 30 },
-      { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 10 },
-      { id: 2, imageUrl: 'https://example.com/b.png', altText: '', clickUrl: '', displayOrder: 20 },
+      { id: 3, imageUrl: 'https://example.com/c.png', altText: '', clickUrl: '', displayOrder: 30, placement: 'BOTH' },
+      { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 10, placement: 'BOTH' },
+      { id: 2, imageUrl: 'https://example.com/b.png', altText: '', clickUrl: '', displayOrder: 20, placement: 'BOTH' },
     ]))));
 
     const { result } = renderHook(() => useBanners(), { wrapper });
@@ -118,5 +118,31 @@ describe('useBanners (React Query)', () => {
     await Promise.all([prefetchBanners(), prefetchBanners()]);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('소식탭 캐러셀에는 placement가 BANNER/BOTH인 배너만 노출되고 SPLASH 전용은 제외된다', async () => {
+    mockFetch(() => Promise.resolve(jsonResponse(true, bannersResponse([
+      { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 1, placement: 'SPLASH' },
+      { id: 2, imageUrl: 'https://example.com/b.png', altText: '', clickUrl: '', displayOrder: 2, placement: 'BANNER' },
+      { id: 3, imageUrl: 'https://example.com/c.png', altText: '', clickUrl: '', displayOrder: 3, placement: 'BOTH' },
+    ]))));
+
+    const { result } = renderHook(() => useBanners(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.banners.map((b) => b.id)).toEqual([2, 3]);
+  });
+
+  it('fetch 시 placement가 SPLASH/BOTH인 배너만 스플래시용 캐시(localStorage)에 저장되고 BANNER 전용은 제외된다', async () => {
+    mockFetch(() => Promise.resolve(jsonResponse(true, bannersResponse([
+      { id: 1, imageUrl: 'https://example.com/a.png', altText: '', clickUrl: '', displayOrder: 1, placement: 'SPLASH' },
+      { id: 2, imageUrl: 'https://example.com/b.png', altText: '', clickUrl: '', displayOrder: 2, placement: 'BANNER' },
+      { id: 3, imageUrl: 'https://example.com/c.png', altText: '', clickUrl: '', displayOrder: 3, placement: 'BOTH' },
+    ]))));
+
+    await prefetchBanners();
+
+    const cached = JSON.parse(localStorage.getItem('splashBannerCache') || '[]');
+    expect(cached.map((b: { id: number }) => b.id).sort()).toEqual([1, 3]);
   });
 });
