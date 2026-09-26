@@ -22,7 +22,7 @@ export interface ShuttleOperationStatusDto {
   isOperating: boolean;
   periodType: PeriodTypeDto;
   dayType: DayTypeDto;
-  noOperationReason: string;
+  noOperationReason: string | null; // 운행일엔 null로 내려옴
 }
 
 export interface AcademicStatusDto {

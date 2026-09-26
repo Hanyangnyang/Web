@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import {
   computeSchedule, computeFullSchedule, curMin, pickClosestStop, SUBWAY_CONNECTED_STOPS,
-  mapServerDayType, mapServerPeriodType, localWeekdayFallback, type ScheduleItem,
+  mapServerDayType, mapServerPeriodType, localWeekdayFallback, resolveEmptyState, type ScheduleItem,
 } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayScheduleUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
@@ -42,10 +42,12 @@ export function useShuttle(isActive = false) {
   // 오늘의 학사/셔틀 통합 운영 상태 — 예전엔 Supabase app_config(현재기간·공휴일·강제주말·미운행 오버라이드)를
   // 프론트에서 직접 조합해서 판정했는데, 이제 이 값 하나로 백엔드가 전부 계산해서 내려준다.
   // 모드와 무관하게 항상 필요(전체 모드 진입 시 기본값 동기화에도 씀)
-  const { data: academicStatus, isStale: isAcademicStatusStale, refetch: refetchAcademicStatus } = useAcademicStatus();
+  const { data: academicStatus, isPending: isAcademicStatusPending, isStale: isAcademicStatusStale, refetch: refetchAcademicStatus } = useAcademicStatus();
   const currentPeriod = academicStatus ? mapServerPeriodType(academicStatus.academic.periodType) : '학기중';
   const shuttleDayType = academicStatus ? mapServerDayType(academicStatus.shuttle.dayType) : localWeekdayFallback();
   const isShuttleOperating = academicStatus ? academicStatus.shuttle.isOperating : true;
+  // 목록이 비었을 때 화면이 "미운행(사유 포함)"과 "운행 정보 없음"을 구분해 보여주기 위한 값
+  const emptyState = resolveEmptyState(isShuttleOperating, academicStatus?.shuttle.noOperationReason ?? null);
 
   // 셔틀화면이 열릴 때(isActive: false → true) 뱃지(학기중/평일 등)가 낡은 값이면 다시 받아온다.
   // academicStatus는 앱이 켜져있는 내내 마운트 상태라(다른 탭을 봐도 화면만 숨겨질 뿐), 탭을 왔다갔다
@@ -177,7 +179,10 @@ export function useShuttle(isActive = false) {
     needsSubway,
     loadErr,
     refetchSchedule,
-    isLoading: !allData && !loadErr,
+    // 학사 상태 응답 전에는 isOperating을 true로 가정하므로, 미운행일에 "운행 정보 없음"이 잠깐 비치지 않도록
+    // 응답(성공/실패 모두 isPending=false)이 올 때까지 스켈레톤을 유지한다
+    isLoading: (!allData && !loadErr) || isAcademicStatusPending,
+    emptyState,
     isSubwayLoading,
     isSubwayError,
     refetchSubway,

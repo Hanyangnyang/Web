@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { mapServerDayType, mapServerPeriodType, localWeekdayFallback, computeSchedule, computeFullSchedule } from './Shuttle.js';
+import { mapServerDayType, mapServerPeriodType, localWeekdayFallback, computeSchedule, computeFullSchedule, resolveEmptyState } from './Shuttle.js';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -30,6 +30,23 @@ describe('localWeekdayFallback', () => {
 
     vi.setSystemTime(new Date('2026-07-27')); // 월요일
     expect(localWeekdayFallback()).toBe('평일');
+  });
+});
+
+describe('resolveEmptyState', () => {
+  it('미운행일이면 NOT_OPERATING과 미운행 사유를 돌려준다', () => {
+    expect(resolveEmptyState(false, '추석')).toEqual({ kind: 'NOT_OPERATING', reason: '추석' });
+  });
+
+  it('미운행일인데 사유가 null이거나 공백뿐이면 reason을 null로 통일한다', () => {
+    expect(resolveEmptyState(false, null)).toEqual({ kind: 'NOT_OPERATING', reason: null });
+    expect(resolveEmptyState(false, '')).toEqual({ kind: 'NOT_OPERATING', reason: null });
+    expect(resolveEmptyState(false, '   ')).toEqual({ kind: 'NOT_OPERATING', reason: null });
+  });
+
+  it('운행일인데 목록이 비었으면 NO_DATA다 (사유가 있어도 무시)', () => {
+    expect(resolveEmptyState(true, null)).toEqual({ kind: 'NO_DATA' });
+    expect(resolveEmptyState(true, '추석')).toEqual({ kind: 'NO_DATA' });
   });
 });
 
