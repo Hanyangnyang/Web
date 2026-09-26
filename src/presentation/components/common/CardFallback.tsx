@@ -19,7 +19,7 @@ export function CardFallback({ message, onRetry, className = '', icon = DEFAULT_
   return (
     <div className={`bg-white rounded-card border border-slate-200 py-10 px-6 flex flex-col items-center justify-center gap-1.5 shadow-sm ${className}`}>
       {icon}
-      <p className="text-center text-text-main text-[15px] font-extrabold">{message}</p>
+      <p className="text-center text-slate-600 text-[15px] font-extrabold">{message}</p>
       {subtext && <p className="text-center text-text-hint text-xs font-medium">{subtext}</p>}
       {onRetry && (
         <button

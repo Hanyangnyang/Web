@@ -27,6 +27,7 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
             lineId={shuttle.lineId}
             setLineId={shuttle.setLineId}
             schedule={shuttle.schedule}
+            emptyState={shuttle.emptyState}
             nextIdx={shuttle.nextIdx}
             now={shuttle.now}
             subwayArrivals={shuttle.subwayArrivals}

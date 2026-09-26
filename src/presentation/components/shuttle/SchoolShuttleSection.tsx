@@ -1,7 +1,7 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
-import { ChevronDown } from 'lucide-react';
-import type { ScheduleItem, ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
+import { Bus, ChevronDown } from 'lucide-react';
+import type { ScheduleItem, ShuttleAppConfig, ShuttleEmptyState } from '../../../domain/entities/Shuttle.js';
 import { SUBWAY_OPTS, isSubwayScheduleMissing, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
 import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
@@ -24,6 +24,7 @@ interface SchoolShuttleSectionProps {
   lineId: string;
   setLineId: (lineId: string) => void;
   schedule: (ScheduleItem & { isLast?: boolean })[];
+  emptyState: ShuttleEmptyState;
   nextIdx: number;
   now: number;
   subwayArrivals: SubwayScheduleRow[];
@@ -52,7 +53,7 @@ export function SchoolShuttleSection({
   viewMode, setViewMode,
   stop, setStop,
   lineId, setLineId,
-  schedule, nextIdx, now,
+  schedule, emptyState, nextIdx, now,
   subwayArrivals,
   isWeekend,
   needsSubway,
@@ -222,10 +223,19 @@ export function SchoolShuttleSection({
               />
             ));
           })() : (
-            // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 오늘 남은 셔틀(또는 해당 조건의 운행)이 없음
-            <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
-              <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
-            </div>
+            // 3. 조회는 됐지만 빈 데이터 — 실패는 아님. 전체 모드는 사용자가 고른 필터 결과라 기존 문구 유지,
+            // 일반 모드는 미운행일(사유 포함)과 운행일인데 시간표 행이 없는 경우를 구분해 안내.
+            // 실패 카드(2번)와 같은 CardFallback을 쓰되 아이콘·보조 문구를 바꿔 "정상인데 비어있음"임을 드러낸다
+            <CardFallback
+              icon={<Bus size={26} className="text-text-hint mb-1" />}
+              message={
+                isFullMode ? '운행 정보가 없습니다'
+                  : emptyState.kind === 'NOT_OPERATING' ? '오늘은 셔틀이 운행하지 않아요'
+                    : '오늘은 셔틀 운행 정보가 없어요'
+              }
+              subtext={!isFullMode && emptyState.kind === 'NOT_OPERATING' && emptyState.reason ? `미운행 사유 · ${emptyState.reason}` : ''}
+              className="min-h-[425px]"
+            />
           )}
         </div>
 
