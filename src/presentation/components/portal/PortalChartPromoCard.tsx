@@ -27,7 +27,7 @@ export function PortalChartPromoCard({ isActive = true, onNavigate }: PortalChar
           </span>
           <span className="text-text-sub">에 너만 아는 띵곡 추천하러 가자!</span>
         </span>
-        <span className="text-lg font-black text-text-main">🔥 실시간 인기차트</span>
+        <span className="text-lg font-black text-text-main">실시간 인기차트🔥</span>
       </button>
 
       {isLoading ? (
