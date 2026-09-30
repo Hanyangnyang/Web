@@ -19,19 +19,19 @@ export function PortalChartPromoCard({ isActive = true, onNavigate }: PortalChar
 
   return (
     <div className="w-full h-full rounded-card flex flex-col bg-white border border-slate-200/90 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.06)] overflow-hidden">
-      <button type="button" onClick={onNavigate} className="text-left flex flex-col gap-1.5 flex-shrink-0 px-3 pt-3 pb-2">
-        <span className="text-xs font-semibold">
+      <button type="button" onClick={onNavigate} className="text-left flex flex-col gap-1.5 flex-shrink-0 px-3 pt-3">
+        <span className="text-[10px] font-extrabold tracking-tight">
           <span className="inline-flex items-center gap-0.5 text-playlist-primary">
             에리카 플레이리스트
-            <Music2 size={12} strokeWidth={2.5} />
+            <Music2 size={11} strokeWidth={2.5} />
           </span>
-          <span className="text-text-sub">에 너만 아는 띵곡 추천하러 가자!</span>
+          <span className="text-text-sub"> 나만 아는 곡 추천하러 가자!</span>
         </span>
-        <span className="text-lg font-black text-text-main">실시간 인기차트🔥</span>
+        <span className="text-[0.88rem] font-extrabold text-text-main">실시간 인기차트🔥</span>
       </button>
 
       {isLoading ? (
-        <div className="flex-1 min-h-0 flex flex-col px-2 scale-90">
+        <div className="flex-1 min-h-0 flex flex-col px-3 pt-4">
           <div className="flex-shrink-0 flex items-center gap-3 px-3 pb-1 text-[11px] font-semibold text-text-hint">
             <span className="w-7 text-center">순위</span>
             <div className="flex-1">곡정보</div>
@@ -54,7 +54,7 @@ export function PortalChartPromoCard({ isActive = true, onNavigate }: PortalChar
           </div>
         </div>
       ) : topTracks.length > 0 ? (
-        <div className="flex-1 min-h-0 flex flex-col px-2 scale-90">
+        <div className="flex-1 min-h-0 flex flex-col px-3 py-2">
           <div className="flex-shrink-0 flex items-center gap-3 px-3 pb-1 text-[11px] font-semibold text-black/70">
             <span className="w-7 text-center">순위</span>
             <div className="flex-1">곡정보</div>
@@ -71,7 +71,7 @@ export function PortalChartPromoCard({ isActive = true, onNavigate }: PortalChar
                 track={track}
                 onPlay={onNavigate}
                 onShowPosts={onNavigate}
-                rankClassName="font-black text-xl text-gray-900 italic -skew-x-6"
+                rankClassName="font-black text-base text-gray-900"
                 thumbnailClassName="w-14 h-14"
               />
             ))}
