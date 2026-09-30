@@ -8,9 +8,12 @@ import type { Banner } from '../../domain/entities/Banner.js';
 const SPLASH_BANNER_CACHE_KEY = 'splashBannerCache';
 
 export function cacheBannersForSplash(banners: Banner[]) {
-  if (!banners.length) return;
   try {
-    localStorage.setItem(SPLASH_BANNER_CACHE_KEY, JSON.stringify(banners));
+    if (banners.length) {
+      localStorage.setItem(SPLASH_BANNER_CACHE_KEY, JSON.stringify(banners));
+    } else {
+      localStorage.removeItem(SPLASH_BANNER_CACHE_KEY);
+    }
   } catch {
     // localStorage 접근 불가(프라이빗 모드 등)해도 스플래시 배너는 있으면 좋은 정도라 조용히 무시
   }
