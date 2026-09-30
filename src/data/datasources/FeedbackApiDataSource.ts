@@ -3,7 +3,7 @@ import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastru
 
 export type FeedbackCategoryDto =
   | 'SHUTTLE' | 'CITY_BUS' | 'SUBWAY' | 'CAMPUS_MAP' | 'MENU' | 'GYM'
-  | 'LIBRARY' | 'PLAYLIST' | 'WEATHER' | 'PARTNERSHIP' | 'BANNER' | 'GENERAL';
+  | 'LIBRARY' | 'PLAYLIST' | 'WEATHER' | 'PARTNERSHIP' | 'BANNER' | 'CLUB' | 'GENERAL';
 
 export type FeedbackTypeDto = 'BUG_REPORT' | 'INACCURACY' | 'FEATURE_REQUEST' | 'INQUIRY' | 'GENERAL_OPINION';
 

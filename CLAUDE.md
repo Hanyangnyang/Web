@@ -20,7 +20,7 @@
 - **프론트엔드**: React + Vite (Capacitor WebView로 래핑)
 - **Android**: Capacitor + Java (Kotlin 전환 예정)
 - **iOS**: Capacitor (Codemagic으로 빌드)
-- **백엔드**: 자체 백엔드 서버(`api.hanyang.life`, Spring Boot) — 학식·날씨·도서관 혼잡도·배너·헬스장·지하철·셔틀·제휴매장·통합피드백·학사달력(공휴일 포함)까지 대부분의 핵심 데이터를 여기서 서빙 (CORS 차단·API Key 보호 역할도 겸함)
+- **백엔드**: 자체 백엔드 서버(Spring Boot) — 학식·날씨·도서관 혼잡도·배너·헬스장·지하철·셔틀·제휴매장·통합피드백·학사달력(공휴일 포함)까지 대부분의 핵심 데이터를 여기서 서빙 (CORS 차단·API Key 보호 역할도 겸함)
 - **BFF / API**: Vercel Serverless Functions — 공공버스 도착정보, 인스타그램 프로필 사진 정적 이미지 주기 갱신(Cron)만 남음. 학식·날씨·도서관·지하철·셔틀·공휴일은 전부 위 백엔드로 이전 완료
 - **DB / Auth**: Supabase — 익명 Auth, FCM 구독·알림 설정(subscriptions·devices), app_config(다가오는 시간표 변경 배너용 period_schedule만 남음 — 나머지 셔틀 설정은 새 백엔드 `/api/v1/academic/status`로 이전). 앱 내 배너 자체는 더 이상 Supabase가 아니라 새 백엔드 `/api/v1/banners`가 서빙
 - **푸시 알림**: Firebase Cloud Messaging (FCM) — Capacitor 네이티브(Android/iOS) + Web 동시 지원
@@ -65,7 +65,7 @@ graph TD
         NativeLayer["Native Layer\n(Android / iOS)"]
     end
 
-    subgraph Backend["🖥️ 백엔드 서버 (api.hanyang.life, Spring Boot)"]
+    subgraph Backend["🖥️ 백엔드 서버 (Spring Boot)"]
         BackendAPI["/api/v1/*\n학식·날씨·도서관·배너·헬스장·\n지하철·셔틀·제휴매장·통합피드백·학사상태"]
     end
 
@@ -144,7 +144,7 @@ graph TD
 
 ### Vercel API 엔드포인트 요약
 
-**이 표는 이제 프론트엔드 호출 기준으로는 대부분 사실이 아님 — 학식·날씨·도서관·지하철·셔틀·공휴일 전부 새 백엔드(`api.hanyang.life`)로 이전 완료.** 아래는 남아있는 Vercel 함수 파일과 실제 살아있는 이유.
+**이 표는 이제 프론트엔드 호출 기준으로는 대부분 사실이 아님 — 학식·날씨·도서관·지하철·셔틀·공휴일 전부 새 백엔드로 이전 완료.** 아래는 남아있는 Vercel 함수 파일과 실제 살아있는 이유.
 
 | 엔드포인트 | 역할 | 외부 호출 대상 | 프론트엔드에서 호출? |
 |---|---|---|---|

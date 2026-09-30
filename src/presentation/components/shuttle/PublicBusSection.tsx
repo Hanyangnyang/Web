@@ -17,6 +17,7 @@ interface PublicBusSectionProps {
   setFavorites: Dispatch<SetStateAction<string[]>>;
   busArrivals: Record<string, TickingBusArrival[]>;
   isBusLoading: Record<string, boolean>;
+  isBusError: Record<string, boolean>;
   userCoords: { latitude: number; longitude: number } | null;
   closestStopName: string | null;
   isManualRefreshing: boolean;
@@ -32,6 +33,7 @@ export function PublicBusSection({
   favorites, setFavorites,
   busArrivals,
   isBusLoading,
+  isBusError,
   userCoords,
   closestStopName,
   isManualRefreshing,
@@ -82,6 +84,7 @@ export function PublicBusSection({
               isClosest={closestStopName === stopName}
               arrivals={busArrivals[stopName] || []}
               isLoading={!!isBusLoading[stopName]}
+              isError={!!isBusError[stopName]}
               hasLoadedOnce={busArrivals[stopName] !== undefined}
               userCoords={userCoords}
               onToggleExpand={handleToggleExpand}

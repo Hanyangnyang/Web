@@ -1,10 +1,10 @@
 // 도메인 레포지토리 인터페이스: 새 백엔드 통합 피드백 접수(POST /api/v1/feedbacks) 계약
 // 기능별 category/feedbackType 태깅이 필수인 새 백엔드 엔드포인트. (구현은 data 레이어의 FeedbackApiRepository)
 // 예전엔 Supabase 직접 연결의 자유 텍스트 전용 IFeedbackRepository가 따로 있었는데, 모든 화면이 이쪽으로
-// 이전 완료되면서 제거했다(기타탭 피드백 -> GENERAL, 캠퍼스맵 제보 -> CAMPUS_MAP/PARTNERSHIP)
+// 이전 완료되면서 제거했다(기타탭 피드백 -> GENERAL, 캠퍼스맵 제보 -> CAMPUS_MAP/PARTNERSHIP, 중앙동아리 제보 -> CLUB)
 export type FeedbackCategory =
   | 'SHUTTLE' | 'CITY_BUS' | 'SUBWAY' | 'CAMPUS_MAP' | 'MENU' | 'GYM'
-  | 'LIBRARY' | 'PLAYLIST' | 'WEATHER' | 'PARTNERSHIP' | 'BANNER' | 'GENERAL';
+  | 'LIBRARY' | 'PLAYLIST' | 'WEATHER' | 'PARTNERSHIP' | 'BANNER' | 'CLUB' | 'GENERAL';
 
 export type FeedbackType = 'BUG_REPORT' | 'INACCURACY' | 'FEATURE_REQUEST' | 'INQUIRY' | 'GENERAL_OPINION';
 

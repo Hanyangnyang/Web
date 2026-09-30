@@ -131,11 +131,11 @@ src/
 
 ## 🔌서드파티와 💾캐싱정책
 
-학식·날씨·도서관 혼잡도·배너·지하철·셔틀·학사달력/공휴일·통합피드백 등 핵심 데이터는 자체 **백엔드 서버**(`api.hanyang.life`, Spring Boot)를 거치고, 인스타그램 프로필·공공버스 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
+학식·날씨·도서관 혼잡도·배너·지하철·셔틀·학사달력/공휴일·통합피드백 등 핵심 데이터는 자체 **백엔드 서버**(Spring Boot)를 거치고, 인스타그램 프로필·공공버스 조회는 **Vercel BFF**(Serverless Functions)를 경유합니다. 앱이 외부 API를 직접 호출하는 경우는 거의 없습니다.
 **Supabase**는 익명 Auth·앱설정(다가오는 시간표 변경 배너용 `period_schedule`만)·알림구독 RPC 목적으로 클라이언트에서 직접 연결합니다.
 푸시 알림은 **Firebase Cloud** Messaging(FCM)으로 발송되며, iOS 빌드·배포는 Codemagic으로 자동화되어 있습니다.
 
-### Supabase 테이블 - Supabase 로그인 되면 수정해야함
+### 🔌Supabase 테이블
 
 | 테이블 | 용도 |
 |--------|------|
@@ -144,20 +144,17 @@ src/
 `devices`(FCM 토큰), `subscriptions`(알림 구독 설정) 테이블은 클라이언트에서 직접 조회하지 않고 RPC로만 접근합니다 — `get_alarm_subscription`(구독 조회), `upsert_alarm_subscription`(구독 생성·수정·해제)
 
 
-### 백엔드 서버 API 엔드포인트 (`https://api.hanyang.life`) + 💾TanStack Query + localStorage
+### 🔌백엔드 서버 API 엔드포인트 + 💾TanStack Query + localStorage
 (Tanstack Query 기본값은 staleTime 15분, gcTime 24시간을 씀. api 실패시 재시도는 2번, 그래서 총 3번 호출함. staleTime이 지났는데 트리거가 있을 경우 SWR. localStorage는 maxAge 24시간으로 설정함. maxAge는 캐싱된 값을 불러올지 말지를 결정하는 기준.)
 
 | 엔드포인트 | 역할 | Redis TTL(백엔드) / TanStackQuery staleTime(FE) | refetch 트리거 (네트워크 재연결시 staleTime 기준으로 다시 불러옴) |
 |---|---|---|---|
 | `/api/v1/menu` | 학식 메뉴 조회 | 12시간 / 1시간 | 콜드스타트 fetch, "다시 시도" 버튼 |
-| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`). academic/status 자체는 셔틀화면이 열릴 때 낡았으면 재검증 + 화면이 켜져있는 동안만 10초마다 KST 날짜 확인해서 자정 넘으면 재요청 — 화면을 계속 띄워둔 채로 자정을 넘겨도(예: 11:50pm부터 보고 있다가) 뱃지(학기중/평일)가 자동으로 갱신됨 |
+| `/api/v1/shuttle` | 셔틀버스 시간표 조회 | 12시간 / 1시간 | 콜드스타트 prefetch, "다시 시도" 버튼, **academic/status 기간/dayType이 실제로 바뀌는 순간 강제 재요청**(`useShuttle`이 이전 값과 비교해 `invalidateQueries`). academic/status 자체는 셔틀화면이 열릴 때 낡았으면 재검증 |
 | `/api/v1/subway/schedule` | 지하철 시간표 조회 | 12시간 / 1시간 | 지하철정보가 필요한 정류장(기숙사·셔틀콕) 선택시, "다시 시도" 버튼, **date-info의 dayType이 바뀌는 순간 강제 재요청**(위와 동일한 이유) |
 | `/api/v1/weather` | 날씨·대기질·자외선 스냅샷, 시간별 예보 | 10분 / 10분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/weather/briefing` | AI 기반 날씨 브리핑 | 30분(매시 22분 갱신) / 30분 | 콜드스타트 prefetch, 소식탭 진입 |
-| `/api/v1/banners` | 홈 배너 조회 | 12시간 / 1시간 | 콜드스타트 prefetch |
-
-배너 `clickUrl`이 `https://www.hanyang.life/?tab=<cafe\|shuttle\|portal\|partner\|misc>` 형태로 우리 도메인 + `tab` 파라미터를 가리키면, 새 창을 열지 않고 앱 내부에서 바로 그 탭으로 전환됩니다(`BannerCarousel.tsx`) — SPA라 페이지 경로가 하나뿐이라, 카카오 딥링크·푸시알림과 동일한 `?tab=` 쿼리 컨벤션을 재사용한 것. 그 외(다른 도메인 등)는 기존처럼 `window.open`으로 외부 링크 취급.
-**⚠️ 반드시 `www.hanyang.life`로 입력할 것** — `BannerCarousel.tsx`의 판정 로직이 `url.origin === window.location.origin`으로 완전 일치를 요구하는데, `capacitor.config.json`의 `server.url`이 `https://www.hanyang.life`라 앱이 실제로 로딩되는 origin이 `www.` 포함이다. `www.` 없이 `https://hanyang.life/?tab=partner`로 주면 origin이 안 맞아 판정에 실패하고, 그냥 `window.open`으로 새 창이 열려버린다(내부 탭 전환 안 됨).
+| `/api/v1/banners` | 홈 배너 조회 | 12시간 / 5분 | 콜드스타트 prefetch (관리자 등록 시 백엔드가 즉시 evict하므로, 새 배너가 늦게 반영되는 답답함을 줄이려고 다른 엔드포인트보다 짧게 잡음) |
 | `/api/v1/library/seats` | 도서관 열람실 좌석 혼잡도 | 3분 / 3분 | 콜드스타트 prefetch, 소식탭 진입, "다시 시도" 버튼 |
 | `/api/v1/gym/gym-periods` | 체대 헬스장 운영기간·시간표 조회 | 12시간 / 1시간 | 헬스장 화면 진입시, "다시 시도" 버튼, **KST 날짜(자정)가 바뀌는 순간 강제 재요청**(`useGymSchedule`이 1분마다 날짜 확인). 셔틀과 달리 academic/status를 안 쓰고 `GymPeriod.startDate/endDate`로 직접 오늘과 비교해 기간을 고르는 구조라, "기간이 바뀌는 순간"이 아니라 "날짜가 바뀌는 순간"을 감지함. `GymView`도 자동판별을 매 gymData 갱신마다 다시 하도록 고쳐서(예전엔 최초 1회만) 화면을 계속 띄워놓은 채로 날짜가 바뀌어도 새 기간으로 따라감(사용자가 드롭다운으로 직접 고른 뒤엔 안 덮어씀) |
 | `/api/v1/partnership/partnership-available` | 단과대별 제휴 가맹점·혜택 조회 | 12시간 / 1시간 | 캠퍼스맵 탭 최초 진입시 호출, "다시 시도" 버튼 |
@@ -179,7 +176,7 @@ src/
 | `/api/v1/playlist/songs/charts` | 인기 차트 순위 조회 (실시간 급상승/주간/월간) | 0(항상 최신값) | 콜드스타트 fetch, 기간 필터 칩(실시간/주간/월간) 전환 시(queryKey에 기간 포함돼 자동 재조회) |
 
 
-### Vercel API 엔드포인트 + 💾TanStack Query + localStorage
+### 🔌Vercel API 엔드포인트 + 💾TanStack Query + localStorage
 
 | 엔드포인트 | 역할 | 외부 호출 대상 | Vercel 캐시 TTL | 프론트엔드 TanStackQuery staleTime | refetch 트리거 |
 |---|---|---|---|---|---|
@@ -189,7 +186,7 @@ src/
 
 **프론트는 안 쓰지만 아직 살아있는 Vercel 함수** — `api/menu.js`, `api/portal.js`(weather+library 통합), `api/holidays.js` 3개는 전부 새 백엔드로 완전히 대체되어 프론트엔드 어디에서도 더 이상 호출하지 않음. 하지만 Supabase Edge Function `menu-alerts`(1분마다 도는 푸시 발송 로직)가 `/api/menu`, `/api/portal?type=weather`, `/api/holidays`를 직접 `fetch()`하고 있어서 세 함수 다 삭제하면 안 됨. 단, `/api/portal?type=library`는 Edge Function도 호출하지 않아 완전히 죽은 라우트 — `api/portal.js` 리팩토링/삭제 시 이 부분만은 안전하게 정리 가능.
 
-**`/api/sentry-discord-webhook`** — 위 표들과 달리 앱이 호출하는 게 아니라 **Sentry가 호출하는 인바운드 웹훅**. Sentry Internal Integration의 Issue Alert(`event_alert`)를 받아서 `sentry-hook-signature` 헤더로 HMAC-SHA256 서명 검증(비교는 `crypto.timingSafeEqual`) 후, Discord 임베드 메시지 형식으로 변환해 `DISCORD_WEBHOOK_URL`로 재전송함. Sentry 무료(Developer) 플랜엔 네이티브 Discord 연동이 없어서(유료 Slack 연동을 억지로 꽂는 방식뿐) 만든 중계 함수. 캐싱 대상이 아니고 staleTime 개념도 없음. title/culprit뿐 아니라 `event.tags`(`boundary`/`area`/`endpoint`/`queryKey`/`mutationKey` — 존재하는 것만) 도 Discord embed 필드로 같이 보내서, 어느 API·어느 ErrorBoundary에서 터졌는지 Sentry를 열지 않고도 바로 알 수 있음.
+위 표들과 별도로, Sentry 이슈 알림을 Discord로 중계하는 내부 전용 인바운드 웹훅도 있음(앱이 호출하는 게 아니라 Sentry가 호출). Sentry 무료(Developer) 플랜엔 네이티브 Discord 연동이 없어서(유료 Slack 연동을 억지로 꽂는 방식뿐) 만든 중계 함수이며, 서명 검증을 거쳐 신뢰할 수 있는 요청만 처리함.
 
 ### 💾localStorage (디스크)
 
@@ -222,4 +219,27 @@ src/
 | 키 | 내용 | 저장되는곳 |
 |---|---|---|
 | `ph_phc_<프로젝트키>_posthog` | device_id/distinct_id (사용자 식별) | 쿠키·로컬스토리지 이중 저장 |
+
+---
+
+## 🔗딥링크와 라우팅
+
+카카오 공유 링크, 푸시 알림 클릭, 배너 클릭 — 앱으로 들어오는 경로가 여러 개지만, 네이티브(Android/iOS)에서는 전부 `hanyang-deeplink` 커스텀 이벤트 → `App.tsx`의 `routeFromParams()`라는 단일 진입점으로 모인다. 배너 클릭만 유일하게 이 파이프라인을 안 타는데, 클릭 시점에 이미 앱이 떠 있어서 딥링크 파싱 자체가 필요 없기 때문(`BannerCarousel.tsx`가 직접 처리).
+
+| 진입 경로 | URL 형식 | 처리 위치 | 도착 화면 |
+|---|---|---|---|
+| 카카오톡 공유 (학식) | `?date=YYYY-MM-DD&cafe=<cafeId>&type=<조식\|중식\|석식\|천원...>` | `App.tsx` 최초 마운트 시 `date`/`cafe`/`type` 파라미터 체크(`activeTab`/`isCafeteriaLink`/`showCafeDeepLinkLoader` 초기값) → 네이티브는 `MainActivity`(커스텀 스킴 `kakao{key}://kakaolink?...`)/`AppDelegate`가 가로채 `routeFromParams()`까지 전달 | 학식탭 + 학식 딥링크 전용 로더 스플래시 |
+| 푸시 알림 - 학식 | `?tab=cafe&date=...&cafe=...` (끼니별 알림은 `&type=...`도 추가) | 네이티브: `PushNotifications`의 `pushNotificationActionPerformed` 리스너 → `routeFromParams()`. 콜드스타트로 인해 리스너 등록 전에 이벤트가 드랍될 수 있어, Android는 `MainActivity.onCreate()`에서 Intent extra(`link`)를 직접 읽어 같은 경로로 주입 | 학식탭 + 학식 딥링크 전용 로더 스플래시 |
+| 푸시 알림 - 날씨 | `?tab=weather` | 위와 동일한 `routeFromParams()` 파이프라인 | 소식탭(portal) |
+| 배너 클릭 (내부 링크) | `?tab=<cafe\|shuttle\|portal\|partner\|misc>&chip=<...>&box=<...>` | `BannerCarousel.tsx`의 `handleClick()` — `url.origin === window.location.origin`이 완전히 일치할 때만 `onNavigateToTab()`을 직접 호출. 딥링크 이벤트나 `routeFromParams`는 안 거침 | tab 전환 + (`chip`이면 캠퍼스맵 특정 칩, `box`면 기타탭 특정 서브뷰까지 지정) |
+| 배너 클릭 (외부 링크) | 그 외 모든 URL | `window.open(url, '_blank')` | 외부 브라우저 |
+
+푸시 알림 링크는 Supabase Edge Function `menu-alerts`가 발송 시점에 만든다(`buildFCMMessage`가 `data.link` 필드에 담아 FCM 페이로드로 전송).
+
+**`chip`/`box` 파라미터는 배너 전용** — 카카오 공유·푸시 알림 딥링크(`routeFromParams`)는 `tab`/`date`/`cafe`/`type`만 처리하고 `chip`/`box`는 안 읽는다. "캠퍼스맵 특정 칩으로 바로 진입하는 카카오 공유 링크" 같은 건 지금 구조에서 못 만든다 — 필요해지면 `routeFromParams`에 `chip`/`box` 케이스를 추가해야 함.
+
+**딥링크 진입 시 앱 내부 상태 전달 방식**:
+- Android 콜드스타트 시 `MainActivity`가 React 마운트 전에 도착한 파라미터를 `window.__pendingDeepLinkParams`에 동기 저장 → `App.tsx`가 마운트되며 즉시 소비.
+- 앱이 이미 실행 중일 때(`onNewIntent`)는 `hanyang-deeplink` CustomEvent로 전달.
+- `App.addListener('appUrlOpen', ...)` 같은 Capacitor 표준 URL-open 리스너는 안 씀 — Universal Links(iOS)/App Links(Android) 둘 다 각 네이티브 레이어(`AppDelegate.swift`/`MainActivity.java`)에서 직접 가로채 위 커스텀 브릿지로 흘려보내는 자체 구현.
 

@@ -1,15 +1,18 @@
 import React, { useState, lazy, Suspense } from 'react';
+import { usePostHog } from 'posthog-js/react';
 
-import { Bell } from 'lucide-react';
+import { Bell, ChevronRight } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather.js';
 import { useWeatherBriefing } from '../../hooks/useWeatherBriefing.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
+import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
 import { PortalHeroCarousel } from './PortalHeroCarousel.jsx';
 import { PortalChartPromoCard } from './PortalChartPromoCard.jsx';
+import { ClubSpotlightCard } from '../misc/ClubSpotlightCard.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
@@ -25,16 +28,18 @@ const AUTO_PLAY_HERO_CAROUSEL = false;
 interface PortalViewProps {
   isActive?: boolean;
   // 배너가 캠퍼스맵 등 앱 내부 탭으로 이동하는 링크일 때 새 창을 열지 않고 바로 탭을 전환하기 위해 씀.
-  // chip은 캠퍼스맵 탭 안에서 특정 칩(예: 오픈스페이스)까지, box는 기타탭 안에서 특정 서브뷰(예: 헬스장)까지
-  // 미리 켜고 싶을 때만 넘어온다
-  onNavigateToTab?: (tab: string, chip?: string, box?: string) => void;
+  // chip은 캠퍼스맵 탭 안에서 특정 칩(예: 오픈스페이스)까지, box는 기타탭 안에서 특정 서브뷰(예: 헬스장)까지,
+  // clubId는 기타탭 중앙동아리 안에서 특정 동아리 위치까지 미리 켜고 싶을 때만 넘어온다
+  onNavigateToTab?: (tab: string, chip?: string, box?: string, clubId?: string) => void;
 }
 
 export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
+  const posthog = usePostHog();
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
   const { briefing } = useWeatherBriefing(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
+  const spotlightClub = useClubSpotlight();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
 
@@ -86,6 +91,21 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
             </ErrorBoundary>,
           ]}
         />
+
+        {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동 */}
+        <ErrorBoundary name="portal-club-spotlight">
+          <ClubSpotlightCard
+            key={spotlightClub.id}
+            club={spotlightClub}
+            actionLabel="보러가기"
+            actionIcon={<ChevronRight size={14} />}
+            onAction={() => {
+              posthog?.capture('club_spotlight_banner_clicked', { club_id: spotlightClub.id, club_name: spotlightClub.name });
+              onNavigateToTab?.('misc', undefined, 'clubs', spotlightClub.id);
+            }}
+            fullCardClickable
+          />
+        </ErrorBoundary>
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
         <ErrorBoundary name="portal-banner">

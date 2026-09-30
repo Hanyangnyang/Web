@@ -1,8 +1,8 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
 import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
-import { ChevronDown } from 'lucide-react';
-import type { ScheduleItem, ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
-import { isSuinBundangLine, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
+import { Bus, ChevronDown } from 'lucide-react';
+import type { ScheduleItem, ShuttleAppConfig, ShuttleEmptyState } from '../../../domain/entities/Shuttle.js';
+import { SUBWAY_OPTS, isSubwayScheduleMissing, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
 import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { CardFallback } from '../common/CardFallback.js';
@@ -24,6 +24,7 @@ interface SchoolShuttleSectionProps {
   lineId: string;
   setLineId: (lineId: string) => void;
   schedule: (ScheduleItem & { isLast?: boolean })[];
+  emptyState: ShuttleEmptyState;
   nextIdx: number;
   now: number;
   subwayArrivals: SubwayScheduleRow[];
@@ -52,7 +53,7 @@ export function SchoolShuttleSection({
   viewMode, setViewMode,
   stop, setStop,
   lineId, setLineId,
-  schedule, nextIdx, now,
+  schedule, emptyState, nextIdx, now,
   subwayArrivals,
   isWeekend,
   needsSubway,
@@ -84,8 +85,9 @@ export function SchoolShuttleSection({
   // needsSubway(지하철 연동 필요 정류장)의 여집합 — SUBWAY_CONNECTED_STOPS(Shuttle.ts)에서 파생
   const hideSubwayCol = !needsSubway;
 
-  // 수인분당선 시간표 개정 미반영 — 선택 시 연결편은 숨기고 안내 배너로 대체
-  const isSuinBundangSelected = isSuinBundangLine(lineId);
+  // 선택된 노선/방향의 시간표 데이터 자체가 없는 예외 상황(시간표 개정 미반영 등) — 조회는 성공했는데 이 경우만 발생
+  const isScheduleMissing = isSubwayScheduleMissing(subwayArrivals, lineId);
+  const selectedLineLabel = SUBWAY_OPTS.find(o => o.id === lineId)?.line ?? '지하철';
 
   // 스크롤 동기화 만료 처리 효과
   useEffect(() => {
@@ -174,16 +176,16 @@ export function SchoolShuttleSection({
           onToggleFullMode={handleToggleFullMode}
         />
 
-        {/* 수인분당선 시간표 개정 미반영 안내 — 연결편 표시를 막는 대신 여기 한 번만 안내 */}
+        {/* 선택된 노선/방향의 시간표 데이터가 통째로 비어있는 예외 상황 안내(시간표 개정 미반영 등) — 조회 자체는 성공했을 때만 뜸 */}
         <NoticeBanner
-          shouldShow={needsSubway && !hideSubwayCol && isSuinBundangSelected}
-          message="수인분당선 시간표를 업데이트 중이에요! 당분간 카카오 지하철을 이용해주세요"
+          shouldShow={needsSubway && !hideSubwayCol && !isSubwayLoading && !isSubwayError && isScheduleMissing}
+          message={`${selectedLineLabel} 시간표 정보를 아직 준비 중이에요! 당분간 카카오 지하철을 이용해주세요`}
           delayMs={0}
         />
 
         {/* 지하철 연결편 조회 실패 안내 — 행마다 반복 표시하면 스팸이라 여기 한 번만. 다른 공지 배너와 동일한 UI + 재시도 버튼만 추가 */}
         <NoticeBanner
-          shouldShow={needsSubway && !hideSubwayCol && isSubwayError && !isSuinBundangSelected}
+          shouldShow={needsSubway && !hideSubwayCol && isSubwayError}
           message="지하철 연결 정보를 불러오지 못했습니다"
           delayMs={0}
           variant="error"
@@ -221,10 +223,19 @@ export function SchoolShuttleSection({
               />
             ));
           })() : (
-            // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 오늘 남은 셔틀(또는 해당 조건의 운행)이 없음
-            <div className="min-h-[425px] flex flex-col justify-center py-8 text-center text-text-sub font-semibold">
-              <p>{isFullMode ? '운행 정보가 없습니다' : '오늘 남은 셔틀이 없습니다'}</p>
-            </div>
+            // 3. 조회는 됐지만 빈 데이터 — 실패는 아님. 전체 모드는 사용자가 고른 필터 결과라 기존 문구 유지,
+            // 일반 모드는 미운행일(사유 포함)과 운행일인데 시간표 행이 없는 경우를 구분해 안내.
+            // 실패 카드(2번)와 같은 CardFallback을 쓰되 아이콘·보조 문구를 바꿔 "정상인데 비어있음"임을 드러낸다
+            <CardFallback
+              icon={<Bus size={26} className="text-text-hint mb-1" />}
+              message={
+                isFullMode ? '운행 정보가 없습니다'
+                  : emptyState.kind === 'NOT_OPERATING' ? '오늘은 셔틀이 운행하지 않아요'
+                    : '오늘은 셔틀 운행 정보가 없어요'
+              }
+              subtext={!isFullMode && emptyState.kind === 'NOT_OPERATING' && emptyState.reason ? `미운행 사유 · ${emptyState.reason}` : ''}
+              className="min-h-[425px]"
+            />
           )}
         </div>
 

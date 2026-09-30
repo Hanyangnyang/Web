@@ -7,6 +7,7 @@ export interface BannerDto {
   altText: string;
   clickUrl: string;
   displayOrder: number;
+  placement?: 'SPLASH' | 'BANNER' | 'BOTH';
 }
 
 export interface BannerApiDataSource {

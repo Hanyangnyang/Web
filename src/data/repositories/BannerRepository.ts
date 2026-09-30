@@ -27,6 +27,8 @@ export const createBannerRepository = (
         clickUrl: banner.clickUrl,
         altText: banner.altText,
         displayOrder: banner.displayOrder,
+        // 롤아웃 초기 등 placement가 없는 응답은 기존 동작(양쪽 다 노출)으로 폴백
+        placement: banner.placement ?? 'BOTH',
       }));
   }),
 });

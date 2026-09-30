@@ -35,6 +35,10 @@ function toRef(selection: MapSelection): MapSelectionRef {
 export type SelectSource = 'marker' | 'list' | 'search' | 'nearest';
 export type StoreSelectSource = SelectSource | 'random'; // 매장만 점메추(random) 경로가 있다
 
+// 교내시설/오픈스페이스는 같은 PlottableBuilding을 공유해서 이벤트도 같이 타므로,
+// 어느 칩(레이어)에서 골랐는지 따로 실어야 둘을 구분해 볼 수 있다.
+export type BuildingVariant = 'facility' | 'openspace';
+
 interface Params {
   // 선택된 대상으로 지도를 이동시킨다. 종류마다 시트 높이가 달라 센터링 계산이 달라지므로
   // '언제 맞출지'는 이 훅이, '어떻게 맞출지'는 호출부가 갖는다.
@@ -63,12 +67,12 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
     onAfterSelect?.();
   }, [select, posthog, onAfterSelect]);
 
-  const selectBuilding = useCallback((building: PlottableBuilding, source: SelectSource) => {
+  const selectBuilding = useCallback((building: PlottableBuilding, source: SelectSource, variant: BuildingVariant) => {
     // 오픈스페이스도 흡연장처럼 'nearest' 경로가 있어서, X로 닫으면 흡연장과 동일하게 펼쳐진 목록으로 복귀시킨다
     returnToList.current = source === 'list' || source === 'nearest';
     select({ kind: 'building', building });
     posthog?.capture('partner_map_building_selected', {
-      building_id: building.id, building_name: building.name, source,
+      building_id: building.id, building_name: building.name, source, variant,
     });
     onAfterSelect?.();
   }, [select, posthog, onAfterSelect]);

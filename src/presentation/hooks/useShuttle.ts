@@ -4,14 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../lib/queryClient.js';
 import {
   computeSchedule, computeFullSchedule, curMin, pickClosestStop, SUBWAY_CONNECTED_STOPS,
-  mapServerDayType, mapServerPeriodType, localWeekdayFallback, type ScheduleItem,
+  mapServerDayType, mapServerPeriodType, localWeekdayFallback, resolveEmptyState, type ScheduleItem,
 } from '../../domain/entities/Shuttle.js';
 import { getShuttleDataUseCase, getSubwayScheduleUseCase } from '../../di.js';
 import { useBoot } from '../context/BootContext.jsx';
 import { useLocation } from './useLocation.js';
 import { useAcademicStatus } from './useAcademicStatus.js';
 import { useDateInfo } from './useDateInfo.js';
-import { getKSTDateKey } from '../../utils/kstTime.js';
 
 const BUS_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 셔틀버스 캐시 TTL(12시간)보다 짧게 재검증. 관리자가 시간표 CRUD할 때만 백엔드 캐시가 지워지므로 대부분은 같은 값을 그대로 돌려받음
 const SUBWAY_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 지하철 시간표 캐시 TTL(12시간, station:line:direction:dayType 키)보다 짧게 재검증
@@ -43,10 +42,12 @@ export function useShuttle(isActive = false) {
   // 오늘의 학사/셔틀 통합 운영 상태 — 예전엔 Supabase app_config(현재기간·공휴일·강제주말·미운행 오버라이드)를
   // 프론트에서 직접 조합해서 판정했는데, 이제 이 값 하나로 백엔드가 전부 계산해서 내려준다.
   // 모드와 무관하게 항상 필요(전체 모드 진입 시 기본값 동기화에도 씀)
-  const { data: academicStatus, isStale: isAcademicStatusStale, refetch: refetchAcademicStatus } = useAcademicStatus();
+  const { data: academicStatus, isPending: isAcademicStatusPending, isStale: isAcademicStatusStale, refetch: refetchAcademicStatus } = useAcademicStatus();
   const currentPeriod = academicStatus ? mapServerPeriodType(academicStatus.academic.periodType) : '학기중';
   const shuttleDayType = academicStatus ? mapServerDayType(academicStatus.shuttle.dayType) : localWeekdayFallback();
   const isShuttleOperating = academicStatus ? academicStatus.shuttle.isOperating : true;
+  // 목록이 비었을 때 화면이 "미운행(사유 포함)"과 "운행 정보 없음"을 구분해 보여주기 위한 값
+  const emptyState = resolveEmptyState(isShuttleOperating, academicStatus?.shuttle.noOperationReason ?? null);
 
   // 셔틀화면이 열릴 때(isActive: false → true) 뱃지(학기중/평일 등)가 낡은 값이면 다시 받아온다.
   // academicStatus는 앱이 켜져있는 내내 마운트 상태라(다른 탭을 봐도 화면만 숨겨질 뿐), 탭을 왔다갔다
@@ -54,25 +55,6 @@ export function useShuttle(isActive = false) {
   useEffect(() => {
     if (isActive && isAcademicStatusStale) refetchAcademicStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- isAcademicStatusStale/refetchAcademicStatus는 매 렌더 새 값이라 deps에 넣으면 매 렌더 실행됨. isActive가 바뀌는 시점에만 검사하면 충분
-  }, [isActive]);
-
-  // 셔틀화면을 계속 띄워놓은 채로 자정을 넘기는 경우(예: 11:50pm부터 계속 보고 있다가 12시가 지남)까지
-  // 잡기 위해, 화면이 활성 상태인 동안만 KST 날짜가 바뀌었는지 10초마다 확인해 academicStatus를 다시
-  // 받아온다 — 그러면 뱃지(학기중/평일 등)가 자정에 자동으로 새 값으로 갱신된다. 화면이 안 보일 때는
-  // 이 타이머 자체를 안 돌려서 불필요한 재요청을 막는다. 지하철(date-info)은 이 정도 실시간성까지는
-  // 필요 없다고 판단해 별도로 안 둠 — 다음에 그 정류장을 고를 때 자연히 최신값을 받아온다
-  useEffect(() => {
-    if (!isActive) return;
-    let lastDateKey = getKSTDateKey();
-    const id = setInterval(() => {
-      const today = getKSTDateKey();
-      if (today !== lastDateKey) {
-        lastDateKey = today;
-        refetchAcademicStatus();
-      }
-    }, 10_000);
-    return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetchAcademicStatus는 매 렌더 새 참조라 deps에 넣으면 타이머가 계속 재시작됨
   }, [isActive]);
 
   // 지하철 연결편 조회는 셔틀 전용 오버라이드(학교 자체 기념일 등)와 무관하게 항상 실제 공휴일 달력 기준을
@@ -197,7 +179,10 @@ export function useShuttle(isActive = false) {
     needsSubway,
     loadErr,
     refetchSchedule,
-    isLoading: !allData && !loadErr,
+    // 학사 상태 응답 전에는 isOperating을 true로 가정하므로, 미운행일에 "운행 정보 없음"이 잠깐 비치지 않도록
+    // 응답(성공/실패 모두 isPending=false)이 올 때까지 스켈레톤을 유지한다
+    isLoading: (!allData && !loadErr) || isAcademicStatusPending,
+    emptyState,
     isSubwayLoading,
     isSubwayError,
     refetchSubway,

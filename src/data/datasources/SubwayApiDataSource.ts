@@ -4,19 +4,9 @@ import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastru
 // 현재 API 스펙상 subwayStation은 이 값 하나만 존재 (한대앞역)
 export const HANDAEAP_STATION = 'HANDAEAP';
 
-export interface SubwayTimetableDto {
-  id: number;
-  subwayStation: typeof HANDAEAP_STATION;
-  subwayLine: 'LINE4' | 'SUIN';
-  direction: 'UPWARD' | 'DOWNWARD';
-  dayType: 'WEEKDAY' | 'WEEKEND' | 'HOLIDAY';
-  time: string;                        // "HH:mm:ss"
-  destination: string;                 // 종착역명 (예: '불암산', '금정', '한성대입구')
-  trainNo: string;
-}
-
+// 응답 shape은 검증 전이라 unknown — 실제 파싱/타입 부여는 SubwaySchema.ts의 zod 스키마가 Repository에서 담당
 export interface SubwayApiDataSource {
-  getSchedule: () => Promise<ApiResponse<SubwayTimetableDto[]>>;
+  getSchedule: () => Promise<ApiResponse<unknown>>;
 }
 
 export const createSubwayApiDataSource = ({ httpClient }: { httpClient: HttpClient }): SubwayApiDataSource => ({

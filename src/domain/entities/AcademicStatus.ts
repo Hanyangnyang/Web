@@ -23,7 +23,7 @@ export interface ShuttleOperationStatus {
   isOperating: boolean;
   periodType: PeriodType;
   dayType: DayType;
-  noOperationReason: string;
+  noOperationReason: string | null; // 운행일엔 null로 내려옴
 }
 
 export interface AcademicStatus {

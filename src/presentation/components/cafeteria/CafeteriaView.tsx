@@ -1,6 +1,6 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, UtensilsCrossed } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
@@ -268,11 +268,12 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                   ))
               ) : (
                 // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 그날 등록된 메뉴가 하나도 없음
-                <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03)]">
-                  <div className="min-h-[80px] flex flex-col justify-center py-8 text-center text-text-sub">
-                    <p>해당 식당은 오늘 등록된 메뉴가 없습니다</p>
-                  </div>
-                </div>
+                <CardFallback
+                  icon={<UtensilsCrossed size={26} className="text-text-hint mb-1" />}
+                  message="해당 식당은 오늘 등록된 메뉴가 없습니다"
+                  subtext=""
+                  className="min-h-[80px]"
+                />
               )
             ) : (
               // 2. 조회 실패 — KNOWN_CAFES 병합 덕에 성공이면 cafes가 항상 4개라, 여긴 진짜 실패일 때만 옴

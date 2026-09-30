@@ -1,4 +1,5 @@
-// 컴포넌트: 기타탭 하위 View(짐/인스타그램/피드백) 공용 헤더 — 뒤로가기 버튼 + 제목
+// 컴포넌트: 기타탭 하위 View(짐/인스타그램/피드백/중앙동아리) 공용 헤더 — 뒤로가기 버튼 + 제목 + (선택) 오른쪽 액션 버튼
+import { type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 interface MiscSubViewHeaderProps {
@@ -6,7 +7,7 @@ interface MiscSubViewHeaderProps {
   onBack: () => void;
   emoji?: string;
   subtitle?: string;
-  rightAction?: React.ReactNode;
+  rightAction?: ReactNode;
 }
 
 export function MiscSubViewHeader({ title, onBack, emoji, subtitle, rightAction }: MiscSubViewHeaderProps) {

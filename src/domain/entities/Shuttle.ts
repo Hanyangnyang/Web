@@ -195,6 +195,18 @@ function mapToScheduleItems(rows: ShuttleRow[], displayStop: string): ScheduleIt
   return items.sort((a, b) => a.depMin - b.depMin);
 }
 
+// 셔틀 목록이 비었을 때 "왜 비었는지" — 미운행일(academic/status.shuttle.isOperating=false)과
+// 운행일인데 조건(기간/요일/정류장)에 맞는 시간표 행이 없는 경우를 구분해 화면이 다른 문구를 보여주게 한다.
+// 막차가 지난 경우는 computeSchedule이 마지막 셔틀 한 편을 돌려주므로 목록이 비지 않아 여기에 해당하지 않는다.
+export type ShuttleEmptyState =
+  | { kind: 'NOT_OPERATING'; reason: string | null }
+  | { kind: 'NO_DATA' };
+
+export function resolveEmptyState(isOperating: boolean, noOperationReason: string | null): ShuttleEmptyState {
+  if (!isOperating) return { kind: 'NOT_OPERATING', reason: noOperationReason?.trim() || null };
+  return { kind: 'NO_DATA' };
+}
+
 // 현재 시각 근처의 셔틀 계산 (순수 함수)
 export function computeSchedule(
   allData: ShuttleRow[],

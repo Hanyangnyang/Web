@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import type { Banner } from '../../../domain/entities/Banner.js';
+import { isInstagramUrl, openInstagram } from '../../../lib/instagram.js';
 
 // BottomNav가 실제로 그리는 탭 키 목록 — clickUrl의 tab 파라미터에 오타/미지원 값이 오면
 // 그대로 setActiveTab에 흘려보내 모든 탭이 안 그려지는 빈 화면이 되는 걸 막는다
@@ -12,8 +13,8 @@ export const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food
 
 // 기타탭(MiscView)이 실제로 진입 가능한 하위 화면 값 목록 — clickUrl의 box 파라미터에
 // 오타/미지원 값이 오면 걸러서 MiscView에 잘못된 서브뷰 상태가 전달되는 걸 막는다.
-// 'calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외
-export const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist'];
+// MiscMenuGrid.tsx의 MiscBoxKey와 동일해야 함('calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외)
+export const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist', 'clubs'];
 
 interface BannerCarouselProps {
   banners: Banner[];
@@ -43,6 +44,13 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
   const mouseStartXRef = useRef<number | null>(null);
 
   const slides = banners.length > 1 ? [...banners, banners[0]] : banners;
+
+  // 배너 이미지가 위에서부터 아래로 그려지며 로드되는 게 그대로 보이는 걸 막기 위해,
+  // 로드 완료 전까지는 shimmer 스켈레톤을 보여주고 로드되면 fade-in으로 전환한다
+  const [loadedKeys, setLoadedKeys] = useState<Set<string | number>>(new Set());
+  const markLoaded = (key: string | number) => {
+    setLoadedKeys((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
+  };
 
   const goForward = () => {
     setTransitionEnabled(true);
@@ -149,13 +157,16 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
     posthog?.capture('banner_clicked', { banner_id: banner.id, banner_alt_text: banner.altText, click_url: banner.clickUrl });
 
     // 우리 앱 자신을 가리키는 링크(예: https://hanyang.life/?tab=partner)면 새 창/브라우저를 열지 않고
-    // 바로 그 탭으로 전환한다 — 네이티브에서는 window.open이 외부 브라우저로 튀어나가버리기 때문
+    // 바로 그 탭으로 전환한다 — 네이티브에서는 window.open이 외부 브라우저로 튀어나가버리기 때문.
+    // 앱은 www.hanyang.life로 로드되지만 배너 링크는 www 없이 등록될 수 있어 www 유무는 무시하고 비교한다
     try {
       const url = new URL(banner.clickUrl, window.location.origin);
+      const normalizeHost = (h: string) => h.replace(/^www\./, '');
       const tab = url.searchParams.get('tab');
-      if (onNavigateToTab && tab && VALID_TABS.includes(tab) && url.origin === window.location.origin) {
+      if (onNavigateToTab && tab && VALID_TABS.includes(tab) && normalizeHost(url.hostname) === normalizeHost(window.location.hostname)) {
         const chip = url.searchParams.get('chip');
-        const box = url.searchParams.get('box');
+        // 내부 관례는 'box'지만, MiscView의 상태 변수명이 'subView'라 배너 등록 시 착각하기 쉬워 별칭으로도 허용
+        const box = url.searchParams.get('box') ?? url.searchParams.get('subView');
         onNavigateToTab(
           tab,
           chip && VALID_MAP_CHIPS.includes(chip) ? chip : undefined,
@@ -164,7 +175,13 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
         return;
       }
     } catch {
-      // clickUrl이 URL로 파싱 안 되면 아래에서 그대로 외부 링크 취급
+      // clickUrl이 URL로 파싱 안 되면 아래에서 계속 진행
+    }
+
+    // 인스타그램 링크(웹 URL, 앱 스킴, @계정명 등)인 경우 앱 실행 시도 후 웹 폴백
+    if (isInstagramUrl(banner.clickUrl)) {
+      openInstagram(banner.clickUrl);
+      return;
     }
 
     window.open(banner.clickUrl, '_blank');
@@ -195,16 +212,23 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
           className={`flex h-full ${transitionEnabled ? 'transition-transform duration-300 ease-in-out' : ''}`}
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          {slides.map((banner, i) => (
-            <img
-              key={i === banners.length ? `${banner.id ?? i}-clone` : (banner.id ?? i)}
-              src={banner.imageUrl}
-              alt={banner.altText || '배너'}
-              className={`w-full h-full object-cover flex-shrink-0 ${banner.clickUrl ? 'cursor-pointer' : ''}`}
-              draggable={false}
-              onClick={() => handleClick(banner)}
-            />
-          ))}
+          {slides.map((banner, i) => {
+            const key = i === banners.length ? `${banner.id ?? i}-clone` : (banner.id ?? i);
+            const loaded = loadedKeys.has(key);
+            return (
+              <div key={key} className="relative w-full h-full flex-shrink-0 overflow-hidden">
+                {!loaded && <div className="absolute inset-0 img-shimmer" aria-hidden="true" />}
+                <img
+                  src={banner.imageUrl}
+                  alt={banner.altText || '배너'}
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'} ${banner.clickUrl ? 'cursor-pointer' : ''}`}
+                  draggable={false}
+                  onLoad={() => markLoaded(key)}
+                  onClick={() => handleClick(banner)}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 

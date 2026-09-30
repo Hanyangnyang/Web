@@ -27,6 +27,7 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
             lineId={shuttle.lineId}
             setLineId={shuttle.setLineId}
             schedule={shuttle.schedule}
+            emptyState={shuttle.emptyState}
             nextIdx={shuttle.nextIdx}
             now={shuttle.now}
             subwayArrivals={shuttle.subwayArrivals}
@@ -64,6 +65,7 @@ export function ShuttleView({ isActive }: ShuttleViewProps) {
             setFavorites={bus.setFavorites}
             busArrivals={bus.busArrivals}
             isBusLoading={bus.isBusLoading}
+            isBusError={bus.isBusError}
             userCoords={bus.userCoords}
             closestStopName={bus.closestStopName}
             isManualRefreshing={bus.isManualRefreshing}
