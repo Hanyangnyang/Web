@@ -306,6 +306,7 @@ function MainLayout() {
         <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
+              isActive={activeTab === 'cafe'}
               date={menuDate}
               changeDate={changeDate}
               cafes={cafes}

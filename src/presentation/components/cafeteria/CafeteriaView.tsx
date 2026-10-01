@@ -4,6 +4,7 @@ import { Bell, UtensilsCrossed } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
+import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.js';
 import { CardFallback } from '../common/CardFallback.js';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.js';
@@ -24,7 +25,17 @@ interface CafeDeepLink {
   type: string | null;
 }
 
+// 뒤로가기로 되돌릴 수 있는 학식탭 화면 상태 — 사용자가 식당 칩이나 날짜를 바꾸기 직전의 모습
+interface NavSnapshot {
+  cafeId: string;
+  date: Date;
+}
+
+// 쌓아 두는 이력 상한 — 날짜를 계속 넘기는 사용자가 있어도 무한히 쌓이지 않게
+const MAX_NAV_HISTORY = 30;
+
 interface CafeteriaViewProps {
+  isActive?: boolean;
   date: Date;
   changeDate: (offsetOrDate: number | Date) => void;
   cafes: Cafe[];
@@ -35,7 +46,7 @@ interface CafeteriaViewProps {
   onCafeDeepLinkHandled?: () => void;
 }
 
-export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, onRetry, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
+export function CafeteriaView({ isActive = true, date, changeDate, cafes, loading, revalidating, onRetry, cafeDeepLink, onCafeDeepLinkHandled }: CafeteriaViewProps) {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTypeRef = useRef(urlParams.get('type'));
   const rootRef = useRef<HTMLDivElement>(null);
@@ -57,7 +68,32 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
 
   const posthog = usePostHog();
 
+  // 뒤로가기 이력: 식당 칩·날짜를 바꿀 때마다 "바꾸기 전" 상태를 쌓고, 뒤로가기가 하나씩 꺼내 복원한다.
+  // 이력이 비어 있을 땐(처음 상태) 핸들러를 등록하지 않아 전역 "한 번 더 누르면 종료" 흐름으로 넘어간다.
+  const [navHistory, setNavHistory] = useState<NavSnapshot[]>([]);
+
+  const pushNavSnapshot = () => {
+    setNavHistory(prev => [...prev, { cafeId: selectedCafeId, date }].slice(-MAX_NAV_HISTORY));
+  };
+
+  const handleDateChange = (offset: number) => {
+    pushNavSnapshot();
+    changeDate(offset);
+  };
+
+  // 탭이 숨겨져 있어도 컴포넌트는 마운트된 채라 isActive를 함께 본다 (CampusMapView와 동일한 이유)
+  useBackHandler(() => {
+    const previous = navHistory[navHistory.length - 1];
+    if (!previous) return;
+    setNavHistory(prev => prev.slice(0, -1));
+    setSelectedCafeId(previous.cafeId);
+    changeDate(previous.date);
+    scrollNearestScrollableAncestorToTop(rootRef.current);
+  }, isActive && navHistory.length > 0);
+
   const handleCafeSelect = (id: string) => {
+    if (id === selectedCafeId) return;
+    pushNavSnapshot();
     const cafeName = id === 'all' ? '전체' : (cafes.find(c => c.id === id)?.name || id);
     posthog?.capture('cafeteria_chip_clicked', { cafeId: id, cafeName });
     setSelectedCafeId(id);
@@ -106,6 +142,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   // 네이티브 알림 탭 딥링크: App에서 전달된 파라미터 처리
   useEffect(() => {
     if (!cafeDeepLink) return;
+    // 알림으로 새로 진입한 화면에서 예전 탐색 이력으로 되돌아가면 어색하므로 비운다
+    setNavHistory([]);
     const { date: dateStr, cafe: cafeId, type: mealType } = cafeDeepLink;
     if (dateStr) {
       const parsed = new Date(dateStr);
@@ -226,7 +264,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
 
       {/* 고정 헤더: 날짜 및 식당 선택 */}
       <div className="sticky top-0 z-[100] bg-surface/90 backdrop-blur-xl pt-4 pb-4 -mx-4 px-4 mb-2.5 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
-        <DateNavigator date={date} loading={loading} onPrev={() => changeDate(-1)} onNext={() => changeDate(1)} />
+        <DateNavigator date={date} loading={loading} onPrev={() => handleDateChange(-1)} onNext={() => handleDateChange(1)} />
         <CafeChipSelector cafes={cafes} selectedCafeId={selectedCafeId} loading={loading} onSelect={handleCafeSelect} />
       </div>
 
