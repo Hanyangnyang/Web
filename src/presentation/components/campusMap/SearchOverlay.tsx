@@ -3,7 +3,7 @@
 // - 폐업 매장도 뱃지와 함께 노출 ("이 가게 제휴 되나?"의 답이므로)
 // - 결과 없음: 제보하기 + PostHog zero-result 로깅 (수요 데이터 수집)
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Search, X, MapPin, Send } from 'lucide-react';
+import { ArrowLeft, Search, X, MapPin, Send, Store } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import {
   searchStores, groupByCategory, activePartnerships,
@@ -13,6 +13,7 @@ import { searchBuildings, type PlottableBuilding } from '../../../domain/entitie
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
+import { CardFallback } from '../common/CardFallback.js';
 
 /**
  * 한 섹션의 상태 한 줄.
@@ -112,9 +113,14 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
       {/* 결과 영역 — 하단 여백은 플로팅 BottomNav에 마지막 행이 가리지 않게 */}
       <div className="flex-1 overflow-y-auto pb-[130px]">
         {trimmed.length === 0 && (
-          <p className="text-center text-[12px] text-text-hint font-medium pt-14">
-            제휴 매장이나 교내시설 이름을 검색해보세요
-          </p>
+          <div className="px-4 pt-6">
+            <CardFallback
+              icon={<Store size={26} className="text-text-hint mb-1" />}
+              message="식당, 카페, 주점이나 교내시설을 검색해보세요"
+              subtext=""
+              className="!border-0 !shadow-none"
+            />
+          </div>
         )}
 
         {/* 교내시설 — 매장보다 먼저 (건물명을 찾는 의도가 더 분명한 검색어가 많다).
