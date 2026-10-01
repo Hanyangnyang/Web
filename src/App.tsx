@@ -15,6 +15,7 @@ import { SplashScreen }  from './presentation/components/common/SplashScreen.jsx
 import { BootProvider, useBoot } from './presentation/context/BootContext';
 import { NetworkProvider, useNetwork } from './presentation/context/NetworkContext';
 import { OfflineModal } from './presentation/components/common/OfflineModal';
+import { ExitWarningBanner } from './presentation/components/common/ExitWarningBanner';
 import { prefetchLocation }      from './presentation/hooks/useLocation.js';
 import { prefetchBanners }       from './presentation/hooks/useBanners.js';
 import { prefetchKakaoMapSdk }   from './lib/kakaoMap';
@@ -291,6 +292,7 @@ function MainLayout() {
       )}
       {/* 오프라인 안내 모달: 스플래시 도중이든 이후든 오프라인이면 항상 노출, 스플래시가 뒤로 넘어가지 못하게 막음 */}
       <OfflineModal />
+      <ExitWarningBanner />
 
       {/* 메인 콘텐츠 화면 */}
       <div
