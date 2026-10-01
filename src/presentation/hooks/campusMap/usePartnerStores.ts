@@ -26,7 +26,7 @@ export function usePartnerStores(): UsePartnerStoresResult {
   return {
     stores: data ?? [],
     loading: isLoading,
-    loadErr: isError ? '제휴 매장 정보를 불러오지 못했습니다' : null,
+    loadErr: isError ? '매장 정보를 불러오지 못했습니다' : null,
     refetch: () => { refetch(); },
   };
 }
