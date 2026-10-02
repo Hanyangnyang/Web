@@ -1,0 +1,313 @@
+import { Heart, MessageCircle, PenLine, Play, Share2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
+import { type ReactionKey } from '../postReactions';
+import { type Song, type ReactionState, type TrackSummary, formatTimeAgo, toReactionState } from '../playlistTypes';
+import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
+import { useTrackPosts, type TrackPostsSort } from '../../../hooks/playlist/useTrackPosts.js';
+import { EmptyGenreState } from '../shared/EmptyGenreState';
+import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
+import { EmojiReactionBar } from '../shared/EmojiReactionBar';
+import { useSongReport } from '../shared/useSongReport';
+import { ReportReasonPopup } from '../shared/ReportReasonPopup';
+import { PostMoreMenu } from '../shared/PostMoreMenu';
+import { useShareModal } from '../shared/useShareModal';
+import { Toast } from '../shared/Toast';
+
+interface TrackPostCollectionViewProps {
+  track: TrackSummary;
+  onBack: () => void;
+  onSelectPost: (post: Song) => void;
+  onPlay: () => void;
+  // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 아이콘이 일시정지 아이콘으로 바뀜
+  isPlaying?: boolean;
+  // 게시글이 하나도 없을 때 뜨는 "이 곡 추천하러 가기" 버튼 — 지금 곡이 미리 채워진 채로 곡추천하기 화면으로 이동
+  onRecommendTrack: (track: TrackSummary) => void;
+}
+
+const SORT_OPTIONS = [
+  { key: 'latest', label: '최신' },
+  { key: 'popular', label: '인기' },
+] as const;
+
+// 곡 단위 게시글 모음 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
+export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, onRecommendTrack }: TrackPostCollectionViewProps) {
+  const [sort, setSort] = useState<TrackPostsSort>('latest');
+  const { data, isLoading } = useTrackPosts(track.trackId, sort);
+  const posts = data?.posts ?? [];
+  const totalCount = data?.totalSongsCount ?? posts.length;
+  const totalPlayCount = data?.totalPlayCount ?? 0;
+  // 딥링크(카카오 공유 등)로 trackId만 가지고 들어오면 track.title 등이 빈 문자열이라, useTrackPosts가
+  // 받아온 값으로 채움 — 검색/차트 등에서 정상적으로 곡 정보를 들고 들어온 경우엔 이미 있는 track 값을 그대로 씀
+  const displayTrack = {
+    trackId: track.trackId,
+    title: data?.title || track.title,
+    artist: data?.artist || track.artist,
+    albumArtUrl: data?.albumArtUrl || track.albumArtUrl,
+  };
+  // 딥링크로 들어와서 아직 곡 정보를 하나도 못 받은 상태 — 이때만 곡 정보 카드에 스켈레톤을 보여줌
+  const isTrackInfoLoading = isLoading && !track.title && !data;
+
+  const [bookmarkedByPost, setBookmarkedByPost] = useState<Record<string, boolean>>({});
+  const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
+  // 게시글 목록을 새로 받아올 때마다(정렬 변경 포함) 서버가 준 초기 북마크/반응 상태로 로컬 상태를 다시 맞춤
+  useEffect(() => {
+    if (!data) return;
+    const bookmarks: Record<string, boolean> = {};
+    const reactions: Record<string, ReactionState> = {};
+    for (const post of data.posts) {
+      if (!post.id) continue;
+      bookmarks[post.id] = post.isBookmarked ?? false;
+      reactions[post.id] = toReactionState(post.reactions);
+    }
+    setBookmarkedByPost(bookmarks);
+    setReactionsByPost(reactions);
+  }, [data]);
+
+  const [openPickerPostId, setOpenPickerPostId] = useState<string | null>(null);
+  const report = useSongReport();
+  const share = useShareModal(displayTrack);
+
+  const { toggleBookmark, toggleReactionMutation } = usePostInteractionMutations();
+
+  // 낙관적으로 먼저 뒤집고, 서버 응답의 실제 isLiked로 맞추거나 실패 시 되돌림.
+  // 로딩 표시로 막지 않고 연타도 그대로 받아서 매번 뒤집음 — 순수 낙관적 UI
+  const handleToggleBookmark = (postId: string) => {
+    const optimistic = !(bookmarkedByPost[postId] ?? false);
+    setBookmarkedByPost((prev) => ({ ...prev, [postId]: optimistic }));
+    toggleBookmark.mutate(postId, {
+      onSuccess: (isLiked) => setBookmarkedByPost((prev) => ({ ...prev, [postId]: isLiked })),
+      onError: () => setBookmarkedByPost((prev) => ({ ...prev, [postId]: !optimistic })),
+    });
+  };
+
+  // 낙관적으로 카운트 증감 후, 서버가 내려준 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤. 연타는 무시
+  const handleToggleReaction = (postId: string, key: ReactionKey) => {
+    if (toggleReactionMutation.isPending) return;
+    const previous = reactionsByPost[postId] ?? {};
+    setReactionsByPost((prev) => ({ ...prev, [postId]: nextOptimisticReaction(prev[postId] ?? {}, key) }));
+
+    toggleReactionMutation.mutate(
+      { songId: postId, reactionType: key },
+      {
+        onSuccess: (updatedReactions) =>
+          setReactionsByPost((prev) => ({ ...prev, [postId]: toReactionState(updatedReactions) })),
+        onError: () => setReactionsByPost((prev) => ({ ...prev, [postId]: previous })),
+      }
+    );
+  };
+
+  return (
+    <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
+      <MiscSubViewHeader
+        title="게시글 모음"
+        emoji="💬"
+        subtitle={displayTrack.title ? `'${displayTrack.title} · ${displayTrack.artist}' 의 추천 게시글을 다 모았어요!` : ''}
+        onBack={onBack}
+      />
+
+      {/* 곡 정보 — 앨범아트는 카드 폭의 40%(w-2/5)로 고정, 거기서 정사각형 높이를 역산해서 카드
+          전체 높이를 결정함. 게시글 수/재생수는 칩이 아니라 아이콘+숫자로 담백하게 표기 */}
+      {isTrackInfoLoading ? (
+        <div className="flex items-stretch gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="w-2/5 flex-shrink-0 aspect-square skeleton-shimmer" />
+          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
+            <div className="space-y-1.5">
+              <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
+              <div className="h-3 w-1/3 skeleton-shimmer rounded-full" />
+            </div>
+            <div className="border-t border-slate-300" />
+            <div className="h-5 w-full skeleton-shimmer rounded-full" />
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-stretch gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+          {/* 앨범커버 — 폭이 카드 전체 너비의 정확히 40%(반응형)가 되도록 w-2/5로 고정하고 aspect-square로
+              그 폭에서 높이를 역산(카드 전체 높이도 이 앨범커버 높이를 따라감). 카드 왼쪽/위/아래 테두리에
+              여백 없이 꽉 차게(overflow-hidden으로 왼쪽 모서리만 카드 라운딩에 맞춰 클립) */}
+          <div className="relative w-2/5 flex-shrink-0 aspect-square">
+            <img
+              src={displayTrack.albumArtUrl}
+              alt={displayTrack.title}
+              className="w-full h-full object-cover bg-slate-100"
+            />
+            {/* 재생 중엔 일시정지 아이콘으로 바뀌어서 그대로 눌러 멈출 수 있음 */}
+            <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} />
+          </div>
+          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
+            <div className="leading-tight">
+              <div className="text-lg font-bold text-text-main truncate">{displayTrack.title}</div>
+              <div className="text-sm text-text-sub truncate">{displayTrack.artist}</div>
+            </div>
+            <div className="border-t border-slate-300" />
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
+                <MessageCircle size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
+                {totalCount.toLocaleString()}개
+              </span>
+              <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
+                <Play size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
+                {totalPlayCount.toLocaleString()}회
+              </span>
+            </div>
+            {/* 버튼이 늘어서 좁은 화면에서 잘리지 않도록, 줄바꿈 대신 EmojiReactionBar와 같은 방식의
+                가로 스크롤로 처리(각 버튼은 flex-shrink-0으로 폭을 그대로 유지) */}
+            <div
+              className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {/* 곡 추천하기/곡 공유하기 — 위 게시글 N개·재생 N회와 같은 색(text-text-sub)으로 맞춤 */}
+              <button
+                onClick={() => onRecommendTrack(displayTrack)}
+                aria-label="곡 추천하기"
+                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-sub flex items-center gap-1 active:scale-95 active:bg-slate-200 transition-all"
+              >
+                <PenLine size={13} strokeWidth={2} />
+                <span className="text-xs font-bold whitespace-nowrap">곡 추천하기</span>
+              </button>
+              <button
+                onClick={() => share.open()}
+                aria-label="곡 공유하기"
+                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-sub flex items-center gap-1 active:scale-95 active:bg-slate-200 transition-all"
+              >
+                <Share2 size={13} strokeWidth={2} />
+                <span className="text-xs font-bold whitespace-nowrap">곡 공유하기</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 정렬 칩 — 게시글 수는 위 곡 정보 카드로 옮김 */}
+      <div className="flex gap-2 mb-3">
+        {SORT_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            onClick={() => setSort(option.key)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
+              sort === option.key
+                ? 'bg-playlist-primary text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
+                : 'bg-white text-playlist-primary border-playlist-primary'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      {isLoading && (
+        <div className="flex flex-col gap-1">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200">
+              <div className="h-4 w-full skeleton-shimmer rounded-full" />
+              <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
+              <div className="h-3 w-16 skeleton-shimmer rounded-full mt-1" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && posts.length === 0 && (
+        <EmptyGenreState
+          message="아직 이 곡을 추천한 게시글이 없어요"
+          buttonLabel="이 곡 추천하러 가기"
+          buttonIcon={<PenLine size={14} strokeWidth={2.5} />}
+          onAction={() => onRecommendTrack(displayTrack)}
+        />
+      )}
+
+      {/* 게시글 리스트 — 카드 사이 간격을 둬서 항목마다 분리된 느낌 */}
+      <div className="flex flex-col gap-1">
+        {posts.map((post) => {
+          const postId = post.id;
+          const bookmarked = postId ? bookmarkedByPost[postId] ?? false : false;
+          const reactions = (postId ? reactionsByPost[postId] : undefined) ?? {};
+
+          return (
+            <div
+              key={postId ?? post.trackId}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelectPost(post)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') onSelectPost(post);
+              }}
+              aria-label="게시글 상세 보기"
+              className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
+            >
+              {/* 본문 + 북마크/더보기 */}
+              <div className="flex items-start gap-3">
+                <p className="min-w-0 flex-1 text-sm text-text-main leading-snug line-clamp-2">
+                  <span className="mr-[1px]">"</span>
+                  {post.comment}
+                  <span className="ml-[1px]">"</span>
+                </p>
+
+                {!post.isMine && (
+                  <div className="flex items-start gap-3 flex-shrink-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (postId) handleToggleBookmark(postId);
+                      }}
+                      aria-label="이 게시글 북마크"
+                      className="active:scale-90 transition-transform"
+                    >
+                      <Heart
+                        size={18}
+                        className={bookmarked ? 'text-text-main' : 'text-text-sub'}
+                        fill={bookmarked ? 'currentColor' : 'none'}
+                        strokeWidth={2}
+                      />
+                    </button>
+                    <PostMoreMenu report={report} menuKey={postId ?? ''} reportTargetId={postId} />
+                  </div>
+                )}
+              </div>
+
+              {/* 시간 + 이모지 반응 — 카드 전체 너비를 다 활용. 시간은 ml-auto로 항상 맨 오른쪽 끝에 고정 */}
+              <div className="flex items-center gap-1.5">
+                <EmojiReactionBar
+                  reactions={reactions}
+                  onToggleReaction={(key) => {
+                    if (postId) handleToggleReaction(postId, key);
+                  }}
+                  disabled={toggleReactionMutation.isPending}
+                  pickerOpen={openPickerPostId === postId}
+                  onTogglePicker={() => setOpenPickerPostId((prev) => (prev === postId ? null : postId ?? null))}
+                  size="compact"
+                  className="flex-1 min-w-0"
+                  emptyFallback={
+                    // 배경 없는 안내 문구만 살짝 얹음 — PostDetailCard와 동일한 문구/스타일
+                    <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
+                      ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
+                    </span>
+                  }
+                />
+
+                <span className="flex-shrink-0 text-xs text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 신고 사유 선택 팝업 */}
+      {report.reportTargetId && (
+        <ReportReasonPopup
+          selectedReason={report.selectedReason}
+          onSelectReason={report.setSelectedReason}
+          onCancel={report.closeReasonPopup}
+          onConfirm={report.confirmReport}
+          isPending={report.isPending}
+          isError={report.isError}
+        />
+      )}
+
+      {/* 신고 접수 완료 토스트 */}
+      {report.toast && <Toast message={report.toast} />}
+
+      {share.node}
+    </div>
+  );
+}

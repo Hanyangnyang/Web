@@ -26,6 +26,9 @@ export default {
         'text-sub': '#6C757D',
         'text-hint': '#94a3b8',
         'hyu-blue-light': '#3b82f6',
+        // 플레이리스트 기능 전용 강조색 — 여러 컴포넌트에 하드코딩된 채로 반복되던 값을 토큰화
+        'playlist-primary': '#618CE9', // 검색/공유/정렬 등 대부분의 강조 요소
+        'playlist-accent': '#8B5CF6', // 곡 추천하기 FAB 등 "새 곡 추천" 액션 전용 포인트 컬러
       },
       borderRadius: {
         card: '12px',

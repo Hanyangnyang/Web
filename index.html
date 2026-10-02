@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <link rel="preload" href="/fonts/HakgyoansimDunggeunmiso-B.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/hanyang_splash.png" as="image" />
+    <!-- 플레이리스트 곡 재생(Spotify embed iframe) 클릭 시 지연을 줄이기 위한 사전 연결 -->
+    <link rel="preconnect" href="https://open.spotify.com" />
+    <link rel="preconnect" href="https://open.spotifycdn.com" crossorigin />
+    <link rel="preconnect" href="https://i.scdn.co" crossorigin />
     <!-- 캠퍼스맵 탭 진입 전 카카오맵 SDK 요청의 DNS/TCP/TLS를 미리 뚫어둠 (App.tsx의 splashDone prefetch와 짝) -->
     <link rel="preconnect" href="https://dapi.kakao.com" />
     <link rel="icon" type="image/png" href="/favicon.png" />
