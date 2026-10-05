@@ -6,7 +6,7 @@ import { useWeather } from '../../hooks/useWeather.js';
 import { useWeatherBriefing } from '../../hooks/useWeatherBriefing.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
-import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
+import { useClubSpotlight, isClubBannerSeason } from '../../hooks/useClubSpotlight.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
@@ -40,6 +40,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
   const spotlightClub = useClubSpotlight();
+  const showClubBanner = isClubBannerSeason();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
 
@@ -92,20 +93,22 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           ]}
         />
 
-        {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동 */}
-        <ErrorBoundary name="portal-club-spotlight">
-          <ClubSpotlightCard
-            key={spotlightClub.id}
-            club={spotlightClub}
-            actionLabel="보러가기"
-            actionIcon={<ChevronRight size={14} />}
-            onAction={() => {
-              posthog?.capture('club_spotlight_banner_clicked', { club_id: spotlightClub.id, club_name: spotlightClub.name });
-              onNavigateToTab?.('misc', undefined, 'clubs', spotlightClub.id);
-            }}
-            fullCardClickable
-          />
-        </ErrorBoundary>
+        {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동. 3월·9월(모집 시즌)에만 노출 */}
+        {showClubBanner && (
+          <ErrorBoundary name="portal-club-spotlight">
+            <ClubSpotlightCard
+              key={spotlightClub.id}
+              club={spotlightClub}
+              actionLabel="보러가기"
+              actionIcon={<ChevronRight size={14} />}
+              onAction={() => {
+                posthog?.capture('club_spotlight_banner_clicked', { club_id: spotlightClub.id, club_name: spotlightClub.name });
+                onNavigateToTab?.('misc', undefined, 'clubs', spotlightClub.id);
+              }}
+              fullCardClickable
+            />
+          </ErrorBoundary>
+        )}
 
         {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
         <ErrorBoundary name="portal-banner">
