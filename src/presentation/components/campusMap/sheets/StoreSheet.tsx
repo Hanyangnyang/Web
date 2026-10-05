@@ -29,7 +29,7 @@ interface Props {
   loading: boolean;
   error: string | null;
   onRetry: () => void;             // 실패 시 "다시 시도" — 다른 탭(헬스장·학식·셔틀)과 동일한 CardFallback 패턴
-  title: string;                   // 리스트 타이틀 (예: '제휴 식당' | '이 위치 제휴 매장')
+  title: string;                   // 리스트 타이틀 (예: '식당' | '매장')
   college: string;                 // 단과대 필터 ('all' | collegeId)
   onCollegeChange: (id: string) => void;
   resetSignal: string;             // 값이 바뀌면 리스트 스크롤을 맨 위로 (칩·단과대 변경 시)
