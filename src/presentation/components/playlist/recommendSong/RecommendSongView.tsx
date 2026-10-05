@@ -291,6 +291,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                           onPlay={onPlay}
                           isPlaying={track.trackId === currentTrackId}
                           onSelect={setSelectedTrack}
+                          albumArtSelects
                           selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
                           disabled={alreadyRecommended}
                           disabledMessage="최근 추천함"

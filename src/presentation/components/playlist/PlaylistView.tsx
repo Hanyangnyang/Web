@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
@@ -33,7 +33,7 @@ type ScreenFrame =
   | { name: 'main' }
   // scrollTarget: 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
   | { name: 'recent'; scrollTarget: string | null }
-  // prefillTrack: 게시글 모음의 "이 곡 추천하러 가기"처럼 특정 곡이 미리 채워진 채로 진입할 때의 곡
+  // prefillTrack: 게시글 모음에서 FAB을 누르는 등 특정 곡이 미리 채워진 채로 진입할 때의 곡
   | { name: 'addSong'; prefillTrack: TrackSummary | null }
   | { name: 'search' }
   // track: 검색 결과·인기차트 등에서 눌러 선택된 곡 — TrackPostCollectionView(곡 단위 게시글 모음)에 넘김
@@ -118,6 +118,23 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const pushAddSong = useCallback((prefill?: TrackSummary) => {
     pushScreen({ name: 'addSong', prefillTrack: prefill ?? null });
   }, [pushScreen]);
+
+  // 게시글 모음(trackPosts) 화면이 조회로 채운 곡 정보 — 딥링크로 들어오면 스택 칸의 track은 title 등이 비어 있어서
+  // 화면이 resolve한 값을 따로 받아둠. FAB 클릭 시점에만 읽으면 돼서 state가 아니라 ref로 보관
+  const resolvedTrackPostsTrackRef = useRef<TrackSummary | null>(null);
+  const handleResolveTrackPostsTrack = useCallback((track: TrackSummary) => {
+    resolvedTrackPostsTrackRef.current = track;
+  }, []);
+
+  // 곡 추천하기 FAB — 게시글 모음 화면에서 누르면 그 곡이 미리 채워진 채로 곡추천하기 화면으로 이동, 그 외 화면은 빈 폼
+  const handleAddSongFabClick = useCallback(() => {
+    if (screen.name === 'trackPosts') {
+      const resolved = resolvedTrackPostsTrackRef.current;
+      pushAddSong(resolved?.trackId === screen.track.trackId ? resolved : screen.track);
+      return;
+    }
+    pushAddSong();
+  }, [screen, pushAddSong]);
 
   // 뒤로가기는 스택을 한 단계씩 pop — 어느 화면에서 들어왔는지와 무관하게 항상 바로 이전 화면으로 돌아감
   const popScreen = useCallback(() => {
@@ -286,7 +303,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSelectPost={handleSelectPost}
             onPlay={() => handlePlay(screen.track)}
             isPlaying={screen.track.trackId === playingTrackId}
-            onRecommendTrack={pushAddSong}
+            onResolveTrack={handleResolveTrackPostsTrack}
           />
         ) : screen.name === 'postDetail' ? (
           <PostView
@@ -364,7 +381,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
       {screen.name !== 'addSong' && (
-        <AddSongFab onClick={() => pushAddSong()} playerHeight={playerHeight} />
+        <AddSongFab onClick={handleAddSongFabClick} playerHeight={playerHeight} />
       )}
 
       {/* 플로팅 Spotify 플레이어*/}

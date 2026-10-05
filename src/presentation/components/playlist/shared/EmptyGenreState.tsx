@@ -2,8 +2,8 @@ import { Plus } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 interface EmptyGenreStateProps {
-  // 클릭 시 동작 — 화면마다 다를 수 있음(곡추천하기로 이동/검색으로 이동 등)
-  onAction: () => void;
+  // 클릭 시 동작 — 화면마다 다를 수 있음(곡추천하기로 이동/검색으로 이동 등). 없으면 버튼 없이 안내 문구만 표시
+  onAction?: () => void;
   // 화면마다 문맥이 달라서(장르 필터 결과 없음/저장한 곡 없음 등) 문구를 오버라이드할 수 있게 함
   message?: string;
   buttonLabel?: string;
@@ -24,6 +24,14 @@ export function EmptyGenreState({
   buttonIcon,
   boxed = false,
 }: EmptyGenreStateProps) {
+  if (!onAction) {
+    return (
+      <div className={`w-full flex flex-col items-center justify-center py-10 px-4 text-center ${boxed ? 'bg-white rounded-xl' : ''}`}>
+        <p className="text-sm font-semibold text-text-sub">{message}</p>
+      </div>
+    );
+  }
+
   return (
     <button
       onClick={onAction}

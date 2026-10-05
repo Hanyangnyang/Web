@@ -29,7 +29,8 @@ export interface ReportSongParams {
 }
 
 export interface ToggleBookmarkParams {
-  songId: string;
+  // 좋아요(북마크)는 게시글이 아니라 곡 단위 — 같은 곡의 모든 게시글에 공통 적용됨
+  trackId: string;
   deviceId: string;
 }
 

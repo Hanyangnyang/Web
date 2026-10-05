@@ -19,6 +19,9 @@ interface MusicSearchResultCardProps {
   // 가수명/게시글 옆 화살표 표시 여부 — 곡추천하기 화면의 검색 결과에서는 "다음 화면으로 이동"이 아니라
   // "이 곡을 고른다"는 동작이라 화살표가 어울리지 않아서 false로 끔. 기본값은 true(검색결과 화면 등)
   showChevron?: boolean;
+  // true면 앨범커버를 눌렀을 때 재생이 아니라 하단 정보 영역과 같은 onSelect(곡 선택)가 실행됨 —
+  // 곡추천하기 화면 검색 결과용. 가운데 재생 아이콘은 그대로 두고(onPlay가 있으면), 그 아이콘만 눌렀을 때 재생됨
+  albumArtSelects?: boolean;
   className?: string;
 }
 
@@ -33,6 +36,7 @@ export function MusicSearchResultCard({
   disabledMessage,
   onRecommend,
   showChevron = true,
+  albumArtSelects = false,
   className = 'w-36',
 }: MusicSearchResultCardProps) {
   return (
@@ -40,7 +44,35 @@ export function MusicSearchResultCard({
       className={`flex-shrink-0 ${className} rounded-xl border border-slate-200 bg-white overflow-hidden transition-opacity ${disabled ? 'opacity-40' : ''}`}
     >
       {/* 앨범커버 */}
-      {onPlay ? (
+      {albumArtSelects ? (
+        <div className="relative w-full aspect-square">
+          <button
+            onClick={() => onSelect(track)}
+            disabled={disabled}
+            aria-label={selectLabel}
+            className="block w-full h-full active:scale-95 transition-transform disabled:pointer-events-none"
+          >
+            <img src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
+          </button>
+          {/* 표지 전체는 곡 선택 버튼이고, 가운데 원형 아이콘만 별도 버튼으로 재생/일시정지(선택으로 전파되지 않게 막음) */}
+          {onPlay && !disabled && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlay(track);
+              }}
+              aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
+              className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center active:scale-95 transition-transform"
+            >
+              {isPlaying ? (
+                <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+              ) : (
+                <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
+              )}
+            </button>
+          )}
+        </div>
+      ) : onPlay ? (
         <button
           onClick={() => onPlay(track)}
           disabled={disabled}

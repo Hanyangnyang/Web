@@ -152,8 +152,8 @@ export const createPlaylistRepository = (
   },
 
   toggleBookmark: async (params) => {
-    const res = await playlistApiDataSource.postLike(params.songId, { deviceId: params.deviceId });
-    const data = unwrap(res, 'playlist song like', (d) => !!d && typeof d.isLiked === 'boolean');
+    const res = await playlistApiDataSource.postTrackLike(params.trackId, { deviceId: params.deviceId });
+    const data = unwrap(res, 'playlist track like', (d) => !!d && typeof d.isLiked === 'boolean');
 
     return data.isLiked;
   },

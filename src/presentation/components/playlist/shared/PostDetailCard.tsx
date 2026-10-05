@@ -121,7 +121,7 @@ export function PostDetailCard({
     }
     const optimistic = !bookmarked;
     setBookmarked(optimistic);
-    toggleBookmark.mutate(post.id, {
+    toggleBookmark.mutate(post.trackId, {
       onSuccess: (isLiked) => setBookmarked(isLiked),
       onError: () => setBookmarked(!optimistic),
     });
@@ -204,6 +204,16 @@ export function PostDetailCard({
           // control: 버튼 히트 영역을 앨범커버 전체가 아니라 눈에 보이는 원(카드 폭 대비 %)만큼만 잡아서,
           // 그 바깥을 누르면 카드 자체의 onSelect(상세로 전환/게시글 보기)로 넘어가게 함
           <AlbumArtPlayButton onPlay={onPlay} label={`${post.title} 재생`} sizeClass={playButtonSizeClass} isPlaying={isPlaying} />
+        )}
+
+        {onPlay && playButtonVariant === 'control' && !hideReactions && (
+          // control + 1열(최근추가된곡 리스트 뷰): 가운데 원형 버튼의 모양은 그대로 두되, 앨범커버 어디를 눌러도
+          // 재생/일시정지되도록 터치 영역만 커버 전체로 넓힘 — 위 원형 버튼 위에 투명 버튼을 덮어서 같은 동작을 함
+          <button
+            onClick={handleAlbumArtPlay}
+            aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
+            className="absolute inset-0 z-[1] cursor-pointer"
+          />
         )}
 
         {onPlay && isTestPlayButton && (

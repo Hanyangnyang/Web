@@ -79,7 +79,8 @@ export interface PlaylistSongReportDto {
   status: string;
 }
 
-// 좋아요(=서비스 내 표기는 "북마크") 토글 응답 — 서버가 현재 상태 보고 등록/취소를 알아서 판단.
+// 곡 좋아요(=서비스 내 표기는 "북마크") 토글 응답 — 곡(trackId) 단위라 같은 곡의 모든 게시글에 공통 적용되고,
+// 서버가 현재 상태 보고 등록/취소를 알아서 판단.
 // 동시성 제어·원자적 카운트 증감은 서버가 보장하므로 클라이언트는 그냥 호출만 하면 됨
 export interface ToggleLikeDto {
   isLiked: boolean;
@@ -175,7 +176,8 @@ export interface PlaylistApiDataSource {
   searchSongs: (params: SearchSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
-  postLike: (songId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
+  // 곡(trackId) 단위 좋아요 토글 — 같은 곡의 모든 게시글에 공통 적용
+  postTrackLike: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
   // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 응답 data는 빈 객체라 성공 여부만 확인
   postTrackPlay: (trackId: string) => Promise<ApiResponse<Record<string, never>>>;
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
@@ -210,7 +212,7 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     const { deviceId, page = DEFAULT_PAGE, size = DEFAULT_SIZE } = params;
     const query = new URLSearchParams({ deviceId, page: String(page), size: String(size) });
 
-    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/liked?${query.toString()}`));
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/tracks/liked?${query.toString()}`));
   },
 
   getMySongs: async (params) => {
@@ -234,8 +236,8 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
   postReport: async (songId, body) =>
     parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/reports`, body)),
 
-  postLike: async (songId, body) =>
-    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/like`, body)),
+  postTrackLike: async (trackId, body) =>
+    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/tracks/${trackId}/like`, body)),
 
   postTrackPlay: async (trackId) =>
     parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/tracks/${trackId}/play`, {})),

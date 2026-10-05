@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, PenLine, Play, Share2 } from 'lucide-react';
+import { Heart, MessageCircle, Play, Share2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type ReactionKey } from '../postReactions';
@@ -21,8 +21,9 @@ interface TrackPostCollectionViewProps {
   onPlay: () => void;
   // 지금 이 곡이 하단 플레이어에서 재생 중인지 — true면 재생 아이콘이 일시정지 아이콘으로 바뀜
   isPlaying?: boolean;
-  // 게시글이 하나도 없을 때 뜨는 "이 곡 추천하러 가기" 버튼 — 지금 곡이 미리 채워진 채로 곡추천하기 화면으로 이동
-  onRecommendTrack: (track: TrackSummary) => void;
+  // 딥링크로 들어와 title 등이 비어 있던 곡 정보가 조회로 채워지면 부모에게 알려줌 — 부모(PlaylistView)의
+  // 곡 추천하기 FAB이 이 화면에서 눌렸을 때 이 곡을 미리 채워서 곡추천하기 화면으로 보내려고 씀
+  onResolveTrack: (track: TrackSummary) => void;
 }
 
 const SORT_OPTIONS = [
@@ -31,7 +32,7 @@ const SORT_OPTIONS = [
 ] as const;
 
 // 곡 단위 게시글 모음 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
-export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, onRecommendTrack }: TrackPostCollectionViewProps) {
+export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, onResolveTrack }: TrackPostCollectionViewProps) {
   const [sort, setSort] = useState<TrackPostsSort>('latest');
   const { data, isLoading } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
@@ -45,22 +46,25 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
     artist: data?.artist || track.artist,
     albumArtUrl: data?.albumArtUrl || track.albumArtUrl,
   };
+  const { trackId, title, artist, albumArtUrl } = displayTrack;
+  useEffect(() => {
+    onResolveTrack({ trackId, title, artist, albumArtUrl });
+  }, [trackId, title, artist, albumArtUrl, onResolveTrack]);
   // 딥링크로 들어와서 아직 곡 정보를 하나도 못 받은 상태 — 이때만 곡 정보 카드에 스켈레톤을 보여줌
   const isTrackInfoLoading = isLoading && !track.title && !data;
 
-  const [bookmarkedByPost, setBookmarkedByPost] = useState<Record<string, boolean>>({});
+  // 좋아요(북마크)는 곡 단위라 이 화면의 모든 게시글이 같은 상태를 공유함 — 서버가 준 첫 게시글의 값으로 초기화
+  const [bookmarked, setBookmarked] = useState(false);
   const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
   // 게시글 목록을 새로 받아올 때마다(정렬 변경 포함) 서버가 준 초기 북마크/반응 상태로 로컬 상태를 다시 맞춤
   useEffect(() => {
     if (!data) return;
-    const bookmarks: Record<string, boolean> = {};
     const reactions: Record<string, ReactionState> = {};
     for (const post of data.posts) {
       if (!post.id) continue;
-      bookmarks[post.id] = post.isBookmarked ?? false;
       reactions[post.id] = toReactionState(post.reactions);
     }
-    setBookmarkedByPost(bookmarks);
+    setBookmarked(data.posts[0]?.isBookmarked ?? false);
     setReactionsByPost(reactions);
   }, [data]);
 
@@ -68,18 +72,10 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   const report = useSongReport();
   const share = useShareModal(displayTrack);
 
-  const { toggleBookmark, toggleReactionMutation } = usePostInteractionMutations();
+  const { toggleReactionMutation } = usePostInteractionMutations();
 
-  // 낙관적으로 먼저 뒤집고, 서버 응답의 실제 isLiked로 맞추거나 실패 시 되돌림.
-  // 로딩 표시로 막지 않고 연타도 그대로 받아서 매번 뒤집음 — 순수 낙관적 UI
-  const handleToggleBookmark = (postId: string) => {
-    const optimistic = !(bookmarkedByPost[postId] ?? false);
-    setBookmarkedByPost((prev) => ({ ...prev, [postId]: optimistic }));
-    toggleBookmark.mutate(postId, {
-      onSuccess: (isLiked) => setBookmarkedByPost((prev) => ({ ...prev, [postId]: isLiked })),
-      onError: () => setBookmarkedByPost((prev) => ({ ...prev, [postId]: !optimistic })),
-    });
-  };
+  // TODO: 곡 좋아요 API(POST /api/v1/playlist/songs/tracks/{trackId}/like) 연동 전까지는 화면 상태만 뒤집음
+  const handleToggleBookmark = () => setBookmarked((prev) => !prev);
 
   // 낙관적으로 카운트 증감 후, 서버가 내려준 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤. 연타는 무시
   const handleToggleReaction = (postId: string, key: ReactionKey) => {
@@ -131,16 +127,42 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               alt={displayTrack.title}
               className="w-full h-full object-cover bg-slate-100"
             />
+            {/* 앨범커버 어디를 눌러도 재생/일시정지되도록 터치 영역을 커버 전체로 넓힘 — 아래 우상단 재생 아이콘·
+                하트·공유 아이콘은 DOM 순서상 이 버튼 위에 쌓여서 각자의 동작을 그대로 유지함 */}
+            <button
+              onClick={onPlay}
+              aria-label={isPlaying ? `${displayTrack.title} 일시정지` : `${displayTrack.title} 재생`}
+              className="absolute inset-0 cursor-pointer"
+            />
             {/* 재생 중엔 일시정지 아이콘으로 바뀌어서 그대로 눌러 멈출 수 있음 */}
             <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} variant="corner" />
+            {/* 곡 좋아요(하트) — 곡 단위라 게시글 리스트가 아니라 앨범커버에 두고, 공유 아이콘(p-2 + 24px = 40px 폭) 왼쪽에 8px 간격으로 배치(터치 영역은 8px 겹침) */}
+            <button
+              onClick={handleToggleBookmark}
+              aria-label="이 곡 좋아요"
+              className="absolute bottom-0 right-8 p-2 active:scale-95 transition-transform"
+            >
+              <Heart
+                size={24}
+                stroke="white"
+                fill={bookmarked ? 'white' : 'none'}
+                strokeWidth={2}
+                className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]"
+              />
+            </button>
+            {/* 곡 공유하기 — 앨범커버 오른쪽 하단에 우상단 재생 아이콘과 같은 흰색 아이콘 스타일로 배치(눌리는 영역은 p-2로 확보).
+                곡 추천하기는 이 화면의 FAB(PlaylistView)이 이 곡을 미리 채워서 처리함 */}
+            <button
+              onClick={() => share.open()}
+              aria-label="곡 공유하기"
+              className="absolute bottom-0 right-0 p-2 active:scale-95 transition-transform"
+            >
+              <Share2 size={24} stroke="white" strokeWidth={2} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" />
+            </button>
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
             <div className="leading-tight">
-              {/* 제목이 한 줄이어도 두 줄 높이(text-lg 줄 높이 1.75rem × 2 = 3.5rem)를 항상 확보하고 아래쪽(가수명 쪽)에 붙임 —
-                  제목 길이와 상관없이 구분선·통계·버튼 위치가 똑같이 유지되게 하려는 것 */}
-              <div className="min-h-[3.5rem] text-lg flex flex-col justify-end">
-                <div className="font-bold text-text-main line-clamp-2 break-words">{displayTrack.title}</div>
-              </div>
+              <div className="text-lg font-bold text-text-main line-clamp-2 break-words">{displayTrack.title}</div>
               <div className="text-sm text-text-sub truncate">{displayTrack.artist}</div>
             </div>
             <div className="border-t border-slate-300" />
@@ -153,30 +175,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                 <Play size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
                 {totalPlayCount.toLocaleString()}회
               </span>
-            </div>
-            {/* 버튼이 늘어서 좁은 화면에서 잘리지 않도록, 줄바꿈 대신 EmojiReactionBar와 같은 방식의
-                가로 스크롤로 처리(각 버튼은 flex-shrink-0으로 폭을 그대로 유지) */}
-            <div
-              className="flex-1 flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [&>:first-child]:ml-auto [&>:last-child]:mr-auto"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {/* 곡 추천하기/곡 공유하기 — 곡 검색 결과 카드의 "이 곡 추천하러 가기"와 같은 보라색(playlist-accent)으로 맞춤 */}
-              <button
-                onClick={() => onRecommendTrack(displayTrack)}
-                aria-label="곡 추천하기"
-                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-white border border-playlist-accent/40 text-playlist-accent shadow-sm flex items-center gap-1 active:scale-95 active:bg-playlist-accent/10 transition-all"
-              >
-                <PenLine size={13} strokeWidth={2} />
-                <span className="text-xs font-bold whitespace-nowrap">곡 추천하기</span>
-              </button>
-              <button
-                onClick={() => share.open()}
-                aria-label="곡 공유하기"
-                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-white border border-playlist-accent/40 text-playlist-accent shadow-sm flex items-center gap-1 active:scale-95 active:bg-playlist-accent/10 transition-all"
-              >
-                <Share2 size={13} strokeWidth={2} />
-                <span className="text-xs font-bold whitespace-nowrap">곡 공유하기</span>
-              </button>
             </div>
           </div>
         </div>
@@ -212,19 +210,13 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       )}
 
       {!isLoading && posts.length === 0 && (
-        <EmptyGenreState
-          message="아직 이 곡을 추천한 게시글이 없어요"
-          buttonLabel="이 곡 추천하러 가기"
-          buttonIcon={<PenLine size={14} strokeWidth={2.5} />}
-          onAction={() => onRecommendTrack(displayTrack)}
-        />
+        <EmptyGenreState message="아직 이 곡을 추천한 게시글이 없어요" />
       )}
 
       {/* 게시글 리스트 — 카드 사이 간격을 둬서 항목마다 분리된 느낌 */}
       <div className="flex flex-col gap-1">
         {posts.map((post) => {
           const postId = post.id;
-          const bookmarked = postId ? bookmarkedByPost[postId] ?? false : false;
           const reactions = (postId ? reactionsByPost[postId] : undefined) ?? {};
 
           return (
@@ -249,21 +241,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
 
                 {!post.isMine && (
                   <div className="flex items-start gap-3 flex-shrink-0">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (postId) handleToggleBookmark(postId);
-                      }}
-                      aria-label="이 게시글 북마크"
-                      className="active:scale-90 transition-transform"
-                    >
-                      <Heart
-                        size={18}
-                        className={bookmarked ? 'text-text-main' : 'text-text-sub'}
-                        fill={bookmarked ? 'currentColor' : 'none'}
-                        strokeWidth={2}
-                      />
-                    </button>
                     <PostMoreMenu report={report} menuKey={postId ?? ''} reportTargetId={postId} />
                   </div>
                 )}

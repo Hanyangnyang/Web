@@ -19,5 +19,12 @@ export function patchSongInListCaches(queryClient: QueryClient, songId: string, 
   }
 }
 
+// 곡 단위 좋아요(북마크)는 같은 곡(trackId)의 모든 게시글에 공통 적용되므로 trackId가 같은 게시글을 전부 패치
+export function patchTrackInListCaches(queryClient: QueryClient, trackId: string, patch: (song: Song) => Song) {
+  for (const key of SONG_LIST_QUERY_KEYS) {
+    queryClient.setQueryData<Song[]>(key, (prev) => prev?.map((song) => (song.trackId === trackId ? patch(song) : song)));
+  }
+}
+
 // useSongSearch(게시글 검색)/useMusicSearch(Spotify 곡 검색)가 공유하는 최소 글자 수 — 이보다 짧으면 호출하지 않음
 export const SONG_SEARCH_MIN_LENGTH = 2;
