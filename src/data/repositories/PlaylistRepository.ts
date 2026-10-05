@@ -1,5 +1,5 @@
 // 레포지토리: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요/재생기록/이모지반응/곡별게시글모아보기/인기차트(새 백엔드)를 도메인 엔티티로 변환해 제공
-import { apiError, type ApiResponse } from '../../infrastructure/http/HttpClient.js';
+import { apiError, type ApiResponse, type HttpError } from '../../infrastructure/http/HttpClient.js';
 import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '../../domain/entities/PlaylistSong.js';
 import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
 import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
@@ -174,7 +174,27 @@ export const createPlaylistRepository = (
   },
 
   getTrackPosts: async (params) => {
-    const res = await playlistApiDataSource.getTrackPosts(params);
+    let res;
+    try {
+      res = await playlistApiDataSource.getTrackPosts(params);
+    } catch (e) {
+      // 404 + C003은 "이 곡에 달린 게시글이 0개"라는 뜻 — 에러가 아니라 정상적인 빈 결과로 바꿔서 돌려줌.
+      // 에러로 던지면 react-query가 재시도(기본 3회)를 하고 최종 실패 시 Sentry에도 쌓이기 때문
+      const err = e as HttpError;
+      if (err?.statusCode === 404 && err.code === 'C003') {
+        return createTrackPosts({
+          trackId: params.trackId,
+          title: '',
+          artist: '',
+          albumArtUrl: '',
+          totalSongsCount: 0,
+          totalHeartCount: 0,
+          totalPlayCount: 0,
+          posts: [],
+        });
+      }
+      throw e;
+    }
     const data = unwrap(res, 'track posts', (d) => !!d && Array.isArray(d.songs?.content));
 
     return createTrackPosts({
