@@ -95,8 +95,16 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   // 곡/장르/코멘트 중 하나라도 채워져 있으면 뒤로가기 시 확인 팝업을 거침
   const hasUnsavedContent = !!selectedTrack || selectedGenres.length > 0 || comment.trim().length > 0;
 
-  // 안드로이드 하드웨어 뒤로가기 — 확인 팝업이 떠 있으면 팝업만 닫고, 저장 안 한 내용이 있으면 팝업을 띄움
+  // 오늘 추천 가능한 곡을 이미 다 채운 상태 — 진입하자마자 막는 팝업을 띄움(상태 로딩 중엔 undefined라 안 뜸)
+  const isDailyLimitReached = creationStatus?.canCreate === false;
+
+  // 안드로이드 하드웨어 뒤로가기 — 한도 소진 팝업이 떠 있으면 바로 나가고, 확인 팝업이 떠 있으면 팝업만 닫고,
+  // 저장 안 한 내용이 있으면 팝업을 띄움
   const handleBackRequest = () => {
+    if (isDailyLimitReached) {
+      onBack();
+      return;
+    }
     if (showLeaveConfirmPopup) {
       setShowLeaveConfirmPopup(false);
       return;
@@ -435,6 +443,28 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-50 whitespace-pre-line text-center copy-toast">
           {submitToast}
         </div>
+      )}
+
+      {/* 1일 3곡 한도를 이미 채운 사용자 — 곡 검색·작성을 헛수고하지 않게 진입 즉시 막음. 바깥을 눌러도
+          안 닫히고 뒤로가기만 가능(서버 PL001이 최종 방어선이라 이 팝업은 안내용) */}
+      {isDailyLimitReached && (
+        <ConfirmPopup
+          buttons={
+            <button
+              onClick={onBack}
+              className="w-full h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+            >
+              뒤로가기
+            </button>
+          }
+        >
+          <p className="text-sm font-semibold text-text-main mb-1 text-center">오늘 추천 가능한 곡을 모두 채웠어요!</p>
+          <p className="text-xs text-text-sub mb-4 text-center">
+            하루에 최대 {creationStatus?.dailyMaxLimit ?? 3}곡까지 추천할 수 있어요.
+            <br />
+            내일 다시 참여해주세요 :)
+          </p>
+        </ConfirmPopup>
       )}
 
       {/* 서버 일시 장애(C004) 재시도 유도 팝업 */}
