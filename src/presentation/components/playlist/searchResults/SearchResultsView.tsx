@@ -29,7 +29,7 @@ interface SearchResultsViewProps {
 
 const MIN_QUERY_LENGTH = 2;
 
-// 검색 결과 화면 — 곡 검색은 BE 카탈로그 검색 API(/api/v1/playlist/catalog/tracks/search), 게시글 검색은 BE 추천글 통합 검색 API 연동 완료
+// 검색 결과 화면 — 곡 검색은 BE 카탈로그 검색 API(/api/v1/playlist/catalog/tracks/search), 게시글 검색은 BE 게시글 통합 검색 API 연동 완료
 export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId, onShowAddSong, onRecommendTrack }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
@@ -82,7 +82,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                   <div className="px-2 py-1.5">
                     <div className="h-3.5 w-24 rounded-full skeleton-shimmer" />
                     <div className="mt-1.5 h-3 w-16 rounded-full skeleton-shimmer" />
-                    {/* 추천글 N개 줄 자리 — 실제 카드는 가수명 아래 이 줄이 하나 더 있는데 빠져있었음 */}
+                    {/* 게시글 N개 줄 자리 — 실제 카드는 가수명 아래 이 줄이 하나 더 있는데 빠져있었음 */}
                     <div className="mt-1 h-2.5 w-14 rounded-full skeleton-shimmer" />
                   </div>
                   {/* 세 번째 행(곡 추천하기) 자리 — MusicSearchResultCard와 같은 높이로 맞춰서

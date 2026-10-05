@@ -11,12 +11,12 @@ interface MusicSearchResultCardProps {
   selectLabel: string;
   // true면 카드를 흐리게 하고 클릭을 막음 — 곡추천하기에서 최근 7일 내 이미 추천한 곡에 씀
   disabled?: boolean;
-  // disabled일 때 "추천글 N개" 대신 보여줄 안내 문구(예: "최근 추천함")
+  // disabled일 때 "게시글 N개" 대신 보여줄 안내 문구(예: "최근 추천함")
   disabledMessage?: string;
   // 카드 안에 "곡 추천하기" 행을 세 번째 섹션으로 추가함(앨범커버/곡정보/곡추천하기) — 검색결과 화면에서
   // 이 곡이 미리 채워진 채로 곡추천하기 화면으로 바로 이동시키는 용도. 안 넘기면(예: 곡추천하기 화면 자체) 행이 아예 안 뜸
   onRecommend?: (track: MusicSearchTrack) => void;
-  // 가수명/추천글 옆 화살표 표시 여부 — 곡추천하기 화면의 검색 결과에서는 "다음 화면으로 이동"이 아니라
+  // 가수명/게시글 옆 화살표 표시 여부 — 곡추천하기 화면의 검색 결과에서는 "다음 화면으로 이동"이 아니라
   // "이 곡을 고른다"는 동작이라 화살표가 어울리지 않아서 false로 끔. 기본값은 true(검색결과 화면 등)
   showChevron?: boolean;
   className?: string;
@@ -66,7 +66,7 @@ export function MusicSearchResultCard({
       )}
 
       {/* 하단 정보 영역 — 눌렀을 때 동작은 onSelect로 화면마다 위임. 제목은 화살표와 무관하게 자기
-          줄을 온전히 차지하고, 화살표는 그 아래 가수명+추천글 두 줄에만 세로 중앙 정렬되게
+          줄을 온전히 차지하고, 화살표는 그 아래 가수명+게시글 두 줄에만 세로 중앙 정렬되게
           그 둘을 별도 flex row로 묶음(제목까지 셋을 한 row로 묶으면 화살표가 제목 쪽까지 걸쳐 보였음) */}
       <button
         onClick={() => onSelect(track)}
@@ -81,14 +81,14 @@ export function MusicSearchResultCard({
             {disabled && disabledMessage ? (
               <div className="text-[10px] font-semibold text-red-400 truncate">{disabledMessage}</div>
             ) : (
-              // 이 곡에 등록된 추천글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount
+              // 이 곡에 등록된 게시글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount
               <div className="flex items-center gap-0.5 text-[10px] text-text-hint truncate">
                 <MessageCircle size={10} className="flex-shrink-0" />
-                <span>추천글 {track.recommendationCount}개</span>
+                <span>게시글 {track.recommendationCount}개</span>
               </div>
             )}
           </div>
-          {/* 가수명/추천글 옆 빈 공간에 카드를 누르면 넘어간다는 걸 알려주는 화살표 */}
+          {/* 가수명/게시글 옆 빈 공간에 카드를 누르면 넘어간다는 걸 알려주는 화살표 */}
           {showChevron && <ChevronRight size={14} className="text-text-hint flex-shrink-0" strokeWidth={2.5} />}
         </div>
       </button>

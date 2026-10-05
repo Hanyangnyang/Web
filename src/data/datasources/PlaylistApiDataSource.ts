@@ -169,9 +169,9 @@ export interface PlaylistApiDataSource {
   getCreationStatus: (deviceId: string) => Promise<ApiResponse<SongCreationStatusDto>>;
   // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   getLikedSongs: (params: GetLikedSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
-  // 내가 등록한 추천글 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
+  // 내가 등록한 게시글 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   getMySongs: (params: GetMySongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
-  // 추천글 가중치 통합 검색(제목/가수/코멘트) — 응답 형태는 getSongs와 동일한 페이지네이션 구조
+  // 게시글 가중치 통합 검색(제목/가수/코멘트) — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   searchSongs: (params: SearchSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   postSong: (body: CreatePlaylistSongDto) => Promise<ApiResponse<PlaylistSongDto>>;
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;

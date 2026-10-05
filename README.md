@@ -162,11 +162,11 @@ src/
 | `/api/v1/academic/status` | 학사 및 셔틀/시설 통합 운영 상태 조회 | 5분(FE staleTime, BE 캐시 주기 미확인) | 앱부팅 시 `BootContext`가 prefetch(스플래시 게이팅 대상—실패해도 markReady는 호출) + 셔틀탭이 `academic`/`shuttle` 필드로 기간·셔틀 dayType·운행여부를 판정. `calendar` 필드는 학교 자체 공휴일까지 섞여 있어 지하철엔 안 씀(아래 date-info 참고) |
 | `/api/v1/holidays/date-info` | 특정 날짜의 평일/주말/공휴일/미운행 상태 조회 | 1시간(FE staleTime, BE 캐시 주기 미확인) | 지하철 연결정보가 필요한 정류장에서만 조회 |
 | `/api/v1/playlist/songs` | 플레이리스트 피드 곡 목록 조회 (최근추가된곡) | 0(항상 최신값) — 여러 사용자가 실시간으로 올리는 피드라 캐싱 안 함 | 콜드스타트 fetch, 최근추가된곡 화면 진입마다 |
-| `/api/v1/playlist/songs/{id}` | 게시글(추천글) 단건 상세 조회 | 0(항상 최신값) | 게시글 목록(TrackPostCollectionView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostView) 진입 |
+| `/api/v1/playlist/songs/{id}` | 게시글 단건 상세 조회 | 0(항상 최신값) | 게시글 목록(TrackPostCollectionView/SearchResultsView 등)에서 항목 클릭 시 상세화면(PostView) 진입 |
 | `/api/v1/playlist/songs/creation-status` | 곡 작성 전 사용자 기기 상태 조회 (오늘 남은 등록 횟수, 최근 7일 중복 추천곡) | 0(항상 최신값) | 곡추천하기 화면 진입(컴포넌트 재마운트)마다. 헤더에 남은 횟수 표시, 최근 7일 내 추천한 곡은 검색 결과에서 선택 자체를 막음 |
 | `/api/v1/playlist/songs/liked` | 내가 좋아요(=서비스 내 "저장") 누른 곡 목록 조회 | 0(항상 최신값) | 저장한 곡 화면 진입(컴포넌트 재마운트)마다 |
-| `/api/v1/playlist/songs/my-songs` | 내가 등록(작성)한 추천글 목록 조회 | 0(항상 최신값) | 내가 등록한 곡 화면 진입(컴포넌트 재마운트)마다 |
-| `/api/v1/playlist/songs/search` | 추천글 가중치 통합 검색 (제목/가수/코멘트) | 0(항상 최신값) | 검색 결과 화면의 "게시글" 섹션 — 검색어(query)가 바뀔 때마다(queryKey에 포함돼 자동 재조회), 2자 미만이면 호출 안 함 |
+| `/api/v1/playlist/songs/my-songs` | 내가 등록(작성)한 게시글 목록 조회 | 0(항상 최신값) | 내가 등록한 곡 화면 진입(컴포넌트 재마운트)마다 |
+| `/api/v1/playlist/songs/search` | 게시글 가중치 통합 검색 (제목/가수/코멘트) | 0(항상 최신값) | 검색 결과 화면의 "게시글" 섹션 — 검색어(query)가 바뀔 때마다(queryKey에 포함돼 자동 재조회), 2자 미만이면 호출 안 함 |
 | `POST /api/v1/playlist/songs` | 곡 추천 및 등록 | 해당없음 (뮤테이션, 캐싱 대상 아님) | 등록 확인 팝업에서 최종 확정 시, 성공하면 위 목록 캐시 맨 앞에 즉시 반영. `isPending` 동안 버튼 비활성화로 중복 제출 방지 |
 | `POST /api/v1/playlist/songs/{id}/reports` | 곡 게시글 신고하기 | 해당없음 (뮤테이션) | 더보기 메뉴 → 사유 선택 → 신고하기 클릭 시 |
 | `POST /api/v1/playlist/songs/{id}/like` | 좋아요(=서비스 내 "저장") 토글 | 해당없음 (뮤테이션) | 저장 배지 클릭 시. 낙관적 업데이트 + 실패 시 롤백, 이전 요청 `isPending` 중엔 연타 무시 |

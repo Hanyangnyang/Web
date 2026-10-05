@@ -92,9 +92,9 @@ export interface PlaylistRepository {
   getSongCreationStatus: (params: GetSongCreationStatusParams) => Promise<SongCreationStatus>;
   // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 조회 — 북마크한 곡 화면용
   getBookmarkedSongs: (params: GetBookmarkedSongsParams) => Promise<PlaylistSong[]>;
-  // 내가 등록(작성)한 추천글 목록 조회 — 내가 등록한 곡 화면용
+  // 내가 등록(작성)한 게시글 목록 조회 — 내가 등록한 곡 화면용
   getMySongs: (params: GetMySongsParams) => Promise<PlaylistSong[]>;
-  // 추천글 가중치 통합 검색(제목/가수/코멘트) — 검색 결과 화면의 "게시글" 섹션용
+  // 게시글 가중치 통합 검색(제목/가수/코멘트) — 검색 결과 화면의 "게시글" 섹션용
   searchSongs: (params: SearchSongsParams) => Promise<PlaylistSong[]>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;
   reportSong: (params: ReportSongParams) => Promise<void>;

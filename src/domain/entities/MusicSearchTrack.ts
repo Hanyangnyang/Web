@@ -4,7 +4,7 @@ export interface MusicSearchTrack {
   title: string;
   artist: string;
   albumArtUrl: string;
-  // 이 곡에 대해 서비스에 등록된, 삭제되지 않은 추천글 수 — 검색 결과 카드에 "추천글 N개"로 표기
+  // 이 곡에 대해 서비스에 등록된, 삭제되지 않은 게시글 수 — 검색 결과 카드에 "게시글 N개"로 표기
   recommendationCount: number;
 }
 
