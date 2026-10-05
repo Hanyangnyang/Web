@@ -136,7 +136,11 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
             <div className="leading-tight">
-              <div className="text-lg font-bold text-text-main truncate">{displayTrack.title}</div>
+              {/* 제목이 한 줄이어도 두 줄 높이(text-lg 줄 높이 1.75rem × 2 = 3.5rem)를 항상 확보하고 아래쪽(가수명 쪽)에 붙임 —
+                  제목 길이와 상관없이 구분선·통계·버튼 위치가 똑같이 유지되게 하려는 것 */}
+              <div className="min-h-[3.5rem] text-lg flex flex-col justify-end">
+                <div className="font-bold text-text-main line-clamp-2 break-words">{displayTrack.title}</div>
+              </div>
               <div className="text-sm text-text-sub truncate">{displayTrack.artist}</div>
             </div>
             <div className="border-t border-slate-300" />
@@ -153,14 +157,14 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             {/* 버튼이 늘어서 좁은 화면에서 잘리지 않도록, 줄바꿈 대신 EmojiReactionBar와 같은 방식의
                 가로 스크롤로 처리(각 버튼은 flex-shrink-0으로 폭을 그대로 유지) */}
             <div
-              className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+              className="flex-1 flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [&>:first-child]:ml-auto [&>:last-child]:mr-auto"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {/* 곡 추천하기/곡 공유하기 — 위 게시글 N개·재생 N회와 같은 색(text-text-sub)으로 맞춤 */}
+              {/* 곡 추천하기/곡 공유하기 — 곡 검색 결과 카드의 "이 곡 추천하러 가기"와 같은 보라색(playlist-accent)으로 맞춤 */}
               <button
                 onClick={() => onRecommendTrack(displayTrack)}
                 aria-label="곡 추천하기"
-                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-sub flex items-center gap-1 active:scale-95 active:bg-slate-200 transition-all"
+                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-white border border-playlist-accent/40 text-playlist-accent shadow-sm flex items-center gap-1 active:scale-95 active:bg-playlist-accent/10 transition-all"
               >
                 <PenLine size={13} strokeWidth={2} />
                 <span className="text-xs font-bold whitespace-nowrap">곡 추천하기</span>
@@ -168,7 +172,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               <button
                 onClick={() => share.open()}
                 aria-label="곡 공유하기"
-                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-slate-100 text-text-sub flex items-center gap-1 active:scale-95 active:bg-slate-200 transition-all"
+                className="flex-shrink-0 h-7 pl-2.5 pr-3 rounded-full bg-white border border-playlist-accent/40 text-playlist-accent shadow-sm flex items-center gap-1 active:scale-95 active:bg-playlist-accent/10 transition-all"
               >
                 <Share2 size={13} strokeWidth={2} />
                 <span className="text-xs font-bold whitespace-nowrap">곡 공유하기</span>
