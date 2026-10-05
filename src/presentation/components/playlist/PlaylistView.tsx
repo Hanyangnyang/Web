@@ -26,6 +26,7 @@ import { useScreenDwellTracking } from '../../hooks/playlist/useScreenDwellTrack
 const RECENT_SONGS_LIMIT = 7;
 const SUSTAINED_PLAY_THRESHOLD_MS = 3000; // 재생 시작 후 이만큼 지속돼야 "진짜 재생"으로 집계(오탭 걸러내기 — docs/playlist-recent-songs-ab-test.md 참고)
 const CHART_PREVIEW_LIMIT = 10;
+const EMPTY_SONGS: Song[] = []; // 데이터 도착 전 fallback — 매 렌더마다 새 [] 를 만들면 songs를 deps로 쓰는 콜백이 계속 재생성되므로 모듈 상수로 고정
 const TRACK_PLAY_THROTTLE_MS = 10 * 1000; // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
@@ -42,14 +43,13 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const isApp = isNativeApp();
   const platform = getPlatform();
   const posthog = usePostHog();
+
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고
   const recentSongsVariant = useRecentSongsTapAreaVariant();
   const [searchQuery, setSearchQuery] = useState('');
   const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
-  const [songs, setSongs] = useState<Song[]>([]);
-  useEffect(() => {
-    if (fetchedSongs) setSongs(fetchedSongs);
-  }, [fetchedSongs]);
+  const songs = fetchedSongs ?? EMPTY_SONGS;
+
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
   const { data: chartData, isLoading: isChartLoading } = usePopularityChart(chartPeriod);
@@ -65,6 +65,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const recordTrackPlay = useRecordTrackPlay();
   // trackId별 마지막 재생기록 전송 시각 — 리렌더와 무관하게 유지돼야 해서 state가 아니라 ref
   const lastPlayRecordedAtRef = useRef<Map<string, number>>(new Map());
+  
   // 재생이 3초 이상 지속됐는지 검사할 때 최신 재생 상태를 읽기 위한 ref — setTimeout 콜백은 handlePlay가
   // 만들어진 시점의 state를 그대로 들고 있어서(클로저), 그 사이 다른 곡을 누르거나 멈춘 최신 상태를 못 봄
   const isPausedRef = useRef(isPaused);
@@ -72,6 +73,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const currentTrackRef = useRef(currentTrack);
   useEffect(() => { currentTrackRef.current = currentTrack; }, [currentTrack]);
   const sustainedPlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
   // 재생 버튼이 어디서 눌리든(최근추가곡/인기차트/검색/게시글 등) 이 함수 하나로 모임 — 같은 곡이 이미
   // 로드돼 있으면 재생/일시정지만 토글하고, 다른 곡이면 새로 로드해서 재생 + 재생수 기록(트랙별 스로틀 적용).
   // surface를 넘기면 "최근 추가된 곡" A/B 테스트 지표(재생 시작/3초 이상 지속)를 표면별로 캡처함
@@ -108,6 +110,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     lastPlayRecordedAtRef.current.set(track.trackId, now);
     recordTrackPlay.mutate(track.trackId);
   }, [currentTrack, isPaused, recordTrackPlay.mutate, posthog, recentSongsVariant]);
+
   // FloatingSpotifyPlayer가 실측해서 올려주는 카드 높이(px) — 0이면 플레이어 닫힘.
   const [playerHeight, setPlayerHeight] = useState(0);
   const handlePlayerHeightChange = useCallback((height: number) => setPlayerHeight(height), []);
@@ -117,6 +120,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
   const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
+  
   // 최근추가된곡/저장한곡/추천한곡 화면의 그리드·리스트 뷰 모드 — 이 화면들은 게시글 상세로 갔다가
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
