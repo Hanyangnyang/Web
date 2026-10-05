@@ -30,6 +30,8 @@ const EMPTY_SONGS: Song[] = []; // 데이터 도착 전 fallback — 매 렌더�
 const TRACK_PLAY_THROTTLE_MS = 10 * 1000; // 같은 곡을 연타/실수로 여러 번 눌러도 인기차트 재생수가 과하게 부풀지 않도록, 트랙별로 이 시간 안엔 재생기록을 다시 안 보냄
 
 type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
+type ViewMode = 'grid' | 'list';
+type ListScreen = 'recent' | 'bookmarked' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들
 // 홈/최근추가된곡 화면만 체류시간(A/B 테스트 지표)을 잰다 — useScreenDwellTracking 참고
 const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = ['main', 'recent'];
 
@@ -124,9 +126,13 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   // 최근추가된곡/저장한곡/추천한곡 화면의 그리드·리스트 뷰 모드 — 이 화면들은 게시글 상세로 갔다가
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
-  const [recentViewMode, setRecentViewMode] = useState<'grid' | 'list'>('list');
-  const [bookmarkedViewMode, setBookmarkedViewMode] = useState<'grid' | 'list'>('list');
-  const [mySongsViewMode, setMySongsViewMode] = useState<'grid' | 'list'>('list');
+  const [viewModes, setViewModes] = useState<Record<ListScreen, ViewMode>>({
+    recent: 'list',
+    bookmarked: 'list',
+    mySongs: 'list',
+  });
+  const changeViewMode = (listScreen: ListScreen) => (mode: ViewMode) =>
+    setViewModes((prev) => ({ ...prev, [listScreen]: mode }));
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
   const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
   const screen = screenStack[screenStack.length - 1];
@@ -188,7 +194,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     trackedScreens: DWELL_TRACKED_SCREENS,
     dwellProps: {
       variant: recentSongsVariant,
-      ...(screen === 'recent' ? { view_mode: recentViewMode } : {}),
+      ...(screen === 'recent' ? { view_mode: viewModes.recent } : {}),
     },
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
     // 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
@@ -292,8 +298,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSelectTrack={handleSelectSearchTrack}
             scrollToTrackId={recentScrollTarget}
             currentTrackId={playingTrackId}
-            viewMode={recentViewMode}
-            onViewModeChange={setRecentViewMode}
+            viewMode={viewModes.recent}
+            onViewModeChange={changeViewMode('recent')}
             playButtonVariant={recentSongsVariant}
           />
         ) : screen === 'addSong' ? (
@@ -359,8 +365,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowRecent={handleShowAllRecent}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
-            viewMode={bookmarkedViewMode}
-            onViewModeChange={setBookmarkedViewMode}
+            viewMode={viewModes.bookmarked}
+            onViewModeChange={changeViewMode('bookmarked')}
           />
         ) : screen === 'mySongs' ? (
           <MySongsView
@@ -369,8 +375,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowAddSong={() => pushAddSong()}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
-            viewMode={mySongsViewMode}
-            onViewModeChange={setMySongsViewMode}
+            viewMode={viewModes.mySongs}
+            onViewModeChange={changeViewMode('mySongs')}
           />
         ) : (
           <PlaylistHomeView
