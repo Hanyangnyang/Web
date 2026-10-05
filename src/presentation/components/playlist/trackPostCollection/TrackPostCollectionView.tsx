@@ -132,7 +132,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               className="w-full h-full object-cover bg-slate-100"
             />
             {/* 재생 중엔 일시정지 아이콘으로 바뀌어서 그대로 눌러 멈출 수 있음 */}
-            <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} />
+            <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} variant="corner" />
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
             <div className="leading-tight">
