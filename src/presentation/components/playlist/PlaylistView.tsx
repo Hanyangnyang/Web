@@ -27,7 +27,24 @@ const RECENT_SONGS_LIMIT = 7;
 const CHART_PREVIEW_LIMIT = 10;
 const EMPTY_SONGS: Song[] = []; // 데이터 도착 전 fallback — 매 렌더마다 새 [] 를 만들면 songs를 deps로 쓰는 콜백이 계속 재생성되므로 모듈 상수로 고정
 
-type PlaylistScreen = 'main' | 'recent' | 'addSong' | 'search' | 'trackPosts' | 'postDetail' | 'chart' | 'myActivity' | 'bookmarked' | 'mySongs';
+// 화면 스택의 한 칸 = 화면 이름 + 그 화면이 쓰는 파라미터. 파라미터를 칸마다 들고 있어야, 같은 화면이 스택에
+// 여러 번 쌓여도(예: 곡A 게시글모음 → 게시글 → 곡B 게시글모음) 뒤로가기 때 각 칸이 자기 값을 그대로 복원함
+type ScreenFrame =
+  | { name: 'main' }
+  // scrollTarget: 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
+  | { name: 'recent'; scrollTarget: string | null }
+  // prefillTrack: 게시글 모음의 "이 곡 추천하러 가기"처럼 특정 곡이 미리 채워진 채로 진입할 때의 곡
+  | { name: 'addSong'; prefillTrack: TrackSummary | null }
+  | { name: 'search' }
+  // track: 검색 결과·인기차트 등에서 눌러 선택된 곡 — TrackPostCollectionView(곡 단위 게시글 모음)에 넘김
+  | { name: 'trackPosts'; track: TrackSummary }
+  // postId: 게시글 목록에서 눌러 선택된 게시글 id — PostView가 GET /api/v1/playlist/songs/{id}로 상세 조회
+  | { name: 'postDetail'; postId: string }
+  | { name: 'chart' }
+  | { name: 'myActivity' }
+  | { name: 'bookmarked' }
+  | { name: 'mySongs' };
+type PlaylistScreen = ScreenFrame['name'];
 type ViewMode = 'grid' | 'list';
 type ListScreen = 'recent' | 'bookmarked' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들
 // 홈/최근추가된곡 화면만 체류시간(A/B 테스트 지표)을 잰다 — useScreenDwellTracking 참고
@@ -65,13 +82,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     handlePlaybackStateChange,
     handlePlayerHeightChange,
   } = usePlaylistPlayer(recentSongsVariant);
-  // 검색 결과의 곡 카드 또는 주간/월간 인기차트 리스트를 눌러 선택된 곡 — 값이 있으면 TrackPostCollectionView(곡 단위 게시글 모음)로 이동
-  const [selectedTrackForPosts, setSelectedTrackForPosts] = useState<TrackSummary | null>(null);
-  // 게시글 목록에서 눌러 선택된 게시글 id — 값이 있으면 PostView가 GET /api/v1/playlist/songs/{id}로 상세 조회
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-  // 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
-  const [recentScrollTarget, setRecentScrollTarget] = useState<string | null>(null);
-  
+
   // 최근추가된곡/저장한곡/추천한곡 화면의 그리드·리스트 뷰 모드 — 이 화면들은 게시글 상세로 갔다가
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
@@ -84,7 +95,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     setViewModes((prev) => ({ ...prev, [listScreen]: mode }));
   
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
-  const [screenStack, setScreenStack] = useState<PlaylistScreen[]>(['main']);
+  const [screenStack, setScreenStack] = useState<ScreenFrame[]>([{ name: 'main' }]);
   const screen = screenStack[screenStack.length - 1];
   // "어떤 곡을 추천해볼까요?" 클릭 시 검색 결과 화면(빈 검색어라 보여줄 게 없음) 대신
   // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistHomeView가 마운트될 때 한 번 소비
@@ -95,19 +106,17 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   // 그래서 이 화면에 들어오는 시점 자체를 트리거로 삼아 직접 refetch — staleTime이 안 지났으면
   // react-query가 알아서 네트워크 요청 없이 캐시를 그대로 반환함
   useEffect(() => {
-    if (screen === 'recent') refetchRecentSongs();
-  }, [screen, refetchRecentSongs]);
+    if (screen.name === 'recent') refetchRecentSongs();
+  }, [screen.name, refetchRecentSongs]);
 
-  const pushScreen = useCallback((next: PlaylistScreen) => {
+  const pushScreen = useCallback((next: ScreenFrame) => {
     setScreenStack((prev) => [...prev, next]);
   }, []);
 
   // 게시글 모음의 "이 곡 추천하러 가기" 버튼처럼 특정 곡이 미리 채워진 채로 곡추천하기 화면에 들어갈 때 씀.
-  // prefill 없이 부르는 모든 진입점(FAB 등)에서는 매번 null로 초기화해서, 이전에 넣어뒀던 값이 새는 걸 막음
-  const [addSongPrefillTrack, setAddSongPrefillTrack] = useState<TrackSummary | null>(null);
+  // 파라미터가 스택 칸에 담겨서, prefill 없이 부르는 진입점(FAB 등)은 null로 쌓으면 끝 — 이전 값이 새지 않음
   const pushAddSong = useCallback((prefill?: TrackSummary) => {
-    setAddSongPrefillTrack(prefill ?? null);
-    pushScreen('addSong');
+    pushScreen({ name: 'addSong', prefillTrack: prefill ?? null });
   }, [pushScreen]);
 
   // 뒤로가기는 스택을 한 단계씩 pop — 어느 화면에서 들어왔는지와 무관하게 항상 바로 이전 화면으로 돌아감
@@ -119,8 +128,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   // 볼 수 있게 최근추가된곡으로 보냄. addSong 프레임을 그대로 recent로 바꿔치기해서(push가 아님)
   // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음
   const handleAddSongSuccess = useCallback(() => {
-    setRecentScrollTarget(null);
-    setScreenStack((prev) => [...prev.slice(0, -1), 'recent']);
+    setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
 
   const handleBack = useCallback(() => {
@@ -140,26 +148,25 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원 + 홈/최근추가된곡
   // 체류시간(A/B 테스트 지표)을 PostHog로 캡처 — 로직 전체는 useScreenDwellTracking 참고
   const { scrollContainerRef } = useScreenDwellTracking({
-    screen,
+    screen: screen.name,
     trackedScreens: DWELL_TRACKED_SCREENS,
     dwellProps: {
       variant: recentSongsVariant,
-      ...(screen === 'recent' ? { view_mode: viewModes.recent } : {}),
+      ...(screen.name === 'recent' ? { view_mode: viewModes.recent } : {}),
     },
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
     // 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
     // 안 그러면 이 훅이 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
-    skipScrollRestore: screen === 'recent' && !!recentScrollTarget,
+    skipScrollRestore: screen.name === 'recent' && !!screen.scrollTarget,
   });
 
   const handleSearchSubmit = useCallback(() => {
     if (!searchQuery.trim()) return;
-    pushScreen('search');
+    pushScreen({ name: 'search' });
   }, [searchQuery, pushScreen]);
 
   const handleSelectSearchTrack = useCallback((track: TrackSummary) => {
-    setSelectedTrackForPosts(track);
-    pushScreen('trackPosts');
+    pushScreen({ name: 'trackPosts', track });
   }, [pushScreen]);
 
   // 카카오 공유 등 딥링크로 넘어온 trackId를 한 번 적용해 그 곡의 게시글 모음으로 바로 이동시키고,
@@ -173,19 +180,21 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
   // 인기차트 리스트 클릭 — ChartTrack을 TrackSummary 형태로 변환해 동일한 TrackPostCollectionView로 이동
   const handleSelectChartSong = useCallback((track: ChartTrack) => {
-    setSelectedTrackForPosts({
-      trackId: track.trackId,
-      title: track.title,
-      artist: track.artist,
-      albumArtUrl: track.albumArtUrl,
+    pushScreen({
+      name: 'trackPosts',
+      track: {
+        trackId: track.trackId,
+        title: track.title,
+        artist: track.artist,
+        albumArtUrl: track.albumArtUrl,
+      },
     });
-    pushScreen('trackPosts');
   }, [pushScreen]);
 
   // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostView로 이동
   const handleSelectPost = useCallback((post: Song) => {
-    setSelectedPostId(post.id ?? null);
-    pushScreen('postDetail');
+    if (!post.id) return; // id가 없으면 상세 조회를 못 하므로 이동하지 않음
+    pushScreen({ name: 'postDetail', postId: post.id });
   }, [pushScreen]);
 
   // 홈의 하단 "더보기"는 미리보기 마지막 곡 위치까지 부드럽게 내려간 뒤 이어서 목록을 보게 한다.
@@ -195,15 +204,13 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
     posthog?.capture('playlist_recent_show_all_clicked', { variant: recentSongsVariant, trigger: scrollToLastPreview ? 'more_button' : 'header_arrow' });
     const previewSongs = songs.slice(0, RECENT_SONGS_LIMIT);
     const lastPreviewTrackId = previewSongs[previewSongs.length - 1]?.trackId ?? null;
-    setRecentScrollTarget(scrollToLastPreview ? lastPreviewTrackId : null);
-    pushScreen('recent');
+    pushScreen({ name: 'recent', scrollTarget: scrollToLastPreview ? lastPreviewTrackId : null });
   }, [pushScreen, songs, posthog, recentSongsVariant]);
 
   // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤
   const handleSelectRecentSong = useCallback((song: Song) => {
     posthog?.capture('playlist_recent_preview_navigate', { variant: recentSongsVariant, track_id: song.trackId });
-    setRecentScrollTarget(song.trackId);
-    pushScreen('recent');
+    pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
   const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
@@ -213,7 +220,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   // 여백 계산에 FAB의 실제 크기·간격(AddSongFab.tsx가 export하는 값과 항상 일치)까지 더해야
   // 목록 마지막 항목이 FAB에 가려지지 않는다
   const FAB_GAP_ABOVE_CONTENT = 12;
-  const isFabVisible = screen !== 'addSong';
+  const isFabVisible = screen.name !== 'addSong';
   const bottomSpace = isFabVisible
     ? playerHeight > 0
       ? playerHeight + PLAYER_GAP_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT // 플레이어 위에 뜬 FAB까지 감안
@@ -234,8 +241,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
         '--playlist-bottom-space': `${bottomSpace}px`,
       } as CSSProperties}
     >
-      <div key={screen} style={{ animation: 'fadeIn 0.25s ease-out' }}>
-        {screen === 'recent' ? (
+      <div key={screen.name} style={{ animation: 'fadeIn 0.25s ease-out' }}>
+        {screen.name === 'recent' ? (
           <RecentSongsView
             songs={songs}
             onBack={popScreen}
@@ -243,25 +250,25 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowAddSong={() => pushAddSong()}
             onShowSearch={() => {
               setAutoFocusSearch(true);
-              setScreenStack(['main']);
+              setScreenStack([{ name: 'main' }]);
             }}
             onSelectTrack={handleSelectSearchTrack}
-            scrollToTrackId={recentScrollTarget}
+            scrollToTrackId={screen.scrollTarget}
             currentTrackId={playingTrackId}
             viewMode={viewModes.recent}
             onViewModeChange={changeViewMode('recent')}
             playButtonVariant={recentSongsVariant}
           />
-        ) : screen === 'addSong' ? (
+        ) : screen.name === 'addSong' ? (
           <RecommendSongView
             onBack={popScreen}
             onSubmitSuccess={handleAddSongSuccess}
             playerHeight={playerHeight}
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
-            prefillTrack={addSongPrefillTrack}
+            prefillTrack={screen.prefillTrack}
           />
-        ) : screen === 'search' ? (
+        ) : screen.name === 'search' ? (
           <SearchResultsView
             query={searchQuery}
             onBack={popScreen}
@@ -272,24 +279,24 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowAddSong={() => pushAddSong()}
             onRecommendTrack={pushAddSong}
           />
-        ) : screen === 'trackPosts' && selectedTrackForPosts ? (
+        ) : screen.name === 'trackPosts' ? (
           <TrackPostCollectionView
-            track={selectedTrackForPosts}
+            track={screen.track}
             onBack={popScreen}
             onSelectPost={handleSelectPost}
-            onPlay={() => handlePlay(selectedTrackForPosts)}
-            isPlaying={selectedTrackForPosts.trackId === playingTrackId}
+            onPlay={() => handlePlay(screen.track)}
+            isPlaying={screen.track.trackId === playingTrackId}
             onRecommendTrack={pushAddSong}
           />
-        ) : screen === 'postDetail' && selectedPostId ? (
+        ) : screen.name === 'postDetail' ? (
           <PostView
-            postId={selectedPostId}
+            postId={screen.postId}
             onBack={popScreen}
             onPlay={handlePlay}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
           />
-        ) : screen === 'chart' ? (
+        ) : screen.name === 'chart' ? (
           <ChartView
             chart={chartTracks}
             isLoading={isChartLoading}
@@ -301,13 +308,13 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onShowPosts={handleSelectChartSong}
             currentTrackId={playingTrackId}
           />
-        ) : screen === 'myActivity' ? (
+        ) : screen.name === 'myActivity' ? (
           <MyPageView
             onBack={popScreen}
-            onShowBookmarked={() => pushScreen('bookmarked')}
-            onShowMySongs={() => pushScreen('mySongs')}
+            onShowBookmarked={() => pushScreen({ name: 'bookmarked' })}
+            onShowMySongs={() => pushScreen({ name: 'mySongs' })}
           />
-        ) : screen === 'bookmarked' ? (
+        ) : screen.name === 'bookmarked' ? (
           <BookmarkedSongsView
             onBack={popScreen}
             onPlay={handlePlay}
@@ -318,7 +325,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             viewMode={viewModes.bookmarked}
             onViewModeChange={changeViewMode('bookmarked')}
           />
-        ) : screen === 'mySongs' ? (
+        ) : screen.name === 'mySongs' ? (
           <MySongsView
             onBack={popScreen}
             onPlay={handlePlay}
@@ -345,9 +352,9 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             recentSongsVariant={recentSongsVariant}
             onPlayTrack={(track) => handlePlay(track, 'home_preview')}
             currentTrackId={playingTrackId}
-            onShowAllChart={() => pushScreen('chart')}
+            onShowAllChart={() => pushScreen({ name: 'chart' })}
             onShowPosts={handleSelectChartSong}
-            onShowMyActivity={() => pushScreen('myActivity')}
+            onShowMyActivity={() => pushScreen({ name: 'myActivity' })}
             onShowAddSong={() => pushAddSong()}
             autoFocusSearch={autoFocusSearch}
             onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
@@ -356,7 +363,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
       </div>
 
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
-      {screen !== 'addSong' && (
+      {screen.name !== 'addSong' && (
         <AddSongFab onClick={() => pushAddSong()} playerHeight={playerHeight} />
       )}
 
