@@ -61,9 +61,11 @@ interface Props {
   // 소비하고 나면 onDeepLinkChipHandled로 부모(App.tsx)에 알려 null로 되돌리게 한다
   deepLinkChip?: string | null;
   onDeepLinkChipHandled?: () => void;
+  // 같은 탭(캠퍼스맵)을 다시 눌렀을 때 값이 바뀐다 — 검색 화면이 열려 있으면 닫고 지도로 돌아온다
+  resetSignal?: number;
 }
 
-export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHandled }: Props) {
+export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHandled, resetSignal = 0 }: Props) {
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY,
     // clusterer: 마커 밀집 대비, services: 좌표↔주소 변환 대비
@@ -87,6 +89,14 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   }, [deepLinkChip]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // 마운트 직후 초기값 0에는 반응하지 않고, 이후 신호가 바뀔 때만 검색을 닫는다
+  const prevResetSignal = useRef(resetSignal);
+  useEffect(() => {
+    if (prevResetSignal.current === resetSignal) return;
+    prevResetSignal.current = resetSignal;
+    setSearchOpen(false);
+  }, [resetSignal]);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // 지도가 실제로 그려지는 컨테이너의 픽셀 높이 — focusMap이 '시트 제외 영역 정중앙'을 계산할 때 쓴다
@@ -470,7 +480,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
             loading={storesLoading}
             error={storesError}
             onRetry={refetchStores}
-            title={storeCategory ? (storeCategory === 'all' ? '제휴 매장' : `제휴 ${CATEGORY_META[storeCategory].label}`) : ''}
+            title={storeCategory ? (storeCategory === 'all' ? '매장' : CATEGORY_META[storeCategory].label) : ''}
             college={college}
             onCollegeChange={handleCollegeChange}
             resetSignal={`${storeCategory ?? 'none'}:${college}`}
