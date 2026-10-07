@@ -7,7 +7,7 @@ export interface TrackPosts {
   artist: string;
   albumArtUrl: string;
   totalSongsCount: number;
-  // 이 곡에 달린 모든 추천 게시글의 공감(북마크) 수 합계
+  // 이 곡에 달린 모든 추천 게시글의 좋아요 수 합계
   totalHeartCount: number;
   // 이 곡의 누적 재생수 — 게시글마다 동일한 값이라 아무 게시글에서나 꺼내 씀(레포지토리에서 계산)
   totalPlayCount: number;

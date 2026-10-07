@@ -3,19 +3,19 @@ import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 
 interface MyPageViewProps {
   onBack: () => void;
-  onShowBookmarked: () => void;
+  onShowLiked: () => void;
   onShowMySongs: () => void;
 }
 
 const MENU_ITEMS = [
-  { key: 'bookmarked', emoji: '❤️', title: '저장한 곡', subtitle: '내가 저장한 곡 게시글 모음' },
+  { key: 'liked', emoji: '❤️', title: '저장한 곡', subtitle: '내가 저장한 곡 모음' },
   { key: 'mySongs', emoji: '🎤', title: '추천한 곡', subtitle: '내가 추천한 곡 모음' },
 ] as const;
 
 // 홈 화면 우측 상단 사람 아이콘에서 진입하는 마이페이지 — 저장한 곡/내가 추천한 곡으로 이동
-export function MyPageView({ onBack, onShowBookmarked, onShowMySongs }: MyPageViewProps) {
+export function MyPageView({ onBack, onShowLiked, onShowMySongs }: MyPageViewProps) {
   const handleSelect = (key: (typeof MENU_ITEMS)[number]['key']) => {
-    if (key === 'bookmarked') onShowBookmarked();
+    if (key === 'liked') onShowLiked();
     else onShowMySongs();
   };
 

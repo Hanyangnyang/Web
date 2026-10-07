@@ -5,7 +5,7 @@ import { useShareModal } from '../shared/useShareModal';
 interface ChartSongRowProps {
   track: ChartTrack;
   onPlay: (track: ChartTrack) => void;
-  // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청 — 북마크가 "곡"이 아니라 "게시글"에 귀속돼서
+  // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청
   // 여러 게시글이 있을 수 있는 곡 하나에 바로 붙일 수 없어 상세 보기로 유도
   onShowPosts: (track: ChartTrack) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜

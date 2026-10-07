@@ -61,7 +61,7 @@ function toPlaylistSong(d: PlaylistSongDto, myDeviceId?: string): PlaylistSong {
     albumArtUrl: d.albumArtUrl,
     comment: d.comment,
     genres: (d.genres ?? []).map((g) => GENRE_LABEL[g] ?? g),
-    isBookmarked: d.isLiked,
+    isLiked: d.isLiked,
     isMine: !!myDeviceId && d.deviceId === myDeviceId,
     reactions: toReactions(d.reactions),
     // 곡 등록(POST) 직후 응답엔 createdAt이 null로 내려옴(DB 기록 시점과 응답 시점이 안 맞는 것으로 보임) —
@@ -88,11 +88,11 @@ export const createPlaylistRepository = (
     return toPlaylistSong(data, params.deviceId);
   },
 
-  getBookmarkedSongs: async (params) => {
+  getLikedSongs: async (params) => {
     const res = await playlistApiDataSource.getLikedSongs(params);
     const data = unwrap(res, 'playlist liked songs', (d) => !!d && Array.isArray(d.content));
 
-    // 북마크한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
+    // 좋아요한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
     return data.content.map((d) => toPlaylistSong(d, params.deviceId));
   },
 
@@ -151,7 +151,7 @@ export const createPlaylistRepository = (
     assertSuccess(res, 'playlist song report');
   },
 
-  toggleBookmark: async (params) => {
+  toggleLike: async (params) => {
     const res = await playlistApiDataSource.postTrackLike(params.trackId, { deviceId: params.deviceId });
     const data = unwrap(res, 'playlist track like', (d) => !!d && typeof d.isLiked === 'boolean');
 

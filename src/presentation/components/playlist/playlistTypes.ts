@@ -13,7 +13,7 @@ export interface TrackSummary {
   albumArtUrl: string;
 }
 
-// RecentSongsView/BookmarkedSongsView/MySongsView(전부 SongListScreen 위에 얇게 얹힌 화면들)가
+// RecentSongsView/LikedSongsView/MySongsView(전부 SongListScreen 위에 얇게 얹힌 화면들)가
 // 공통으로 받는 prop — 각 화면은 이걸 extends하고 자기만의 prop(데이터 소스, 빈 상태 문구 등)만 추가
 export interface SongListViewBaseProps {
   onBack: () => void;
@@ -39,8 +39,8 @@ export interface Song {
   albumArtUrl: string;
   comment: string;
   genres: string[];
-  isBookmarked?: boolean;
-  // 지금 이 기기가 등록한 게시글인지 — 북마크/신고 아이콘을 숨길지 판단하는 데 씀
+  isLiked?: boolean;
+  // 지금 이 기기가 등록한 게시글인지 — 신고 아이콘을 숨길지 판단하는 데 씀
   isMine?: boolean;
   reactions?: PlaylistReaction[];
   // react-query 캐시에 그대로 들어가 localStorage에 직렬화되므로 Date 인스턴스가 아니라 ISO 문자열로 유지 —
@@ -58,7 +58,7 @@ export function mapPlaylistSongToSong(song: PlaylistSong): Song {
     albumArtUrl: song.albumArtUrl,
     comment: song.comment,
     genres: song.genres,
-    isBookmarked: song.isBookmarked,
+    isLiked: song.isLiked,
     isMine: song.isMine,
     reactions: song.reactions,
     createdAt: song.createdAt,
@@ -76,9 +76,6 @@ export const GENRES = [
   { key: 'ballad', label: '발라드', emoji: '🎻', light: 'bg-[rgba(187,247,208,0.6)]', active: 'bg-[rgba(34,197,94,1)]' },
   { key: 'pop', label: 'POP', emoji: '🗽', light: 'bg-[rgba(153,246,228,0.6)]', active: 'bg-[rgba(20,184,166,1)]' },
   { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]' },
-  // 다른 장르에서 안 쓴 색상 계열로 — Tailwind orange-600(진한 주황)은 K-POP의 톤 다운된
-  // 커스텀 오렌지(230,140,60)보다 훨씬 채도 높고 진해서 구분되고, light도 200이 아닌 300 계열로
-  // 밝기를 달리 잡아 K-POP light(254,215,170)와 안 겹치게 함
   { key: 'ost', label: 'OST', emoji: '🎬', light: 'bg-[rgba(253,186,116,0.6)]', active: 'bg-[rgba(234,88,12,1)]' },
   { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]' },
 ];

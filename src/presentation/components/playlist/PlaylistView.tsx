@@ -10,7 +10,7 @@ import { SearchResultsView } from './searchResults/SearchResultsView';
 import { TrackPostCollectionView } from './trackPostCollection/TrackPostCollectionView';
 import { PostView } from './post/PostView';
 import { MyPageView } from './myPage/MyPageView';
-import { BookmarkedSongsView } from './bookmarkedSongs/BookmarkedSongsView';
+import { LikedSongsView } from './likedSongs/LikedSongsView';
 import { MySongsView } from './mySongs/MySongsView';
 import { PlaylistHomeView } from './home/PlaylistHomeView';
 import { type Song, type ChartPeriod, type TrackSummary } from './playlistTypes';
@@ -42,11 +42,11 @@ type ScreenFrame =
   | { name: 'postDetail'; postId: string }
   | { name: 'chart' }
   | { name: 'myActivity' }
-  | { name: 'bookmarked' }
+  | { name: 'liked' }
   | { name: 'mySongs' };
 type PlaylistScreen = ScreenFrame['name'];
 type ViewMode = 'grid' | 'list';
-type ListScreen = 'recent' | 'bookmarked' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들
+type ListScreen = 'recent' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들 (저장한 곡은 2열 고정이라 제외)
 // 홈/최근추가된곡 화면만 체류시간(A/B 테스트 지표)을 잰다 — useScreenDwellTracking 참고
 const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = ['main', 'recent'];
 
@@ -88,7 +88,6 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
   // 마지막으로 보던 모드를 그대로 복원함
   const [viewModes, setViewModes] = useState<Record<ListScreen, ViewMode>>({
     recent: 'list',
-    bookmarked: 'list',
     mySongs: 'list',
   });
   const changeViewMode = (listScreen: ListScreen) => (mode: ViewMode) =>
@@ -256,6 +255,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
           paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
         } : {}),
         '--playlist-bottom-space': `${bottomSpace}px`,
+        // 하단 플로팅 플레이어 실측 높이(닫힘이면 0) — 좋아요 토스트처럼 플레이어 위에 떠야 하는 요소가 읽음
+        '--playlist-player-height': `${playerHeight}px`,
       } as CSSProperties}
     >
       <div key={screen.name} style={{ animation: 'fadeIn 0.25s ease-out' }}>
@@ -328,19 +329,17 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
         ) : screen.name === 'myActivity' ? (
           <MyPageView
             onBack={popScreen}
-            onShowBookmarked={() => pushScreen({ name: 'bookmarked' })}
+            onShowLiked={() => pushScreen({ name: 'liked' })}
             onShowMySongs={() => pushScreen({ name: 'mySongs' })}
           />
-        ) : screen.name === 'bookmarked' ? (
-          <BookmarkedSongsView
+        ) : screen.name === 'liked' ? (
+          <LikedSongsView
             onBack={popScreen}
             onPlay={handlePlay}
             onShowAddSong={() => pushAddSong()}
             onShowRecent={handleShowAllRecent}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
-            viewMode={viewModes.bookmarked}
-            onViewModeChange={changeViewMode('bookmarked')}
           />
         ) : screen.name === 'mySongs' ? (
           <MySongsView

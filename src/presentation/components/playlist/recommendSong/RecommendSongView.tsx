@@ -1,5 +1,5 @@
 import { Loader2, Pause, Play, Search, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { GENRES, type TrackSummary } from '../playlistTypes';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
@@ -10,7 +10,8 @@ import { PLAYER_GAP_PX } from '../shared/AddSongFab';
 import { useAddSongDraft } from './useAddSongDraft';
 import { useSubmitSong } from '../../../hooks/playlist/useSubmitSong.js';
 import { useSongCreationStatus } from '../../../hooks/playlist/useSongCreationStatus.js';
-import { useMusicSearch } from '../../../hooks/playlist/useMusicSearch.js';
+import { useMusicSearch, normalizeMusicSearchQuery } from '../../../hooks/playlist/useMusicSearch.js';
+import { useRetryCountdown, getSearchErrorMessage } from '../../../hooks/playlist/useRetryCountdown.js';
 import { useBackHandler } from '../../../hooks/useBackHandler.js';
 import { type HttpError } from '../../../../infrastructure/http/HttpClient.js';
 
@@ -64,21 +65,11 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const [hasSearched, setHasSearched] = useState(false);
   // 글자 수 미달 등 API를 부르기도 전에 걸러내는 입력값 검증 에러 — 네트워크 에러(searchError)와 구분
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [retryBlockedUntil, setRetryBlockedUntil] = useState(0);
-  const { data: searchResultsData, isFetching: isSearching, error: musicSearchError } = useMusicSearch(committedQuery);
+  const { data: searchResultsData, isFetching: isSearching, error: musicSearchError, refetch: refetchMusicSearch } = useMusicSearch(committedQuery);
   const searchResults: MusicSearchTrack[] = searchResultsData ?? [];
-  const searchErrorMessage = validationError ?? musicSearchError?.message ?? null;
-
-  // 429(요청 제한) 응답이면 Retry-After만큼 재시도를 막고, 약간의 지터를 더해 동시에 몰린 여러 기기가
-  // 같은 순간에 다시 몰리지 않게 함
-  useEffect(() => {
-    if (!musicSearchError?.retryAfterSeconds) return;
-    const jitterMs = Math.random() * 1000;
-    const waitMs = musicSearchError.retryAfterSeconds * 1000 + jitterMs;
-    setRetryBlockedUntil(Date.now() + waitMs);
-    const timer = setTimeout(() => setRetryBlockedUntil(0), waitMs);
-    return () => clearTimeout(timer);
-  }, [musicSearchError]);
+  // 429(요청 제한) 응답이면 Retry-After만큼 재검색을 막고 남은 초를 안내 — 0이 되면 다시 검색 가능
+  const { remainingSeconds: retryRemainingSeconds, isBlocked: isRetryBlocked } = useRetryCountdown(musicSearchError);
+  const searchErrorMessage = validationError ?? getSearchErrorMessage(musicSearchError, retryRemainingSeconds);
 
   const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(initialDraft?.track ?? prefillTrack ?? null);
   const [selectedGenres, setSelectedGenres] = useState<string[]>(initialDraft?.selectedGenres ?? []);
@@ -130,12 +121,17 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
     const now = Date.now();
     if (now - lastSearchAtRef.current < SEARCH_COOLDOWN_MS) return;
-    if (isSearching || retryBlockedUntil > 0) return;
+    if (isSearching || isRetryBlocked) return;
     lastSearchAtRef.current = now;
 
     setValidationError(null);
     setSelectedTrack(null);
     setHasSearched(true);
+    // 직전 검색이 실패(429 등)한 같은 검색어면 쿼리 키가 그대로라 setState만으로는 재조회가 안 나가서 직접 refetch
+    if (musicSearchError && normalizeMusicSearchQuery(query) === normalizeMusicSearchQuery(committedQuery)) {
+      refetchMusicSearch();
+      return;
+    }
     setCommittedQuery(query); // useMusicSearch가 이 값으로 다시 조회(같은 검색어 30초 내 재검색이면 캐시 재사용)
   };
 
@@ -259,7 +255,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               />
               <button
                 onClick={handleSearchClick}
-                disabled={isSearching || retryBlockedUntil > 0 || !query.trim()}
+                disabled={isSearching || isRetryBlocked || !query.trim()}
                 aria-label="곡 검색"
                 className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
               >

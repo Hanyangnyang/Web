@@ -13,6 +13,7 @@ import { ReportReasonPopup } from '../shared/ReportReasonPopup';
 import { PostMoreMenu } from '../shared/PostMoreMenu';
 import { useShareModal } from '../shared/useShareModal';
 import { Toast } from '../shared/Toast';
+import { useLikeToast } from '../shared/useLikeToast';
 
 interface TrackPostCollectionViewProps {
   track: TrackSummary;
@@ -53,10 +54,10 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   // 딥링크로 들어와서 아직 곡 정보를 하나도 못 받은 상태 — 이때만 곡 정보 카드에 스켈레톤을 보여줌
   const isTrackInfoLoading = isLoading && !track.title && !data;
 
-  // 좋아요(북마크)는 곡 단위라 이 화면의 모든 게시글이 같은 상태를 공유함 — 서버가 준 첫 게시글의 값으로 초기화
-  const [bookmarked, setBookmarked] = useState(false);
+  // 좋아요는 곡 단위라 이 화면의 모든 게시글이 같은 상태를 공유함 — 서버가 준 첫 게시글의 값으로 초기화
+  const [liked, setLiked] = useState(false);
   const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
-  // 게시글 목록을 새로 받아올 때마다(정렬 변경 포함) 서버가 준 초기 북마크/반응 상태로 로컬 상태를 다시 맞춤
+  // 게시글 목록을 새로 받아올 때마다(정렬 변경 포함) 서버가 준 초기 좋아요/반응 상태로 로컬 상태를 다시 맞춤
   useEffect(() => {
     if (!data) return;
     const reactions: Record<string, ReactionState> = {};
@@ -64,18 +65,33 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       if (!post.id) continue;
       reactions[post.id] = toReactionState(post.reactions);
     }
-    setBookmarked(data.posts[0]?.isBookmarked ?? false);
+    setLiked(data.posts[0]?.isLiked ?? false);
     setReactionsByPost(reactions);
   }, [data]);
 
   const [openPickerPostId, setOpenPickerPostId] = useState<string | null>(null);
   const report = useSongReport();
+  const likeToast = useLikeToast();
   const share = useShareModal(displayTrack);
 
-  const { toggleReactionMutation } = usePostInteractionMutations();
+  const { toggleLike, toggleReactionMutation } = usePostInteractionMutations();
 
-  // TODO: 곡 좋아요 API(POST /api/v1/playlist/songs/tracks/{trackId}/like) 연동 전까지는 화면 상태만 뒤집음
-  const handleToggleBookmark = () => setBookmarked((prev) => !prev);
+  // 먼저 화면 상태를 낙관적으로 뒤집고, 응답이 오면 서버 값으로 맞추거나 실패 시 되돌림. 연타도 그대로 받아서 매번 뒤집음
+  const handleToggleLike = () => {
+    const optimistic = !liked;
+    setLiked(optimistic);
+    likeToast.show(optimistic);
+    toggleLike.mutate(trackId, {
+      onSuccess: (isLiked) => {
+        setLiked(isLiked);
+        if (isLiked !== optimistic) likeToast.show(isLiked); // 서버 상태가 예상과 다르면 실제 결과로 안내를 바로잡음
+      },
+      onError: () => {
+        setLiked(!optimistic);
+        likeToast.hide();
+      },
+    });
+  };
 
   // 낙관적으로 카운트 증감 후, 서버가 내려준 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤. 연타는 무시
   const handleToggleReaction = (postId: string, key: ReactionKey) => {
@@ -136,16 +152,16 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             />
             {/* 재생 중엔 일시정지 아이콘으로 바뀌어서 그대로 눌러 멈출 수 있음 */}
             <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} variant="corner" />
-            {/* 곡 좋아요(하트) — 곡 단위라 게시글 리스트가 아니라 앨범커버에 두고, 공유 아이콘(p-2 + 24px = 40px 폭) 왼쪽에 8px 간격으로 배치(터치 영역은 8px 겹침) */}
+            {/* 곡 좋아요(하트) — 곡 단위라 게시글 리스트가 아니라 앨범커버에 두고, 공유 아이콘(p-2 + 20px = 36px 폭) 왼쪽에 8px 간격으로 배치(터치 영역은 8px 겹침) */}
             <button
-              onClick={handleToggleBookmark}
+              onClick={handleToggleLike}
               aria-label="이 곡 좋아요"
-              className="absolute bottom-0 right-8 p-2 active:scale-95 transition-transform"
+              className="absolute bottom-0 right-7 p-2 active:scale-95 transition-transform"
             >
               <Heart
-                size={24}
+                size={20}
                 stroke="white"
-                fill={bookmarked ? 'white' : 'none'}
+                fill={liked ? 'white' : 'none'}
                 strokeWidth={2}
                 className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]"
               />
@@ -157,7 +173,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               aria-label="곡 공유하기"
               className="absolute bottom-0 right-0 p-2 active:scale-95 transition-transform"
             >
-              <Share2 size={24} stroke="white" strokeWidth={2} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" />
+              <Share2 size={20} stroke="white" strokeWidth={2} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" />
             </button>
           </div>
           <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
@@ -231,7 +247,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               aria-label="게시글 상세 보기"
               className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
             >
-              {/* 본문 + 북마크/더보기 */}
+              {/* 본문 + 좋아요/더보기 */}
               <div className="flex items-start gap-3">
                 <p className="min-w-0 flex-1 text-sm text-text-main leading-snug line-clamp-2">
                   <span className="mr-[1px]">"</span>
@@ -287,6 +303,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
 
       {/* 신고 접수 완료 토스트 */}
       {report.toast && <Toast message={report.toast} />}
+      {likeToast.node}
 
       {share.node}
     </div>

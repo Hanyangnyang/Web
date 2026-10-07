@@ -120,6 +120,30 @@ export default defineConfig(({ mode }) => {
           });
         }
       },
+      {
+        // 개발 서버 전용 목 — Spotify 곡 검색 API의 에러 응답(429/502)을 실제 백엔드 없이 재현한다.
+        // 검색창에 아래 "마법 검색어"를 입력하면 가짜 응답을, 그 외 검색어는 평소처럼 실제 백엔드로 넘긴다.
+        // configureServer는 dev 서버에서만 실행되므로 프로덕션 빌드에는 영향이 없다.
+        //   __429 → 429 + Retry-After: 10초 + PL005   (재시도 카운트다운 UX 확인)
+        //   __502 → 502 + PL004                       (Spotify 장애 문구 확인)
+        name: 'mock-music-search-errors',
+        configureServer(server) {
+          server.middlewares.use('/backend/api/v1/playlist/catalog/tracks/search', (req, res, next) => {
+            const keyword = new URL(req.url, 'http://localhost').searchParams.get('keyword');
+            const mocks = {
+              __429: { status: 429, retryAfter: 10, code: 'PL005', message: 'Spotify 요청 제한에 걸렸어요. 잠시 후 다시 시도해주세요.' },
+              __502: { status: 502, code: 'PL004', message: 'Spotify 검색에 문제가 생겼어요.' },
+            };
+            const mock = mocks[keyword];
+            if (!mock) return next();
+
+            res.statusCode = mock.status;
+            res.setHeader('Content-Type', 'application/json');
+            if (mock.retryAfter) res.setHeader('Retry-After', String(mock.retryAfter));
+            res.end(JSON.stringify({ success: false, data: null, error: { code: mock.code, message: mock.message } }));
+          });
+        },
+      },
       sentryVitePlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
         org: "hanyangnyang",

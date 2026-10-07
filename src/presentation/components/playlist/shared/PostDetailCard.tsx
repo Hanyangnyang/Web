@@ -11,6 +11,7 @@ import { ReportReasonPopup } from './ReportReasonPopup';
 import { PostMoreMenu } from './PostMoreMenu';
 import { useShareModal } from './useShareModal';
 import { Toast } from './Toast';
+import { useLikeToast } from './useLikeToast';
 
 export interface PostDetailCardData {
   // 신고하기 등 서버에 곡 id가 필요한 액션에 씀 — 실제 API 연동 전 더미 게시글엔 없을 수 있어서 옵셔널
@@ -22,9 +23,9 @@ export interface PostDetailCardData {
   body: string;
   genres: string[];
   createdAt: Date | string;
-  // 서버가 계산해서 내려주는 "지금 이 기기가 북마크했는지" 여부 — 없으면 false로 시작
-  isBookmarked?: boolean;
-  // 지금 이 기기가 등록한 게시글인지 — true면 북마크/신고 아이콘을 자동으로 숨김
+  // 서버가 계산해서 내려주는 "지금 이 기기가 좋아요했는지" 여부 — 없으면 false로 시작
+  isLiked?: boolean;
+  // 지금 이 기기가 등록한 게시글인지 — true면 신고 아이콘을 자동으로 숨김(좋아요는 본인 글도 가능)
   isMine?: boolean;
   // 서버가 내려주는 이모지별 반응 수 + 내 반응 여부 — 없으면 반응 0개로 시작
   reactions?: PlaylistReaction[];
@@ -61,7 +62,7 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
     body: song.comment,
     genres: song.genres,
     createdAt: song.createdAt,
-    isBookmarked: song.isBookmarked,
+    isLiked: song.isLiked,
     isMine: song.isMine,
     reactions: song.reactions,
   };
@@ -81,10 +82,11 @@ export function PostDetailCard({
   const isTestPlayButton = playButtonVariant === 'test';
   const [pickerOpen, setPickerOpen] = useState(false);
   const [reactions, setReactions] = useState<ReactionState>(() => toReactionState(post.reactions));
-  const [bookmarked, setBookmarked] = useState(post.isBookmarked ?? false);
+  const [liked, setLiked] = useState(post.isLiked ?? false);
   const report = useSongReport();
+  const likeToast = useLikeToast();
   const share = useShareModal({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
-  const { toggleBookmark, toggleReactionMutation } = usePostInteractionMutations();
+  const { toggleLike, toggleReactionMutation } = usePostInteractionMutations();
 
   const handleAlbumArtPlay = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -114,16 +116,20 @@ export function PostDetailCard({
 
   // 서버 응답이 오기 전에 먼저 눈에 보이게 뒤집고(낙관적 업데이트), 응답 오면 실제 값으로 맞추거나
   // 실패 시 원래 상태로 되돌림. 로딩 표시로 막지 않고 연타도 그대로 받아서 매번 뒤집음 — 순수 낙관적 UI
-  const toggleBookmarked = () => {
-    if (!post.id) {
-      setBookmarked((prev) => !prev);
-      return;
-    }
-    const optimistic = !bookmarked;
-    setBookmarked(optimistic);
-    toggleBookmark.mutate(post.trackId, {
-      onSuccess: (isLiked) => setBookmarked(isLiked),
-      onError: () => setBookmarked(!optimistic),
+  // 좋아요 API는 게시글 id가 아니라 trackId 기준이라, 게시글 id가 없어도(저장한 곡 목록처럼 곡 단위로 내려오는 경우) 호출해야 함
+  const toggleLiked = () => {
+    const optimistic = !liked;
+    setLiked(optimistic);
+    likeToast.show(optimistic);
+    toggleLike.mutate(post.trackId, {
+      onSuccess: (isLiked) => {
+        setLiked(isLiked);
+        if (isLiked !== optimistic) likeToast.show(isLiked); // 서버 상태가 예상과 다르면 실제 결과로 안내를 바로잡음
+      },
+      onError: () => {
+        setLiked(!optimistic);
+        likeToast.hide();
+      },
     });
   };
 
@@ -170,10 +176,10 @@ export function PostDetailCard({
   // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류
   const moreButton = <PostMoreMenu report={report} menuKey="more" reportTargetId={post.id} />;
 
-  // 공유/북마크 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
-  // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 북마크가 그 왼쪽
+  // 공유/좋아요 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
+  // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 좋아요가 그 왼쪽
   const actionBadgeSizeClass = hideReactions ? 'w-7' : 'w-9';
-  const bookmarkBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
+  const likeBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
   // 2열(요약 카드)의 재생 버튼은 카드 폭 자체가 좁아서 같은 16%라도 절대 크기가 작아 보임 — 더 큰 비율로 보정
   const playButtonSizeClass = hideReactions ? 'w-[22%]' : 'w-[16%]';
 
@@ -240,9 +246,8 @@ export function PostDetailCard({
           </button>
         )}
 
-        {/* 앨범커버 우측 하단 공유하기/북마크 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서
-            서로 멀리 떨어져 있어 공유 버튼을 놓치는 일이 없게 함. 북마크는 자기 글을 북마크할 이유가
-            없는 본인 게시글에서만 숨김. 공유 클릭 동작(카카오톡/링크 공유 시트)은 다음 단계에서 연결
+        {/* 앨범커버 우측 하단 공유하기/좋아요 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서
+            서로 멀리 떨어져 있어 공유 버튼을 놓치는 일이 없게 함. 좋아요는 본인 게시글에서도 누를 수 있음. 공유 클릭 동작(카카오톡/링크 공유 시트)은 다음 단계에서 연결
             (각 배지를 .relative 앨범커버 컨테이너에 직접 매다는 이유: flex 래퍼로 한 번 더 감싸면
             그 래퍼가 width:auto라 안의 w-[20%]가 기준으로 삼을 폭이 없어져 버튼이 찌그러들었음) */}
         <button
@@ -256,18 +261,16 @@ export function PostDetailCard({
           <Share2 className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} />
         </button>
 
-        {!post.isMine && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleBookmarked();
-            }}
-            aria-label="북마크"
-            className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${bookmarkBadgeRightClass}`}
-          >
-            <Heart className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} fill={bookmarked ? 'currentColor' : 'none'} />
-          </button>
-        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleLiked();
+          }}
+          aria-label="좋아요"
+          className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${likeBadgeRightClass}`}
+        >
+          <Heart className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} fill={liked ? 'currentColor' : 'none'} />
+        </button>
       </div>
 
       <div className="px-4 pt-3 pb-4 flex-1 flex flex-col">
@@ -352,6 +355,8 @@ export function PostDetailCard({
 
       {/* 신고 접수 완료 토스트 */}
       {report.toast && <Toast message={report.toast} />}
+
+      {likeToast.node}
 
       {share.node}
     </div>

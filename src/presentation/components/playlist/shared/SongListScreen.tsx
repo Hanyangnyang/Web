@@ -31,6 +31,9 @@ interface SongListScreenProps {
   onEmptyStateAction?: () => void;
   // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
+  // 2열(요약 카드)로만 보여주고 1열 상세 보기·전환 버튼은 제공하지 않음 — 카드를 눌러도 상세(1열)로 전환되지 않고,
+  // 곡명·가수명을 눌러 게시글 모음으로 이동하는 것만 가능. enableViewToggle/viewMode보다 우선
+  gridOnly?: boolean;
   // 뷰 모드를 상위(PlaylistView)에서 제어하고 싶을 때 넘김 — 게시글 상세로 갔다가 뒤로가기로 돌아와도
   // 이 화면이 통째로 언마운트/리마운트되면서 내부 state가 초기화되는데, 상위에 보관해두면 마지막으로
   // 보던 모드가 그대로 유지됨. 안 넘기면 이 화면 내부 state로만 관리(항상 1열로 시작)
@@ -63,6 +66,7 @@ export function SongListScreen({
   emptyStateButtonIcon,
   onEmptyStateAction,
   enableViewToggle = false,
+  gridOnly = false,
   scrollToTrackId,
   currentTrackId,
   emptyStateBoxed = true,
@@ -72,7 +76,7 @@ export function SongListScreen({
 }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>(enableViewToggle ? 'list' : 'grid');
-  const viewMode = viewModeProp ?? internalViewMode;
+  const viewMode = gridOnly ? 'grid' : (viewModeProp ?? internalViewMode);
   const setViewMode = (mode: 'grid' | 'list') => {
     onViewModeChange?.(mode);
     setInternalViewMode(mode);
@@ -84,7 +88,7 @@ export function SongListScreen({
   const filteredSongs = filterSongsByGenre(songs, selectedGenre);
 
   // 2열은 요약 목록, 1열은 상세 — 토글이 켜진 화면에서 2열일 때만 요약 취급
-  const isSummaryMode = enableViewToggle && viewMode === 'grid';
+  const isSummaryMode = (enableViewToggle || gridOnly) && viewMode === 'grid';
 
   const listContainerRef = useRef<HTMLDivElement>(null);
 
@@ -186,7 +190,7 @@ export function SongListScreen({
                   onPlay={() => onPlay(song)}
                   isPlaying={song.trackId === currentTrackId}
                   hideReactions={isSummaryMode}
-                  onSelect={isSummaryMode ? () => handleSelectSummary(song) : undefined}
+                  onSelect={isSummaryMode && !gridOnly ? () => handleSelectSummary(song) : undefined}
                   onSelectTrack={onSelectTrack}
                   playButtonVariant={playButtonVariant}
                 />

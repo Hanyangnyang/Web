@@ -19,11 +19,11 @@ export interface PlaylistSongDto {
   albumArtUrl: string;
   comment: string;
   genres: PlaylistGenreDto[];
-  isLiked: boolean; // 서비스 내 명칭은 "북마크"지만 API 필드명은 isLiked
+  isLiked: boolean;
   reactions: PlaylistReactionDto[];
   createdAt: string | null; // ISO 8601 — 곡 등록(POST) 직후 응답엔 null로 내려옴
   // 이 곡을 추천 등록한 기기 — 화면에 직접 표기하진 않지만, 요청 기기의 deviceId와 비교해서
-  // "내가 등록한 게시글인지"(isMine)를 판단하는 데 씀 (신고/북마크 아이콘 노출 여부 결정)
+  // "내가 등록한 게시글인지"(isMine)를 판단하는 데 씀 (신고 아이콘 노출 여부 결정)
   deviceId: string;
   // 이 게시글이 속한 곡(trackId) 전체의 누적 재생수 — 재생 기록 API가 게시글이 아니라
   // 트랙 단위(POST /tracks/{trackId}/play)라, 같은 곡의 모든 게시글에 동일한 값이 실려옴
@@ -79,7 +79,7 @@ export interface PlaylistSongReportDto {
   status: string;
 }
 
-// 곡 좋아요(=서비스 내 표기는 "북마크") 토글 응답 — 곡(trackId) 단위라 같은 곡의 모든 게시글에 공통 적용되고,
+// 곡 좋아요 토글 응답 — 곡(trackId) 단위라 같은 곡의 모든 게시글에 공통 적용되고,
 // 서버가 현재 상태 보고 등록/취소를 알아서 판단.
 // 동시성 제어·원자적 카운트 증감은 서버가 보장하므로 클라이언트는 그냥 호출만 하면 됨
 export interface ToggleLikeDto {
@@ -103,7 +103,7 @@ export interface TrackPostsDto {
   artist: string;
   albumArtUrl: string;
   totalSongsCount: number;
-  // 이 곡에 달린 모든 추천 게시글의 공감(북마크) 수 합계
+  // 이 곡에 달린 모든 추천 게시글의 좋아요 수 합계
   totalHeartCount: number;
   songs: PagedPlaylistSongsDto;
 }
@@ -168,7 +168,7 @@ export interface PlaylistApiDataSource {
   // 게시글 단건 상세 조회 — 응답 형태가 PlaylistSongDto와 동일(+heartCount/totalPlayCount/updatedAt, 화면에 안 써서 버림)
   getSongById: (songId: string, deviceId?: string) => Promise<ApiResponse<PlaylistSongDto>>;
   getCreationStatus: (deviceId: string) => Promise<ApiResponse<SongCreationStatusDto>>;
-  // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
+  // 내가 좋아요 누른 곡 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   getLikedSongs: (params: GetLikedSongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
   // 내가 등록한 게시글 목록 — 응답 형태는 getSongs와 동일한 페이지네이션 구조
   getMySongs: (params: GetMySongsDataSourceParams) => Promise<ApiResponse<PagedPlaylistSongsDto>>;
@@ -212,7 +212,7 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     const { deviceId, page = DEFAULT_PAGE, size = DEFAULT_SIZE } = params;
     const query = new URLSearchParams({ deviceId, page: String(page), size: String(size) });
 
-    return parseOrThrow(await httpClient.get(`/api/v1/playlist/tracks/liked?${query.toString()}`));
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/tracks/liked?${query.toString()}`));
   },
 
   getMySongs: async (params) => {

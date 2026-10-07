@@ -90,8 +90,11 @@ onlineManager.setEventListener(subscribeToNetworkStatus);
  *   건물 openSpaces가 string[] → OpenSpace[], 좌표 미확보 표기가 {0,0} → null.
  *   이전 캐시를 그대로 읽으면 매장이 전부 비활성으로 걸러지고(isActive undefined),
  *   오픈스페이스 자리에 undefined가 찍히며, {0,0} 건물 마커가 되살아난다.
+ *
+ * v4 (플레이리스트): Song/PlaylistSong 엔티티의 isBookmarked → isLiked 필드명 변경.
+ *   이전 캐시를 그대로 읽으면 isLiked가 undefined라 저장한 곡·최근 추가된 곡의 하트가 전부 빈 상태로 복원된다.
  */
-const CACHE_BUSTER = 'v3';
+const CACHE_BUSTER = 'v4';
 
 // buster 도입 전에는 키에 버전을 붙였다. 그 시절 항목은 아무도 읽지 않으므로 한 번 지워준다.
 const LEGACY_CACHE_KEYS = ['hyu_rq_cache_v1'];

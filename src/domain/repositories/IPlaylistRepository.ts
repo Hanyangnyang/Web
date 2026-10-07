@@ -1,4 +1,4 @@
-// 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요(북마크)/재생기록/이모지반응/곡별게시글모아보기/인기차트 계약 (구현은 data 레이어의 PlaylistRepository)
+// 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요/재생기록/이모지반응/곡별게시글모아보기/인기차트 계약 (구현은 data 레이어의 PlaylistRepository)
 import type { PlaylistSong, PlaylistReaction } from '../entities/PlaylistSong.js';
 import type { TrackPosts } from '../entities/TrackPosts.js';
 import type { PopularityChart } from '../entities/PopularityChart.js';
@@ -28,8 +28,8 @@ export interface ReportSongParams {
   reason: string;
 }
 
-export interface ToggleBookmarkParams {
-  // 좋아요(북마크)는 게시글이 아니라 곡 단위 — 같은 곡의 모든 게시글에 공통 적용됨
+export interface ToggleLikeParams {
+  // 좋아요는 게시글이 아니라 곡 단위 — 같은 곡의 모든 게시글에 공통 적용됨
   trackId: string;
   deviceId: string;
 }
@@ -64,7 +64,7 @@ export interface GetSongCreationStatusParams {
   deviceId: string;
 }
 
-export interface GetBookmarkedSongsParams {
+export interface GetLikedSongsParams {
   deviceId: string;
   page?: number;
   size?: number;
@@ -91,8 +91,8 @@ export interface PlaylistRepository {
   getSongById: (params: GetSongByIdParams) => Promise<PlaylistSong>;
   // 곡 등록 화면 진입 시 1일 3곡 제한/최근 7일 중복 추천 사전 확인용 기기 상태 조회
   getSongCreationStatus: (params: GetSongCreationStatusParams) => Promise<SongCreationStatus>;
-  // 내가 좋아요(=서비스 내 "북마크") 누른 곡 목록 조회 — 북마크한 곡 화면용
-  getBookmarkedSongs: (params: GetBookmarkedSongsParams) => Promise<PlaylistSong[]>;
+  // 내가 좋아요 누른 곡 목록 조회 — 좋아요한 곡 화면용
+  getLikedSongs: (params: GetLikedSongsParams) => Promise<PlaylistSong[]>;
   // 내가 등록(작성)한 게시글 목록 조회 — 내가 등록한 곡 화면용
   getMySongs: (params: GetMySongsParams) => Promise<PlaylistSong[]>;
   // 게시글 가중치 통합 검색(제목/가수/코멘트) — 검색 결과 화면의 "게시글" 섹션용
@@ -101,7 +101,7 @@ export interface PlaylistRepository {
   reportSong: (params: ReportSongParams) => Promise<void>;
   // 서버가 현재 상태를 보고 등록/취소를 알아서 판단(토글)하므로 원하는 목표값은 넘기지 않음 —
   // 결과로 내려온 실제 isLiked만 반환 (heartCount는 화면에 안 써서 버림)
-  toggleBookmark: (params: ToggleBookmarkParams) => Promise<boolean>;
+  toggleLike: (params: ToggleLikeParams) => Promise<boolean>;
   // 재생 버튼을 누를 때마다 기록 — 어디서 눌렸든 결과를 화면에서 안 써서 반환값 없음
   recordTrackPlay: (trackId: string) => Promise<void>;
   // 서버가 토글 후 그 곡의 9종 반응 전체 최신 카운트를 내려줘서, 화면 상태를 통째로 그걸로 맞추면 됨

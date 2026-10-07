@@ -4,7 +4,7 @@ import { type TrackSummary } from '../playlistTypes';
 
 interface ChartTopCardProps {
   track: ChartTrack;
-  // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청 — 북마크가 "곡"이 아니라 "게시글"에 귀속돼서
+  // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청
   // 여러 게시글이 있을 수 있는 곡 하나에 바로 붙일 수 없어 상세 보기로 유도
   onShowPosts: (track: ChartTrack) => void;
   // 앨범아트(흰 구분선 위쪽) 클릭 — 바로 재생

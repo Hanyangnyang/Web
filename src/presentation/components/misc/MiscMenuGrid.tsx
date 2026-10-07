@@ -46,7 +46,7 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
 
         <div className={cardClass} onClick={() => onBoxClick('playlist')}>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
-            <Music size={28} color="#10b981" />
+            <Music size={28} color="#8B5CF6" />
           </div>
           <div className="flex flex-col">
             <span className="text-[0.95rem] font-extrabold text-text-main">에리카 플레이리스트</span>

@@ -4,7 +4,8 @@ import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
 import { useSongSearch } from '../../../hooks/playlist/useSongSearch.js';
-import { useMusicSearch } from '../../../hooks/playlist/useMusicSearch.js';
+import { useMusicSearch, normalizeMusicSearchQuery } from '../../../hooks/playlist/useMusicSearch.js';
+import { useRetryCountdown, getSearchErrorMessage } from '../../../hooks/playlist/useRetryCountdown.js';
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
@@ -36,14 +37,21 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
   const [activeQuery, setActiveQuery] = useState(query);
   const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(activeQuery);
   const [localQuery, setLocalQuery] = useState(query);
-  const { data: trackResultsData, isFetching: isSearching, error: musicSearchError } = useMusicSearch(activeQuery);
+  const { data: trackResultsData, isFetching: isSearching, error: musicSearchError, refetch: refetchMusicSearch } = useMusicSearch(activeQuery);
   const trackResults: MusicSearchTrack[] = trackResultsData ?? [];
-  const searchError = musicSearchError?.message ?? null;
+  // 429(요청 제한) 응답이면 Retry-After만큼 재검색을 막고 남은 초를 안내 — 0이 되면 다시 검색 가능
+  const { remainingSeconds: retryRemainingSeconds, isBlocked: isRetryBlocked } = useRetryCountdown(musicSearchError);
+  const searchError = getSearchErrorMessage(musicSearchError, retryRemainingSeconds);
 
   // 검색바에서 Enter를 치거나 화살표 버튼을 누르면 재검색
   const handleResearch = () => {
     const trimmed = localQuery.trim();
-    if (!trimmed) return;
+    if (!trimmed || isSearching || isRetryBlocked) return;
+    // 직전 검색이 실패(429 등)한 같은 검색어면 쿼리 키가 그대로라 setState만으로는 재조회가 안 나가서 직접 refetch
+    if (musicSearchError && normalizeMusicSearchQuery(trimmed) === normalizeMusicSearchQuery(activeQuery)) {
+      refetchMusicSearch();
+      return;
+    }
     setActiveQuery(trimmed);
   };
 
