@@ -13,8 +13,10 @@ export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       if (!import.meta.env.PROD) return; // 개발 중엔 어차피 Sentry가 비활성이라 SDK만 헛로드된다
-      if (navigator.onLine === false) return; // 기기가 오프라인일 때 에러를 반환하지 않는다 
+      if (navigator.onLine === false) return; // 기기가 오프라인일 때 에러를 반환하지 않는다
       const err = error as (ApiValidationError & HttpError);
+      // 곡 검색 요청 제한(429 PL005)은 장애가 아니라 앱이 카운트다운 UX로 직접 처리하는 정상 응답이라 Sentry 노이즈만 됨
+      if (err.statusCode === 429 && err.code === 'PL005') return;
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
           tags: {

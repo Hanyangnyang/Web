@@ -6,12 +6,15 @@ import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTr
 import { type PlayableTrack } from '../shared/FloatingSpotifyPlayer';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { ConfirmPopup } from '../shared/ConfirmPopup';
+import { PlaylistFallback } from '../shared/PlaylistFallback';
+import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { PLAYER_GAP_PX } from '../shared/AddSongFab';
 import { useAddSongDraft } from './useAddSongDraft';
 import { useSubmitSong } from '../../../hooks/playlist/useSubmitSong.js';
 import { useSongCreationStatus } from '../../../hooks/playlist/useSongCreationStatus.js';
 import { useMusicSearch, normalizeMusicSearchQuery } from '../../../hooks/playlist/useMusicSearch.js';
 import { useRetryCountdown, getSearchErrorMessage } from '../../../hooks/playlist/useRetryCountdown.js';
+import { formatBlockedUntil } from './formatBlockedUntil';
 import { useBackHandler } from '../../../hooks/useBackHandler.js';
 import { type HttpError } from '../../../../infrastructure/http/HttpClient.js';
 
@@ -26,16 +29,18 @@ const MAX_GENRES = 3;
 const GENRE_OPTIONS = GENRES.filter((genre) => genre.key !== 'all');
 
 // 곡 등록 실패 에러 코드별 클라이언트 대응 (API 문서의 "곡 추천 등록 규칙"/"AI 모더레이션 검열" 그대로)
-// PL001·PL002: 토스트 노출 / PL003·C001: 문구 노출 및 수정 유도(폼 하단 인라인) / C004(500): 재시도 유도 팝업
+// PL001·PL002·PL007: 토스트 노출 / PL003·C001: 문구 노출 및 수정 유도(폼 하단 인라인) / C004(500)·PL008: 재시도 유도 팝업
+// (PL007: 같은 기기의 다른 등록이 아직 진행 중, PL008: 서버가 중복 등록 잠금을 확인하지 못한 일시 장애)
 const TOAST_ERROR_MESSAGES: Record<string, string> = {
   PL001: '오늘 추천 가능한 3곡을 모두 작성하셨어요! 내일 다시 참여해주세요.',
   PL002: '최근 7일 이내에 이미 추천하신 곡이에요. 다른 곡을 추천해주세요!',
+  PL007: '다른 곡 등록이 진행 중이에요. 잠시 후 다시 시도해주세요.',
 };
 const INLINE_ERROR_MESSAGES: Record<string, string> = {
   PL003: '부적절하거나 비속어가 포함된 코멘트는 추천할 수 없어요.',
   C001: '장르는 최소 1개, 최대 3개까지 선택하고 코멘트는 200자 이내로 입력해주세요.',
 };
-const RETRY_ERROR_CODE = 'C004';
+const RETRY_ERROR_CODES = new Set(['C004', 'PL008']);
 
 interface RecommendSongViewProps {
   onBack: () => void;
@@ -80,19 +85,24 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const [showRegisterNoticePopup, setShowRegisterNoticePopup] = useState(false);
   const [showLeaveConfirmPopup, setShowLeaveConfirmPopup] = useState(false);
   const submitSong = useSubmitSong();
-  const { data: creationStatus } = useSongCreationStatus();
+  const { data: creationStatus, isError: isStatusError, isFetching: isStatusFetching, refetch: refetchStatus } = useSongCreationStatus();
   const recentlyRecommendedTrackIds = new Set(creationStatus?.recentTrackIdsIn7Days ?? []);
 
   // 곡/장르/코멘트 중 하나라도 채워져 있으면 뒤로가기 시 확인 팝업을 거침
   const hasUnsavedContent = !!selectedTrack || selectedGenres.length > 0 || comment.trim().length > 0;
 
-  // 오늘 추천 가능한 곡을 이미 다 채운 상태 — 진입하자마자 막는 팝업을 띄움(상태 로딩 중엔 undefined라 안 뜸)
-  const isDailyLimitReached = creationStatus?.canCreate === false;
+  // 서버가 일시적으로 등록을 막은 상태(하루 한도와 별개) — "내일 다시"가 아니라 blockedUntil 기준으로 안내해야 해서
+  // 한도 소진과 분리함. 둘 다 진입하자마자 막는 팝업을 띄움(상태 로딩 중/조회 실패엔 undefined라 안 뜸)
+  const isTemporarilyBlocked = creationStatus?.temporarilyBlocked === true;
+  // 오늘 추천 가능한 곡을 이미 다 채운 상태
+  const isDailyLimitReached = creationStatus?.canCreate === false && !isTemporarilyBlocked;
+  const isRegistrationBlocked = isDailyLimitReached || isTemporarilyBlocked;
+  const blockedUntilLabel = formatBlockedUntil(creationStatus?.blockedUntil);
 
   // 안드로이드 하드웨어 뒤로가기 — 한도 소진 팝업이 떠 있으면 바로 나가고, 확인 팝업이 떠 있으면 팝업만 닫고,
   // 저장 안 한 내용이 있으면 팝업을 띄움
   const handleBackRequest = () => {
-    if (isDailyLimitReached) {
+    if (isRegistrationBlocked) {
       onBack();
       return;
     }
@@ -144,6 +154,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
     selectedGenres.length >= MIN_GENRES &&
     comment.trim().length > 0 &&
     creationStatus?.canCreate !== false &&
+    !isTemporarilyBlocked &&
     !submitSong.isPending;
 
   const handleGenreClick = (key: string) => {
@@ -189,7 +200,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             return;
           }
 
-          if (code === RETRY_ERROR_CODE) {
+          if (code && RETRY_ERROR_CODES.has(code)) {
             setShowSubmitRetryPopup(true);
             return;
           }
@@ -221,15 +232,31 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         emoji="✏️"
         subtitle={
           creationStatus
-            ? creationStatus.canCreate
-              ? creationStatus.recentTrackIdsIn7Days.length === 0
-                ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요!`
-                : `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요! (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
-              : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요 :)'
+            ? isTemporarilyBlocked
+              ? '지금은 곡을 추천할 수 없어요. 잠시 후 다시 만나요 :)'
+              : creationStatus.canCreate
+                ? creationStatus.recentTrackIdsIn7Days.length === 0
+                  ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요!`
+                  : `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요! (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
+                : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요 :)'
             : ''
         }
         onBack={handleBackRequest}
       />
+
+      {/* 등록 가능 여부 조회 실패 — 막지는 않고(서버가 등록 시 최종 판단) 확인하지 못했음을 알리고 다시 확인할 수 있게 함 */}
+      {isStatusError && (
+        <div className="mb-4 flex items-center justify-between gap-2 rounded-card border border-slate-200 bg-white px-3.5 py-2.5">
+          <p className="text-xs text-text-hint">오늘 추천 가능한 횟수를 확인하지 못했어요. 등록할 때 다시 확인해요.</p>
+          <button
+            onClick={() => refetchStatus()}
+            disabled={isStatusFetching}
+            className="flex-shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
+          >
+            다시 확인
+          </button>
+        </div>
+      )}
 
       {/* 1. 곡 검색 */}
       <section className="mb-5">
@@ -272,6 +299,13 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           >
             <div className="overflow-hidden">
               <div className="bg-white border border-t-0 border-slate-200 group-focus-within:border-playlist-primary/40 transition-colors rounded-b-card py-3">
+                {/* 곡 카드 렌더가 터져도 폼·장르·코멘트·팝업은 살아 있게 이 패널 안에서만 대체함. key=committedQuery:
+                    렌더 에러로 폴백이 뜬 뒤에도 새로 검색하면 경계가 새로 마운트돼서 다시 시도됨 */}
+                <ErrorBoundary
+                  key={committedQuery}
+                  name="recommend-song-search-results"
+                  fallback={<PlaylistFallback message="곡 검색 결과를 표시할 수 없어요" minHeight={186} className="!border-0" />}
+                >
                 {searchResults.length > 0 ? (
                   <div
                     className="flex gap-3 px-3 overflow-x-auto [&::-webkit-scrollbar]:hidden"
@@ -302,6 +336,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                     {searchErrorMessage || '검색 결과가 없어요'}
                   </p>
                 )}
+                </ErrorBoundary>
               </div>
             </div>
           </div>
@@ -442,6 +477,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         </div>
       )}
 
+      {/* 한도/임시 차단 팝업은 사전 안내용이고 서버가 등록 시 최종 판단하므로(PL001 등), 이 팝업 렌더가 터지면
+          폴백 없이 그냥 안 그리고(null) 사용자는 그대로 진행하게 함 — 팝업 하나 때문에 화면 전체가 죽지 않게 */}
+      <ErrorBoundary name="recommend-song-status-popups">
       {/* 1일 3곡 한도를 이미 채운 사용자 — 곡 검색·작성을 헛수고하지 않게 진입 즉시 막음. 바깥을 눌러도
           안 닫히고 뒤로가기만 가능(서버 PL001이 최종 방어선이라 이 팝업은 안내용) */}
       {isDailyLimitReached && (
@@ -464,7 +502,29 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         </ConfirmPopup>
       )}
 
-      {/* 서버 일시 장애(C004) 재시도 유도 팝업 */}
+      {/* 서버가 일시적으로 등록을 막은 사용자 — 한도 소진과 달리 "내일 다시"가 아니라 풀리는 시각을 안내.
+          한도 팝업과 마찬가지로 바깥을 눌러도 안 닫히고 뒤로가기만 가능 */}
+      {isTemporarilyBlocked && (
+        <ConfirmPopup
+          buttons={
+            <button
+              onClick={onBack}
+              className="w-full h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+            >
+              뒤로가기
+            </button>
+          }
+        >
+          <p className="text-sm font-semibold text-text-main mb-1 text-center">지금은 곡을 추천할 수 없어요</p>
+          <p className="text-xs text-text-sub mb-4 text-center">
+            {blockedUntilLabel ? `${blockedUntilLabel} 이후에 다시 시도해주세요.` : '잠시 후 다시 시도해주세요.'}
+          </p>
+        </ConfirmPopup>
+      )}
+
+      </ErrorBoundary>
+
+      {/* 서버 일시 장애(C004/PL008) 재시도 유도 팝업 */}
       {showSubmitRetryPopup && (
         <ConfirmPopup
           buttons={

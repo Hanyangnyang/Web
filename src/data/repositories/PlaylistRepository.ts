@@ -4,6 +4,7 @@ import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '..
 import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
 import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
 import { createSongCreationStatus } from '../../domain/entities/SongCreationStatus.js';
+import { SongCreationStatusSchema } from '../schemas/SongCreationStatusSchema.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
 
@@ -116,7 +117,15 @@ export const createPlaylistRepository = (
     const res = await playlistApiDataSource.getCreationStatus(params.deviceId);
     const data = unwrap(res, 'playlist creation-status', (d) => !!d);
 
-    return createSongCreationStatus(data);
+    // canCreate 같은 핵심 필드가 없거나 타입이 틀리면 조용히 기본값으로 감추지 않고 에러로 던짐
+    const parsed = SongCreationStatusSchema.safeParse(data);
+    if (!parsed.success)
+      throw apiError(
+        `playlist creation-status API returned invalid shaped 'data': ${parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
+        { area: AREA, endpoint: res._requestUrl }
+      );
+
+    return createSongCreationStatus(parsed.data);
   },
 
   submitSong: async (params) => {

@@ -12,6 +12,7 @@ export interface MusicSearchTrack {
 // 곡추천하기/검색결과 화면이 이 값으로 재시도 대기 UX(버튼 비활성화 등)를 보여줌
 export interface MusicSearchRateLimitError extends Error {
   statusCode: number;
+  endpoint?: string; // 실패한 요청 URL — 전역 Sentry 핸들러가 태그로 씀
   code?: string; // C001(검색어 길이) / PL005(요청 제한) / PL004(Spotify 장애)
   retryAfterSeconds?: number;
 }

@@ -28,9 +28,13 @@ export function useRetryCountdown(error: MusicSearchRateLimitError | null | unde
   return { remainingSeconds, isBlocked: remainingSeconds > 0 };
 }
 
-// 대기 중이면 남은 초를 담은 안내 문구, 아니면 서버가 준 에러 메시지 그대로
+const GENERIC_SEARCH_ERROR_MESSAGE = '검색 중 문제가 생겼어요. 다시 시도해주세요.';
+
+// 대기 중이면 남은 초를 담은 안내 문구, 서버가 준 HTTP 에러면 그 메시지 그대로.
+// statusCode가 없는 에러(네트워크 단절의 "Failed to fetch", 응답 모양 검증 실패의 apiError 등)는
+// 개발자용 영문/기술 메시지라 화면에 그대로 노출하지 않고 공통 문구로 바꿈
 export function getSearchErrorMessage(error: MusicSearchRateLimitError | null | undefined, remainingSeconds: number): string | null {
   if (!error) return null;
   if (remainingSeconds > 0) return `검색 요청이 많아요. ${remainingSeconds}초 후 다시 시도해주세요.`;
-  return error.message;
+  return error.statusCode ? error.message : GENERIC_SEARCH_ERROR_MESSAGE;
 }

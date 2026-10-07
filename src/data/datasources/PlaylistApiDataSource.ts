@@ -134,14 +134,9 @@ export interface ChartDto {
   // snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀
 }
 
-// 곡 등록 화면 진입 시 사전 확인 응답 — 오늘 남은 등록 가능 횟수 및 최근 7일 내 이미 추천한 곡 목록
-export interface SongCreationStatusDto {
-  canCreate: boolean;
-  dailyCount: number;
-  dailyMaxLimit: number;
-  remainingCount: number;
-  recentTrackIdsIn7Days: string[];
-}
+// 곡 등록 화면 진입 시 사전 확인 응답 — 오늘 남은 등록 가능 횟수, 최근 7일 내 이미 추천한 곡 목록, 임시 차단 상태.
+// 응답 shape 검증과 타입은 SongCreationStatusSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
+export type SongCreationStatusDto = unknown;
 
 export interface GetLikedSongsDataSourceParams {
   deviceId: string;
