@@ -1,4 +1,3 @@
-import { Music } from 'lucide-react';
 import { useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
@@ -9,8 +8,9 @@ import { useRetryCountdown, getSearchErrorMessage } from '../../../hooks/playlis
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
-import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
+import { PlaylistFallback } from '../shared/PlaylistFallback';
+import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { EmptyMessageCard } from './EmptyMessageCard';
 
 interface SearchResultsViewProps {
@@ -18,20 +18,16 @@ interface SearchResultsViewProps {
   onBack: () => void;
   onSelectTrack: (track: TrackSummary) => void;
   onSelectPost: (post: Song) => void;
-  // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
-  onPlay: (track: TrackSummary) => void;
-  // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
-  currentTrackId?: string | null;
-  // 게시글 검색 결과가 없을 때 "곡 추천하러 가기" 버튼 — 곡추천하기 화면으로 이동
-  onShowAddSong: () => void;
-  // 곡 검색 결과 카드의 "✏️ 곡 추천하기" 버튼 — 해당 곡이 미리 채워진 채로 곡추천하기 화면으로 이동
-  onRecommendTrack: (track: TrackSummary) => void;
+  onPlay: (track: TrackSummary) => void; // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
+  currentTrackId?: string | null; // 지금 하단 플레이어에서 재생 중인 곡 
+  onRecommendTrack: (track: TrackSummary) => void; // 곡 검색 결과 카드의 "✏️ 곡 추천하기" 버튼
 }
 
+// 검색 최소 글자수
 const MIN_QUERY_LENGTH = 2;
 
-// 검색 결과 화면 — 곡 검색은 BE 카탈로그 검색 API(/api/v1/playlist/catalog/tracks/search), 게시글 검색은 BE 게시글 통합 검색 API 연동 완료
-export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId, onShowAddSong, onRecommendTrack }: SearchResultsViewProps) {
+// 검색 결과 화면
+export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendTrack }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
   const [activeQuery, setActiveQuery] = useState(query);
@@ -39,7 +35,6 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
   const [localQuery, setLocalQuery] = useState(query);
   const { data: trackResultsData, isFetching: isSearching, error: musicSearchError, refetch: refetchMusicSearch } = useMusicSearch(activeQuery);
   const trackResults: MusicSearchTrack[] = trackResultsData ?? [];
-  // 429(요청 제한) 응답이면 Retry-After만큼 재검색을 막고 남은 초를 안내 — 0이 되면 다시 검색 가능
   const { remainingSeconds: retryRemainingSeconds, isBlocked: isRetryBlocked } = useRetryCountdown(musicSearchError);
   const searchError = getSearchErrorMessage(musicSearchError, retryRemainingSeconds);
 
@@ -57,7 +52,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
 
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
-      {/* 고정 헤더 — 게시글 목록을 세로로 스크롤해도 항상 상단에 유지됨 */}
+      {/* 고정 헤더 */}
       <div className="sticky -top-6 -mt-6 z-[100] bg-surface/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader
           title="검색 결과"
@@ -67,7 +62,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         />
       </div>
 
-      {/* 검색바: 검색어를 수정하고 Enter나 화살표 버튼을 누르면 이 화면 안에서 재검색 */}
+      {/* 검색바 */}
       <PlaylistSearchBar
         value={localQuery}
         onChange={setLocalQuery}
@@ -76,9 +71,15 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
         className="mt-4 mb-4"
       />
 
-      {/* 1. Spotify 곡 검색 결과 — 가로 스크롤 */}
+      {/* 1. Spotify 곡 검색 결과 */}
       <section className="mb-3">
         <h3 className="text-lg font-bold text-text-main mb-2">곡</h3>
+        {/* key=activeQuery: 렌더 에러로 폴백이 뜬 뒤에도 새로 검색하면 경계가 새로 마운트돼서 다시 시도됨 */}
+        <ErrorBoundary
+          key={activeQuery}
+          name="playlist-search-tracks"
+          fallback={<PlaylistFallback message="곡 검색 결과를 표시할 수 없어요" minHeight={208} />}
+        >
         <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <div className="flex gap-3 pb-2">
             {activeQuery.trim().length < MIN_QUERY_LENGTH ? (
@@ -90,11 +91,10 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
                   <div className="px-2 py-1.5">
                     <div className="h-3.5 w-24 rounded-full skeleton-shimmer" />
                     <div className="mt-1.5 h-3 w-16 rounded-full skeleton-shimmer" />
-                    {/* 게시글 N개 줄 자리 — 실제 카드는 가수명 아래 이 줄이 하나 더 있는데 빠져있었음 */}
+                    {/* 게시글 N개 줄 자리 */}
                     <div className="mt-1 h-2.5 w-14 rounded-full skeleton-shimmer" />
                   </div>
-                  {/* 세 번째 행(곡 추천하기) 자리 — MusicSearchResultCard와 같은 높이로 맞춰서
-                      로딩이 끝났을 때 카드 높이가 갑자기 늘어나 보이지 않게 함 */}
+                  {/* 세 번째 행(곡 추천하기) 자리 */}
                   <div className="h-7 flex items-center justify-center">
                     <div className="h-3 w-20 rounded-full skeleton-shimmer" />
                   </div>
@@ -120,13 +120,19 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             <div className="w-1 flex-shrink-0" aria-hidden="true" />
           </div>
         </div>
+        </ErrorBoundary>
       </section>
 
       <div className="border-t border-slate-200 mb-3" />
 
-      {/* 2. 우리 서비스에 등록된 게시글 — 세로 스크롤 */}
+      {/* 2. 우리 서비스에 등록된 게시글 */}
       <section>
         <h3 className="text-lg font-bold text-text-main mb-2">게시글</h3>
+        <ErrorBoundary
+          key={activeQuery}
+          name="playlist-search-posts"
+          fallback={<PlaylistFallback message="게시글 검색 결과를 표시할 수 없어요" />}
+        >
         <div className="flex flex-col gap-1.5">
           {isSearchingPosts ? (
             Array.from({ length: 3 }).map((_, i) => (
@@ -135,13 +141,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
           ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
             <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
           ) : !postResults || postResults.length === 0 ? (
-            <EmptyGenreState
-              message="검색 결과가 없어요"
-              buttonLabel="곡 추천하러 가기"
-              buttonIcon={<Music size={14} strokeWidth={2.5} />}
-              onAction={onShowAddSong}
-              boxed
-            />
+            <EmptyMessageCard message="검색 결과가 없어요" />
           ) : (
             postResults.map((post) => (
               <RecentSongRow
@@ -154,6 +154,7 @@ export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, 
             ))
           )}
         </div>
+        </ErrorBoundary>
       </section>
     </div>
   );

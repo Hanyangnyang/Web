@@ -294,7 +294,6 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
             onSelectPost={handleSelectPost}
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
-            onShowAddSong={() => pushAddSong()}
             onRecommendTrack={pushAddSong}
           />
         ) : screen.name === 'trackPosts' ? (

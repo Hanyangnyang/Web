@@ -5,12 +5,10 @@ import { searchMusicTracksUseCase } from '../../../di.js';
 import type { MusicSearchTrack, MusicSearchRateLimitError } from '../../../domain/entities/MusicSearchTrack.js';
 import { SONG_SEARCH_MIN_LENGTH } from './playlistQueryKeys.js';
 
-// Spotify 검색 결과는 잠깐 사이에 잘 안 바뀌니, 같은 검색어를 다시 눌러도(예: 곡추천하기에서
-// 검색 버튼 연타) 이 시간 안엔 네트워크를 다시 안 태우고 캐시를 그대로 씀
 const MUSIC_SEARCH_STALE_TIME_MS = 60 * 1000;
 
 // 연속 공백은 한 칸으로 접어서, 같은 의미의 검색어가 다른 캐시 키로 흩어지는 걸 막음
-// — 호출부가 "지금 검색어와 같은 검색어인지" 비교할 때도 이 값을 씀
+// 호출부가 "지금 검색어와 같은 검색어인지" 비교할 때도 이 값을 씀
 export const normalizeMusicSearchQuery = (query: string) => query.trim().replace(/\s+/g, ' ');
 
 export function useMusicSearch(query: string) {
