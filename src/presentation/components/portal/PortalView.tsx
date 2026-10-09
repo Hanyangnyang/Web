@@ -13,6 +13,7 @@ import { LibraryStatusCard } from './LibraryStatusCard.jsx';
 import { PortalHeroCarousel } from './PortalHeroCarousel.jsx';
 import { PortalChartPromoCard } from './PortalChartPromoCard.jsx';
 import { ClubSpotlightCard } from '../misc/ClubSpotlightCard.js';
+import { ArtistPromoBanner } from '../playlist/shared/ArtistPromoBanner.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
@@ -24,6 +25,13 @@ const SHOW_WEATHER_ALARM_BUTTON = false;
 
 // 인기차트 캐러셀 개발 중이라 자동 재생만 잠깐 꺼둠(스와이프는 그대로 동작) — 완성되면 이 값만 true로
 const AUTO_PLAY_HERO_CAROUSEL = false;
+
+const DEV_ARTIST_SAMPLES = [
+  { artistName: '원필', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5ebadfa0c5f2bc6e9e4e408258d' },
+  { artistName: '유다빈밴드', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5ebe418c02a8003826b64fc513a' },
+  { artistName: 'Hadestown Original Broadway Company', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5eb6ae283bfcf57bdf977dfd6d0' },
+  { artistName: '크르르', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5ebda11746cfe726e8a0067cf9f' },
+] as const;
 
 interface PortalViewProps {
   isActive?: boolean;
@@ -43,6 +51,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const showClubBanner = isClubBannerSeason();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
+  const [devArtist] = useState(() => DEV_ARTIST_SAMPLES[Math.floor(Math.random() * DEV_ARTIST_SAMPLES.length)]);
 
   return (
     <>
@@ -79,6 +88,13 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
       )}
     
       <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
+        {/* 모바일 디자인 검수용 샘플 — 임시 프리뷰 브랜치에서 아티스트가 새로고침마다 바뀐다 */}
+        <ArtistPromoBanner
+          artistName={devArtist.artistName}
+          artistImageUrl={devArtist.artistImageUrl}
+          onClick={() => onNavigateToTab?.('misc', undefined, 'playlist')}
+        />
+
         {/* 1. 인기차트 홍보 + 에리카 날씨 캐러셀 — 첫 슬라이드는 플레이리스트 인기차트 홍보, 둘째는 날씨 */}
         <PortalHeroCarousel
           isActive={isActive}
