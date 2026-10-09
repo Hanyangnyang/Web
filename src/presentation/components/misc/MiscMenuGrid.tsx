@@ -44,7 +44,8 @@ export function MiscMenuGrid({ onBoxClick }: MiscMenuGridProps) {
           </div>
         </div>
 
-        <div className={cardClass} onClick={() => onBoxClick('playlist')}>
+        <div className={`${cardClass} relative`} onClick={() => onBoxClick('playlist')}>
+          <span className="absolute right-2 top-2 rounded-full bg-red-500 px-2 py-1 text-[9px] font-extrabold leading-none text-white shadow-sm">NEW</span>
           <div className="w-14 h-14 bg-surface rounded-card flex items-center justify-center">
             <Music size={28} color="#8B5CF6" />
           </div>
