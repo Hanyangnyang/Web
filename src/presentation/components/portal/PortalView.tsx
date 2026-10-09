@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { usePostHog } from 'posthog-js/react';
 
 import { Bell, ChevronRight } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useWeather } from '../../hooks/useWeather.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
 import { useClubSpotlight, isClubBannerSeason } from '../../hooks/useClubSpotlight.js';
+import { useArtistRecommendations } from '../../hooks/playlist/useArtistRecommendations.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
@@ -19,13 +20,6 @@ const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').the
 
 // 날씨 알림 기능 자체는 그대로 두고, 진입 버튼만 사용자에게 안 보이게 내림 — 다시 노출하려면 이 값만 true로
 const SHOW_WEATHER_ALARM_BUTTON = false;
-
-const DEV_ARTIST_SAMPLES = [
-  { artistName: '원필', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5ebadfa0c5f2bc6e9e4e408258d' },
-  { artistName: '유다빈밴드', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5ebe418c02a8003826b64fc513a' },
-  { artistName: 'Hadestown Original Broadway Company', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5eb6ae283bfcf57bdf977dfd6d0' },
-  { artistName: '크르르', artistImageUrl: 'https://i.scdn.co/image/ab6761610000e5ebda11746cfe726e8a0067cf9f' },
-] as const;
 
 interface PortalViewProps {
   isActive?: boolean;
@@ -41,6 +35,12 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
+  const { data: recommendations } = useArtistRecommendations(isActive);
+  // 데이터가 같은 동안 배열 참조를 유지해야 캐러셀이 매 렌더마다 첫 장으로 되돌아가지 않음
+  const artistPromos = useMemo(
+    () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),
+    [recommendations],
+  );
   const spotlightClub = useClubSpotlight();
   const showClubBanner = isClubBannerSeason();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
@@ -86,12 +86,14 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           <WeatherCard weather={weather} loading={weatherLoading} error={weatherError} onRetry={refetchWeather} />
         </ErrorBoundary>
 
-        {/* 플레이리스트 홍보 캐러셀 — 아직 더미 아티스트 샘플 */}
-        <ArtistPromoCarousel
-          artists={DEV_ARTIST_SAMPLES}
-          isActive={isActive}
-          onClick={(artist) => onNavigateToTab?.('misc', undefined, 'playlist', undefined, artist.artistName)}
-        />
+        {/* 플레이리스트 홍보 캐러셀 — 백엔드가 기기별로 추천한 가수(0~5개). 없거나 실패하면 조용히 숨긴다 */}
+        <ErrorBoundary name="portal-artist-promo">
+          <ArtistPromoCarousel
+            artists={artistPromos}
+            isActive={isActive}
+            onClick={(artist) => onNavigateToTab?.('misc', undefined, 'playlist', undefined, artist.artistName)}
+          />
+        </ErrorBoundary>
 
         {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동. 3월·9월(모집 시즌)에만 노출 */}
         {showClubBanner && (

@@ -4,7 +4,9 @@ import { createPlaylistSong, type PlaylistSong, type PlaylistReaction } from '..
 import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
 import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
 import { createSongCreationStatus } from '../../domain/entities/SongCreationStatus.js';
+import { createArtistRecommendation } from '../../domain/entities/ArtistRecommendation.js';
 import { SongCreationStatusSchema } from '../schemas/SongCreationStatusSchema.js';
+import { ArtistRecommendationsDataSchema, ArtistRecommendationItemSchema } from '../schemas/ArtistRecommendationSchema.js';
 import { ChartDataSchema, ChartTrackDtoSchema } from '../schemas/ChartSchema.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
@@ -246,5 +248,24 @@ export const createPlaylistRepository = (
       displayTitle: parsed.data.displayTitle,
       tracks,
     });
+  },
+
+  getArtistRecommendations: async (params) => {
+    const res = await playlistApiDataSource.getRecommendations(params.deviceId);
+    const data = unwrap(res, 'playlist recommendations', (d) => !!d);
+
+    const parsed = ArtistRecommendationsDataSchema.safeParse(data);
+    if (!parsed.success)
+      throw apiError(
+        `playlist recommendations API returned invalid shaped 'data': ${parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
+        { area: AREA, endpoint: res._requestUrl }
+      );
+
+    // 카드 하나가 이상하면(artist/trackId 누락 등) 그 카드만 제외 — 서버가 준 순서는 그대로 유지.
+    // 0개는 오류가 아니라 정상 결과(기록·주간차트가 모두 없는 경우)라 빈 배열 그대로 돌려줌
+    return parsed.data.items
+      .map((item) => ArtistRecommendationItemSchema.safeParse(item))
+      .filter((r) => r.success)
+      .map((r) => createArtistRecommendation(r.data));
   },
 });

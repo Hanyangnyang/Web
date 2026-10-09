@@ -67,6 +67,7 @@ import { createRecordTrackPlayUseCase } from './domain/usecases/RecordTrackPlayU
 import { createToggleReactionUseCase } from './domain/usecases/ToggleReactionUseCase.js';
 import { createGetTrackPostsUseCase } from './domain/usecases/GetTrackPostsUseCase.js';
 import { createGetPopularityChartUseCase } from './domain/usecases/GetPopularityChartUseCase.js';
+import { createGetArtistRecommendationsUseCase } from './domain/usecases/GetArtistRecommendationsUseCase.js';
 import { createSearchMusicTracksUseCase } from './domain/usecases/SearchMusicTracksUseCase.js';
 
 // 기존 Vercel BFF(/api/*) 전용 
@@ -137,6 +138,7 @@ export const recordTrackPlayUseCase = createRecordTrackPlayUseCase({ playlistRep
 export const toggleReactionUseCase = createToggleReactionUseCase({ playlistRepository });
 export const getTrackPostsUseCase = createGetTrackPostsUseCase({ playlistRepository });
 export const getPopularityChartUseCase = createGetPopularityChartUseCase({ playlistRepository });
+export const getArtistRecommendationsUseCase = createGetArtistRecommendationsUseCase({ playlistRepository });
 export const searchMusicTracksUseCase = createSearchMusicTracksUseCase({ musicSearchRepository });
 export const submitFeedbackApiUseCase = createSubmitFeedbackApiUseCase({ feedbackApiRepository });
 export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerStoreRepository });

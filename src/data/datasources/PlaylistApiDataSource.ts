@@ -127,6 +127,9 @@ export type ChartDto = unknown;
 // 응답 shape 검증과 타입은 SongCreationStatusSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
 export type SongCreationStatusDto = unknown;
 
+// 소식탭 가수·대표곡 추천 응답 — shape 검증과 타입은 ArtistRecommendationSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
+export type ArtistRecommendationsDto = unknown;
+
 export interface GetLikedSongsDataSourceParams {
   deviceId: string;
   page?: number;
@@ -168,6 +171,8 @@ export interface PlaylistApiDataSource {
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
   getTrackPosts: (params: GetTrackPostsDataSourceParams) => Promise<ApiResponse<TrackPostsDto>>;
   getCharts: (type?: ChartTypeDto, deviceId?: string) => Promise<ApiResponse<ChartDto>>;
+  // 기기별 가수·대표곡 추천 카드 최대 5개(서버가 기기별 5분 캐시) — deviceId 누락/UUID 형식 오류는 400
+  getRecommendations: (deviceId: string) => Promise<ApiResponse<ArtistRecommendationsDto>>;
 }
 
 const DEFAULT_PAGE = 0;
@@ -247,4 +252,7 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     const queryString = query.toString();
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/charts${queryString ? `?${queryString}` : ''}`));
   },
+
+  getRecommendations: async (deviceId) =>
+    parseOrThrow(await httpClient.get(`/api/v1/playlist/recommendations?${new URLSearchParams({ deviceId }).toString()}`)),
 });

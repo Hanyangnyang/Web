@@ -3,6 +3,7 @@ import type { PlaylistSong, PlaylistReaction } from '../entities/PlaylistSong.js
 import type { TrackPosts } from '../entities/TrackPosts.js';
 import type { PopularityChart } from '../entities/PopularityChart.js';
 import type { SongCreationStatus } from '../entities/SongCreationStatus.js';
+import type { ArtistRecommendation } from '../entities/ArtistRecommendation.js';
 
 export interface GetPlaylistSongsParams {
   genre?: string;
@@ -87,6 +88,10 @@ export interface GetMySongsParams {
   size?: number;
 }
 
+export interface GetArtistRecommendationsParams {
+  deviceId: string;
+}
+
 export interface PlaylistRepository {
   getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
   // 게시글 단건 상세 조회 — 딥링크/SNS 공유/알림 연동, 그리고 게시글 목록에서 상세화면 진입 시 사용
@@ -112,4 +117,6 @@ export interface PlaylistRepository {
   getTrackPosts: (params: GetTrackPostsParams) => Promise<TrackPosts>;
   // 인기 차트(실시간 급상승/주간/월간) 조회
   getPopularityChart: (params?: GetPopularityChartParams) => Promise<PopularityChart>;
+  // 소식탭 배너용 기기별 가수·대표곡 추천 카드(0~5개) — 서버가 준 순서 그대로, 빈 배열은 정상 결과
+  getArtistRecommendations: (params: GetArtistRecommendationsParams) => Promise<ArtistRecommendation[]>;
 }

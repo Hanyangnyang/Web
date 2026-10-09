@@ -8,6 +8,7 @@ export const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
 export const LIKED_SONGS_QUERY_KEY = ['playlist', 'liked-songs'];
 export const MY_SONGS_QUERY_KEY = ['playlist', 'my-songs'];
 export const SONG_CREATION_STATUS_QUERY_KEY = ['playlist', 'creation-status'];
+export const ARTIST_RECOMMENDATIONS_QUERY_KEY = ['playlist', 'artist-recommendations'];
 
 // 최근추가된곡/저장한곡/내가등록한곡 화면은 모두 이 세 캐시 중 하나에서 목록을 읽는데, 화면을 나갔다 들어오면
 // SongListScreen/PostDetailCard가 통째로 리마운트되면서 카드 안에서만 들고 있던 낙관적 업데이트(좋아요/반응)가

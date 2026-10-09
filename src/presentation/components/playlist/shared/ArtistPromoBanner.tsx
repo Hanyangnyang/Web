@@ -3,7 +3,7 @@ import { getArtistNameSize, pickArtistPromoTemplate, truncateArtistName, type Ar
 
 export interface ArtistPromoBannerProps {
   artistName: string;
-  artistImageUrl: string;
+  artistImageUrl: string | null;
   onClick?: () => void;
   className?: string;
 }
@@ -98,7 +98,9 @@ export function ArtistPromoBanner({
   onClick,
   className = '',
 }: ArtistPromoBannerProps) {
-  const [imageFailed, setImageFailed] = useState(false);
+  const [loadFailed, setImageFailed] = useState(false);
+  // 이미지 URL 자체가 없으면 로드 실패와 같은 기본 이미지로 처리
+  const imageFailed = loadFailed || !artistImageUrl;
   const [edgePalette, setEdgePalette] = useState<EdgePalette | null>(null);
   const [copyTemplate] = useState<ArtistPromoTemplate>(() => pickArtistPromoTemplate());
   const safeArtistName = artistName.trim() || '이 아티스트';
@@ -135,7 +137,7 @@ export function ArtistPromoBanner({
         >
           {!imageFailed ? (
             <img
-              src={artistImageUrl}
+              src={artistImageUrl ?? undefined}
               crossOrigin="anonymous"
               alt={`${safeArtistName} 아티스트 이미지`}
               className="h-full w-full object-cover"

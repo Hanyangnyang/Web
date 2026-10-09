@@ -3,7 +3,8 @@ import { ArtistPromoBanner } from './ArtistPromoBanner.js';
 
 export interface ArtistPromo {
   artistName: string;
-  artistImageUrl: string;
+  // 사진이 없는 가수는 null — 배너가 이니셜 기본 이미지로 표시
+  artistImageUrl: string | null;
 }
 
 interface ArtistPromoCarouselProps {
