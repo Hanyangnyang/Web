@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
+import { RefreshCw } from 'lucide-react';
+import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
@@ -27,12 +29,10 @@ const RECENT_SONGS_LIMIT = 7;
 const CHART_PREVIEW_LIMIT = 10;
 const EMPTY_SONGS: Song[] = []; // 데이터 도착 전 fallback — 매 렌더마다 새 [] 를 만들면 songs를 deps로 쓰는 콜백이 계속 재생성되므로 모듈 상수로 고정
 
-// 화면 스택의 한 칸 = 화면 이름 + 그 화면이 쓰는 파라미터. 파라미터를 칸마다 들고 있어야, 같은 화면이 스택에
-// 여러 번 쌓여도(예: 곡A 게시글모음 → 게시글 → 곡B 게시글모음) 뒤로가기 때 각 칸이 자기 값을 그대로 복원함
+// 화면 스택의 한 칸 = 화면 이름 + 그 화면이 쓰는 파라미터 
 type ScreenFrame =
   | { name: 'main' }
-  // scrollTarget: 홈의 최근 추가된 곡 카드를 눌렀을 때, 전체보기 화면에서 바로 그 카드 위치로 스크롤하기 위한 대상
-  | { name: 'recent'; scrollTarget: string | null }
+  | { name: 'recent'; scrollTarget: string | null } // scrollTarget: 홈의 최근추가된곡 섹션의 곡 카드를 눌렀을때, 해당하는 곡으로 스크롤하기 위함 
   // prefillTrack: 게시글 모음에서 FAB을 누르는 등 특정 곡이 미리 채워진 채로 진입할 때의 곡
   | { name: 'addSong'; prefillTrack: TrackSummary | null }
   | { name: 'search' }
@@ -180,6 +180,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     skipScrollRestore: screen.name === 'recent' && !!screen.scrollTarget,
   });
 
+  // 최근추가된곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면에서만 켬
+  const { pull, isRefreshing: isPullRefreshing, threshold: pullThreshold } = usePullToRefresh({
+    containerRef: scrollContainerRef,
+    onRefresh: () => refetchRecentSongs(),
+    enabled: screen.name === 'recent',
+  });
+
   const handleSearchSubmit = useCallback(() => {
     if (!searchQuery.trim()) return;
     pushScreen({ name: 'search' });
@@ -267,6 +274,28 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         '--playlist-player-height': `${playerHeight}px`,
       } as CSSProperties}
     >
+      {/* 당겨서 새로고침 인디케이터 — 당기는 만큼 내려오고, 기준 거리를 넘으면 회전 */}
+      {(pull > 0 || isPullRefreshing) && (
+        <div
+          className="fixed left-1/2 z-[1100] pointer-events-none"
+          style={{
+            top: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+            transform: `translate(-50%, ${pull}px)`,
+            opacity: Math.min(pull / pullThreshold, 1),
+            transition: pull === 0 || isPullRefreshing ? 'transform 0.2s ease-out, opacity 0.2s' : undefined,
+          }}
+        >
+          <div className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.12)] flex items-center justify-center">
+            <RefreshCw
+              size={16}
+              strokeWidth={2.2}
+              className={isPullRefreshing ? 'animate-spin text-playlist-accent' : 'text-text-main'}
+              style={isPullRefreshing ? undefined : { transform: `rotate(${(pull / pullThreshold) * 270}deg)` }}
+            />
+          </div>
+        </div>
+      )}
+
       <div key={screen.name} style={{ animation: 'fadeIn 0.25s ease-out' }}>
         {screen.name === 'recent' ? (
           <RecentSongsView
