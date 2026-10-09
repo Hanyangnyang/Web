@@ -90,8 +90,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
   const [viewModes, setViewModes] = useState<Record<ListScreen, ViewMode>>({
-    recent: 'list',
-    mySongs: 'list',
+    recent: 'grid',
+    mySongs: 'grid',
   });
   const changeViewMode = (listScreen: ListScreen) => (mode: ViewMode) =>
     setViewModes((prev) => ({ ...prev, [listScreen]: mode }));
@@ -211,10 +211,14 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     });
   }, [pushScreen]);
 
-  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 어느 목록에서 들어왔든 항상 같은 PostView로 이동
+  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 기획 단계에서 게시글 상세(postDetail/PostView)를
+  // 쓰지 않기로 해서, 최근추가된곡 화면으로 이동하면서 그 곡 위치로 스크롤함(홈의 최근 추가된 곡 카드 클릭과 같은 방식).
+  // postDetail 화면/PostView 코드는 그대로 남겨둠 — 다시 쓰려면 아래를 pushScreen({ name: 'postDetail', postId: post.id })로 되돌리면 됨.
+  // 주의: 최근추가된곡 목록은 최신 50개만 받아서, 그보다 오래된 게시글이면 해당 카드가 없어 스크롤 없이 목록 맨 위로 열림
+  // 게시글 전문을 바로 읽을 수 있게 무조건 1열(리스트)로 열림 — 2열이었어도 여기서 1열로 바꿈(이후 토글 버튼으로 다시 2열 전환 가능)
   const handleSelectPost = useCallback((post: Song) => {
-    if (!post.id) return; // id가 없으면 상세 조회를 못 하므로 이동하지 않음
-    pushScreen({ name: 'postDetail', postId: post.id });
+    setViewModes((prev) => ({ ...prev, recent: 'list' }));
+    pushScreen({ name: 'recent', scrollTarget: post.trackId });
   }, [pushScreen]);
 
   // 홈의 하단 "더보기"는 미리보기 마지막 곡 위치까지 부드럽게 내려간 뒤 이어서 목록을 보게 한다.

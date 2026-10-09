@@ -2,7 +2,7 @@ import { LayoutGrid, Rows3 } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary, filterSongsByGenre } from '../playlistTypes';
-import { PostDetailCard, songToPostDetailCardData } from './PostDetailCard';
+import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './PostDetailCard';
 import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips } from './GenreFilterChips';
@@ -75,35 +75,68 @@ export function SongListScreen({
   playButtonVariant,
 }: SongListScreenProps) {
   const [selectedGenre, setSelectedGenre] = useState('all');
-  const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>(enableViewToggle ? 'list' : 'grid');
+  // 지금 이모지 선택창이 열려 있는 카드(song.id ?? song.trackId) — 목록 전체에서 하나만 열리도록 여기서 보관
+  const [openPickerKey, setOpenPickerKey] = useState<string | null>(null);
+  const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>('grid'); // 기본은 2열 — 1열은 토글로 전환
   const viewMode = gridOnly ? 'grid' : (viewModeProp ?? internalViewMode);
   const setViewMode = (mode: 'grid' | 'list') => {
     onViewModeChange?.(mode);
     setInternalViewMode(mode);
   };
-  // 홈 진입 스크롤 + 요약 카드 클릭 시 스크롤을 같은 상태로 관리 — 값이 바뀌지 않는 한 그리드⇄리스트를
-  // 오가도 같은 카드를 계속 다시 스크롤해서 보여주므로, 2열에서 카드를 눌러 1열로 갔다가 다시 2열
-  // 토글 버튼을 눌러 돌아와도 그 카드가 보이던 위치 그대로 복원됨
-  const [scrollTarget, setScrollTarget] = useState<string | null>(scrollToTrackId ?? null);
+  // 홈/게시글 모음 등에서 특정 곡을 눌러 들어왔을 때의 스크롤 대상 — 값이 바뀌지 않는 한 그리드⇄리스트를
+  // 오가도 같은 카드를 계속 다시 스크롤해서 보여주므로, 토글 버튼으로 1열↔2열을 바꿔도 그 카드가 보이던 위치 그대로 복원됨
+  const [scrollTarget] = useState<string | null>(scrollToTrackId ?? null);
   const filteredSongs = filterSongsByGenre(songs, selectedGenre);
-
-  // 2열은 요약 목록, 1열은 상세 — 토글이 켜진 화면에서 2열일 때만 요약 취급
-  const isSummaryMode = (enableViewToggle || gridOnly) && viewMode === 'grid';
 
   const listContainerRef = useRef<HTMLDivElement>(null);
 
-  // 대상이 생기거나(홈 진입/요약 카드 클릭) 뷰 모드가 바뀌어 목록 DOM이 다시 그려질 때마다 해당 카드로 부드럽게 스크롤
+  // 2열에서 한 카드가 한마디를 펼쳐도 같은 행의 옆 카드는 원래 높이를 유지하게 함 — 그리드가 행 높이를 맞추느라(items-stretch)
+  // 옆 카드를 같이 늘려버리기 때문. 펼치기 시작할 때 옆 카드의 현재 높이(=펼치기 전 행 높이)를 재서 보관하고,
+  // 펼친 동안 그 높이로 고정(align-self:start). 둘 다 펼쳤거나 둘 다 접혔으면 고정하지 않음.
+  // 접을 땐 애니메이션이 끝난 뒤(BODY_TOGGLE_MS) 펼침 상태를 해제해서, 접히는 도중 옆 카드가 커졌다 줄어드는 일이 없게 함
+  const songKey = (song: Song) => song.id ?? song.trackId;
+  const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(new Set());
+  const [baseHeights, setBaseHeights] = useState<Record<string, number>>({});
+  const collapseTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  useEffect(() => () => Object.values(collapseTimersRef.current).forEach(clearTimeout), []);
+  useEffect(() => setBaseHeights({}), [viewMode, selectedGenre]); // 짝이 바뀌므로 재둔 높이는 버림
+
+  const handleBodyExpandedChange = (song: Song, index: number, expanded: boolean) => {
+    const key = songKey(song);
+    clearTimeout(collapseTimersRef.current[key]);
+    if (expanded) {
+      const partner = viewMode === 'grid' ? filteredSongs[index ^ 1] : undefined; // 같은 행의 짝: 0↔1, 2↔3 ...
+      const partnerEl = partner && listContainerRef.current?.querySelector<HTMLElement>(`[data-song-key="${songKey(partner)}"]`);
+      if (partner && partnerEl && !expandedKeys.has(songKey(partner))) {
+        setBaseHeights((prev) => ({ ...prev, [songKey(partner)]: partnerEl.offsetHeight }));
+      }
+      setExpandedKeys((prev) => new Set(prev).add(key));
+    } else {
+      collapseTimersRef.current[key] = setTimeout(() => {
+        setExpandedKeys((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }, BODY_TOGGLE_MS + 20);
+    }
+  };
+  // 짝은 펼쳐졌는데 나는 접혀 있을 때만, 짝이 펼치기 전의 행 높이로 고정
+  const lockedHeightFor = (song: Song, index: number): number | undefined => {
+    if (viewMode !== 'grid') return undefined;
+    const partner = filteredSongs[index ^ 1];
+    if (!partner || !expandedKeys.has(songKey(partner)) || expandedKeys.has(songKey(song))) return undefined;
+    return baseHeights[songKey(song)];
+  };
+
+  // 대상이 있거나 뷰 모드가 바뀌어 목록 DOM이 다시 그려질 때마다 해당 카드로 부드럽게 스크롤
   useLayoutEffect(() => {
     if (!scrollTarget) return;
     const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
     target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, [viewMode, scrollTarget]);
 
-  // 요약 목록(2열)에서 카드를 누르면 그 곡의 상세(1열)로 전환
-  const handleSelectSummary = (song: Song) => {
-    setScrollTarget(song.trackId);
-    setViewMode('list');
-  };
+  // (2열 카드를 눌러 1열 상세로 전환하던 동작은 없앰 — 카드 하단을 누르면 한마디 더보기/접기로 동작함. 1열은 우측 상단 토글 버튼으로 전환)
 
   // 그리드 보기 전환 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다(뭐먹지 코치마크와 동일한 실험)
   const [viewToggleCoachmark, setViewToggleCoachmark] = useState<'hidden' | 'visible' | 'leaving'>(() => {
@@ -181,21 +214,41 @@ export function SongListScreen({
           />
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
-            {filteredSongs.map((song) => (
-              <div key={song.id ?? song.trackId} data-track-id={song.trackId} className={viewMode === 'grid' ? 'h-full' : undefined}>
+            {filteredSongs.map((song, index) => {
+              const lockedHeight = lockedHeightFor(song, index);
+              return (
+              <div
+                key={songKey(song)}
+                data-track-id={song.trackId}
+                data-song-key={songKey(song)}
+                className={viewMode === 'grid' ? 'h-full' : undefined}
+                style={lockedHeight !== undefined ? { alignSelf: 'start', height: lockedHeight } : undefined}
+              >
                 <PostDetailCard
                   post={songToPostDetailCardData(song)}
                   // 2열(그리드)에서는 같은 행 카드끼리 높이를 맞춤 — 본문 길이가 짧은 카드도 옆 카드 높이만큼 늘어남
                   className={viewMode === 'grid' ? 'w-full h-full' : 'w-full'}
                   onPlay={() => onPlay(song)}
                   isPlaying={song.trackId === currentTrackId}
-                  hideReactions={isSummaryMode}
-                  onSelect={isSummaryMode && !gridOnly ? () => handleSelectSummary(song) : undefined}
+                  // 2열에서도 하단 구성(이모지 반응·제목·본문·장르·시간)은 1열과 동일 — 폭이 좁아서 크기만 narrow로 조정.
+                  // 반응을 숨기는 건 곡명·가수명만 보여주는 저장한 곡(gridOnly)뿐
+                  hideReactions={gridOnly}
+                  narrow={viewMode === 'grid'}
+                  // 2열의 이모지 선택창은 1열과 같은 폭이라 카드보다 넓음 — 왼쪽 열은 오른쪽으로, 오른쪽 열은 왼쪽으로 펼쳐서 화면 밖으로 안 나가게 함
+                  pickerAnchor={viewMode === 'grid' ? (index % 2 === 0 ? 'left' : 'right') : undefined}
+                  // 이모지 선택창은 목록 전체에서 하나만 열림 — 다른 카드의 버튼을 누르면 앞서 열린 것이 닫힘
+                  pickerOpen={openPickerKey === (song.id ?? song.trackId)}
+                  onPickerOpenChange={(open) => setOpenPickerKey(open ? (song.id ?? song.trackId) : null)}
+                  onBodyExpandedChange={(expanded) => handleBodyExpandedChange(song, index, expanded)}
                   onSelectTrack={onSelectTrack}
+                  // 2열 고정(저장한 곡)에서는 더보기(⋯) 대신 > 버튼으로 곡의 게시글 모음에 바로 이동
+                  trailingAction={gridOnly ? 'trackLink' : 'more'}
+                  compact={gridOnly}
                   playButtonVariant={playButtonVariant}
                 />
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

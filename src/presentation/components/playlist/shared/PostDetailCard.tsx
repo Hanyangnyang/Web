@@ -1,5 +1,5 @@
 import { Heart, ChevronRight, Pause, Play, Share2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { type Song, type PlaylistReaction, type ReactionState, type TrackSummary, GENRES, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { type ReactionKey } from '../postReactions';
 import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
@@ -12,6 +12,8 @@ import { PostMoreMenu } from './PostMoreMenu';
 import { useShareModal } from './useShareModal';
 import { Toast } from './Toast';
 import { useLikeToast } from './useLikeToast';
+
+export const BODY_TOGGLE_MS = 300; // 2열 카드 한마디 더보기/접기 애니메이션 시간 — 본문의 duration-300과 같은 값이어야 함
 
 export interface PostDetailCardData {
   // 신고하기 등 서버에 곡 id가 필요한 액션에 씀 — 실제 API 연동 전 더미 게시글엔 없을 수 있어서 옵셔널
@@ -40,11 +42,29 @@ interface PostDetailCardProps {
   isPlaying?: boolean;
   // true면 이모지 리액션을 숨김 — 빠르게 훑어보는 요약 목록(2열)용
   hideReactions?: boolean;
+  // true면 2열 그리드처럼 폭이 좁은 카드용 크기로 그림 — 재생/공유/좋아요 버튼 비율을 키우고, 본문은 3줄로 자르고, 이모지 선택창을 3×3으로 배치.
+  // 하단 구성(이모지 반응 행·제목·본문·장르·시간)은 1열과 동일하게 유지. hideReactions를 쓰는 요약 카드(저장한 곡)는 자동으로 narrow 취급
+  narrow?: boolean;
+  // 이모지 선택창을 이모지 버튼이 아니라 카드 가장자리 기준으로 띄움 — 2열처럼 카드 폭보다 선택창이 넓을 때 씀.
+  // 왼쪽 열 카드는 'left'(오른쪽으로 펼침), 오른쪽 열 카드는 'right'(왼쪽으로 펼침). 안 넘기면 1열처럼 버튼 기준
+  pickerAnchor?: 'left' | 'right';
+  // 이모지 선택창 열림 상태를 부모가 제어 — 목록에서 카드 여러 개 중 선택창이 하나만 열려 있게 할 때 씀.
+  // 둘 다 안 넘기면 카드가 혼자 관리(게시글 상세 등 카드가 하나뿐인 화면)
+  pickerOpen?: boolean;
+  onPickerOpenChange?: (open: boolean) => void;
+  // 2열에서 한마디를 펼치거나 접기 "시작하는 순간" 호출(레이아웃이 바뀌기 전) — 부모가 이웃 카드 높이를 미리 재서 고정하는 데 씀
+  onBodyExpandedChange?: (expanded: boolean) => void;
   // 넘겨주면 카드 전체가 클릭 가능해짐 — 요약 목록(2열)에서 눌러 상세(1열)로 전환할 때 사용
   onSelect?: () => void;
   // 넘겨주면 곡명·가수명을 눌렀을 때 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동 — 카드 자체의
   // onSelect(게시글 상세 보기)와는 별개 동작이라 화살표 아이콘으로 구분해서 보여줌
   onSelectTrack?: (track: TrackSummary) => void;
+  // 제목 행 오른쪽 버튼 종류 — 기본 'more'는 더보기(⋯ → 신고하기), 'trackLink'는 같은 자리에 > 버튼을 두고 누르면
+  // 이 곡의 게시글 모음으로 이동(onSelectTrack 필요). 신고는 게시글 모음 화면에서 할 수 있음.
+  // 'trackLink'면 제목 옆의 작은 > 아이콘은 중복이라 숨김
+  trailingAction?: 'more' | 'trackLink';
+  // true면 곡명·가수명만 보여줌 — 본문·구분선·장르를 숨기고 하단 여백도 줄임(곡 단위로 훑어보는 저장한 곡 목록용)
+  compact?: boolean;
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트에서 재생 버튼 위치/히트영역만 바꾸는 배정값
   // (docs/playlist-recent-songs-ab-test.md 참고). 안 넘기면 기존(control: 정중앙 원형 버튼) 동작 — 최근추가된곡
   // 화면 외의 다른 화면(게시글 상세/게시글 모음 등)은 이 prop을 넘기지 않아 항상 control로 유지됨
@@ -75,12 +95,80 @@ export function PostDetailCard({
   onPlay,
   isPlaying = false,
   hideReactions = false,
+  narrow = false,
+  pickerAnchor,
+  pickerOpen: pickerOpenProp,
+  onPickerOpenChange,
+  onBodyExpandedChange,
   onSelect,
   onSelectTrack,
+  trailingAction = 'more',
+  compact = false,
   playButtonVariant = 'control',
 }: PostDetailCardProps) {
   const isTestPlayButton = playButtonVariant === 'test';
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const isNarrow = narrow || hideReactions; // 2열처럼 폭이 좁은 카드 — 버튼 비율·글자 크기·이모지 선택창 배치를 좁은 폭에 맞춤
+
+  // 2열(좁은 카드)은 본문을 3줄로 자르는데, 잘린 글을 보려고 카드를 누르면 1열 상세로 전환돼버려서
+  // 잘렸을 때만 "더보기/접기" 토글을 보여줌. 잘렸는지는 접힌 상태에서 실제 높이(scrollHeight)와 보이는 높이(clientHeight)를 비교해 판단
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const [bodyExpanded, setBodyExpanded] = useState(false);
+  const [isBodyClamped, setIsBodyClamped] = useState(false);
+  // line-clamp는 높이 transition이 안 먹어서, 펼치고 접는 동안엔 line-clamp를 잠깐 풀고 max-height(px)를 직접 움직여 애니메이션함.
+  // isClampApplied: line-clamp-3(말줄임표)가 걸려 있는지 / bodyMaxHeight: 애니메이션 중 inline max-height(null이면 제한 없음)
+  const [isClampApplied, setIsClampApplied] = useState(true);
+  const [bodyMaxHeight, setBodyMaxHeight] = useState<number | null>(null);
+  const bodyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(bodyTimerRef.current), []);
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    // 펼쳤거나 애니메이션 중(clamp가 풀린 동안)엔 잘림 여부를 다시 재지 않음 — 토글 버튼이 사라지지 않게 마지막 값을 유지
+    if (!el || !isNarrow || !isClampApplied || bodyExpanded) return;
+    const measure = () => setIsBodyClamped(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    const observer = new ResizeObserver(measure); // 화면 회전 등으로 카드 폭이 바뀌어 줄 수가 달라질 때 다시 잼
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [post.body, isNarrow, isClampApplied, bodyExpanded]);
+
+  const canToggleBody = isNarrow && !compact && !!post.body && (isBodyClamped || bodyExpanded);
+
+  const toggleBody = () => {
+    const el = bodyRef.current;
+    if (!el) return;
+    clearTimeout(bodyTimerRef.current);
+    onBodyExpandedChange?.(!bodyExpanded); // 높이가 바뀌기 전에 알려야 부모가 이웃 카드의 원래 높이를 잴 수 있음
+    // 접힌 높이 = 줄 높이 × 3 (leading-relaxed라 계산된 line-height는 px 값)
+    const collapsedPx = parseFloat(getComputedStyle(el).lineHeight) * 3;
+    // 시작 높이를 먼저 px로 박은 뒤 다음 프레임에 목표 높이로 바꿔야 CSS transition이 동작함
+    const animateTo = (from: number, to: number) => {
+      setBodyMaxHeight(from);
+      requestAnimationFrame(() => requestAnimationFrame(() => setBodyMaxHeight(to)));
+    };
+    if (!bodyExpanded) {
+      setBodyExpanded(true);
+      setIsClampApplied(false);
+      animateTo(collapsedPx, el.scrollHeight);
+      bodyTimerRef.current = setTimeout(() => setBodyMaxHeight(null), BODY_TOGGLE_MS); // 끝나면 제한 해제(내용이 바뀌어도 자유롭게 커지게)
+    } else {
+      setBodyExpanded(false);
+      animateTo(el.scrollHeight, collapsedPx);
+      bodyTimerRef.current = setTimeout(() => {
+        setIsClampApplied(true); // 다 접힌 뒤에 말줄임표를 다시 켬
+        setBodyMaxHeight(null);
+      }, BODY_TOGGLE_MS);
+    }
+  };
+  // 이모지 선택창 열림 상태 — 부모가 pickerOpenProp/onPickerOpenChange를 넘기면 부모가 제어(여러 카드 중 하나만 열리게),
+  // 안 넘기면 카드 안에서 혼자 관리
+  const [localPickerOpen, setLocalPickerOpen] = useState(false);
+  const isPickerControlled = pickerOpenProp !== undefined;
+  const pickerOpen = isPickerControlled ? pickerOpenProp : localPickerOpen;
+  const setPickerOpen = (open: boolean) => {
+    if (!isPickerControlled) setLocalPickerOpen(open);
+    onPickerOpenChange?.(open);
+  };
   const [reactions, setReactions] = useState<ReactionState>(() => toReactionState(post.reactions));
   const [liked, setLiked] = useState(post.isLiked ?? false);
   const report = useSongReport();
@@ -137,6 +225,8 @@ export function PostDetailCard({
   // 별개 동작이라 전파를 막음. 단, 카드 자체가 이미 onSelect로 클릭 가능한 요약 목록(2열)에서는
   // 카드 전체가 게시글 상세로 가는 단일 탭 영역이어야 해서 제목만 따로 분리하지 않음
   const showTrackLink = !!onSelectTrack && !onSelect;
+  // trailingAction='trackLink'면 더보기 자리에 > 버튼을 둠 — 이동할 곳(onSelectTrack)이 없으면 기본 더보기로 되돌림
+  const useTrackLinkButton = trailingAction === 'trackLink' && !!onSelectTrack;
   const handleSelectTrackClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     onSelectTrack?.({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
@@ -158,30 +248,44 @@ export function PostDetailCard({
     <div className={`min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
       <div className="flex items-center gap-0.5">
         <span className="text-sm font-bold text-text-main truncate">{post.title}</span>
-        {showTrackLink && <ChevronRight size={16} className="flex-shrink-0 text-text-sub" />}
+        {showTrackLink && !useTrackLinkButton && <ChevronRight size={16} className="flex-shrink-0 text-text-sub" />}
       </div>
       <div className="text-xs font-medium text-text-sub truncate">{post.artist}</div>
     </div>
   ) : (
     <div className={`flex items-center gap-0.5 min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
       <span className="truncate min-w-0">
-        <span className="text-base font-bold text-text-main">{post.title}</span>
-        <span className="text-sm font-medium text-text-sub"> · {post.artist}</span>
+        {/* 폭이 좁은 2열(narrow)은 한 단계 작게 — 제목 sm / 가수 xs (1열은 base / sm) */}
+        <span className={`${isNarrow ? 'text-sm' : 'text-base'} font-bold text-text-main`}>{post.title}</span>
+        <span className={`${isNarrow ? 'text-xs' : 'text-sm'} font-medium text-text-sub`}> · {post.artist}</span>
       </span>
-      {showTrackLink && <ChevronRight size={19} className="flex-shrink-0 text-text-sub" />}
+      {showTrackLink && !useTrackLinkButton && <ChevronRight size={19} className="flex-shrink-0 text-text-sub" />}
     </div>
   );
 
   // 더보기 버튼: 앨범 커버 바로 아래 첫 행의 맨 오른쪽에 위치 —
   // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류
   const moreButton = <PostMoreMenu report={report} menuKey="more" reportTargetId={post.id} />;
+  // 같은 자리에 들어가는 우측 버튼 — 'trackLink'면 > 버튼(내 글 여부와 무관하게 이동은 항상 가능),
+  // 아니면 더보기(신고는 내 글에는 숨김)
+  const trailingButton = useTrackLinkButton ? (
+    <button
+      onClick={handleSelectTrackClick}
+      aria-label={`${post.title} 게시글 모음 보기`}
+      className="flex-shrink-0 active:scale-90 transition-transform"
+    >
+      <ChevronRight size={20} className="text-text-sub" />
+    </button>
+  ) : (
+    !post.isMine && moreButton
+  );
 
   // 공유/좋아요 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
   // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 좋아요가 그 왼쪽
-  const actionBadgeSizeClass = hideReactions ? 'w-7' : 'w-9';
-  const likeBadgeRightClass = hideReactions ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
-  // 2열(요약 카드)의 재생 버튼은 카드 폭 자체가 좁아서 같은 16%라도 절대 크기가 작아 보임 — 더 큰 비율로 보정
-  const playButtonSizeClass = hideReactions ? 'w-[22%]' : 'w-[16%]';
+  const actionBadgeSizeClass = isNarrow ? 'w-7' : 'w-9';
+  const likeBadgeRightClass = isNarrow ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
+  // 2열(좁은 카드)의 재생 버튼은 카드 폭 자체가 좁아서 같은 16%라도 절대 크기가 작아 보임 — 더 큰 비율로 보정
+  const playButtonSizeClass = isNarrow ? 'w-[22%]' : 'w-[16%]';
 
   return (
     <div
@@ -196,14 +300,15 @@ export function PostDetailCard({
           : undefined
       }
       aria-label={onSelect ? `${post.title} 상세 보기` : undefined}
-      className={`flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] ${onSelect ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex flex-col bg-white rounded-2xl border border-slate-200 ${pickerOpen ? 'relative z-20' : 'overflow-hidden'} shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] ${onSelect ? 'cursor-pointer' : ''} ${className}`}
     >
       {/* 앨범 커버 */}
       <div className="relative">
         <img
           src={post.albumArtUrl}
           alt={post.title}
-          className="w-full aspect-square object-cover bg-slate-100"
+          // rounded-t: 이모지 선택창이 열려 있는 동안엔 카드의 overflow-hidden을 풀어서(선택창이 카드 밖으로 나가도록) 커버 모서리를 직접 둥글게 유지
+          className="w-full aspect-square object-cover bg-slate-100 rounded-t-[15px]"
         />
 
         {onPlay && !isTestPlayButton && (
@@ -212,9 +317,10 @@ export function PostDetailCard({
           <AlbumArtPlayButton onPlay={onPlay} label={`${post.title} 재생`} sizeClass={playButtonSizeClass} isPlaying={isPlaying} />
         )}
 
-        {onPlay && playButtonVariant === 'control' && !hideReactions && (
-          // control + 1열(최근추가된곡 리스트 뷰): 가운데 원형 버튼의 모양은 그대로 두되, 앨범커버 어디를 눌러도
-          // 재생/일시정지되도록 터치 영역만 커버 전체로 넓힘 — 위 원형 버튼 위에 투명 버튼을 덮어서 같은 동작을 함
+        {onPlay && playButtonVariant === 'control' && (
+          // control(1열·2열 공통): 가운데 원형 버튼의 모양은 그대로 두되, 앨범커버 어디를 눌러도
+          // 재생/일시정지되도록 터치 영역만 커버 전체로 넓힘 — 위 원형 버튼 위에 투명 버튼을 덮어서 같은 동작을 함.
+          // 2열에서도 커버를 누르면 카드의 onSelect(1열 상세로 전환)가 아니라 재생이 됨(전환은 커버 아래 텍스트 영역을 눌러서)
           <button
             onClick={handleAlbumArtPlay}
             aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
@@ -273,7 +379,13 @@ export function PostDetailCard({
         </button>
       </div>
 
-      <div className="px-4 pt-3 pb-4 flex-1 flex flex-col">
+      {/* pickerAnchor가 있으면 relative — 이모지 선택창이 이 영역(카드 폭 전체)의 왼쪽/오른쪽 끝을 기준으로 뜸(EmojiReactionBar pickerAnchor 참고) */}
+      {/* 2열(narrow) 카드는 하단 영역 어디를 눌러도 한마디 더보기/접기와 같은 동작 — 예전엔 1열 상세로 전환됐음.
+          한마디가 안 잘렸으면(토글 버튼이 없으면) 눌러도 아무 일 없음. 안의 버튼들은 각자 stopPropagation으로 이 동작과 분리돼 있음 */}
+      <div
+        onClick={canToggleBody ? toggleBody : undefined}
+        className={`px-4 pt-3 ${compact ? 'pb-3' : 'pb-4'} flex-1 flex flex-col ${pickerAnchor ? 'relative' : ''} ${canToggleBody ? 'cursor-pointer' : ''}`}
+      >
         {!hideReactions && (
           <div className="flex items-center gap-1.5 mb-2">
             <EmojiReactionBar
@@ -281,44 +393,70 @@ export function PostDetailCard({
               onToggleReaction={toggleReaction}
               disabled={toggleReactionMutation.isPending}
               pickerOpen={pickerOpen}
-              onTogglePicker={() => setPickerOpen((prev) => !prev)}
+              onTogglePicker={() => setPickerOpen(!pickerOpen)}
               className="flex-1 min-w-0"
+              pickerAnchor={pickerAnchor}
               emptyFallback={
                 // 배경 없는 안내 문구만 살짝 얹음. 클릭 가능한 건 왼쪽 이모지 추가 버튼 하나로 충분해서,
                 // 여기는 버튼처럼 보이지 않게 배경/클릭 이벤트 없이 텍스트로만 둠
                 <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
-                  ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
+                  {/* 폭이 좁은 2열은 줄여서 말줄임표로 잘리지 않게 함 */}
+                  {isNarrow ? '← 반응을 남겨주세요!' : '← 아직 반응이 없어요, 첫 반응을 남겨주세요!'}
                 </span>
               }
             />
 
-            {!post.isMine && moreButton}
+            {trailingButton}
           </div>
         )}
 
-        <div className={`mb-1 ${hideReactions ? 'flex items-center gap-2' : ''}`}>
+        <div className={`${compact ? '' : 'mb-1'} ${hideReactions ? 'flex items-center gap-2' : ''}`}>
           <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
-          {hideReactions && !post.isMine && moreButton}
+          {hideReactions && trailingButton}
         </div>
 
         {/* 본문 */}
-        {post.body && (
-          <p
-            className={`${hideReactions ? 'text-xs line-clamp-3' : 'text-sm'} text-text-main leading-relaxed mb-2 whitespace-pre-line`}
-          >
-            <span className="mr-[1px]">"</span>
-            {post.body}
-            <span className="ml-[1px]">"</span>
-          </p>
+        {!compact && post.body && (
+          <>
+            <p
+              ref={bodyRef}
+              style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
+              className={`${
+                isNarrow
+                  ? `text-xs overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
+                  : 'text-sm'
+              } text-text-main leading-relaxed ${
+                isNarrow && (isBodyClamped || bodyExpanded) ? 'mb-1' : 'mb-2'
+              } whitespace-pre-line`}
+            >
+              <span className="mr-[1px]">"</span>
+              {post.body}
+              <span className="ml-[1px]">"</span>
+            </p>
+            {/* 더보기/접기 — 카드 전체 클릭(1열 상세로 전환)과 별개 동작이라 전파를 막음 */}
+            {canToggleBody && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleBody();
+                }}
+                aria-expanded={bodyExpanded}
+                className="self-start mb-2 text-[11px] font-semibold text-text-hint active:opacity-60"
+              >
+                {bodyExpanded ? '접기' : '더보기'}
+              </button>
+            )}
+          </>
         )}
 
         {/* 구분선 + 장르(최대 3개) — 묶어서 mt-auto로 카드 하단에 고정. 구분선을 장르 행과
             분리해두면 2열 그리드에서 카드 높이가 늘어날 때(본문이 짧은 카드) 구분선만 본문
             바로 아래 뜨고 장르는 저 밑에 떨어져 보였어서, 항상 장르 바로 위에 붙도록 묶음 */}
+        {!compact && (
         <div className="mt-auto">
           <div className="border-t border-slate-100 mb-3" />
           <div className="flex items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-xs font-medium text-text-sub">
+            <div className={`flex flex-wrap items-center gap-x-1 gap-y-1 ${isNarrow ? 'text-[11px]' : 'text-xs'} font-medium text-text-sub`}>
               {post.genres.flatMap((label, index) => {
                 const genre = GENRES.find((g) => g.label === label);
                 const chip = (
@@ -335,10 +473,11 @@ export function PostDetailCard({
               })}
             </div>
             {!hideReactions && (
-              <span className="flex-shrink-0 text-xs text-text-hint">{formatTimeAgo(post.createdAt)}</span>
+              <span className={`flex-shrink-0 ${isNarrow ? 'text-[11px]' : 'text-xs'} text-text-hint`}>{formatTimeAgo(post.createdAt)}</span>
             )}
           </div>
         </div>
+        )}
       </div>
 
       {/* 신고 사유 선택 팝업 */}

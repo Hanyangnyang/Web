@@ -10,10 +10,15 @@ export function PostDetailCardSkeleton({ variant = 'card', className = '' }: Pos
     return (
       <div className={`h-full flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden ${className}`}>
         <div className="w-full aspect-square skeleton-shimmer" />
-        <div className="px-4 pt-3 pb-4 flex-1 flex flex-col gap-2">
-          <div className="h-4 w-3/4 rounded-full skeleton-shimmer" />
-          <div className="h-3 w-1/2 rounded-full skeleton-shimmer" />
-          <div className="h-3 w-full rounded-full skeleton-shimmer" />
+        <div className="px-4 pt-3 pb-4 flex-1 flex flex-col">
+          {/* PostDetailCard(2열)와 같은 구성: 이모지 반응 행 / 제목 / 본문 / 장르 */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <div className="w-6 h-6 rounded-full skeleton-shimmer flex-shrink-0" />
+            <div className="h-5 w-12 rounded-full skeleton-shimmer" />
+          </div>
+          <div className="h-4 w-3/4 rounded-full skeleton-shimmer mb-2" />
+          <div className="h-3.5 w-full rounded-full skeleton-shimmer mb-1.5" />
+          <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer mb-3" />
           <div className="h-3 w-16 rounded-full skeleton-shimmer mt-auto" />
         </div>
       </div>

@@ -320,7 +320,11 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                           track={track}
                           onPlay={onPlay}
                           isPlaying={track.trackId === currentTrackId}
-                          onSelect={setSelectedTrack}
+                          onSelect={(selected) => {
+                            setSelectedTrack(selected);
+                            // 선택과 동시에 재생 — 이미 재생 중인 곡이면 onPlay가 일시정지로 토글해버리므로 건너뜀
+                            if (selected.trackId !== currentTrackId) onPlay?.(selected);
+                          }}
                           albumArtSelects
                           selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
                           disabled={alreadyRecommended}
