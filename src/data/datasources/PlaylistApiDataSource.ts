@@ -167,7 +167,7 @@ export interface PlaylistApiDataSource {
   postTrackLike: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
   // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 성공 응답은 data=null(Swagger 예시의 {}는 자동 생성값)이라 성공 여부만 확인.
   // DB에 없는 트랙(아직 추천 등록 안 된 검색 결과 곡 등)이면 404 C003
-  postTrackPlay: (trackId: string) => Promise<ApiResponse<null>>;
+  postTrackPlay: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<null>>;
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
   getTrackPosts: (params: GetTrackPostsDataSourceParams) => Promise<ApiResponse<TrackPostsDto>>;
   getCharts: (type?: ChartTypeDto, deviceId?: string) => Promise<ApiResponse<ChartDto>>;
@@ -230,8 +230,8 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
   postTrackLike: async (trackId, body) =>
     parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/tracks/${trackId}/like`, body)),
 
-  postTrackPlay: async (trackId) =>
-    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/tracks/${trackId}/play`, {})),
+  postTrackPlay: async (trackId, body) =>
+    parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/tracks/${trackId}/play`, body)),
 
   postReaction: async (songId, body) =>
     parseOrThrow(await httpClient.post(`/api/v1/playlist/songs/${songId}/reactions`, body)),

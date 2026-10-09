@@ -171,8 +171,8 @@ export const createPlaylistRepository = (
     return data.isLiked;
   },
 
-  recordTrackPlay: async (trackId) => {
-    const res = await playlistApiDataSource.postTrackPlay(trackId);
+  recordTrackPlay: async (params) => {
+    const res = await playlistApiDataSource.postTrackPlay(params.trackId, { deviceId: params.deviceId });
     assertSuccess(res, 'playlist track play');
   },
 

@@ -35,6 +35,12 @@ export interface ToggleLikeParams {
   deviceId: string;
 }
 
+export interface RecordTrackPlayParams {
+  trackId: string;
+  // 곡·기기별 하루(KST 자정 기준) 최초 요청만 서버가 집계 — 필수
+  deviceId: string;
+}
+
 export interface ToggleReactionParams {
   songId: string;
   deviceId: string;
@@ -110,7 +116,7 @@ export interface PlaylistRepository {
   // 결과로 내려온 실제 isLiked만 반환 (heartCount는 화면에 안 써서 버림)
   toggleLike: (params: ToggleLikeParams) => Promise<boolean>;
   // 재생 버튼을 누를 때마다 기록 — 어디서 눌렸든 결과를 화면에서 안 써서 반환값 없음
-  recordTrackPlay: (trackId: string) => Promise<void>;
+  recordTrackPlay: (params: RecordTrackPlayParams) => Promise<void>;
   // 서버가 토글 후 그 곡의 9종 반응 전체 최신 카운트를 내려줘서, 화면 상태를 통째로 그걸로 맞추면 됨
   toggleReaction: (params: ToggleReactionParams) => Promise<PlaylistReaction[]>;
   // 특정 곡(trackId)에 달린 추천 게시글 모아보기 — 곡 단위 게시글 모음 화면(TrackPostCollectionView)용
