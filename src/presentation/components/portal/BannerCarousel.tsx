@@ -230,19 +230,19 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
             );
           })}
         </div>
-      </div>
 
-      {/* 배너 개수 표시 — 1개일 땐 표시할 의미가 없어 생략 */}
-      {banners.length > 1 && (
-        <div className="flex justify-center items-center gap-1.5 mt-2">
-          {banners.map((banner, i) => (
-            <span
-              key={banner.id ?? i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === current % banners.length ? 'w-4 bg-text-main' : 'w-1.5 bg-slate-300'}`}
-            />
-          ))}
-        </div>
-      )}
+        {/* 배너 개수 표시 — 이미지 안 하단 중앙에 겹쳐 둔다(플레이리스트 캐러셀과 동일). 1개일 땐 표시할 의미가 없어 생략 */}
+        {banners.length > 1 && (
+          <div className="pointer-events-none absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5">
+            {banners.map((banner, i) => (
+              <span
+                key={banner.id ?? i}
+                className={`h-1.5 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-all duration-300 ${i === current % banners.length ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
