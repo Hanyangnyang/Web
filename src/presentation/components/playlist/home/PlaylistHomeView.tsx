@@ -1,4 +1,4 @@
-import { ChevronRight, User } from 'lucide-react';
+import { ChevronRight, Heart } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartTopCard } from './ChartTopCard';
@@ -10,6 +10,8 @@ import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
+
+const MY_SONGS_PREVIEW_LIMIT = 10;
 
 interface PlaylistHomeViewProps {
   onBack: () => void;
@@ -33,8 +35,13 @@ interface PlaylistHomeViewProps {
   currentTrackId?: string | null;
   onShowAllChart: () => void;
   onShowPosts: (track: ChartTrack) => void;
-  onShowMyActivity: () => void;
+  onShowLiked: () => void;
   onShowAddSong: () => void;
+  // "내가 추천한 곡" 섹션 — 카드 UI는 인기차트(ChartTopCard)와 동일, 순위만 없음
+  mySongs: Song[];
+  isMySongsLoading: boolean;
+  onShowAllMySongs: () => void;
+  onSelectMySong: (track: TrackSummary) => void;
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
   autoFocusSearch?: boolean;
   onAutoFocusSearchConsumed?: () => void;
@@ -60,8 +67,12 @@ export function PlaylistHomeView({
   currentTrackId,
   onShowAllChart,
   onShowPosts,
-  onShowMyActivity,
+  onShowLiked,
   onShowAddSong,
+  mySongs,
+  isMySongsLoading,
+  onShowAllMySongs,
+  onSelectMySong,
   autoFocusSearch = false,
   onAutoFocusSearchConsumed,
 }: PlaylistHomeViewProps) {
@@ -83,11 +94,11 @@ export function PlaylistHomeView({
         onBack={onBack}
         rightAction={
           <button
-            onClick={onShowMyActivity}
-            aria-label="내 활동 보기"
+            onClick={onShowLiked}
+            aria-label="저장한 곡 보기"
             className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
           >
-            <User size={16} strokeWidth={2} />
+            <Heart size={16} strokeWidth={2} className="text-red-500" fill="currentColor" />
           </button>
         }
       />
@@ -214,6 +225,61 @@ export function PlaylistHomeView({
             >
               더보기
             </button>
+          </div>
+        )}
+      </section>
+
+      {/* 내가 추천한 곡 섹션 */}
+      <section className="mt-6">
+        <div className="flex items-center gap-1 mb-2">
+          <h3 className="text-lg font-bold text-text-main">내가 추천한 곡</h3>
+          <button
+            onClick={onShowAllMySongs}
+            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
+            aria-label="내가 추천한 곡 전체보기"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {isMySongsLoading ? (
+          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex gap-2 pb-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-[152px] aspect-[3/4] rounded-xl skeleton-shimmer" />
+              ))}
+            </div>
+          </div>
+        ) : mySongs.length === 0 ? (
+          <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
+            <EmptyGenreState
+              message="아직 추천한 곡이 없어요"
+              buttonLabel="곡 추천하러 가기"
+              buttonIcon={<span>✏️</span>}
+              onAction={onShowAddSong}
+            />
+          </div>
+        ) : (
+          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex gap-2 pb-2">
+              {mySongs.slice(0, MY_SONGS_PREVIEW_LIMIT).map((song) => (
+                <ChartTopCard
+                  key={song.id ?? song.trackId}
+                  track={song}
+                  onShowPosts={onSelectMySong}
+                  onPlay={onPlayTrack}
+                  currentTrackId={currentTrackId}
+                />
+              ))}
+              <button
+                onClick={onShowAllMySongs}
+                aria-label="내가 추천한 곡 전체보기"
+                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+              >
+                더보기
+              </button>
+              <div className="w-1 flex-shrink-0" aria-hidden="true" />
+            </div>
           </div>
         )}
       </section>

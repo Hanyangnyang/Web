@@ -20,6 +20,7 @@ import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
+import { useMySongs } from '../../hooks/playlist/useMySongs.js';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 import { useRecentSongsTapAreaVariant } from '../../hooks/playlist/usePlaylistExperiment';
@@ -69,6 +70,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const [searchQuery, setSearchQuery] = useState('');
   const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const songs = fetchedSongs ?? EMPTY_SONGS;
+  const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
 
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
@@ -408,8 +410,12 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             currentTrackId={playingTrackId}
             onShowAllChart={() => pushScreen({ name: 'chart' })}
             onShowPosts={handleSelectChartSong}
-            onShowMyActivity={() => pushScreen({ name: 'myActivity' })}
+            onShowLiked={() => pushScreen({ name: 'liked' })}
             onShowAddSong={() => pushAddSong()}
+            mySongs={mySongs ?? EMPTY_SONGS}
+            isMySongsLoading={isMySongsLoading}
+            onShowAllMySongs={() => pushScreen({ name: 'mySongs' })}
+            onSelectMySong={handleSelectSearchTrack}
             autoFocusSearch={autoFocusSearch}
             onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
           />
