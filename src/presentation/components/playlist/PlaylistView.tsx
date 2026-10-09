@@ -182,11 +182,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     skipScrollRestore: (screen.name === 'recent' || screen.name === 'mySongs') && !!screen.scrollTarget,
   });
 
-  // 최근추가된곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면에서만 켬
+  // 최근추가된곡/인기차트 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
   const { pull, isRefreshing: isPullRefreshing, threshold: pullThreshold } = usePullToRefresh({
     containerRef: scrollContainerRef,
-    onRefresh: () => refetchRecentSongs(),
-    enabled: screen.name === 'recent',
+    onRefresh: () => (screen.name === 'chart' ? refetchChart() : refetchRecentSongs()),
+    enabled: screen.name === 'recent' || screen.name === 'chart',
   });
 
   const handleSearchSubmit = useCallback(() => {

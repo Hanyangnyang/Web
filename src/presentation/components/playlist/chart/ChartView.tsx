@@ -48,15 +48,13 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
         <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
           <span className="w-7 text-center">순위</span>
           <div className="flex-1">곡정보</div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <span className="w-9 text-center">듣기</span>
             <span className="w-9 text-center">좋아요</span>
-            <span className="w-9 text-center">공유</span>
           </div>
         </div>
 
-        {/* 리스트 — 로딩 중엔 ChartSongRow와 동일한 레이아웃(순위/앨범아트/곡정보/좋아요/듣기/공유)의 스켈레톤을 보여줌.
-            key=chartPeriod: 렌더 에러로 폴백이 뜬 뒤에도 기간 칩을 바꾸면 경계가 새로 마운트돼서 다시 시도됨 */}
+        {/* 리스트 */}
         <ErrorBoundary
           key={chartPeriod}
           name="playlist-chart"

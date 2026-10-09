@@ -1,6 +1,5 @@
-import { Heart, Pause, Play, Share2 } from 'lucide-react';
+import { Heart, Pause, Play } from 'lucide-react';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
-import { useShareModal } from '../shared/useShareModal';
 
 interface ChartSongRowProps {
   track: ChartTrack;
@@ -8,7 +7,7 @@ interface ChartSongRowProps {
   // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청
   // 여러 게시글이 있을 수 있는 곡 하나에 바로 붙일 수 없어 상세 보기로 유도
   onShowPosts: (track: ChartTrack) => void;
-  // 넘겨주면 듣기와 공유 사이에 좋아요(하트) 버튼이 생김 — 소식탭 홍보 카드처럼 좋아요가 필요 없는 곳은 안 넘김
+  // 넘겨주면 듣기 옆에 좋아요(하트) 버튼이 생김 — 소식탭 홍보 카드처럼 좋아요가 필요 없는 곳은 안 넘김
   onToggleLike?: (track: ChartTrack) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
@@ -30,7 +29,6 @@ export function ChartSongRow({
   thumbnailClassName = 'w-12 h-12',
 }: ChartSongRowProps) {
   const isPlaying = track.trackId === currentTrackId;
-  const share = useShareModal({ trackId: track.trackId, title: track.title, artist: track.artist, albumArtUrl: track.albumArtUrl });
 
   return (
     <div
@@ -63,55 +61,43 @@ export function ChartSongRow({
         <div className="text-xs text-text-sub truncate">{track.artist}</div>
       </div>
 
-      {/* 재생 버튼 — row 전체 클릭(게시글 보기)과 별개 동작이라 전파를 막음 */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onPlay(track);
-        }}
-        aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
-        className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
-      >
-        {isPlaying ? (
-          <Pause size={18} fill="none" stroke="currentColor" strokeWidth={2} />
-        ) : (
-          <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
-        )}
-      </button>
-
-      {/* 좋아요 버튼 — 곡 단위, 듣기와 공유 사이. row 클릭과 별개 동작이라 전파를 막음 */}
-      {onToggleLike && (
+      <div className="flex items-center flex-shrink-0">
+        {/* 재생 버튼 — row 전체 클릭(게시글 보기)과 별개 동작이라 전파를 막음 */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onToggleLike(track);
+            onPlay(track);
           }}
-          aria-label={track.isLiked ? `${track.title} 좋아요 취소` : `${track.title} 좋아요`}
-          aria-pressed={track.isLiked}
+          aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
           className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
         >
-          <Heart
-            size={16}
-            strokeWidth={2}
-            fill={track.isLiked ? 'currentColor' : 'none'}
-            className={track.isLiked ? 'text-red-500' : undefined}
-          />
+          {isPlaying ? (
+            <Pause size={18} fill="none" stroke="currentColor" strokeWidth={2} />
+          ) : (
+            <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
+          )}
         </button>
-      )}
 
-      {/* 공유 버튼 — 재생 버튼과 같은 자리, row 클릭과 별개 동작이라 전파를 막음 */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          share.open();
-        }}
-        aria-label={`${track.title} 공유하기`}
-        className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
-      >
-        <Share2 size={16} strokeWidth={2} />
-      </button>
-
-      {share.node}
+        {/* 좋아요 버튼 — 곡 단위, 듣기 옆. row 클릭과 별개 동작이라 전파를 막음 */}
+        {onToggleLike && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleLike(track);
+            }}
+            aria-label={track.isLiked ? `${track.title} 좋아요 취소` : `${track.title} 좋아요`}
+            aria-pressed={track.isLiked}
+            className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+          >
+            <Heart
+              size={16}
+              strokeWidth={2}
+              fill={track.isLiked ? 'currentColor' : 'none'}
+              className={track.isLiked ? 'text-red-500' : undefined}
+            />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
