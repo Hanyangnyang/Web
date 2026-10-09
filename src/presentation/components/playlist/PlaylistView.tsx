@@ -44,7 +44,7 @@ type ScreenFrame =
   | { name: 'chart' }
   | { name: 'myActivity' }
   | { name: 'liked' }
-  | { name: 'mySongs' };
+  | { name: 'mySongs'; scrollTarget: string | null }; // scrollTarget: 홈의 내가추천한곡 카드를 눌렀을 때 해당 곡으로 스크롤
 type PlaylistScreen = ScreenFrame['name'];
 type ViewMode = 'grid' | 'list';
 type ListScreen = 'recent' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들 (저장한 곡은 2열 고정이라 제외)
@@ -179,7 +179,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
     // 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
     // 안 그러면 이 훅이 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
-    skipScrollRestore: screen.name === 'recent' && !!screen.scrollTarget,
+    skipScrollRestore: (screen.name === 'recent' || screen.name === 'mySongs') && !!screen.scrollTarget,
   });
 
   // 최근추가된곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면에서만 켬
@@ -370,7 +370,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           <MyPageView
             onBack={popScreen}
             onShowLiked={() => pushScreen({ name: 'liked' })}
-            onShowMySongs={() => pushScreen({ name: 'mySongs' })}
+            onShowMySongs={() => pushScreen({ name: 'mySongs', scrollTarget: null })}
           />
         ) : screen.name === 'liked' ? (
           <LikedSongsView
@@ -387,6 +387,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={handlePlay}
             onShowAddSong={() => pushAddSong()}
             onSelectTrack={handleSelectSearchTrack}
+            scrollToTrackId={screen.scrollTarget}
             currentTrackId={playingTrackId}
             viewMode={viewModes.mySongs}
             onViewModeChange={changeViewMode('mySongs')}
@@ -414,8 +415,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onShowAddSong={() => pushAddSong()}
             mySongs={mySongs ?? EMPTY_SONGS}
             isMySongsLoading={isMySongsLoading}
-            onShowAllMySongs={() => pushScreen({ name: 'mySongs' })}
-            onSelectMySong={handleSelectSearchTrack}
+            onShowAllMySongs={() => pushScreen({ name: 'mySongs', scrollTarget: null })}
+            onSelectMySong={(song) => pushScreen({ name: 'mySongs', scrollTarget: song.trackId })}
             autoFocusSearch={autoFocusSearch}
             onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
           />

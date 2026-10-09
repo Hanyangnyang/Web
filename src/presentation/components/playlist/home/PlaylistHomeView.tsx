@@ -2,6 +2,7 @@ import { ChevronRight, Heart } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartTopCard } from './ChartTopCard';
+import { MySongCard } from './MySongCard';
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
@@ -41,7 +42,8 @@ interface PlaylistHomeViewProps {
   mySongs: Song[];
   isMySongsLoading: boolean;
   onShowAllMySongs: () => void;
-  onSelectMySong: (track: TrackSummary) => void;
+  // 카드를 누르면 내가 추천한 곡 화면으로 이동하면서 그 곡 위치로 스크롤
+  onSelectMySong: (song: Song) => void;
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
   autoFocusSearch?: boolean;
   onAutoFocusSearchConsumed?: () => void;
@@ -263,13 +265,7 @@ export function PlaylistHomeView({
           <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex gap-2 pb-2">
               {mySongs.slice(0, MY_SONGS_PREVIEW_LIMIT).map((song) => (
-                <ChartTopCard
-                  key={song.id ?? song.trackId}
-                  track={song}
-                  onShowPosts={onSelectMySong}
-                  onPlay={onPlayTrack}
-                  currentTrackId={currentTrackId}
-                />
+                <MySongCard key={song.id ?? song.trackId} track={song} onSelect={() => onSelectMySong(song)} />
               ))}
               <button
                 onClick={onShowAllMySongs}
