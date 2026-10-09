@@ -97,12 +97,15 @@ interface MiscViewProps {
   // subView를 'playlist'로 바꾸는 건 위 deepLinkBox가 처리하므로, 여기선 PlaylistView로 그대로 전달만 함
   deepLinkTrackId?: string | null;
   onDeepLinkTrackIdHandled?: () => void;
+  // 소식탭 플레이리스트 배너에서 아티스트를 눌렀을 때, 그 검색 결과 화면으로 바로 가기 위해 PlaylistView로 그대로 전달만 함
+  deepLinkSearchQuery?: string | null;
+  onDeepLinkSearchQueryHandled?: () => void;
   // 소식탭 오늘의 동아리 추천에서 넘어왔을 때, 중앙동아리 목록의 그 동아리 위치로 자동 스크롤하기 위해 넘어옴
   deepLinkClubId?: string | null;
   onDeepLinkClubIdHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkSearchQuery, onDeepLinkSearchQueryHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
@@ -142,6 +145,8 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
         isActive={isActive}
         deepLinkTrackId={deepLinkTrackId}
         onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
+        deepLinkSearchQuery={deepLinkSearchQuery}
+        onDeepLinkSearchQueryHandled={onDeepLinkSearchQueryHandled}
       />
     );
   }

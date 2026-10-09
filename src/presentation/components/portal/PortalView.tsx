@@ -10,7 +10,7 @@ import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
 import { ClubSpotlightCard } from '../misc/ClubSpotlightCard.js';
-import { ArtistPromoBanner } from '../playlist/shared/ArtistPromoBanner.js';
+import { ArtistPromoCarousel } from '../playlist/shared/ArtistPromoCarousel.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
@@ -32,7 +32,8 @@ interface PortalViewProps {
   // 배너가 캠퍼스맵 등 앱 내부 탭으로 이동하는 링크일 때 새 창을 열지 않고 바로 탭을 전환하기 위해 씀.
   // chip은 캠퍼스맵 탭 안에서 특정 칩(예: 오픈스페이스)까지, box는 기타탭 안에서 특정 서브뷰(예: 헬스장)까지,
   // clubId는 기타탭 중앙동아리 안에서 특정 동아리 위치까지 미리 켜고 싶을 때만 넘어온다
-  onNavigateToTab?: (tab: string, chip?: string, box?: string, clubId?: string) => void;
+  // playlistSearchQuery는 box가 'playlist'일 때, 플레이리스트 검색 결과 화면을 그 검색어로 바로 열고 싶을 때만 넘어온다
+  onNavigateToTab?: (tab: string, chip?: string, box?: string, clubId?: string, playlistSearchQuery?: string) => void;
 }
 
 export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
@@ -44,7 +45,6 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const showClubBanner = isClubBannerSeason();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
-  const [devArtist] = useState(() => DEV_ARTIST_SAMPLES[Math.floor(Math.random() * DEV_ARTIST_SAMPLES.length)]);
 
   return (
     <>
@@ -81,17 +81,17 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
       )}
     
       <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
-        {/* 모바일 디자인 검수용 샘플 — 임시 프리뷰 브랜치에서 아티스트가 새로고침마다 바뀐다 */}
-        <ArtistPromoBanner
-          artistName={devArtist.artistName}
-          artistImageUrl={devArtist.artistImageUrl}
-          onClick={() => onNavigateToTab?.('misc', undefined, 'playlist')}
-        />
-
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
           <WeatherCard weather={weather} loading={weatherLoading} error={weatherError} onRetry={refetchWeather} />
         </ErrorBoundary>
+
+        {/* 플레이리스트 홍보 캐러셀 — 아직 더미 아티스트 샘플 */}
+        <ArtistPromoCarousel
+          artists={DEV_ARTIST_SAMPLES}
+          isActive={isActive}
+          onClick={(artist) => onNavigateToTab?.('misc', undefined, 'playlist', undefined, artist.artistName)}
+        />
 
         {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동. 3월·9월(모집 시즌)에만 노출 */}
         {showClubBanner && (

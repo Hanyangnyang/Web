@@ -58,9 +58,12 @@ interface PlaylistViewProps {
   isActive?: boolean;
   deepLinkTrackId?: string | null;
   onDeepLinkTrackIdHandled?: () => void;
+  // 소식탭 배너에서 아티스트를 눌러 들어올 때 — 이 검색어로 검색 결과 화면을 바로 연다
+  deepLinkSearchQuery?: string | null;
+  onDeepLinkSearchQueryHandled?: () => void;
 }
 
-export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled }: PlaylistViewProps) {
+export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkSearchQuery, onDeepLinkSearchQueryHandled }: PlaylistViewProps) {
   const isApp = isNativeApp();
   const platform = getPlatform();
   const posthog = usePostHog();
@@ -207,6 +210,14 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     onDeepLinkTrackIdHandled?.();
   }, [deepLinkTrackId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 소식탭 아티스트 배너 딥링크: 검색바에 그 이름을 채우고 검색 결과 화면을 연다. 이미 검색 결과 화면이면 쌓지 않고 검색어만 바꾼다
+  useEffect(() => {
+    if (!deepLinkSearchQuery) return;
+    setSearchQuery(deepLinkSearchQuery);
+    setScreenStack((prev) => (prev[prev.length - 1].name === 'search' ? prev : [...prev, { name: 'search' }]));
+    onDeepLinkSearchQueryHandled?.();
+  }, [deepLinkSearchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // 인기차트 리스트 클릭 — ChartTrack을 TrackSummary 형태로 변환해 동일한 TrackPostCollectionView로 이동
   const handleSelectChartSong = useCallback((track: ChartTrack) => {
     pushScreen({
@@ -327,6 +338,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           />
         ) : screen.name === 'search' ? (
           <SearchResultsView
+            key={searchQuery} // 이미 검색 결과 화면인 채로 딥링크로 검색어가 바뀌면, 내부 activeQuery(처음 진입 때만 query로 초기화)가 따라가도록 새로 마운트
             query={searchQuery}
             onBack={popScreen}
             onSelectTrack={handleSelectSearchTrack}

@@ -14,7 +14,7 @@ interface WeatherCardProps {
 
 function WeatherSkeleton() {
   return (
-    <div className="rounded-card px-4 py-3 bg-slate-100 animate-pulse flex flex-col justify-start">
+    <div className="bg-white/90 backdrop-blur-xl rounded-2xl rounded-t-none px-4 py-3 animate-pulse flex flex-col justify-start">
       <div className="pl-1">
         <div className="h-3 w-20 bg-slate-200 rounded-full" />
         <div className="flex items-baseline gap-1.5 mt-1.5">
@@ -35,12 +35,12 @@ export function WeatherCard({ weather, loading, error = null, onRetry }: Weather
 
   // 1. 첫 로딩 — 스켈레톤
   if (loading) {
-    return <section className="-mt-3"><WeatherSkeleton /></section>;
+    return <section><WeatherSkeleton /></section>;
   }
 
   // 2. 조회 실패 — 캐시된 이전 데이터도 없을 때만. 있으면 그걸 계속 보여준다(아래 4번).
   if (error && !current) {
-    return <section className="-mt-3"><CardFallback message="날씨 정보를 불러오지 못했습니다" onRetry={onRetry} className="min-h-[180px]" /></section>;
+    return <section><CardFallback message="날씨 정보를 불러오지 못했습니다" onRetry={onRetry} className="min-h-[180px]" /></section>;
   }
 
   // 3. 아직 아무것도 못 받음 — 실패도 아니므로 자리를 비워둔다
@@ -48,14 +48,11 @@ export function WeatherCard({ weather, loading, error = null, onRetry }: Weather
 
   // 4. 정상
   return (
-    <section className="-mt-3">
-      <div className="bg-white/90 backdrop-blur-xl border border-slate-200/90 rounded-2xl px-4 py-3 text-slate-800 relative overflow-hidden flex flex-col justify-start shadow-[0_8px_30px_-4px_rgba(15,23,42,0.06),0_2px_8px_-2px_rgba(15,23,42,0.04),0_0_0_1px_rgba(15,23,42,0.03)] select-none">
+    <section>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl rounded-t-none px-4 py-3 text-slate-800 relative overflow-hidden flex flex-col justify-start select-none">
         <div className="relative z-10 w-full">
           <div className="flex flex-col w-full">
-            <div className="pl-1">
-              <p className="text-[11px] font-semibold text-slate-500 leading-tight">
-                안산시 상록구 사동
-              </p>
+            <div className="pl-1 flex items-center gap-3">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-4xl font-black tracking-tight leading-none">{current.temp}°</span>
                 {/* 설명 텍스트와 한파 뱃지는 기준선이 아닌 수평 중앙선을 기준으로 나란히 정렬 */}
@@ -70,12 +67,18 @@ export function WeatherCard({ weather, loading, error = null, onRetry }: Weather
                   )}
                 </span>
               </div>
-              {current.maxTemp !== null && current.minTemp !== null && (
-                <p className="text-xs font-bold text-slate-500 leading-tight mt-0.5 flex items-center gap-1">
-                  <span>최고 {current.maxTemp}°</span>
-                  <span>최저 {current.minTemp}°</span>
+              {/* 현재 기온·상태 오른쪽: 위치 + 최고/최저 */}
+              <div className="flex flex-col gap-0.5">
+                <p className="text-[11px] font-semibold text-slate-400 leading-tight">
+                  안산시 상록구 사동
                 </p>
-              )}
+                {current.maxTemp !== null && current.minTemp !== null && (
+                  <p className="text-xs font-bold text-slate-500 leading-tight flex items-center gap-1">
+                    <span>최고 {current.maxTemp}°</span>
+                    <span>최저 {current.minTemp}°</span>
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -83,7 +86,7 @@ export function WeatherCard({ weather, loading, error = null, onRetry }: Weather
           color: weatherTheme.color,
           opacity: 0.18
         }}>
-          {weatherTheme.icon && React.createElement(weatherTheme.icon, { size: 80 })}
+          {weatherTheme.icon && React.createElement(weatherTheme.icon, { size: 60 })}
         </div>
       </div>
     </section>

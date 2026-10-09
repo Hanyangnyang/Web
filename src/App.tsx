@@ -148,6 +148,8 @@ function MainLayout() {
     if (dl.get('tab') !== 'misc' || dl.get('box') !== 'playlist') return null;
     return dl.get('trackId');
   });
+  // 소식탭 플레이리스트 배너에서 아티스트를 눌렀을 때, 플레이리스트의 그 아티스트 검색 결과 화면으로 바로 보내기 위해 PlaylistView에 한 번만 전달
+  const [pendingPlaylistSearchQuery, setPendingPlaylistSearchQuery] = useState<string | null>(null);
   // 소식탭 오늘의 동아리 추천에서 "보러가기"를 눌렀을 때, 중앙동아리 목록에서 그 동아리 위치로
   // 자동 스크롤하기 위해 ClubView에 한 번만 전달
   const [pendingClubId, setPendingClubId] = useState<string | null>(null);
@@ -275,10 +277,11 @@ function MainLayout() {
   // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지, box는 기타탭의
   // 특정 서브뷰(예: 헬스장)까지 지정하고 싶을 때만 넘어온다.
   // 이미 그 탭에 있는 상태에서 다시 눌러도 값은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
-  const handleTabChange = useCallback((tab: string, chip?: string, box?: string, clubId?: string) => {
+  const handleTabChange = useCallback((tab: string, chip?: string, box?: string, clubId?: string, playlistSearchQuery?: string) => {
     if (chip && tab === 'partner') setPendingMapChip(chip);
     if (box && tab === 'misc') setPendingMiscBox(box);
     if (clubId && tab === 'misc' && box === 'clubs') setPendingClubId(clubId);
+    if (playlistSearchQuery && tab === 'misc' && box === 'playlist') setPendingPlaylistSearchQuery(playlistSearchQuery);
     if (tab === 'misc' && showMiscNew) {
       setShowMiscNew(false);
       try { localStorage.setItem('seenPlaylistFeature', '1'); } catch { /* 저장 실패해도 이번 세션에선 숨겨짐 */ }
@@ -335,7 +338,7 @@ function MainLayout() {
         } : {}}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : 'py-6'}`}>
+        <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : activeTab === 'portal' ? 'pb-6' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}
@@ -362,6 +365,8 @@ function MainLayout() {
               onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
               deepLinkTrackId={pendingPlaylistTrackId}
               onDeepLinkTrackIdHandled={() => setPendingPlaylistTrackId(null)}
+              deepLinkSearchQuery={pendingPlaylistSearchQuery}
+              onDeepLinkSearchQueryHandled={() => setPendingPlaylistSearchQuery(null)}
               deepLinkClubId={pendingClubId}
               onDeepLinkClubIdHandled={() => setPendingClubId(null)}
             />
