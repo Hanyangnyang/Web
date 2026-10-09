@@ -35,6 +35,9 @@ export const queryClient = new QueryClient({
       if (!import.meta.env.PROD) return;
       if (navigator.onLine === false) return;
       const err = error as (ApiValidationError & HttpError);
+      // 재생수 기록의 404 C003(DB에 없는 트랙)은 장애가 아니라 정상 응답 — 아직 아무도 추천 등록하지 않은 검색 결과 곡을
+      // 재생하면 항상 이렇게 내려옴. 다른 뮤테이션의 C003은 진짜 문제일 수 있어 mutationKey로 범위를 좁힘
+      if (mutation.options.mutationKey?.join('/') === 'playlist/record-track-play' && err.code === 'C003') return;
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
           tags: {

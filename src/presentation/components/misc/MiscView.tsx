@@ -139,6 +139,7 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
     return (
       <PlaylistView
         onBack={() => setSubView('list')}
+        isActive={isActive}
         deepLinkTrackId={deepLinkTrackId}
         onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
       />

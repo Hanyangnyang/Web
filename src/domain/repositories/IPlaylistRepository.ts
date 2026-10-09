@@ -53,6 +53,8 @@ export type ChartType = 'RISING' | 'WEEKLY' | 'MONTHLY';
 
 export interface GetPopularityChartParams {
   type?: ChartType;
+  // 있으면 각 곡에 기기별 isLiked가 붙어서 내려옴
+  deviceId?: string;
 }
 
 export interface GetSongByIdParams {

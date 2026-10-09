@@ -5,6 +5,7 @@ import { createTrackPosts } from '../../domain/entities/TrackPosts.js';
 import { createPopularityChart } from '../../domain/entities/PopularityChart.js';
 import { createSongCreationStatus } from '../../domain/entities/SongCreationStatus.js';
 import { SongCreationStatusSchema } from '../schemas/SongCreationStatusSchema.js';
+import { ChartDataSchema, ChartTrackDtoSchema } from '../schemas/ChartSchema.js';
 import type { PlaylistApiDataSource, PlaylistSongDto, PlaylistGenreDto, PlaylistReactionDto } from '../datasources/PlaylistApiDataSource.js';
 import type { PlaylistRepository } from '../../domain/repositories/IPlaylistRepository.js';
 
@@ -21,6 +22,7 @@ const GENRE_LABEL: Record<PlaylistGenreDto, string> = {
   BALLAD: '발라드',
   POP: 'POP',
   JPOP: 'J-POP',
+  OST: 'OST',
   OTHER: '기타',
 };
 
@@ -220,13 +222,29 @@ export const createPlaylistRepository = (
   },
 
   getPopularityChart: async (params) => {
-    const res = await playlistApiDataSource.getCharts(params?.type);
-    const data = unwrap(res, 'playlist charts', (d) => !!d && Array.isArray(d.tracks));
+    const res = await playlistApiDataSource.getCharts(params?.type, params?.deviceId);
+    const data = unwrap(res, 'playlist charts', (d) => !!d);
+    const invalidShape = (detail: string) =>
+      apiError(`playlist charts API returned invalid shaped 'data': ${detail}`, { area: AREA, endpoint: res._requestUrl });
+
+    // 1. data 봉투가 구조적으로 잘못됐으면(tracks가 배열이 아님 등) 에러로 던짐
+    const parsed = ChartDataSchema.safeParse(data);
+    if (!parsed.success)
+      throw invalidShape(parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', '));
+
+    // 2. 곡 하나가 이상하면(rank/trackId 누락 등) 그 곡만 제외
+    const tracks = parsed.data.tracks
+      .map((t) => ChartTrackDtoSchema.safeParse(t))
+      .filter((r) => r.success)
+      .map((r) => r.data);
+
+    // 3. 곡이 있었는데 하나도 못 살렸으면 "집계 안 됨"이 아니라 응답 형태가 바뀐 것이라 에러로 던짐
+    if (parsed.data.tracks.length > 0 && tracks.length === 0) throw invalidShape('every track failed validation');
 
     return createPopularityChart({
-      chartType: data.chartType,
-      displayTitle: data.displayTitle,
-      tracks: data.tracks,
+      chartType: parsed.data.chartType,
+      displayTitle: parsed.data.displayTitle,
+      tracks,
     });
   },
 });

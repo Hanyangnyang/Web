@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleLikeUseCase } from '../../../di.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
-import { patchTrackInListCaches } from './playlistQueryKeys.js';
+import { patchTrackInListCaches, patchTrackInChartCaches } from './playlistQueryKeys.js';
 
 export function useToggleLike() {
   const queryClient = useQueryClient();
@@ -16,6 +16,7 @@ export function useToggleLike() {
     },
     onSuccess: (isLiked, trackId) => {
       patchTrackInListCaches(queryClient, trackId, (song) => ({ ...song, isLiked: isLiked }));
+      patchTrackInChartCaches(queryClient, trackId, isLiked);
     },
   });
 }

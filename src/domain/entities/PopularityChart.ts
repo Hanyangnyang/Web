@@ -5,6 +5,8 @@ export interface ChartTrack {
   title: string;
   artist: string;
   albumArtUrl: string;
+  // 이 기기가 곡에 좋아요를 눌렀는지 (곡 단위)
+  isLiked: boolean;
 }
 
 export interface PopularityChart {

@@ -52,11 +52,14 @@ const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = ['main', 'recent'];
 
 interface PlaylistViewProps {
   onBack: () => void;
+  // 기타 탭이 지금 화면에 보이는지 — 탭을 오가도 이 뷰는 마운트가 유지돼서(display:none) 인기차트가 "새로 마운트되는 시점"에
+  // 재조회되지 않으므로, 이 값이 false→true로 바뀌는 시점을 트리거로 삼음(staleTime이 지났을 때만 실제 요청)
+  isActive?: boolean;
   deepLinkTrackId?: string | null;
   onDeepLinkTrackIdHandled?: () => void;
 }
 
-export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled }: PlaylistViewProps) {
+export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled }: PlaylistViewProps) {
   const isApp = isNativeApp();
   const platform = getPlatform();
   const posthog = usePostHog();
@@ -69,7 +72,7 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
-  const { data: chartData, isLoading: isChartLoading } = usePopularityChart(chartPeriod);
+  const { data: chartData, isLoading: isChartLoading, isError: isChartError, refetch: refetchChart } = usePopularityChart(chartPeriod, isActive);
   const chartTracks = chartData?.tracks ?? [];
   // 하단 플로팅 플레이어 상태 + 재생 버튼 동작(handlePlay) — usePlaylistPlayer 참고
   const {
@@ -102,8 +105,9 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
 
   // PlaylistView 자체는 최근추가된곡 화면을 드나들어도 마운트가 유지돼서, react-query의
   // staleTime이 지나 있어도 "새로 마운트되는 시점" 트리거가 없어 자동으로 재조회되지 않았음.
-  // 그래서 이 화면에 들어오는 시점 자체를 트리거로 삼아 직접 refetch — staleTime이 안 지났으면
-  // react-query가 알아서 네트워크 요청 없이 캐시를 그대로 반환함
+  // 그래서 이 화면에 들어오는 시점 자체를 트리거로 삼아 직접 refetch — 주의: refetch()는 staleTime과 무관하게
+  // 항상 요청을 보냄(실측 확인). useRecentSongs가 staleTime: 0이라 "화면 진입 때마다 최신으로 받기"와 같은 뜻이라 지금은 의도대로임.
+  // 나중에 staleTime을 늘리면 이 refetch가 그 값을 무시하게 되니, 그때는 인기차트처럼 enabled 토글 방식으로 바꿔야 함
   useEffect(() => {
     if (screen.name === 'recent') refetchRecentSongs();
   }, [screen.name, refetchRecentSongs]);
@@ -317,6 +321,8 @@ export function PlaylistView({ onBack, deepLinkTrackId, onDeepLinkTrackIdHandled
           <ChartView
             chart={chartTracks}
             isLoading={isChartLoading}
+            isError={isChartError}
+            onRetry={() => void refetchChart()}
             chartPeriod={chartPeriod}
             onChangePeriod={setChartPeriod}
             onBack={popScreen}

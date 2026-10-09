@@ -2,7 +2,7 @@
 import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
 // 백엔드 genre enum
-export type PlaylistGenreDto = 'KPOP' | 'ROCK' | 'BAND' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OTHER';
+export type PlaylistGenreDto = 'KPOP' | 'ROCK' | 'BAND' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OST' | 'OTHER';
 
 export interface PlaylistReactionDto {
   type: string;
@@ -119,20 +119,9 @@ export interface GetTrackPostsDataSourceParams {
 // 백엔드 차트 유형 — RISING(실시간 급상승, 기본값), WEEKLY(주간), MONTHLY(월간)
 export type ChartTypeDto = 'RISING' | 'WEEKLY' | 'MONTHLY';
 
-export interface ChartTrackDto {
-  rank: number;
-  trackId: string;
-  title: string;
-  artist: string;
-  albumArtUrl: string;
-}
-
-export interface ChartDto {
-  chartType: ChartTypeDto;
-  displayTitle: string;
-  tracks: ChartTrackDto[];
-  // snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀
-}
+// 인기차트 응답 shape 검증과 타입은 ChartSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
+// (snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀)
+export type ChartDto = unknown;
 
 // 곡 등록 화면 진입 시 사전 확인 응답 — 오늘 남은 등록 가능 횟수, 최근 7일 내 이미 추천한 곡 목록, 임시 차단 상태.
 // 응답 shape 검증과 타입은 SongCreationStatusSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
@@ -173,11 +162,12 @@ export interface PlaylistApiDataSource {
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
   // 곡(trackId) 단위 좋아요 토글 — 같은 곡의 모든 게시글에 공통 적용
   postTrackLike: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
-  // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 응답 data는 빈 객체라 성공 여부만 확인
-  postTrackPlay: (trackId: string) => Promise<ApiResponse<Record<string, never>>>;
+  // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 성공 응답은 data=null(Swagger 예시의 {}는 자동 생성값)이라 성공 여부만 확인.
+  // DB에 없는 트랙(아직 추천 등록 안 된 검색 결과 곡 등)이면 404 C003
+  postTrackPlay: (trackId: string) => Promise<ApiResponse<null>>;
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
   getTrackPosts: (params: GetTrackPostsDataSourceParams) => Promise<ApiResponse<TrackPostsDto>>;
-  getCharts: (type?: ChartTypeDto) => Promise<ApiResponse<ChartDto>>;
+  getCharts: (type?: ChartTypeDto, deviceId?: string) => Promise<ApiResponse<ChartDto>>;
 }
 
 const DEFAULT_PAGE = 0;
@@ -249,8 +239,11 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/tracks/${trackId}?${query.toString()}`));
   },
 
-  getCharts: async (type) => {
-    const query = type ? `?type=${type}` : '';
-    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/charts${query}`));
+  getCharts: async (type, deviceId) => {
+    const query = new URLSearchParams();
+    if (type) query.set('type', type);
+    if (deviceId) query.set('deviceId', deviceId);
+    const queryString = query.toString();
+    return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/charts${queryString ? `?${queryString}` : ''}`));
   },
 });

@@ -2,6 +2,7 @@
 // 다른 파일들처럼 use*.ts 1:1 규칙 대상이 아니고, 공유 상수/유틸이라 이름을 그대로 둠
 import type { QueryClient } from '@tanstack/react-query';
 import type { Song } from '../../components/playlist/playlistTypes.js';
+import type { PopularityChart } from '../../../domain/entities/PopularityChart.js';
 
 export const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
 export const LIKED_SONGS_QUERY_KEY = ['playlist', 'liked-songs'];
@@ -25,6 +26,17 @@ export function patchTrackInListCaches(queryClient: QueryClient, trackId: string
   for (const key of SONG_LIST_QUERY_KEYS) {
     queryClient.setQueryData<Song[]>(key, (prev) => prev?.map((song) => (song.trackId === trackId ? patch(song) : song)));
   }
+}
+
+// 인기차트 캐시 키 — period(popular/weekly/monthly)별로 ['playlist', 'chart', period]로 저장됨
+export const CHART_QUERY_KEY = ['playlist', 'chart'];
+
+// 좋아요는 곡 단위라 실시간/주간/월간 차트 캐시 전부에서 같은 곡의 isLiked를 맞춤.
+// 차트 캐시를 길게 들고 있으니(staleTime) 어느 화면에서 좋아요를 눌러도 차트 하트가 같이 맞춰져야 함
+export function patchTrackInChartCaches(queryClient: QueryClient, trackId: string, isLiked: boolean) {
+  queryClient.setQueriesData<PopularityChart>({ queryKey: CHART_QUERY_KEY }, (prev) =>
+    prev && { ...prev, tracks: prev.tracks.map((t) => (t.trackId === trackId ? { ...t, isLiked } : t)) }
+  );
 }
 
 // useSongSearch(게시글 검색)/useMusicSearch(Spotify 곡 검색)가 공유하는 최소 글자 수 — 이보다 짧으면 호출하지 않음
