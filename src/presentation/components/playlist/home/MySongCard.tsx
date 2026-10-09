@@ -1,6 +1,6 @@
-import { type TrackSummary } from '../playlistTypes';
+import { type TrackSummary, formatTimeAgo } from '../playlistTypes';
 
-type MySongCardTrack = TrackSummary & { comment?: string };
+type MySongCardTrack = TrackSummary & { comment?: string; createdAt?: string };
 
 interface MySongCardProps {
   track: MySongCardTrack;
@@ -23,10 +23,15 @@ export function MySongCard({ track, onSelect }: MySongCardProps) {
         <div className="text-sm font-bold text-white truncate leading-tight">{track.title}</div>
         <div className="text-xs font-medium text-white/90 truncate leading-tight mt-1">{track.artist}</div>
         <div className="h-px bg-white/40 my-2" aria-hidden="true" />
-        {/* 사용자 한마디 — 한 줄로 말줄임 */}
-        {track.comment && (
-          <div className="text-xs font-medium text-white/90 truncate leading-tight">"{track.comment}"</div>
-        )}
+        {/* 사용자 한마디(왼쪽, 한 줄 말줄임) + 추천 시각(오른쪽 하단) */}
+        <div className="flex items-baseline gap-1.5">
+          <div className="flex-1 min-w-0 text-xs font-medium text-white/90 truncate leading-tight">
+            {track.comment && `"${track.comment}"`}
+          </div>
+          {track.createdAt && (
+            <span className="flex-shrink-0 text-[10px] text-white/70 leading-tight">{formatTimeAgo(track.createdAt)}</span>
+          )}
+        </div>
       </div>
     </button>
   );

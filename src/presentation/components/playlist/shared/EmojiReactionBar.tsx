@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Smile } from 'lucide-react';
 import { EMOJI_REACTIONS, type ReactionKey } from '../postReactions';
 import { type ReactionState } from '../playlistTypes';
@@ -35,6 +35,22 @@ export function EmojiReactionBar({
   pickerAnchor,
 }: EmojiReactionBarProps) {
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
+  const pickerWrapperRef = useRef<HTMLDivElement>(null);
+  const onTogglePickerRef = useRef(onTogglePicker);
+  onTogglePickerRef.current = onTogglePicker;
+
+  // 선택창이 열려 있을 때 버튼·선택창 바깥을 누르면 닫음. pointerdown 캡처 단계에서 받아 다른 요소가 전파를 막아도 동작하고,
+  // 다른 카드의 이모지 버튼을 누르는 경우에도 click 전에 먼저 닫혀서 그 카드의 선택창이 정상적으로 열림
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (pickerWrapperRef.current?.contains(e.target as Node)) return;
+      onTogglePickerRef.current();
+    };
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    return () => document.removeEventListener('pointerdown', handlePointerDown, true);
+  }, [pickerOpen]);
+
   const isCompact = size === 'compact';
   const isMini = size === 'mini';
   const addButtonSizeClass = isMini ? 'w-[18px] h-[18px]' : isCompact ? 'w-5 h-5' : 'w-6 h-6';
@@ -47,7 +63,7 @@ export function EmojiReactionBar({
     <div className={`flex items-center ${chipGapClass} ${className}`}>
       {/* 이모지 추가 버튼 — 스크롤 영역 밖에 고정, 위로 뜨는 팝오버가 잘리지 않게 함 */}
       {/* pickerAnchor가 있으면 relative를 빼서, 선택창이 이 버튼(폭 24px)이 아니라 가장 가까운 relative 조상(카드 폭 전체)을 기준으로 뜨게 함 */}
-      <div className={`${pickerAnchor ? '' : 'relative'} inline-block flex-shrink-0`}>
+      <div ref={pickerWrapperRef} className={`${pickerAnchor ? '' : 'relative'} inline-block flex-shrink-0`}>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -65,7 +81,7 @@ export function EmojiReactionBar({
               pickerAnchor ? `w-max ${pickerAnchor === 'right' ? 'right-0' : 'left-0'}` : 'left-0'
             }`}
           >
-            <div className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-full shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
+            <div className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
               {EMOJI_REACTIONS.map(({ key, emoji }) => (
                 <button
                   key={key}
@@ -83,12 +99,12 @@ export function EmojiReactionBar({
               ))}
             </div>
             {/* 말풍선 꼬리 */}
-            {!pickerAnchor && <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-3 -mt-1.5" />}
+            {!pickerAnchor && <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-[14px] -mt-1.5" />}
           </div>
         )}
         {/* 카드 가장자리 기준으로 띄운 선택창은 알약이 어느 쪽으로 펼쳐지든 꼬리가 이모지 추가 버튼(카드 왼쪽 padding 16px 뒤) 바로 위에 오도록 따로 둠 */}
         {pickerOpen && pickerAnchor && (
-          <div className={`absolute bottom-full mb-[2px] ${isMini ? 'left-[15px]' : 'left-[22px]'} z-10 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45`} />
+          <div className={`absolute bottom-full mb-[2px] ${isMini ? 'left-[19px]' : 'left-[22px]'} z-10 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45`} />
         )}
       </div>
 

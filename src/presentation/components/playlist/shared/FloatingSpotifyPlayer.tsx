@@ -240,7 +240,7 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
               }`}
             >
               <span className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-black text-sm font-bold shadow-lg">
-                <Play size={18} fill="black" />
+                <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
                 탭해서 재생하기
               </span>
             </button>
