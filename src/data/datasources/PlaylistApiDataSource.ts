@@ -174,6 +174,8 @@ const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 50;
 // 게시글 검색은 API 문서 기본값(size=20)을 그대로 따름 — 다른 목록보다 짧게
 const SEARCH_DEFAULT_SIZE = 20;
+// 내가 작성한 추천글 조회도 API 문서 기본값(size=20, 허용 범위 1~100)을 따름. page < 0 또는 size 범위 위반 시 서버가 400을 반환
+const MY_SONGS_DEFAULT_SIZE = 20;
 
 export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpClient }): PlaylistApiDataSource => ({
   getSongs: async (params = {}) => {
@@ -201,9 +203,8 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
   },
 
   getMySongs: async (params) => {
-    const { deviceId, direction, page = DEFAULT_PAGE, size = DEFAULT_SIZE } = params;
-    const query = new URLSearchParams({ deviceId, page: String(page), size: String(size) });
-    if (direction) query.set('direction', direction);
+    const { deviceId, direction = 'DESC', page = DEFAULT_PAGE, size = MY_SONGS_DEFAULT_SIZE } = params;
+    const query = new URLSearchParams({ deviceId, page: String(page), size: String(size), direction });
 
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/my-songs?${query.toString()}`));
   },
