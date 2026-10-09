@@ -55,19 +55,22 @@ interface RecommendSongViewProps {
   // 게시글 모음 화면의 "이 곡 추천하러 가기" 버튼 등으로 특정 곡이 미리 정해진 채로 진입할 때 씀.
   // 임시저장된 초안이 있으면 그걸 더 우선함(사용자가 쓰던 다른 곡 내용을 이걸로 덮어쓰지 않기 위해)
   prefillTrack?: SearchTrack | null;
+  // 검색 결과 화면의 FAB으로 들어왔을 때, 그 검색어로 곡 검색을 미리 해둔 채 진입하기 위해 씀(prefillTrack과 달리 곡을 고르지는 않고 결과 목록만 띄움)
+  prefillQuery?: string | null;
 }
 
 // 등록하기 버튼 자체의 높이(h-12)와, 그 위 마지막 섹션(곡에 대한 한마디)이 버튼에 가리지 않도록 두는 여유 간격
 const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
-export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId, prefillTrack }: RecommendSongViewProps) {
+export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId, prefillTrack, prefillQuery }: RecommendSongViewProps) {
   const { initialDraft, restoredToast: draftRestoredToast, saveDraft, clearDraft } = useAddSongDraft();
-  const [query, setQuery] = useState('');
+  const initialQuery = prefillQuery && prefillQuery.trim().length >= MIN_QUERY_LENGTH ? prefillQuery.trim() : '';
+  const [query, setQuery] = useState(initialQuery);
   // 검색 버튼을 눌러야만 바뀌는 "실제로 검색한 검색어" — query(입력창 타이핑)와 분리해서,
   // 타이핑 중엔 재검색이 안 나가고 버튼/Enter를 눌렀을 때만 useMusicSearch가 다시 호출됨
-  const [committedQuery, setCommittedQuery] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
+  const [committedQuery, setCommittedQuery] = useState(initialQuery);
+  const [hasSearched, setHasSearched] = useState(initialQuery !== '');
   // 글자 수 미달 등 API를 부르기도 전에 걸러내는 입력값 검증 에러 — 네트워크 에러(searchError)와 구분
   const [validationError, setValidationError] = useState<string | null>(null);
   const { data: searchResultsData, isFetching: isSearching, error: musicSearchError, refetch: refetchMusicSearch } = useMusicSearch(committedQuery);

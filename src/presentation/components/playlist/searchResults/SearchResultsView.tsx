@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
@@ -21,18 +21,20 @@ interface SearchResultsViewProps {
   onPlay: (track: TrackSummary) => void; // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
   currentTrackId?: string | null; // 지금 하단 플레이어에서 재생 중인 곡 
   onRecommendTrack: (track: TrackSummary) => void; // 곡 검색 결과 카드의 "✏️ 곡 추천하기" 버튼
+  onActiveQueryChange?: (query: string) => void; // 이 화면에서 재검색해 바뀐 "지금 보고 있는 검색어"를 부모(곡 추천하기 FAB)가 알 수 있게 알려줌
 }
 
 // 검색 최소 글자수
 const MIN_QUERY_LENGTH = 2;
 
 // 검색 결과 화면
-export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendTrack }: SearchResultsViewProps) {
+export function SearchResultsView({ query, onBack, onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
   const [activeQuery, setActiveQuery] = useState(query);
   const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(activeQuery);
   const [localQuery, setLocalQuery] = useState(query);
+  useEffect(() => { onActiveQueryChange?.(activeQuery); }, [activeQuery]); // eslint-disable-line react-hooks/exhaustive-deps
   const { data: trackResultsData, isFetching: isSearching, error: musicSearchError, refetch: refetchMusicSearch } = useMusicSearch(activeQuery);
   const trackResults: MusicSearchTrack[] = trackResultsData ?? [];
   const { remainingSeconds: retryRemainingSeconds, isBlocked: isRetryBlocked } = useRetryCountdown(musicSearchError);

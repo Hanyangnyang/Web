@@ -35,7 +35,8 @@ type ScreenFrame =
   | { name: 'main' }
   | { name: 'recent'; scrollTarget: string | null } // scrollTarget: 홈의 최근추가된곡 섹션의 곡 카드를 눌렀을때, 해당하는 곡으로 스크롤하기 위함 
   // prefillTrack: 게시글 모음에서 FAB을 누르는 등 특정 곡이 미리 채워진 채로 진입할 때의 곡
-  | { name: 'addSong'; prefillTrack: TrackSummary | null }
+  // prefillQuery: 검색 결과 화면의 FAB에서 들어올 때 그 검색어로 곡 검색을 미리 해둠
+  | { name: 'addSong'; prefillTrack: TrackSummary | null; prefillQuery: string | null }
   | { name: 'search' }
   // track: 검색 결과·인기차트 등에서 눌러 선택된 곡 — TrackPostCollectionView(곡 단위 게시글 모음)에 넘김
   | { name: 'trackPosts'; track: TrackSummary }
@@ -123,8 +124,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
 
   // 게시글 모음의 "이 곡 추천하러 가기" 버튼처럼 특정 곡이 미리 채워진 채로 곡추천하기 화면에 들어갈 때 씀.
   // 파라미터가 스택 칸에 담겨서, prefill 없이 부르는 진입점(FAB 등)은 null로 쌓으면 끝 — 이전 값이 새지 않음
-  const pushAddSong = useCallback((prefill?: TrackSummary) => {
-    pushScreen({ name: 'addSong', prefillTrack: prefill ?? null });
+  const pushAddSong = useCallback((prefill?: TrackSummary, prefillQuery?: string) => {
+    pushScreen({ name: 'addSong', prefillTrack: prefill ?? null, prefillQuery: prefillQuery ?? null });
   }, [pushScreen]);
 
   // 게시글 모음(trackPosts) 화면이 조회로 채운 곡 정보 — 딥링크로 들어오면 스택 칸의 track은 title 등이 비어 있어서
@@ -134,6 +135,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     resolvedTrackPostsTrackRef.current = track;
   }, []);
 
+  // 검색 결과 화면 안에서 재검색해 바뀐 검색어 — FAB 클릭 시점에만 읽으면 돼서 ref로 보관
+  const activeSearchQueryRef = useRef('');
+
   // 곡 추천하기 FAB — 게시글 모음 화면에서 누르면 그 곡이 미리 채워진 채로 곡추천하기 화면으로 이동, 그 외 화면은 빈 폼
   const handleAddSongFabClick = useCallback(() => {
     if (screen.name === 'trackPosts') {
@@ -141,8 +145,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       pushAddSong(resolved?.trackId === screen.track.trackId ? resolved : screen.track);
       return;
     }
+    // 검색 결과 화면에서는 지금 보고 있는 검색어로 곡 검색이 된 채로 들어감
+    if (screen.name === 'search') {
+      pushAddSong(undefined, activeSearchQueryRef.current || searchQuery);
+      return;
+    }
     pushAddSong();
-  }, [screen, pushAddSong]);
+  }, [screen, pushAddSong, searchQuery]);
 
   // 뒤로가기는 스택을 한 단계씩 pop — 어느 화면에서 들어왔는지와 무관하게 항상 바로 이전 화면으로 돌아감
   const popScreen = useCallback(() => {
@@ -335,6 +344,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
             prefillTrack={screen.prefillTrack}
+            prefillQuery={screen.prefillQuery}
           />
         ) : screen.name === 'search' ? (
           <SearchResultsView
@@ -346,6 +356,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
             onRecommendTrack={pushAddSong}
+            onActiveQueryChange={(q) => { activeSearchQueryRef.current = q; }}
           />
         ) : screen.name === 'trackPosts' ? (
           <TrackPostCollectionView

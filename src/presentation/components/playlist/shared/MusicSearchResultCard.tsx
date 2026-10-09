@@ -119,7 +119,7 @@ export function MusicSearchResultCard({
           onClick={() => onRecommend(track)}
           disabled={disabled}
           aria-label={`${track.title} 곡 추천하기`}
-          className="w-full h-7 border-t border-slate-100 bg-[#ffffff] text-playlist-accent/80 flex items-center justify-center gap-1 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          className="w-full h-8 border-t border-slate-100 bg-[#ffffff] text-playlist-accent/80 flex items-center justify-center gap-1 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
         >
           <PenLine size={10} strokeWidth={2.2} className="flex-shrink-0" />
           <span className="text-[10px] font-bold">이 곡 추천하러 가기</span>
