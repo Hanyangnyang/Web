@@ -9,8 +9,8 @@ interface EmojiReactionBarProps {
   disabled?: boolean;
   pickerOpen: boolean;
   onTogglePicker: () => void;
-  // 'default': PostDetailCard(1열 상세) 크기, 'compact': TrackPostCollectionView 같은 목록 행 크기
-  size?: 'default' | 'compact';
+  // 'default': PostDetailCard(1열 상세) 크기, 'compact': TrackPostCollectionView 같은 목록 행 크기, 'mini': 2열 그리드 카드용(가장 작음)
+  size?: 'default' | 'compact' | 'mini';
   // 반응이 하나도 없을 때 보여줄 안내 — 안 넘기면 이모지 추가 버튼만 남고 아무것도 안 보여줌
   emptyFallback?: ReactNode;
   className?: string;
@@ -36,9 +36,12 @@ export function EmojiReactionBar({
 }: EmojiReactionBarProps) {
   const displayedReactions = EMOJI_REACTIONS.filter(({ key }) => (reactions[key]?.count ?? 0) > 0);
   const isCompact = size === 'compact';
-  const addButtonSizeClass = isCompact ? 'w-5 h-5' : 'w-6 h-6';
-  const addButtonIconSize = isCompact ? 11 : 13;
-  const chipGapClass = isCompact ? 'gap-1' : 'gap-1.5';
+  const isMini = size === 'mini';
+  const addButtonSizeClass = isMini ? 'w-[18px] h-[18px]' : isCompact ? 'w-5 h-5' : 'w-6 h-6';
+  const addButtonIconSize = isMini ? 10 : isCompact ? 11 : 13;
+  const chipGapClass = isCompact || isMini ? 'gap-1' : 'gap-1.5';
+  const chipClass = isMini ? 'px-1 py-px text-[9px]' : 'px-1.5 py-0.5 text-[10px]';
+  const chipEmojiClass = isMini ? 'text-[10px]' : 'text-xs';
 
   return (
     <div className={`flex items-center ${chipGapClass} ${className}`}>
@@ -85,7 +88,7 @@ export function EmojiReactionBar({
         )}
         {/* 카드 가장자리 기준으로 띄운 선택창은 알약이 어느 쪽으로 펼쳐지든 꼬리가 이모지 추가 버튼(카드 왼쪽 padding 16px 뒤) 바로 위에 오도록 따로 둠 */}
         {pickerOpen && pickerAnchor && (
-          <div className="absolute bottom-full mb-[2px] left-[22px] z-10 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45" />
+          <div className={`absolute bottom-full mb-[2px] ${isMini ? 'left-[15px]' : 'left-[22px]'} z-10 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45`} />
         )}
       </div>
 
@@ -106,11 +109,11 @@ export function EmojiReactionBar({
                 }}
                 disabled={disabled}
                 aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
-                className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all active:scale-95 ${
+                className={`flex-shrink-0 flex items-center gap-0.5 ${chipClass} rounded-full font-semibold border transition-all active:scale-95 ${
                   mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
                 }`}
               >
-                <span className="text-xs">{emoji}</span>
+                <span className={chipEmojiClass}>{emoji}</span>
                 <span>{count}</span>
               </button>
             );

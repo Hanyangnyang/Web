@@ -384,10 +384,10 @@ export function PostDetailCard({
           한마디가 안 잘렸으면(토글 버튼이 없으면) 눌러도 아무 일 없음. 안의 버튼들은 각자 stopPropagation으로 이 동작과 분리돼 있음 */}
       <div
         onClick={canToggleBody ? toggleBody : undefined}
-        className={`px-4 pt-3 ${compact ? 'pb-3' : 'pb-4'} flex-1 flex flex-col ${pickerAnchor ? 'relative' : ''} ${canToggleBody ? 'cursor-pointer' : ''}`}
+        className={`${isNarrow ? 'px-3 pt-2 pb-2' : `px-4 pt-3 ${compact ? 'pb-3' : 'pb-4'}`} flex-1 flex flex-col ${pickerAnchor ? 'relative' : ''} ${canToggleBody ? 'cursor-pointer' : ''}`}
       >
         {!hideReactions && (
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className={`flex items-center gap-1.5 ${isNarrow ? 'mb-1' : 'mb-2'}`}>
             <EmojiReactionBar
               reactions={reactions}
               onToggleReaction={toggleReaction}
@@ -396,6 +396,7 @@ export function PostDetailCard({
               onTogglePicker={() => setPickerOpen(!pickerOpen)}
               className="flex-1 min-w-0"
               pickerAnchor={pickerAnchor}
+              size={isNarrow ? 'mini' : 'default'}
               emptyFallback={
                 // 배경 없는 안내 문구만 살짝 얹음. 클릭 가능한 건 왼쪽 이모지 추가 버튼 하나로 충분해서,
                 // 여기는 버튼처럼 보이지 않게 배경/클릭 이벤트 없이 텍스트로만 둠
