@@ -13,6 +13,8 @@ import { scrollNearestScrollableAncestorToTop } from '../../../../utils/scroll';
 
 // 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다(Coachmark.tsx 참고)
 const VIEW_TOGGLE_COACHMARK_SEEN_KEY = 'viewToggleCoachmarkSeen';
+// 스마일(반응) 버튼을 꾹 눌러 슬라이드로 이모지를 고를 수 있다는 힌트 — 위 보기 전환 코치마크가 끝난 뒤에 한 번만 띄움
+const REACTION_HOLD_HINT_SEEN_KEY = 'reactionHoldHintSeen';
 
 interface SongListScreenProps {
   title: string;
@@ -191,6 +193,21 @@ export function SongListScreen({
   // 그리드 보기 전환 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다
   const viewToggleCoachmark = useCoachmark(VIEW_TOGGLE_COACHMARK_SEEN_KEY, enableViewToggle);
 
+  // 꾹 누르기 힌트 — 첫 번째 카드의 스마일 버튼 아래에 띄움. 카드가 overflow-hidden이라 카드 안에 그리지 못하고,
+  // 버튼 위치를 재서 화면 기준(fixed) 좌표로 놓음. 버튼이 화면에 보이는 위치일 때만 띄우고(스크롤돼 있으면 건너뜀 — 아직 안 본 것으로 남음),
+  // 앞선 보기 전환 코치마크가 사라진 뒤에 시작. 어둡게 덮는 효과는 다른 코치마크와 같음(z-110: 고정 헤더 z-100 위까지 덮음)
+  const [reactionHintAnchor, setReactionHintAnchor] = useState<{ left: number; top: number; width: number; height: number; bottom: number } | null>(null);
+  const reactionHintReady = !gridOnly && !isLoading && filteredSongs.length > 0 && viewToggleCoachmark.state === 'hidden';
+  useLayoutEffect(() => {
+    if (!reactionHintReady) return;
+    const button = listContainerRef.current?.querySelector<HTMLElement>('button[aria-label="이모지 추가"]');
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    const visible = rect.top > 120 && rect.bottom < window.innerHeight - 160;
+    setReactionHintAnchor(visible ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height, bottom: rect.bottom } : null);
+  }, [reactionHintReady, viewMode]);
+  const reactionHintCoachmark = useCoachmark(REACTION_HOLD_HINT_SEEN_KEY, reactionHintReady && reactionHintAnchor !== null);
+
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       {/* 고정 헤더 */}
@@ -254,6 +271,22 @@ export function SongListScreen({
       </div>
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}
       <div ref={listContainerRef} className="-mx-4 px-2">
+        {reactionHintAnchor && (
+          <Coachmark
+            {...reactionHintCoachmark}
+            tail="top"
+            tailClassName="left-4"
+            zClassName="z-[110]"
+            className="fixed"
+            // 말풍선은 버튼 아래에, 버튼 자리는 어둡게 덮이지 않도록 스포트라이트로 비워 둠(버튼보다 사방 3px 크게)
+            style={{ left: Math.max(8, reactionHintAnchor.left), top: reactionHintAnchor.bottom + 14 }}
+            spotlight={{ left: reactionHintAnchor.left - 3, top: reactionHintAnchor.top - 3, width: reactionHintAnchor.width + 6, height: reactionHintAnchor.height + 6 }}
+          >
+            반응 버튼을 꾹 누른 채 옆으로 밀면,
+            <br />
+            이모지를 편하게 고를 수 있어요!😊
+          </Coachmark>
+        )}
         {isLoading ? (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
             {Array.from({ length: viewMode === 'grid' ? 4 : 3 }).map((_, i) => (
