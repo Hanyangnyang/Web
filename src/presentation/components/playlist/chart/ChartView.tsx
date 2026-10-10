@@ -1,6 +1,7 @@
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { type GenreFilterState } from '../shared/GenreFilterChips';
 import { GenreFilterDropdown } from '../shared/GenreFilterDropdown';
@@ -20,6 +21,10 @@ interface ChartViewProps {
   onRetry: () => void;
   chartPeriod: ChartPeriod;
   onChangePeriod: (period: ChartPeriod) => void;
+  // 홈에서 누른 카드의 곡으로 바로 스크롤하기 위한 대상 trackId
+  scrollToTrackId?: string | null;
+  // 스크롤+강조를 한 번 마친 뒤 호출 — 상위가 대상을 비워서, 곡 상세에 갔다 돌아와 이 화면이 다시 마운트돼도 효과가 반복되지 않게 함
+  onScrollTargetConsumed?: () => void;
   // 기간 칩 오른쪽 장르 드롭다운 — 고른 장르의 차트만 서버에서 받아옴(비어 있으면 전체)
   genreFilter: GenreFilterState;
   onGenreFilterChange: (next: GenreFilterState) => void;
@@ -32,9 +37,30 @@ interface ChartViewProps {
 }
 
 // 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
-export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, genreFilter, onGenreFilterChange, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
+export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, scrollToTrackId, onScrollTargetConsumed, genreFilter, onGenreFilterChange, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
   const likeToast = useLikeToast();
   const { toggle } = useChartTrackLike(likeToast.show, likeToast.hide);
+  const listRef = useRef<HTMLDivElement>(null);
+  const scrolledRef = useRef(false);
+  const [highlightedTrackId, setHighlightedTrackId] = useState<string | null>(null);
+
+  // 홈의 인기차트 카드를 눌러 들어오면, 목록이 그려진 뒤 그 곡 행이 화면 가운데 오도록 한 번만 부드럽게 스크롤
+  useLayoutEffect(() => {
+    if (!scrollToTrackId || scrolledRef.current) return;
+    const target = listRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollToTrackId}"]`);
+    if (!target) return;
+    scrolledRef.current = true;
+    target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setHighlightedTrackId(scrollToTrackId);
+    onScrollTargetConsumed?.();
+  }, [scrollToTrackId, chart]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 강조는 잠깐만 — 스크롤이 끝난 뒤 한 번 번쩍이고 사라지면 표시도 걷어냄(다시 렌더돼도 애니메이션이 재시작되지 않게)
+  useEffect(() => {
+    if (!highlightedTrackId) return;
+    const timer = setTimeout(() => setHighlightedTrackId(null), 2400);
+    return () => clearTimeout(timer);
+  }, [highlightedTrackId]);
 
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
@@ -52,13 +78,13 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
       </div>
 
       {/* 차트 리스트 */}
-      <div className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
+      <div ref={listRef} className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
         {/* 헤더 */}
         <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
           <span className="w-7 text-center">순위</span>
           <div className="flex-1">곡정보</div>
           <div className="flex items-center">
-            <span className="w-9 text-center">듣기</span>
+            <span className="w-10 text-center">듣기</span>
             <span className="w-9 text-center">좋아요</span>
           </div>
         </div>
@@ -94,7 +120,6 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
               ? '이 장르의 차트가 아직 집계되지 않았어요'
               : `아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
             buttonLabel="최근 추가된 곡 보러가기"
-            buttonIcon={<span>🎵</span>}
             onAction={onShowRecent}
           />
         ) : (
@@ -106,6 +131,7 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
               onShowPosts={onShowPosts}
               onToggleLike={(t) => toggle(t.trackId, t.isLiked)}
               currentTrackId={currentTrackId}
+              highlighted={track.trackId === highlightedTrackId}
             />
           ))
         )}

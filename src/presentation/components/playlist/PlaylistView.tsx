@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo, type CSSProperties } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { RefreshCw } from 'lucide-react';
 import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
@@ -45,7 +45,7 @@ type ScreenFrame =
   | { name: 'trackPosts'; track: TrackSummary }
   // postId: 게시글 목록에서 눌러 선택된 게시글 id — PostView가 GET /api/v1/playlist/songs/{id}로 상세 조회
   | { name: 'postDetail'; postId: string }
-  | { name: 'chart' }
+  | { name: 'chart'; scrollTarget: string | null } // scrollTarget: 홈의 인기차트 카드를 눌렀을 때 해당 곡으로 스크롤
   | { name: 'myActivity' }
   | { name: 'liked' }
   | { name: 'mySongs'; scrollTarget: string | null }; // scrollTarget: 홈의 내가추천한곡 카드를 눌렀을 때 해당 곡으로 스크롤
@@ -178,6 +178,23 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     pushAddSong();
   }, [screen, pushAddSong, searchQuery]);
 
+  // 검색 결과 화면에서 홈으로 돌아오면 홈 검색바를 비움 — 어떤 경로(뒤로가기·시스템 뒤로가기·홈 이동 버튼)로 와도 동일하게 처리.
+  // useLayoutEffect라 페인트 전에 비워져서 이전 검색어가 한 프레임도 보이지 않음
+  const prevScreenNameRef = useRef(screen.name);
+  useLayoutEffect(() => {
+    if (prevScreenNameRef.current === 'search' && screen.name === 'main') setSearchQuery('');
+    prevScreenNameRef.current = screen.name;
+  }, [screen.name]);
+
+  // 인기차트 화면이 홈 카드로 찾아온 곡에 스크롤+강조를 마치면 대상을 비움 — 그대로 두면 곡 게시글을 보고 돌아올 때
+  // 인기차트 화면이 다시 마운트되면서 같은 곡으로 또 스크롤·강조됨(홈 카드로 처음 들어온 때만 효과가 나와야 함)
+  const consumeChartScrollTarget = useCallback(() => {
+    setScreenStack((prev) => {
+      const last = prev[prev.length - 1];
+      return last.name === 'chart' && last.scrollTarget ? [...prev.slice(0, -1), { name: 'chart', scrollTarget: null }] : prev;
+    });
+  }, []);
+
   // 뒤로가기는 스택을 한 단계씩 pop — 어느 화면에서 들어왔는지와 무관하게 항상 바로 이전 화면으로 돌아감
   const popScreen = useCallback(() => {
     setScreenStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
@@ -216,7 +233,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
     // 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
     // 안 그러면 이 훅이 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
-    skipScrollRestore: (screen.name === 'recent' || screen.name === 'mySongs') && !!screen.scrollTarget,
+    skipScrollRestore: (screen.name === 'recent' || screen.name === 'mySongs' || screen.name === 'chart') && !!screen.scrollTarget,
   });
 
   // 최근추가된곡/인기차트 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
@@ -412,6 +429,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             isLoading={isScreenChartLoading}
             isError={isScreenChartError}
             onRetry={() => void refetchScreenChart()}
+            scrollToTrackId={screen.scrollTarget}
+            onScrollTargetConsumed={consumeChartScrollTarget}
             genreFilter={chartGenreFilter}
             onGenreFilterChange={setChartGenreFilter}
             chartPeriod={chartPeriod}
@@ -467,10 +486,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             recentSongsVariant={recentSongsVariant}
             onPlayTrack={(track) => handlePlay(track, 'home_preview')}
             currentTrackId={playingTrackId}
-            onShowAllChart={() => {
+            onShowAllChart={(scrollTarget) => {
               // 홈 미리보기는 항상 전체 차트라, 인기차트 화면도 장르를 전체로 되돌려서 연다
               setChartGenreFilter((prev) => ({ ...prev, selected: [] }));
-              pushScreen({ name: 'chart' });
+              pushScreen({ name: 'chart', scrollTarget: scrollTarget ?? null });
             }}
             onShowLiked={() => pushScreen({ name: 'liked' })}
             onShowAddSong={() => pushAddSong()}

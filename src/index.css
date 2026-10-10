@@ -484,3 +484,21 @@ body {
 .lucide-cloud-lightning polygon {
   stroke: #f59e0b !important; /* 진하고 영롱한 노란색 번개 */
 }
+
+/* 인기차트 화면에서 홈 카드로 찾아온 곡 행을 잠깐 파랗게 강조 — 연한 파란 배경 + 파란 테두리가 번쩍였다가 서서히 사라짐 */
+@keyframes chartRowHighlight {
+  0% {
+    background-color: rgba(97, 140, 233, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0.45);
+  }
+
+  60% {
+    background-color: rgba(97, 140, 233, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0.25);
+  }
+
+  100% {
+    background-color: rgba(97, 140, 233, 0);
+    box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0);
+  }
+}

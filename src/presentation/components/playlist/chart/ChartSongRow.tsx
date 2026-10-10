@@ -17,6 +17,8 @@ interface ChartSongRowProps {
   // 앨범 커버 크기 — 기본은 ChartView 목록의 48px(w-12 h-12). 소식탭 홍보 카드처럼 더 크게 보이고
   // 싶은 곳에서만 예) "w-14 h-14"로 덮어쓴다
   thumbnailClassName?: string;
+  // true면 행을 잠깐 파랗게 강조 — 홈 카드를 눌러 이 곡으로 스크롤돼 왔을 때 "이 곡이에요"를 알려줌
+  highlighted?: boolean;
 }
 
 export function ChartSongRow({
@@ -27,11 +29,13 @@ export function ChartSongRow({
   currentTrackId,
   rankClassName = 'font-bold text-sm text-gray-900',
   thumbnailClassName = 'w-12 h-12',
+  highlighted = false,
 }: ChartSongRowProps) {
   const isPlaying = track.trackId === currentTrackId;
 
   return (
     <div
+      data-track-id={track.trackId}
       onClick={() => onShowPosts(track)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onShowPosts(track);
@@ -39,7 +43,7 @@ export function ChartSongRow({
       role="button"
       tabIndex={0}
       aria-label={`${track.title} 추천 게시글 보기`}
-      className="flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
+      className={`flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer ${highlighted ? '[animation:chartRowHighlight_1.8s_ease-out_0.3s_both]' : ''}`}
     >
       {/* 순위 */}
       <span className={`${rankClassName} w-7 text-center flex-shrink-0`}>
@@ -69,7 +73,7 @@ export function ChartSongRow({
             onPlay(track);
           }}
           aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
-          className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+          className="w-12 h-12 -mx-1 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
         >
           {isPlaying ? (
             <Pause size={18} fill="none" stroke="currentColor" strokeWidth={2} />
