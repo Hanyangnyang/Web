@@ -436,7 +436,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             chartPeriod={chartPeriod}
             onChangePeriod={setChartPeriod}
             onBack={popScreen}
-            onShowRecent={handleShowAllRecent}
+            onShowRecent={() => handleShowAllRecent()}
             onPlay={handlePlay}
             onShowPosts={handleSelectChartSong}
             currentTrackId={playingTrackId}
@@ -452,7 +452,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onBack={popScreen}
             onPlay={handlePlay}
             onShowAddSong={() => pushAddSong()}
-            onShowRecent={handleShowAllRecent}
+            onShowRecent={() => handleShowAllRecent()}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
           />
