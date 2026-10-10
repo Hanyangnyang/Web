@@ -56,6 +56,12 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading
   };
   const goBack = () => setCurrent((prev) => (prev - 1 + count) % count);
 
+  const goTo = (index: number) => {
+    setTransitionEnabled(true);
+    setCurrent(index);
+    resetTimer();
+  };
+
   const resetTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (count <= 1 || !isActive) return;
@@ -173,12 +179,20 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading
 
         {/* 인디케이터는 사진 안 하단 중앙에 겹쳐 둔다 — 어두운 배경 위라 흰색 */}
         {count > 1 && (
-          <div className="pointer-events-none absolute bottom-2 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5">
+          <div className="absolute bottom-0 left-1/2 z-30 flex -translate-x-1/2 items-center">
             {artists.map((artist, i) => (
-              <span
+              // 점이 작아 누르기 어려우니 버튼 패딩으로 터치 영역을 넓힌다
+              <button
                 key={artist.artistName}
-                className={`h-1.5 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-all duration-300 ${i === current % count ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
-              />
+                type="button"
+                aria-label={`${i + 1}번째 배너로 이동`}
+                className="px-[3px] py-2"
+                onClick={() => goTo(i)}
+              >
+                <span
+                  className={`block h-1.5 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-all duration-300 ${i === current % count ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
+                />
+              </button>
             ))}
           </div>
         )}

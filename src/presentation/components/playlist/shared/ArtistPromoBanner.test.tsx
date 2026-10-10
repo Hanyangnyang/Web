@@ -15,7 +15,7 @@ describe('ArtistPromoBanner', () => {
 
     expect(screen.getByText('검정치마')).toBeTruthy();
     expect(screen.getByText('같이 들어요')).toBeTruthy();
-    expect(screen.getByText('에리카 플레이리스트 바로가기>')).toBeTruthy();
+    expect(screen.getByText('에리카 플레이리스트 바로가기')).toBeTruthy();
     expect(screen.getByTestId('artist-promo-banner').className).toContain('aspect-[2/1]');
     expect(screen.getByAltText('검정치마 아티스트 이미지').getAttribute('src')).toBe('https://example.com/artist.jpg');
   });

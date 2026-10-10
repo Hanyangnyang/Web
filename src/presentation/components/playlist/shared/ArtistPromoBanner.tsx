@@ -195,8 +195,11 @@ export function ArtistPromoBanner({
         <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center py-[2cqw] pl-[4cqw] pr-[2cqw] text-left text-white">
           <ArtistPromoCopy artistName={safeArtistName} template={template ?? randomTemplate} compact={compact} />
           {/* 문구("같이 들어요" 등) 아래 이동 안내 — 클릭은 배너 전체가 받으므로 장식용 */}
-          {!compact && <span className="pointer-events-none mt-[1.6cqw] max-w-full self-start whitespace-nowrap rounded-full border border-white/25 bg-black/25 px-[2.4cqw] py-[1cqw] text-[clamp(8px,2.5cqw,12px)] font-bold leading-none tracking-[-0.02em] text-white/90 shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
-            에리카 플레이리스트 바로가기{'>'}
+          {!compact && <span className="pointer-events-none mt-[1.6cqw] inline-flex max-w-full items-center gap-[0.8cqw] self-start whitespace-nowrap rounded-full border border-white/25 bg-black/25 px-[2.4cqw] py-[1cqw] text-[clamp(8px,2.5cqw,12px)] font-bold leading-none tracking-[-0.02em] text-white/90 shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
+            에리카 플레이리스트 바로가기
+            <svg viewBox="7 3 11 18" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-[1.1em] w-[0.67em] shrink-0">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
           </span>}
         </div>
 
