@@ -485,18 +485,22 @@ export function PostDetailCard({
         <div className="mt-auto">
           <div className="border-t border-slate-100 mb-3" />
           <div className="flex items-center justify-between gap-2">
-            <div className={`flex flex-wrap items-center gap-x-1 gap-y-1 ${isNarrow ? 'text-[11px]' : 'text-xs'} font-medium text-text-sub`}>
+            {/* 장르가 3개라 폭이 모자라도 두 줄로 꺾이지 않게 한 줄 가로 스크롤(반응 칩과 동일 방식) */}
+            <div
+              className={`flex flex-nowrap items-center gap-x-1 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden ${isNarrow ? 'text-[11px]' : 'text-xs'} font-medium text-text-sub`}
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
               {post.genres.flatMap((label, index) => {
                 const genre = GENRES.find((g) => g.label === label);
                 const chip = (
-                  <span key={label} className="flex items-center">
+                  <span key={label} className="flex items-center flex-shrink-0 whitespace-nowrap">
                     {genre?.emoji && <span>{genre.emoji}</span>}
                     <span>{label}</span>
                   </span>
                 );
                 if (index === 0) return [chip];
                 return [
-                  <span key={`${label}-dot`} className="text-text-hint" aria-hidden="true">·</span>,
+                  <span key={`${label}-dot`} className="text-text-hint flex-shrink-0" aria-hidden="true">·</span>,
                   chip,
                 ];
               })}
