@@ -40,7 +40,6 @@ interface PlaylistHomeViewProps {
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   onShowAllChart: () => void;
-  onShowPosts: (track: ChartTrack) => void;
   onShowLiked: () => void;
   onShowAddSong: () => void;
   // "내가 추천한 곡" 섹션 — 카드 UI는 인기차트(ChartTopCard)와 동일, 순위만 없음
@@ -79,7 +78,6 @@ export function PlaylistHomeView({
   onPlayTrack,
   currentTrackId,
   onShowAllChart,
-  onShowPosts,
   onShowLiked,
   onShowAddSong,
   mySongs,
@@ -100,6 +98,11 @@ export function PlaylistHomeView({
     onAutoFocusSearchConsumed?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const openChartWithPlay = (track: TrackSummary) => {
+    if (track.trackId !== currentTrackId) onPlayTrack(track);
+    onShowAllChart();
+  };
 
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
@@ -179,8 +182,9 @@ export function PlaylistHomeView({
                 <ChartTopCard
                   key={track.trackId}
                   track={track}
-                  onShowPosts={onShowPosts}
-                  onPlay={onPlayTrack}
+                  // 카드 어디를 눌러도 곡을 재생하면서 인기차트 화면으로 이동 — 이미 재생 중인 곡이면 일시정지되지 않게 이동만 함
+                  onShowPosts={openChartWithPlay}
+                  onPlay={openChartWithPlay}
                   currentTrackId={currentTrackId}
                 />
               ))}

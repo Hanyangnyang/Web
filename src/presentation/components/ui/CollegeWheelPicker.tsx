@@ -14,13 +14,14 @@ interface Props {
   onChange: (id: string) => void;
   triggerClassName: string;
   onOpen?: () => void;  // 피커가 열릴 때 호출 (예: 접힌 바텀시트를 펼치는 용도)
+  panelWidthClassName?: string; // 펼쳐지는 목록의 너비 — 항목 글자가 짧은 곳에서 좌우 여백을 줄이려고 덮어씀(기본 170px)
 }
 
 const ITEM_HEIGHT = 36;
 const VISIBLE_COUNT = 5;
 const PAD_COUNT = Math.floor(VISIBLE_COUNT / 2);
 
-export function CollegeWheelPicker({ options, value, onChange, triggerClassName, onOpen }: Props) {
+export function CollegeWheelPicker({ options, value, onChange, triggerClassName, onOpen, panelWidthClassName = 'w-[170px]' }: Props) {
   const [open, setOpen] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -71,7 +72,7 @@ export function CollegeWheelPicker({ options, value, onChange, triggerClassName,
       </button>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[170px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+        <div className={`absolute top-[calc(100%+6px)] right-0 ${panelWidthClassName} bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]`}>
           <div className="relative" style={{ height: ITEM_HEIGHT * VISIBLE_COUNT }}>
             {/* 선택 하이라이트 바 */}
             <div

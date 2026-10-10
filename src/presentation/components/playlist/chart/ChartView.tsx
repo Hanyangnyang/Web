@@ -2,7 +2,8 @@ import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
-import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
+import { type GenreFilterState } from '../shared/GenreFilterChips';
+import { GenreFilterDropdown } from '../shared/GenreFilterDropdown';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
@@ -19,7 +20,7 @@ interface ChartViewProps {
   onRetry: () => void;
   chartPeriod: ChartPeriod;
   onChangePeriod: (period: ChartPeriod) => void;
-  // 기간 칩 아래 장르 칩 — 고른 장르의 차트만 서버에서 받아옴(비어 있으면 전체)
+  // 기간 칩 오른쪽 장르 드롭다운 — 고른 장르의 차트만 서버에서 받아옴(비어 있으면 전체)
   genreFilter: GenreFilterState;
   onGenreFilterChange: (next: GenreFilterState) => void;
   onBack: () => void;
@@ -44,8 +45,11 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
         onBack={onBack}
       />
 
-      <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="!mb-1.5" />
-      <GenreFilterChips value={genreFilter} onChange={onGenreFilterChange} className="mb-2" />
+      {/* 기간 칩 한 줄 — 오른쪽 끝에 장르 드롭다운 */}
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="!mb-0" />
+        <GenreFilterDropdown value={genreFilter} onChange={onGenreFilterChange} />
+      </div>
 
       {/* 차트 리스트 */}
       <div className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">

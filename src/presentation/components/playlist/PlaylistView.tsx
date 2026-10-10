@@ -467,8 +467,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             recentSongsVariant={recentSongsVariant}
             onPlayTrack={(track) => handlePlay(track, 'home_preview')}
             currentTrackId={playingTrackId}
-            onShowAllChart={() => pushScreen({ name: 'chart' })}
-            onShowPosts={handleSelectChartSong}
+            onShowAllChart={() => {
+              // 홈 미리보기는 항상 전체 차트라, 인기차트 화면도 장르를 전체로 되돌려서 연다
+              setChartGenreFilter((prev) => ({ ...prev, selected: [] }));
+              pushScreen({ name: 'chart' });
+            }}
             onShowLiked={() => pushScreen({ name: 'liked' })}
             onShowAddSong={() => pushAddSong()}
             mySongs={mySongs ?? EMPTY_SONGS}
