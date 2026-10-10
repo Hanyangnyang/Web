@@ -350,7 +350,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 onClick={handleSearchClick}
                 disabled={isSearching || isRetryBlocked || !query.trim()}
                 aria-label="곡 검색"
-                className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
+                // 아이콘은 그대로 두고 터치 영역만 44px로 키움 — 음수 마진으로 레이아웃 크기는 기존(28px) 유지
+                className="flex-shrink-0 flex items-center justify-center w-11 h-11 -m-2 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
               >
                 {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
               </button>
@@ -362,7 +363,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   aria-expanded={isResultsPanelOpen}
                   // 검색 아이콘과 같은 색 규칙 — 쓸 수 있을 땐 파란색, 검색어가 비어 있으면 회색으로 비활성화
                   disabled={!query.trim()}
-                  className="flex-shrink-0 -ml-1 flex items-center justify-center w-7 h-7 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
+                  className="flex-shrink-0 -m-2 flex items-center justify-center w-11 h-11 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
                 >
                   {isResultsPanelOpen ? <ChevronUp size={18} strokeWidth={2.2} /> : <ChevronDown size={18} strokeWidth={2.2} />}
                 </button>
@@ -444,7 +445,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               <button
                 onClick={() => onPlay(selectedTrack)}
                 aria-label={selectedTrack.trackId === currentTrackId ? `${selectedTrack.title} 일시정지` : `${selectedTrack.title} 재생`}
-                className="flex-shrink-0 p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+                className="flex-shrink-0 p-3 -mx-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
               >
                 {selectedTrack.trackId === currentTrackId ? (
                   <Pause size={16} className="text-text-sub" fill="currentColor" />
@@ -456,7 +457,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             <button
               onClick={() => setSelectedTrack(null)}
               aria-label="선택한 곡 취소"
-              className="flex-shrink-0 p-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
+              className="flex-shrink-0 p-3 -mx-1 hover:bg-slate-100 rounded-full transition-colors active:scale-90"
             >
               <X size={16} className="text-text-sub" />
             </button>
@@ -566,7 +567,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           buttons={
             <button
               onClick={onBack}
-              className="w-full h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              className="w-full h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
             >
               뒤로가기
             </button>
@@ -588,7 +589,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           buttons={
             <button
               onClick={onBack}
-              className="w-full h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              className="w-full h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
             >
               뒤로가기
             </button>
@@ -610,7 +611,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             <div className="flex gap-2">
               <button
                 onClick={() => setShowSubmitRetryPopup(false)}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
               >
                 닫기
               </button>
@@ -619,7 +620,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowSubmitRetryPopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 다시 시도
               </button>
@@ -637,7 +638,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           buttons={
             <button
               onClick={dismissFirstNotice}
-              className="w-full h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              className="w-full h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
             >
               확인했어요
             </button>
@@ -659,7 +660,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             <div className="flex gap-2">
               <button
                 onClick={() => setShowRegisterNoticePopup(false)}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
               >
                 취소
               </button>
@@ -668,7 +669,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowRegisterNoticePopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 추천하기
               </button>

@@ -31,7 +31,7 @@ export function ScrollToTopPill() {
       aria-label="맨 위로 이동"
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
-      className={`absolute left-1/2 top-full mt-2 -translate-x-1/2 flex items-center gap-1 h-8 px-3 rounded-full bg-[rgba(15,23,42,0.85)] text-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] text-xs font-semibold transition-all duration-200 active:scale-95 ${
+      className={`absolute before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 left-1/2 top-full mt-2 -translate-x-1/2 flex items-center gap-1 h-8 px-3 rounded-full bg-[rgba(15,23,42,0.85)] text-white shadow-[0_4px_12px_rgba(0,0,0,0.12)] text-xs font-semibold transition-all duration-200 active:scale-95 ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
       }`}
     >

@@ -53,7 +53,8 @@ export function MusicSearchResultCard({
                 onPlay(track);
               }}
               aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
-              className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center active:scale-95 transition-transform"
+              // before 의사요소로 버튼 바깥 12px까지 터치 영역을 넓힘(원형 아이콘이 카드 폭의 22%라 손가락보다 작음)
+              className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center active:scale-95 transition-transform before:content-[''] before:absolute before:-inset-3"
             >
               {isPlaying ? (
                 <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />

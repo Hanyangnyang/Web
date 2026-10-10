@@ -90,7 +90,7 @@ export function ChartSongRow({
               onShare(track);
             }}
             aria-label={`${track.title} 공유`}
-            className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+            className="relative before:content-[''] before:absolute before:-inset-y-1.5 w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
           >
             <Share2 size={16} strokeWidth={2} />
           </button>

@@ -151,9 +151,9 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
         <button
           onClick={onClose}
           aria-label="닫기"
-          className="absolute top-1 right-1 z-10 p-1 text-text-hint hover:text-text-sub active:scale-90 transition-transform"
+          className="absolute top-0.5 right-0.5 z-10 p-2 before:content-[''] before:absolute before:-inset-1.5 text-text-hint hover:text-text-sub active:scale-90 transition-transform"
         >
-          <X size={16} />
+          <X size={22} />
         </button>
 
         {/* 공유 대상 곡 미리보기 — 앨범커버를 크게 가운데 배치 */}

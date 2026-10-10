@@ -25,7 +25,7 @@ export function PostMoreMenu({ report, menuKey, reportTargetId }: PostMoreMenuPr
           report.toggleMenu(menuKey);
         }}
         aria-label="더보기"
-        className="active:scale-90 transition-transform"
+        className="relative before:content-[''] before:absolute before:-inset-3 active:scale-90 transition-transform"
       >
         <MoreVertical size={18} className="text-text-sub" />
       </button>

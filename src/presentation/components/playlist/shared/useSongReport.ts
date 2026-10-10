@@ -20,11 +20,13 @@ export function useSongReport() {
   // 더보기 메뉴가 열려있을 때, 메뉴/버튼 바깥을 누르면 닫음
   useEffect(() => {
     if (!openMenuKey) return;
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: PointerEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpenMenuKey(null);
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    // 모바일에선 mousedown이 탭이 끝난 뒤에야 합성되고, 스크롤하려는 터치나 stopPropagation()을 쓰는 버튼(재생·공유·반응 등) 위에선
+    // 아예 안 올 수 있어서 pointerdown을 캡처 단계에서 받음 — 어디를 터치하든 터치 시작 즉시 닫힘
+    document.addEventListener('pointerdown', handleClickOutside, true);
+    return () => document.removeEventListener('pointerdown', handleClickOutside, true);
   }, [openMenuKey]);
 
   const toggleMenu = (key: string) => setOpenMenuKey((prev) => (prev === key ? null : key));

@@ -573,7 +573,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             <div className="flex gap-2">
               <button
                 onClick={() => setShowExitConfirm(false)}
-                className="flex-1 h-8 rounded-full text-xs font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
               >
                 취소
               </button>
@@ -582,7 +582,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
                   setShowExitConfirm(false);
                   onBack();
                 }}
-                className="flex-1 h-8 rounded-full text-xs font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 나가기
               </button>

@@ -23,7 +23,7 @@ export function ReportReasonPopup({ selectedReason, onSelectReason, onCancel, on
             <button
               key={reason}
               onClick={() => onSelectReason(reason)}
-              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium border transition-colors active:scale-[0.98] ${
+              className={`w-full text-left px-3 py-3 rounded-xl text-xs font-medium border transition-colors active:scale-[0.98] ${
                 selectedReason === reason
                   ? 'bg-primary/10 border-primary text-primary'
                   : 'bg-slate-100 border-transparent text-text-sub hover:bg-slate-200'
@@ -39,14 +39,14 @@ export function ReportReasonPopup({ selectedReason, onSelectReason, onCancel, on
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+            className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
           >
             취소
           </button>
           <button
             onClick={onConfirm}
             disabled={!selectedReason || isPending}
-            className={`flex-1 h-10 rounded-full text-sm font-bold active:scale-[0.97] transition-transform ${
+            className={`flex-1 h-11 rounded-full text-sm font-bold active:scale-[0.97] transition-transform ${
               selectedReason && !isPending ? 'text-white bg-red-500' : 'text-slate-300 bg-slate-100'
             }`}
           >

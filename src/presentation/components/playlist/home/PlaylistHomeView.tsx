@@ -127,7 +127,7 @@ export function PlaylistHomeView({
           <button
             onClick={onShowLiked}
             aria-label="저장한 곡 보기"
-            className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
+            className="relative before:content-[''] before:absolute before:-inset-1 w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
           >
             <Heart size={16} strokeWidth={2} className="text-red-500" fill="none" />
           </button>

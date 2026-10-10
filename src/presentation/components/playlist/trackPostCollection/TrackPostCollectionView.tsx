@@ -170,7 +170,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             <button
               onClick={handleToggleLike}
               aria-label="이 곡 좋아요"
-              className="absolute bottom-0 right-0 p-2 active:scale-95 transition-transform"
+              className="absolute bottom-0 right-0 p-2 before:content-[''] before:absolute before:-inset-1 active:scale-95 transition-transform"
             >
               <Heart
                 size={20}

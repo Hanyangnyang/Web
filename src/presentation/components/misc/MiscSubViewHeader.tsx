@@ -15,7 +15,7 @@ export function MiscSubViewHeader({ title, onBack, emoji, subtitle, subtitleLoad
   return (
     <header className="flex items-center gap-4 mb-3">
       <button
-        className="w-10 h-10 rounded-card bg-white border border-slate-200 flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-200 hover:bg-surface"
+        className="relative before:content-[''] before:absolute before:-inset-1.5 w-10 h-10 rounded-card bg-white border border-slate-200 flex items-center justify-center text-text-sub shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-200 hover:bg-surface"
         onClick={onBack}
       >
         <ArrowLeft size={20} />
