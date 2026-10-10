@@ -630,14 +630,10 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             </div>
           }
         >
-          <p className="text-sm font-semibold text-text-main mb-3 text-center">추천 전에 확인해주세요!</p>
-          <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
-            <li>한 번 추천한 곡은 삭제하거나 수정할 수 없어요.</li>
-            <li>
-              하루에 최대 {dailyMaxLimit}곡까지만 추천할 수 있어요
-              {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
-            </li>
-          </ul>
+          <p className="text-sm font-bold text-text-main mb-1.5 text-center">
+            {creationStatus ? `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요!` : `하루에 최대 ${dailyMaxLimit}곡 추천할 수 있어요!`}
+          </p>
+          <p className="text-xs text-text-sub mb-4 text-center">추천한 곡은 삭제하거나 수정할 수 없어요.</p>
         </ConfirmPopup>
       )}
     </div>
