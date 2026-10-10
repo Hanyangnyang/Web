@@ -9,7 +9,7 @@ import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
-import { ArtistPromoCarousel, type ArtistPromo } from '../shared/ArtistPromoCarousel';
+import { TrackPromoCarousel } from './TrackPromoCarousel';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
@@ -18,7 +18,9 @@ const MY_SONGS_PREVIEW_LIMIT = 10;
 
 interface PlaylistHomeViewProps {
   onBack: () => void;
+  isActive?: boolean;
   visibleSongs: Song[];
+  promoRecentSongs: readonly Song[];
   // 최근 추가된 곡 미리보기의 장르 필터(비어 있으면 전체)
   recentGenreFilter: GenreFilterState;
   onChangeRecentGenreFilter: (next: GenreFilterState) => void;
@@ -52,17 +54,20 @@ interface PlaylistHomeViewProps {
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
   autoFocusSearch?: boolean;
   onAutoFocusSearchConsumed?: () => void;
-  // 인기차트 위 가수 추천 배너(소식탭 배너와 같은 데이터, 높이 절반) — 눌린 가수의 검색 결과로 이동
-  artistPromos: readonly ArtistPromo[];
-  isArtistPromosLoading: boolean;
-  onSelectArtistPromo: (artist: ArtistPromo) => void;
+  promoPopularTracks: readonly ChartTrack[];
+  promoWeeklyTracks: readonly ChartTrack[];
+  isTrackPromosLoading: boolean;
+  onSelectRecentPromo: (song: Song) => void;
+  onSelectChartPromo: (track: ChartTrack, period: Extract<ChartPeriod, 'popular' | 'weekly'>) => void;
 }
 
 // 에리카 플레이리스트 홈 화면 — 검색바 + 인기차트 미리보기 + 최근 추가된 곡 미리보기.
 // PlaylistView(화면 전환을 관리하는 컨테이너)가 screenStack이 ['main']일 때 렌더링함
 export function PlaylistHomeView({
   onBack,
+  isActive = true,
   visibleSongs,
+  promoRecentSongs,
   recentGenreFilter,
   onChangeRecentGenreFilter,
   isRecentSongsLoading,
@@ -87,9 +92,11 @@ export function PlaylistHomeView({
   onSelectMySong,
   autoFocusSearch = false,
   onAutoFocusSearchConsumed,
-  artistPromos,
-  isArtistPromosLoading,
-  onSelectArtistPromo,
+  promoPopularTracks,
+  promoWeeklyTracks,
+  isTrackPromosLoading,
+  onSelectRecentPromo,
+  onSelectChartPromo,
 }: PlaylistHomeViewProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -129,15 +136,23 @@ export function PlaylistHomeView({
         className="-mt-1 mb-2"
       />
 
-      {/* 가수 추천 배너 — 소식탭 배너의 절반 높이 버전. 추천이 없거나 실패하면 조용히 숨김 */}
-      <div className="mb-4">
-        <ArtistPromoCarousel
-          artists={artistPromos}
-          loading={isArtistPromosLoading}
-          compact
-          onClick={onSelectArtistPromo}
-        />
-      </div>
+      {/* 최근 추천곡·실시간 차트·주간 차트에서 한 곡씩 보여주는 홈 전용 캐러셀 */}
+      {isTrackPromosLoading ? (
+        <div className="mb-4">
+          <div className="aspect-[4/1] rounded-2xl skeleton-shimmer" data-testid="track-promo-skeleton" />
+        </div>
+      ) : promoRecentSongs.length > 0 || promoPopularTracks.length > 0 || promoWeeklyTracks.length > 0 ? (
+        <div className="mb-4">
+          <TrackPromoCarousel
+            recentSongs={promoRecentSongs}
+            popularTracks={promoPopularTracks}
+            weeklyTracks={promoWeeklyTracks}
+            isActive={isActive}
+            onSelectRecent={onSelectRecentPromo}
+            onSelectChart={onSelectChartPromo}
+          />
+        </div>
+      ) : null}
 
       {/* 인기차트 섹션 */}
       <section className="mb-4">

@@ -22,7 +22,6 @@ import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
-import { useArtistRecommendations } from '../../hooks/playlist/useArtistRecommendations.js';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 import { useRecentSongsTapAreaVariant } from '../../hooks/playlist/usePlaylistExperiment';
@@ -83,16 +82,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const [recentGenreFilter, setRecentGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
   const filteredRecentSongs = useMemo(() => filterSongsByGenre(songs, recentGenreFilter.selected), [songs, recentGenreFilter.selected]);
   const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
-  // 홈 인기차트 위 가수 추천 배너 — 소식탭 배너와 같은 쿼리라 캐시를 공유함(데이터 한 번만 받음)
-  const { data: recommendations, isLoading: isArtistPromosLoading } = useArtistRecommendations(isActive);
-  const artistPromos = useMemo(
-    () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),
-    [recommendations],
-  );
-
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
   const { data: chartData, isLoading: isChartLoading, isError: isChartError, refetch: refetchChart } = usePopularityChart(chartPeriod, isActive);
+  // 홈 곡 배너는 현재 선택된 차트 칩과 무관하게 실시간·주간 전체 장르 TOP 10을 각각 사용한다.
+  // 같은 queryKey가 겹치면 React Query가 요청과 캐시를 자동으로 공유한다.
+  const { data: promoPopularChart, isLoading: isPromoPopularLoading } = usePopularityChart('popular', isActive);
+  const { data: promoWeeklyChart, isLoading: isPromoWeeklyLoading } = usePopularityChart('weekly', isActive);
   const chartTracks = chartData?.tracks ?? [];
   // 인기차트 화면의 장르 필터 — 홈 미리보기에는 적용되지 않고(홈은 항상 전체 차트), 화면 안에서만 장르별 차트를 서버에서 받아옴
   const [chartGenreFilter, setChartGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
@@ -312,6 +308,18 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
+  // 홈 곡 배너에서는 요청한 동선대로 최근 곡 화면을 2열 그리드로 열고 해당 곡을 가운데로 이동한다.
+  const handleSelectRecentPromo = useCallback((song: Song) => {
+    setViewModes((prev) => ({ ...prev, recent: 'grid' }));
+    pushScreen({ name: 'recent', scrollTarget: song.trackId });
+  }, [pushScreen]);
+
+  const handleSelectChartPromo = useCallback((track: ChartTrack, period: Extract<ChartPeriod, 'popular' | 'weekly'>) => {
+    setChartPeriod(period);
+    setChartGenreFilter((prev) => ({ ...prev, selected: [] }));
+    pushScreen({ name: 'chart', scrollTarget: track.trackId });
+  }, [pushScreen]);
+
   const visibleSongs = filteredRecentSongs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = chartTracks.slice(0, CHART_PREVIEW_LIMIT);
 
@@ -476,7 +484,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         ) : (
           <PlaylistHomeView
             onBack={onBack}
+            isActive={isActive}
             visibleSongs={visibleSongs}
+            promoRecentSongs={songs.slice(0, 10)}
             recentGenreFilter={recentGenreFilter}
             onChangeRecentGenreFilter={setRecentGenreFilter}
             isRecentSongsLoading={isRecentSongsLoading}
@@ -503,9 +513,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             isMySongsLoading={isMySongsLoading}
             onShowAllMySongs={() => pushScreen({ name: 'mySongs', scrollTarget: null })}
             onSelectMySong={(song) => pushScreen({ name: 'mySongs', scrollTarget: song.trackId })}
-            artistPromos={artistPromos}
-            isArtistPromosLoading={isArtistPromosLoading}
-            onSelectArtistPromo={(artist) => { setSearchQuery(artist.artistName); pushScreen({ name: 'search' }); }}
+            promoPopularTracks={(promoPopularChart?.tracks ?? EMPTY_CHART).slice(0, 10)}
+            promoWeeklyTracks={(promoWeeklyChart?.tracks ?? EMPTY_CHART).slice(0, 10)}
+            isTrackPromosLoading={isRecentSongsLoading || isPromoPopularLoading || isPromoWeeklyLoading}
+            onSelectRecentPromo={handleSelectRecentPromo}
+            onSelectChartPromo={handleSelectChartPromo}
             autoFocusSearch={autoFocusSearch}
             onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
           />
