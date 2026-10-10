@@ -35,7 +35,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
-  const { data: recommendations } = useArtistRecommendations(isActive);
+  const { data: recommendations, isLoading: recommendationsLoading } = useArtistRecommendations(isActive);
   // 데이터가 같은 동안 배열 참조를 유지해야 캐러셀이 매 렌더마다 첫 장으로 되돌아가지 않음
   const artistPromos = useMemo(
     () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),
@@ -91,6 +91,7 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           <ArtistPromoCarousel
             artists={artistPromos}
             isActive={isActive}
+            loading={recommendationsLoading}
             onClick={(artist) => onNavigateToTab?.('misc', undefined, 'playlist', undefined, artist.artistName)}
           />
         </ErrorBoundary>

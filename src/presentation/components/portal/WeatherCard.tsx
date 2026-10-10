@@ -14,15 +14,19 @@ interface WeatherCardProps {
 
 function WeatherSkeleton() {
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-2xl rounded-t-none px-4 py-3 animate-pulse flex flex-col justify-start">
-      <div className="pl-1">
-        <div className="h-3 w-20 bg-slate-200 rounded-full" />
-        <div className="flex items-baseline gap-1.5 mt-1.5">
-          <div className="h-9 w-20 bg-slate-200 rounded-xl" />
-          <div className="h-5 w-14 bg-slate-200 rounded-lg" />
+    // 실제 카드와 같은 한 줄 구성: [기온 + 상태] [위치 / 최고·최저 2줄], 오른쪽에 흐린 날씨 아이콘 자리
+    <div className="bg-white/90 backdrop-blur-xl rounded-2xl rounded-t-none px-4 py-3 animate-pulse relative overflow-hidden flex flex-col justify-start">
+      <div className="pl-1 flex items-center gap-3">
+        <div className="flex items-baseline gap-1.5">
+          <div className="h-9 w-16 bg-slate-200 rounded-xl" />
+          <div className="h-4 w-10 bg-slate-200 rounded-full" />
         </div>
-        <div className="h-3 w-24 bg-slate-200 rounded-full mt-2" />
+        <div className="flex flex-col gap-1.5">
+          <div className="h-2.5 w-24 bg-slate-200 rounded-full" />
+          <div className="h-3 w-28 bg-slate-200 rounded-full" />
+        </div>
       </div>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 h-[60px] w-[60px] rounded-full bg-slate-200/60" />
     </div>
   );
 }

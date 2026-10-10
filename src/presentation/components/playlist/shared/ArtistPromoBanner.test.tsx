@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ArtistPromoBanner } from './ArtistPromoBanner.js';
-import { ARTIST_PROMO_TEMPLATES, getArtistNameSize, pickArtistPromoTemplate, truncateArtistName } from './artistPromoTypography.js';
+import { ARTIST_PROMO_TEMPLATES, getArtistNameSize, pickArtistPromoTemplate } from './artistPromoTypography.js';
 
 describe('ArtistPromoBanner', () => {
   it('백엔드에서 받은 가수명과 이미지를 학술정보관 카드와 비슷한 2:1 배너로 렌더링한다', () => {
@@ -15,7 +15,7 @@ describe('ArtistPromoBanner', () => {
 
     expect(screen.getByText('검정치마')).toBeTruthy();
     expect(screen.getByText('같이 들어요')).toBeTruthy();
-    expect(screen.getByText('에리카 플레이리스트로 이동하기')).toBeTruthy();
+    expect(screen.getByText('에리카 플레이리스트 바로가기>')).toBeTruthy();
     expect(screen.getByTestId('artist-promo-banner').className).toContain('aspect-[2/1]');
     expect(screen.getByAltText('검정치마 아티스트 이미지').getAttribute('src')).toBe('https://example.com/artist.jpg');
   });
@@ -38,31 +38,47 @@ describe('ArtistPromoBanner', () => {
     expect(screen.queryByAltText('백예린 아티스트 이미지')).toBeNull();
   });
 
-  it('긴 가수명도 한 줄 영역과 전체 이름 툴팁을 유지한다', () => {
+  it('긴 가수명은 말줄임표 없이 전체 이름을 한 줄로 두고 툴팁을 유지한다', () => {
     const longName = 'The Artist With A Very Long Name';
     render(<ArtistPromoBanner artistName={longName} artistImageUrl="https://example.com/long.jpg" />);
 
-    const displayedName = screen.getByText('The Artist With A Very…');
-    expect(displayedName.className).toContain('truncate');
+    const displayedName = screen.getByText(longName);
+    expect(displayedName.className).toContain('whitespace-nowrap');
+    expect(displayedName.className).not.toContain('truncate');
     expect(displayedName.getAttribute('title')).toBe(longName);
   });
 
+  it('가수명이 영역을 넘칠 때만 오른쪽 끝 페이드를 적용한다', () => {
+    const widths = vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get');
+    const clientWidths = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get');
+    try {
+      widths.mockReturnValue(300);
+      clientWidths.mockReturnValue(100);
+      const { unmount } = render(<ArtistPromoBanner artistName="Hadestown Original Broadway Company" artistImageUrl="https://example.com/a.jpg" />);
+      expect(screen.getByText('Hadestown Original Broadway Company').getAttribute('data-clipped')).toBe('true');
+      unmount();
+
+      widths.mockReturnValue(100);
+      render(<ArtistPromoBanner artistName="원필" artistImageUrl="https://example.com/b.jpg" />);
+      expect(screen.getByText('원필').getAttribute('data-clipped')).toBe('false');
+    } finally {
+      widths.mockRestore();
+      clientWidths.mockRestore();
+    }
+  });
+
   it('가수명의 시각적 길이에 따라 글자 크기를 다르게 적용한다', () => {
-    expect(getArtistNameSize('원필')).toBe('clamp(42px, 13.5cqw, 66px)');
-    expect(getArtistNameSize('The Artist With A Very Long Name')).toBe('clamp(17px, 5.5cqw, 28px)');
+    expect(getArtistNameSize('원필')).toBe('clamp(36px, 11.5cqw, 56px)');
+    expect(getArtistNameSize('The Artist With A Very Long Name')).toBe('clamp(15px, 4.7cqw, 24px)');
   });
 
-  it('두 가지 문구 템플릿을 무작위 값에 맞춰 선택한다', () => {
-    expect(ARTIST_PROMO_TEMPLATES).toHaveLength(2);
+  it('세 가지 문구 템플릿을 무작위 값에 맞춰 선택한다', () => {
+    expect(ARTIST_PROMO_TEMPLATES).toHaveLength(3);
     expect(pickArtistPromoTemplate(() => 0)).toBe('listen-together');
-    expect(pickArtistPromoTemplate(() => 0.49)).toBe('listen-together');
-    expect(pickArtistPromoTemplate(() => 0.5)).toBe('do-you-like');
-    expect(pickArtistPromoTemplate(() => 0.99)).toBe('do-you-like');
-  });
-
-  it('한글과 영문에 서로 다른 글자 수 기준으로 말줄임한다', () => {
-    expect(truncateArtistName('가나다라마바사아자차')).toBe('가나다라마바사아…');
-    expect(truncateArtistName('Hadestown Original Broadway Company')).toBe('Hadestown Original Bro…');
-    expect(truncateArtistName('유다빈밴드')).toBe('유다빈밴드');
+    expect(pickArtistPromoTemplate(() => 0.32)).toBe('listen-together');
+    expect(pickArtistPromoTemplate(() => 0.34)).toBe('do-you-like');
+    expect(pickArtistPromoTemplate(() => 0.65)).toBe('do-you-like');
+    expect(pickArtistPromoTemplate(() => 0.67)).toBe('how-about');
+    expect(pickArtistPromoTemplate(() => 0.99)).toBe('how-about');
   });
 });

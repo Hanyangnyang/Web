@@ -1,11 +1,13 @@
-import { useState, type CSSProperties, type SyntheticEvent } from 'react';
-import { getArtistNameSize, pickArtistPromoTemplate, truncateArtistName, type ArtistPromoTemplate } from './artistPromoTypography.js';
+import { useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from 'react';
+import { getArtistNameSize, pickArtistPromoTemplate, type ArtistPromoTemplate } from './artistPromoTypography.js';
 
 export interface ArtistPromoBannerProps {
   artistName: string;
   artistImageUrl: string | null;
   onClick?: () => void;
   className?: string;
+  // 지정하면 이 문구를 쓰고, 없으면 마운트 때 무작위로 고른다(캐러셀 복제 슬라이드와 문구를 맞추려고 씀)
+  template?: ArtistPromoTemplate;
 }
 
 interface EdgePalette {
@@ -14,23 +16,52 @@ interface EdgePalette {
   end: string;
 }
 
-function ArtistPromoCopy({ artistName, template }: { artistName: string; template: ArtistPromoTemplate }) {
-  const displayArtistName = truncateArtistName(artistName);
-  const artist = (
+// 오른쪽 끝 1.6em 구간에서 투명해지는 마스크 — 말줄임표(…) 대신 글자가 배경으로 스며들듯 사라지게 한다
+const NAME_FADE_MASK = 'linear-gradient(90deg, #000 calc(100% - 1.6em), transparent 100%)';
+
+// 가수명이 한 줄 영역을 넘칠 때만 오른쪽 끝을 페이드로 가린다(넘치지 않는 이름은 끝 글자가 흐려지면 안 되므로 측정 후 적용)
+function FadingArtistName({ name }: { name: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [isClipped, setIsClipped] = useState(false);
+  const fontSize = getArtistNameSize(name);
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const measure = () => setIsClipped(element.scrollWidth > element.clientWidth + 1);
+    measure();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(element);
+    // 웹폰트가 늦게 로드되면 글자 폭이 바뀌므로 로드 완료 후 다시 잰다
+    document.fonts?.ready.then(measure);
+    return () => observer?.disconnect();
+  }, [name, fontSize]);
+
+  return (
     <span
-      className="inline-block max-w-full truncate align-bottom"
-      style={{ fontSize: getArtistNameSize(displayArtistName) } as CSSProperties}
-      title={artistName}
+      ref={ref}
+      className="block max-w-full overflow-hidden whitespace-nowrap"
+      style={{
+        fontSize,
+        ...(isClipped ? { maskImage: NAME_FADE_MASK, WebkitMaskImage: NAME_FADE_MASK } : null),
+      } as CSSProperties}
+      data-clipped={isClipped}
+      title={name}
     >
-      {displayArtistName}
+      {name}
     </span>
   );
-  const lineClass = 'block max-w-full text-[clamp(24px,7.8cqw,39px)]';
+}
+
+function ArtistPromoCopy({ artistName, template }: { artistName: string; template: ArtistPromoTemplate }) {
+  const artist = <FadingArtistName name={artistName.trim()} />;
+  const lineClass = 'block max-w-full text-[clamp(20px,6.6cqw,33px)]';
 
   return (
     <p className="min-w-0 max-w-full font-black leading-[1.06] tracking-[-0.05em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]">
       {template === 'listen-together' && <><span className="block max-w-full">{artist}</span><span className={lineClass}>같이 들어요</span></>}
       {template === 'do-you-like' && <><span className="block max-w-full">{artist}</span><span className={lineClass}>좋아하세요?</span></>}
+      {template === 'how-about' && <><span className="block max-w-full">{artist}</span><span className={lineClass}>어때요?</span></>}
     </p>
   );
 }
@@ -97,12 +128,13 @@ export function ArtistPromoBanner({
   artistImageUrl,
   onClick,
   className = '',
+  template,
 }: ArtistPromoBannerProps) {
   const [loadFailed, setImageFailed] = useState(false);
   // 이미지 URL 자체가 없으면 로드 실패와 같은 기본 이미지로 처리
   const imageFailed = loadFailed || !artistImageUrl;
   const [edgePalette, setEdgePalette] = useState<EdgePalette | null>(null);
-  const [copyTemplate] = useState<ArtistPromoTemplate>(() => pickArtistPromoTemplate());
+  const [randomTemplate] = useState<ArtistPromoTemplate>(() => pickArtistPromoTemplate());
   const safeArtistName = artistName.trim() || '이 아티스트';
   const Wrapper = onClick ? 'button' : 'div';
   const wrapperProps = onClick
@@ -112,7 +144,7 @@ export function ArtistPromoBanner({
   return (
     <Wrapper
       {...wrapperProps}
-      className={`relative block w-full aspect-[2/1] overflow-hidden rounded-2xl bg-slate-900 text-left [container-type:inline-size] ${onClick ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''} ${className}`}
+      className={`relative block w-full select-none aspect-[2/1] overflow-hidden rounded-2xl bg-slate-900 text-left [container-type:inline-size] ${onClick ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''} ${className}`}
       data-testid="artist-promo-banner"
     >
       <div
@@ -140,7 +172,8 @@ export function ArtistPromoBanner({
               src={artistImageUrl ?? undefined}
               crossOrigin="anonymous"
               alt={`${safeArtistName} 아티스트 이미지`}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover select-none"
+              draggable={false}
               onLoad={(event: SyntheticEvent<HTMLImageElement>) => {
                 setEdgePalette(extractRightEdgePalette(event.currentTarget));
               }}
@@ -154,12 +187,20 @@ export function ArtistPromoBanner({
         </div>
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center py-[2cqw] pl-[4cqw] pr-[2cqw] text-left text-white">
-          <ArtistPromoCopy artistName={safeArtistName} template={copyTemplate} />
+          <ArtistPromoCopy artistName={safeArtistName} template={template ?? randomTemplate} />
+          {/* 문구("같이 들어요" 등) 아래 이동 안내 — 클릭은 배너 전체가 받으므로 장식용 */}
+          <span className="pointer-events-none mt-[1.6cqw] max-w-full self-start whitespace-nowrap rounded-full border border-white/25 bg-black/25 px-[2.4cqw] py-[1cqw] text-[clamp(8px,2.5cqw,12px)] font-bold leading-none tracking-[-0.02em] text-white/90 shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
+            에리카 플레이리스트 바로가기{'>'}
+          </span>
         </div>
 
-        <span className="pointer-events-none absolute bottom-[3cqw] right-[3cqw] z-20 rounded-full border border-white/25 bg-black/25 px-[3cqw] py-[1.2cqw] text-[clamp(8px,2.5cqw,12px)] font-bold tracking-[-0.02em] text-white/90 shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          에리카 플레이리스트로 이동하기
-        </span>
+        {/* 왼쪽 상단 하냥냥 로고(글자+발자국 PNG) — 배너 폭에 맞춰 같이 커지고 작아짐 */}
+        <img
+          src="/assets/brand/hanyangnyang_logo.png"
+          alt="하냥냥"
+          className="pointer-events-none absolute left-[3cqw] top-[3cqw] z-20 h-[clamp(18px,5cqw,28px)] w-auto drop-shadow-[0_1px_4px_rgba(0,0,0,0.35)]"
+          draggable={false}
+        />
       </div>
     </Wrapper>
   );

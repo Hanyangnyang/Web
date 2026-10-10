@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArtistPromoBanner } from './ArtistPromoBanner.js';
+import { pickArtistPromoTemplate, type ArtistPromoTemplate } from './artistPromoTypography.js';
 
 export interface ArtistPromo {
   artistName: string;
@@ -13,6 +14,8 @@ interface ArtistPromoCarouselProps {
   onClick?: (artist: ArtistPromo) => void;
   // 소식 탭이 비활성(다른 탭 표시 중)일 때 자동 슬라이드 타이머를 멈추기 위해 씀
   isActive?: boolean;
+  // 첫 로딩 중이면 소식탭 배너 캐러셀(BannerCarousel)과 같은 스켈레톤을 보여준다
+  loading?: boolean;
 }
 
 const AUTO_SLIDE_MS = 7000;
@@ -20,7 +23,7 @@ const TRANSITION_MS = 300; // 아래 슬라이드 트랙의 duration-300과 반�
 
 // 소식탭 배너 캐러셀(BannerCarousel)과 같은 동작: 7초 자동 슬라이드, 좌우 스와이프, 끝에서 첫 장으로 이어지는 무한 루프, 점 인디케이터.
 // 슬라이드 목록 끝에 첫 장을 복제해 두고, 복제본에 도달하면 트랜지션을 잠깐 끄고 0번으로 순간이동한다.
-export function ArtistPromoCarousel({ artists, onClick, isActive = true }: ArtistPromoCarouselProps) {
+export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading = false }: ArtistPromoCarouselProps) {
   const count = artists.length;
   const [current, setCurrent] = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
@@ -31,6 +34,17 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true }: Artis
   const axisLockedRef = useRef<'h' | 'v' | null>(null);
   const isSwiping = useRef(false);
   const mouseStartXRef = useRef<number | null>(null);
+
+  // 가수별 문구를 한 번만 정해 둔다 — 끝에 붙인 첫 장 복제본이 원본과 다른 문구를 뽑으면, 순간이동 뒤에 문구가 뒤늦게 바뀌어 보인다
+  const templatesRef = useRef(new Map<string, ArtistPromoTemplate>());
+  const getTemplate = (name: string) => {
+    let template = templatesRef.current.get(name);
+    if (!template) {
+      template = pickArtistPromoTemplate();
+      templatesRef.current.set(name, template);
+    }
+    return template;
+  };
 
   const slides = count > 1 ? [...artists, artists[0]] : artists;
 
@@ -120,6 +134,14 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true }: Artis
     mouseStartXRef.current = null;
   };
 
+  if (loading && !count) {
+    return (
+      <div>
+        <div className="rounded-2xl aspect-[2/1] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" data-testid="artist-promo-skeleton" />
+      </div>
+    );
+  }
+
   if (!count) return null;
 
   return (
@@ -139,6 +161,7 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true }: Artis
               <ArtistPromoBanner
                 artistName={artist.artistName}
                 artistImageUrl={artist.artistImageUrl}
+                template={getTemplate(artist.artistName)}
                 onClick={onClick && (() => { if (!isSwiping.current) onClick(artist); })}
               />
             </div>
