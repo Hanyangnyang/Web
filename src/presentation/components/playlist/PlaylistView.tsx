@@ -360,10 +360,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       style={{
         backgroundColor: '#FFFFFF',
         animation: 'fadeIn 0.25s ease-out',
-        ...(isApp ? {
-          paddingTop: `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`,
-          paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
-        } : {}),
+        paddingTop: `calc(1.5rem + ${isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)'})`,
+        paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
         '--playlist-bottom-space': `${bottomSpace}px`,
         // 하단 플로팅 플레이어 실측 높이(닫힘이면 0) — 좋아요 토스트처럼 플레이어 위에 떠야 하는 요소가 읽음
         '--playlist-player-height': `${playerHeight}px`,

@@ -332,10 +332,12 @@ function MainLayout() {
       {/* 메인 콘텐츠 화면 */}
       <div
         className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden"
-        style={isApp ? {
-          paddingTop: platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)',
+        style={{
+          // 안드로이드 네이티브만 env 미지원 대비 28px 폴백. 그 외(iOS 앱·PWA·Safari)는 env 값 그대로 —
+          // 노치/상태바가 없는 환경에선 0이라 일반 브라우저에 영향 없음
+          paddingTop: isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)',
           paddingBottom: 'env(safe-area-inset-bottom)',
-        } : {}}
+        }}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
         <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : activeTab === 'portal' ? 'pb-6' : 'py-6'}`}>
