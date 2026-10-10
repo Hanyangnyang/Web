@@ -14,6 +14,7 @@ import { ReportReasonPopup } from '../shared/ReportReasonPopup';
 import { PostMoreMenu } from '../shared/PostMoreMenu';
 import { useShareModal } from '../shared/useShareModal';
 import { Toast } from '../shared/Toast';
+import { MarqueeText } from '../shared/MarqueeText';
 import { useLikeToast } from '../shared/useLikeToast';
 import { RecentSongsPreviewSection } from '../shared/RecentSongsPreviewSection';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
@@ -163,11 +164,12 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             />
             {/* 재생 중엔 일시정지 아이콘으로 바뀌어서 그대로 눌러 멈출 수 있음 */}
             <AlbumArtPlayButton onPlay={onPlay} label={`${displayTrack.title} 재생`} isPlaying={isPlaying} variant="corner" />
-            {/* 곡 좋아요(하트) — 곡 단위라 게시글 리스트가 아니라 앨범커버에 두고, 공유 아이콘(p-2 + 20px = 36px 폭) 왼쪽에 8px 간격으로 배치(터치 영역은 8px 겹침) */}
+            {/* 곡 좋아요(하트) — 곡 단위라 게시글 리스트가 아니라 앨범커버 오른쪽 하단에 둠. 공유는 곡 정보 카드의
+                "다른 하냥이에게 이 곡을 공유해봐요!" 버튼이 맡음 */}
             <button
               onClick={handleToggleLike}
               aria-label="이 곡 좋아요"
-              className="absolute bottom-0 right-7 p-2 active:scale-95 transition-transform"
+              className="absolute bottom-0 right-0 p-2 active:scale-95 transition-transform"
             >
               <Heart
                 size={20}
@@ -177,31 +179,35 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                 className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]"
               />
             </button>
-            {/* 곡 공유하기 — 앨범커버 오른쪽 하단에 우상단 재생 아이콘과 같은 흰색 아이콘 스타일로 배치(눌리는 영역은 p-2로 확보).
-                곡 추천하기는 이 화면의 FAB(PlaylistView)이 이 곡을 미리 채워서 처리함 */}
-            <button
-              onClick={() => share.open()}
-              aria-label="곡 공유하기"
-              className="absolute bottom-0 right-0 p-2 active:scale-95 transition-transform"
-            >
-              <Share2 size={20} stroke="white" strokeWidth={2} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" />
-            </button>
           </div>
-          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
-            <div className="leading-tight">
-              <div className="text-lg font-bold text-text-main line-clamp-2 break-words">{displayTrack.title}</div>
+          {/* 오른쪽 열 — 수평선을 카드 세로 중앙에 두고, 위(곡명·가수)와 아래(추천글·재생수·공유 안내)가 같은 높이를 나눠 갖게 함.
+              위/아래 영역이 각각 flex-1이라 내용 양이 달라도 수평선 위치는 항상 가운데에 고정됨 */}
+          <div className="min-w-0 flex-1 flex flex-col pt-4 pb-2 pr-3">
+            <div className="flex-1 flex flex-col justify-end pb-1.5 leading-tight">
+              {/* 곡명이 길어도 한 줄로만 — 넘치면 끝까지 천천히 슬라이드했다가 처음으로 돌아와서 뒷부분도 볼 수 있음 */}
+              <MarqueeText text={displayTrack.title} className="text-lg font-bold text-text-main" />
               <div className="text-sm text-text-sub truncate">{displayTrack.artist}</div>
             </div>
             <div className="border-t border-slate-300" />
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
-                <MessageCircle size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
-                {totalCount.toLocaleString()}개
-              </span>
-              <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
-                <Play size={12} className="flex-shrink-0" fill="currentColor" stroke="none" />
-                {totalPlayCount.toLocaleString()}회
-              </span>
+            <div className="flex-1 flex flex-col justify-start gap-1.5 pt-1.5">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
+                  <MessageCircle size={12} className="flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} />
+                  추천글 {totalCount.toLocaleString()}개
+                </span>
+                <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
+                  <Play size={12} className="flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} />
+                  재생수 {totalPlayCount.toLocaleString()}회
+                </span>
+              </div>
+              {/* 공유 유도 — 앨범커버의 공유 아이콘과 같은 공유 팝업을 염. 아이콘만으로는 눈에 안 띄어서 문구로 한 번 더 안내 */}
+              <button
+                onClick={() => share.open()}
+                className="self-start max-w-full flex items-center gap-1 rounded-md bg-slate-50 border border-slate-200 px-1.5 py-[3.5px] text-left text-[10.5px] font-medium leading-tight text-text-sub active:bg-slate-100 transition-colors"
+              >
+                <span>다른 하냥이에게 곡을 공유해봐요!</span>
+                <Share2 size={11} className="flex-shrink-0 text-text-hint" strokeWidth={2.2} />
+              </button>
             </div>
           </div>
         </div>
@@ -259,7 +265,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             >
               {/* 본문 + 좋아요/더보기 */}
               <div className="flex items-start gap-2">
-                {/* 한마디는 flex-1이 아니라 내용 폭만큼만 차지해서(길면 줄어들며 2줄 말줄임), 뱃지가 오른쪽 끝이 아니라 한마디 바로 옆에 붙음 */}
                 {/* 한마디는 선택 입력이라 비어 있을 수 있음 — 빈 따옴표("")만 덩그러니 보이지 않게 있을 때만 그림 */}
                 {post.comment && (
                   <p className="min-w-0 text-sm text-text-main leading-snug line-clamp-2">
@@ -269,10 +274,10 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                   </p>
                 )}
 
-                {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 배경 없이 얇은 회색 테두리만 있는 알약 */}
+                {/* 내 글이면 줄 오른쪽 끝에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김, 더보기 버튼과 같은 자리) — 배경 없이 얇은 회색 테두리만 있는 알약 */}
                 {post.isMine ? (
                   // h-5는 한마디 첫 줄(text-sm × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
-                  <span className="flex-shrink-0 h-5 px-2 flex items-center rounded-full border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none">
+                  <span className="ml-auto flex-shrink-0 h-5 px-2 flex items-center rounded-full border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none">
                     내 추천
                   </span>
                 ) : (

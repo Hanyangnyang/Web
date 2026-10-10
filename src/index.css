@@ -302,6 +302,24 @@ body {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* 한 줄에 안 들어가는 제목을 한 방향으로 계속 흘려보내는 마키(MarqueeText) — 맨 앞에서 잠깐(20%) 멈춰 처음 글자를 읽게 한 뒤,
+   글자+간격 한 칸만큼 왼쪽으로 일정한 속도로 이동하고 처음으로 이어짐(뒤따라오는 복사본이 정확히 처음 자리에 옴).
+   이동 거리는 컴포넌트가 --marquee-distance(음수 px)로 넘겨줌 */
+@keyframes marqueeSlide {
+  0%,
+  20% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(var(--marquee-distance));
+  }
+}
+
+.marquee-slide {
+  animation: marqueeSlide 8s linear infinite;
+}
+
 /* ═══ 아코디언 (grid-template-rows 트랜지션 — Tailwind로 표현 불가) ═══ */
 .accordion-content {
   display: grid;

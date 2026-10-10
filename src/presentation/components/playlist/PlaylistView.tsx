@@ -10,6 +10,7 @@ import { RecommendSongView } from './recommendSong/RecommendSongView';
 import { EMPTY_GENRE_FILTER, type GenreFilterState } from './shared/GenreFilterChips';
 import { RecentSongsView } from './recentSongs/RecentSongsView';
 import { SearchResultsView } from './searchResults/SearchResultsView';
+import { SearchPostsView } from './searchResults/SearchPostsView';
 import { TrackPostCollectionView } from './trackPostCollection/TrackPostCollectionView';
 import { PostView } from './post/PostView';
 import { MyPageView } from './myPage/MyPageView';
@@ -41,6 +42,8 @@ type ScreenFrame =
   // prefillQuery: 검색 결과 화면의 FAB에서 들어올 때 그 검색어로 곡 검색을 미리 해둠
   | { name: 'addSong'; prefillTrack: TrackSummary | null; prefillQuery: string | null }
   | { name: 'search' }
+  // query: 검색 결과 화면의 추천글 "더보기"로 들어온 검색어 — 그 검색어의 추천글 전체 목록(SearchPostsView)
+  | { name: 'searchPosts'; query: string }
   // track: 검색 결과·인기차트 등에서 눌러 선택된 곡 — TrackPostCollectionView(곡 단위 게시글 모음)에 넘김
   | { name: 'trackPosts'; track: TrackSummary }
   // postId: 게시글 목록에서 눌러 선택된 게시글 id — PostView가 GET /api/v1/playlist/songs/{id}로 상세 조회
@@ -172,6 +175,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       pushAddSong(undefined, activeSearchQueryRef.current || searchQuery);
       return;
     }
+    if (screen.name === 'searchPosts') {
+      pushAddSong(undefined, screen.query);
+      return;
+    }
     pushAddSong();
   }, [screen, pushAddSong, searchQuery]);
 
@@ -206,12 +213,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
 
-  // 플레이리스트 탭을 나가면 플레이어가 언마운트돼서 듣던 곡이 끊김 — 재생 중일 때만 확인 팝업을 먼저 띄움(일시정지/미재생이면 바로 나감)
+  // 홈에서 플레이리스트를 나가려 하면 항상 확인 팝업을 먼저 띄움 — 재생 중이면 나가는 순간 플레이어가 언마운트돼서
+  // 듣던 곡이 끊기므로 그 안내를, 재생 중이 아니면 가볍게 한 번 더 묻는 문구를 보여줌(문구는 아래 팝업에서 분기)
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const requestExit = useCallback(() => {
-    if (playingTrackId) setShowExitConfirm(true);
-    else onBack();
-  }, [playingTrackId, onBack]);
+  const requestExit = useCallback(() => setShowExitConfirm(true), []);
 
   const handleBack = useCallback(() => {
     if (showExitConfirm) {
@@ -321,8 +326,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   }, [pushScreen, posthog, recentSongsVariant]);
 
   // 홈 곡 배너에서는 최근 곡 화면을 1열(리스트)로 열고 해당 곡을 가운데로 이동한다.
+  // 장르 필터도 "전체"로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문(handleSelectPost와 같은 이유)
   const handleSelectRecentPromo = useCallback((song: Song) => {
     setViewModes((prev) => ({ ...prev, recent: 'list' }));
+    setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen]);
 
@@ -419,6 +426,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             key={searchQuery} // 이미 검색 결과 화면인 채로 딥링크로 검색어가 바뀌면, 내부 activeQuery(처음 진입 때만 query로 초기화)가 따라가도록 새로 마운트
             query={searchQuery}
             onBack={popScreen}
+            onShowMorePosts={(q) => pushScreen({ name: 'searchPosts', query: q })}
             onShowRecent={() => handleShowAllRecent()}
             recentSongs={songs}
             isRecentSongsLoading={isRecentSongsLoading}
@@ -431,6 +439,14 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onRecommendTrack={pushAddSong}
             onActiveQueryChange={(q) => { activeSearchQueryRef.current = q; }}
           />
+        ) : screen.name === 'searchPosts' ? (
+          <SearchPostsView
+            query={screen.query}
+            onBack={popScreen}
+            onSelectPost={handleSelectPost}
+            onPlay={handlePlay}
+            currentTrackId={playingTrackId}
+          />
         ) : screen.name === 'trackPosts' ? (
           <TrackPostCollectionView
             track={screen.track}
@@ -439,7 +455,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={() => handlePlay(screen.track)}
             isPlaying={screen.track.trackId === playingTrackId}
             onResolveTrack={handleResolveTrackPostsTrack}
-            onShowRecent={() => handleShowAllRecent()}
+            onShowRecent={() => {
+              // 하단 "더보기" — 여러 곡을 훑어보라는 맥락이라 최근 추가된 곡을 2열 그리드로 염(이후 토글 버튼으로 1열 전환 가능)
+              setViewModes((prev) => ({ ...prev, recent: 'grid' }));
+              handleShowAllRecent();
+            }}
             recentSongs={songs}
             isRecentSongsLoading={isRecentSongsLoading}
             onSelectRecentSong={handleSelectRecentSong}
@@ -547,7 +567,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         <AddSongFab onClick={handleAddSongFabClick} playerHeight={playerHeight} showCoachmark={screen.name === 'main'} />
       )}
 
-      {/* 재생 중에 플레이리스트를 나가려 할 때 확인 팝업 */}
+      {/* 플레이리스트를 나가려 할 때 확인 팝업(재생 중이면 음악이 멈춘다는 안내) */}
       {showExitConfirm && (
         <ConfirmPopup
           compact
@@ -571,8 +591,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             </div>
           }
         >
-          <p className="text-[15px] font-bold text-text-main mb-1 text-center">정말 나가시겠어요?</p>
-          <p className="text-xs font-medium text-text-hint mb-3.5 text-center">뒤로가면 재생 중인 음악이 정지돼요.</p>
+          <p className="text-[15px] font-bold text-text-main mb-1 text-center">에리카 플리를 종료하시겠습니까?</p>
+          <p className="text-xs font-medium text-text-hint mb-3.5 text-center">
+            {playingTrackId ? '종료하면 재생 중인 음악이 정지돼요.' : '하냥이들의 새로운 추천곡이 기다리고 있어요!'}
+          </p>
         </ConfirmPopup>
       )}
 

@@ -18,6 +18,7 @@ import { EmptyMessageCard } from './EmptyMessageCard';
 interface SearchResultsViewProps {
   query: string;
   onBack: () => void;
+  onShowMorePosts: (query: string) => void; // 추천글 "더보기" — 이 검색어의 추천글 전체 목록 화면으로 이동
   onShowRecent: () => void; // 최근 추가된 곡 섹션의 제목/"더보기" — 최근 추가된 곡 전체보기로 이동
   recentSongs: Song[]; // 최근 추가된 곡 섹션에 보여줄 곡(앞의 RECENT_PREVIEW_LIMIT개만 사용)
   isRecentSongsLoading: boolean;
@@ -33,9 +34,11 @@ interface SearchResultsViewProps {
 
 // 검색 최소 글자수
 const MIN_QUERY_LENGTH = 2;
+// 추천글 섹션에서 미리 보여줄 개수 — 이보다 많으면 "더보기"로 전체 목록 화면으로 보냄
+const POST_PREVIEW_LIMIT = 5;
 
 // 검색 결과 화면
-export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
+export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
   const [activeQuery, setActiveQuery] = useState(query);
@@ -150,7 +153,7 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
           ) : !postResults || postResults.length === 0 ? (
             <EmptyMessageCard message={'아직 이 검색어의 추천글이 없어요.\n첫 추천글을 남겨보세요!'} />
           ) : (
-            postResults.map((post) => (
+            postResults.slice(0, POST_PREVIEW_LIMIT).map((post) => (
               <RecentSongRow
                 key={post.id ?? post.trackId}
                 song={post}
@@ -163,6 +166,18 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
         </div>
         </ErrorBoundary>
 
+        {/* 미리보기 개수를 넘는 추천글이 있으면 하단에 더보기 */}
+        {!isSearchingPosts && postResults && postResults.length > POST_PREVIEW_LIMIT && (
+          <div className="flex justify-center mt-3">
+            <button
+              type="button"
+              onClick={() => onShowMorePosts(activeQuery)}
+              className="px-4 py-1.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+            >
+              더보기
+            </button>
+          </div>
+        )}
       </section>
 
       <hr className="-mx-3 mb-4 border-slate-200" />

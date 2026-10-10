@@ -127,6 +127,7 @@ export function EmojiReactionBar({
   // 높이를 "반응" 알약 버튼과 똑같이 고정해서 나란히 놓였을 때 키가 어긋나지 않게 함
   const chipClass = isMini ? 'h-[18px] px-1 text-[9px]' : 'h-[22px] px-1.5 text-[10px]';
   const chipEmojiClass = isMini ? 'text-[10px]' : 'text-xs';
+  const TOUCH_AREA_CLASS = 'relative before:absolute before:-inset-y-1.5 before:-inset-x-[2px]';
 
   return (
     <div className={`flex items-center ${chipGapClass} ${className}`}>
@@ -150,7 +151,7 @@ export function EmojiReactionBar({
           onContextMenu={(e) => e.preventDefault()}
           aria-label="이모지 추가"
           style={{ touchAction: 'none', WebkitTouchCallout: 'none' } as React.CSSProperties}
-          className={`${addButtonSizeClass} rounded-full bg-slate-100 flex items-center justify-center whitespace-nowrap font-semibold text-text-sub active:scale-90 transition-transform select-none`}
+          className={`${addButtonSizeClass} ${TOUCH_AREA_CLASS} rounded-full bg-slate-100 flex items-center justify-center whitespace-nowrap font-semibold text-text-sub active:scale-90 transition-transform select-none`}
         >
           <Smile size={addButtonIconSize} className="text-text-sub" strokeWidth={2} />
           {/* 반응이 하나도 없으면 버튼 글씨가 안내 문구로 바뀜 */}
@@ -196,7 +197,7 @@ export function EmojiReactionBar({
       {displayedReactions.length > 0 ? (
         /* 이미 달린 리액션 칩 — 여러 개로 늘어날 수 있어서 가로 스크롤 */
         <div
-          className={`flex items-center ${chipGapClass} flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden`}
+          className={`flex items-center ${chipGapClass} flex-1 min-w-0 overflow-x-auto py-1.5 -my-1.5 [&::-webkit-scrollbar]:hidden`}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayedReactions.map(({ key, emoji }) => {
@@ -210,7 +211,7 @@ export function EmojiReactionBar({
                 }}
                 disabled={disabled}
                 aria-label={`${emoji} 반응 ${mine ? '취소' : '남기기'}`}
-                className={`flex-shrink-0 flex items-center gap-0.5 ${chipClass} rounded-full font-semibold border transition-all active:scale-95 ${
+                className={`flex-shrink-0 flex items-center gap-0.5 ${chipClass} ${TOUCH_AREA_CLASS} rounded-full font-semibold border transition-all active:scale-95 ${
                   mine ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-100 border-transparent text-text-sub'
                 }`}
               >

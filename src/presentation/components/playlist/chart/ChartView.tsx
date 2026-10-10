@@ -68,17 +68,20 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
 
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
-      <MiscSubViewHeader
-        title="인기차트"
-        emoji="🔥"
-        subtitle="에리카생들이 가장 많이 들은 곡"
-        onBack={onBack}
-      />
+      {/* 고정 헤더 — 최근 추가된 곡(SongListScreen)과 같은 방식. 스크롤해도 제목과 기간·장르 필터가 상단에 남음 */}
+      <div className="sticky -top-6 -mt-6 z-[100] bg-white pt-6 -mx-4 px-4 mb-2 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+        <MiscSubViewHeader
+          title="인기차트"
+          emoji="🔥"
+          subtitle="에리카생들이 가장 많이 들은 곡"
+          onBack={onBack}
+        />
 
-      {/* 기간 칩 한 줄 — 오른쪽 끝에 장르 드롭다운 */}
-      <div className="flex items-center justify-between gap-2 -mt-1.5 mb-2">
-        <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="!mb-0" />
-        <GenreFilterDropdown value={genreFilter} onChange={onGenreFilterChange} />
+        {/* 기간 칩 한 줄 — 오른쪽 끝에 장르 드롭다운 */}
+        <div className="flex items-center justify-between gap-2 -mt-1.5 pb-2">
+          <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="!mb-0" />
+          <GenreFilterDropdown value={genreFilter} onChange={onGenreFilterChange} />
+        </div>
       </div>
 
       {/* 차트 리스트 */}

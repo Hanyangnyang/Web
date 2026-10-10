@@ -7,6 +7,8 @@ import { type TrackSummary } from '../playlistTypes';
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
 // "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요 — Android/데스크톱은 이 정책이 없어서 해당 없음.
 const AUTOPLAY_CHECK_MS = 1500;
+const END_TOLERANCE_MS = 500; // 재생 위치가 전체 길이에서 이 안쪽이면 "끝까지 재생됨"으로 봄
+const END_GRACE_MS = 1500; // 끝 시각이 지나도 Spotify의 실제 이벤트가 없으면 이만큼 더 기다렸다가 멈춤으로 알림
 
 export type PlayableTrack = TrackSummary;
 
@@ -40,11 +42,27 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
   const isPausedRef = useRef(true);
   const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 미리듣기(30초)가 끝까지 재생된 상태 — Spotify embed는 끝에서 isPaused=true를 안 보내거나 늦게 보내서, 카드의 일시정지
+  // 아이콘이 재생 아이콘으로 돌아오지 않았음. position이 duration에 닿았거나 그 시각이 지나면 "끝남=멈춤"으로 직접 알림
+  const endedRef = useRef(false);
+  const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearEndTimer = () => {
+    if (endTimerRef.current) clearTimeout(endTimerRef.current);
+    endTimerRef.current = null;
+  };
 
   // 카드들의 재생/일시정지 버튼이 이 컴포넌트 안에서만 존재하는 controller를 직접 조작할 수 있게 노출
   useImperativeHandle(ref, () => ({
     pause: () => controllerRef.current?.pause(),
-    resume: () => controllerRef.current?.resume(),
+    // 끝까지 재생된 뒤라면 resume()이 먹지 않을 수 있어서 처음부터 다시 재생(play)함
+    resume: () => {
+      if (endedRef.current) {
+        endedRef.current = false;
+        controllerRef.current?.play();
+        return;
+      }
+      controllerRef.current?.resume();
+    },
   }), []);
 
   // 재생 시작 후 일정 시간 안에 실제로 재생이 시작되지 않으면 자동재생이 막힌 것으로 보고 "탭해서 재생하기" 버튼을 띄운다.
@@ -93,6 +111,8 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
 
     setShowTapToPlay(false);
     isPausedRef.current = true;
+    endedRef.current = false;
+    clearEndTimer();
 
     if (controllerRef.current) {
       controllerRef.current.loadUri(uri);
@@ -110,10 +130,26 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
         (controller) => {
           controllerRef.current = controller;
           controller.addListener('ready', () => setIframeLoaded(true));
-          controller.addListener('playback_update', (e: { data: { isPaused: boolean } }) => {
-            isPausedRef.current = e.data.isPaused;
-            onPlaybackStateChange?.(e.data.isPaused);
-            if (!e.data.isPaused) setShowTapToPlay(false);
+          // position/duration은 ms. 끝에 닿았으면 isPaused가 false로 와도 멈춘 것으로 취급하고,
+          // 끝 직전 이벤트 이후로 소식이 없을 때를 대비해 남은 시간 뒤에 한 번 더 "멈춤"을 알림(새 이벤트가 오면 타이머를 다시 잡음)
+          controller.addListener('playback_update', (e: { data: { isPaused: boolean; position?: number; duration?: number } }) => {
+            const { isPaused, position = 0, duration = 0 } = e.data;
+            clearEndTimer();
+            const ended = duration > 0 && position >= duration - END_TOLERANCE_MS;
+            endedRef.current = ended;
+            const paused = isPaused || ended;
+            isPausedRef.current = paused;
+            onPlaybackStateChange?.(paused);
+            if (!paused) {
+              setShowTapToPlay(false);
+              if (duration > 0) {
+                endTimerRef.current = setTimeout(() => {
+                  endedRef.current = true;
+                  isPausedRef.current = true;
+                  onPlaybackStateChange?.(true);
+                }, duration - position + END_GRACE_MS);
+              }
+            }
           });
           controller.play();
           schedulePlaybackCheck();
@@ -134,6 +170,7 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
       controllerRef.current?.destroy();
       controllerRef.current = null;
       if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
+      clearEndTimer();
     };
   }, []);
 

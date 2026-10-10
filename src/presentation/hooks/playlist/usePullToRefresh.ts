@@ -27,8 +27,10 @@ export function usePullToRefresh({ containerRef, onRefresh, enabled }: Options) 
     let current = 0;
 
     const onTouchStart = (e: TouchEvent) => {
+      // 휠피커 같은 자체 스크롤 영역(data-no-pull-refresh)에서 시작한 터치는 그 영역의 스크롤이어야 해서 당김으로 가로채지 않음
+      const startedInOwnScroller = e.target instanceof Element && e.target.closest('[data-no-pull-refresh]') !== null;
       // 맨 위에서 시작한 터치만 당김으로 취급 (이미 새로고침 중이면 무시)
-      startY = el.scrollTop <= 0 && !refreshingRef.current ? e.touches[0].clientY : null;
+      startY = el.scrollTop <= 0 && !refreshingRef.current && !startedInOwnScroller ? e.touches[0].clientY : null;
       current = 0;
     };
 

@@ -28,7 +28,6 @@ export function MySongsView({ onBack, onPlay, onShowAddSong, onSelectTrack, curr
       enableViewToggle
       currentTrackId={currentTrackId}
       emptyStateBoxed={false}
-      hideMineBadge
       viewMode={viewMode}
       onViewModeChange={onViewModeChange}
     />

@@ -270,29 +270,18 @@ export function PostDetailCard({
   // 더보기 버튼: 앨범 커버 바로 아래 첫 행의 맨 오른쪽에 위치 —
   // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류
   const moreButton = <PostMoreMenu report={report} menuKey="more" reportTargetId={post.id} />;
-  // "내 추천" 뱃지 — 추천글 모음 화면과 같은 모양(배경 없이 얇은 회색 테두리 알약). 누르는 버튼이 아니라 표시일 뿐.
-  // 1열은 같은 줄의 반응 칩(EmojiReactionBar default: h-[22px])과 높이를 맞춤. 2열(좁은 카드)은 아래 앨범커버 우상단 글래스 뱃지를 씀
-  // 내 글에는 신고 더보기가 없어서 그 자리(리액션 행/제목 행의 맨 오른쪽)에 대신 앉음
-  const mineBadge = showMineBadge && !isNarrow ? (
-    <span className={`flex-shrink-0 ${isNarrow ? 'h-5' : 'h-[22px]'} px-2 flex items-center rounded-full border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none`}>
-      내 추천
-    </span>
-  ) : null;
   // 같은 자리에 들어가는 우측 버튼 — 'trackLink'면 > 버튼(내 글 여부와 무관하게 이동은 항상 가능),
-  // 아니면 더보기(신고는 내 글에는 숨김, 대신 "내 추천" 뱃지)
+  // 아니면 더보기(신고는 내 글에는 숨김)
   const trailingButton = useTrackLinkButton ? (
-    <div className="flex items-center gap-1.5 flex-shrink-0">
-      {mineBadge}
-      <button
-        onClick={handleSelectTrackClick}
-        aria-label={`${post.title} 추천글 모음 보기`}
-        className="flex-shrink-0 active:scale-90 transition-transform"
-      >
-        <ChevronRight size={20} className="text-text-sub" />
-      </button>
-    </div>
+    <button
+      onClick={handleSelectTrackClick}
+      aria-label={`${post.title} 추천글 모음 보기`}
+      className="flex-shrink-0 active:scale-90 transition-transform"
+    >
+      <ChevronRight size={20} className="text-text-sub" />
+    </button>
   ) : (
-    post.isMine ? mineBadge : moreButton
+    !post.isMine && moreButton
   );
 
   // 공유/좋아요 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
@@ -367,13 +356,12 @@ export function PostDetailCard({
           </button>
         )}
 
-        {showMineBadge && isNarrow && (
-          // 2열(좁은 카드)의 "내 추천" 뱃지 — 앨범커버 우상단. 공유/좋아요/재생 배지와 같은 글래스 스타일.
+        {showMineBadge && (
+          // "내 추천" 뱃지 — 1열·2열 공통으로 앨범커버 우상단. 공유/좋아요/재생 배지와 같은 글래스 스타일.
           // 누르는 버튼이 아니라 표시일 뿐이라 pointer-events-none. A/B 테스트 재생 버튼(test)이 같은 자리에 있으면 그 왼쪽으로 비켜 앉음
-          // (1열은 반응 이모지 줄 오른쪽 끝의 회색 테두리 뱃지 — mineBadge 참고)
           <span
             className={`absolute top-[4%] z-10 h-5 px-2 text-[10px] rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md font-semibold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] pointer-events-none ${
-              onPlay && isTestPlayButton ? 'right-[calc(4%_+_48px)]' : 'right-[4%]'
+              onPlay && isTestPlayButton ? (isNarrow ? 'right-[calc(4%_+_48px)]' : 'right-[calc(4%_+_64px)]') : 'right-[4%]'
             }`}
           >
             내 추천

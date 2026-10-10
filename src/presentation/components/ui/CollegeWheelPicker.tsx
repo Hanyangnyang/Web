@@ -101,7 +101,8 @@ export function CollegeWheelPicker({ options, value, onChange, triggerClassName,
             />
             <div
               ref={scrollRef}
-              className="h-full overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              data-no-pull-refresh
+              className="h-full overflow-y-auto overscroll-contain touch-pan-y no-scrollbar snap-y snap-mandatory relative z-0"
               onScroll={(e) => {
                 const idx = Math.round(e.currentTarget.scrollTop / ITEM_HEIGHT);
                 const opt = options[idx];
