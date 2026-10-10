@@ -21,7 +21,7 @@ export function PlaylistFallback({ message, onRetry, className = '', minHeight, 
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-1 px-5 py-2.5 rounded-full bg-white text-text-main border border-slate-200 shadow-sm text-[13px] font-bold active:scale-95 transition-transform"
+          className="relative before:content-[''] before:absolute before:-inset-2 mt-1 px-5 py-2.5 rounded-full bg-white text-text-main border border-slate-200 shadow-sm text-[13px] font-bold active:scale-95 transition-transform"
         >
           다시 시도
         </button>

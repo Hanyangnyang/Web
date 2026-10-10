@@ -35,7 +35,7 @@ export const PlaylistSearchBar = forwardRef<HTMLInputElement, PlaylistSearchBarP
           onClick={onSubmit}
           disabled={!value.trim()}
           aria-label="검색"
-          className="relative before:content-[''] before:absolute before:-inset-2 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-playlist-primary text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
+          className="relative before:content-[''] before:absolute before:-inset-3 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-playlist-primary text-white disabled:bg-slate-200 disabled:text-text-hint transition-all active:scale-90"
         >
           <ArrowRight size={14} />
         </button>

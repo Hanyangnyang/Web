@@ -214,7 +214,7 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
             <button
               onClick={onClose}
               aria-label="닫기"
-              className="relative before:content-[''] before:absolute before:-inset-2.5 ml-1 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
+              className="relative before:content-[''] before:absolute before:-inset-4 ml-1 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
             >
               <X size={18} className="text-black" />
             </button>

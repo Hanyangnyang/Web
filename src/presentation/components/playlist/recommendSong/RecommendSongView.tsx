@@ -317,7 +317,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           <button
             onClick={() => refetchStatus()}
             disabled={isStatusFetching}
-            className="flex-shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 text-[13px] font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
+            className="relative before:content-[''] before:absolute before:-inset-2 flex-shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 text-[13px] font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
           >
             다시 확인
           </button>

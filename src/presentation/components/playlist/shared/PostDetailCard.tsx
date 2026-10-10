@@ -277,7 +277,7 @@ export function PostDetailCard({
     <button
       onClick={handleSelectTrackClick}
       aria-label={`${post.title} 추천글 모음 보기`}
-      className="relative before:content-[''] before:absolute before:-inset-3 flex-shrink-0 active:scale-90 transition-transform"
+      className="relative before:content-[''] before:absolute before:-inset-4 flex-shrink-0 active:scale-90 transition-transform"
     >
       <ChevronRight size={20} className="text-text-sub" />
     </button>
@@ -379,7 +379,7 @@ export function PostDetailCard({
             share.open();
           }}
           aria-label="공유하기"
-          className={`absolute bottom-[4%] right-[4%] z-10 ${actionBadgeSizeClass} aspect-square before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-1 rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
+          className={`absolute bottom-[4%] right-[4%] z-10 ${actionBadgeSizeClass} aspect-square before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-2 rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
         >
           <Share2 className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} />
         </button>
@@ -390,7 +390,7 @@ export function PostDetailCard({
             toggleLiked();
           }}
           aria-label="좋아요"
-          className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-1 rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${likeBadgeRightClass}`}
+          className={`absolute bottom-[4%] z-10 ${actionBadgeSizeClass} aspect-square before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-2 rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform ${likeBadgeRightClass}`}
         >
           <Heart className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" strokeWidth={2} fill={liked ? 'currentColor' : 'none'} />
         </button>
@@ -457,7 +457,7 @@ export function PostDetailCard({
                     toggleBody();
                   }}
                   aria-expanded={false}
-                  className="absolute before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 bottom-0 right-0 pl-6 text-[13px] leading-relaxed font-semibold text-text-hint bg-gradient-to-l from-white from-70% to-transparent active:opacity-60"
+                  className="absolute before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 bottom-0 right-0 pl-6 text-[13px] leading-relaxed font-semibold text-text-hint bg-gradient-to-l from-white from-70% to-transparent active:opacity-60"
                 >
                   더보기
                 </button>
@@ -470,7 +470,7 @@ export function PostDetailCard({
                   toggleBody();
                 }}
                 aria-expanded
-                className="relative before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 self-end mb-2 text-[13px] leading-relaxed font-semibold text-text-hint active:opacity-60"
+                className="relative before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 self-end mb-2 text-[13px] leading-relaxed font-semibold text-text-hint active:opacity-60"
               >
                 접기
               </button>

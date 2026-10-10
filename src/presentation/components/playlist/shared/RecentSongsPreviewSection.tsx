@@ -55,7 +55,7 @@ export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading
           <button
             type="button"
             onClick={onShowRecent}
-            className="px-5 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+            className="relative before:content-[''] before:absolute before:-inset-2 px-5 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
           >
             더보기
           </button>

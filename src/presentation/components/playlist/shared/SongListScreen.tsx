@@ -93,7 +93,21 @@ export function SongListScreen({
   const [openPickerKey, setOpenPickerKey] = useState<string | null>(null);
   const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>('grid'); // 기본은 2열 — 1열은 토글로 전환
   const viewMode = gridOnly ? 'grid' : (viewModeProp ?? internalViewMode);
+  // 토글을 누르는 순간 화면 가운데에 가장 가까운 카드 — 열 수가 바뀌어 레이아웃이 달라져도 보던 곡으로 다시 스크롤하기 위해 기억해 둠
+  const viewAnchorRef = useRef<string | null>(null);
   const setViewMode = (mode: 'grid' | 'list') => {
+    if (mode !== viewMode) {
+      const centerY = window.innerHeight / 2;
+      let bestDistance = Infinity;
+      listContainerRef.current?.querySelectorAll<HTMLElement>('[data-track-id]').forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        const distance = Math.abs((rect.top + rect.bottom) / 2 - centerY);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          viewAnchorRef.current = card.dataset.trackId ?? null;
+        }
+      });
+    }
     onViewModeChange?.(mode);
     setInternalViewMode(mode);
   };
@@ -149,6 +163,13 @@ export function SongListScreen({
   // 찾아온 카드를 잠깐 강조 — 처음 스크롤할 때 대상 카드가 실제로 그려져 있을 때만 한 번 켬(토글로 1열↔2열을 바꿀 땐 다시 켜지 않음)
   const [highlightedTrackId, setHighlightedTrackId] = useState<string | null>(null);
   useLayoutEffect(() => {
+    // 토글로 열 수가 바뀐 경우 — 처음 찾아온 곡이 아니라 방금까지 보던 곡으로 스크롤
+    const anchorTrackId = viewAnchorRef.current;
+    if (anchorTrackId) {
+      viewAnchorRef.current = null;
+      listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${anchorTrackId}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
     if (!scrollTarget) return;
     const isInitial = !didInitialScrollRef.current;
     if (isInitial) {
@@ -186,11 +207,11 @@ export function SongListScreen({
                 <div
                   role="group"
                   aria-label="목록 보기 방식"
-                  className={`relative flex items-center w-[84px] h-10 p-[3px] rounded-full bg-slate-100 border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] ${viewToggleCoachmark.state !== 'hidden' ? 'z-[45]' : ''}`}
+                  className={`relative flex items-center w-[96px] h-11 rounded-full bg-slate-100 border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] ${viewToggleCoachmark.state !== 'hidden' ? 'z-[45]' : ''}`}
                 >
                   <span
                     aria-hidden
-                    className="absolute top-[3px] left-[3px] w-[38px] h-[32px] rounded-full bg-white shadow-sm transition-transform duration-200 ease-out"
+                    className="absolute top-[3px] left-[3px] w-[calc(50%-3px)] h-[calc(100%-6px)] rounded-full bg-white shadow-sm transition-transform duration-200 ease-out"
                     style={{ transform: viewMode === 'grid' ? 'translateX(0)' : 'translateX(100%)' }}
                   />
                   <button
@@ -230,7 +251,6 @@ export function SongListScreen({
           large
           className="-mt-1.5 pb-2"
         />
-        <ScrollToTopPill />
       </div>
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}
       <div ref={listContainerRef} className="-mx-4 px-2">
@@ -288,6 +308,7 @@ export function SongListScreen({
           </div>
         )}
       </div>
+      <ScrollToTopPill />
     </div>
   );
 }

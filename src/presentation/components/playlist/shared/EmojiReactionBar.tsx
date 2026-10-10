@@ -127,7 +127,7 @@ export function EmojiReactionBar({
   // 높이를 "반응" 알약 버튼과 똑같이 고정해서 나란히 놓였을 때 키가 어긋나지 않게 함
   const chipClass = isMini ? 'h-[22px] px-1.5 text-[10px]' : 'h-[26px] px-2 text-xs';
   const chipEmojiClass = isMini ? 'text-xs' : 'text-sm';
-  const TOUCH_AREA_CLASS = 'relative before:absolute before:-inset-y-1.5 before:-inset-x-[2px]';
+  const TOUCH_AREA_CLASS = 'relative before:absolute before:-inset-y-2.5 before:-inset-x-[2px]';
 
   return (
     <div className={`flex items-center ${chipGapClass} ${className}`}>
@@ -197,7 +197,7 @@ export function EmojiReactionBar({
       {displayedReactions.length > 0 ? (
         /* 이미 달린 리액션 칩 — 여러 개로 늘어날 수 있어서 가로 스크롤 */
         <div
-          className={`flex items-center ${chipGapClass} flex-1 min-w-0 overflow-x-auto py-1.5 -my-1.5 [&::-webkit-scrollbar]:hidden`}
+          className={`flex items-center ${chipGapClass} flex-1 min-w-0 overflow-x-auto overscroll-x-contain touch-pan-x py-2.5 -my-2.5 [&::-webkit-scrollbar]:hidden`}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayedReactions.map(({ key, emoji }) => {

@@ -20,7 +20,7 @@ export function EmptyMessageCard({ message, className = '', minHeight, action }:
         <button
           type="button"
           onClick={action.onClick}
-          className="flex items-center gap-1 px-3.5 py-2 rounded-full bg-white text-text-sub border border-slate-200 shadow-sm text-[12px] font-semibold cursor-pointer active:scale-[0.97] transition-transform"
+          className="relative before:content-[''] before:absolute before:-inset-2 flex items-center gap-1 px-3.5 py-2 rounded-full bg-white text-text-sub border border-slate-200 shadow-sm text-[12px] font-semibold cursor-pointer active:scale-[0.97] transition-transform"
         >
           {action.label}
         </button>
