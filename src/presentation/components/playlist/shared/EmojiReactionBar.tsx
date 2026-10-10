@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { Smile } from 'lucide-react';
 import { EMOJI_REACTIONS, type ReactionKey } from '../postReactions';
 import { type ReactionState } from '../playlistTypes';
@@ -23,6 +23,9 @@ interface EmojiReactionBarProps {
 // 이모지 추가 버튼(팝오버) + 이미 달린 리액션 칩 — PostDetailCard/TrackPostCollectionView가 공유하는
 // "게시글에 이모지로 반응하기" UI. 팝오버 열림 상태와 반응 토글은 부모가 들고 있고, 이 컴포넌트는
 // 순수 표시 + 이벤트 위임만 함(부모마다 단건/목록별 반응 상태 관리 방식이 달라서)
+// 스마일 버튼을 이 시간 이상 누르고 있으면 "꾹 누르기" — 선택창이 열리고, 손가락을 그대로 좌우로 밀면 그 위치의 이모지가 활성화된다
+const HOLD_MS = 250;
+
 export function EmojiReactionBar({
   reactions,
   onToggleReaction,
@@ -38,6 +41,73 @@ export function EmojiReactionBar({
   const pickerWrapperRef = useRef<HTMLDivElement>(null);
   const onTogglePickerRef = useRef(onTogglePicker);
   onTogglePickerRef.current = onTogglePicker;
+
+  // 꾹 누르고 슬라이드해서 고르기: 누른 채로 열린 선택창에서 손가락 x 위치에 해당하는 이모지를 hoverKey로 표시하고,
+  // 손을 떼는 순간 그 이모지로 반응을 남긴다(이모지 위가 아니면 선택창만 열린 채로 둠)
+  const pickerRowRef = useRef<HTMLDivElement>(null);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdingRef = useRef(false); // 꾹 누르기로 선택창이 열려 슬라이드 중인지
+  const longPressedRef = useRef(false); // 꾹 누르기 뒤에 따라오는 click이 선택창을 다시 닫지 않게 막는 표시
+  const hoverKeyRef = useRef<ReactionKey | null>(null);
+  const [hoverKey, setHoverKey] = useState<ReactionKey | null>(null);
+  const updateHoverKey = (key: ReactionKey | null) => {
+    hoverKeyRef.current = key;
+    setHoverKey(key);
+  };
+  const clearHoldTimer = () => {
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = null;
+  };
+  useEffect(() => clearHoldTimer, []);
+
+  // 손가락의 가로 위치와 가장 가까운 이모지 — 선택창은 버튼 위에 떠 있어서 세로 위치는 보지 않고, 선택창 가로 범위 밖이면 없음
+  const findKeyAtX = (clientX: number): ReactionKey | null => {
+    const buttons = pickerRowRef.current?.querySelectorAll<HTMLElement>('[data-reaction-key]');
+    if (!buttons || buttons.length === 0) return null;
+    const first = buttons[0].getBoundingClientRect();
+    const last = buttons[buttons.length - 1].getBoundingClientRect();
+    if (clientX < first.left || clientX > last.right) return null;
+    let nearest: { key: string; distance: number } | null = null;
+    buttons.forEach((button) => {
+      const rect = button.getBoundingClientRect();
+      const distance = Math.abs(clientX - (rect.left + rect.width / 2));
+      if (!nearest || distance < nearest.distance) nearest = { key: button.dataset.reactionKey ?? '', distance };
+    });
+    return (nearest as { key: string } | null)?.key as ReactionKey | null;
+  };
+
+  const handleAddPointerDown = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    longPressedRef.current = false;
+    // 이미 열려 있으면 기존대로 click으로 닫기만 함
+    if (pickerOpen) return;
+    e.currentTarget.setPointerCapture(e.pointerId); // 손가락이 버튼 밖으로 나가도 move/up을 계속 받음
+    clearHoldTimer();
+    holdTimerRef.current = setTimeout(() => {
+      holdTimerRef.current = null;
+      holdingRef.current = true;
+      longPressedRef.current = true;
+      onTogglePickerRef.current();
+    }, HOLD_MS);
+  };
+  const handleAddPointerMove = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    if (holdingRef.current) updateHoverKey(findKeyAtX(e.clientX));
+  };
+  const handleAddPointerUp = () => {
+    clearHoldTimer();
+    if (!holdingRef.current) return;
+    holdingRef.current = false;
+    const key = hoverKeyRef.current;
+    updateHoverKey(null);
+    if (key && !disabled) {
+      onToggleReaction(key);
+      onTogglePickerRef.current(); // 고른 뒤 선택창 닫기(탭해서 고를 때와 동일)
+    }
+  };
+  const handleAddPointerCancel = () => {
+    clearHoldTimer();
+    holdingRef.current = false;
+    updateHoverKey(null);
+  };
 
   // 선택창이 열려 있을 때 버튼·선택창 바깥을 누르면 닫음. pointerdown 캡처 단계에서 받아 다른 요소가 전파를 막아도 동작하고,
   // 다른 카드의 이모지 버튼을 누르는 경우에도 click 전에 먼저 닫혀서 그 카드의 선택창이 정상적으로 열림
@@ -67,10 +137,21 @@ export function EmojiReactionBar({
         <button
           onClick={(e) => {
             e.stopPropagation();
+            // 꾹 누르기로 이미 열었으면 이어서 오는 click은 무시(안 그러면 열자마자 닫힘)
+            if (longPressedRef.current) {
+              longPressedRef.current = false;
+              return;
+            }
             onTogglePicker();
           }}
+          onPointerDown={handleAddPointerDown}
+          onPointerMove={handleAddPointerMove}
+          onPointerUp={handleAddPointerUp}
+          onPointerCancel={handleAddPointerCancel}
+          onContextMenu={(e) => e.preventDefault()}
           aria-label="이모지 추가"
-          className={`${addButtonSizeClass} rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform`}
+          style={{ touchAction: 'none', WebkitTouchCallout: 'none' } as React.CSSProperties}
+          className={`${addButtonSizeClass} rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform select-none`}
         >
           <Smile size={addButtonIconSize} className="text-text-sub" strokeWidth={2} />
         </button>
@@ -81,10 +162,11 @@ export function EmojiReactionBar({
               pickerAnchor ? `w-max ${pickerAnchor === 'right' ? 'right-0' : 'left-0'}` : 'left-0'
             }`}
           >
-            <div className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
+            <div ref={pickerRowRef} className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
               {EMOJI_REACTIONS.map(({ key, emoji }) => (
                 <button
                   key={key}
+                  data-reaction-key={key}
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleReaction(key);
@@ -92,7 +174,9 @@ export function EmojiReactionBar({
                   }}
                   disabled={disabled}
                   aria-label={`${emoji} 남기기`}
-                  className="w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-100 active:scale-90 transition-transform"
+                  className={`w-8 h-8 flex items-center justify-center text-base rounded-full hover:bg-slate-100 active:scale-90 transition-transform ${
+                    hoverKey === key ? 'bg-slate-100 scale-125' : ''
+                  }`}
                 >
                   {emoji}
                 </button>
