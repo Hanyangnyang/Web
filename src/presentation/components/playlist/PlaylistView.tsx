@@ -399,7 +399,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             key={searchQuery} // 이미 검색 결과 화면인 채로 딥링크로 검색어가 바뀌면, 내부 activeQuery(처음 진입 때만 query로 초기화)가 따라가도록 새로 마운트
             query={searchQuery}
             onBack={popScreen}
-            onGoHome={() => setScreenStack([{ name: 'main' }])}
+            onShowRecent={() => handleShowAllRecent()}
+            recentSongs={songs}
+            isRecentSongsLoading={isRecentSongsLoading}
+            onSelectRecentSong={handleSelectRecentSong}
+            recentSongsVariant={recentSongsVariant}
             onSelectTrack={handleSelectSearchTrack}
             onSelectPost={handleSelectPost}
             onPlay={handlePlay}
