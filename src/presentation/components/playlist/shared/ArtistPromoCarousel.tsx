@@ -16,6 +16,8 @@ interface ArtistPromoCarouselProps {
   isActive?: boolean;
   // 첫 로딩 중이면 소식탭 배너 캐러셀(BannerCarousel)과 같은 스켈레톤을 보여준다
   loading?: boolean;
+  // 높이를 절반으로 줄인 배너(플레이리스트 홈용)로 보여줄지
+  compact?: boolean;
 }
 
 const AUTO_SLIDE_MS = 7000;
@@ -23,7 +25,7 @@ const TRANSITION_MS = 300; // 아래 슬라이드 트랙의 duration-300과 반�
 
 // 소식탭 배너 캐러셀(BannerCarousel)과 같은 동작: 7초 자동 슬라이드, 좌우 스와이프, 끝에서 첫 장으로 이어지는 무한 루프, 점 인디케이터.
 // 슬라이드 목록 끝에 첫 장을 복제해 두고, 복제본에 도달하면 트랜지션을 잠깐 끄고 0번으로 순간이동한다.
-export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading = false }: ArtistPromoCarouselProps) {
+export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading = false, compact = false }: ArtistPromoCarouselProps) {
   const count = artists.length;
   const [current, setCurrent] = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
@@ -137,7 +139,7 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading
   if (loading && !count) {
     return (
       <div>
-        <div className="rounded-2xl aspect-[2/1] bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" data-testid="artist-promo-skeleton" />
+        <div className={`rounded-2xl ${compact ? 'aspect-[4/1]' : 'aspect-[2/1]'} bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse`} data-testid="artist-promo-skeleton" />
       </div>
     );
   }
@@ -162,6 +164,7 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading
                 artistName={artist.artistName}
                 artistImageUrl={artist.artistImageUrl}
                 template={getTemplate(artist.artistName)}
+                compact={compact}
                 onClick={onClick && (() => { if (!isSwiping.current) onClick(artist); })}
               />
             </div>

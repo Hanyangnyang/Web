@@ -1,5 +1,6 @@
 import { type Song, type SongListViewBaseProps } from '../playlistTypes';
 import { SongListScreen } from '../shared/SongListScreen';
+import { type GenreFilterState } from '../shared/GenreFilterChips';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
 interface RecentSongsViewProps extends SongListViewBaseProps {
@@ -10,9 +11,12 @@ interface RecentSongsViewProps extends SongListViewBaseProps {
   scrollToTrackId?: string | null;
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정값 (docs/playlist-recent-songs-ab-test.md 참고)
   playButtonVariant?: RecentSongsTapAreaVariant;
+  // 홈 미리보기와 동기화되는 장르 필터(선택 + 칩 위치)
+  genreFilter: GenreFilterState;
+  onGenreFilterChange: (next: GenreFilterState) => void;
 }
 
-export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, currentTrackId, viewMode, onViewModeChange, playButtonVariant }: RecentSongsViewProps) {
+export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, currentTrackId, viewMode, onViewModeChange, playButtonVariant, genreFilter, onGenreFilterChange }: RecentSongsViewProps) {
   return (
     <SongListScreen
       title="최근 추가된 곡"
@@ -32,6 +36,8 @@ export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSe
       viewMode={viewMode}
       onViewModeChange={onViewModeChange}
       playButtonVariant={playButtonVariant}
+      genreFilter={genreFilter}
+      onGenreFilterChange={onGenreFilterChange}
     />
   );
 }

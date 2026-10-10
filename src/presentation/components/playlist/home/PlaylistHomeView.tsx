@@ -7,7 +7,9 @@ import { RecentSongRow } from '../shared/RecentSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
+import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
+import { ArtistPromoCarousel, type ArtistPromo } from '../shared/ArtistPromoCarousel';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
@@ -17,6 +19,9 @@ const MY_SONGS_PREVIEW_LIMIT = 10;
 interface PlaylistHomeViewProps {
   onBack: () => void;
   visibleSongs: Song[];
+  // 최근 추가된 곡 미리보기의 장르 필터(비어 있으면 전체)
+  recentGenreFilter: GenreFilterState;
+  onChangeRecentGenreFilter: (next: GenreFilterState) => void;
   isRecentSongsLoading: boolean;
   visibleChart: ChartTrack[];
   isChartLoading: boolean;
@@ -47,6 +52,10 @@ interface PlaylistHomeViewProps {
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
   autoFocusSearch?: boolean;
   onAutoFocusSearchConsumed?: () => void;
+  // 인기차트 위 가수 추천 배너(소식탭 배너와 같은 데이터, 높이 절반) — 눌린 가수의 검색 결과로 이동
+  artistPromos: readonly ArtistPromo[];
+  isArtistPromosLoading: boolean;
+  onSelectArtistPromo: (artist: ArtistPromo) => void;
 }
 
 // 에리카 플레이리스트 홈 화면 — 검색바 + 인기차트 미리보기 + 최근 추가된 곡 미리보기.
@@ -54,6 +63,8 @@ interface PlaylistHomeViewProps {
 export function PlaylistHomeView({
   onBack,
   visibleSongs,
+  recentGenreFilter,
+  onChangeRecentGenreFilter,
   isRecentSongsLoading,
   visibleChart,
   isChartLoading,
@@ -77,6 +88,9 @@ export function PlaylistHomeView({
   onSelectMySong,
   autoFocusSearch = false,
   onAutoFocusSearchConsumed,
+  artistPromos,
+  isArtistPromosLoading,
+  onSelectArtistPromo,
 }: PlaylistHomeViewProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -113,6 +127,16 @@ export function PlaylistHomeView({
         onSubmit={onSubmitSearch}
         placeholder="듣고 싶은 곡을 검색해보세요!"
       />
+
+      {/* 가수 추천 배너 — 소식탭 배너의 절반 높이 버전. 추천이 없거나 실패하면 조용히 숨김 */}
+      <div className="mt-4 mb-4">
+        <ArtistPromoCarousel
+          artists={artistPromos}
+          loading={isArtistPromosLoading}
+          compact
+          onClick={onSelectArtistPromo}
+        />
+      </div>
 
       {/* 인기차트 섹션 */}
       <section className="mb-4">
@@ -187,6 +211,9 @@ export function PlaylistHomeView({
           </button>
         </div>
 
+        {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜 */}
+        <GenreFilterChips value={recentGenreFilter} onChange={onChangeRecentGenreFilter} className="mb-2" />
+
         {/* 최근 추가된 곡 목록 */}
         {isRecentSongsLoading ? (
           <div className="flex flex-col gap-1.5">
@@ -197,7 +224,7 @@ export function PlaylistHomeView({
         ) : visibleSongs.length === 0 ? (
           <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
             <EmptyGenreState
-              message="아직 추가된 곡이 없어요"
+              message={recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추가된 곡이 없어요'}
               buttonLabel="곡 추천하러 가기"
               buttonIcon={<span>✏️</span>}
               onAction={onShowAddSong}

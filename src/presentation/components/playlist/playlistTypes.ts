@@ -89,11 +89,12 @@ export const CHART_PERIOD_OPTIONS = [
 
 export type ChartPeriod = (typeof CHART_PERIOD_OPTIONS)[number]['key'];
 
-// selectedGenre는 GENRES의 key('indie' 등), song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교
-export function filterSongsByGenre(songs: Song[], selectedGenre: string): Song[] {
-  if (selectedGenre === 'all') return songs;
-  const label = GENRES.find((genre) => genre.key === selectedGenre)?.label;
-  return songs.filter((song) => song.genres.includes(label ?? ''));
+// selectedGenres는 GENRES의 key('indie' 등) 목록, song.genres에는 label('인디' 등)이 들어있어서 변환해서 비교.
+// 비어 있으면 전체, 여러 개면 그중 하나라도 가진 곡을 남긴다
+export function filterSongsByGenre(songs: Song[], selectedGenres: string[]): Song[] {
+  if (selectedGenres.length === 0) return songs;
+  const labels = selectedGenres.map((key) => GENRES.find((genre) => genre.key === key)?.label ?? '');
+  return songs.filter((song) => song.genres.some((genre) => labels.includes(genre)));
 }
 
 const MINUTE_MS = 60 * 1000;

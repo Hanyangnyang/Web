@@ -5,7 +5,7 @@ import { type Song, type TrackSummary, filterSongsByGenre } from '../playlistTyp
 import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './PostDetailCard';
 import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
-import { GenreFilterChips } from './GenreFilterChips';
+import { GenreFilterChips, EMPTY_GENRE_FILTER, type GenreFilterState } from './GenreFilterChips';
 import { Coachmark, useCoachmark } from './Coachmark';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
@@ -49,6 +49,9 @@ interface SongListScreenProps {
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트에서 카드 재생 버튼 배정값 — RecentSongsView만 넘겨줌.
   // 안 넘기면 PostDetailCard가 기존(control) 동작으로 렌더링됨
   playButtonVariant?: RecentSongsTapAreaVariant;
+  // 장르 필터를 상위(PlaylistView)에서 제어하고 싶을 때 넘김 — 홈 미리보기와 선택·칩 위치를 동기화. 안 넘기면 이 화면 내부 state로만 관리
+  genreFilter?: GenreFilterState;
+  onGenreFilterChange?: (next: GenreFilterState) => void;
 }
 
 export function SongListScreen({
@@ -73,8 +76,13 @@ export function SongListScreen({
   viewMode: viewModeProp,
   onViewModeChange,
   playButtonVariant,
+  genreFilter: genreFilterProp,
+  onGenreFilterChange,
 }: SongListScreenProps) {
-  const [selectedGenre, setSelectedGenre] = useState('all');
+  const [internalGenreFilter, setInternalGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
+  const genreFilter = genreFilterProp ?? internalGenreFilter;
+  const setGenreFilter = onGenreFilterChange ?? setInternalGenreFilter;
+  const selectedGenres = genreFilter.selected;
   // 지금 이모지 선택창이 열려 있는 카드(song.id ?? song.trackId) — 목록 전체에서 하나만 열리도록 여기서 보관
   const [openPickerKey, setOpenPickerKey] = useState<string | null>(null);
   const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>('grid'); // 기본은 2열 — 1열은 토글로 전환
@@ -86,7 +94,7 @@ export function SongListScreen({
   // 홈/게시글 모음 등에서 특정 곡을 눌러 들어왔을 때의 스크롤 대상 — 값이 바뀌지 않는 한 그리드⇄리스트를
   // 오가도 같은 카드를 계속 다시 스크롤해서 보여주므로, 토글 버튼으로 1열↔2열을 바꿔도 그 카드가 보이던 위치 그대로 복원됨
   const [scrollTarget] = useState<string | null>(scrollToTrackId ?? null);
-  const filteredSongs = filterSongsByGenre(songs, selectedGenre);
+  const filteredSongs = filterSongsByGenre(songs, selectedGenres);
 
   const listContainerRef = useRef<HTMLDivElement>(null);
 
@@ -99,7 +107,7 @@ export function SongListScreen({
   const [baseHeights, setBaseHeights] = useState<Record<string, number>>({});
   const collapseTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   useEffect(() => () => Object.values(collapseTimersRef.current).forEach(clearTimeout), []);
-  useEffect(() => setBaseHeights({}), [viewMode, selectedGenre]); // 짝이 바뀌므로 재둔 높이는 버림
+  useEffect(() => setBaseHeights({}), [viewMode, selectedGenres]); // 짝이 바뀌므로 재둔 높이는 버림
 
   const handleBodyExpandedChange = (song: Song, index: number, expanded: boolean) => {
     const key = songKey(song);
@@ -173,9 +181,9 @@ export function SongListScreen({
           }
         />
         <GenreFilterChips
-          selectedGenre={selectedGenre}
-          onSelectGenre={setSelectedGenre}
-          className="pb-3"
+          value={genreFilter}
+          onChange={setGenreFilter}
+          className="-mt-1.5 pb-2"
         />
       </div>
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}

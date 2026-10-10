@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { RefreshCw } from 'lucide-react';
 import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
@@ -7,6 +7,7 @@ import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
 import { RecommendSongView } from './recommendSong/RecommendSongView';
+import { EMPTY_GENRE_FILTER, type GenreFilterState } from './shared/GenreFilterChips';
 import { RecentSongsView } from './recentSongs/RecentSongsView';
 import { SearchResultsView } from './searchResults/SearchResultsView';
 import { TrackPostCollectionView } from './trackPostCollection/TrackPostCollectionView';
@@ -15,12 +16,13 @@ import { MyPageView } from './myPage/MyPageView';
 import { LikedSongsView } from './likedSongs/LikedSongsView';
 import { MySongsView } from './mySongs/MySongsView';
 import { PlaylistHomeView } from './home/PlaylistHomeView';
-import { type Song, type ChartPeriod, type TrackSummary } from './playlistTypes';
+import { type Song, type ChartPeriod, type TrackSummary, filterSongsByGenre } from './playlistTypes';
 import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
+import { useArtistRecommendations } from '../../hooks/playlist/useArtistRecommendations.js';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 import { useRecentSongsTapAreaVariant } from '../../hooks/playlist/usePlaylistExperiment';
@@ -75,7 +77,17 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const [searchQuery, setSearchQuery] = useState(deepLinkSearchQuery ?? '');
   const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const songs = fetchedSongs ?? EMPTY_SONGS;
+  // 홈 "최근 추가된 곡" 미리보기의 장르 필터
+  // 최근 추가된 곡 화면과 상태(선택 + 칩 위치)를 공유해서, 홈에서 고른 장르가 그 화면에도 그대로 이어진다
+  const [recentGenreFilter, setRecentGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
+  const filteredRecentSongs = useMemo(() => filterSongsByGenre(songs, recentGenreFilter.selected), [songs, recentGenreFilter.selected]);
   const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
+  // 홈 인기차트 위 가수 추천 배너 — 소식탭 배너와 같은 쿼리라 캐시를 공유함(데이터 한 번만 받음)
+  const { data: recommendations, isLoading: isArtistPromosLoading } = useArtistRecommendations(isActive);
+  const artistPromos = useMemo(
+    () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),
+    [recommendations],
+  );
 
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
@@ -258,7 +270,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // A안/B안 사이 이견 없이 병합하는 개선이라 A/B 테스트 대상은 아니지만, "홈 → 최근추가된곡 진입" CTR 지표는 여기서 같이 캡처함
   const handleShowAllRecent = useCallback((scrollToLastPreview = false) => {
     posthog?.capture('playlist_recent_show_all_clicked', { variant: recentSongsVariant, trigger: scrollToLastPreview ? 'more_button' : 'header_arrow' });
-    const previewSongs = songs.slice(0, RECENT_SONGS_LIMIT);
+    const previewSongs = filteredRecentSongs.slice(0, RECENT_SONGS_LIMIT);
     const lastPreviewTrackId = previewSongs[previewSongs.length - 1]?.trackId ?? null;
     pushScreen({ name: 'recent', scrollTarget: scrollToLastPreview ? lastPreviewTrackId : null });
   }, [pushScreen, songs, posthog, recentSongsVariant]);
@@ -269,7 +281,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
-  const visibleSongs = songs.slice(0, RECENT_SONGS_LIMIT);
+  const visibleSongs = filteredRecentSongs.slice(0, RECENT_SONGS_LIMIT);
   const visibleChart = chartTracks.slice(0, CHART_PREVIEW_LIMIT);
 
   // AddSongFab은 곡추천하기 화면(screen === 'addSong')만 빼고 항상 떠 있어서, 그 화면이 아니면
@@ -338,6 +350,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             viewMode={viewModes.recent}
             onViewModeChange={changeViewMode('recent')}
             playButtonVariant={recentSongsVariant}
+            genreFilter={recentGenreFilter}
+            onGenreFilterChange={setRecentGenreFilter}
           />
         ) : screen.name === 'addSong' ? (
           <RecommendSongView
@@ -424,6 +438,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           <PlaylistHomeView
             onBack={onBack}
             visibleSongs={visibleSongs}
+            recentGenreFilter={recentGenreFilter}
+            onChangeRecentGenreFilter={setRecentGenreFilter}
             isRecentSongsLoading={isRecentSongsLoading}
             visibleChart={visibleChart}
             isChartLoading={isChartLoading}
@@ -445,6 +461,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             isMySongsLoading={isMySongsLoading}
             onShowAllMySongs={() => pushScreen({ name: 'mySongs', scrollTarget: null })}
             onSelectMySong={(song) => pushScreen({ name: 'mySongs', scrollTarget: song.trackId })}
+            artistPromos={artistPromos}
+            isArtistPromosLoading={isArtistPromosLoading}
+            onSelectArtistPromo={(artist) => { setSearchQuery(artist.artistName); pushScreen({ name: 'search' }); }}
             autoFocusSearch={autoFocusSearch}
             onAutoFocusSearchConsumed={() => setAutoFocusSearch(false)}
           />

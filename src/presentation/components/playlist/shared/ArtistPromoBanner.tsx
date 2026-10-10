@@ -8,6 +8,8 @@ export interface ArtistPromoBannerProps {
   className?: string;
   // 지정하면 이 문구를 쓰고, 없으면 마운트 때 무작위로 고른다(캐러셀 복제 슬라이드와 문구를 맞추려고 씀)
   template?: ArtistPromoTemplate;
+  // 높이를 절반(4:1)으로 줄인 버전 — 플레이리스트 홈의 인기차트 위에 쓴다. 로고와 '바로가기' 버튼은 빼고 글씨는 비례해서 줄인다
+  compact?: boolean;
 }
 
 interface EdgePalette {
@@ -16,14 +18,17 @@ interface EdgePalette {
   end: string;
 }
 
+// 컴팩트 배너(높이 절반)에서 가수명·문구 글씨에 곱하는 비율
+const COMPACT_TEXT_SCALE = 0.7;
+
 // 오른쪽 끝 1.6em 구간에서 투명해지는 마스크 — 말줄임표(…) 대신 글자가 배경으로 스며들듯 사라지게 한다
 const NAME_FADE_MASK = 'linear-gradient(90deg, #000 calc(100% - 1.6em), transparent 100%)';
 
 // 가수명이 한 줄 영역을 넘칠 때만 오른쪽 끝을 페이드로 가린다(넘치지 않는 이름은 끝 글자가 흐려지면 안 되므로 측정 후 적용)
-function FadingArtistName({ name }: { name: string }) {
+function FadingArtistName({ name, compact }: { name: string; compact: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [isClipped, setIsClipped] = useState(false);
-  const fontSize = getArtistNameSize(name);
+  const fontSize = getArtistNameSize(name, compact ? COMPACT_TEXT_SCALE : 1);
 
   useLayoutEffect(() => {
     const element = ref.current;
@@ -53,9 +58,9 @@ function FadingArtistName({ name }: { name: string }) {
   );
 }
 
-function ArtistPromoCopy({ artistName, template }: { artistName: string; template: ArtistPromoTemplate }) {
-  const artist = <FadingArtistName name={artistName.trim()} />;
-  const lineClass = 'block max-w-full text-[clamp(20px,6.6cqw,33px)]';
+function ArtistPromoCopy({ artistName, template, compact }: { artistName: string; template: ArtistPromoTemplate; compact: boolean }) {
+  const artist = <FadingArtistName name={artistName.trim()} compact={compact} />;
+  const lineClass = `block max-w-full ${compact ? 'text-[clamp(14px,4.6cqw,23px)]' : 'text-[clamp(20px,6.6cqw,33px)]'}`;
 
   return (
     <p className="min-w-0 max-w-full font-black leading-[1.06] tracking-[-0.05em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]">
@@ -129,6 +134,7 @@ export function ArtistPromoBanner({
   onClick,
   className = '',
   template,
+  compact = false,
 }: ArtistPromoBannerProps) {
   const [loadFailed, setImageFailed] = useState(false);
   // 이미지 URL 자체가 없으면 로드 실패와 같은 기본 이미지로 처리
@@ -144,7 +150,7 @@ export function ArtistPromoBanner({
   return (
     <Wrapper
       {...wrapperProps}
-      className={`relative block w-full select-none aspect-[2/1] overflow-hidden rounded-2xl bg-slate-900 text-left [container-type:inline-size] ${onClick ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''} ${className}`}
+      className={`relative block w-full select-none ${compact ? 'aspect-[4/1]' : 'aspect-[2/1]'} overflow-hidden rounded-2xl bg-slate-900 text-left [container-type:inline-size] ${onClick ? 'cursor-pointer active:scale-[0.99] transition-transform' : ''} ${className}`}
       data-testid="artist-promo-banner"
     >
       <div
@@ -187,20 +193,20 @@ export function ArtistPromoBanner({
         </div>
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col items-start justify-center py-[2cqw] pl-[4cqw] pr-[2cqw] text-left text-white">
-          <ArtistPromoCopy artistName={safeArtistName} template={template ?? randomTemplate} />
+          <ArtistPromoCopy artistName={safeArtistName} template={template ?? randomTemplate} compact={compact} />
           {/* 문구("같이 들어요" 등) 아래 이동 안내 — 클릭은 배너 전체가 받으므로 장식용 */}
-          <span className="pointer-events-none mt-[1.6cqw] max-w-full self-start whitespace-nowrap rounded-full border border-white/25 bg-black/25 px-[2.4cqw] py-[1cqw] text-[clamp(8px,2.5cqw,12px)] font-bold leading-none tracking-[-0.02em] text-white/90 shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
+          {!compact && <span className="pointer-events-none mt-[1.6cqw] max-w-full self-start whitespace-nowrap rounded-full border border-white/25 bg-black/25 px-[2.4cqw] py-[1cqw] text-[clamp(8px,2.5cqw,12px)] font-bold leading-none tracking-[-0.02em] text-white/90 shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md">
             에리카 플레이리스트 바로가기{'>'}
-          </span>
+          </span>}
         </div>
 
         {/* 왼쪽 상단 하냥냥 로고(글자+발자국 PNG) — 배너 폭에 맞춰 같이 커지고 작아짐 */}
-        <img
+        {!compact && <img
           src="/assets/brand/hanyangnyang_logo.png"
           alt="하냥냥"
           className="pointer-events-none absolute left-[3cqw] top-[3cqw] z-20 h-[clamp(18px,5cqw,28px)] w-auto drop-shadow-[0_1px_4px_rgba(0,0,0,0.35)]"
           draggable={false}
-        />
+        />}
       </div>
     </Wrapper>
   );
