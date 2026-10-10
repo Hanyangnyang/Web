@@ -268,10 +268,10 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                   </p>
                 )}
 
-                {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 그림자 없는 연한 회색 알약 */}
+                {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 배경 없이 얇은 회색 테두리만 있는 알약 */}
                 {post.isMine ? (
                   // h-5는 한마디 첫 줄(text-sm × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
-                  <span className="flex-shrink-0 h-5 px-2 flex items-center rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none">
+                  <span className="flex-shrink-0 h-5 px-2 flex items-center rounded-full border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none">
                     내 추천
                   </span>
                 ) : (

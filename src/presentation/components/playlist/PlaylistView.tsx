@@ -199,8 +199,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
 
   // 곡추천하기 등록 성공 — 어느 화면에서 곡추천하기로 들어왔든, 자기 곡이 잘 올라갔는지 바로
   // 볼 수 있게 최근추가된곡으로 보냄. addSong 프레임을 그대로 recent로 바꿔치기해서(push가 아님)
-  // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음
+  // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음.
+  // 방금 올린 글을 바로 읽을 수 있게 1열(리스트)로 열림(이후 토글 버튼으로 2열 전환 가능)
   const handleAddSongSuccess = useCallback(() => {
+    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
 

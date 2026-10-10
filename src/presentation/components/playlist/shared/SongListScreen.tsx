@@ -7,6 +7,7 @@ import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips, EMPTY_GENRE_FILTER, type GenreFilterState } from './GenreFilterChips';
 import { Coachmark, useCoachmark } from './Coachmark';
+import { ScrollToTopPill } from './ScrollToTopPill';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { scrollNearestScrollableAncestorToTop } from '../../../../utils/scroll';
 
@@ -194,6 +195,7 @@ export function SongListScreen({
           large
           className="-mt-1.5 pb-2"
         />
+        <ScrollToTopPill />
       </div>
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}
       <div ref={listContainerRef} className="-mx-4 px-2">
