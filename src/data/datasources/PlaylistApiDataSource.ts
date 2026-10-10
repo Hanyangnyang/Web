@@ -118,6 +118,7 @@ export interface GetTrackPostsDataSourceParams {
 
 // 백엔드 차트 유형 — RISING(실시간 급상승, 기본값), WEEKLY(주간), MONTHLY(월간)
 export type ChartTypeDto = 'RISING' | 'WEEKLY' | 'MONTHLY';
+export type ChartGenreDto = 'KPOP' | 'BAND' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OST' | 'OTHER';
 
 // 인기차트 응답 shape 검증과 타입은 ChartSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
 // (snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀)
@@ -170,7 +171,7 @@ export interface PlaylistApiDataSource {
   postTrackPlay: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<null>>;
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
   getTrackPosts: (params: GetTrackPostsDataSourceParams) => Promise<ApiResponse<TrackPostsDto>>;
-  getCharts: (type?: ChartTypeDto, deviceId?: string) => Promise<ApiResponse<ChartDto>>;
+  getCharts: (type?: ChartTypeDto, deviceId?: string, genre?: ChartGenreDto) => Promise<ApiResponse<ChartDto>>;
   // 기기별 가수·대표곡 추천 카드 최대 5개(서버가 기기별 5분 캐시) — deviceId 누락/UUID 형식 오류는 400
   getRecommendations: (deviceId: string) => Promise<ApiResponse<ArtistRecommendationsDto>>;
 }
@@ -245,9 +246,10 @@ export const createPlaylistApiDataSource = ({ httpClient }: { httpClient: HttpCl
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/tracks/${trackId}?${query.toString()}`));
   },
 
-  getCharts: async (type, deviceId) => {
+  getCharts: async (type, deviceId, genre) => {
     const query = new URLSearchParams();
     if (type) query.set('type', type);
+    if (genre) query.set('genre', genre);
     if (deviceId) query.set('deviceId', deviceId);
     const queryString = query.toString();
     return parseOrThrow(await httpClient.get(`/api/v1/playlist/songs/charts${queryString ? `?${queryString}` : ''}`));

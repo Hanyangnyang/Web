@@ -224,7 +224,7 @@ export const createPlaylistRepository = (
   },
 
   getPopularityChart: async (params) => {
-    const res = await playlistApiDataSource.getCharts(params?.type, params?.deviceId);
+    const res = await playlistApiDataSource.getCharts(params?.type, params?.deviceId, params?.genre);
     const data = unwrap(res, 'playlist charts', (d) => !!d);
     const invalidShape = (detail: string) =>
       apiError(`playlist charts API returned invalid shaped 'data': ${detail}`, { area: AREA, endpoint: res._requestUrl });

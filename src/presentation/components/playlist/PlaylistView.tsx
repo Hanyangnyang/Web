@@ -31,6 +31,7 @@ import { useScreenDwellTracking } from '../../hooks/playlist/useScreenDwellTrack
 const RECENT_SONGS_LIMIT = 7;
 const CHART_PREVIEW_LIMIT = 10;
 const EMPTY_SONGS: Song[] = []; // 데이터 도착 전 fallback — 매 렌더마다 새 [] 를 만들면 songs를 deps로 쓰는 콜백이 계속 재생성되므로 모듈 상수로 고정
+const EMPTY_CHART: ChartTrack[] = []; // 인기차트 화면 데이터 도착 전 fallback (위 EMPTY_SONGS와 같은 이유)
 
 // 화면 스택의 한 칸 = 화면 이름 + 그 화면이 쓰는 파라미터 
 type ScreenFrame =
@@ -93,6 +94,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
   const { data: chartData, isLoading: isChartLoading, isError: isChartError, refetch: refetchChart } = usePopularityChart(chartPeriod, isActive);
   const chartTracks = chartData?.tracks ?? [];
+  // 인기차트 화면의 장르 필터 — 홈 미리보기에는 적용되지 않고(홈은 항상 전체 차트), 화면 안에서만 장르별 차트를 서버에서 받아옴
+  const [chartGenreFilter, setChartGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
   // 하단 플로팅 플레이어 상태 + 재생 버튼 동작(handlePlay) — usePlaylistPlayer 참고
   const {
     playerRef,
@@ -120,6 +123,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     deepLinkSearchQuery ? [{ name: 'main' }, { name: 'search' }] : [{ name: 'main' }],
   );
   const screen = screenStack[screenStack.length - 1];
+  // 인기차트 화면용 차트 — 전체(장르 없음)이면 홈 미리보기와 같은 쿼리 키라 캐시를 공유하고, 장르를 고르면 그 장르 차트를 따로 받음
+  const {
+    data: screenChartData,
+    isLoading: isScreenChartLoading,
+    isError: isScreenChartError,
+    refetch: refetchScreenChart,
+  } = usePopularityChart(chartPeriod, isActive && screen.name === 'chart', chartGenreFilter.selected[0]);
   // "어떤 곡을 추천해볼까요?" 클릭 시 검색 결과 화면(빈 검색어라 보여줄 게 없음) 대신
   // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistHomeView가 마운트될 때 한 번 소비
   const [autoFocusSearch, setAutoFocusSearch] = useState(false);
@@ -212,7 +222,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 최근추가된곡/인기차트 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
   const { pull, isRefreshing: isPullRefreshing, threshold: pullThreshold } = usePullToRefresh({
     containerRef: scrollContainerRef,
-    onRefresh: () => (screen.name === 'chart' ? refetchChart() : refetchRecentSongs()),
+    onRefresh: () => (screen.name === 'chart' ? refetchScreenChart() : refetchRecentSongs()),
     enabled: screen.name === 'recent' || screen.name === 'chart',
   });
 
@@ -275,9 +285,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     pushScreen({ name: 'recent', scrollTarget: scrollToLastPreview ? lastPreviewTrackId : null });
   }, [pushScreen, songs, posthog, recentSongsVariant]);
 
-  // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤
+  // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤.
+  // 눌러서 들어온 곡을 바로 읽을 수 있게 1열(리스트)로 열림(이후 토글 버튼으로 2열 전환 가능)
   const handleSelectRecentSong = useCallback((song: Song) => {
     posthog?.capture('playlist_recent_preview_navigate', { variant: recentSongsVariant, track_id: song.trackId });
+    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
@@ -396,10 +408,12 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           />
         ) : screen.name === 'chart' ? (
           <ChartView
-            chart={chartTracks}
-            isLoading={isChartLoading}
-            isError={isChartError}
-            onRetry={() => void refetchChart()}
+            chart={screenChartData?.tracks ?? EMPTY_CHART}
+            isLoading={isScreenChartLoading}
+            isError={isScreenChartError}
+            onRetry={() => void refetchScreenChart()}
+            genreFilter={chartGenreFilter}
+            onGenreFilterChange={setChartGenreFilter}
             chartPeriod={chartPeriod}
             onChangePeriod={setChartPeriod}
             onBack={popScreen}

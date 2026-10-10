@@ -2,6 +2,7 @@ import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartSongRow } from './ChartSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
+import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
@@ -18,6 +19,9 @@ interface ChartViewProps {
   onRetry: () => void;
   chartPeriod: ChartPeriod;
   onChangePeriod: (period: ChartPeriod) => void;
+  // 기간 칩 아래 장르 칩 — 고른 장르의 차트만 서버에서 받아옴(비어 있으면 전체)
+  genreFilter: GenreFilterState;
+  onGenreFilterChange: (next: GenreFilterState) => void;
   onBack: () => void;
   onShowRecent: () => void;
   onPlay: (track: ChartTrack) => void;
@@ -27,7 +31,7 @@ interface ChartViewProps {
 }
 
 // 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
-export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
+export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, genreFilter, onGenreFilterChange, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
   const likeToast = useLikeToast();
   const { toggle } = useChartTrackLike(likeToast.show, likeToast.hide);
 
@@ -40,7 +44,8 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
         onBack={onBack}
       />
 
-      <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} />
+      <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="!mb-1.5" />
+      <GenreFilterChips value={genreFilter} onChange={onGenreFilterChange} className="mb-2" />
 
       {/* 차트 리스트 */}
       <div className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
@@ -81,7 +86,9 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
           <PlaylistFallback message="인기차트를 불러올 수 없어요" onRetry={onRetry} minHeight={208} className="!border-0 !rounded-none" />
         ) : chart.length === 0 ? (
           <EmptyGenreState
-            message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
+            message={genreFilter.selected.length > 0
+              ? '이 장르의 차트가 아직 집계되지 않았어요'
+              : `아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
             buttonLabel="최근 추가된 곡 보러가기"
             buttonIcon={<span>🎵</span>}
             onAction={onShowRecent}

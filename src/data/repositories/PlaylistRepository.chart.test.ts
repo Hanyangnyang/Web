@@ -28,6 +28,15 @@ describe('PlaylistRepository.getPopularityChart', () => {
     await expect(repo.getPopularityChart({ type: 'RISING', deviceId: 'x' })).resolves.toEqual(okBody);
   });
 
+  it('type/genre/deviceId를 데이터소스로 그대로 넘긴다', async () => {
+    const calls: unknown[][] = [];
+    const repo = createPlaylistRepository({
+      playlistApiDataSource: { getCharts: async (...args: unknown[]) => { calls.push(args); return { success: true, data: okBody, _requestUrl: URL_ }; } } as unknown as PlaylistApiDataSource,
+    });
+    await repo.getPopularityChart({ type: 'WEEKLY', genre: 'R_AND_B', deviceId: 'x' });
+    expect(calls[0]).toEqual(['WEEKLY', 'x', 'R_AND_B']);
+  });
+
   it('isLiked가 없는 응답(deviceId 미전송 등)이면 false로 채운다', async () => {
     const { isLiked: _omit, ...noLiked } = track(1);
     const repo = repoWith({ success: true, data: { ...okBody, tracks: [noLiked] }, _requestUrl: URL_ });

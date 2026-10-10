@@ -17,8 +17,10 @@ interface GenreFilterChipsProps {
 }
 
 // 선택 안 된 칩은 모두 기본 흰색, 선택된 칩은 플레이리스트 파란색 계열의 연한 톤
-const CHIP_INACTIVE = 'bg-white text-gray-800 border-slate-200';
-const CHIP_ACTIVE = 'bg-[#8FB0F3] text-white border-transparent';
+// 인기차트 기간 칩(ChartPeriodChips)도 같은 모양을 쓰도록 export
+export const CHIP_INACTIVE = 'bg-white text-gray-800 border-slate-200';
+export const CHIP_ACTIVE = 'bg-[#8FB0F3] text-white border-transparent';
+export const CHIP_BASE = 'flex items-center gap-1 px-[9px] py-[5px] rounded-full text-[13px] font-bold whitespace-nowrap border flex-shrink-0 transition-colors duration-200 active:scale-[0.96]';
 
 const MOVE_MS = 300;
 const GENRE_KEYS = GENRES.map((genre) => genre.key);
@@ -85,7 +87,7 @@ export function GenreFilterChips({ value, onChange, className = '' }: GenreFilte
             }}
             onClick={() => (isAll ? onChange({ ...value, selected: [] }) : toggleGenre(key))}
             aria-pressed={isSelected}
-            className={`flex items-center gap-1 px-[9px] py-[5px] rounded-full text-[13px] font-bold whitespace-nowrap border flex-shrink-0 transition-colors duration-200 active:scale-[0.96] ${
+            className={`${CHIP_BASE} ${
               isSelected ? CHIP_ACTIVE : CHIP_INACTIVE
             }`}
           >

@@ -57,9 +57,12 @@ export interface GetTrackPostsParams {
 }
 
 export type ChartType = 'RISING' | 'WEEKLY' | 'MONTHLY';
+export type ChartGenre = 'KPOP' | 'BAND' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OST' | 'OTHER';
 
 export interface GetPopularityChartParams {
   type?: ChartType;
+  // 있으면 그 장르 차트만, 없으면 전체 차트
+  genre?: ChartGenre;
   // 있으면 각 곡에 기기별 isLiked가 붙어서 내려옴
   deviceId?: string;
 }
