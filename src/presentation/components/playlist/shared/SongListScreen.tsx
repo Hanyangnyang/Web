@@ -6,10 +6,10 @@ import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './Post
 import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips } from './GenreFilterChips';
+import { Coachmark, useCoachmark } from './Coachmark';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
-// 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다
-// (캠퍼스맵의 '뭐먹지' 코치마크와 동일한 방식)
+// 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다(Coachmark.tsx 참고)
 const VIEW_TOGGLE_COACHMARK_SEEN_KEY = 'viewToggleCoachmarkSeen';
 
 interface SongListScreenProps {
@@ -138,21 +138,8 @@ export function SongListScreen({
 
   // (2열 카드를 눌러 1열 상세로 전환하던 동작은 없앰 — 카드 하단을 누르면 한마디 더보기/접기로 동작함. 1열은 우측 상단 토글 버튼으로 전환)
 
-  // 그리드 보기 전환 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다(뭐먹지 코치마크와 동일한 실험)
-  const [viewToggleCoachmark, setViewToggleCoachmark] = useState<'hidden' | 'visible' | 'leaving'>(() => {
-    if (!enableViewToggle) return 'hidden';
-    try {
-      return localStorage.getItem(VIEW_TOGGLE_COACHMARK_SEEN_KEY) ? 'hidden' : 'visible';
-    } catch {
-      return 'hidden';
-    }
-  });
-  useEffect(() => {
-    if (viewToggleCoachmark !== 'visible') return;
-    try { localStorage.setItem(VIEW_TOGGLE_COACHMARK_SEEN_KEY, '1'); } catch {}
-    const t = setTimeout(() => setViewToggleCoachmark('leaving'), 3000);
-    return () => clearTimeout(t);
-  }, [viewToggleCoachmark]);
+  // 그리드 보기 전환 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다
+  const viewToggleCoachmark = useCoachmark(VIEW_TOGGLE_COACHMARK_SEEN_KEY, enableViewToggle);
 
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
@@ -175,17 +162,12 @@ export function SongListScreen({
                 </button>
 
                 {/* 그리드 보기 코치마크 — 버튼 존재를 알려주려고 3초만 떴다 사라진다 */}
-                {viewToggleCoachmark !== 'hidden' && (
-                  <div
-                    className={`absolute right-0 top-full mt-2 z-40 w-max pointer-events-none ${viewToggleCoachmark === 'visible' ? '[animation:fadeIn_0.3s_ease-out]' : '[animation:fadeOut_0.4s_ease-in_forwards]'}`}
-                    onAnimationEnd={() => { if (viewToggleCoachmark === 'leaving') setViewToggleCoachmark('hidden'); }}
-                  >
-                    <div className="relative whitespace-nowrap bg-gradient-to-br from-[#A78BFA] to-playlist-accent text-white text-[12.5px] font-extrabold leading-snug px-3.5 py-2.5 rounded-2xl shadow-[0_6px_18px_rgba(139,92,246,0.35)]">
-                      그리드로도 볼 수 있어요!🔲
-                      <span className="absolute -top-1.5 right-3 w-3 h-3 bg-playlist-accent rotate-45 rounded-[2px]" />
-                    </div>
-                  </div>
-                )}
+                <Coachmark
+                  {...viewToggleCoachmark}
+                  className="absolute right-0 top-full mt-2"
+                >
+                  {viewMode === 'grid' ? '한 줄로 크게 볼 수도 있어요!📖' : '한눈에 모아 볼 수도 있어요!🔲'}
+                </Coachmark>
               </div>
             ) : undefined
           }

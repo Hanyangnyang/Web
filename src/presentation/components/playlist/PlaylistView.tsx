@@ -71,7 +71,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
 
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고
   const recentSongsVariant = useRecentSongsTapAreaVariant();
-  const [searchQuery, setSearchQuery] = useState('');
+  // 소식탭 배너 딥링크로 마운트되면 첫 렌더부터 그 검색어/검색 화면으로 시작 — 마운트 후 effect로 옮기면 홈이 한 프레임 먼저 그려져 반짝임
+  const [searchQuery, setSearchQuery] = useState(deepLinkSearchQuery ?? '');
   const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const songs = fetchedSongs ?? EMPTY_SONGS;
   const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
@@ -103,7 +104,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     setViewModes((prev) => ({ ...prev, [listScreen]: mode }));
   
   // 에리카 플레이리스트가 홈, 그 위에 화면들이 스택처럼 쌓임 (예: 홈 → 최근추가된곡 → 곡추천하기)
-  const [screenStack, setScreenStack] = useState<ScreenFrame[]>([{ name: 'main' }]);
+  const [screenStack, setScreenStack] = useState<ScreenFrame[]>(
+    deepLinkSearchQuery ? [{ name: 'main' }, { name: 'search' }] : [{ name: 'main' }],
+  );
   const screen = screenStack[screenStack.length - 1];
   // "어떤 곡을 추천해볼까요?" 클릭 시 검색 결과 화면(빈 검색어라 보여줄 게 없음) 대신
   // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistHomeView가 마운트될 때 한 번 소비
@@ -351,10 +354,12 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             key={searchQuery} // 이미 검색 결과 화면인 채로 딥링크로 검색어가 바뀌면, 내부 activeQuery(처음 진입 때만 query로 초기화)가 따라가도록 새로 마운트
             query={searchQuery}
             onBack={popScreen}
+            onGoHome={() => setScreenStack([{ name: 'main' }])}
             onSelectTrack={handleSelectSearchTrack}
             onSelectPost={handleSelectPost}
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
+            onRecommendWithQuery={(q) => pushAddSong(undefined, q)}
             onRecommendTrack={pushAddSong}
             onActiveQueryChange={(q) => { activeSearchQueryRef.current = q; }}
           />
@@ -448,7 +453,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
 
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
       {screen.name !== 'addSong' && (
-        <AddSongFab onClick={handleAddSongFabClick} playerHeight={playerHeight} />
+        <AddSongFab onClick={handleAddSongFabClick} playerHeight={playerHeight} showCoachmark={screen.name === 'main'} />
       )}
 
       {/* 플로팅 Spotify 플레이어*/}

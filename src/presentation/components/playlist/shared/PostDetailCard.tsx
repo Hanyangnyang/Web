@@ -342,7 +342,7 @@ export function PostDetailCard({
           <button
             onClick={handleAlbumArtPlay}
             aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
-            className="absolute top-[4%] right-[4%] z-10 w-10 aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+            className={`absolute top-[4%] right-[4%] z-10 ${isNarrow ? 'w-10' : 'w-14'} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
           >
             {isPlaying ? (
               <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />

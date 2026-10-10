@@ -27,7 +27,7 @@ export function EmptyGenreState({
   if (!onAction) {
     return (
       <div className={`w-full flex flex-col items-center justify-center py-10 px-4 text-center ${boxed ? 'bg-white rounded-xl' : ''}`}>
-        <p className="text-sm font-semibold text-text-sub">{message}</p>
+        <p className="text-xs text-text-hint whitespace-pre-line">{message}</p>
       </div>
     );
   }
@@ -35,13 +35,13 @@ export function EmptyGenreState({
   return (
     <button
       onClick={onAction}
-      className={`w-full flex flex-col items-center justify-center gap-1.5 py-10 px-4 text-center transition-colors active:scale-[0.98] ${
+      className={`w-full flex flex-col items-center justify-center gap-3 py-10 px-4 text-center transition-colors active:scale-[0.98] ${
         boxed ? 'bg-white rounded-xl' : ''
       }`}
     >
-      <p className="text-sm font-semibold text-text-sub">{message}</p>
-      <span className="flex items-center gap-1 mt-1 px-3 py-1.5 rounded-full bg-white text-text-main border border-slate-200 shadow-sm text-xs font-bold">
-        {buttonIcon ?? <Plus size={14} strokeWidth={2.5} />}
+      <p className="text-xs text-text-hint whitespace-pre-line">{message}</p>
+      <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-white text-text-sub border border-slate-200 shadow-sm text-[11px] font-semibold">
+        {buttonIcon ?? <Plus size={12} strokeWidth={2.5} />}
         {buttonLabel}
       </span>
     </button>
