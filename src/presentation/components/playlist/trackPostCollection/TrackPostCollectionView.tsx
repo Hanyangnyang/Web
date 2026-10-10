@@ -186,17 +186,17 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           <div className="min-w-0 flex-1 flex flex-col pt-4 pb-2 pr-3">
             <div className="flex-1 flex flex-col justify-end pb-1.5 leading-tight">
               {/* 곡명이 길어도 한 줄로만 — 넘치면 끝까지 천천히 슬라이드했다가 처음으로 돌아와서 뒷부분도 볼 수 있음 */}
-              <MarqueeText text={displayTrack.title} className="text-lg font-bold text-text-main" />
-              <div className="text-sm text-text-sub truncate">{displayTrack.artist}</div>
+              <MarqueeText text={displayTrack.title} className="text-[19px] font-bold text-text-main" />
+              <div className="text-[15px] text-text-sub truncate">{displayTrack.artist}</div>
             </div>
             <div className="border-t border-slate-300" />
             <div className="flex-1 flex flex-col justify-start gap-1.5 pt-1.5">
               <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
+                <span className="flex items-center gap-1 text-[13px] font-semibold text-text-sub">
                   <MessageCircle size={12} className="flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} />
                   추천글 {totalCount.toLocaleString()}개
                 </span>
-                <span className="flex items-center gap-1 text-xs font-semibold text-text-sub">
+                <span className="flex items-center gap-1 text-[13px] font-semibold text-text-sub">
                   <Play size={12} className="flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} />
                   재생수 {totalPlayCount.toLocaleString()}회
                 </span>
@@ -204,7 +204,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               {/* 공유 유도 — 앨범커버의 공유 아이콘과 같은 공유 팝업을 염. 아이콘만으로는 눈에 안 띄어서 문구로 한 번 더 안내 */}
               <button
                 onClick={() => share.open()}
-                className="relative before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 self-start max-w-full flex items-center gap-1 rounded-md bg-slate-50 border border-slate-200 px-1.5 py-[3.5px] text-left text-[10.5px] font-medium leading-tight text-text-sub active:bg-slate-100 transition-colors"
+                className="relative before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 self-start max-w-full flex items-center gap-1 rounded-md bg-slate-50 border border-slate-200 px-1.5 py-[3.5px] text-left text-[11.5px] font-medium leading-tight text-text-sub active:bg-slate-100 transition-colors"
               >
                 <span>다른 하냥이에게 곡을 공유해봐요!</span>
                 <Share2 size={11} className="flex-shrink-0 text-text-hint" strokeWidth={2.2} />
@@ -268,19 +268,19 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               <div className="flex items-start gap-2">
                 {/* 한마디는 선택 입력이라 비어 있을 수 있음 — 빈 따옴표("")만 덩그러니 보이지 않게, 비면 앱 안내 문구로 대체 */}
                 {post.comment ? (
-                  <p className="min-w-0 text-sm text-text-main leading-snug line-clamp-2">
+                  <p className="min-w-0 text-[15px] text-text-main leading-snug line-clamp-2">
                     <span className="mr-[1px]">"</span>
                     {post.comment}
                     <span className="ml-[1px]">"</span>
                   </p>
                 ) : (
-                  <EmptyCommentNote className="min-w-0 text-sm text-text-hint line-clamp-2" />
+                  <EmptyCommentNote className="min-w-0 text-[15px] text-text-hint line-clamp-2" />
                 )}
 
                 {/* 내 글이면 줄 오른쪽 끝에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김, 더보기 버튼과 같은 자리) — 배경 없이 얇은 회색 테두리만 있는 알약 */}
                 {post.isMine ? (
-                  // h-5는 한마디 첫 줄(text-sm × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
-                  <span className="ml-auto flex-shrink-0 h-5 px-2 flex items-center rounded-full border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none">
+                  // h-5는 한마디 첫 줄(text-[15px] × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
+                  <span className="ml-auto flex-shrink-0 h-6 px-2.5 flex items-center rounded-full border border-slate-200 text-slate-500 text-[11px] font-semibold leading-none">
                     내 추천
                   </span>
                 ) : (
@@ -304,7 +304,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                   className="flex-1 min-w-0"
                 />
 
-                <span className="flex-shrink-0 text-xs text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>
+                <span className="flex-shrink-0 text-[13px] text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>
               </div>
             </div>
           );

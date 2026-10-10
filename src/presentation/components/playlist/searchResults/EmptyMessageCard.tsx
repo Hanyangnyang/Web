@@ -15,12 +15,12 @@ export function EmptyMessageCard({ message, className = '', minHeight, action }:
       className={`w-full px-4 rounded-xl border border-dashed border-slate-200 text-center flex flex-col items-center justify-center gap-1 ${minHeight ? '' : 'py-8'} ${className}`}
       style={minHeight ? { minHeight: `${minHeight}px` } : undefined}
     >
-      <p className="text-xs text-text-hint whitespace-pre-line">{message}</p>
+      <p className="text-[13px] text-text-hint whitespace-pre-line">{message}</p>
       {action && (
         <button
           type="button"
           onClick={action.onClick}
-          className="flex items-center gap-1 px-3.5 py-2 rounded-full bg-white text-text-sub border border-slate-200 shadow-sm text-[11px] font-semibold cursor-pointer active:scale-[0.97] transition-transform"
+          className="flex items-center gap-1 px-3.5 py-2 rounded-full bg-white text-text-sub border border-slate-200 shadow-sm text-[12px] font-semibold cursor-pointer active:scale-[0.97] transition-transform"
         >
           {action.label}
         </button>

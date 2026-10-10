@@ -84,18 +84,18 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId, variant 
             원하는 것과 달랐음) */}
         <div className="flex-1 min-w-0 flex flex-col justify-evenly">
           <div className="min-w-0 truncate leading-tight">
-            <span className="font-semibold text-text-main text-sm">{song.title}</span>
-            <span className="text-xs text-text-sub"> · {song.artist}</span>
+            <span className="font-semibold text-text-main text-[15px]">{song.title}</span>
+            <span className="text-[13px] text-text-sub"> · {song.artist}</span>
           </div>
           {/* 한마디 코멘트 */}
           {song.comment ? (
-            <p className="text-xs text-text-main truncate leading-tight">
+            <p className="text-[13px] text-text-main truncate leading-tight">
               <span className="mr-[1px]">"</span>
               {song.comment}
               <span className="ml-[1px]">"</span>
             </p>
           ) : (
-            <EmptyCommentNote className="text-xs text-text-hint truncate leading-tight" />
+            <EmptyCommentNote className="text-[13px] text-text-hint truncate leading-tight" />
           )}
           {/* 이모지와 올린시각  */}
           <div className="flex items-center gap-1 min-w-0 leading-tight">
@@ -107,9 +107,9 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId, variant 
                 {displayedReactions.map(({ key, emoji }) => (
                   <span
                     key={key}
-                    className="flex-shrink-0 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-slate-100 border-transparent text-text-sub"
+                    className="flex-shrink-0 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-slate-100 border-transparent text-text-sub"
                   >
-                    <span className="text-[10px]">{emoji}</span>
+                    <span className="text-[11px]">{emoji}</span>
                     <span>{reactions[key]?.count ?? 0}</span>
                   </span>
                 ))}
@@ -121,13 +121,13 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId, variant 
                   <Smile size={11} className="text-text-sub" strokeWidth={2} />
                 </span>
               ) : (
-                <span className="flex items-center gap-1 min-w-0 pl-1 pr-2 py-0.5 rounded-full bg-slate-100 text-[10px] text-text-sub">
+                <span className="flex items-center gap-1 min-w-0 pl-1 pr-2 py-0.5 rounded-full bg-slate-100 text-[11px] text-text-sub">
                   <Smile size={11} className="text-text-sub flex-shrink-0" strokeWidth={2} />
                   <span className="truncate">반응 남기기</span>
                 </span>
               )
             )}
-            <span className="ml-auto flex-shrink-0 text-[10px] text-text-hint">
+            <span className="ml-auto flex-shrink-0 text-[11px] text-text-hint">
               {formatTimeAgo(song.createdAt)}
             </span>
           </div>

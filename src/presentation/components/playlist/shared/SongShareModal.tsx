@@ -164,10 +164,10 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
             className="w-28 h-28 rounded-2xl object-cover shadow-md bg-slate-100"
           />
           <div className="mt-3 max-w-full text-center">
-            <div className="text-sm font-bold text-text-main truncate">{song.title}</div>
-            <div className="text-xs text-text-sub truncate">{song.artist}</div>
+            <div className="text-[15px] font-bold text-text-main truncate">{song.title}</div>
+            <div className="text-[13px] text-text-sub truncate">{song.artist}</div>
           </div>
-          <p className="mt-3 text-[11px] text-text-hint">친구에게 곡을 공유하여 함께 즐겨봐요!</p>
+          <p className="mt-3 text-[12px] text-text-hint">친구에게 곡을 공유하여 함께 즐겨봐요!</p>
         </div>
 
         <div className="border-t border-slate-100" />
@@ -180,7 +180,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
             <div className="w-11 h-11 rounded-full flex items-center justify-center bg-[#FEE500]">
               <KakaoIcon />
             </div>
-            <span className="text-[11px] font-semibold text-text-main">카카오톡</span>
+            <span className="text-[12px] font-semibold text-text-main">카카오톡</span>
           </button>
           <button
             className="flex flex-col items-center gap-1.5 bg-none border-none cursor-pointer p-3 rounded-2xl transition-colors duration-150 font-[inherit] hover:bg-surface"
@@ -189,7 +189,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
             <div className="w-11 h-11 rounded-full flex items-center justify-center bg-slate-100">
               <Share2 size={16} className="text-text-sub" />
             </div>
-            <span className="text-[11px] font-semibold text-text-main">링크 공유</span>
+            <span className="text-[12px] font-semibold text-text-main">링크 공유</span>
           </button>
         </div>
       </div>

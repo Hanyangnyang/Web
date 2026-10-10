@@ -7,6 +7,6 @@ interface EmptyCommentNoteProps {
   className?: string;
 }
 
-export function EmptyCommentNote({ className = 'text-xs text-text-hint' }: EmptyCommentNoteProps) {
+export function EmptyCommentNote({ className = 'text-[13px] text-text-hint' }: EmptyCommentNoteProps) {
   return <p className={`leading-snug ${className}`}>{EMPTY_COMMENT_NOTE}</p>;
 }

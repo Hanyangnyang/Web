@@ -12,7 +12,7 @@ interface ChartSongRowProps {
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 순위 숫자 타이포그래피 — 기본은 인기차트 전체보기(ChartView)의 담백한 스타일. 소식탭 홍보 카드처럼
-  // 강조하고 싶은 곳에서만 예) "font-black text-base text-gray-900 italic -skew-x-6"로 덮어쓴다
+  // 강조하고 싶은 곳에서만 예) "font-black text-[17px] text-gray-900 italic -skew-x-6"로 덮어쓴다
   rankClassName?: string;
   // 앨범 커버 크기 — 기본은 ChartView 목록의 48px(w-12 h-12). 소식탭 홍보 카드처럼 더 크게 보이고
   // 싶은 곳에서만 예) "w-14 h-14"로 덮어쓴다
@@ -27,7 +27,7 @@ export function ChartSongRow({
   onShowPosts,
   onShare,
   currentTrackId,
-  rankClassName = 'font-bold text-sm text-gray-900',
+  rankClassName = 'font-bold text-[15px] text-gray-900',
   thumbnailClassName = 'w-12 h-12',
   highlighted = false,
 }: ChartSongRowProps) {
@@ -61,8 +61,8 @@ export function ChartSongRow({
 
       {/* 곡정보 */}
       <div className="flex-1 min-w-0">
-        <div className="font-semibold text-text-main truncate text-sm">{track.title}</div>
-        <div className="text-xs text-text-sub truncate">{track.artist}</div>
+        <div className="font-semibold text-text-main truncate text-[15px]">{track.title}</div>
+        <div className="text-[13px] text-text-sub truncate">{track.artist}</div>
       </div>
 
       <div className="flex items-center flex-shrink-0">

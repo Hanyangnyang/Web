@@ -66,7 +66,7 @@ export function Coachmark({ state, onAnimationEnd, children, className = '', sty
     >
       {/* 모양·색은 캠퍼스맵 '뭐먹지' 말풍선과 동일. 두 번째 그림자(100vmax 확산)가 말풍선 둘레 화면 전체를 어둡게 덮어 시선이 말풍선으로 가게 한다 —
           별도 오버레이가 아니라 말풍선 자신의 그림자라 말풍선 위치·페이드와 항상 함께 움직이고 클릭도 막지 않는다 */}
-      <div className="relative whitespace-nowrap bg-gradient-to-br from-amber-300 to-orange-400 text-[#5b3a00] text-[12.5px] font-extrabold leading-snug px-3.5 py-2.5 rounded-2xl shadow-[0_6px_18px_rgba(217,119,6,0.35),0_0_0_100vmax_rgba(0,0,0,0.4)]">
+      <div className="relative whitespace-nowrap bg-gradient-to-br from-amber-300 to-orange-400 text-[#5b3a00] text-[13.5px] font-extrabold leading-snug px-3.5 py-2.5 rounded-2xl shadow-[0_6px_18px_rgba(217,119,6,0.35),0_0_0_100vmax_rgba(0,0,0,0.4)]">
         {children}
         <span className={`absolute ${tail === 'top' ? '-top-1.5' : '-bottom-1.5'} ${tailClassName} w-3 h-3 bg-orange-400 rotate-45 rounded-[2px]`} />
       </div>

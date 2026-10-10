@@ -29,7 +29,7 @@ export const PlaylistSearchBar = forwardRef<HTMLInputElement, PlaylistSearchBarP
             if (e.key === 'Enter') onSubmit();
           }}
           placeholder={placeholder}
-          className="flex-1 min-w-0 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+          className="flex-1 min-w-0 bg-transparent text-[15px] text-text-main placeholder-text-hint outline-none"
         />
         <button
           onClick={onSubmit}

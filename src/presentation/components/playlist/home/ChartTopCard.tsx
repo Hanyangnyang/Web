@@ -77,8 +77,8 @@ export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onP
           className="flex items-center gap-1 px-3 pt-2 pb-3 text-left active:bg-black/10 transition-colors"
         >
           <div className="min-w-0 flex-1 flex flex-col gap-0.5">
-            <div className="text-sm font-bold text-white truncate leading-tight">{track.title}</div>
-            <div className="text-xs font-medium text-white/90 truncate leading-tight">{track.artist}</div>
+            <div className="text-[15px] font-bold text-white truncate leading-tight">{track.title}</div>
+            <div className="text-[13px] font-medium text-white/90 truncate leading-tight">{track.artist}</div>
           </div>
         </button>
       </div>

@@ -252,17 +252,17 @@ export function PostDetailCard({
   const titleBlock = hideReactions ? (
     <div className={`min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
       <div className="flex items-center gap-0.5">
-        <span className="text-sm font-bold text-text-main truncate">{post.title}</span>
+        <span className="text-[15px] font-bold text-text-main truncate">{post.title}</span>
         {showTrackLink && !useTrackLinkButton && <ChevronRight size={16} className="flex-shrink-0 text-text-sub" />}
       </div>
-      <div className="text-xs font-medium text-text-sub truncate">{post.artist}</div>
+      <div className="text-[13px] font-medium text-text-sub truncate">{post.artist}</div>
     </div>
   ) : (
     <div className={`flex items-center gap-0.5 min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
       <span className="truncate min-w-0">
         {/* 폭이 좁은 2열(narrow)은 한 단계 작게 — 제목 sm / 가수 xs (1열은 base / sm) */}
-        <span className={`${isNarrow ? 'text-sm' : 'text-base'} font-bold text-text-main`}>{post.title}</span>
-        <span className={`${isNarrow ? 'text-xs' : 'text-sm'} font-medium text-text-sub`}> · {post.artist}</span>
+        <span className={`${isNarrow ? 'text-[15px]' : 'text-[17px]'} font-bold text-text-main`}>{post.title}</span>
+        <span className={`${isNarrow ? 'text-[13px]' : 'text-[15px]'} font-medium text-text-sub`}> · {post.artist}</span>
       </span>
       {showTrackLink && !useTrackLinkButton && <ChevronRight size={19} className="flex-shrink-0 text-text-sub" />}
     </div>
@@ -287,8 +287,8 @@ export function PostDetailCard({
 
   // 공유/좋아요 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
   // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 좋아요가 그 왼쪽
-  const actionBadgeSizeClass = isNarrow ? 'w-7' : 'w-9';
-  const likeBadgeRightClass = isNarrow ? 'right-[calc(4%_+_38px)]' : 'right-[calc(4%_+_46px)]';
+  const actionBadgeSizeClass = isNarrow ? 'w-8' : 'w-10';
+  const likeBadgeRightClass = isNarrow ? 'right-[calc(4%_+_42px)]' : 'right-[calc(4%_+_50px)]';
   // 2열(좁은 카드)의 재생 버튼은 카드 폭 자체가 좁아서 같은 16%라도 절대 크기가 작아 보임 — 더 큰 비율로 보정
   const playButtonSizeClass = isNarrow ? 'w-[22%]' : 'w-[16%]';
 
@@ -347,7 +347,7 @@ export function PostDetailCard({
           <button
             onClick={handleAlbumArtPlay}
             aria-label={isPlaying ? `${post.title} 일시정지` : `${post.title} 재생`}
-            className={`absolute top-[4%] right-[4%] z-10 ${isNarrow ? 'w-10' : 'w-14'} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
+            className={`absolute top-[4%] right-[4%] z-10 ${isNarrow ? 'w-11' : 'w-14'} aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md active:scale-95 transition-transform`}
           >
             {isPlaying ? (
               <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
@@ -361,7 +361,7 @@ export function PostDetailCard({
           // "내 추천" 뱃지 — 1열·2열 공통으로 앨범커버 우상단. 공유/좋아요/재생 배지와 같은 글래스 스타일.
           // 누르는 버튼이 아니라 표시일 뿐이라 pointer-events-none. A/B 테스트 재생 버튼(test)이 같은 자리에 있으면 그 왼쪽으로 비켜 앉음
           <span
-            className={`absolute top-[4%] z-10 h-5 px-2 text-[10px] rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md font-semibold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] pointer-events-none ${
+            className={`absolute top-[4%] z-10 h-6 px-2.5 text-[11px] rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md font-semibold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] pointer-events-none ${
               onPlay && isTestPlayButton ? (isNarrow ? 'right-[calc(4%_+_48px)]' : 'right-[calc(4%_+_64px)]') : 'right-[4%]'
             }`}
           >
@@ -427,7 +427,7 @@ export function PostDetailCard({
 
         {/* 한마디가 비어 있으면 앱 안내 문구로 대체 */}
         {!compact && !post.body && (
-          <EmptyCommentNote className={`mb-2 ${isNarrow ? 'text-xs' : 'text-sm'} text-text-hint`} />
+          <EmptyCommentNote className={`mb-2 ${isNarrow ? 'text-[13px]' : 'text-[15px]'} text-text-hint`} />
         )}
 
         {/* 본문 */}
@@ -441,8 +441,8 @@ export function PostDetailCard({
                 style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
                 className={`${
                   isNarrow
-                    ? `text-xs overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
-                    : 'text-sm'
+                    ? `text-[13px] overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
+                    : 'text-[15px]'
                 } text-text-main leading-relaxed whitespace-pre-line`}
               >
                 <span className="mr-[1px]">"</span>
@@ -457,7 +457,7 @@ export function PostDetailCard({
                     toggleBody();
                   }}
                   aria-expanded={false}
-                  className="absolute before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 bottom-0 right-0 pl-6 text-xs leading-relaxed font-semibold text-text-hint bg-gradient-to-l from-white from-70% to-transparent active:opacity-60"
+                  className="absolute before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 bottom-0 right-0 pl-6 text-[13px] leading-relaxed font-semibold text-text-hint bg-gradient-to-l from-white from-70% to-transparent active:opacity-60"
                 >
                   더보기
                 </button>
@@ -470,7 +470,7 @@ export function PostDetailCard({
                   toggleBody();
                 }}
                 aria-expanded
-                className="relative before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 self-end mb-2 text-xs leading-relaxed font-semibold text-text-hint active:opacity-60"
+                className="relative before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-2 self-end mb-2 text-[13px] leading-relaxed font-semibold text-text-hint active:opacity-60"
               >
                 접기
               </button>
@@ -487,7 +487,7 @@ export function PostDetailCard({
           <div className="flex items-center justify-between gap-2">
             {/* 장르가 3개라 폭이 모자라도 두 줄로 꺾이지 않게 한 줄 가로 스크롤(반응 칩과 동일 방식) */}
             <div
-              className={`flex flex-nowrap items-center gap-x-1 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden ${isNarrow ? 'text-[11px]' : 'text-xs'} font-medium text-text-sub`}
+              className={`flex flex-nowrap items-center gap-x-1 flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden ${isNarrow ? 'text-[12px]' : 'text-[13px]'} font-medium text-text-sub`}
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {post.genres.flatMap((label, index) => {
@@ -506,7 +506,7 @@ export function PostDetailCard({
               })}
             </div>
             {!hideReactions && (
-              <span className={`flex-shrink-0 ${isNarrow ? 'text-[11px]' : 'text-xs'} text-text-hint`}>{formatTimeAgo(post.createdAt)}</span>
+              <span className={`flex-shrink-0 ${isNarrow ? 'text-[12px]' : 'text-[13px]'} text-text-hint`}>{formatTimeAgo(post.createdAt)}</span>
             )}
           </div>
         </div>

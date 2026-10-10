@@ -208,8 +208,8 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
         >
           <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-white/10">
             <div className="flex-1 min-w-0 truncate">
-              <span className="text-sm font-bold text-text-main">{displaySong.title}</span>
-              <span className="text-sm text-text-sub"> · {displaySong.artist}</span>
+              <span className="text-[15px] font-bold text-text-main">{displaySong.title}</span>
+              <span className="text-[15px] text-text-sub"> · {displaySong.artist}</span>
             </div>
             <button
               onClick={onClose}
@@ -249,7 +249,7 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
                 showTapToPlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
-              <span className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-black text-sm font-bold shadow-lg">
+              <span className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-black text-[15px] font-bold shadow-lg">
                 <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
                 탭해서 재생하기
               </span>

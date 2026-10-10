@@ -38,8 +38,8 @@ export function MyPageView({ onBack, onShowLiked, onShowMySongs }: MyPageViewPro
             <div className="flex items-center gap-3">
               <span className="text-2xl">{item.emoji}</span>
               <div>
-                <div className="text-sm font-bold text-text-main">{item.title}</div>
-                <div className="text-xs text-text-sub">{item.subtitle}</div>
+                <div className="text-[15px] font-bold text-text-main">{item.title}</div>
+                <div className="text-[13px] text-text-sub">{item.subtitle}</div>
               </div>
             </div>
             <ChevronRight size={20} className="text-text-sub flex-shrink-0" />

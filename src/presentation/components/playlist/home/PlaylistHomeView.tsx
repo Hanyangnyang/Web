@@ -161,7 +161,7 @@ export function PlaylistHomeView({
           <button
             onClick={() => onShowAllChart()}
             aria-label="인기차트 전체보기"
-            className="flex items-center py-2 -my-2 text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
+            className="flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
           >
             <span>인기차트</span>
             <ChevronRight size={20} className="ml-0.5" />
@@ -206,7 +206,7 @@ export function PlaylistHomeView({
               <button
                 onClick={() => onShowAllChart()}
                 aria-label="인기차트 전체보기"
-                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
               >
                 더보기
               </button>
@@ -223,7 +223,7 @@ export function PlaylistHomeView({
           <button
             onClick={() => onShowAllRecent()}
             aria-label="최근 추가된 곡 전체보기"
-            className="flex items-center py-2 -my-2 text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
+            className="flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
           >
             <span>최근 추가된 곡</span>
             <ChevronRight size={20} className="ml-0.5" />
@@ -268,7 +268,7 @@ export function PlaylistHomeView({
           <div className="flex justify-center mt-3">
             <button
               onClick={() => onShowAllRecent(true)}
-              className="px-5 py-2.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+              className="px-5 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
             >
               더보기
             </button>
@@ -283,7 +283,7 @@ export function PlaylistHomeView({
           <button
             onClick={onShowAllMySongs}
             aria-label="내가 추천한 곡 전체보기"
-            className="flex items-center py-2 -my-2 text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
+            className="flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
           >
             <span>내가 추천한 곡</span>
             <ChevronRight size={20} className="ml-0.5" />
@@ -315,7 +315,7 @@ export function PlaylistHomeView({
               <button
                 onClick={onShowAllMySongs}
                 aria-label="내가 추천한 곡 전체보기"
-                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
               >
                 더보기
               </button>

@@ -24,7 +24,7 @@ export function GenreFilterDropdown({ value, onChange, className = '' }: GenreFi
         panelWidthClassName="w-[96px]"
         liveChangeDelayMs={250}
         onChange={(key) => onChange({ ...value, selected: key === 'all' ? [] : [key] })}
-        triggerClassName="min-w-[64px] max-w-[96px] flex items-center justify-between gap-1 text-[13px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1.5 py-1.5"
+        triggerClassName="min-w-[64px] max-w-[96px] flex items-center justify-between gap-1 text-[14px] font-bold text-text-main bg-surface border border-[#e2e8f0] rounded-lg pl-2 pr-1.5 py-1.5"
       />
     </div>
   );

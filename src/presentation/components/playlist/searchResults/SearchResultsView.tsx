@@ -85,7 +85,7 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
 
       {/* 1. Spotify 곡 검색 결과 */}
       <section className="mb-4">
-        <h3 className="text-lg font-bold text-text-main mb-2">곡</h3>
+        <h3 className="text-[19px] font-bold text-text-main mb-2">곡</h3>
         {/* key=activeQuery: 렌더 에러로 폴백이 뜬 뒤에도 새로 검색하면 경계가 새로 마운트돼서 다시 시도됨 */}
         <ErrorBoundary
           key={activeQuery}
@@ -137,7 +137,7 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
 
       {/* 2. 우리 서비스에 등록된 게시글 */}
       <section className="mb-4">
-        <h3 className="text-lg font-bold text-text-main mb-2">추천글</h3>
+        <h3 className="text-[19px] font-bold text-text-main mb-2">추천글</h3>
         <ErrorBoundary
           key={activeQuery}
           name="playlist-search-posts"
@@ -172,7 +172,7 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
             <button
               type="button"
               onClick={() => onShowMorePosts(activeQuery)}
-              className="px-5 py-2.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+              className="px-5 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
             >
               더보기
             </button>

@@ -313,11 +313,11 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {/* 등록 가능 여부 조회 실패 — 막지는 않고(서버가 등록 시 최종 판단) 확인하지 못했음을 알리고 다시 확인할 수 있게 함 */}
       {isStatusError && (
         <div className="mb-4 flex items-center justify-between gap-2 rounded-card border border-slate-200 bg-white px-3.5 py-2.5">
-          <p className="text-xs text-text-hint">오늘 추천 가능한 횟수를 확인하지 못했어요. 등록할 때 다시 확인해요.</p>
+          <p className="text-[13px] text-text-hint">오늘 추천 가능한 횟수를 확인하지 못했어요. 등록할 때 다시 확인해요.</p>
           <button
             onClick={() => refetchStatus()}
             disabled={isStatusFetching}
-            className="flex-shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
+            className="flex-shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 text-[13px] font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
           >
             다시 확인
           </button>
@@ -326,7 +326,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
       {/* 1. 곡 검색 */}
       <section ref={searchSectionRef} className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-2">곡 검색</h3>
+        <h3 className="text-[19px] font-bold text-text-main mb-2">곡 검색</h3>
         {/* 검색창 + 아래 결과 패널을 한 group으로 묶어서, 입력창에 포커스가 가 있는 동안엔
             둘 다 같은 파란 테두리로 보이게 함(포커스 여부와 무관하게 결과 패널만 회색으로 남아 어긋나 보이던 문제) */}
         <div className="group">
@@ -344,7 +344,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   if (e.key === 'Enter') handleSearchClick();
                 }}
                 placeholder="곡 제목이나 아티스트를 검색해보세요"
-                className="flex-1 bg-transparent text-sm text-text-main placeholder-text-hint outline-none"
+                className="flex-1 bg-transparent text-[15px] text-text-main placeholder-text-hint outline-none"
               />
               <button
                 onClick={handleSearchClick}
@@ -419,7 +419,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                     })}
                   </div>
                 ) : (
-                  <p className="text-xs text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
+                  <p className="text-[13px] text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
                     {searchErrorMessage || '검색 결과가 없어요'}
                   </p>
                 )}
@@ -438,8 +438,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               className="w-10 h-10 rounded object-cover flex-shrink-0 bg-slate-100"
             />
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-text-main truncate">{selectedTrack.title}</div>
-              <div className="text-xs text-text-sub truncate">{selectedTrack.artist}</div>
+              <div className="text-[15px] font-semibold text-text-main truncate">{selectedTrack.title}</div>
+              <div className="text-[13px] text-text-sub truncate">{selectedTrack.artist}</div>
             </div>
             {onPlay && (
               <button
@@ -468,8 +468,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {/* 2. 장르 */}
       <section className="mb-5">
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">장르</h3>
-          <span className="text-xs font-semibold text-text-hint">({selectedGenres.length}/{MAX_GENRES})</span>
+          <h3 className="text-[19px] font-bold text-text-main">장르</h3>
+          <span className="text-[13px] font-semibold text-text-hint">({selectedGenres.length}/{MAX_GENRES})</span>
         </div>
         <div className="bg-white border border-slate-200 rounded-card p-2 shadow-[0_2px_4px_rgba(0,0,0,0.03)] flex flex-wrap justify-center gap-2">
           {GENRE_OPTIONS.map((genre) => {
@@ -480,7 +480,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 key={genre.key}
                 onClick={() => handleGenreClick(genre.key)}
                 disabled={isDisabled}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-2xl text-[13px] font-medium border transition-all duration-200 active:scale-[0.96] ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-2xl text-[14px] font-medium border transition-all duration-200 active:scale-[0.96] ${
                   isSelected
                     ? `${genre.light} ${genre.activeBorder} text-gray-600`
                     : isDisabled
@@ -488,7 +488,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                       : 'text-gray-500 border-gray-300'
                 }`}
               >
-                <span className="text-base">{genre.emoji}</span>
+                <span className="text-[17px]">{genre.emoji}</span>
                 <span>{genre.label}</span>
               </button>
             );
@@ -499,8 +499,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
         <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">곡에 대한 한마디</h3>
-          <span className="text-xs font-semibold text-text-hint">(선택)</span>
+          <h3 className="text-[19px] font-bold text-text-main">곡에 대한 한마디</h3>
+          <span className="text-[13px] font-semibold text-text-hint">(선택)</span>
         </div>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-playlist-primary focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
           <textarea
@@ -510,16 +510,16 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             onFocus={collapseResultsAfterPick}
             placeholder={'이 곡에 대한 얘기를 자유롭게 남겨주세요!\n한마디가 생각나지 않는다면 건너뛰어도 돼요.'}
             rows={5}
-            className="w-full bg-transparent text-sm text-text-main placeholder-text-hint outline-none resize-none"
+            className="w-full bg-transparent text-[15px] text-text-main placeholder-text-hint outline-none resize-none"
           />
         </div>
-        <div className="mt-1 text-right text-[11px] text-text-hint">
+        <div className="mt-1 text-right text-[12px] text-text-hint">
           {comment.length}/{COMMENT_MAX_LENGTH}
         </div>
       </section>
 
       {submitInlineError && (
-        <p className="text-center text-xs text-red-500 mb-3 whitespace-pre-line">
+        <p className="text-center text-[13px] text-red-500 mb-3 whitespace-pre-line">
           {submitInlineError}
         </p>
       )}
@@ -528,7 +528,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       <button
         onClick={handleRegisterClick}
         disabled={!canSubmit}
-        className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-sm font-bold border transition-all active:scale-[0.97] z-40 ${
+        className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-[15px] font-bold border transition-all active:scale-[0.97] z-40 ${
           canSubmit
             ? 'bg-playlist-primary text-white border-transparent shadow-[0_6px_20px_rgba(15,23,42,0.35)]'
             : 'bg-slate-100 text-slate-300 border-transparent'
@@ -549,7 +549,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="flex flex-col items-center gap-3 bg-white rounded-2xl shadow-xl px-8 py-6">
             <Loader2 size={28} className="animate-spin text-playlist-primary" />
-            <p className="text-sm font-semibold text-text-main">추천 중이에요...</p>
+            <p className="text-[15px] font-semibold text-text-main">추천 중이에요...</p>
           </div>
         </div>
       )}
@@ -567,14 +567,14 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           buttons={
             <button
               onClick={onBack}
-              className="w-full h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              className="w-full h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
             >
               뒤로가기
             </button>
           }
         >
-          <p className="text-sm font-semibold text-text-main mb-1 text-center">오늘 추천 가능한 곡을 모두 채웠어요!</p>
-          <p className="text-xs text-text-sub mb-4 text-center">
+          <p className="text-[15px] font-semibold text-text-main mb-1 text-center">오늘 추천 가능한 곡을 모두 채웠어요!</p>
+          <p className="text-[13px] text-text-sub mb-4 text-center">
             하루에 최대 {dailyMaxLimit}곡까지 추천할 수 있어요.
             <br />
             내일 다시 참여해주세요 :)
@@ -589,14 +589,14 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           buttons={
             <button
               onClick={onBack}
-              className="w-full h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              className="w-full h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
             >
               뒤로가기
             </button>
           }
         >
-          <p className="text-sm font-semibold text-text-main mb-1 text-center">곡 추천이 일시적으로 제한되었어요</p>
-          <p className="text-xs text-text-sub mb-4 whitespace-pre-line text-center">
+          <p className="text-[15px] font-semibold text-text-main mb-1 text-center">곡 추천이 일시적으로 제한되었어요</p>
+          <p className="text-[13px] text-text-sub mb-4 whitespace-pre-line text-center">
             {blockedUntilLabel ? `${blockedUntilLabel}까지는 곡을 추천할 수 없어요.\n이후에 다시 이용해주세요.` : '잠시 후 다시 이용해주세요.'}
           </p>
         </ConfirmPopup>
@@ -611,7 +611,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             <div className="flex gap-2">
               <button
                 onClick={() => setShowSubmitRetryPopup(false)}
-                className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-[15px] font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
               >
                 닫기
               </button>
@@ -620,15 +620,15 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowSubmitRetryPopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 다시 시도
               </button>
             </div>
           }
         >
-          <p className="text-sm font-semibold text-text-main mb-1 text-center">일시적인 오류가 발생했어요</p>
-          <p className="text-xs text-text-sub mb-4 text-center">잠시 후 다시 시도해주세요.</p>
+          <p className="text-[15px] font-semibold text-text-main mb-1 text-center">일시적인 오류가 발생했어요</p>
+          <p className="text-[13px] text-text-sub mb-4 text-center">잠시 후 다시 시도해주세요.</p>
         </ConfirmPopup>
       )}
 
@@ -638,14 +638,14 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           buttons={
             <button
               onClick={dismissFirstNotice}
-              className="w-full h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              className="w-full h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
             >
               확인했어요
             </button>
           }
         >
-          <p className="text-sm font-semibold text-text-main mb-1 text-center">곡 추천은 하루 {dailyMaxLimit}곡까지!</p>
-          <p className="text-xs text-text-sub mb-4 text-center">
+          <p className="text-[15px] font-semibold text-text-main mb-1 text-center">곡 추천은 하루 {dailyMaxLimit}곡까지!</p>
+          <p className="text-[13px] text-text-sub mb-4 text-center">
             하루에 최대 {dailyMaxLimit}곡까지 추천할 수 있어요.
             <br />
             마음에 드는 곡을 골라 추천해보세요 :)
@@ -660,7 +660,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             <div className="flex gap-2">
               <button
                 onClick={() => setShowRegisterNoticePopup(false)}
-                className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-[15px] font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
               >
                 취소
               </button>
@@ -669,17 +669,17 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                   setShowRegisterNoticePopup(false);
                   submitSongNow();
                 }}
-                className="flex-1 h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 추천하기
               </button>
             </div>
           }
         >
-          <p className="text-sm font-bold text-text-main mb-1.5 text-center">
+          <p className="text-[15px] font-bold text-text-main mb-1.5 text-center">
             {creationStatus ? `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요!` : `하루에 최대 ${dailyMaxLimit}곡 추천할 수 있어요!`}
           </p>
-          <p className="text-xs text-text-sub mb-4 text-center">추천한 곡은 삭제하거나 수정할 수 없어요.</p>
+          <p className="text-[13px] text-text-sub mb-4 text-center">추천한 곡은 삭제하거나 수정할 수 없어요.</p>
         </ConfirmPopup>
       )}
     </div>

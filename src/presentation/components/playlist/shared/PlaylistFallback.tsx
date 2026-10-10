@@ -17,11 +17,11 @@ export function PlaylistFallback({ message, onRetry, className = '', minHeight, 
       style={minHeight ? { minHeight: `${minHeight}px` } : undefined}
     >
       {icon ?? <CircleAlert size={22} className="text-text-hint" />}
-      <p className="text-sm font-semibold text-text-sub">{message}</p>
+      <p className="text-[15px] font-semibold text-text-sub">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-1 px-5 py-2.5 rounded-full bg-white text-text-main border border-slate-200 shadow-sm text-xs font-bold active:scale-95 transition-transform"
+          className="mt-1 px-5 py-2.5 rounded-full bg-white text-text-main border border-slate-200 shadow-sm text-[13px] font-bold active:scale-95 transition-transform"
         >
           다시 시도
         </button>

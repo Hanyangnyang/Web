@@ -564,7 +564,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             <div className="flex gap-2">
               <button
                 onClick={() => setShowExitConfirm(false)}
-                className="flex-1 h-11 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-[15px] font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
               >
                 취소
               </button>
@@ -573,15 +573,15 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
                   setShowExitConfirm(false);
                   onBack();
                 }}
-                className="flex-1 h-11 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+                className="flex-1 h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
                 나가기
               </button>
             </div>
           }
         >
-          <p className="text-[15px] font-bold text-text-main mb-1 text-center">플리를 종료하시겠습니까?</p>
-          <p className="text-xs font-medium text-text-hint mb-3.5 text-center">
+          <p className="text-[16px] font-bold text-text-main mb-1 text-center">플리를 종료하시겠습니까?</p>
+          <p className="text-[13px] font-medium text-text-hint mb-3.5 text-center">
             {playingTrackId ? '종료하면 재생 중인 음악이 정지돼요.' : '하냥이들의 새로운 추천곡이 기다리고 있어요!'}
           </p>
         </ConfirmPopup>

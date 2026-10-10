@@ -87,7 +87,7 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
       {/* 차트 리스트 */}
       <div ref={listRef} className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
         {/* 헤더 */}
-        <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-xs text-gray-600 bg-slate-50">
+        <div className="flex items-center gap-3 px-3 py-3 border-b border-slate-200 font-semibold text-[13px] text-gray-600 bg-slate-50">
           <span className="w-7 text-center">순위</span>
           <div className="flex-1">곡정보</div>
           <div className="flex items-center">

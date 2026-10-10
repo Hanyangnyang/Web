@@ -97,15 +97,15 @@ export function MusicSearchResultCard({
         className="relative w-full px-2 py-1.5 flex flex-col text-left hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:pointer-events-none"
       >
         {/* 곡명(leading-5=20px)·가수명(leading-4=16px) 줄 높이를 고정해서, 화살표를 둘 사이 경계선(위 여백 6px + 20px = 26px)에 세로 중앙으로 맞춤 */}
-        <div className={`text-sm leading-5 font-semibold text-text-main truncate ${showChevron ? 'pr-5' : ''}`}>{track.title}</div>
+        <div className={`text-[15px] leading-5 font-semibold text-text-main truncate ${showChevron ? 'pr-5' : ''}`}>{track.title}</div>
         <div className="min-w-0">
-          <div className={`text-xs leading-4 text-text-sub truncate ${showChevron ? 'pr-5' : ''}`}>{track.artist}</div>
+          <div className={`text-[13px] leading-4 text-text-sub truncate ${showChevron ? 'pr-5' : ''}`}>{track.artist}</div>
           {disabled && disabledMessage ? (
-            <div className="text-[10px] font-semibold text-red-400 truncate">{disabledMessage}</div>
+            <div className="text-[11px] font-semibold text-red-400 truncate">{disabledMessage}</div>
           ) : (
             // 이 곡에 등록된 추천글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount.
             // "이 곡 추천하러 가기" 버튼이 있는 검색 결과 화면(onRecommend)은 회색, 곡 추천하기 화면은 파란색
-            <div className={`flex items-center gap-0.5 text-[10px] truncate ${onRecommend ? 'text-text-hint' : 'text-playlist-primary'}`}>
+            <div className={`flex items-center gap-0.5 text-[11px] truncate ${onRecommend ? 'text-text-hint' : 'text-playlist-primary'}`}>
               <MessageCircle size={10} className="flex-shrink-0" />
               <span>추천글 {track.recommendationCount}개</span>
             </div>
@@ -121,10 +121,10 @@ export function MusicSearchResultCard({
           onClick={() => onRecommend(track)}
           disabled={disabled}
           aria-label={`${track.title} 곡 추천하기`}
-          className="w-full h-8 border-t border-slate-100 bg-[#ffffff] text-playlist-accent/80 flex items-center justify-center gap-1 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          className="w-full h-10 border-t border-slate-100 bg-[#ffffff] text-playlist-accent/80 flex items-center justify-center gap-1 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
         >
-          <PenLine size={10} strokeWidth={2.2} className="flex-shrink-0" />
-          <span className="text-[10px] font-bold">이 곡 추천하러 가기</span>
+          <PenLine size={12} strokeWidth={2.2} className="flex-shrink-0" />
+          <span className="text-[11px] font-bold">이 곡 추천하러 가기</span>
         </button>
       )}
     </div>

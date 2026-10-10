@@ -37,7 +37,7 @@ export function PostMoreMenu({ report, menuKey, reportTargetId }: PostMoreMenuPr
               e.stopPropagation();
               report.openReasonPopup(reportTargetId);
             }}
-            className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
+            className="block w-full px-4 py-2.5 text-left text-[15px] font-semibold text-red-500 hover:bg-slate-50 whitespace-nowrap"
           >
             신고하기
           </button>
