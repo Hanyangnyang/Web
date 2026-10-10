@@ -93,37 +93,40 @@ export function MusicSearchResultCard({
         onClick={() => onSelect(track, 'info')}
         disabled={disabled}
         aria-label={selectLabel}
-        className="w-full px-2 py-1.5 flex flex-col text-left hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:pointer-events-none"
+        className="relative w-full px-2 py-1.5 flex flex-col text-left hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:pointer-events-none"
       >
-        <div className="text-sm font-semibold text-text-main truncate">{track.title}</div>
-        <div className="flex items-center gap-1">
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-text-sub truncate">{track.artist}</div>
-            {disabled && disabledMessage ? (
-              <div className="text-[10px] font-semibold text-red-400 truncate">{disabledMessage}</div>
-            ) : (
-              // 이 곡에 등록된 게시글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount
-              <div className="flex items-center gap-0.5 text-[10px] text-playlist-primary truncate">
-                <MessageCircle size={10} className="flex-shrink-0" />
-                <span>추천글 {track.recommendationCount}개</span>
-              </div>
-            )}
-          </div>
-          {/* 가수명/게시글 옆 빈 공간에 카드를 누르면 넘어간다는 걸 알려주는 화살표 */}
-          {showChevron && <ChevronRight size={14} className="text-text-hint flex-shrink-0" strokeWidth={2.5} />}
+        {/* 곡명(leading-5=20px)·가수명(leading-4=16px) 줄 높이를 고정해서, 화살표를 둘 사이 경계선(위 여백 6px + 20px = 26px)에 세로 중앙으로 맞춤 */}
+        <div className={`text-sm leading-5 font-semibold text-text-main truncate ${showChevron ? 'pr-5' : ''}`}>{track.title}</div>
+        <div className="min-w-0">
+          <div className={`text-xs leading-4 text-text-sub truncate ${showChevron ? 'pr-5' : ''}`}>{track.artist}</div>
+          {disabled && disabledMessage ? (
+            <div className="text-[10px] font-semibold text-red-400 truncate">{disabledMessage}</div>
+          ) : !onRecommend && (
+            // 이 곡에 등록된 추천글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount.
+            // "이 곡 추천하러 가기" 버튼이 있는 검색 결과 화면에서는 그 버튼 위 별도 줄에 회색 문구로 보여줌(아래 참고)
+            <div className="flex items-center gap-0.5 text-[10px] text-playlist-primary truncate">
+              <MessageCircle size={10} className="flex-shrink-0" />
+              <span>추천글 {track.recommendationCount}개</span>
+            </div>
+          )}
         </div>
+        {/* 카드를 누르면 넘어간다는 걸 알려주는 화살표 — 곡명과 가수명 사이 경계선에 세로 중앙 정렬 */}
+        {showChevron && <ChevronRight size={14} className="absolute right-2 top-[19px] text-text-hint" strokeWidth={2.5} />}
       </button>
 
-      {/* 세 번째 행: 곡 추천하기 */}
+      {/* 곡 추천하기 섹션 — 추천글 수 안내와 "이 곡 추천하러 가기"를 하나의 버튼으로 묶어서 함께 눌림/호버되게 함 */}
       {onRecommend && (
         <button
           onClick={() => onRecommend(track)}
           disabled={disabled}
           aria-label={`${track.title} 곡 추천하기`}
-          className="w-full h-8 border-t border-slate-100 bg-[#ffffff] text-playlist-accent/80 flex items-center justify-center gap-1 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          className="w-full px-2 py-1.5 border-t border-slate-100 bg-[#ffffff] flex flex-col items-center gap-0 hover:bg-playlist-accent/5 active:bg-playlist-accent/5 transition-colors disabled:opacity-40 disabled:pointer-events-none"
         >
-          <PenLine size={10} strokeWidth={2.2} className="flex-shrink-0" />
-          <span className="text-[10px] font-bold">이 곡 추천하러 가기</span>
+          <span className="flex items-center gap-1 leading-4 text-playlist-accent/80">
+            <PenLine size={10} strokeWidth={2.2} className="flex-shrink-0" />
+            <span className="text-[10px] leading-4 font-bold">이 곡 추천하러 가기</span>
+          </span>
+          <span className="max-w-full text-[10px] leading-4 text-text-hint truncate">추천글이 {track.recommendationCount}개 밖에 없어요</span>
         </button>
       )}
     </div>

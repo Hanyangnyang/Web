@@ -27,7 +27,6 @@ interface SearchResultsViewProps {
   onSelectPost: (post: Song) => void;
   onPlay: (track: TrackSummary) => void; // 곡 검색 결과의 앨범커버를 눌렀을 때 하단 플레이어로 재생
   currentTrackId?: string | null; // 지금 하단 플레이어에서 재생 중인 곡 
-  onRecommendWithQuery: (query: string) => void; // 게시글이 없을 때 "곡 추천하러 가기" — 지금 검색어로 곡 검색이 된 채로 곡추천하기 화면으로
   onRecommendTrack: (track: TrackSummary) => void; // 곡 검색 결과 카드의 "✏️ 곡 추천하기" 버튼
   onActiveQueryChange?: (query: string) => void; // 이 화면에서 재검색해 바뀐 "지금 보고 있는 검색어"를 부모(곡 추천하기 FAB)가 알 수 있게 알려줌
 }
@@ -36,7 +35,7 @@ interface SearchResultsViewProps {
 const MIN_QUERY_LENGTH = 2;
 
 // 검색 결과 화면
-export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendWithQuery, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
+export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
   const [activeQuery, setActiveQuery] = useState(query);
@@ -149,10 +148,7 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
           ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
             <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />
           ) : !postResults || postResults.length === 0 ? (
-            <EmptyMessageCard
-              message={'아직 이 검색어의 추천글이 없어요.\n첫 추천글을 남겨보세요!'}
-              action={{ label: '곡 추천하러 가기', onClick: () => onRecommendWithQuery(activeQuery) }}
-            />
+            <EmptyMessageCard message={'아직 이 검색어의 추천글이 없어요.\n첫 추천글을 남겨보세요!'} />
           ) : (
             postResults.map((post) => (
               <RecentSongRow

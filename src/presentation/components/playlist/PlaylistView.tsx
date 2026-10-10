@@ -428,7 +428,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onSelectPost={handleSelectPost}
             onPlay={handlePlay}
             currentTrackId={playingTrackId}
-            onRecommendWithQuery={(q) => pushAddSong(undefined, q)}
             onRecommendTrack={pushAddSong}
             onActiveQueryChange={(q) => { activeSearchQueryRef.current = q; }}
           />

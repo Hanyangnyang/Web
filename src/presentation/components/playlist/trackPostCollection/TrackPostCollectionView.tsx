@@ -5,7 +5,7 @@ import { type ReactionKey } from '../postReactions';
 import { type Song, type ReactionState, type TrackSummary, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
 import { useTrackPosts, type TrackPostsSort } from '../../../hooks/playlist/useTrackPosts.js';
-import { EmptyGenreState } from '../shared/EmptyGenreState';
+import { EmptyMessageCard } from '../searchResults/EmptyMessageCard';
 import { CHIP_ACTIVE, CHIP_BASE, CHIP_INACTIVE } from '../shared/GenreFilterChips';
 import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
 import { EmojiReactionBar } from '../shared/EmojiReactionBar';
@@ -234,8 +234,9 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         </div>
       )}
 
+      {/* 추천글이 없을 때 — 검색 결과 화면의 "추천글 없음" 안내와 같은 점선 카드.  */}
       {!isLoading && posts.length === 0 && (
-        <EmptyGenreState message="아직 이 곡의 추천글이 없어요" />
+        <EmptyMessageCard message={'아직 이 곡의 추천글이 없어요.\n첫 추천글을 남겨보세요!'} />
       )}
 
       {/* 게시글 리스트 — 카드 사이 간격을 둬서 항목마다 분리된 느낌 */}
