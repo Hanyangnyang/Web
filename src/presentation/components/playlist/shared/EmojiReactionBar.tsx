@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { Smile } from 'lucide-react';
 import { EMOJI_REACTIONS, type ReactionKey } from '../postReactions';
 import { type ReactionState } from '../playlistTypes';
@@ -11,8 +11,6 @@ interface EmojiReactionBarProps {
   onTogglePicker: () => void;
   // 'default': PostDetailCard(1열 상세) 크기, 'compact': TrackPostCollectionView 같은 목록 행 크기, 'mini': 2열 그리드 카드용(가장 작음)
   size?: 'default' | 'compact' | 'mini';
-  // 반응이 하나도 없을 때 보여줄 안내 — 안 넘기면 이모지 추가 버튼만 남고 아무것도 안 보여줌
-  emptyFallback?: ReactNode;
   className?: string;
   // 2열 카드처럼 폭이 좁은 곳용 — 이모지 선택창이 1열과 같은 크기(가로 한 줄 알약)로 떠서 카드보다 넓을 수 있으므로,
   // 이모지 버튼이 아니라 가장 가까운 relative 조상(PostDetailCard 하단 영역=카드 폭)의 가장자리에 붙여 띄움.
@@ -33,7 +31,6 @@ export function EmojiReactionBar({
   pickerOpen,
   onTogglePicker,
   size = 'default',
-  emptyFallback,
   className = '',
   pickerAnchor,
 }: EmojiReactionBarProps) {
@@ -123,10 +120,12 @@ export function EmojiReactionBar({
 
   const isCompact = size === 'compact';
   const isMini = size === 'mini';
-  const addButtonSizeClass = isMini ? 'w-[18px] h-[18px]' : isCompact ? 'w-5 h-5' : 'w-6 h-6';
+  // "😊 반응" 알약 — 아이콘만 있을 땐 누를 곳이 너무 작아서 가로로 길게 하고 "반응" 글씨를 붙임
+  const addButtonSizeClass = isMini ? 'h-[18px] px-1.5 gap-0.5 text-[9px]' : isCompact ? 'h-[22px] px-2 gap-1 text-[10px]' : 'h-[22px] px-2.5 gap-1 text-[11px]';
   const addButtonIconSize = isMini ? 10 : isCompact ? 11 : 13;
   const chipGapClass = isCompact || isMini ? 'gap-1' : 'gap-1.5';
-  const chipClass = isMini ? 'px-1 py-px text-[9px]' : 'px-1.5 py-0.5 text-[10px]';
+  // 높이를 "반응" 알약 버튼과 똑같이 고정해서 나란히 놓였을 때 키가 어긋나지 않게 함
+  const chipClass = isMini ? 'h-[18px] px-1 text-[9px]' : 'h-[22px] px-1.5 text-[10px]';
   const chipEmojiClass = isMini ? 'text-[10px]' : 'text-xs';
 
   return (
@@ -151,9 +150,11 @@ export function EmojiReactionBar({
           onContextMenu={(e) => e.preventDefault()}
           aria-label="이모지 추가"
           style={{ touchAction: 'none', WebkitTouchCallout: 'none' } as React.CSSProperties}
-          className={`${addButtonSizeClass} rounded-full bg-slate-100 flex items-center justify-center active:scale-90 transition-transform select-none`}
+          className={`${addButtonSizeClass} rounded-full bg-slate-100 flex items-center justify-center whitespace-nowrap font-semibold text-text-sub active:scale-90 transition-transform select-none`}
         >
           <Smile size={addButtonIconSize} className="text-text-sub" strokeWidth={2} />
+          {/* 반응이 하나도 없으면 버튼 글씨가 안내 문구로 바뀜 */}
+          <span>{displayedReactions.length > 0 ? '반응' : '반응을 남겨주세요!'}</span>
         </button>
 
         {pickerOpen && (
@@ -183,17 +184,17 @@ export function EmojiReactionBar({
               ))}
             </div>
             {/* 말풍선 꼬리 */}
-            {!pickerAnchor && <div className="w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 ml-[14px] -mt-1.5" />}
+            {!pickerAnchor && <div className={`w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 -mt-1.5 ${isCompact ? 'ml-[19px]' : 'ml-[24px]'}`} />}
           </div>
         )}
         {/* 카드 가장자리 기준으로 띄운 선택창은 알약이 어느 쪽으로 펼쳐지든 꼬리가 이모지 추가 버튼(카드 왼쪽 padding 16px 뒤) 바로 위에 오도록 따로 둠 */}
         {pickerOpen && pickerAnchor && (
-          <div className={`absolute bottom-full mb-[2px] ${isMini ? 'left-[19px]' : 'left-[22px]'} z-10 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45`} />
+          <div className={`absolute bottom-full mb-[2px] ${isMini ? 'left-[31px]' : 'left-[40px]'} z-10 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45`} />
         )}
       </div>
 
       {displayedReactions.length > 0 ? (
-        /* 이미 달린 리액션 칩 — 9종까지 늘어날 수 있어서 가로 스크롤 */
+        /* 이미 달린 리액션 칩 — 여러 개로 늘어날 수 있어서 가로 스크롤 */
         <div
           className={`flex items-center ${chipGapClass} flex-1 min-w-0 overflow-x-auto [&::-webkit-scrollbar]:hidden`}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -219,9 +220,7 @@ export function EmojiReactionBar({
             );
           })}
         </div>
-      ) : (
-        emptyFallback
-      )}
+      ) : null}
     </div>
   );
 }

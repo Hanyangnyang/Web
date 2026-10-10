@@ -93,7 +93,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
     });
   };
 
-  // 낙관적으로 카운트 증감 후, 서버가 내려준 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤. 연타는 무시
+  // 낙관적으로 카운트 증감 후, 서버가 내려준 그 곡의 반응 전체 최신 값으로 통째로 맞춤. 연타는 무시
   const handleToggleReaction = (postId: string, key: ReactionKey) => {
     if (toggleReactionMutation.isPending) return;
     const previous = reactionsByPost[postId] ?? {};
@@ -274,12 +274,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                   onTogglePicker={() => setOpenPickerPostId((prev) => (prev === postId ? null : postId ?? null))}
                   size="compact"
                   className="flex-1 min-w-0"
-                  emptyFallback={
-                    // 배경 없는 안내 문구만 살짝 얹음 — PostDetailCard와 동일한 문구/스타일
-                    <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
-                      ← 아직 반응이 없어요, 첫 반응을 남겨주세요!
-                    </span>
-                  }
                 />
 
                 <span className="flex-shrink-0 text-xs text-text-hint ml-auto">{formatTimeAgo(post.createdAt)}</span>

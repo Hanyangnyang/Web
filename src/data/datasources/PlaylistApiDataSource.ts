@@ -88,7 +88,7 @@ export interface ToggleLikeDto {
 }
 
 // 이모지 반응 토글 응답 — 좋아요와 마찬가지로 서버가 현재 상태 보고 등록/취소를 판단.
-// reactions에 그 곡의 9종 반응 전체 최신 카운트가 함께 내려와서, 화면 상태를 통째로 이걸로 맞추면 됨
+// reactions에 그 곡의 반응 전체 최신 카운트가 함께 내려와서, 화면 상태를 통째로 이걸로 맞추면 됨
 export interface ToggleReactionDto {
   songId: string;
   reactionType: string;

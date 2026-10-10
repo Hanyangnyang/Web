@@ -182,7 +182,7 @@ export function PostDetailCard({
   };
 
   // 먼저 로컬 카운트를 낙관적으로 증감시켜 바로 반응이 보이게 하고(서버가 내려준 count엔 이미 내 반응이
-  // 포함돼 있어 +1/-1로 계산), 서버 응답이 오면 그 곡의 9종 반응 전체 최신 값으로 통째로 맞춤.
+  // 포함돼 있어 +1/-1로 계산), 서버 응답이 오면 그 곡의 반응 전체 최신 값으로 통째로 맞춤.
   // 실패하면 원래 상태로 되돌림. post.id가 없는(아직 더미인) 게시글은 API 호출 없이 로컬로만 토글.
   // 이전 요청이 아직 처리 중이면 연타를 무시 — 여러 요청이 동시에 나가면 응답 도착 순서가
   // 클릭 순서와 안 맞아서 최종 상태가 서버 상태와 어긋날 수 있음
@@ -397,14 +397,6 @@ export function PostDetailCard({
               className="flex-1 min-w-0"
               pickerAnchor={pickerAnchor}
               size={isNarrow ? 'mini' : 'default'}
-              emptyFallback={
-                // 배경 없는 안내 문구만 살짝 얹음. 클릭 가능한 건 왼쪽 이모지 추가 버튼 하나로 충분해서,
-                // 여기는 버튼처럼 보이지 않게 배경/클릭 이벤트 없이 텍스트로만 둠
-                <span className="flex-1 min-w-0 truncate text-[11px] text-text-hint">
-                  {/* 폭이 좁은 2열은 줄여서 말줄임표로 잘리지 않게 함 */}
-                  {isNarrow ? '← 반응을 남겨주세요!' : '← 아직 반응이 없어요, 첫 반응을 남겨주세요!'}
-                </span>
-              }
             />
 
             {trailingButton}
