@@ -20,7 +20,6 @@ export function MySongsView({ onBack, onPlay, onShowAddSong, onSelectTrack, curr
       isLoading={isLoading}
       emptyStateMessage="아직 이 장르로 추천한 곡이 없어요"
       emptyStateButtonLabel="곡 추천하러 가기"
-      emptyStateButtonIcon={<span>✏️</span>}
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}

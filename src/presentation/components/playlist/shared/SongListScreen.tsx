@@ -1,5 +1,5 @@
 import { LayoutGrid, Rows3 } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary, filterSongsByGenre } from '../playlistTypes';
 import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './PostDetailCard';
@@ -27,7 +27,6 @@ interface SongListScreenProps {
   // 빈 상태 문구/버튼/동작을 화면마다 다르게 하고 싶을 때 오버라이드 — 없으면 장르 안내 문구 + 곡추천하기로 기본 동작
   emptyStateMessage?: string;
   emptyStateButtonLabel?: string;
-  emptyStateButtonIcon?: ReactNode;
   onEmptyStateAction?: () => void;
   // 그리드(2열)/1열 보기 전환 UI를 이 화면에서 쓸지 여부 — 예: 최근 추가된 곡만 지원
   enableViewToggle?: boolean;
@@ -66,7 +65,6 @@ export function SongListScreen({
   onSelectTrack,
   emptyStateMessage,
   emptyStateButtonLabel,
-  emptyStateButtonIcon,
   onEmptyStateAction,
   enableViewToggle = false,
   gridOnly = false,
@@ -164,7 +162,7 @@ export function SongListScreen({
                 <button
                   onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
                   aria-label={viewMode === 'grid' ? '1열로 보기' : '2열로 보기'}
-                  className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
+                  className={`w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95 ${viewToggleCoachmark.state !== 'hidden' ? 'relative z-[45]' : ''}`}
                 >
                   {viewMode === 'grid' ? <Rows3 size={16} strokeWidth={2} /> : <LayoutGrid size={16} strokeWidth={2} />}
                 </button>
@@ -199,7 +197,6 @@ export function SongListScreen({
             onAction={onEmptyStateAction ?? onShowAddSong}
             message={emptyStateMessage}
             buttonLabel={emptyStateButtonLabel}
-            buttonIcon={emptyStateButtonIcon}
             boxed={emptyStateBoxed}
           />
         ) : (

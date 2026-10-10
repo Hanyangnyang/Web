@@ -22,7 +22,6 @@ export function EmptyMessageCard({ message, className = '', minHeight, action }:
           onClick={action.onClick}
           className="flex items-center gap-1 px-2 py-1 rounded-full bg-white text-text-sub border border-slate-200 shadow-sm text-[11px] font-semibold cursor-pointer active:scale-[0.97] transition-transform"
         >
-          <span>✏️</span>
           {action.label}
         </button>
       )}

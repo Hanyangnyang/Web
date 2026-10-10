@@ -39,7 +39,8 @@ interface PlaylistHomeViewProps {
   onPlayTrack: (track: TrackSummary) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
-  onShowAllChart: () => void;
+  // trackId를 넘기면 인기차트 화면이 그 곡 위치로 스크롤해서 열림(카드 클릭용), 없으면 맨 위부터
+  onShowAllChart: (trackId?: string) => void;
   onShowLiked: () => void;
   onShowAddSong: () => void;
   // "내가 추천한 곡" 섹션 — 카드 UI는 인기차트(ChartTopCard)와 동일, 순위만 없음
@@ -99,11 +100,6 @@ export function PlaylistHomeView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openChartWithPlay = (track: TrackSummary) => {
-    if (track.trackId !== currentTrackId) onPlayTrack(track);
-    onShowAllChart();
-  };
-
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
@@ -117,7 +113,7 @@ export function PlaylistHomeView({
             aria-label="저장한 곡 보기"
             className="w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95"
           >
-            <Heart size={16} strokeWidth={2} className="text-red-500" fill="currentColor" />
+            <Heart size={16} strokeWidth={2} className="text-red-500" fill="none" />
           </button>
         }
       />
@@ -129,10 +125,12 @@ export function PlaylistHomeView({
         onChange={setSearchQuery}
         onSubmit={onSubmitSearch}
         placeholder="듣고 싶은 곡을 검색해보세요!"
+        // 헤더(아래 여백 12px)와 검색바, 검색바와 배너 사이를 똑같이 8px로 맞춤
+        className="-mt-1 mb-2"
       />
 
       {/* 가수 추천 배너 — 소식탭 배너의 절반 높이 버전. 추천이 없거나 실패하면 조용히 숨김 */}
-      <div className="mt-4 mb-4">
+      <div className="mb-4">
         <ArtistPromoCarousel
           artists={artistPromos}
           loading={isArtistPromosLoading}
@@ -143,16 +141,17 @@ export function PlaylistHomeView({
 
       {/* 인기차트 섹션 */}
       <section className="mb-4">
-        <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">인기차트</h3>
+        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
+        <h3 className="mb-2">
           <button
-            onClick={onShowAllChart}
-            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
+            onClick={() => onShowAllChart()}
             aria-label="인기차트 전체보기"
+            className="flex items-center text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
           >
-            <ChevronRight size={20} />
+            <span>인기차트</span>
+            <ChevronRight size={20} className="ml-0.5" />
           </button>
-        </div>
+        </h3>
 
         {/* 실시간 / 주간 / 월간 칩 */}
         <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangeChartPeriod} />
@@ -171,7 +170,6 @@ export function PlaylistHomeView({
             <EmptyGenreState
               message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
               buttonLabel="최근 추가된 곡 보러가기"
-              buttonIcon={<span>🎵</span>}
               onAction={onShowAllRecent}
             />
           </div>
@@ -182,17 +180,17 @@ export function PlaylistHomeView({
                 <ChartTopCard
                   key={track.trackId}
                   track={track}
-                  // 카드 어디를 눌러도 곡을 재생하면서 인기차트 화면으로 이동 — 이미 재생 중인 곡이면 일시정지되지 않게 이동만 함
-                  onShowPosts={openChartWithPlay}
-                  onPlay={openChartWithPlay}
+                  // 카드 어디를 눌러도 재생 없이 인기차트 화면으로 이동하면서 누른 곡 위치로 스크롤
+                  onShowPosts={() => onShowAllChart(track.trackId)}
+                  onPlay={() => onShowAllChart(track.trackId)}
                   currentTrackId={currentTrackId}
                 />
               ))}
               {/* 더보기 — 카드 캐러셀 맨 끝까지 스크롤하면 나오는 버튼(최근 추가된 곡 더보기 버튼과 동일한 디자인), 인기차트 전체보기로 이동 */}
               <button
-                onClick={onShowAllChart}
+                onClick={() => onShowAllChart()}
                 aria-label="인기차트 전체보기"
-                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+                className="flex-shrink-0 self-center px-3 py-1.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
               >
                 더보기
               </button>
@@ -204,16 +202,17 @@ export function PlaylistHomeView({
 
       {/* 최근 추가된 곡 섹션 */}
       <section>
-        <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">최근 추가된 곡</h3>
+        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
+        <h3 className="mb-2">
           <button
             onClick={() => onShowAllRecent()}
-            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
             aria-label="최근 추가된 곡 전체보기"
+            className="flex items-center text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
           >
-            <ChevronRight size={20} />
+            <span>최근 추가된 곡</span>
+            <ChevronRight size={20} className="ml-0.5" />
           </button>
-        </div>
+        </h3>
 
         {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜 */}
         <GenreFilterChips value={recentGenreFilter} onChange={onChangeRecentGenreFilter} className="mb-2" />
@@ -230,7 +229,6 @@ export function PlaylistHomeView({
             <EmptyGenreState
               message={recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추가된 곡이 없어요'}
               buttonLabel="곡 추천하러 가기"
-              buttonIcon={<span>✏️</span>}
               onAction={onShowAddSong}
             />
           </div>
@@ -254,7 +252,7 @@ export function PlaylistHomeView({
           <div className="flex justify-center mt-3">
             <button
               onClick={() => onShowAllRecent(true)}
-              className="px-7 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+              className="px-4 py-1.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
             >
               더보기
             </button>
@@ -263,17 +261,18 @@ export function PlaylistHomeView({
       </section>
 
       {/* 내가 추천한 곡 섹션 */}
-      <section className="mt-6">
-        <div className="flex items-center gap-1 mb-2">
-          <h3 className="text-lg font-bold text-text-main">내가 추천한 곡</h3>
+      <section className="mt-4">
+        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
+        <h3 className="mb-2">
           <button
             onClick={onShowAllMySongs}
-            className="flex items-center justify-center text-text-sub hover:text-text-main transition-colors active:scale-95"
             aria-label="내가 추천한 곡 전체보기"
+            className="flex items-center text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
           >
-            <ChevronRight size={20} />
+            <span>내가 추천한 곡</span>
+            <ChevronRight size={20} className="ml-0.5" />
           </button>
-        </div>
+        </h3>
 
         {isMySongsLoading ? (
           <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -288,7 +287,6 @@ export function PlaylistHomeView({
             <EmptyGenreState
               message="아직 추천한 곡이 없어요"
               buttonLabel="곡 추천하러 가기"
-              buttonIcon={<span>✏️</span>}
               onAction={onShowAddSong}
             />
           </div>
@@ -301,7 +299,7 @@ export function PlaylistHomeView({
               <button
                 onClick={onShowAllMySongs}
                 aria-label="내가 추천한 곡 전체보기"
-                className="flex-shrink-0 self-center px-4 py-2.5 rounded-full text-sm font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+                className="flex-shrink-0 self-center px-3 py-1.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
               >
                 더보기
               </button>

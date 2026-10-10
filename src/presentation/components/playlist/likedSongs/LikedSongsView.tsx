@@ -21,7 +21,6 @@ export function LikedSongsView({ onBack, onPlay, onShowAddSong, onShowRecent, on
       isLoading={isLoading}
       emptyStateMessage="이런 곡들은 어때요?"
       emptyStateButtonLabel="최근 추가된 곡 보러가기"
-      emptyStateButtonIcon={<span>🎵</span>}
       onEmptyStateAction={onShowRecent}
       onBack={onBack}
       onPlay={onPlay}

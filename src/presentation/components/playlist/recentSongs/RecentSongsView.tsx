@@ -29,7 +29,6 @@ export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSe
       onSelectTrack={onSelectTrack}
       onEmptyStateAction={onShowSearch}
       emptyStateButtonLabel="어떤 곡을 추천해볼까요?"
-      emptyStateButtonIcon={<span>🔍</span>}
       enableViewToggle
       scrollToTrackId={scrollToTrackId}
       currentTrackId={currentTrackId}
