@@ -1,4 +1,4 @@
-import { Heart, Pause, Play } from 'lucide-react';
+import { Pause, Play, Share2 } from 'lucide-react';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 
 interface ChartSongRowProps {
@@ -7,8 +7,8 @@ interface ChartSongRowProps {
   // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청
   // 여러 게시글이 있을 수 있는 곡 하나에 바로 붙일 수 없어 상세 보기로 유도
   onShowPosts: (track: ChartTrack) => void;
-  // 넘겨주면 듣기 옆에 좋아요(하트) 버튼이 생김 — 소식탭 홍보 카드처럼 좋아요가 필요 없는 곳은 안 넘김
-  onToggleLike?: (track: ChartTrack) => void;
+  // 넘겨주면 듣기 옆에 공유 버튼이 생김 — 소식탭 홍보 카드처럼 공유가 필요 없는 곳은 안 넘김
+  onShare?: (track: ChartTrack) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 순위 숫자 타이포그래피 — 기본은 인기차트 전체보기(ChartView)의 담백한 스타일. 소식탭 홍보 카드처럼
@@ -25,7 +25,7 @@ export function ChartSongRow({
   track,
   onPlay,
   onShowPosts,
-  onToggleLike,
+  onShare,
   currentTrackId,
   rankClassName = 'font-bold text-sm text-gray-900',
   thumbnailClassName = 'w-12 h-12',
@@ -82,23 +82,17 @@ export function ChartSongRow({
           )}
         </button>
 
-        {/* 좋아요 버튼 — 곡 단위, 듣기 옆. row 클릭과 별개 동작이라 전파를 막음 */}
-        {onToggleLike && (
+        {/* 공유 버튼 — 듣기 옆. row 클릭과 별개 동작이라 전파를 막음 */}
+        {onShare && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onToggleLike(track);
+              onShare(track);
             }}
-            aria-label={track.isLiked ? `${track.title} 좋아요 취소` : `${track.title} 좋아요`}
-            aria-pressed={track.isLiked}
+            aria-label={`${track.title} 공유`}
             className="w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
           >
-            <Heart
-              size={16}
-              strokeWidth={2}
-              fill={track.isLiked ? 'currentColor' : 'none'}
-              className={track.isLiked ? 'text-red-500' : undefined}
-            />
+            <Share2 size={16} strokeWidth={2} />
           </button>
         )}
       </div>

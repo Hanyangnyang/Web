@@ -8,9 +8,8 @@ import { GenreFilterDropdown } from '../shared/GenreFilterDropdown';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
-import { useLikeToast } from '../shared/useLikeToast';
-import { useChartTrackLike } from '../../../hooks/playlist/useChartTrackLike.js';
-import { type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
+import { useShareModal } from '../shared/useShareModal';
+import { type ChartPeriod, type TrackSummary, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 
 interface ChartViewProps {
@@ -38,8 +37,13 @@ interface ChartViewProps {
 
 // 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
 export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, scrollToTrackId, onScrollTargetConsumed, genreFilter, onGenreFilterChange, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
-  const likeToast = useLikeToast();
-  const { toggle } = useChartTrackLike(likeToast.show, likeToast.hide);
+  // 공유 모달은 화면에 하나만 두고, 누른 행의 곡을 담아서 염 — 행마다 모달 상태를 들고 있지 않게
+  const [shareTrack, setShareTrack] = useState<TrackSummary>({ trackId: '', title: '', artist: '', albumArtUrl: '' });
+  const share = useShareModal(shareTrack);
+  const handleShare = (t: ChartTrack) => {
+    setShareTrack({ trackId: t.trackId, title: t.title, artist: t.artist, albumArtUrl: t.albumArtUrl });
+    share.open();
+  };
   const listRef = useRef<HTMLDivElement>(null);
   const scrolledRef = useRef(false);
   const [highlightedTrackId, setHighlightedTrackId] = useState<string | null>(null);
@@ -85,7 +89,7 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
           <div className="flex-1">곡정보</div>
           <div className="flex items-center">
             <span className="w-10 text-center">듣기</span>
-            <span className="w-9 text-center">좋아요</span>
+            <span className="w-9 text-center">공유</span>
           </div>
         </div>
 
@@ -129,7 +133,7 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
               track={track}
               onPlay={onPlay}
               onShowPosts={onShowPosts}
-              onToggleLike={(t) => toggle(t.trackId, t.isLiked)}
+              onShare={handleShare}
               currentTrackId={currentTrackId}
               highlighted={track.trackId === highlightedTrackId}
             />
@@ -137,7 +141,7 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
         )}
         </ErrorBoundary>
       </div>
-      {likeToast.node}
+      {share.node}
     </div>
   );
 }

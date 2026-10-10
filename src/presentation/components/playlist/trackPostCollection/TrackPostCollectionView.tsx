@@ -259,11 +259,14 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               {/* 본문 + 좋아요/더보기 */}
               <div className="flex items-start gap-2">
                 {/* 한마디는 flex-1이 아니라 내용 폭만큼만 차지해서(길면 줄어들며 2줄 말줄임), 뱃지가 오른쪽 끝이 아니라 한마디 바로 옆에 붙음 */}
-                <p className="min-w-0 text-sm text-text-main leading-snug line-clamp-2">
-                  <span className="mr-[1px]">"</span>
-                  {post.comment}
-                  <span className="ml-[1px]">"</span>
-                </p>
+                {/* 한마디는 선택 입력이라 비어 있을 수 있음 — 빈 따옴표("")만 덩그러니 보이지 않게 있을 때만 그림 */}
+                {post.comment && (
+                  <p className="min-w-0 text-sm text-text-main leading-snug line-clamp-2">
+                    <span className="mr-[1px]">"</span>
+                    {post.comment}
+                    <span className="ml-[1px]">"</span>
+                  </p>
+                )}
 
                 {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 그림자 없는 연한 회색 알약 */}
                 {post.isMine ? (

@@ -1,11 +1,13 @@
 import { ChevronDown, ChevronUp, Loader2, Pause, Play, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { GENRES, type TrackSummary } from '../playlistTypes';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
 import { type PlayableTrack } from '../shared/FloatingSpotifyPlayer';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { ConfirmPopup } from '../shared/ConfirmPopup';
+import { Toast } from '../shared/Toast';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { PLAYER_GAP_PX } from '../shared/AddSongFab';
@@ -45,6 +47,8 @@ const INLINE_ERROR_MESSAGES: Record<string, string> = {
   C001: '장르는 최소 1개, 최대 3개까지 선택하고 코멘트는 200자 이내로 입력해주세요.',
 };
 const RETRY_ERROR_CODES = new Set(['C004', 'PL008']);
+// 인라인 문구 에러(PL003·C001)는 폼 하단까지 시선이 안 가는 경우가 많아 같은 문구를 토스트로도 이만큼(ms) 띄움 — 인라인 문구는 수정할 때까지 그대로 남음
+const INLINE_ERROR_TOAST_MS = 3000;
 
 interface RecommendSongViewProps {
   onBack: () => void;
@@ -91,6 +95,13 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const [comment, setComment] = useState('');
   const [submitToast, setSubmitToast] = useState('');
   const [submitInlineError, setSubmitInlineError] = useState<string | null>(null);
+  const submitToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showSubmitToast = (message: string, durationMs: number) => {
+    if (submitToastTimerRef.current) clearTimeout(submitToastTimerRef.current);
+    setSubmitToast(message);
+    submitToastTimerRef.current = setTimeout(() => setSubmitToast(''), durationMs);
+  };
+  useEffect(() => () => { if (submitToastTimerRef.current) clearTimeout(submitToastTimerRef.current); }, []);
   const [showSubmitRetryPopup, setShowSubmitRetryPopup] = useState(false);
   const [showRegisterNoticePopup, setShowRegisterNoticePopup] = useState(false);
   const submitSong = useSubmitSong();
@@ -109,6 +120,41 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
   // 안드로이드 하드웨어 뒤로가기 — 작성 중인 내용이 있어도 확인 없이 바로 나감(임시저장 기능은 기획에서 제외됨)
   useBackHandler(onBack);
+
+  // 이탈 계측 — 임시저장 기능을 둘지 판단할 근거(작성하다 등록 없이 나가는 비율·어느 단계에서 나가는지).
+  // playlist_recommend_entered(분모) 대비 playlist_recommend_abandoned(등록 성공 없이 화면을 떠남) 비율로 봄.
+  // 화면을 떠나는 순간(언마운트)의 최신 입력 상태를 읽어야 해서 매 렌더 ref에 스냅샷을 갱신함
+  const posthog = usePostHog();
+  const enteredAtRef = useRef(Date.now());
+  const submittedRef = useRef(false);
+  const abandonSnapshotRef = useRef({ hasSearched, hasTrack: false, genreCount: 0, commentLength: 0, blocked: false });
+  abandonSnapshotRef.current = {
+    hasSearched,
+    hasTrack: selectedTrack !== null,
+    genreCount: selectedGenres.length,
+    commentLength: comment.trim().length,
+    blocked: isRegistrationBlocked,
+  };
+  useEffect(() => {
+    posthog?.capture('playlist_recommend_entered', { prefilled_track: !!prefillTrack, prefilled_query: initialQuery !== '' });
+    return () => {
+      if (submittedRef.current) return;
+      const duration = Date.now() - enteredAtRef.current;
+      if (duration < 500) return; // 개발 모드 StrictMode의 즉시 재마운트 같은 노이즈 제외
+      const { hasSearched: searched, hasTrack, genreCount, commentLength, blocked } = abandonSnapshotRef.current;
+      // 가장 멀리 진행한 단계 — 한마디 > 장르 > 곡 선택 > 검색 > 아무것도 안 함 순
+      const furthestStep = commentLength > 0 ? 'comment' : genreCount > 0 ? 'genre' : hasTrack ? 'track' : searched ? 'search' : 'none';
+      posthog?.capture('playlist_recommend_abandoned', {
+        furthest_step: furthestStep,
+        has_track: hasTrack,
+        genre_count: genreCount,
+        comment_length: commentLength,
+        blocked, // 한도 소진/임시 차단으로 진입 즉시 막힌 이탈 — 작성 포기와 구분해서 볼 것
+        duration_ms: duration,
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const lastSearchAtRef = useRef(0);
 
@@ -150,7 +196,6 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const canSubmit =
     !!selectedTrack &&
     selectedGenres.length >= MIN_GENRES &&
-    comment.trim().length > 0 &&
     creationStatus?.canCreate !== false &&
     !isTemporarilyBlocked &&
     !submitSong.isPending;
@@ -208,14 +253,14 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       },
       {
         onSuccess: () => {
+          submittedRef.current = true;
           onSubmitSuccess();
         },
         onError: (error) => {
           const code = (error as HttpError).code;
 
           if (code && TOAST_ERROR_MESSAGES[code]) {
-            setSubmitToast(TOAST_ERROR_MESSAGES[code]);
-            setTimeout(() => setSubmitToast(''), 2500);
+            showSubmitToast(TOAST_ERROR_MESSAGES[code], 2500);
             return;
           }
 
@@ -224,10 +269,11 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             return;
           }
 
+          const inlineMessage = code ? INLINE_ERROR_MESSAGES[code] : undefined;
           setSubmitInlineError(
-            (code && INLINE_ERROR_MESSAGES[code]) ||
-              (error instanceof Error ? error.message : '곡 추천에 실패했어요. 다시 시도해주세요.')
+            inlineMessage || (error instanceof Error ? error.message : '곡 추천에 실패했어요. 다시 시도해주세요.')
           );
+          if (inlineMessage) showSubmitToast(inlineMessage, INLINE_ERROR_TOAST_MS);
         },
       }
     );
@@ -252,7 +298,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         subtitle={
           creationStatus
             ? isTemporarilyBlocked
-              ? '지금은 곡을 추천할 수 없어요. 잠시 후 다시 만나요 :)'
+              ? '곡 추천이 일시적으로 제한되었어요'
               : creationStatus.canCreate
                 ? creationStatus.recentTrackIdsIn7Days.length === 0
                   ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요!`
@@ -451,14 +497,17 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
       {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
-        <h3 className="text-lg font-bold text-text-main mb-2">곡에 대한 한마디</h3>
+        <div className="flex items-center gap-1 mb-2">
+          <h3 className="text-lg font-bold text-text-main">곡에 대한 한마디</h3>
+          <span className="text-xs font-semibold text-text-hint">(선택)</span>
+        </div>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-playlist-primary focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
           <textarea
             value={comment}
             maxLength={COMMENT_MAX_LENGTH}
             onChange={(e) => setComment(e.target.value)}
             onFocus={collapseResultsAfterPick}
-            placeholder="이 곡에 대한 얘기를 자유롭게 남겨주세요!"
+            placeholder={'이 곡에 대한 얘기를 자유롭게 남겨주세요!\n한마디가 생각나지 않는다면 건너뛰어도 돼요.'}
             rows={5}
             className="w-full bg-transparent text-sm text-text-main placeholder-text-hint outline-none resize-none"
           />
@@ -504,12 +553,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         </div>
       )}
 
-      {/* 1일 3곡 제한(PL001)/최근 7일 중복 추천(PL002) 안내 토스트 */}
-      {submitToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-50 whitespace-pre-line text-center copy-toast">
-          {submitToast}
-        </div>
-      )}
+      {/* 등록 실패 안내 토스트(PL001/PL002/PL007, 인라인 문구 에러 PL003/C001) — 플레이리스트 공용 Toast */}
+      {submitToast && <Toast message={submitToast} />}
 
       {/* 한도/임시 차단 팝업은 사전 안내용이고 서버가 등록 시 최종 판단하므로(PL001 등), 이 팝업 렌더가 터지면
           폴백 없이 그냥 안 그리고(null) 사용자는 그대로 진행하게 함 — 팝업 하나 때문에 화면 전체가 죽지 않게 */}
@@ -549,9 +594,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             </button>
           }
         >
-          <p className="text-sm font-semibold text-text-main mb-1 text-center">지금은 곡을 추천할 수 없어요</p>
-          <p className="text-xs text-text-sub mb-4 text-center">
-            {blockedUntilLabel ? `${blockedUntilLabel} 이후에 다시 시도해주세요.` : '잠시 후 다시 시도해주세요.'}
+          <p className="text-sm font-semibold text-text-main mb-1 text-center">곡 추천이 일시적으로 제한되었어요</p>
+          <p className="text-xs text-text-sub mb-4 whitespace-pre-line text-center">
+            {blockedUntilLabel ? `${blockedUntilLabel}까지는 곡을 추천할 수 없어요.\n이후에 다시 이용해주세요.` : '잠시 후 다시 이용해주세요.'}
           </p>
         </ConfirmPopup>
       )}

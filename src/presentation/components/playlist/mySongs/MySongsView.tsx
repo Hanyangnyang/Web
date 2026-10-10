@@ -13,7 +13,7 @@ export function MySongsView({ onBack, onPlay, onShowAddSong, onSelectTrack, curr
 
   return (
     <SongListScreen
-      title="추천한 곡"
+      title="내가 추천한 곡"
       emoji="🎤"
       subtitle=""
       songs={songs ?? []}

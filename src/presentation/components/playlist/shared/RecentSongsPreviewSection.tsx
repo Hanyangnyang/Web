@@ -23,7 +23,7 @@ interface RecentSongsPreviewSectionProps {
 export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading, onSelectRecentSong, onPlay, currentTrackId, variant = 'control' }: RecentSongsPreviewSectionProps) {
   return (
     <section>
-      <h3 className="mb-2 text-base font-bold text-text-main">하냥이들이 어떤 곡을 추천했을까요?</h3>
+      <h3 className="mb-2 text-base font-bold text-text-main">하냥이들은 어떤 곡을 추천했을까요?</h3>
       <ErrorBoundary
         name="playlist-recent-preview"
         fallback={<PlaylistFallback message="최근 추가된 곡을 표시할 수 없어요" />}
