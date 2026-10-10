@@ -11,8 +11,8 @@ interface ChartTopCardProps<T extends ChartCardTrack> {
   onShowPosts: (track: T) => void;
   // 앨범아트(흰 구분선 위쪽) 클릭 — 바로 재생
   onPlay: (track: TrackSummary) => void;
-  // 넘겨주면 우상단 재생 아이콘 옆에 공유 아이콘이 생김 — 공유가 필요 없는 곳(소식탭 홍보 카드 등)은 안 넘김
-  onShare?: (track: T) => void;
+  // true면 우상단 재생 아이콘 옆에 공유 아이콘이 보임 — 장식용이라 눌러도 별도 동작 없이 아래 영역의 클릭(onPlay)으로 통과됨
+  showShareIcon?: boolean;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 카드 너비 — 기본은 홈 미리보기의 가로 스크롤용 고정폭(152px). 소식탭 홍보 카드처럼 부모가 폭을
@@ -25,7 +25,7 @@ interface ChartTopCardProps<T extends ChartCardTrack> {
 
 // 인기차트 홈 미리보기 카드(최대 10위) — 배경은 앨범아트 하나로 카드 전체를 채우고, 그 위에 흰
 // 구분선으로 나눈 두 클릭 영역(위: 재생, 아래: 곡명·가수명 눌러 게시글 모음)만 얹음
-export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onPlay, onShare, currentTrackId, widthClassName = 'w-[152px] flex-shrink-0', heightClassName = 'aspect-[3/4]' }: ChartTopCardProps<T>) {
+export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onPlay, showShareIcon, currentTrackId, widthClassName = 'w-[152px] flex-shrink-0', heightClassName = 'aspect-[3/4]' }: ChartTopCardProps<T>) {
   const isPlaying = track.trackId === currentTrackId;
 
   return (
@@ -56,17 +56,9 @@ export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onP
             )}
           </button>
 
-          {/* 우상단 아이콘 줄 — 재생 아이콘은 아래 버튼의 클릭을 그대로 통과시키고, 공유 버튼만 따로 눌림 */}
+          {/* 우상단 아이콘 줄 — 전부 장식이라 클릭은 아래 버튼(onPlay)으로 그대로 통과 */}
           <div className="absolute top-2 right-2 flex items-center gap-2 pointer-events-none">
-            {onShare && (
-              <button
-                onClick={() => onShare(track)}
-                aria-label={`${track.title} 공유`}
-                className="pointer-events-auto -m-2 p-2 active:scale-90 transition-transform"
-              >
-                <Share2 size={20} stroke="white" strokeWidth={2} />
-              </button>
-            )}
+            {showShareIcon && <Share2 size={20} stroke="white" strokeWidth={2} aria-hidden="true" />}
             {isPlaying ? (
               <Pause size={24} fill="white" stroke="white" strokeWidth={1} />
             ) : (

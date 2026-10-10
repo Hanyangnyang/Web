@@ -317,7 +317,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           <button
             onClick={() => refetchStatus()}
             disabled={isStatusFetching}
-            className="flex-shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
+            className="flex-shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-text-main shadow-sm active:scale-95 transition-transform disabled:text-text-hint"
           >
             다시 확인
           </button>
@@ -480,12 +480,12 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 key={genre.key}
                 onClick={() => handleGenreClick(genre.key)}
                 disabled={isDisabled}
-                className={`flex items-center gap-1 px-2 py-1 rounded-2xl text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-2xl text-[13px] font-medium border transition-all duration-200 active:scale-[0.96] ${
                   isSelected
-                    ? `${genre.light} ${genre.activeBorder} text-gray-700`
+                    ? `${genre.light} ${genre.activeBorder} text-gray-600`
                     : isDisabled
                       ? 'text-slate-300 border-slate-200'
-                      : 'text-gray-700 border-gray-300'
+                      : 'text-gray-500 border-gray-300'
                 }`}
               >
                 <span className="text-base">{genre.emoji}</span>

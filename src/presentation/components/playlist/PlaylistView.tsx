@@ -37,7 +37,7 @@ const EMPTY_CHART: ChartTrack[] = []; // 인기차트 화면 데이터 도착 �
 // 화면 스택의 한 칸 = 화면 이름 + 그 화면이 쓰는 파라미터 
 type ScreenFrame =
   | { name: 'main' }
-  | { name: 'recent'; scrollTarget: string | null } // scrollTarget: 홈의 최근추가된곡 섹션의 곡 카드를 눌렀을때, 해당하는 곡으로 스크롤하기 위함 
+  | { name: 'recent'; scrollTarget: string | null; highlight?: boolean } // highlight: false면 스크롤만 하고 카드 강조 생략(홈 "더보기"). // scrollTarget: 홈의 최근추가된곡 섹션의 곡 카드를 눌렀을때, 해당하는 곡으로 스크롤하기 위함 
   // prefillTrack: 게시글 모음에서 FAB을 누르는 등 특정 곡이 미리 채워진 채로 진입할 때의 곡
   // prefillQuery: 검색 결과 화면의 FAB에서 들어올 때 그 검색어로 곡 검색을 미리 해둠
   | { name: 'addSong'; prefillTrack: TrackSummary | null; prefillQuery: string | null }
@@ -310,7 +310,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     posthog?.capture('playlist_recent_show_all_clicked', { variant: recentSongsVariant, trigger: scrollToLastPreview ? 'more_button' : 'header_arrow' });
     const previewSongs = filteredRecentSongs.slice(0, RECENT_SONGS_LIMIT);
     const lastPreviewTrackId = previewSongs[previewSongs.length - 1]?.trackId ?? null;
-    pushScreen({ name: 'recent', scrollTarget: scrollToLastPreview ? lastPreviewTrackId : null });
+    // 특정 곡을 누른 게 아니라 미리보기 끝 위치를 이어 보여주는 것이므로 카드 강조는 하지 않음
+    pushScreen({ name: 'recent', scrollTarget: scrollToLastPreview ? lastPreviewTrackId : null, highlight: false });
   }, [pushScreen, songs, posthog, recentSongsVariant]);
 
   // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤.
@@ -395,6 +396,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             }}
             onSelectTrack={handleSelectSearchTrack}
             scrollToTrackId={screen.scrollTarget}
+            highlightScrollTarget={screen.highlight !== false}
             currentTrackId={playingTrackId}
             viewMode={viewModes.recent}
             onViewModeChange={changeViewMode('recent')}

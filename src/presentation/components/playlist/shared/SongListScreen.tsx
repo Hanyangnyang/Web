@@ -42,6 +42,8 @@ interface SongListScreenProps {
   onViewModeChange?: (mode: 'grid' | 'list') => void;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;
+  // false면 스크롤만 하고 도착한 카드 강조 효과는 생략 — 특정 곡을 눌러 온 게 아니라 위치만 이어 보여줄 때(홈 "더보기")
+  highlightScrollTarget?: boolean;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 카드의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 빈 상태를 흰 카드 박스로 감쌀지 — 최근추가된곡의 카드 그리드와 톤을 맞추려는 화면(기본값)용.
@@ -73,6 +75,7 @@ export function SongListScreen({
   enableViewToggle = false,
   gridOnly = false,
   scrollToTrackId,
+  highlightScrollTarget = true,
   currentTrackId,
   emptyStateBoxed = true,
   viewMode: viewModeProp,
@@ -154,7 +157,7 @@ export function SongListScreen({
     }
     const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
     target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    if (isInitial && target) setHighlightedTrackId(scrollTarget);
+    if (isInitial && target && highlightScrollTarget) setHighlightedTrackId(scrollTarget);
   }, [viewMode, scrollTarget]);
   useEffect(() => {
     if (!highlightedTrackId) return;
@@ -183,11 +186,11 @@ export function SongListScreen({
                 <div
                   role="group"
                   aria-label="목록 보기 방식"
-                  className={`relative flex items-center w-[76px] h-9 p-[3px] rounded-full bg-slate-100 border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] ${viewToggleCoachmark.state !== 'hidden' ? 'z-[45]' : ''}`}
+                  className={`relative flex items-center w-[84px] h-10 p-[3px] rounded-full bg-slate-100 border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] ${viewToggleCoachmark.state !== 'hidden' ? 'z-[45]' : ''}`}
                 >
                   <span
                     aria-hidden
-                    className="absolute top-[3px] left-[3px] w-[34px] h-[28px] rounded-full bg-white shadow-sm transition-transform duration-200 ease-out"
+                    className="absolute top-[3px] left-[3px] w-[38px] h-[32px] rounded-full bg-white shadow-sm transition-transform duration-200 ease-out"
                     style={{ transform: viewMode === 'grid' ? 'translateX(0)' : 'translateX(100%)' }}
                   />
                   <button

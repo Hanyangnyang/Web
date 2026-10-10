@@ -359,7 +359,7 @@ export function TrackPromoCarousel({ recentSongs, popularTracks, weeklyTracks, i
       {count > 1 && (
         <div className="absolute bottom-1 right-3 z-20 flex items-center gap-1" aria-label={`${current % count + 1} / ${count}`}>
           {promos.map((promo, index) => (
-            <button key={`${promo.source}-${promo.track.trackId}`} type="button" aria-label={`${index + 1}번째 배너로 이동`} className="py-1" onClick={() => { setTransitionEnabled(true); setCurrent(index); resetTimer(); }}>
+            <button key={`${promo.source}-${promo.track.trackId}`} type="button" aria-label={`${index + 1}번째 배너로 이동`} className="px-[3px] py-2.5 -my-1.5" onClick={() => { setTransitionEnabled(true); setCurrent(index); resetTimer(); }}>
               <span className={`block h-1 rounded-full transition-all ${index === current % count ? 'w-3.5 bg-white' : 'w-1 bg-white/45'}`} />
             </button>
           ))}

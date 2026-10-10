@@ -9,6 +9,8 @@ interface RecentSongsViewProps extends SongListViewBaseProps {
   onShowSearch: () => void;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
   scrollToTrackId?: string | null;
+  // false면 스크롤만 하고 카드 강조는 생략 (홈 "더보기"처럼 특정 곡을 누른 게 아닐 때)
+  highlightScrollTarget?: boolean;
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정값 (docs/playlist-recent-songs-ab-test.md 참고)
   playButtonVariant?: RecentSongsTapAreaVariant;
   // 홈 미리보기와 동기화되는 장르 필터(선택 + 칩 위치)
@@ -16,12 +18,12 @@ interface RecentSongsViewProps extends SongListViewBaseProps {
   onGenreFilterChange: (next: GenreFilterState) => void;
 }
 
-export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, currentTrackId, viewMode, onViewModeChange, playButtonVariant, genreFilter, onGenreFilterChange }: RecentSongsViewProps) {
+export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, highlightScrollTarget, currentTrackId, viewMode, onViewModeChange, playButtonVariant, genreFilter, onGenreFilterChange }: RecentSongsViewProps) {
   return (
     <SongListScreen
       title="최근 추가된 곡"
       emoji="🎵"
-      subtitle="에리카생들이 이제 막 추천한 곡들을 확인해보세요!"
+      subtitle="에리카생들이 방금 추천한 곡을 확인해보세요!"
       songs={songs}
       onBack={onBack}
       onPlay={onPlay}
@@ -31,6 +33,7 @@ export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSe
       emptyStateButtonLabel="어떤 곡을 추천해볼까요?"
       enableViewToggle
       scrollToTrackId={scrollToTrackId}
+      highlightScrollTarget={highlightScrollTarget}
       currentTrackId={currentTrackId}
       viewMode={viewMode}
       onViewModeChange={onViewModeChange}

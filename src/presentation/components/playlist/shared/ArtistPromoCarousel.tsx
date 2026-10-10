@@ -186,7 +186,7 @@ export function ArtistPromoCarousel({ artists, onClick, isActive = true, loading
                 key={artist.artistName}
                 type="button"
                 aria-label={`${i + 1}번째 배너로 이동`}
-                className="px-[3px] py-2"
+                className="px-1 py-3"
                 onClick={() => goTo(i)}
               >
                 <span

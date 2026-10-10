@@ -19,10 +19,10 @@ interface GenreFilterChipsProps {
 
 // 선택 안 된 칩은 모두 기본 흰색, 선택된 칩은 플레이리스트 파란색 계열의 연한 톤
 // 인기차트 기간 칩(ChartPeriodChips)도 같은 모양을 쓰도록 export
-export const CHIP_INACTIVE = 'bg-white text-gray-700 border-slate-200';
+export const CHIP_INACTIVE = 'bg-white text-gray-500 border-slate-200';
 export const CHIP_ACTIVE = 'bg-[#8FB0F3] text-white border-transparent';
-export const CHIP_LARGE = 'px-[10.5px] py-[4.5px] text-[13.5px]';
-export const CHIP_BASE = 'flex items-center gap-1 px-[9px] py-[3px] rounded-2xl text-[13px] font-bold whitespace-nowrap border flex-shrink-0 transition-colors duration-200 active:scale-[0.96]';
+export const CHIP_LARGE = 'px-3.5 py-2 text-[14.5px]';
+export const CHIP_BASE = 'flex items-center gap-1 px-3 py-1.5 rounded-2xl text-sm font-medium whitespace-nowrap border flex-shrink-0 transition-colors duration-200 active:scale-[0.96]';
 
 const MOVE_MS = 300;
 const GENRE_KEYS = GENRES.map((genre) => genre.key);

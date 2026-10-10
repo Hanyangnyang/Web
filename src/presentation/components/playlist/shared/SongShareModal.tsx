@@ -151,7 +151,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
         <button
           onClick={onClose}
           aria-label="닫기"
-          className="absolute top-0.5 right-0.5 z-10 p-2 before:content-[''] before:absolute before:-inset-1.5 text-text-hint hover:text-text-sub active:scale-90 transition-transform"
+          className="absolute top-0 right-0 z-10 p-3 before:content-[''] before:absolute before:-inset-2 text-text-hint hover:text-text-sub active:scale-90 transition-transform"
         >
           <X size={22} />
         </button>
@@ -172,9 +172,9 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
 
         <div className="border-t border-slate-100" />
 
-        <div className="flex justify-center gap-8 px-3 py-3">
+        <div className="flex justify-center gap-4 px-3 py-1">
           <button
-            className="flex flex-col items-center gap-1.5 bg-none border-none cursor-pointer p-1 rounded-full transition-colors duration-150 font-[inherit] hover:bg-surface"
+            className="flex flex-col items-center gap-1.5 bg-none border-none cursor-pointer p-3 rounded-2xl transition-colors duration-150 font-[inherit] hover:bg-surface"
             onClick={handleKakao}
           >
             <div className="w-11 h-11 rounded-full flex items-center justify-center bg-[#FEE500]">
@@ -183,7 +183,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
             <span className="text-[11px] font-semibold text-text-main">카카오톡</span>
           </button>
           <button
-            className="flex flex-col items-center gap-1.5 bg-none border-none cursor-pointer p-1 rounded-full transition-colors duration-150 font-[inherit] hover:bg-surface"
+            className="flex flex-col items-center gap-1.5 bg-none border-none cursor-pointer p-3 rounded-2xl transition-colors duration-150 font-[inherit] hover:bg-surface"
             onClick={handleShare}
           >
             <div className="w-11 h-11 rounded-full flex items-center justify-center bg-slate-100">
