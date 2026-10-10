@@ -105,7 +105,7 @@ export function MusicSearchResultCard({
               // 이 곡에 등록된 게시글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount
               <div className="flex items-center gap-0.5 text-[10px] text-text-hint truncate">
                 <MessageCircle size={10} className="flex-shrink-0" />
-                <span>게시글 {track.recommendationCount}개</span>
+                <span>추천글 {track.recommendationCount}개</span>
               </div>
             )}
           </div>

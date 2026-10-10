@@ -243,7 +243,7 @@ export function PostDetailCard({
         onKeyDown: (e: { key: string; stopPropagation: () => void }) => {
           if (e.key === 'Enter' || e.key === ' ') handleSelectTrackClick(e);
         },
-        'aria-label': `${post.title} 게시글 모음 보기`,
+        'aria-label': `${post.title} 추천글 모음 보기`,
       }
     : {};
 
@@ -275,7 +275,7 @@ export function PostDetailCard({
   const trailingButton = useTrackLinkButton ? (
     <button
       onClick={handleSelectTrackClick}
-      aria-label={`${post.title} 게시글 모음 보기`}
+      aria-label={`${post.title} 추천글 모음 보기`}
       className="flex-shrink-0 active:scale-90 transition-transform"
     >
       <ChevronRight size={20} className="text-text-sub" />
@@ -427,32 +427,46 @@ export function PostDetailCard({
         {/* 본문 */}
         {!compact && post.body && (
           <>
-            <p
-              ref={bodyRef}
-              style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
-              className={`${
-                isNarrow
-                  ? `text-xs overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
-                  : 'text-sm'
-              } text-text-main leading-relaxed ${
-                isNarrow && (isBodyClamped || bodyExpanded) ? 'mb-1' : 'mb-2'
-              } whitespace-pre-line`}
-            >
-              <span className="mr-[1px]">"</span>
-              {post.body}
-              <span className="ml-[1px]">"</span>
-            </p>
-            {/* 더보기/접기 — 카드 전체 클릭(1열 상세로 전환)과 별개 동작이라 전파를 막음 */}
-            {canToggleBody && (
+            {/* 접힌 상태의 "더보기"는 인스타그램 캡션처럼 잘린 마지막 줄 끝(말줄임표 자리)에 겹쳐 놓음 —
+                흰 배경+왼쪽 그라데이션이 `...`을 가려서 "…더보기"처럼 한 줄 안에 보임. 펼친 뒤의 "접기"는 본문 아래 별도 줄 */}
+            <div className={`relative ${isNarrow && bodyExpanded ? 'mb-1' : 'mb-2'}`}>
+              <p
+                ref={bodyRef}
+                style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
+                className={`${
+                  isNarrow
+                    ? `text-xs overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
+                    : 'text-sm'
+                } text-text-main leading-relaxed whitespace-pre-line`}
+              >
+                <span className="mr-[1px]">"</span>
+                {post.body}
+                <span className="ml-[1px]">"</span>
+              </p>
+              {/* 더보기/접기 — 카드 전체 클릭(1열 상세로 전환)과 별개 동작이라 전파를 막음 */}
+              {canToggleBody && !bodyExpanded && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleBody();
+                  }}
+                  aria-expanded={false}
+                  className="absolute bottom-0 right-0 pl-6 text-xs leading-relaxed font-semibold text-text-hint bg-gradient-to-l from-white from-70% to-transparent active:opacity-60"
+                >
+                  더보기
+                </button>
+              )}
+            </div>
+            {canToggleBody && bodyExpanded && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleBody();
                 }}
-                aria-expanded={bodyExpanded}
-                className="self-start mb-2 text-[11px] font-semibold text-text-hint active:opacity-60"
+                aria-expanded
+                className="self-end mb-2 text-xs leading-relaxed font-semibold text-text-hint active:opacity-60"
               >
-                {bodyExpanded ? '접기' : '더보기'}
+                접기
               </button>
             )}
           </>

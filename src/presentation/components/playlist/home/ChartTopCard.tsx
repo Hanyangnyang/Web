@@ -66,7 +66,7 @@ export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onP
         {/* 아래쪽: 곡명·가수명 — 누르면 이 곡의 게시글 모음으로 이동 */}
         <button
           onClick={() => onShowPosts(track)}
-          aria-label={`${track.title} 추천 게시글 보기`}
+          aria-label={`${track.title} 추천글 보기`}
           className="flex items-center gap-1 px-3 pt-2 pb-3 text-left active:bg-black/10 transition-colors"
         >
           <div className="min-w-0 flex-1 flex flex-col gap-0.5">

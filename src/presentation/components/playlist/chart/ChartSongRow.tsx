@@ -42,7 +42,7 @@ export function ChartSongRow({
       }}
       role="button"
       tabIndex={0}
-      aria-label={`${track.title} 추천 게시글 보기`}
+      aria-label={`${track.title} 추천글 보기`}
       className={`flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer ${highlighted ? '[animation:chartRowHighlight_1.8s_ease-out_0.3s_both]' : ''}`}
     >
       {/* 순위 */}

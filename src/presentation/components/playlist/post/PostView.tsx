@@ -22,7 +22,7 @@ export function PostView({ postId, onBack, onPlay, onSelectTrack, currentTrackId
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
-        title="게시글"
+        title="추천글"
         emoji="💬"
         subtitle={post ? `'${post.title} · ${post.artist}' 를 추천하는 글이에요!` : ''}
         onBack={onBack}

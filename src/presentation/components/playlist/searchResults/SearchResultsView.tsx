@@ -18,6 +18,7 @@ import { EmptyMessageCard } from './EmptyMessageCard';
 interface SearchResultsViewProps {
   query: string;
   onBack: () => void;
+  onGoHome: () => void; // 하단 "플레이리스트 홈화면으로 가기" 배너 — 스택을 홈으로 초기화
   onShowRecent: () => void; // 최근 추가된 곡 섹션의 제목/"더보기" — 최근 추가된 곡 전체보기로 이동
   recentSongs: Song[]; // 최근 추가된 곡 섹션에 보여줄 곡(앞의 RECENT_PREVIEW_LIMIT개만 사용)
   isRecentSongsLoading: boolean;
@@ -36,7 +37,7 @@ interface SearchResultsViewProps {
 const MIN_QUERY_LENGTH = 2;
 
 // 검색 결과 화면
-export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendWithQuery, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
+export function SearchResultsView({ query, onBack, onGoHome, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendWithQuery, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
   // 처음 진입 시 검색어(query prop)로 시작하고, 이 화면 안에서 재검색하면 activeQuery만 갱신 —
   // query prop 자체는 부모(PlaylistView)의 홈 검색바 상태라 건드리지 않음
   const [activeQuery, setActiveQuery] = useState(query);
@@ -122,7 +123,7 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
                   onPlay={onPlay}
                   isPlaying={track.trackId === currentTrackId}
                   onSelect={onSelectTrack}
-                  selectLabel={`${track.title} 추천 게시글 보기`}
+                  selectLabel={`${track.title} 추천글 보기`}
                   onRecommend={onRecommendTrack}
                 />
               ))
@@ -135,11 +136,11 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
 
       {/* 2. 우리 서비스에 등록된 게시글 */}
       <section className="mb-4">
-        <h3 className="text-lg font-bold text-text-main mb-2">게시글</h3>
+        <h3 className="text-lg font-bold text-text-main mb-2">추천글</h3>
         <ErrorBoundary
           key={activeQuery}
           name="playlist-search-posts"
-          fallback={<PlaylistFallback message="게시글 검색 결과를 표시할 수 없어요" />}
+          fallback={<PlaylistFallback message="추천글 검색 결과를 표시할 수 없어요" />}
         >
         <div className="flex flex-col gap-1.5">
           {isSearchingPosts ? (
@@ -170,6 +171,14 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
       </section>
 
       <hr className="-mx-3 mb-4 border-slate-200" />
+
+      <button
+        type="button"
+        onClick={onGoHome}
+        className="w-full mb-4 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-left text-sm font-semibold text-text-main active:scale-[0.98] transition-transform"
+      >
+      🏠 플레이리스트 홈화면 가기!
+      </button>
 
       {/* 3. 최근 추가된 곡 */}
       <RecentSongsPreviewSection

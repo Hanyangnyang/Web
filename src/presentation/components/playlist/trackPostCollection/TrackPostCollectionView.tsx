@@ -123,9 +123,9 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       <MiscSubViewHeader
-        title="게시글 모음"
+        title="추천글 모음"
         emoji="💬"
-        subtitle={displayTrack.title ? `'${displayTrack.title} · ${displayTrack.artist}' 의 추천 게시글을 다 모았어요!` : ''}
+        subtitle={displayTrack.title ? `'${displayTrack.title} · ${displayTrack.artist}' 의 추천글을 다 모았어요!` : ''}
         onBack={onBack}
       />
 
@@ -235,7 +235,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       )}
 
       {!isLoading && posts.length === 0 && (
-        <EmptyGenreState message="아직 이 곡을 추천한 게시글이 없어요" />
+        <EmptyGenreState message="아직 이 곡의 추천글이 없어요" />
       )}
 
       {/* 게시글 리스트 — 카드 사이 간격을 둬서 항목마다 분리된 느낌 */}
@@ -253,7 +253,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') onSelectPost(post);
               }}
-              aria-label="게시글 상세 보기"
+              aria-label="추천글 상세 보기"
               className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
             >
               {/* 본문 + 좋아요/더보기 */}
