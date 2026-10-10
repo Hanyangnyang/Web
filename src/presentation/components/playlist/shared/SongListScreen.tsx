@@ -143,15 +143,24 @@ export function SongListScreen({
   // 대상이 있거나 뷰 모드가 바뀌어 목록 DOM이 다시 그려질 때마다 해당 카드로 부드럽게 스크롤
   // 처음 진입할 땐 홈에서 내려와 있던 스크롤 위치가 그대로 남아 있어 아래→위로 스크롤되므로, 맨 위로 먼저 옮긴 뒤 위→아래로 스크롤
   const didInitialScrollRef = useRef(false);
+  // 찾아온 카드를 잠깐 강조 — 처음 스크롤할 때 대상 카드가 실제로 그려져 있을 때만 한 번 켬(토글로 1열↔2열을 바꿀 땐 다시 켜지 않음)
+  const [highlightedTrackId, setHighlightedTrackId] = useState<string | null>(null);
   useLayoutEffect(() => {
     if (!scrollTarget) return;
-    if (!didInitialScrollRef.current) {
+    const isInitial = !didInitialScrollRef.current;
+    if (isInitial) {
       didInitialScrollRef.current = true;
       scrollNearestScrollableAncestorToTop(listContainerRef.current);
     }
     const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
     target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (isInitial && target) setHighlightedTrackId(scrollTarget);
   }, [viewMode, scrollTarget]);
+  useEffect(() => {
+    if (!highlightedTrackId) return;
+    const timer = setTimeout(() => setHighlightedTrackId(null), 2400);
+    return () => clearTimeout(timer);
+  }, [highlightedTrackId]);
 
   // (2열 카드를 눌러 1열 상세로 전환하던 동작은 없앰 — 카드 하단을 누르면 한마디 더보기/접기로 동작함. 1열은 우측 상단 토글 버튼으로 전환)
 
@@ -170,20 +179,43 @@ export function SongListScreen({
           rightAction={
             enableViewToggle ? (
               <div className="relative">
-                <button
-                  onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                  aria-label={viewMode === 'grid' ? '1열로 보기' : '2열로 보기'}
-                  className={`w-9 h-9 rounded-full bg-white border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] flex items-center justify-center text-text-main transition-shadow active:scale-95 ${viewToggleCoachmark.state !== 'hidden' ? 'relative z-[45]' : ''}`}
+                {/* 2열/1열 토글 — 두 아이콘을 모두 보여주고 현재 모드 쪽에 흰 썸이 올라간다 */}
+                <div
+                  role="group"
+                  aria-label="목록 보기 방식"
+                  className={`relative flex items-center w-[76px] h-9 p-[3px] rounded-full bg-slate-100 border border-slate-200 shadow-[0_6px_20px_rgba(0,0,0,0.08)] ${viewToggleCoachmark.state !== 'hidden' ? 'z-[45]' : ''}`}
                 >
-                  {viewMode === 'grid' ? <Rows3 size={16} strokeWidth={2} /> : <LayoutGrid size={16} strokeWidth={2} />}
-                </button>
+                  <span
+                    aria-hidden
+                    className="absolute top-[3px] left-[3px] w-[34px] h-[28px] rounded-full bg-white shadow-sm transition-transform duration-200 ease-out"
+                    style={{ transform: viewMode === 'grid' ? 'translateX(0)' : 'translateX(100%)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('grid')}
+                    aria-label="2열로 보기"
+                    aria-pressed={viewMode === 'grid'}
+                    className={`relative z-10 flex-1 h-full flex items-center justify-center rounded-full transition-colors ${viewMode === 'grid' ? 'text-text-main' : 'text-slate-400'}`}
+                  >
+                    <LayoutGrid size={16} strokeWidth={2} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('list')}
+                    aria-label="1열로 보기"
+                    aria-pressed={viewMode === 'list'}
+                    className={`relative z-10 flex-1 h-full flex items-center justify-center rounded-full transition-colors ${viewMode === 'list' ? 'text-text-main' : 'text-slate-400'}`}
+                  >
+                    <Rows3 size={16} strokeWidth={2} />
+                  </button>
+                </div>
 
                 {/* 그리드 보기 코치마크 — 버튼 존재를 알려주려고 3초만 떴다 사라진다 */}
                 <Coachmark
                   {...viewToggleCoachmark}
                   className="absolute right-0 top-full mt-2"
                 >
-                  {viewMode === 'grid' ? '한 줄로 크게 볼 수도 있어요!📖' : '한눈에 모아 볼 수도 있어요!🔲'}
+                  원하는 형태로 볼 수 있어요!👀
                 </Coachmark>
               </div>
             ) : undefined
@@ -221,7 +253,7 @@ export function SongListScreen({
                 key={songKey(song)}
                 data-track-id={song.trackId}
                 data-song-key={songKey(song)}
-                className={viewMode === 'grid' ? 'h-full' : undefined}
+                className={`${viewMode === 'grid' ? 'h-full' : ''} ${song.trackId === highlightedTrackId ? 'rounded-2xl [animation:songCardHighlight_1.8s_ease-out_0.3s_both]' : ''}`.trim() || undefined}
                 style={lockedHeight !== undefined ? { alignSelf: 'start', height: lockedHeight } : undefined}
               >
                 <PostDetailCard

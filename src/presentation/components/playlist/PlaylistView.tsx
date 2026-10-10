@@ -108,7 +108,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     handlePlayerHeightChange,
   } = usePlaylistPlayer(recentSongsVariant);
 
-  // 최근추가된곡/저장한곡/추천한곡 화면의 그리드·리스트 뷰 모드 — 이 화면들은 게시글 상세로 갔다가
+  // 최근추가된곡/추천한곡 화면의 그리드·리스트 뷰 모드(사용자가 토글로 고른 값) — 어느 경로로 들어오든 이 선택대로 열린다. 이 화면들은 게시글 상세로 갔다가
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
   const [viewModes, setViewModes] = useState<Record<ListScreen, ViewMode>>({
@@ -207,9 +207,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 곡추천하기 등록 성공 — 어느 화면에서 곡추천하기로 들어왔든, 자기 곡이 잘 올라갔는지 바로
   // 볼 수 있게 최근추가된곡으로 보냄. addSong 프레임을 그대로 recent로 바꿔치기해서(push가 아님)
   // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음.
-  // 방금 올린 글을 바로 읽을 수 있게 1열(리스트)로 열림(이후 토글 버튼으로 2열 전환 가능)
   const handleAddSongSuccess = useCallback(() => {
-    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
 
@@ -299,10 +297,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 쓰지 않기로 해서, 최근추가된곡 화면으로 이동하면서 그 곡 위치로 스크롤함(홈의 최근 추가된 곡 카드 클릭과 같은 방식).
   // postDetail 화면/PostView 코드는 그대로 남겨둠 — 다시 쓰려면 아래를 pushScreen({ name: 'postDetail', postId: post.id })로 되돌리면 됨.
   // 주의: 최근추가된곡 목록은 최신 50개만 받아서, 그보다 오래된 게시글이면 해당 카드가 없어 스크롤 없이 목록 맨 위로 열림
-  // 게시글 전문을 바로 읽을 수 있게 무조건 1열(리스트)로 열림 — 2열이었어도 여기서 1열로 바꿈(이후 토글 버튼으로 다시 2열 전환 가능)
   // 장르 필터도 전체로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
   const handleSelectPost = useCallback((post: Song) => {
-    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
     pushScreen({ name: 'recent', scrollTarget: post.trackId });
   }, [pushScreen]);
@@ -318,17 +314,14 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   }, [pushScreen, songs, posthog, recentSongsVariant]);
 
   // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤.
-  // 눌러서 들어온 곡을 바로 읽을 수 있게 1열(리스트)로 열림(이후 토글 버튼으로 2열 전환 가능)
   const handleSelectRecentSong = useCallback((song: Song) => {
     posthog?.capture('playlist_recent_preview_navigate', { variant: recentSongsVariant, track_id: song.trackId });
-    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
-  // 홈 곡 배너에서는 최근 곡 화면을 1열(리스트)로 열고 해당 곡을 가운데로 이동한다.
+  // 홈 곡 배너에서는 최근 곡 화면을 열고 해당 곡을 가운데로 이동한다.
   // 장르 필터도 "전체"로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문(handleSelectPost와 같은 이유)
   const handleSelectRecentPromo = useCallback((song: Song) => {
-    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen]);
@@ -453,11 +446,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={() => handlePlay(screen.track)}
             isPlaying={screen.track.trackId === playingTrackId}
             onResolveTrack={handleResolveTrackPostsTrack}
-            onShowRecent={() => {
-              // 하단 "더보기" — 여러 곡을 훑어보라는 맥락이라 최근 추가된 곡을 2열 그리드로 염(이후 토글 버튼으로 1열 전환 가능)
-              setViewModes((prev) => ({ ...prev, recent: 'grid' }));
-              handleShowAllRecent();
-            }}
+            onShowRecent={() => handleShowAllRecent()}
             recentSongs={songs}
             isRecentSongsLoading={isRecentSongsLoading}
             onSelectRecentSong={handleSelectRecentSong}

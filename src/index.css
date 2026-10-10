@@ -527,3 +527,18 @@ body {
     box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0);
   }
 }
+
+/* 최근추가된곡 등 카드 목록에서 홈/게시글로 찾아온 카드를 잠깐 파랗게 강조 — 카드가 흰 배경에 overflow-hidden이라 바깥쪽 링 + 은은한 글로우가 번쩍였다가 사라짐 */
+@keyframes songCardHighlight {
+  0% {
+    box-shadow: 0 0 0 1px rgba(97, 140, 233, 0.75), 0 0 18px 4px rgba(97, 140, 233, 0.35);
+  }
+
+  60% {
+    box-shadow: 0 0 0 1px rgba(97, 140, 233, 0.4), 0 0 12px 2px rgba(97, 140, 233, 0.18);
+  }
+
+  100% {
+    box-shadow: 0 0 0 1px rgba(97, 140, 233, 0), 0 0 0 0 rgba(97, 140, 233, 0);
+  }
+}
