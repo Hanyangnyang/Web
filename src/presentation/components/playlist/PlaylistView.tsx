@@ -22,6 +22,7 @@ import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
+import { ConfirmPopup } from './shared/ConfirmPopup';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 import { useRecentSongsTapAreaVariant } from '../../hooks/playlist/usePlaylistExperiment';
@@ -203,13 +204,22 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
 
+  // 플레이리스트 탭을 나가면 플레이어가 언마운트돼서 듣던 곡이 끊김 — 재생 중일 때만 확인 팝업을 먼저 띄움(일시정지/미재생이면 바로 나감)
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const requestExit = useCallback(() => {
+    if (playingTrackId) setShowExitConfirm(true);
+    else onBack();
+  }, [playingTrackId, onBack]);
+
   const handleBack = useCallback(() => {
-    if (screenStack.length > 1) {
+    if (showExitConfirm) {
+      setShowExitConfirm(false); // 하드웨어 뒤로가기로 팝업만 닫음
+    } else if (screenStack.length > 1) {
       popScreen();
     } else {
-      onBack();
+      requestExit();
     }
-  }, [screenStack, popScreen, onBack]);
+  }, [showExitConfirm, screenStack, popScreen, requestExit]);
   useBackHandler(handleBack);
 
   // 플레이리스트의 모든 API가 device_id를 요구해서, 화면 진입 시점에 무조건 익명 기기 식별자를 발급/재사용해둠
@@ -308,9 +318,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
-  // 홈 곡 배너에서는 요청한 동선대로 최근 곡 화면을 2열 그리드로 열고 해당 곡을 가운데로 이동한다.
+  // 홈 곡 배너에서는 최근 곡 화면을 1열(리스트)로 열고 해당 곡을 가운데로 이동한다.
   const handleSelectRecentPromo = useCallback((song: Song) => {
-    setViewModes((prev) => ({ ...prev, recent: 'grid' }));
+    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen]);
 
@@ -428,6 +438,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={() => handlePlay(screen.track)}
             isPlaying={screen.track.trackId === playingTrackId}
             onResolveTrack={handleResolveTrackPostsTrack}
+            onShowRecent={() => handleShowAllRecent()}
+            recentSongs={songs}
+            isRecentSongsLoading={isRecentSongsLoading}
+            onSelectRecentSong={handleSelectRecentSong}
+            onPlayTrack={handlePlay}
+            currentTrackId={playingTrackId}
+            recentSongsVariant={recentSongsVariant}
           />
         ) : screen.name === 'postDetail' ? (
           <PostView
@@ -483,7 +500,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           />
         ) : (
           <PlaylistHomeView
-            onBack={onBack}
+            onBack={requestExit}
             isActive={isActive}
             visibleSongs={visibleSongs}
             promoRecentSongs={songs.slice(0, 10)}
@@ -527,6 +544,35 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       {/* 곡 추가 FAB: 곡추천하기 화면에서는 숨김. 플레이어 열림/닫힘에 따라 위치가 애니메이션으로 이동함 */}
       {screen.name !== 'addSong' && (
         <AddSongFab onClick={handleAddSongFabClick} playerHeight={playerHeight} showCoachmark={screen.name === 'main'} />
+      )}
+
+      {/* 재생 중에 플레이리스트를 나가려 할 때 확인 팝업 */}
+      {showExitConfirm && (
+        <ConfirmPopup
+          compact
+          buttons={
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 h-8 rounded-full text-xs font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  setShowExitConfirm(false);
+                  onBack();
+                }}
+                className="flex-1 h-8 rounded-full text-xs font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+              >
+                나가기
+              </button>
+            </div>
+          }
+        >
+          <p className="text-[15px] font-bold text-text-main mb-1 text-center">정말 나가시겠어요?</p>
+          <p className="text-xs font-medium text-text-hint mb-3.5 text-center">뒤로가면 재생 중인 음악이 정지돼요.</p>
+        </ConfirmPopup>
       )}
 
       {/* 플로팅 Spotify 플레이어*/}

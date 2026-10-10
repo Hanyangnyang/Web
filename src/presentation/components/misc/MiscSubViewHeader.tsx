@@ -7,10 +7,11 @@ interface MiscSubViewHeaderProps {
   onBack: () => void;
   emoji?: string;
   subtitle?: string;
+  subtitleLoading?: boolean; // 부제목을 API로 받아오는 중이면 글자 대신 shimmer 막대를 보여줌
   rightAction?: ReactNode;
 }
 
-export function MiscSubViewHeader({ title, onBack, emoji, subtitle, rightAction }: MiscSubViewHeaderProps) {
+export function MiscSubViewHeader({ title, onBack, emoji, subtitle, subtitleLoading, rightAction }: MiscSubViewHeaderProps) {
   return (
     <header className="flex items-center gap-4 mb-3">
       <button
@@ -26,7 +27,8 @@ export function MiscSubViewHeader({ title, onBack, emoji, subtitle, rightAction 
             {emoji}
           </h1>
         </div>
-        {subtitle && <p className="text-[0.8rem] text-text-sub font-medium m-0 truncate">{subtitle}</p>}
+        {subtitleLoading && <div className="h-3.5 w-48 max-w-full rounded-full skeleton-shimmer" />}
+        {!subtitleLoading && subtitle && <p className="text-[0.8rem] text-text-sub font-medium m-0 truncate">{subtitle}</p>}
       </div>
       {rightAction && <div className="flex-shrink-0">{rightAction}</div>}
     </header>

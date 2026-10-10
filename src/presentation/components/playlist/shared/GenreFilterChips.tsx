@@ -14,18 +14,20 @@ interface GenreFilterChipsProps {
   value: GenreFilterState;
   onChange: (next: GenreFilterState) => void;
   className?: string;
+  large?: boolean; // 목록 화면처럼 모바일에서 누르기 편하도록 칩을 조금 키움(홈 미리보기는 기본 크기)
 }
 
 // 선택 안 된 칩은 모두 기본 흰색, 선택된 칩은 플레이리스트 파란색 계열의 연한 톤
 // 인기차트 기간 칩(ChartPeriodChips)도 같은 모양을 쓰도록 export
-export const CHIP_INACTIVE = 'bg-white text-gray-800 border-slate-200';
+export const CHIP_INACTIVE = 'bg-white text-gray-700 border-slate-200';
 export const CHIP_ACTIVE = 'bg-[#8FB0F3] text-white border-transparent';
-export const CHIP_BASE = 'flex items-center gap-1 px-[9px] py-[5px] rounded-full text-[13px] font-bold whitespace-nowrap border flex-shrink-0 transition-colors duration-200 active:scale-[0.96]';
+export const CHIP_LARGE = 'px-[10.5px] py-[4.5px] text-[13.5px]';
+export const CHIP_BASE = 'flex items-center gap-1 px-[9px] py-[3px] rounded-2xl text-[13px] font-bold whitespace-nowrap border flex-shrink-0 transition-colors duration-200 active:scale-[0.96]';
 
 const MOVE_MS = 300;
 const GENRE_KEYS = GENRES.map((genre) => genre.key);
 
-export function GenreFilterChips({ value, onChange, className = '' }: GenreFilterChipsProps) {
+export function GenreFilterChips({ value, onChange, className = '', large = false }: GenreFilterChipsProps) {
   const { selected: selectedGenres, recent: recentKeys } = value;
   const containerRef = useRef<HTMLDivElement>(null);
   const chipRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -87,7 +89,7 @@ export function GenreFilterChips({ value, onChange, className = '' }: GenreFilte
             }}
             onClick={() => (isAll ? onChange({ ...value, selected: [] }) : toggleGenre(key))}
             aria-pressed={isSelected}
-            className={`${CHIP_BASE} ${
+            className={`${CHIP_BASE} ${large ? CHIP_LARGE : ''} ${
               isSelected ? CHIP_ACTIVE : CHIP_INACTIVE
             }`}
           >

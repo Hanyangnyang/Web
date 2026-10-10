@@ -1,4 +1,4 @@
-import { ChevronRight, Pause, Play } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 import { type TrackSummary } from '../playlistTypes';
 
 // rank가 없으면(예: 홈의 "내가 추천한 곡") 순위 숫자만 생략하고 나머지 UI는 동일하게 그림
@@ -73,7 +73,6 @@ export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onP
             <div className="text-sm font-bold text-white truncate leading-tight">{track.title}</div>
             <div className="text-xs font-medium text-white/90 truncate leading-tight">{track.artist}</div>
           </div>
-          <ChevronRight size={16} className="text-white/80 flex-shrink-0" />
         </button>
       </div>
     </div>

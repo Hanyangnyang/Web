@@ -72,7 +72,7 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
       />
 
       {/* 기간 칩 한 줄 — 오른쪽 끝에 장르 드롭다운 */}
-      <div className="flex items-center justify-between gap-2 mb-2">
+      <div className="flex items-center justify-between gap-2 -mt-1.5 mb-2">
         <ChartPeriodChips chartPeriod={chartPeriod} onChangePeriod={onChangePeriod} className="!mb-0" />
         <GenreFilterDropdown value={genreFilter} onChange={onGenreFilterChange} />
       </div>

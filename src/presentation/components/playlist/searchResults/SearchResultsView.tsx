@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
@@ -8,6 +7,7 @@ import { useSongSearch } from '../../../hooks/playlist/useSongSearch.js';
 import { useMusicSearch, normalizeMusicSearchQuery } from '../../../hooks/playlist/useMusicSearch.js';
 import { useRetryCountdown, getSearchErrorMessage } from '../../../hooks/playlist/useRetryCountdown.js';
 import { RecentSongRow } from '../shared/RecentSongRow';
+import { RecentSongsPreviewSection } from '../shared/RecentSongsPreviewSection';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
@@ -34,8 +34,6 @@ interface SearchResultsViewProps {
 
 // 검색 최소 글자수
 const MIN_QUERY_LENGTH = 2;
-// 최근 추가된 곡 섹션에서 보여줄 개수
-const RECENT_PREVIEW_LIMIT = 3;
 
 // 검색 결과 화면
 export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, recentSongsVariant = 'control', onSelectTrack, onSelectPost, onPlay, currentTrackId, onRecommendWithQuery, onRecommendTrack, onActiveQueryChange }: SearchResultsViewProps) {
@@ -171,57 +169,18 @@ export function SearchResultsView({ query, onBack, onShowRecent, recentSongs, is
 
       </section>
 
-      {/* 3. 최근 추가된 곡 — 홈의 최근 추가된 곡 미리보기와 같은 행 UI, 3개만 보여주고 더보기로 전체보기 이동 */}
-      <section>
-        <h3 className="mb-2">
-          <button
-            type="button"
-            onClick={onShowRecent}
-            aria-label="최근 추가된 곡 전체보기"
-            className="flex items-center text-lg font-bold text-text-main active:scale-[0.98] transition-transform"
-          >
-            <span>최근 추가된 곡</span>
-            <ChevronRight size={20} className="ml-0.5" />
-          </button>
-        </h3>
-        <ErrorBoundary
-          name="playlist-search-recent"
-          fallback={<PlaylistFallback message="최근 추가된 곡을 표시할 수 없어요" />}
-        >
-        <div className="flex flex-col gap-1.5">
-          {isRecentSongsLoading ? (
-            Array.from({ length: RECENT_PREVIEW_LIMIT }).map((_, i) => (
-              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
-            ))
-          ) : recentSongs.length === 0 ? (
-            <EmptyMessageCard message="아직 추가된 곡이 없어요" />
-          ) : (
-            recentSongs.slice(0, RECENT_PREVIEW_LIMIT).map((song) => (
-              <RecentSongRow
-                key={song.id ?? song.trackId}
-                song={song}
-                onSelect={onSelectRecentSong}
-                onPlay={onPlay}
-                currentTrackId={currentTrackId}
-                variant={recentSongsVariant}
-              />
-            ))
-          )}
-        </div>
-        </ErrorBoundary>
+      <hr className="-mx-3 mb-4 border-slate-200" />
 
-        {!isRecentSongsLoading && recentSongs.length > 0 && (
-          <div className="flex justify-center mt-3">
-            <button
-              type="button"
-              onClick={onShowRecent}
-              className="px-4 py-1.5 rounded-full text-xs font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
-            >
-              더보기
-            </button>
-          </div>
-        )}
-      </section>
+      {/* 3. 최근 추가된 곡 */}
+      <RecentSongsPreviewSection
+        onShowRecent={onShowRecent}
+        recentSongs={recentSongs}
+        isLoading={isRecentSongsLoading}
+        onSelectRecentSong={onSelectRecentSong}
+        onPlay={onPlay}
+        currentTrackId={currentTrackId}
+        variant={recentSongsVariant}
+      />
     </div>
   );
 }

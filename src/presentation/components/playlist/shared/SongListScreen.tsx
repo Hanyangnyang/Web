@@ -8,6 +8,7 @@ import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips, EMPTY_GENRE_FILTER, type GenreFilterState } from './GenreFilterChips';
 import { Coachmark, useCoachmark } from './Coachmark';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
+import { scrollNearestScrollableAncestorToTop } from '../../../../utils/scroll';
 
 // 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다(Coachmark.tsx 참고)
 const VIEW_TOGGLE_COACHMARK_SEEN_KEY = 'viewToggleCoachmarkSeen';
@@ -139,8 +140,14 @@ export function SongListScreen({
   };
 
   // 대상이 있거나 뷰 모드가 바뀌어 목록 DOM이 다시 그려질 때마다 해당 카드로 부드럽게 스크롤
+  // 처음 진입할 땐 홈에서 내려와 있던 스크롤 위치가 그대로 남아 있어 아래→위로 스크롤되므로, 맨 위로 먼저 옮긴 뒤 위→아래로 스크롤
+  const didInitialScrollRef = useRef(false);
   useLayoutEffect(() => {
     if (!scrollTarget) return;
+    if (!didInitialScrollRef.current) {
+      didInitialScrollRef.current = true;
+      scrollNearestScrollableAncestorToTop(listContainerRef.current);
+    }
     const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
     target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, [viewMode, scrollTarget]);
@@ -184,6 +191,7 @@ export function SongListScreen({
         <GenreFilterChips
           value={genreFilter}
           onChange={setGenreFilter}
+          large
           className="-mt-1.5 pb-2"
         />
       </div>

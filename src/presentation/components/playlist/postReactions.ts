@@ -13,13 +13,13 @@ export type ReactionKey =
   | 'SURPRISED'
   | 'ANGRY';
 
-// 화면에 표시하는 7종(선택창·반응 칩 공통, 이 순서대로 — 자주 쓰는 👍🔥😍을 앞에). 목록에 없는 key는 서버 응답에 있어도 숨겨짐
+// 화면에 표시하는 7종(선택창·반응 칩 공통, 이 순서대로). 목록에 없는 key는 서버 응답에 있어도 숨겨짐
 export const EMOJI_REACTIONS: { key: ReactionKey; emoji: string }[] = [
   { key: 'THUMBS_UP', emoji: '👍' },
-  { key: 'FIRE', emoji: '🔥' },
   { key: 'LOVE', emoji: '😍' },
   { key: 'COOL', emoji: '😎' },
   { key: 'EMOTIONAL', emoji: '🥹' },
-  { key: 'ANGRY', emoji: '😡' },
   { key: 'SURPRISED', emoji: '😮' },
+  { key: 'ANGRY', emoji: '😡' },
+  { key: 'FIRE', emoji: '🔥' },
 ];

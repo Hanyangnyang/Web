@@ -66,18 +66,18 @@ export function mapPlaylistSongToSong(song: PlaylistSong): Song {
 }
 
 export const GENRES = [
-  { key: 'all', label: '전체', emoji: '', light: '', active: '' },
-  { key: 'kpop', label: 'K-POP', emoji: '🕺', light: 'bg-[rgba(254,215,170,0.6)]', active: 'bg-[rgba(230,140,60,1)]' },
-  { key: 'rock', label: '락', emoji: '🎸', light: 'bg-[rgba(254,202,202,0.6)]', active: 'bg-[rgba(239,68,68,1)]' },
-  { key: 'rb', label: 'R&B', emoji: '🎹', light: 'bg-[rgba(251,207,232,0.6)]', active: 'bg-[rgba(219,39,119,1)]' },
-  { key: 'hiphop', label: '힙합', emoji: '🎤', light: 'bg-[rgba(233,213,255,0.6)]', active: 'bg-[rgba(147,51,234,1)]' },
-  { key: 'indie', label: '인디', emoji: '☁️', light: 'bg-[rgba(191,219,254,0.6)]', active: 'bg-[rgba(59,130,246,1)]' },
-  { key: 'band', label: '밴드', emoji: '🥁', light: 'bg-[rgba(165,243,252,0.6)]', active: 'bg-[rgba(6,182,212,1)]' },
-  { key: 'ballad', label: '발라드', emoji: '🎻', light: 'bg-[rgba(187,247,208,0.6)]', active: 'bg-[rgba(34,197,94,1)]' },
-  { key: 'pop', label: 'POP', emoji: '🗽', light: 'bg-[rgba(153,246,228,0.6)]', active: 'bg-[rgba(20,184,166,1)]' },
-  { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]' },
-  { key: 'ost', label: 'OST', emoji: '🎬', light: 'bg-[rgba(253,186,116,0.6)]', active: 'bg-[rgba(234,88,12,1)]' },
-  { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]' },
+  { key: 'all', label: '전체', emoji: '', light: '', active: '', activeBorder: '' },
+  { key: 'kpop', label: 'K-POP', emoji: '🕺', light: 'bg-[rgba(254,215,170,0.6)]', active: 'bg-[rgba(230,140,60,1)]', activeBorder: 'border-[rgba(230,140,60,0.5)]' },
+  { key: 'rock', label: '락', emoji: '🎸', light: 'bg-[rgba(254,202,202,0.6)]', active: 'bg-[rgba(239,68,68,1)]', activeBorder: 'border-[rgba(239,68,68,0.5)]' },
+  { key: 'rb', label: 'R&B', emoji: '🎹', light: 'bg-[rgba(251,207,232,0.6)]', active: 'bg-[rgba(219,39,119,1)]', activeBorder: 'border-[rgba(219,39,119,0.5)]' },
+  { key: 'hiphop', label: '힙합', emoji: '🎤', light: 'bg-[rgba(233,213,255,0.6)]', active: 'bg-[rgba(147,51,234,1)]', activeBorder: 'border-[rgba(147,51,234,0.5)]' },
+  { key: 'indie', label: '인디', emoji: '☁️', light: 'bg-[rgba(191,219,254,0.6)]', active: 'bg-[rgba(59,130,246,1)]', activeBorder: 'border-[rgba(59,130,246,0.5)]' },
+  { key: 'band', label: '밴드', emoji: '🥁', light: 'bg-[rgba(165,243,252,0.6)]', active: 'bg-[rgba(6,182,212,1)]', activeBorder: 'border-[rgba(6,182,212,0.5)]' },
+  { key: 'ballad', label: '발라드', emoji: '🎻', light: 'bg-[rgba(187,247,208,0.6)]', active: 'bg-[rgba(34,197,94,1)]', activeBorder: 'border-[rgba(34,197,94,0.5)]' },
+  { key: 'pop', label: 'POP', emoji: '🗽', light: 'bg-[rgba(153,246,228,0.6)]', active: 'bg-[rgba(20,184,166,1)]', activeBorder: 'border-[rgba(20,184,166,0.5)]' },
+  { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]', activeBorder: 'border-[rgba(202,138,4,0.5)]' },
+  { key: 'ost', label: 'OST', emoji: '🎬', light: 'bg-[rgba(253,186,116,0.6)]', active: 'bg-[rgba(234,88,12,1)]', activeBorder: 'border-[rgba(234,88,12,0.5)]' },
+  { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]', activeBorder: 'border-[rgba(107,114,128,0.5)]' },
 ];
 
 // 인기차트 상단 기간 필터 칩 — 홈 미리보기와 인기차트 상세 화면이 공용으로 사용. 실제 기간별 재집계 로직은 추후 연동

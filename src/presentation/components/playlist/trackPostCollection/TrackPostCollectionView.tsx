@@ -15,6 +15,8 @@ import { PostMoreMenu } from '../shared/PostMoreMenu';
 import { useShareModal } from '../shared/useShareModal';
 import { Toast } from '../shared/Toast';
 import { useLikeToast } from '../shared/useLikeToast';
+import { RecentSongsPreviewSection } from '../shared/RecentSongsPreviewSection';
+import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
 interface TrackPostCollectionViewProps {
   track: TrackSummary;
@@ -26,6 +28,14 @@ interface TrackPostCollectionViewProps {
   // 딥링크로 들어와 title 등이 비어 있던 곡 정보가 조회로 채워지면 부모에게 알려줌 — 부모(PlaylistView)의
   // 곡 추천하기 FAB이 이 화면에서 눌렸을 때 이 곡을 미리 채워서 곡추천하기 화면으로 보내려고 씀
   onResolveTrack: (track: TrackSummary) => void;
+  // 화면 하단 "최근 추가된 곡" 섹션용
+  onShowRecent: () => void;
+  recentSongs: Song[];
+  isRecentSongsLoading: boolean;
+  onSelectRecentSong: (song: Song) => void;
+  onPlayTrack: (track: TrackSummary) => void;
+  currentTrackId?: string | null;
+  recentSongsVariant?: RecentSongsTapAreaVariant;
 }
 
 const SORT_OPTIONS = [
@@ -34,7 +44,7 @@ const SORT_OPTIONS = [
 ] as const;
 
 // 곡 단위 게시글 모음 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
-export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, onResolveTrack }: TrackPostCollectionViewProps) {
+export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, onResolveTrack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, onPlayTrack, currentTrackId, recentSongsVariant }: TrackPostCollectionViewProps) {
   const [sort, setSort] = useState<TrackPostsSort>('latest');
   const { data, isLoading } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
@@ -255,11 +265,10 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                   <span className="ml-[1px]">"</span>
                 </p>
 
-                {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 흰 바탕 + 얇은 칩 파란색 테두리 + 검정 글자 */}
+                {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 그림자 없는 연한 회색 알약 */}
                 {post.isMine ? (
-                  // 앨범커버 위 뱃지(PostDetailCard)와 같은 글래스 알약 — 다만 여긴 흰 카드 위라 반투명 흰색(bg-white/30)은 안 보여서
-                  // 반투명 슬레이트로 바꿈. h-5는 한마디 첫 줄(text-sm × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
-                  <span className="flex-shrink-0 h-5 px-2 flex items-center rounded-full bg-slate-500/50 backdrop-blur-md border border-white/40 shadow-md text-white text-[10px] font-semibold leading-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">
+                  // h-5는 한마디 첫 줄(text-sm × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
+                  <span className="flex-shrink-0 h-5 px-2 flex items-center rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-semibold leading-none">
                     내 추천
                   </span>
                 ) : (
@@ -289,6 +298,18 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           );
         })}
       </div>
+
+      <hr className="-mx-3 my-4 border-slate-200" />
+
+      <RecentSongsPreviewSection
+        onShowRecent={onShowRecent}
+        recentSongs={recentSongs}
+        isLoading={isRecentSongsLoading}
+        onSelectRecentSong={onSelectRecentSong}
+        onPlay={onPlayTrack}
+        currentTrackId={currentTrackId}
+        variant={recentSongsVariant}
+      />
 
       {/* 신고 사유 선택 팝업 */}
       {report.reportTargetId && (

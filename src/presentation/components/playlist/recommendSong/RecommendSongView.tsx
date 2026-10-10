@@ -260,6 +260,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요 :)'
             : ''
         }
+        subtitleLoading={!creationStatus && !isStatusError}
         onBack={onBack}
       />
 
@@ -432,12 +433,12 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 key={genre.key}
                 onClick={() => handleGenreClick(genre.key)}
                 disabled={isDisabled}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
+                className={`flex items-center gap-1 px-2 py-1 rounded-2xl text-[12px] font-bold border transition-all duration-200 active:scale-[0.96] ${
                   isSelected
-                    ? `${genre.active} text-white border-transparent shadow-[0_2px_6px_rgba(15,23,42,0.25)]`
+                    ? `${genre.light} ${genre.activeBorder} text-gray-700`
                     : isDisabled
-                      ? 'bg-slate-100 text-slate-300 border-transparent'
-                      : `${genre.light} text-gray-800 border-transparent`
+                      ? 'text-slate-300 border-slate-200'
+                      : 'text-gray-700 border-gray-300'
                 }`}
               >
                 <span className="text-base">{genre.emoji}</span>
