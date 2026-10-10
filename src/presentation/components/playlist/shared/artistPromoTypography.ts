@@ -22,6 +22,8 @@ export const ARTIST_PROMO_TEMPLATES = [
   'listen-together',
   'do-you-like',
   'how-about',
+  'give-it-a-listen',
+  'want-to-listen',
 ] as const;
 
 export type ArtistPromoTemplate = (typeof ARTIST_PROMO_TEMPLATES)[number];

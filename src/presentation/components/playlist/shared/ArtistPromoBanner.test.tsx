@@ -72,13 +72,21 @@ describe('ArtistPromoBanner', () => {
     expect(getArtistNameSize('The Artist With A Very Long Name')).toBe('clamp(15px, 4.7cqw, 24px)');
   });
 
-  it('세 가지 문구 템플릿을 무작위 값에 맞춰 선택한다', () => {
-    expect(ARTIST_PROMO_TEMPLATES).toHaveLength(3);
+  it('다섯 가지 문구 템플릿을 무작위 값에 맞춰 선택한다', () => {
+    expect(ARTIST_PROMO_TEMPLATES).toHaveLength(5);
     expect(pickArtistPromoTemplate(() => 0)).toBe('listen-together');
-    expect(pickArtistPromoTemplate(() => 0.32)).toBe('listen-together');
-    expect(pickArtistPromoTemplate(() => 0.34)).toBe('do-you-like');
-    expect(pickArtistPromoTemplate(() => 0.65)).toBe('do-you-like');
-    expect(pickArtistPromoTemplate(() => 0.67)).toBe('how-about');
-    expect(pickArtistPromoTemplate(() => 0.99)).toBe('how-about');
+    expect(pickArtistPromoTemplate(() => 0.2)).toBe('do-you-like');
+    expect(pickArtistPromoTemplate(() => 0.4)).toBe('how-about');
+    expect(pickArtistPromoTemplate(() => 0.6)).toBe('give-it-a-listen');
+    expect(pickArtistPromoTemplate(() => 0.8)).toBe('want-to-listen');
+    expect(pickArtistPromoTemplate(() => 0.99)).toBe('want-to-listen');
+  });
+
+  it('추가한 추천 문구를 렌더링한다', () => {
+    const { rerender } = render(<ArtistPromoBanner artistName="잔나비" artistImageUrl={null} template="give-it-a-listen" />);
+    expect(screen.getByText('들어보세요')).toBeTruthy();
+
+    rerender(<ArtistPromoBanner artistName="잔나비" artistImageUrl={null} template="want-to-listen" />);
+    expect(screen.getByText('들어볼래요?')).toBeTruthy();
   });
 });
