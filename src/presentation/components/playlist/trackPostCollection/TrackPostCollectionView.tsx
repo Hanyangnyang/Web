@@ -12,6 +12,7 @@ import { EmojiReactionBar } from '../shared/EmojiReactionBar';
 import { useSongReport } from '../shared/useSongReport';
 import { ReportReasonPopup } from '../shared/ReportReasonPopup';
 import { PostMoreMenu } from '../shared/PostMoreMenu';
+import { EmptyCommentNote } from '../shared/EmptyCommentNote';
 import { useShareModal } from '../shared/useShareModal';
 import { Toast } from '../shared/Toast';
 import { MarqueeText } from '../shared/MarqueeText';
@@ -265,13 +266,15 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
             >
               {/* 본문 + 좋아요/더보기 */}
               <div className="flex items-start gap-2">
-                {/* 한마디는 선택 입력이라 비어 있을 수 있음 — 빈 따옴표("")만 덩그러니 보이지 않게 있을 때만 그림 */}
-                {post.comment && (
+                {/* 한마디는 선택 입력이라 비어 있을 수 있음 — 빈 따옴표("")만 덩그러니 보이지 않게, 비면 앱 안내 문구로 대체 */}
+                {post.comment ? (
                   <p className="min-w-0 text-sm text-text-main leading-snug line-clamp-2">
                     <span className="mr-[1px]">"</span>
                     {post.comment}
                     <span className="ml-[1px]">"</span>
                   </p>
+                ) : (
+                  <EmptyCommentNote className="min-w-0 text-sm text-text-hint line-clamp-2" />
                 )}
 
                 {/* 내 글이면 줄 오른쪽 끝에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김, 더보기 버튼과 같은 자리) — 배경 없이 얇은 회색 테두리만 있는 알약 */}

@@ -29,7 +29,7 @@ import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
 import { useRecentSongsTapAreaVariant } from '../../hooks/playlist/usePlaylistExperiment';
 import { useScreenDwellTracking } from '../../hooks/playlist/useScreenDwellTracking.js';
 
-const RECENT_SONGS_LIMIT = 7;
+const RECENT_SONGS_LIMIT = 5;
 const CHART_PREVIEW_LIMIT = 10;
 const EMPTY_SONGS: Song[] = []; // 데이터 도착 전 fallback — 매 렌더마다 새 [] 를 만들면 songs를 deps로 쓰는 콜백이 계속 재생성되므로 모듈 상수로 고정
 const EMPTY_CHART: ChartTrack[] = []; // 인기차트 화면 데이터 도착 전 fallback (위 EMPTY_SONGS와 같은 이유)
@@ -591,7 +591,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             </div>
           }
         >
-          <p className="text-[15px] font-bold text-text-main mb-1 text-center">에리카 플리를 종료하시겠습니까?</p>
+          <p className="text-[15px] font-bold text-text-main mb-1 text-center">플리를 종료하시겠습니까?</p>
           <p className="text-xs font-medium text-text-hint mb-3.5 text-center">
             {playingTrackId ? '종료하면 재생 중인 음악이 정지돼요.' : '하냥이들의 새로운 추천곡이 기다리고 있어요!'}
           </p>

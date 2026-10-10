@@ -1,4 +1,4 @@
-import { Pause, Play } from 'lucide-react';
+import { Pause, Play, Share2 } from 'lucide-react';
 import { type TrackSummary } from '../playlistTypes';
 
 // rank가 없으면(예: 홈의 "내가 추천한 곡") 순위 숫자만 생략하고 나머지 UI는 동일하게 그림
@@ -11,6 +11,8 @@ interface ChartTopCardProps<T extends ChartCardTrack> {
   onShowPosts: (track: T) => void;
   // 앨범아트(흰 구분선 위쪽) 클릭 — 바로 재생
   onPlay: (track: TrackSummary) => void;
+  // 넘겨주면 우상단 재생 아이콘 옆에 공유 아이콘이 생김 — 공유가 필요 없는 곳(소식탭 홍보 카드 등)은 안 넘김
+  onShare?: (track: T) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 카드 너비 — 기본은 홈 미리보기의 가로 스크롤용 고정폭(152px). 소식탭 홍보 카드처럼 부모가 폭을
@@ -23,7 +25,7 @@ interface ChartTopCardProps<T extends ChartCardTrack> {
 
 // 인기차트 홈 미리보기 카드(최대 10위) — 배경은 앨범아트 하나로 카드 전체를 채우고, 그 위에 흰
 // 구분선으로 나눈 두 클릭 영역(위: 재생, 아래: 곡명·가수명 눌러 게시글 모음)만 얹음
-export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onPlay, currentTrackId, widthClassName = 'w-[152px] flex-shrink-0', heightClassName = 'aspect-[3/4]' }: ChartTopCardProps<T>) {
+export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onPlay, onShare, currentTrackId, widthClassName = 'w-[152px] flex-shrink-0', heightClassName = 'aspect-[3/4]' }: ChartTopCardProps<T>) {
   const isPlaying = track.trackId === currentTrackId;
 
   return (
@@ -41,24 +43,37 @@ export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onP
       {/* 이미지 위에 얹는 두 클릭 영역 */}
       <div className="relative z-10 flex flex-col h-full">
         {/* 위쪽: 순위 + 재생 아이콘 — 누르면 바로 재생 */}
-        <button
-          onClick={() => onPlay(track)}
-          aria-label={`${track.rank != null ? `${track.rank}위 ` : ''}${track.title} ${isPlaying ? '일시정지' : '재생'}`}
-          className="relative flex-1 min-h-0 active:scale-[0.98] transition-transform"
-        >
-          <span className="absolute top-2 right-2">
+        <div className="relative flex-1 min-h-0">
+          <button
+            onClick={() => onPlay(track)}
+            aria-label={`${track.rank != null ? `${track.rank}위 ` : ''}${track.title} ${isPlaying ? '일시정지' : '재생'}`}
+            className="absolute inset-0 w-full h-full active:scale-[0.98] transition-transform"
+          >
+            {track.rank != null && (
+              <span className="absolute bottom-1 left-3 text-4xl font-black italic leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+                {track.rank}
+              </span>
+            )}
+          </button>
+
+          {/* 우상단 아이콘 줄 — 재생 아이콘은 아래 버튼의 클릭을 그대로 통과시키고, 공유 버튼만 따로 눌림 */}
+          <div className="absolute top-2 right-2 flex items-center gap-2 pointer-events-none">
+            {onShare && (
+              <button
+                onClick={() => onShare(track)}
+                aria-label={`${track.title} 공유`}
+                className="pointer-events-auto -m-2 p-2 active:scale-90 transition-transform"
+              >
+                <Share2 size={20} stroke="white" strokeWidth={2} />
+              </button>
+            )}
             {isPlaying ? (
               <Pause size={24} fill="white" stroke="white" strokeWidth={1} />
             ) : (
               <Play size={24} className="ml-0.5" fill="white" stroke="white" strokeWidth={1} />
             )}
-          </span>
-          {track.rank != null && (
-            <span className="absolute bottom-1 left-3 text-4xl font-black italic leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
-              {track.rank}
-            </span>
-          )}
-        </button>
+          </div>
+        </div>
 
         {/* 흰색 구분선 — 위(재생)/아래(게시글 모음) 클릭 영역을 구분 */}
         <div className="h-px mx-3 bg-white/40" aria-hidden="true" />

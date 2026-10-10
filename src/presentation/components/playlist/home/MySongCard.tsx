@@ -1,4 +1,5 @@
 import { type TrackSummary, formatTimeAgo } from '../playlistTypes';
+import { EMPTY_COMMENT_NOTE } from '../shared/EmptyCommentNote';
 
 type MySongCardTrack = TrackSummary & { comment?: string; createdAt?: string };
 
@@ -26,7 +27,7 @@ export function MySongCard({ track, onSelect }: MySongCardProps) {
         {/* 사용자 한마디(왼쪽, 한 줄 말줄임) + 추천 시각(오른쪽 하단) */}
         <div className="flex items-baseline gap-1.5">
           <div className="flex-1 min-w-0 text-xs font-medium text-white/90 truncate leading-tight">
-            {track.comment && `"${track.comment}"`}
+            {track.comment ? `"${track.comment}"` : <span className="italic text-white/70">{EMPTY_COMMENT_NOTE}</span>}
           </div>
           {track.createdAt && (
             <span className="flex-shrink-0 text-[10px] text-white/70 leading-tight">{formatTimeAgo(track.createdAt)}</span>

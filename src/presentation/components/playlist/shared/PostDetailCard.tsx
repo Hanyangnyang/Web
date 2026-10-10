@@ -9,6 +9,7 @@ import { EmojiReactionBar } from './EmojiReactionBar';
 import { useSongReport } from './useSongReport';
 import { ReportReasonPopup } from './ReportReasonPopup';
 import { PostMoreMenu } from './PostMoreMenu';
+import { EmptyCommentNote } from './EmptyCommentNote';
 import { useShareModal } from './useShareModal';
 import { Toast } from './Toast';
 import { useLikeToast } from './useLikeToast';
@@ -423,6 +424,11 @@ export function PostDetailCard({
           <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
           {hideReactions && trailingButton}
         </div>
+
+        {/* 한마디가 비어 있으면 앱 안내 문구로 대체 */}
+        {!compact && !post.body && (
+          <EmptyCommentNote className={`mb-2 ${isNarrow ? 'text-xs' : 'text-sm'} text-text-hint`} />
+        )}
 
         {/* 본문 */}
         {!compact && post.body && (

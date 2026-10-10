@@ -1,6 +1,7 @@
 import { ChevronRight, Pause, Play, Smile } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, toReactionState, formatTimeAgo } from '../playlistTypes';
+import { EmptyCommentNote } from './EmptyCommentNote';
 import { EMOJI_REACTIONS } from '../postReactions';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
@@ -87,12 +88,14 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId, variant 
             <span className="text-xs text-text-sub"> · {song.artist}</span>
           </div>
           {/* 한마디 코멘트 */}
-          {song.comment && (
+          {song.comment ? (
             <p className="text-xs text-text-main truncate leading-tight">
               <span className="mr-[1px]">"</span>
               {song.comment}
               <span className="ml-[1px]">"</span>
             </p>
+          ) : (
+            <EmptyCommentNote className="text-xs text-text-hint truncate leading-tight" />
           )}
           {/* 이모지와 올린시각  */}
           <div className="flex items-center gap-1 min-w-0 leading-tight">
