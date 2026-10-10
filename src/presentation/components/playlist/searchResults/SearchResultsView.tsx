@@ -73,7 +73,7 @@ export function SearchResultsView({ query, onBack, onGoHome, onSelectTrack, onSe
         onChange={setLocalQuery}
         onSubmit={handleResearch}
         placeholder="곡 제목이나 아티스트로 검색해보세요"
-        className="mt-4 mb-4"
+        className="mt-2 mb-2"
       />
 
       {/* 1. Spotify 곡 검색 결과 */}

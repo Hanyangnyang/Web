@@ -69,6 +69,8 @@ interface PostDetailCardProps {
   // (docs/playlist-recent-songs-ab-test.md 참고). 안 넘기면 기존(control: 정중앙 원형 버튼) 동작 — 최근추가된곡
   // 화면 외의 다른 화면(게시글 상세/게시글 모음 등)은 이 prop을 넘기지 않아 항상 control로 유지됨
   playButtonVariant?: RecentSongsTapAreaVariant;
+  // true면 내 글이어도 "내 추천" 뱃지를 숨김 — 전부 내 글인 "추천한 곡" 화면에서는 정보량이 없어서 끔
+  hideMineBadge?: boolean;
 }
 
 // 리스트/캐러셀에서 쓰는 Song 엔티티를 PostDetailCard가 받는 형태로 변환 (본문=comment)
@@ -105,8 +107,10 @@ export function PostDetailCard({
   trailingAction = 'more',
   compact = false,
   playButtonVariant = 'control',
+  hideMineBadge = false,
 }: PostDetailCardProps) {
   const isTestPlayButton = playButtonVariant === 'test';
+  const showMineBadge = !!post.isMine && !hideMineBadge;
   const isNarrow = narrow || hideReactions; // 2열처럼 폭이 좁은 카드 — 버튼 비율·글자 크기·이모지 선택창 배치를 좁은 폭에 맞춤
 
   // 2열(좁은 카드)은 본문을 3줄로 자르는데, 잘린 글을 보려고 카드를 누르면 1열 상세로 전환돼버려서
@@ -350,6 +354,18 @@ export function PostDetailCard({
               <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
             )}
           </button>
+        )}
+
+        {showMineBadge && (
+          // "내 추천" 뱃지 — 1열·2열 공통으로 앨범커버 우상단. 공유/좋아요/재생 배지와 같은 글래스 스타일(글자와 테두리 사이 여백이 커 보여서 높이는 버튼보다 낮게).
+          // 누르는 버튼이 아니라 표시일 뿐이라 pointer-events-none. A/B 테스트 재생 버튼(test)이 같은 자리에 있으면 그 왼쪽으로 비켜 앉음
+          <span
+            className={`absolute top-[4%] z-10 ${isNarrow ? 'h-5 px-2 text-[10px]' : 'h-6 px-2.5 text-[11px]'} rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-md font-semibold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] pointer-events-none ${
+              onPlay && isTestPlayButton ? (isNarrow ? 'right-[calc(4%_+_48px)]' : 'right-[calc(4%_+_64px)]') : 'right-[4%]'
+            }`}
+          >
+            내 추천
+          </span>
         )}
 
         {/* 앨범커버 우측 하단 공유하기/좋아요 배지 — 둘 다 "곡에 대한 액션"이라 한 코너에 나란히 묶어서

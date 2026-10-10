@@ -1,5 +1,5 @@
-import { Loader2, Pause, Play, Search, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { ChevronDown, ChevronUp, Loader2, Pause, Play, Search, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { GENRES, type TrackSummary } from '../playlistTypes';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
@@ -9,7 +9,7 @@ import { ConfirmPopup } from '../shared/ConfirmPopup';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { PLAYER_GAP_PX } from '../shared/AddSongFab';
-import { useAddSongDraft } from './useAddSongDraft';
+import { useFirstRecommendNotice } from './useFirstRecommendNotice';
 import { useSubmitSong } from '../../../hooks/playlist/useSubmitSong.js';
 import { useSongCreationStatus } from '../../../hooks/playlist/useSongCreationStatus.js';
 import { useMusicSearch, normalizeMusicSearchQuery } from '../../../hooks/playlist/useMusicSearch.js';
@@ -25,6 +25,10 @@ const SEARCH_COOLDOWN_MS = 600;
 const MIN_QUERY_LENGTH = 2;
 const MIN_GENRES = 1;
 const MAX_GENRES = 3;
+// 곡을 고른 뒤 이만큼(px) 아래로 스크롤하면 "다음 단계(장르·한마디)로 넘어간다"는 뜻으로 보고 결과 패널을 자동으로 접음
+const AUTO_COLLAPSE_SCROLL_PX = 40;
+// 서버 creation-status를 아직 못 받았을 때(로딩/조회 실패) 안내 문구에 쓰는 기본 하루 추천 한도
+const DEFAULT_DAILY_MAX_LIMIT = 5;
 
 const GENRE_OPTIONS = GENRES.filter((genre) => genre.key !== 'all');
 
@@ -32,7 +36,7 @@ const GENRE_OPTIONS = GENRES.filter((genre) => genre.key !== 'all');
 // PL001·PL002·PL007: 토스트 노출 / PL003·C001: 문구 노출 및 수정 유도(폼 하단 인라인) / C004(500)·PL008: 재시도 유도 팝업
 // (PL007: 같은 기기의 다른 등록이 아직 진행 중, PL008: 서버가 중복 등록 잠금을 확인하지 못한 일시 장애)
 const TOAST_ERROR_MESSAGES: Record<string, string> = {
-  PL001: '오늘 추천 가능한 3곡을 모두 작성하셨어요! 내일 다시 참여해주세요.',
+  PL001: '오늘 추천 가능한 곡을 모두 작성하셨어요! 내일 다시 참여해주세요.',
   PL002: '최근 7일 이내에 이미 추천하신 곡이에요. 다른 곡을 추천해주세요!',
   PL007: '다른 곡 등록이 진행 중이에요. 잠시 후 다시 시도해주세요.',
 };
@@ -53,7 +57,6 @@ interface RecommendSongViewProps {
   // 지금 하단 플레이어에서 재생 중인 곡 — 선택한 곡과 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
   // 게시글 모음 화면의 "이 곡 추천하러 가기" 버튼 등으로 특정 곡이 미리 정해진 채로 진입할 때 씀.
-  // 임시저장된 초안이 있으면 그걸 더 우선함(사용자가 쓰던 다른 곡 내용을 이걸로 덮어쓰지 않기 위해)
   prefillTrack?: SearchTrack | null;
   // 검색 결과 화면의 FAB으로 들어왔을 때, 그 검색어로 곡 검색을 미리 해둔 채 진입하기 위해 씀(prefillTrack과 달리 곡을 고르지는 않고 결과 목록만 띄움)
   prefillQuery?: string | null;
@@ -64,7 +67,6 @@ const REGISTER_BUTTON_HEIGHT = 48;
 const REGISTER_BUTTON_CLEARANCE_GAP = 16;
 
 export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, onPlay, currentTrackId, prefillTrack, prefillQuery }: RecommendSongViewProps) {
-  const { initialDraft, restoredToast: draftRestoredToast, saveDraft, clearDraft } = useAddSongDraft();
   const initialQuery = prefillQuery && prefillQuery.trim().length >= MIN_QUERY_LENGTH ? prefillQuery.trim() : '';
   const [query, setQuery] = useState(initialQuery);
   // 검색 버튼을 눌러야만 바뀌는 "실제로 검색한 검색어" — query(입력창 타이핑)와 분리해서,
@@ -79,20 +81,23 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const { remainingSeconds: retryRemainingSeconds, isBlocked: isRetryBlocked } = useRetryCountdown(musicSearchError);
   const searchErrorMessage = validationError ?? getSearchErrorMessage(musicSearchError, retryRemainingSeconds);
 
-  const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(initialDraft?.track ?? prefillTrack ?? null);
-  const [selectedGenres, setSelectedGenres] = useState<string[]>(initialDraft?.selectedGenres ?? []);
-  const [comment, setComment] = useState(initialDraft?.comment ?? '');
+  const [selectedTrack, setSelectedTrack] = useState<SearchTrack | null>(prefillTrack ?? null);
+  // 앨범커버를 눌러 곡을 고른 경우엔 결과 패널을 닫지 않고 열어둠 — 여러 곡을 이어서 들어보며 고를 수 있게.
+  // 하단 정보 영역으로 고르거나 새로 검색하면 다시 false로 돌아가 기존처럼 패널이 접힘
+  const [keepResultsOpen, setKeepResultsOpen] = useState(false);
+  // 결과 패널 아래 접기/펼치기 토글로 사용자가 직접 정한 상태 — null이면 위 규칙(자동)을 따르고, 곡을 고르거나 새로 검색하면 다시 null로 돌아감
+  const [resultsToggleOverride, setResultsToggleOverride] = useState<boolean | null>(null);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [comment, setComment] = useState('');
   const [submitToast, setSubmitToast] = useState('');
   const [submitInlineError, setSubmitInlineError] = useState<string | null>(null);
   const [showSubmitRetryPopup, setShowSubmitRetryPopup] = useState(false);
   const [showRegisterNoticePopup, setShowRegisterNoticePopup] = useState(false);
-  const [showLeaveConfirmPopup, setShowLeaveConfirmPopup] = useState(false);
   const submitSong = useSubmitSong();
   const { data: creationStatus, isError: isStatusError, isFetching: isStatusFetching, refetch: refetchStatus } = useSongCreationStatus();
   const recentlyRecommendedTrackIds = new Set(creationStatus?.recentTrackIdsIn7Days ?? []);
-
-  // 곡/장르/코멘트 중 하나라도 채워져 있으면 뒤로가기 시 확인 팝업을 거침
-  const hasUnsavedContent = !!selectedTrack || selectedGenres.length > 0 || comment.trim().length > 0;
+  const dailyMaxLimit = creationStatus?.dailyMaxLimit ?? DEFAULT_DAILY_MAX_LIMIT;
+  const { shouldShow: shouldShowFirstNotice, dismiss: dismissFirstNotice } = useFirstRecommendNotice();
 
   // 서버가 일시적으로 등록을 막은 상태(하루 한도와 별개) — "내일 다시"가 아니라 blockedUntil 기준으로 안내해야 해서
   // 한도 소진과 분리함. 둘 다 진입하자마자 막는 팝업을 띄움(상태 로딩 중/조회 실패엔 undefined라 안 뜸)
@@ -102,30 +107,16 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
   const isRegistrationBlocked = isDailyLimitReached || isTemporarilyBlocked;
   const blockedUntilLabel = formatBlockedUntil(creationStatus?.blockedUntil);
 
-  // 안드로이드 하드웨어 뒤로가기 — 한도 소진 팝업이 떠 있으면 바로 나가고, 확인 팝업이 떠 있으면 팝업만 닫고,
-  // 저장 안 한 내용이 있으면 팝업을 띄움
-  const handleBackRequest = () => {
-    if (isRegistrationBlocked) {
-      onBack();
-      return;
-    }
-    if (showLeaveConfirmPopup) {
-      setShowLeaveConfirmPopup(false);
-      return;
-    }
-    if (hasUnsavedContent) {
-      setShowLeaveConfirmPopup(true);
-      return;
-    }
-    onBack();
-  };
-  useBackHandler(handleBackRequest);
+  // 안드로이드 하드웨어 뒤로가기 — 작성 중인 내용이 있어도 확인 없이 바로 나감(임시저장 기능은 기획에서 제외됨)
+  useBackHandler(onBack);
 
   const lastSearchAtRef = useRef(0);
 
   const handleSearchClick = () => {
     if (query.trim().length < MIN_QUERY_LENGTH) {
       setSelectedTrack(null);
+      setKeepResultsOpen(false);
+      setResultsToggleOverride(null);
       setCommittedQuery('');
       setValidationError(`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`);
       setHasSearched(true);
@@ -139,6 +130,8 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
     setValidationError(null);
     setSelectedTrack(null);
+    setKeepResultsOpen(false);
+    setResultsToggleOverride(null);
     setHasSearched(true);
     // 직전 검색이 실패(429 등)한 같은 검색어면 쿼리 키가 그대로라 setState만으로는 재조회가 안 나가서 직접 refetch
     if (musicSearchError && normalizeMusicSearchQuery(query) === normalizeMusicSearchQuery(committedQuery)) {
@@ -148,7 +141,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
     setCommittedQuery(query); // useMusicSearch가 이 값으로 다시 조회(같은 검색어 30초 내 재검색이면 캐시 재사용)
   };
 
-  const isResultsPanelOpen = !selectedTrack && hasSearched && !isSearching;
+  // 토글 버튼은 검색을 한 번이라도 했고 검색 중이 아닐 때 보임 — 곡을 골라서 패널이 접힌 뒤에도 다시 펼쳐볼 수 있게
+  const canToggleResults = hasSearched && !isSearching;
+  const isResultsPanelOpen = canToggleResults && (resultsToggleOverride ?? (!selectedTrack || keepResultsOpen));
 
   // 서버가 최종 판단하지만(PL001/PL002 토스트가 안전망), creation-status 값이 이미 있으면 미리 막아서
   // 어차피 실패할 요청을 보내지 않게 함. 아직 안 불러와졌으면(undefined) 막지 않고 그대로 진행
@@ -160,7 +155,29 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
     !isTemporarilyBlocked &&
     !submitSong.isPending;
 
+  // 곡을 고른 뒤 장르·한마디 같은 다음 단계 입력을 시작하면 결과 패널을 알아서 접음(곡을 고르지 않았으면 결과를 계속 둘러봐야 하니 그대로 둠)
+  const collapseResultsAfterPick = () => {
+    if (selectedTrack && isResultsPanelOpen) setResultsToggleOverride(false);
+  };
+
+  // 곡을 고른 채 아래로 스크롤해도 자동으로 접음 — 스크롤 컨테이너는 이 화면 밖(PlaylistView 루트, playlist-root 클래스)이라 closest로 찾음.
+  // 사용자가 토글로 직접 펼쳐둔 상태(override === true)는 존중해서 건드리지 않음
+  const searchSectionRef = useRef<HTMLElement>(null);
+  const shouldWatchScroll = !!selectedTrack && isResultsPanelOpen && resultsToggleOverride !== true;
+  useEffect(() => {
+    if (!shouldWatchScroll) return;
+    const scroller = searchSectionRef.current?.closest<HTMLElement>('.playlist-root');
+    if (!scroller) return;
+    const startTop = scroller.scrollTop;
+    const onScroll = () => {
+      if (scroller.scrollTop - startTop > AUTO_COLLAPSE_SCROLL_PX) setResultsToggleOverride(false);
+    };
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    return () => scroller.removeEventListener('scroll', onScroll);
+  }, [shouldWatchScroll]);
+
   const handleGenreClick = (key: string) => {
+    collapseResultsAfterPick();
     setSelectedGenres((prev) => {
       if (prev.includes(key)) return prev.filter((g) => g !== key);
       if (prev.length >= MAX_GENRES) return prev;
@@ -191,7 +208,6 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       },
       {
         onSuccess: () => {
-          clearDraft();
           onSubmitSuccess();
         },
         onError: (error) => {
@@ -244,7 +260,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요 :)'
             : ''
         }
-        onBack={handleBackRequest}
+        onBack={onBack}
       />
 
       {/* 등록 가능 여부 조회 실패 — 막지는 않고(서버가 등록 시 최종 판단) 확인하지 못했음을 알리고 다시 확인할 수 있게 함 */}
@@ -262,7 +278,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       )}
 
       {/* 1. 곡 검색 */}
-      <section className="mb-5">
+      <section ref={searchSectionRef} className="mb-5">
         <h3 className="text-lg font-bold text-text-main mb-2">곡 검색</h3>
         {/* 검색창 + 아래 결과 패널을 한 group으로 묶어서, 입력창에 포커스가 가 있는 동안엔
             둘 다 같은 파란 테두리로 보이게 함(포커스 여부와 무관하게 결과 패널만 회색으로 남아 어긋나 보이던 문제) */}
@@ -291,6 +307,19 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               >
                 {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
               </button>
+              {/* 검색 결과 접기/펼치기 — 검색 아이콘 오른쪽. 한 번도 검색하지 않은 최초 상태(결과 자체가 없음)엔 숨김 */}
+              {canToggleResults && (
+                <button
+                  onClick={() => setResultsToggleOverride(!isResultsPanelOpen)}
+                  aria-label={isResultsPanelOpen ? '검색 결과 접기' : '검색 결과 펼치기'}
+                  aria-expanded={isResultsPanelOpen}
+                  // 검색 아이콘과 같은 색 규칙 — 쓸 수 있을 땐 파란색, 검색어가 비어 있으면 회색으로 비활성화
+                  disabled={!query.trim()}
+                  className="flex-shrink-0 -ml-1 flex items-center justify-center w-7 h-7 rounded-full text-playlist-primary disabled:text-text-hint hover:bg-playlist-primary/10 transition-colors active:scale-90"
+                >
+                  {isResultsPanelOpen ? <ChevronUp size={18} strokeWidth={2.2} /> : <ChevronDown size={18} strokeWidth={2.2} />}
+                </button>
+              )}
             </div>
           </div>
 
@@ -323,10 +352,13 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                           track={track}
                           onPlay={onPlay}
                           isPlaying={track.trackId === currentTrackId}
-                          onSelect={(selected) => {
+                          onSelect={(selected, source) => {
                             setSelectedTrack(selected);
-                            // 선택과 동시에 재생 — 이미 재생 중인 곡이면 onPlay가 일시정지로 토글해버리므로 건너뜀
-                            if (selected.trackId !== currentTrackId) onPlay?.(selected);
+                            // 앨범커버로 선택할 땐 선택과 동시에 재생하고 결과 패널은 열어둠 — 이미 재생 중인 곡이면 onPlay가 일시정지로 토글해버리므로 재생은 건너뜀.
+                            // 하단 정보 영역으로 선택할 땐 선택만 하고(재생 안 함) 기존처럼 패널을 접음
+                            setKeepResultsOpen(source === 'cover');
+                            setResultsToggleOverride(null);
+                            if (source === 'cover' && selected.trackId !== currentTrackId) onPlay?.(selected);
                           }}
                           albumArtSelects
                           selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
@@ -339,7 +371,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
+                  <p className="text-xs text-text-hint text-center px-3 min-h-[186px] flex items-center justify-center whitespace-pre-line">
                     {searchErrorMessage || '검색 결과가 없어요'}
                   </p>
                 )}
@@ -424,6 +456,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             value={comment}
             maxLength={COMMENT_MAX_LENGTH}
             onChange={(e) => setComment(e.target.value)}
+            onFocus={collapseResultsAfterPick}
             placeholder="이 곡에 대한 얘기를 자유롭게 남겨주세요!"
             rows={5}
             className="w-full bg-transparent text-sm text-text-main placeholder-text-hint outline-none resize-none"
@@ -470,13 +503,6 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         </div>
       )}
 
-      {/* 임시저장 초안을 복원했을 때 안내 토스트 */}
-      {draftRestoredToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-50 whitespace-pre-line text-center copy-toast">
-          {draftRestoredToast}
-        </div>
-      )}
-
       {/* 1일 3곡 제한(PL001)/최근 7일 중복 추천(PL002) 안내 토스트 */}
       {submitToast && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[rgba(15,23,42,0.85)] text-white text-[0.78rem] font-medium px-4 py-2 rounded-full z-50 whitespace-pre-line text-center copy-toast">
@@ -502,7 +528,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         >
           <p className="text-sm font-semibold text-text-main mb-1 text-center">오늘 추천 가능한 곡을 모두 채웠어요!</p>
           <p className="text-xs text-text-sub mb-4 text-center">
-            하루에 최대 {creationStatus?.dailyMaxLimit ?? 3}곡까지 추천할 수 있어요.
+            하루에 최대 {dailyMaxLimit}곡까지 추천할 수 있어요.
             <br />
             내일 다시 참여해주세요 :)
           </p>
@@ -559,7 +585,28 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         </ConfirmPopup>
       )}
 
-      {/* 추천 전 안내 — 삭제·수정 불가, 1일 3곡 제한 */}
+      {/* 처음 들어온 사용자에게 하루 추천 한도를 한 번만 안내 — 한도 소진/임시 차단 팝업이 이미 떠 있으면 겹치지 않게 건너뜀 */}
+      {shouldShowFirstNotice && !isRegistrationBlocked && (
+        <ConfirmPopup
+          buttons={
+            <button
+              onClick={dismissFirstNotice}
+              className="w-full h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+            >
+              확인했어요
+            </button>
+          }
+        >
+          <p className="text-sm font-semibold text-text-main mb-1 text-center">곡 추천은 하루 {dailyMaxLimit}곡까지!</p>
+          <p className="text-xs text-text-sub mb-4 text-center">
+            하루에 최대 {dailyMaxLimit}곡까지 추천할 수 있어요.
+            <br />
+            마음에 드는 곡을 골라 추천해보세요 :)
+          </p>
+        </ConfirmPopup>
+      )}
+
+      {/* 추천 전 안내 — 삭제·수정 불가, 하루 추천 한도 */}
       {showRegisterNoticePopup && (
         <ConfirmPopup
           buttons={
@@ -586,49 +633,10 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
           <ul className="text-xs text-text-sub mb-4 space-y-1.5 list-disc pl-4">
             <li>한 번 추천한 곡은 삭제하거나 수정할 수 없어요.</li>
             <li>
-              하루에 최대 3곡까지만 추천할 수 있어요
+              하루에 최대 {dailyMaxLimit}곡까지만 추천할 수 있어요
               {creationStatus ? ` (오늘 ${creationStatus.remainingCount}곡 남음)` : ''}.
             </li>
           </ul>
-        </ConfirmPopup>
-      )}
-
-      {/* 뒤로가기 시 작성 중인 내용이 있으면 확인 — 임시저장/저장 안 함/계속 작성 3가지 중 선택 */}
-      {showLeaveConfirmPopup && (
-        <ConfirmPopup
-          buttons={
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  saveDraft({ track: selectedTrack, selectedGenres, comment });
-                  setShowLeaveConfirmPopup(false);
-                  onBack();
-                }}
-                className="h-10 rounded-full text-sm font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
-              >
-                임시저장하고 나가기
-              </button>
-              <button
-                onClick={() => {
-                  clearDraft();
-                  setShowLeaveConfirmPopup(false);
-                  onBack();
-                }}
-                className="h-10 rounded-full text-sm font-bold text-red-500 bg-red-50 active:scale-[0.97] transition-transform"
-              >
-                저장 안 하고 나가기
-              </button>
-              <button
-                onClick={() => setShowLeaveConfirmPopup(false)}
-                className="h-10 rounded-full text-sm font-bold text-text-sub bg-slate-100 active:scale-[0.97] transition-transform"
-              >
-                계속 작성하기
-              </button>
-            </div>
-          }
-        >
-          <p className="text-sm font-semibold text-text-main mb-1 text-center">작성 중인 내용이 있어요</p>
-          <p className="text-xs text-text-sub mb-4 text-center">나가기 전에 어떻게 할까요?</p>
         </ConfirmPopup>
       )}
     </div>

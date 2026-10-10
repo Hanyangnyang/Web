@@ -48,6 +48,8 @@ interface SongListScreenProps {
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트에서 카드 재생 버튼 배정값 — RecentSongsView만 넘겨줌.
   // 안 넘기면 PostDetailCard가 기존(control) 동작으로 렌더링됨
   playButtonVariant?: RecentSongsTapAreaVariant;
+  // true면 카드의 "내 추천" 뱃지를 숨김 — 목록이 전부 내 글인 화면(추천한 곡)용
+  hideMineBadge?: boolean;
   // 장르 필터를 상위(PlaylistView)에서 제어하고 싶을 때 넘김 — 홈 미리보기와 선택·칩 위치를 동기화. 안 넘기면 이 화면 내부 state로만 관리
   genreFilter?: GenreFilterState;
   onGenreFilterChange?: (next: GenreFilterState) => void;
@@ -74,6 +76,7 @@ export function SongListScreen({
   viewMode: viewModeProp,
   onViewModeChange,
   playButtonVariant,
+  hideMineBadge = false,
   genreFilter: genreFilterProp,
   onGenreFilterChange,
 }: SongListScreenProps) {
@@ -232,6 +235,7 @@ export function SongListScreen({
                   trailingAction={gridOnly ? 'trackLink' : 'more'}
                   compact={gridOnly}
                   playButtonVariant={playButtonVariant}
+                  hideMineBadge={hideMineBadge}
                 />
               </div>
               );

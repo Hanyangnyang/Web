@@ -29,6 +29,7 @@ export function LikedSongsView({ onBack, onPlay, onShowAddSong, onShowRecent, on
       gridOnly
       currentTrackId={currentTrackId}
       emptyStateBoxed={false}
+      hideMineBadge
     />
   );
 }

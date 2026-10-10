@@ -6,6 +6,7 @@ import { type Song, type ReactionState, type TrackSummary, formatTimeAgo, toReac
 import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
 import { useTrackPosts, type TrackPostsSort } from '../../../hooks/playlist/useTrackPosts.js';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
+import { CHIP_ACTIVE, CHIP_BASE, CHIP_INACTIVE } from '../shared/GenreFilterChips';
 import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
 import { EmojiReactionBar } from '../shared/EmojiReactionBar';
 import { useSongReport } from '../shared/useSongReport';
@@ -197,16 +198,14 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       )}
 
       {/* 정렬 칩 — 게시글 수는 위 곡 정보 카드로 옮김 */}
-      <div className="flex gap-2 mb-3">
+      {/* 장르 칩·기간 칩(ChartPeriodChips)과 같은 모양(CHIP_*) */}
+      <div className="flex gap-1.5 mb-3">
         {SORT_OPTIONS.map((option) => (
           <button
             key={option.key}
             onClick={() => setSort(option.key)}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 active:scale-[0.96] ${
-              sort === option.key
-                ? 'bg-playlist-primary text-white border-transparent shadow-[0_4px_10px_rgba(15,23,42,0.35)]'
-                : 'bg-white text-playlist-primary border-playlist-primary'
-            }`}
+            aria-pressed={sort === option.key}
+            className={`${CHIP_BASE} ${sort === option.key ? CHIP_ACTIVE : CHIP_INACTIVE}`}
           >
             {option.label}
           </button>
@@ -248,15 +247,23 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
             >
               {/* 본문 + 좋아요/더보기 */}
-              <div className="flex items-start gap-3">
-                <p className="min-w-0 flex-1 text-sm text-text-main leading-snug line-clamp-2">
+              <div className="flex items-start gap-2">
+                {/* 한마디는 flex-1이 아니라 내용 폭만큼만 차지해서(길면 줄어들며 2줄 말줄임), 뱃지가 오른쪽 끝이 아니라 한마디 바로 옆에 붙음 */}
+                <p className="min-w-0 text-sm text-text-main leading-snug line-clamp-2">
                   <span className="mr-[1px]">"</span>
                   {post.comment}
                   <span className="ml-[1px]">"</span>
                 </p>
 
-                {!post.isMine && (
-                  <div className="flex items-start gap-3 flex-shrink-0">
+                {/* 내 글이면 한마디 바로 옆에 "내 추천" 뱃지(신고 더보기는 내 글에선 숨김) — 흰 바탕 + 얇은 칩 파란색 테두리 + 검정 글자 */}
+                {post.isMine ? (
+                  // 앨범커버 위 뱃지(PostDetailCard)와 같은 글래스 알약 — 다만 여긴 흰 카드 위라 반투명 흰색(bg-white/30)은 안 보여서
+                  // 반투명 슬레이트로 바꿈. h-5는 한마디 첫 줄(text-sm × leading-snug ≈ 19px)과 거의 같은 높이라 세로 중앙이 맞음
+                  <span className="flex-shrink-0 h-5 px-2 flex items-center rounded-full bg-slate-500/50 backdrop-blur-md border border-white/40 shadow-md text-white text-[10px] font-semibold leading-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">
+                    내 추천
+                  </span>
+                ) : (
+                  <div className="flex items-start gap-3 flex-shrink-0 ml-auto">
                     <PostMoreMenu report={report} menuKey={postId ?? ''} reportTargetId={postId} />
                   </div>
                 )}

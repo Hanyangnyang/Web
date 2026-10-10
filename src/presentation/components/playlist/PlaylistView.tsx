@@ -287,8 +287,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // postDetail 화면/PostView 코드는 그대로 남겨둠 — 다시 쓰려면 아래를 pushScreen({ name: 'postDetail', postId: post.id })로 되돌리면 됨.
   // 주의: 최근추가된곡 목록은 최신 50개만 받아서, 그보다 오래된 게시글이면 해당 카드가 없어 스크롤 없이 목록 맨 위로 열림
   // 게시글 전문을 바로 읽을 수 있게 무조건 1열(리스트)로 열림 — 2열이었어도 여기서 1열로 바꿈(이후 토글 버튼으로 다시 2열 전환 가능)
+  // 장르 필터도 전체로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
   const handleSelectPost = useCallback((post: Song) => {
     setViewModes((prev) => ({ ...prev, recent: 'list' }));
+    setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
     pushScreen({ name: 'recent', scrollTarget: post.trackId });
   }, [pushScreen]);
 
@@ -327,7 +329,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   return (
     <div
       ref={scrollContainerRef}
-      className="fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app px-4 py-4"
+      className="playlist-root fixed inset-0 z-[1001] overflow-y-auto overflow-x-hidden mx-auto w-full max-w-app px-4 py-4"
       style={{
         backgroundColor: '#FFFFFF',
         animation: 'fadeIn 0.25s ease-out',
@@ -517,7 +519,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         song={currentTrack}
         onClose={handlePlayerClose}
         onHeightChange={handlePlayerHeightChange}
-        onSelectTrack={handleSelectSearchTrack}
         onPlaybackStateChange={handlePlaybackStateChange}
       />
     </div>

@@ -5,7 +5,8 @@ interface MusicSearchResultCardProps {
   track: MusicSearchTrack;
   onPlay?: (track: MusicSearchTrack) => void;
   isPlaying?: boolean;
-  onSelect: (track: MusicSearchTrack) => void;
+  // source: 앨범커버를 눌러 선택했는지('cover') 하단 정보 영역을 눌러 선택했는지('info') — 호출하는 쪽이 선택 시 재생 여부 등을 구분할 수 있게 알려줌
+  onSelect: (track: MusicSearchTrack, source: 'cover' | 'info') => void;
   selectLabel: string;
   disabled?: boolean; 
   disabledMessage?: string; 
@@ -37,7 +38,7 @@ export function MusicSearchResultCard({
       {albumArtSelects ? (
         <div className="relative w-full aspect-square">
           <button
-            onClick={() => onSelect(track)}
+            onClick={() => onSelect(track, 'cover')}
             disabled={disabled}
             aria-label={selectLabel}
             className="block w-full h-full active:scale-95 transition-transform disabled:pointer-events-none"
@@ -89,7 +90,7 @@ export function MusicSearchResultCard({
 
       {/* 하단 정보 영역 */}
       <button
-        onClick={() => onSelect(track)}
+        onClick={() => onSelect(track, 'info')}
         disabled={disabled}
         aria-label={selectLabel}
         className="w-full px-2 py-1.5 flex flex-col text-left hover:bg-slate-50 active:bg-slate-100 transition-colors disabled:pointer-events-none"

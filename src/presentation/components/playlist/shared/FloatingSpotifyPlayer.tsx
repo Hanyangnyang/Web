@@ -1,8 +1,7 @@
-import { ChevronRight, Play, Share2, X } from 'lucide-react';
+import { Play, X } from 'lucide-react';
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 import { isIOSDevice } from '../../../../lib/platform.js';
-import { useShareModal } from './useShareModal';
 import { type TrackSummary } from '../playlistTypes';
 
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
@@ -23,8 +22,6 @@ interface FloatingSpotifyPlayerProps {
   onClose: () => void;
   // 실제 렌더링된 플레이어 카드 높이(safe-area 포함)를 전달 — 닫히면 0
   onHeightChange?: (height: number) => void;
-  // 헤더의 곡명·가수명을 누르면 이 곡의 게시글 모음(TrackPostCollectionView)으로 이동
-  onSelectTrack?: (track: PlayableTrack) => void;
   // Spotify iframe이 보고하는 실제 재생/일시정지 상태가 바뀔 때마다 상위로 올림 — 앨범커버 재생 버튼들이
   // 재생 중엔 일시정지 아이콘으로 바뀌어야 해서, 이 상태를 알아야 함
   onPlaybackStateChange?: (isPaused: boolean) => void;
@@ -33,14 +30,11 @@ interface FloatingSpotifyPlayerProps {
 const CLOSE_ANIMATION_MS = 250;
 
 export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, FloatingSpotifyPlayerProps>(
-  function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onSelectTrack, onPlaybackStateChange }, ref) {
+  function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onPlaybackStateChange }, ref) {
   const [displaySong, setDisplaySong] = useState<PlayableTrack | null>(song);
   const [closing, setClosing] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [showTapToPlay, setShowTapToPlay] = useState(false);
-  // displaySong이 null(닫힘 상태)이어도 훅은 항상 호출돼야 해서 빈 값으로 대체 — 실제로는
-  // displaySong이 있을 때만 공유 버튼이 렌더링되므로 open()이 빈 값으로 호출될 일은 없음
-  const share = useShareModal(displaySong ?? { trackId: '', title: '', artist: '', albumArtUrl: '' });
   const containerRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyEmbedController | null>(null);
@@ -176,31 +170,10 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
           }}
         >
           <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-white/10">
-            {onSelectTrack ? (
-              <button
-                onClick={() => onSelectTrack(displaySong)}
-                aria-label={`${displaySong.title} 게시글 모음 보기`}
-                className="flex-1 min-w-0 flex items-center gap-0.5 text-left"
-              >
-                <span className="min-w-0 truncate">
-                  <span className="text-sm font-bold text-text-main">{displaySong.title}</span>
-                  <span className="text-sm text-text-sub"> · {displaySong.artist}</span>
-                </span>
-                <ChevronRight size={16} className="flex-shrink-0 text-text-sub" />
-              </button>
-            ) : (
-              <div className="flex-1 min-w-0 truncate">
-                <span className="text-sm font-bold text-text-main">{displaySong.title}</span>
-                <span className="text-sm text-text-sub"> · {displaySong.artist}</span>
-              </div>
-            )}
-            <button
-              onClick={() => share.open()}
-              aria-label="공유하기"
-              className="ml-2 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
-            >
-              <Share2 size={18} className="text-black" />
-            </button>
+            <div className="flex-1 min-w-0 truncate">
+              <span className="text-sm font-bold text-text-main">{displaySong.title}</span>
+              <span className="text-sm text-text-sub"> · {displaySong.artist}</span>
+            </div>
             <button
               onClick={onClose}
               aria-label="닫기"
@@ -247,8 +220,6 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
           </div>
         </div>
       </div>
-
-      {share.node}
     </div>
   );
   }

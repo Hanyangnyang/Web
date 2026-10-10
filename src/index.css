@@ -47,6 +47,13 @@
   /* iOS 롱클릭 공유 팝업 해제 */
 }
 
+/* 에리카 플레이리스트: 이미지를 길게 누르거나 끌 때 사진이 반투명 유령 이미지로 따라 움직이는 브라우저 기본 드래그 동작을 막음
+   (위 * 규칙의 user-select/touch-callout으로는 이 드래그가 안 막힘). PlaylistView 루트에 playlist-root 클래스를 붙여 그 안의 모든 img에만 적용 */
+.playlist-root img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 /* 입력창 및 편집 영역은 정상적인 텍스트 입력을 위해 선택 가능하도록 예외 처리 */
 input,
 textarea,
