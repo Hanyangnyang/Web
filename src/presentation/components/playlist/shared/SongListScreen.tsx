@@ -193,6 +193,38 @@ export function SongListScreen({
   // 그리드 보기 전환 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다
   const viewToggleCoachmark = useCoachmark(VIEW_TOGGLE_COACHMARK_SEEN_KEY, enableViewToggle);
 
+  // 2열에서 같은 줄 두 카드의 반응 행·한마디 영역 높이를 큰 쪽에 맞춤 — 한쪽만 칩이 두 줄로 늘어나면 곡명 위치가 좌우로 어긋나 읽기 불편해서.
+  // 반응 바(data-reaction-bar)의 본래 높이를 재서 줄(2k, 2k+1) 단위로 최대값을 반응 행(data-reaction-row)의 min-height로 줌.
+  // 반응을 달거나 취소해 높이가 바뀌어도 따라가도록 ResizeObserver로 지켜봄(min-height는 바 높이에 영향이 없어 되먹임 없음)
+  useLayoutEffect(() => {
+    const container = listContainerRef.current;
+    if (!container || viewMode !== 'grid' || isLoading) return;
+    const sync = () => {
+      const cards = Array.from(container.querySelectorAll<HTMLElement>('[data-song-key]'));
+      for (let i = 0; i < cards.length; i += 2) {
+        const pair = cards.slice(i, i + 2);
+        const rows = pair.map((c) => c.querySelector<HTMLElement>('[data-reaction-row]'));
+        const bars = pair.map((c) => c.querySelector<HTMLElement>('[data-reaction-bar]'));
+        const tallest = pair.length === 2 ? Math.max(...bars.map((b) => b?.offsetHeight ?? 0)) : 0;
+        rows.forEach((row) => { if (row) row.style.minHeight = tallest ? `${tallest}px` : ''; });
+        // 한마디 영역도 같은 방식 — 한쪽 글이 두 줄이면 다른 쪽 한마디 영역도 그 높이로 늘려, 아래 ⋮ 버튼(영역 오른쪽 아래)과 구분선이 같은 높이에 놓이게 함.
+        // 한마디를 펼친 카드가 있으면 건너뜀(펼친 동안 옆 카드는 원래 높이로 고정되는 별도 로직이 있고, 여기서 늘리면 그 고정 높이에 잘림)
+        const blocks = pair.map((c) => c.querySelector<HTMLElement>('[data-body-block]'));
+        const texts = pair.map((c) => c.querySelector<HTMLElement>('[data-body-text]'));
+        const anyExpanded = blocks.some((b) => b?.hasAttribute('data-body-expanded'));
+        const tallestBody = pair.length === 2 && !anyExpanded ? Math.max(...texts.map((t) => t?.offsetHeight ?? 0)) : 0;
+        blocks.forEach((block) => { if (block) block.style.minHeight = tallestBody ? `${tallestBody}px` : ''; });
+      }
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
+    container.querySelectorAll('[data-reaction-bar], [data-body-text]').forEach((el) => observer.observe(el));
+    return () => {
+      observer.disconnect();
+      container.querySelectorAll<HTMLElement>('[data-reaction-row], [data-body-block]').forEach((el) => { el.style.minHeight = ''; });
+    };
+  }, [viewMode, isLoading, filteredSongs.length, songs]);
+
   // 꾹 누르기 힌트 — 첫 번째 카드의 스마일 버튼 아래에 띄움. 카드가 overflow-hidden이라 카드 안에 그리지 못하고,
   // 버튼 위치를 재서 화면 기준(fixed) 좌표로 놓음. 버튼이 화면에 보이는 위치일 때만 띄우고(스크롤돼 있으면 건너뜀 — 아직 안 본 것으로 남음),
   // 앞선 보기 전환 코치마크가 사라진 뒤에 시작. 어둡게 덮는 효과는 다른 코치마크와 같음(z-110: 고정 헤더 z-100 위까지 덮음)

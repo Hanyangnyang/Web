@@ -130,7 +130,8 @@ export function EmojiReactionBar({
   const TOUCH_AREA_CLASS = 'relative before:absolute before:-inset-y-2.5 before:-inset-x-[2px]';
 
   return (
-    <div className={`flex items-center ${chipGapClass} ${className}`}>
+    // 2열(mini)은 😊 버튼과 칩들을 한 줄에 이어 놓다가 넘치면 글 문단처럼 다음 줄 맨 왼쪽부터 이어서 배치(flex-wrap)
+    <div data-reaction-bar className={`flex items-center ${chipGapClass} ${isMini ? 'flex-wrap' : ''} ${className}`}>
       {/* 이모지 추가 버튼 — 스크롤 영역 밖에 고정, 위로 뜨는 팝오버가 잘리지 않게 함 */}
       {/* pickerAnchor가 있으면 relative를 빼서, 선택창이 이 버튼(폭 24px)이 아니라 가장 가까운 relative 조상(카드 폭 전체)을 기준으로 뜨게 함 */}
       <div ref={pickerWrapperRef} className={`${pickerAnchor ? '' : 'relative'} inline-block flex-shrink-0`}>
@@ -200,9 +201,12 @@ export function EmojiReactionBar({
       </div>
 
       {displayedReactions.length > 0 ? (
-        /* 이미 달린 리액션 칩 — 여러 개로 늘어날 수 있어서 가로 스크롤 */
+        /* 이미 달린 리액션 칩 — 여러 개로 늘어날 수 있음. 1열/목록은 가로 스크롤, 2열(mini)은 폭이 좁아 스크롤 대신 두 줄로 줄바꿈 */
         <div
-          className={`flex items-center ${chipGapClass} flex-1 min-w-0 overflow-x-auto overscroll-x-contain touch-pan-x py-2.5 -my-2.5 [&::-webkit-scrollbar]:hidden`}
+          className={`flex items-center ${chipGapClass} ${
+            // mini: 칩 컨테이너를 display:contents로 풀어 칩들이 바깥 줄바꿈 줄에 직접 섞이게 함(안 풀면 😊 버튼 옆 칸 안에서만 줄바꿈돼 둘째 줄이 들여쓰기됨)
+            isMini ? 'contents' : 'flex-1 min-w-0 overflow-x-auto overscroll-x-contain touch-pan-x py-2.5 -my-2.5 [&::-webkit-scrollbar]:hidden'
+          }`}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayedReactions.map(({ key, emoji }) => {

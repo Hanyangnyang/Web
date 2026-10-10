@@ -407,7 +407,8 @@ export function PostDetailCard({
         className={`${isNarrow ? 'px-3 pt-2 pb-2' : `px-4 pt-3 ${compact ? 'pb-3' : 'pb-4'}`} flex-1 flex flex-col ${pickerAnchor ? 'relative' : ''} ${canToggleBody ? 'cursor-pointer' : ''}`}
       >
         {!hideReactions && (
-          <div className={`flex items-center gap-1.5 ${isNarrow ? 'mb-1' : 'mb-2'}`}>
+          // data-reaction-row: 2열 그리드에서 같은 줄 두 카드의 이 행 높이를 맞출 때 SongListScreen이 min-height를 거는 대상(위로 정렬해 😊 버튼 위치는 그대로)
+          <div data-reaction-row className={`flex ${isNarrow ? 'items-start mb-1' : 'items-center mb-2'} gap-1.5`}>
             <EmojiReactionBar
               reactions={reactions}
               onToggleReaction={toggleReaction}
@@ -437,8 +438,10 @@ export function PostDetailCard({
         {/* 본문 */}
         {!compact && post.body && (
           <>
-            <div className={`relative ${canToggleBody || (isNarrow && bodyExpanded) ? 'mb-1' : 'mb-2'}`}>
+            {/* data-body-block/-text/-expanded: 2열 그리드에서 같은 줄 두 카드의 한마디 영역 높이를 맞출 때 SongListScreen이 쓰는 표시 */}
+            <div data-body-block data-body-expanded={bodyExpanded ? '' : undefined} className={`relative ${canToggleBody || (isNarrow && bodyExpanded) ? 'mb-1' : 'mb-2'}`}>
               <p
+                data-body-text
                 ref={bodyRef}
                 style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
                 className={`${
