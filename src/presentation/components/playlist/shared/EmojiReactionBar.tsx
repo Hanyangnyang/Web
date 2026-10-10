@@ -121,12 +121,12 @@ export function EmojiReactionBar({
   const isCompact = size === 'compact';
   const isMini = size === 'mini';
   // "😊 반응" 알약 — 아이콘만 있을 땐 누를 곳이 너무 작아서 가로로 길게 하고 "반응" 글씨를 붙임
-  const addButtonSizeClass = isMini ? 'h-[22px] px-2 gap-0.5 text-[10px]' : isCompact ? 'h-[26px] px-2.5 gap-1 text-[11px]' : 'h-[26px] px-3 gap-1 text-xs';
+  const addButtonSizeClass = isMini ? 'h-[24px] px-1 gap-0.5 text-[11px]' : isCompact ? 'h-[26px] px-1.5 gap-1 text-[11px]' : 'h-[26px] px-2 gap-1 text-xs';
   const addButtonIconSize = isMini ? 12 : isCompact ? 13 : 15;
   const chipGapClass = isCompact || isMini ? 'gap-1' : 'gap-1.5';
   // 높이를 "반응" 알약 버튼과 똑같이 고정해서 나란히 놓였을 때 키가 어긋나지 않게 함
-  const chipClass = isMini ? 'h-[22px] px-1.5 text-[10px]' : 'h-[26px] px-2 text-xs';
-  const chipEmojiClass = isMini ? 'text-xs' : 'text-sm';
+  const chipClass = isMini ? 'h-[24px] px-1.5 text-[11px]' : 'h-[26px] px-2 text-xs';
+  const chipEmojiClass = isMini ? 'text-sm' : 'text-sm';
   const TOUCH_AREA_CLASS = 'relative before:absolute before:-inset-y-2.5 before:-inset-x-[2px]';
 
   return (
@@ -165,7 +165,10 @@ export function EmojiReactionBar({
             }`}
           >
             <div ref={pickerRowRef} className="flex gap-1 px-2 py-1.5 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
-              {EMOJI_REACTIONS.map(({ key, emoji }) => (
+              {EMOJI_REACTIONS.map(({ key, emoji }) => {
+                // 이미 내가 남긴 반응은 칩과 같은 파란 배경으로 표시 — 다시 누르면 취소됨
+                const mine = reactions[key]?.mine ?? false;
+                return (
                 <button
                   key={key}
                   data-reaction-key={key}
@@ -175,14 +178,16 @@ export function EmojiReactionBar({
                     onTogglePicker();
                   }}
                   disabled={disabled}
-                  aria-label={`${emoji} 남기기`}
-                  className={`w-9 h-9 flex items-center justify-center text-lg rounded-full hover:bg-slate-100 active:scale-90 transition-transform ${
-                    hoverKey === key ? 'bg-slate-100 scale-125' : ''
-                  }`}
+                  aria-label={`${emoji} ${mine ? '취소' : '남기기'}`}
+                  aria-pressed={mine}
+                  className={`w-9 h-9 flex items-center justify-center text-lg rounded-full active:scale-90 transition-transform ${
+                    mine ? 'bg-primary/20' : 'hover:bg-slate-100'
+                  } ${hoverKey === key ? (mine ? 'scale-125' : 'bg-slate-100 scale-125') : ''}`}
                 >
                   {emoji}
                 </button>
-              ))}
+                );
+              })}
             </div>
             {/* 말풍선 꼬리 */}
             {!pickerAnchor && <div className={`w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 -mt-1.5 ${isCompact ? 'ml-[19px]' : 'ml-[24px]'}`} />}

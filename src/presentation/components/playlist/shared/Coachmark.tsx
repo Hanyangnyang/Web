@@ -64,6 +64,9 @@ export function Coachmark({ state, onAnimationEnd, children, className = '', sty
       onAnimationEnd={onAnimationEnd}
       role="status"
     >
+      {/* 어두워진 화면을 터치해도 아래 버튼·카드가 눌리지 않게 막는 투명 터치 차단막 — 어둡게 만드는 건 아래 말풍선의 그림자라 이 요소는 눈에 안 보임.
+          wrapper가 pointer-events-none이라 여기만 auto로 되살림. 말풍선이 3초 뒤 사라지면(state hidden → return null) 같이 사라짐 */}
+      <div className="fixed inset-0 pointer-events-auto" aria-hidden="true" />
       {/* 모양·색은 캠퍼스맵 '뭐먹지' 말풍선과 동일. 두 번째 그림자(100vmax 확산)가 말풍선 둘레 화면 전체를 어둡게 덮어 시선이 말풍선으로 가게 한다 —
           별도 오버레이가 아니라 말풍선 자신의 그림자라 말풍선 위치·페이드와 항상 함께 움직이고 클릭도 막지 않는다 */}
       <div className="relative whitespace-nowrap bg-gradient-to-br from-amber-300 to-orange-400 text-[#5b3a00] text-[13.5px] font-extrabold leading-snug px-3.5 py-2.5 rounded-2xl shadow-[0_6px_18px_rgba(217,119,6,0.35),0_0_0_100vmax_rgba(0,0,0,0.4)]">

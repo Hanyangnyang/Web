@@ -270,7 +270,7 @@ export function PostDetailCard({
 
   // 더보기 버튼: 앨범 커버 바로 아래 첫 행의 맨 오른쪽에 위치 —
   // 1열(리액션 있음)에서는 리액션 행, 2열(리액션 숨김)에서는 제목 행에 합류
-  const moreButton = <PostMoreMenu report={report} menuKey="more" reportTargetId={post.id} />;
+  const moreButton = <PostMoreMenu report={report} menuKey="more" reportTargetId={post.id} placement={isNarrow && !hideReactions ? 'up' : 'down'} />;
   // 같은 자리에 들어가는 우측 버튼 — 'trackLink'면 > 버튼(내 글 여부와 무관하게 이동은 항상 가능),
   // 아니면 더보기(신고는 내 글에는 숨김)
   const trailingButton = useTrackLinkButton ? (
@@ -284,6 +284,9 @@ export function PostDetailCard({
   ) : (
     !post.isMine && moreButton
   );
+
+  // 2열 카드의 점 3개는 한마디가 있으면 그 마지막 줄 오른쪽 끝에, 없으면 구분선 바로 위 줄에 둠
+  const moreInBody = isNarrow && !compact && !hideReactions && !useTrackLinkButton && !!trailingButton && !!post.body;
 
   // 공유/좋아요 배지 크기 — 1열은 36px, 2열(좁은 요약 카드)은 그보다 더 작게(28px).
   // offset은 "공유 버튼 폭 + 간격(10px)" 고정값 — 공유가 모서리(right-[4%]), 좋아요가 그 왼쪽
@@ -416,7 +419,8 @@ export function PostDetailCard({
               size={isNarrow ? 'mini' : 'default'}
             />
 
-            {trailingButton}
+            {/* 2열 카드는 더보기(⋮)를 한마디 아래·구분선 바로 위 오른쪽으로 내림 — 아래 구분선 블록에서 렌더 */}
+            {!(isNarrow && !useTrackLinkButton) && trailingButton}
           </div>
         )}
 
@@ -433,9 +437,7 @@ export function PostDetailCard({
         {/* 본문 */}
         {!compact && post.body && (
           <>
-            {/* 접힌 상태의 "더보기"는 인스타그램 캡션처럼 잘린 마지막 줄 끝(말줄임표 자리)에 겹쳐 놓음 —
-                흰 배경+왼쪽 그라데이션이 `...`을 가려서 "…더보기"처럼 한 줄 안에 보임. 펼친 뒤의 "접기"는 본문 아래 별도 줄 */}
-            <div className={`relative ${isNarrow && bodyExpanded ? 'mb-1' : 'mb-2'}`}>
+            <div className={`relative ${canToggleBody || (isNarrow && bodyExpanded) ? 'mb-1' : 'mb-2'}`}>
               <p
                 ref={bodyRef}
                 style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
@@ -443,36 +445,26 @@ export function PostDetailCard({
                   isNarrow
                     ? `text-[13px] overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
                     : 'text-[15px]'
-                } text-text-main leading-relaxed whitespace-pre-line`}
+                } ${moreInBody ? 'pr-7' : ''} text-text-main leading-relaxed whitespace-pre-line`}
               >
                 <span className="mr-[1px]">"</span>
                 {post.body}
                 <span className="ml-[1px]">"</span>
               </p>
-              {/* 더보기/접기 — 카드 전체 클릭(1열 상세로 전환)과 별개 동작이라 전파를 막음 */}
-              {canToggleBody && !bodyExpanded && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleBody();
-                  }}
-                  aria-expanded={false}
-                  className="absolute before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 bottom-0 right-0 pl-6 text-[13px] leading-relaxed font-semibold text-text-hint bg-gradient-to-l from-white from-70% to-transparent active:opacity-60"
-                >
-                  더보기
-                </button>
-              )}
+              {/* 점 3개 — 한마디 마지막 줄 오른쪽 끝. 글이 그 밑으로 들어가지 않게 위 <p>에 오른쪽 여백(pr-7)을 줌 */}
+              {moreInBody && <div className="absolute bottom-0 right-0">{trailingButton}</div>}
             </div>
-            {canToggleBody && bodyExpanded && (
+            {/* 더보기/접기 — 한마디 하단 왼쪽, 같은 자리에서 글자만 바뀜. 카드 전체 클릭과 별개 동작이라 전파를 막음 */}
+            {canToggleBody && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleBody();
                 }}
-                aria-expanded
-                className="relative before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 self-end mb-2 text-[13px] leading-relaxed font-semibold text-text-hint active:opacity-60"
+                aria-expanded={bodyExpanded}
+                className="relative before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 self-start mb-2 text-[13px] leading-relaxed font-semibold text-text-hint active:opacity-60"
               >
-                접기
+                {bodyExpanded ? '접기' : '더보기'}
               </button>
             )}
           </>
@@ -483,6 +475,9 @@ export function PostDetailCard({
             바로 아래 뜨고 장르는 저 밑에 떨어져 보였어서, 항상 장르 바로 위에 붙도록 묶음 */}
         {!compact && (
         <div className="mt-auto">
+          {isNarrow && !hideReactions && !useTrackLinkButton && trailingButton && !moreInBody && (
+            <div className="flex justify-end mb-1">{trailingButton}</div>
+          )}
           <div className="border-t border-slate-100 mb-3" />
           <div className="flex items-center justify-between gap-2">
             {/* 장르가 3개라 폭이 모자라도 두 줄로 꺾이지 않게 한 줄 가로 스크롤(반응 칩과 동일 방식) */}

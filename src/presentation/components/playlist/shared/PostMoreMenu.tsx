@@ -9,11 +9,13 @@ interface PostMoreMenuProps {
   menuKey: string;
   // 신고 API에 실제로 보낼 게시글 id — 없으면(더미 게시글 등) confirmReport가 조용히 무시함
   reportTargetId: string | undefined;
+  // 메뉴가 열리는 방향 — 기본은 버튼 아래, 카드 하단에 붙어 있어 아래로 열면 잘리는 곳은 'up'
+  placement?: 'down' | 'up';
 }
 
 // 앨범 커버/제목 행 오른쪽에 붙는 "더보기 → 신고하기" 드롭다운 — PostDetailCard/TrackPostCollectionView가
 // 각자 들고 있던 동일한 마크업을 하나로 모음(상태는 이미 useSongReport로 공유하고 있었음)
-export function PostMoreMenu({ report, menuKey, reportTargetId }: PostMoreMenuProps) {
+export function PostMoreMenu({ report, menuKey, reportTargetId, placement = 'down' }: PostMoreMenuProps) {
   return (
     <div
       ref={report.openMenuKey === menuKey ? report.menuRef : undefined}
@@ -31,7 +33,7 @@ export function PostMoreMenu({ report, menuKey, reportTargetId }: PostMoreMenuPr
       </button>
 
       {report.openMenuKey === menuKey && (
-        <div className="absolute top-full right-0 mt-0.5 z-20 bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden">
+        <div className={`absolute right-0 z-20 ${placement === 'up' ? 'bottom-full mb-0.5' : 'top-full mt-0.5'} bg-white border border-slate-200 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] overflow-hidden`}>
           <button
             onClick={(e) => {
               e.stopPropagation();
