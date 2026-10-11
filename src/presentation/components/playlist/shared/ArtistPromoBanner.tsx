@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from 'react';
+import { edgePaletteGradient, extractRightEdgePalette, type EdgePalette } from './bannerEdgePalette.js';
 import { getArtistNameSize, pickArtistPromoTemplate, type ArtistPromoTemplate } from './artistPromoTypography.js';
 
 export interface ArtistPromoBannerProps {
@@ -10,12 +11,6 @@ export interface ArtistPromoBannerProps {
   template?: ArtistPromoTemplate;
   // 높이를 절반(4:1)으로 줄인 버전 — 플레이리스트 홈의 인기차트 위에 쓴다. 로고와 '바로가기' 버튼은 빼고 글씨는 비례해서 줄인다
   compact?: boolean;
-}
-
-interface EdgePalette {
-  edge: string;
-  middle: string;
-  end: string;
 }
 
 // 컴팩트 배너(높이 절반)에서 가수명·문구 글씨에 곱하는 비율
@@ -73,59 +68,6 @@ function ArtistPromoCopy({ artistName, template, compact }: { artistName: string
   );
 }
 
-function darken([red, green, blue]: number[], amount: number): string {
-  return `rgb(${Math.round(red * amount)}, ${Math.round(green * amount)}, ${Math.round(blue * amount)})`;
-}
-
-function extractRightEdgePalette(image: HTMLImageElement): EdgePalette | null {
-  try {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 64;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context || image.naturalWidth === 0 || image.naturalHeight === 0) return null;
-
-    // 테두리의 워터마크·압축 노이즈는 피하고, 사진 오른쪽 여백의 대표색을 작은 표본으로 뽑는다.
-    context.drawImage(
-      image,
-      image.naturalWidth * 0.88,
-      image.naturalHeight * 0.08,
-      image.naturalWidth * 0.1,
-      image.naturalHeight * 0.72,
-      0,
-      0,
-      canvas.width,
-      canvas.height,
-    );
-
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    const buckets = new Map<string, { count: number; red: number; green: number; blue: number }>();
-    for (let index = 0; index < pixels.length; index += 4) {
-      if (pixels[index + 3] < 128) continue;
-      const key = `${pixels[index] >> 4}-${pixels[index + 1] >> 4}-${pixels[index + 2] >> 4}`;
-      const bucket = buckets.get(key) ?? { count: 0, red: 0, green: 0, blue: 0 };
-      bucket.count += 1;
-      bucket.red += pixels[index];
-      bucket.green += pixels[index + 1];
-      bucket.blue += pixels[index + 2];
-      buckets.set(key, bucket);
-    }
-
-    const dominant = [...buckets.values()].sort((a, b) => b.count - a.count)[0];
-    if (!dominant) return null;
-    const color = [dominant.red / dominant.count, dominant.green / dominant.count, dominant.blue / dominant.count];
-
-    return {
-      edge: darken(color, 1),
-      middle: darken(color, 0.56),
-      end: darken(color, 0.38),
-    };
-  } catch {
-    // CDN이 CORS 픽셀 읽기를 막는 경우에도 배너 자체는 정상 노출한다.
-    return null;
-  }
-}
-
 /**
  * 백엔드가 내려준 가수 이미지와 이름을 학술정보관 카드와 비슷한 2:1 비율로 조합한다.
  * 원본 이미지를 흐린 배경으로 한 번 더 사용하므로 별도의 색상 추출 없이도 톤이 자연스럽게 이어진다.
@@ -161,7 +103,7 @@ export function ArtistPromoBanner({
           background: imageFailed
             ? 'linear-gradient(115deg, #334155 0%, #111827 48%, #020617 100%)'
             : edgePalette
-              ? `linear-gradient(90deg, ${edgePalette.edge} 0%, ${edgePalette.edge} 38%, ${edgePalette.middle} 78%, ${edgePalette.end} 100%)`
+              ? edgePaletteGradient(edgePalette)
               : 'linear-gradient(90deg, #9ca3af 0%, #4b5563 52%, #111827 100%)',
         }}
         aria-hidden="true"

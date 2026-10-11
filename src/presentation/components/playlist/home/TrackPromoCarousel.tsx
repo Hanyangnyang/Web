@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { Music2 } from 'lucide-react';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
+import { edgePaletteGradient, extractRightEdgePalette, type EdgePalette } from '../shared/bannerEdgePalette.js';
 import { type ChartPeriod, type Song, type TrackSummary } from '../playlistTypes.js';
 
 type PromoSource = 'recent' | 'popular' | 'weekly';
@@ -39,12 +40,6 @@ interface PromoSelection {
   recent: [Song | undefined, Song | undefined];
   popular: ChartTrack | undefined;
   weekly: ChartTrack | undefined;
-}
-
-interface EdgePalette {
-  edge: string;
-  middle: string;
-  end: string;
 }
 
 function randomItem<T>(items: readonly T[]): T | undefined {
@@ -113,41 +108,6 @@ function getCachedSelection(recentSongs: readonly Song[], popularTracks: readonl
   return selection;
 }
 
-function darken([red, green, blue]: number[], amount: number): string {
-  return `rgb(${Math.round(red * amount)}, ${Math.round(green * amount)}, ${Math.round(blue * amount)})`;
-}
-
-// 기존 가수 배너와 동일하게 이미지 오른쪽 가장자리의 대표색을 뽑아 배경 그라데이션으로 자연스럽게 잇는다.
-function extractRightEdgePalette(image: HTMLImageElement): EdgePalette | null {
-  try {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 64;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context || image.naturalWidth === 0 || image.naturalHeight === 0) return null;
-
-    context.drawImage(image, image.naturalWidth * 0.88, image.naturalHeight * 0.08, image.naturalWidth * 0.1, image.naturalHeight * 0.72, 0, 0, canvas.width, canvas.height);
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    const buckets = new Map<string, { count: number; red: number; green: number; blue: number }>();
-    for (let index = 0; index < pixels.length; index += 4) {
-      if (pixels[index + 3] < 128) continue;
-      const key = `${pixels[index] >> 4}-${pixels[index + 1] >> 4}-${pixels[index + 2] >> 4}`;
-      const bucket = buckets.get(key) ?? { count: 0, red: 0, green: 0, blue: 0 };
-      bucket.count += 1;
-      bucket.red += pixels[index];
-      bucket.green += pixels[index + 1];
-      bucket.blue += pixels[index + 2];
-      buckets.set(key, bucket);
-    }
-    const dominant = [...buckets.values()].sort((a, b) => b.count - a.count)[0];
-    if (!dominant) return null;
-    const color = [dominant.red / dominant.count, dominant.green / dominant.count, dominant.blue / dominant.count];
-    return { edge: darken(color, 1), middle: darken(color, 0.56), end: darken(color, 0.38) };
-  } catch {
-    return null;
-  }
-}
-
 function TrackPromoBanner({ promo, onClick }: { promo: TrackPromo; onClick: () => void }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [edgePalette, setEdgePalette] = useState<EdgePalette | null>(null);
@@ -165,7 +125,7 @@ function TrackPromoBanner({ promo, onClick }: { promo: TrackPromo; onClick: () =
         className="absolute inset-0"
         style={{
           background: hasImage && edgePalette
-            ? `linear-gradient(90deg, ${edgePalette.edge} 0%, ${edgePalette.edge} 38%, ${edgePalette.middle} 78%, ${edgePalette.end} 100%)`
+            ? edgePaletteGradient(edgePalette)
             : 'linear-gradient(90deg, #9ca3af 0%, #4b5563 52%, #111827 100%)',
         }}
         aria-hidden="true"

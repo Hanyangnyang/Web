@@ -435,7 +435,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             <RefreshCw
               size={16}
               strokeWidth={2.2}
-              className={isPullRefreshing ? 'animate-spin text-playlist-accent' : 'text-text-main'}
+              className={isPullRefreshing ? 'animate-spin text-primary' : 'text-primary'}
               style={isPullRefreshing ? undefined : { transform: `rotate(${(pull / pullThreshold) * 270}deg)` }}
             />
           </div>
