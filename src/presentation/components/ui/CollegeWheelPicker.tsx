@@ -14,20 +14,38 @@ interface Props {
   onChange: (id: string) => void;
   triggerClassName: string;
   onOpen?: () => void;  // 피커가 열릴 때 호출 (예: 접힌 바텀시트를 펼치는 용도)
+  panelWidthClassName?: string; // 펼쳐지는 목록의 너비 — 항목 글자가 짧은 곳에서 좌우 여백을 줄이려고 덮어씀(기본 170px)
+  // 지정하면 목록을 연 채로 휠이 이 시간(ms) 동안 멈춰 있을 때 바로 부모에 반영(닫을 때까지 기다리지 않음).
+  // 휠을 굴리는 중간 항목마다 반영되면 요청이 몰리므로 디바운스. 생략하면 기존처럼 닫힐 때만 반영
+  liveChangeDelayMs?: number;
 }
 
 const ITEM_HEIGHT = 36;
 const VISIBLE_COUNT = 5;
 const PAD_COUNT = Math.floor(VISIBLE_COUNT / 2);
 
-export function CollegeWheelPicker({ options, value, onChange, triggerClassName, onOpen }: Props) {
+export function CollegeWheelPicker({ options, value, onChange, triggerClassName, onOpen, panelWidthClassName = 'w-[170px]', liveChangeDelayMs }: Props) {
   const [open, setOpen] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // 열린 채로 반영한 값 — 부모 value가 따라 바뀌어도 휠 위치를 다시 맞추지 않으려는 표식(사용자가 아직 스크롤 중일 수 있음)
+  const liveCommittedRef = useRef(false);
+
+  // 열린 채로 휠이 멈추면 부모에 반영 (디바운스)
+  useEffect(() => {
+    if (!open || liveChangeDelayMs === undefined || localValue === value) return;
+    const timer = setTimeout(() => {
+      liveCommittedRef.current = true;
+      onChange(localValue);
+    }, liveChangeDelayMs);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, localValue, liveChangeDelayMs]);
 
   // 열릴 때 현재 값으로 로컬 상태 초기화, 닫힐 때 부모에 커밋 (셔틀 선택기와 동일 패턴)
   useEffect(() => {
+    liveCommittedRef.current = false;
     if (open) {
       setLocalValue(value);
     } else if (localValue !== value) {
@@ -37,16 +55,18 @@ export function CollegeWheelPicker({ options, value, onChange, triggerClassName,
   }, [open]);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    // mousedown은 터치에선 "탭"이 끝난 뒤에야 합성되고 스크롤하려는 터치엔 아예 안 생겨서, 바깥을 스크롤하면 안 닫혔음 —
+    // 터치 시작 즉시 발생하는 pointerdown으로 감지
+    const handler = (e: PointerEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
   }, []);
 
   // 열릴 때 현재 선택값이 중앙에 오도록 스크롤 위치 초기화
   useEffect(() => {
-    if (!open) return;
+    if (!open || liveCommittedRef.current) return;
     const timer = setTimeout(() => {
       const idx = options.findIndex((o) => o.id === value);
       if (scrollRef.current && idx !== -1) scrollRef.current.scrollTop = idx * ITEM_HEIGHT;
@@ -71,7 +91,7 @@ export function CollegeWheelPicker({ options, value, onChange, triggerClassName,
       </button>
 
       {open && (
-        <div className="absolute top-[calc(100%+6px)] right-0 w-[170px] bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]">
+        <div className={`absolute top-[calc(100%+6px)] right-0 ${panelWidthClassName} bg-white border border-[#e2e8f0] rounded-card shadow-[0_16px_40px_rgba(0,0,0,0.18)] overflow-hidden z-[200] [animation:sttDropIn_0.18s_cubic-bezier(0.16,1,0.3,1)]`}>
           <div className="relative" style={{ height: ITEM_HEIGHT * VISIBLE_COUNT }}>
             {/* 선택 하이라이트 바 */}
             <div
@@ -83,7 +103,8 @@ export function CollegeWheelPicker({ options, value, onChange, triggerClassName,
             />
             <div
               ref={scrollRef}
-              className="h-full overflow-y-auto no-scrollbar snap-y snap-mandatory relative z-0"
+              data-no-pull-refresh
+              className="h-full overflow-y-auto overscroll-contain touch-pan-y no-scrollbar snap-y snap-mandatory relative z-0"
               onScroll={(e) => {
                 const idx = Math.round(e.currentTarget.scrollTop / ITEM_HEIGHT);
                 const opt = options[idx];

@@ -120,6 +120,87 @@ export default defineConfig(({ mode }) => {
           });
         }
       },
+      {
+        // 개발 서버 전용 목 — Spotify 곡 검색 API의 에러 응답(429/502)을 실제 백엔드 없이 재현한다.
+        // 검색창에 아래 "마법 검색어"를 입력하면 가짜 응답을, 그 외 검색어는 평소처럼 실제 백엔드로 넘긴다.
+        // configureServer는 dev 서버에서만 실행되므로 프로덕션 빌드에는 영향이 없다.
+        //   __429 → 429 + Retry-After: 10초 + PL005   (재시도 카운트다운 UX 확인)
+        //   __502 → 502 + PL004                       (Spotify 장애 문구 확인)
+        name: 'mock-music-search-errors',
+        configureServer(server) {
+          server.middlewares.use('/backend/api/v1/playlist/catalog/tracks/search', (req, res, next) => {
+            const keyword = new URL(req.url, 'http://localhost').searchParams.get('keyword');
+            const mocks = {
+              __429: { status: 429, retryAfter: 10, code: 'PL005', message: 'Spotify 요청 제한에 걸렸어요. 잠시 후 다시 시도해주세요.' },
+              __502: { status: 502, code: 'PL004', message: 'Spotify 검색에 문제가 생겼어요.' },
+            };
+            const mock = mocks[keyword];
+            if (!mock) return next();
+
+            res.statusCode = mock.status;
+            res.setHeader('Content-Type', 'application/json');
+            if (mock.retryAfter) res.setHeader('Retry-After', String(mock.retryAfter));
+            res.end(JSON.stringify({ success: false, data: null, error: { code: mock.code, message: mock.message } }));
+          });
+        },
+      },
+      {
+        // 개발 서버 전용 목 — 곡 등록 가능 상태(creation-status)와 곡 등록(POST /songs)의 에러 상황을 실제 백엔드 없이 재현한다.
+        // 서버 메모리에 "현재 모드"를 하나 들고 있고, 브라우저 주소창에서 아래 주소로 모드를 바꾼다(서버를 재시작하면 off로 초기화).
+        //   http://localhost:5173/__mock/playlist?mode=blocked       → creation-status가 임시 차단(temporarilyBlocked) 응답
+        //   http://localhost:5173/__mock/playlist?mode=limit         → creation-status가 하루 한도 소진(canCreate:false) 응답
+        //   http://localhost:5173/__mock/playlist?mode=status-error  → creation-status가 500 (조회 실패 안내 확인)
+        //   http://localhost:5173/__mock/playlist?mode=pl007         → 곡 등록이 PL007(다른 등록 진행 중)로 실패
+        //   http://localhost:5173/__mock/playlist?mode=pl008         → 곡 등록이 PL008(잠금 확인 실패)로 실패
+        //   http://localhost:5173/__mock/playlist?mode=off           → 목 해제(실제 백엔드로 전달)
+        // configureServer는 dev 서버에서만 실행되므로 프로덕션 빌드에는 영향이 없다.
+        name: 'mock-playlist-creation',
+        configureServer(server) {
+          let mode = 'off';
+          const MODES = ['off', 'blocked', 'limit', 'status-error', 'pl007', 'pl008'];
+          const sendJson = (res, status, body) => {
+            res.statusCode = status;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(body));
+          };
+          const fail = (res, status, code, message) =>
+            sendJson(res, status, { success: false, data: null, error: { code, message } });
+
+          // 모드 전환 주소 — 브라우저로 한 번 열면 됨
+          server.middlewares.use('/__mock/playlist', (req, res) => {
+            const requested = new URL(req.url, 'http://localhost').searchParams.get('mode');
+            if (requested && MODES.includes(requested)) mode = requested;
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.end(`playlist mock mode: ${mode}\n(available: ${MODES.join(', ')})`);
+          });
+
+          // 등록 가능 상태 조회
+          server.middlewares.use('/backend/api/v1/playlist/songs/creation-status', (req, res, next) => {
+            const status = {
+              canCreate: true, dailyCount: 0, dailyMaxLimit: 3, remainingCount: 3,
+              recentTrackIdsIn7Days: [], temporarilyBlocked: false, blockedUntil: null,
+            };
+            if (mode === 'blocked') {
+              // 30분 뒤(KST)에 풀리는 임시 차단
+              const until = new Date(Date.now() + 30 * 60 * 1000 + 9 * 60 * 60 * 1000).toISOString().replace('Z', '+09:00').replace(/\.\d+/, '');
+              return sendJson(res, 200, { success: true, data: { ...status, canCreate: false, temporarilyBlocked: true, blockedUntil: until }, error: null });
+            }
+            if (mode === 'limit')
+              return sendJson(res, 200, { success: true, data: { ...status, canCreate: false, dailyCount: 3, remainingCount: 0 }, error: null });
+            if (mode === 'status-error') return fail(res, 500, 'C004', '서버 오류가 발생했어요.');
+            next();
+          });
+
+          // 곡 등록(정확히 POST /songs만 — /songs/{id}/reactions 같은 하위 경로는 건드리지 않음)
+          server.middlewares.use('/backend/api/v1/playlist/songs', (req, res, next) => {
+            const isCreate = req.method === 'POST' && (req.url === '/' || req.url === '');
+            if (!isCreate) return next();
+            if (mode === 'pl007') return fail(res, 400, 'PL007', '다른 등록이 진행 중입니다.');
+            if (mode === 'pl008') return fail(res, 503, 'PL008', '등록 잠금을 확인하지 못했습니다.');
+            next();
+          });
+        },
+      },
       sentryVitePlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
         org: "hanyangnyang",

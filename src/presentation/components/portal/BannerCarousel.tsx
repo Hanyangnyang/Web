@@ -9,12 +9,12 @@ const VALID_TABS = ['cafe', 'shuttle', 'portal', 'partner', 'misc'];
 
 // 캠퍼스맵(useCampusMapFilters.ts의 MapChip)이 실제로 받아들이는 칩 값 목록 — clickUrl의
 // chip 파라미터에 오타/미지원 값이 오면 걸러서 CampusMapView에 잘못된 칩 상태가 전달되는 걸 막는다
-const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food', 'cafe', 'pub', 'play', 'life'];
+export const VALID_MAP_CHIPS = ['all', 'building', 'openspace', 'smoking', 'food', 'cafe', 'pub', 'play', 'life'];
 
 // 기타탭(MiscView)이 실제로 진입 가능한 하위 화면 값 목록 — clickUrl의 box 파라미터에
 // 오타/미지원 값이 오면 걸러서 MiscView에 잘못된 서브뷰 상태가 전달되는 걸 막는다.
 // MiscMenuGrid.tsx의 MiscBoxKey와 동일해야 함('calendar'는 서브뷰가 아니라 외부 링크를 여는 항목이라 제외)
-const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'clubs'];
+export const VALID_MISC_BOXES = ['gym', 'insta', 'feedback', 'playlist', 'clubs'];
 
 interface BannerCarouselProps {
   banners: Banner[];
@@ -56,6 +56,12 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
     setTransitionEnabled(true);
     // 복제본(clone) 위에 떠 있는 상태에서 또 넘기면(스냅백 전) 그다음 실제 슬라이드로 보낸다
     setCurrent((prev) => (prev >= banners.length ? 1 : prev + 1));
+  };
+
+  const goTo = (index: number) => {
+    setTransitionEnabled(true);
+    setCurrent(index);
+    resetTimer();
   };
 
   const resetTimer = () => {
@@ -230,19 +236,27 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
             );
           })}
         </div>
-      </div>
 
-      {/* 배너 개수 표시 — 1개일 땐 표시할 의미가 없어 생략 */}
-      {banners.length > 1 && (
-        <div className="flex justify-center items-center gap-1.5 mt-2">
-          {banners.map((banner, i) => (
-            <span
-              key={banner.id ?? i}
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === current % banners.length ? 'w-4 bg-text-main' : 'w-1.5 bg-slate-300'}`}
-            />
-          ))}
-        </div>
-      )}
+        {/* 배너 개수 표시 — 이미지 안 하단 중앙에 겹쳐 둔다(플레이리스트 캐러셀과 동일). 1개일 땐 표시할 의미가 없어 생략 */}
+        {banners.length > 1 && (
+          <div className="absolute bottom-0 left-1/2 z-10 flex -translate-x-1/2 items-center">
+            {banners.map((banner, i) => (
+              // 점이 작아 누르기 어려우니 버튼 패딩으로 터치 영역을 넓힌다
+              <button
+                key={banner.id ?? i}
+                type="button"
+                aria-label={`${i + 1}번째 배너로 이동`}
+                className="px-[3px] py-2"
+                onClick={() => goTo(i)}
+              >
+                <span
+                  className={`block h-1.5 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-all duration-300 ${i === current % banners.length ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

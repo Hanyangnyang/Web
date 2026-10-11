@@ -9,6 +9,7 @@ export interface HttpError extends Error {
   statusCode?: number;
   code?: string;
   endpoint?: string;
+  retryAfterSeconds?: number; // 429 응답의 Retry-After 헤더(초)
 }
 
 // 새 백엔드 공용 응답 포맷. success:false일 때의 처리(어떤 에러를 던질지)는
@@ -27,6 +28,8 @@ export const parseOrThrow = async (res: Response) => {
     err.statusCode = res.status;
     if (data.error?.code) err.code = data.error.code;
     err.endpoint = res.url;
+    const retryAfter = Number(res.headers.get('Retry-After'));
+    if (retryAfter > 0) err.retryAfterSeconds = retryAfter;
     throw err;
   }
   // 정적 JSON(교내건물·흡연장 등)은 배열을 그대로 반환한다 — 스프레드하면 배열이 아닌

@@ -38,41 +38,37 @@ export const getHourlyIconFill = (Icon: LucideIcon): string =>
   FILLED_ICONS.includes(Icon) ? '#ffffff' : 'none';
 
 
-// 카드 배경 테마 
+// 카드 아이콘 테마 (카드는 흰 배경, 큰 배경 아이콘만 날씨별 색을 가진다)
 export interface WeatherTheme {
   icon: LucideIcon | null;
-  bg: string;
-  iconColor?: string;
+  color: string;
 }
 
-const HOT_TEMP = 28;
-
-const BG = {
-  hotSunny:  'linear-gradient(135deg, #FAD961 0%, #F76B1C 100%)', // 빛이 들어오는 골드&오렌지
-  coolSunny: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', // 청량한 스카이블루
-  partly:    'linear-gradient(135deg, #4a779d 0%, #7db9e8 100%)', // 파스텔 소프트블루
-  cloudy:    'linear-gradient(135deg, #a1b0be 0%, #66788a 100%)', // 프리미엄 클라우드그레이
-  snow:      'linear-gradient(135deg, #8ca0ba 0%, #ffffff 100%)', // 눈부신 설원
-  rain:      'linear-gradient(135deg, #2b5876 0%, #4e4376 100%)', // 깊은 딥스톰 퍼플그레이
+// 예전 그라데이션 배경의 대표색
+const COLOR = {
+  sunny:     '#F76B1C', // 해는 기온과 상관없이 항상 주황
+  partly:    '#0083B0', // 스카이블루
+  cloudy:    '#66788a', // 클라우드그레이
+  snow:      '#4A607A', // 설원
+  rain:      '#4e4376', // 딥스톰 퍼플그레이
 };
 
 const THEME: Record<WeatherCondition, WeatherTheme> = {
-  SUNNY:         { icon: Sun,       bg: BG.coolSunny },
-  MOSTLY_CLOUDY: { icon: Cloud,     bg: BG.partly },
-  CLOUDY:        { icon: Cloud,     bg: BG.cloudy },
-  RAIN:          { icon: CloudRain, bg: BG.rain },
-  RAIN_SNOW:     { icon: CloudRain, bg: BG.rain },
-  SNOW:          { icon: Snowflake, bg: BG.snow, iconColor: '#4A607A' },
-  SHOWER:        { icon: CloudRain, bg: BG.rain },
+  SUNNY:         { icon: Sun,       color: COLOR.sunny },
+  MOSTLY_CLOUDY: { icon: Cloud,     color: COLOR.partly },
+  CLOUDY:        { icon: Cloud,     color: COLOR.cloudy },
+  RAIN:          { icon: CloudRain, color: COLOR.rain },
+  RAIN_SNOW:     { icon: CloudRain, color: COLOR.rain },
+  SNOW:          { icon: Snowflake, color: COLOR.snow },
+  SHOWER:        { icon: CloudRain, color: COLOR.rain },
 };
 
 export function getWeatherTheme(weather: Weather | null): WeatherTheme {
-  if (!weather) return { icon: null, bg: 'transparent' };
+  if (!weather) return { icon: null, color: 'transparent' };
 
-  const { condition, temp } = weather.current;
-  if (!condition) return { icon: Cloud, bg: BG.cloudy };
+  const { condition } = weather.current;
+  if (!condition) return { icon: Cloud, color: COLOR.cloudy };
 
-  if (condition === 'SUNNY' && temp >= HOT_TEMP) return { icon: Sun, bg: BG.hotSunny };
   return THEME[condition];
 }
 

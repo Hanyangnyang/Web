@@ -1,0 +1,101 @@
+import { Pause, Play, Share2 } from 'lucide-react';
+import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
+
+interface ChartSongRowProps {
+  track: ChartTrack;
+  onPlay: (track: ChartTrack) => void;
+  // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청
+  // 여러 게시글이 있을 수 있는 곡 하나에 바로 붙일 수 없어 상세 보기로 유도
+  onShowPosts: (track: ChartTrack) => void;
+  // 넘겨주면 듣기 옆에 공유 버튼이 생김 — 소식탭 홍보 카드처럼 공유가 필요 없는 곳은 안 넘김
+  onShare?: (track: ChartTrack) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
+  currentTrackId?: string | null;
+  // 순위 숫자 타이포그래피 — 기본은 인기차트 전체보기(ChartView)의 담백한 스타일. 소식탭 홍보 카드처럼
+  // 강조하고 싶은 곳에서만 예) "font-black text-[17px] text-gray-900 italic -skew-x-6"로 덮어쓴다
+  rankClassName?: string;
+  // 앨범 커버 크기 — 기본은 ChartView 목록의 48px(w-12 h-12). 소식탭 홍보 카드처럼 더 크게 보이고
+  // 싶은 곳에서만 예) "w-14 h-14"로 덮어쓴다
+  thumbnailClassName?: string;
+  // true면 행을 잠깐 파랗게 강조 — 홈 카드를 눌러 이 곡으로 스크롤돼 왔을 때 "이 곡이에요"를 알려줌
+  highlighted?: boolean;
+}
+
+export function ChartSongRow({
+  track,
+  onPlay,
+  onShowPosts,
+  onShare,
+  currentTrackId,
+  rankClassName = 'font-bold text-[15px] text-gray-900',
+  thumbnailClassName = 'w-12 h-12',
+  highlighted = false,
+}: ChartSongRowProps) {
+  const isPlaying = track.trackId === currentTrackId;
+
+  return (
+    <div
+      data-track-id={track.trackId}
+      onClick={() => onShowPosts(track)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onShowPosts(track);
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`${track.title} 추천글 보기`}
+      className={`flex items-center gap-3 px-3 py-2.5 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer ${highlighted ? '[animation:chartRowHighlight_1.8s_ease-out_0.3s_both]' : ''}`}
+    >
+      {/* 순위 */}
+      <span className={`${rankClassName} w-7 text-center flex-shrink-0`}>
+        {track.rank}
+      </span>
+
+      {/* 앨범 커버 */}
+      {track.albumArtUrl && (
+        <img
+          src={track.albumArtUrl}
+          alt={track.title}
+          className={`${thumbnailClassName} object-cover rounded flex-shrink-0`}
+        />
+      )}
+
+      {/* 곡정보 */}
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-text-main truncate text-[15px]">{track.title}</div>
+        <div className="text-[13px] text-text-sub truncate">{track.artist}</div>
+      </div>
+
+      <div className="flex items-center flex-shrink-0">
+        {/* 재생 버튼 — row 전체 클릭(게시글 보기)과 별개 동작이라 전파를 막음 */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onPlay(track);
+          }}
+          aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
+          className="w-12 h-12 -mx-1 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+        >
+          {isPlaying ? (
+            <Pause size={18} fill="none" stroke="currentColor" strokeWidth={2} />
+          ) : (
+            <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
+          )}
+        </button>
+
+        {/* 공유 버튼 — 듣기 옆. row 클릭과 별개 동작이라 전파를 막음 */}
+        {onShare && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onShare(track);
+            }}
+            aria-label={`${track.title} 공유`}
+            className="relative before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-1 w-9 h-9 flex items-center justify-center text-text-sub hover:scale-110 transition-transform active:scale-95 flex-shrink-0"
+          >
+            <Share2 size={16} strokeWidth={2} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}

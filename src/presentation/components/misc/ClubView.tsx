@@ -142,9 +142,7 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
   // 파고들어(top/margin-top을 이 값의 음수로) 세이프에리어(노치)까지 완전히 덮을 수 있다.
   // 이 값이 컨테이너 padding-top과 어긋나면 스크롤 시 노치 부분에 헤더 배경이 못 미쳐
   // 뒤 콘텐츠가 잠깐 비쳐 보인다 (중앙동아리 화면에서만 나던 현상의 원인).
-  const scrollTopPadding = isApp
-    ? `calc(1.5rem + ${platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)'})`
-    : '1.5rem';
+  const scrollTopPadding = `calc(1.5rem + ${isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)'})`;
 
   return (
     <div className="fixed inset-0 z-[1001] bg-surface">

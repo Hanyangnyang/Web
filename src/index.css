@@ -47,6 +47,13 @@
   /* iOS 롱클릭 공유 팝업 해제 */
 }
 
+/* 에리카 플레이리스트: 이미지를 길게 누르거나 끌 때 사진이 반투명 유령 이미지로 따라 움직이는 브라우저 기본 드래그 동작을 막음
+   (위 * 규칙의 user-select/touch-callout으로는 이 드래그가 안 막힘). PlaylistView 루트에 playlist-root 클래스를 붙여 그 안의 모든 img에만 적용 */
+.playlist-root img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 /* 입력창 및 편집 영역은 정상적인 텍스트 입력을 위해 선택 가능하도록 예외 처리 */
 input,
 textarea,
@@ -278,6 +285,41 @@ body {
   }
 }
 
+/* 스켈레톤 로딩 카드에 쓰는 shimmer(좌→우로 밝은 띠가 스쳐 지나가는) 효과 */
+@keyframes shimmer {
+  0% {
+    background-position: 150% 0;
+  }
+
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* 한 줄에 안 들어가는 제목을 한 방향으로 계속 흘려보내는 마키(MarqueeText) — 맨 앞에서 잠깐(20%) 멈춰 처음 글자를 읽게 한 뒤,
+   글자+간격 한 칸만큼 왼쪽으로 일정한 속도로 이동하고 처음으로 이어짐(뒤따라오는 복사본이 정확히 처음 자리에 옴).
+   이동 거리는 컴포넌트가 --marquee-distance(음수 px)로 넘겨줌 */
+@keyframes marqueeSlide {
+  0%,
+  20% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(var(--marquee-distance));
+  }
+}
+
+.marquee-slide {
+  animation: marqueeSlide 8s linear infinite;
+}
+
 /* ═══ 아코디언 (grid-template-rows 트랜지션 — Tailwind로 표현 불가) ═══ */
 .accordion-content {
   display: grid;
@@ -466,4 +508,37 @@ body {
 .lucide-cloud-lightning path:not(:first-child),
 .lucide-cloud-lightning polygon {
   stroke: #f59e0b !important; /* 진하고 영롱한 노란색 번개 */
+}
+
+/* 인기차트 화면에서 홈 카드로 찾아온 곡 행을 잠깐 파랗게 강조 — 연한 파란 배경 + 파란 테두리가 번쩍였다가 서서히 사라짐 */
+@keyframes chartRowHighlight {
+  0% {
+    background-color: rgba(97, 140, 233, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0.45);
+  }
+
+  60% {
+    background-color: rgba(97, 140, 233, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0.25);
+  }
+
+  100% {
+    background-color: rgba(97, 140, 233, 0);
+    box-shadow: inset 0 0 0 1px rgba(97, 140, 233, 0);
+  }
+}
+
+/* 최근추가된곡 등 카드 목록에서 홈/게시글로 찾아온 카드를 잠깐 파랗게 강조 — 카드가 흰 배경에 overflow-hidden이라 바깥쪽 링 + 은은한 글로우가 번쩍였다가 사라짐 */
+@keyframes songCardHighlight {
+  0% {
+    box-shadow: 0 0 0 1px rgba(97, 140, 233, 0.75), 0 0 18px 4px rgba(97, 140, 233, 0.35);
+  }
+
+  60% {
+    box-shadow: 0 0 0 1px rgba(97, 140, 233, 0.4), 0 0 12px 2px rgba(97, 140, 233, 0.18);
+  }
+
+  100% {
+    box-shadow: 0 0 0 1px rgba(97, 140, 233, 0), 0 0 0 0 rgba(97, 140, 233, 0);
+  }
 }
