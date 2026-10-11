@@ -254,10 +254,21 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
       {
         onSuccess: () => {
           submittedRef.current = true;
+          // 추천 퍼널의 최종 전환 — playlist_recommend_entered(분모) 대비 이 이벤트로 등록 완료율을 직접 집계
+          // (entered − abandoned로 역산하면 언마운트 전에 앱이 죽는 경우 등이 섞여 부정확해짐)
+          posthog?.capture('playlist_recommend_submitted', {
+            prefilled_track: !!prefillTrack,
+            prefilled_query: initialQuery !== '',
+            genre_count: selectedGenres.length,
+            comment_length: comment.trim().length,
+            duration_ms: Date.now() - enteredAtRef.current,
+          });
           onSubmitSuccess();
         },
         onError: (error) => {
           const code = (error as HttpError).code;
+          // 등록을 시도했지만 서버가 거절/실패한 경우 — 어떤 에러코드가 등록을 막는지 파악용(abandoned와 달리 "의지는 있었음")
+          posthog?.capture('playlist_recommend_submit_failed', { error_code: code ?? 'unknown' });
 
           if (code && TOAST_ERROR_MESSAGES[code]) {
             showSubmitToast(TOAST_ERROR_MESSAGES[code], 2500);
