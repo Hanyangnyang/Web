@@ -15,17 +15,22 @@ export default defineConfig(({ mode }) => {
   // .env 값을 못 읽으므로, 같은 env로 매 dev/build 시작 시 다시 생성해 소스를 하나로 유지
   generateFirebaseMessagingSw(env);
 
+  // 에셋 파일명에 붙이는 배포 고유값 — 같은 URL을 두 배포가 다시 쓰지 않게 한다.
+  // 2026-10-11 사고: 배포/롤백 사이에 옛 청크 URL로 들어온 요청이 404를 받았는데, vercel.json이 /assets/*.js에
+  // 붙이는 1년 immutable 헤더가 404에도 붙어 Cloudflare·기기 캐시에 그대로 박혔다. 롤백으로 같은 내용이 다시
+  // 빌드되면 content hash가 같아 같은 URL이 되므로, 박힌 404를 받아 흰 화면이 됐다.
+  // 커밋마다 URL이 달라지면 롤백도 새 URL로 나가서 박힌 404를 다시 요청할 일이 없다.
+  // 대가: 배포마다 vendor 청크(react 등)까지 새 URL이라 재방문자도 JS를 전부 다시 받는다.
+  const buildId = (process.env.VERCEL_GIT_COMMIT_SHA || Date.now().toString(36)).slice(0, 7);
+
   return {
     build: {
       sourcemap: true, // Source map generation must be turned on
       rollupOptions: {
-        // 파일명 끝의 -r2는 캐시 무효화용. 2026-10-11 배포/롤백 사이에 옛 청크 URL로 들어온 요청이 404를 받았고,
-        // vercel.json이 /assets/*.js에 붙이는 1년 immutable 헤더 때문에 그 404가 Cloudflare·기기 캐시에 그대로 박혔다.
-        // 같은 URL은 다시 못 쓰므로 접미사로 모든 JS/CSS URL을 새로 만든다. 같은 사고가 또 나면 숫자를 올린다.
         output: {
-          entryFileNames: 'assets/[name]-[hash]-r2.js',
-          chunkFileNames: 'assets/[name]-[hash]-r2.js',
-          assetFileNames: 'assets/[name]-[hash]-r2[extname]',
+          entryFileNames: `assets/[name]-[hash]-${buildId}.js`,
+          chunkFileNames: `assets/[name]-[hash]-${buildId}.js`,
+          assetFileNames: `assets/[name]-[hash]-${buildId}[extname]`,
         },
       },
     },
