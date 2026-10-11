@@ -1,5 +1,6 @@
 import { Share2, X } from 'lucide-react';
 import { useEffect } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import { loadKakaoSdk } from '../../../../lib/kakaoShare.js';
 import { initSentry } from '../../../../lib/sentry.js';
 import { type TrackSummary } from '../playlistTypes';
@@ -37,6 +38,13 @@ interface SongShareModalProps {
 // 곡/게시글 공유 팝업 — 학식 공유(ShareSheet)의 바텀시트 대신, 플레이리스트 카드들과 톤을 맞춰
 // 화면 중앙 팝업(RecommendSongView/PostDetailCard의 안내 팝업과 동일한 패턴)으로 구성
 export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps) {
+  const posthog = usePostHog();
+  // 공유 지표 — 실제로 공유/복사가 끝난 시점에만 찍음(공유창을 열었다 취소한 경우 제외).
+  // playlist_opened(source: deeplink, shared_track: true)와 짝지어 "공유 → 유입" 루프를 봄
+  const captureShared = (method: 'kakao' | 'native' | 'clipboard') => {
+    posthog?.capture('playlist_shared', { method, track_id: song.trackId, is_post: !!song.postId });
+  };
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -83,6 +91,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
         },
         buttons: [{ title: '이 곡 들으러 가기', link }],
       });
+      captureShared('kakao');
       onClose();
     } catch (e: any) {
       const code = e?.code ?? e?.status ?? 'UNKNOWN';
@@ -100,10 +109,12 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
     if (nativeShare) {
       try {
         await nativeShare.share({ text: shareText, dialogTitle: '공유하기' });
+        captureShared('native');
         onClose();
       } catch (e: any) {
         if (e?.message !== 'Share canceled') {
           await navigator.clipboard.writeText(shareText).catch(() => {});
+          captureShared('clipboard');
           onClose();
           onCopied?.();
         }
@@ -114,10 +125,12 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
     if (navigator.share) {
       try {
         await navigator.share({ text: shareText });
+        captureShared('native');
         onClose();
       } catch (e: any) {
         if (e.name !== 'AbortError') {
           await navigator.clipboard.writeText(shareText).catch(() => {});
+          captureShared('clipboard');
           onClose();
           onCopied?.();
         }
@@ -133,6 +146,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
         document.execCommand('copy');
         document.body.removeChild(el);
       }
+      captureShared('clipboard');
       onClose();
       onCopied?.();
     }
