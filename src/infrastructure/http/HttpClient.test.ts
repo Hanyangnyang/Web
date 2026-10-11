@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createHttpClient, parseOrThrow } from './HttpClient';
+import { createHttpClient, parseOrThrow, isTimeoutError } from './HttpClient';
 
 describe('createHttpClient', () => {
   beforeEach(() => {
@@ -9,41 +9,58 @@ describe('createHttpClient', () => {
   it('handles baseUrl without trailing slash and path with leading slash', async () => {
     const client = createHttpClient({ baseUrl: 'https://api.hanyang.life' });
     await client.get('/api/v1/subway/schedule');
-    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', expect.objectContaining({ headers: {} }));
   });
 
   it('strips trailing slash from baseUrl when path starts with slash (prevents double slash //)', async () => {
     const client = createHttpClient({ baseUrl: 'https://api.hanyang.life/' });
     await client.get('/api/v1/subway/schedule');
-    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', expect.objectContaining({ headers: {} }));
   });
 
   it('handles baseUrl with multiple trailing slashes', async () => {
     const client = createHttpClient({ baseUrl: 'https://api.hanyang.life///' });
     await client.get('/api/v1/subway/schedule');
-    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', expect.objectContaining({ headers: {} }));
   });
 
   it('ensures slash when path does not start with slash', async () => {
     const client = createHttpClient({ baseUrl: 'https://api.hanyang.life' });
     await client.get('api/v1/subway/schedule');
-    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/subway/schedule', expect.objectContaining({ headers: {} }));
   });
 
   it('works correctly with empty baseUrl', async () => {
     const client = createHttpClient({ baseUrl: '' });
     await client.get('/api/v1/subway/schedule');
-    expect(fetch).toHaveBeenCalledWith('/api/v1/subway/schedule', { headers: {} });
+    expect(fetch).toHaveBeenCalledWith('/api/v1/subway/schedule', expect.objectContaining({ headers: {} }));
   });
 
   it('works correctly with post requests', async () => {
     const client = createHttpClient({ baseUrl: 'https://api.hanyang.life/' });
     await client.post('/api/v1/feedback', { text: 'test' });
-    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/feedback', {
+    expect(fetch).toHaveBeenCalledWith('https://api.hanyang.life/api/v1/feedback', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: 'test' }),
-    });
+    }));
+  });
+
+  // 서버가 응답 없이 멈춰도 로딩이 끝나야 한다 — 15초가 지나면 요청을 끊고 TimeoutError로 던진다
+  it('aborts and throws TimeoutError when the server does not respond', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.stubGlobal('fetch', vi.fn((_url: string, init: RequestInit) => new Promise((_, reject) => {
+        init.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+      })));
+      const client = createHttpClient({ baseUrl: 'https://api.hanyang.life' });
+      const request = client.get('/api/v1/menu');
+      const assertion = expect(request).rejects.toSatisfy((e: unknown) => isTimeoutError(e));
+      await vi.advanceTimersByTimeAsync(15_000);
+      await assertion;
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

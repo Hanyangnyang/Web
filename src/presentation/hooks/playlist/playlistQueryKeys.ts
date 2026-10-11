@@ -58,6 +58,20 @@ export function prependSongToPagesCache(queryClient: QueryClient, key: readonly 
   );
 }
 
+// 무한 스크롤 캐시를 첫 페이지만 남김 — 당겨서 새로고침 직전에 씀. 무한 쿼리를 그대로 refetch하면 받아둔 페이지를
+// 0→1→2… 순서대로 전부 다시 받아서(다음 페이지 번호를 앞 페이지 응답으로 정하므로 병렬 불가) 스크롤한 만큼 새로고침이 느려짐.
+// 새로고침은 맨 위에서만 일어나므로 첫 페이지만 다시 받고, 아래는 스크롤하면 이어서 받음
+export function keepOnlyFirstPage(queryClient: QueryClient, queryKey: readonly unknown[]) {
+  for (const [key, data] of queryClient.getQueriesData<InfiniteData<unknown>>({ queryKey })) {
+    // 같은 접두사 아래 배열·단건 캐시도 섞여 있어서 페이지 구조인 것만 골라냄
+    if (!data || !Array.isArray(data.pages) || data.pages.length <= 1) continue;
+    queryClient.setQueryData<InfiniteData<unknown>>(key, {
+      pages: data.pages.slice(0, 1),
+      pageParams: data.pageParams.slice(0, 1),
+    });
+  }
+}
+
 // 인기차트 캐시 키 — period(popular/weekly/monthly)별로 ['playlist', 'chart', period]로 저장됨
 export const CHART_QUERY_KEY = ['playlist', 'chart'];
 
