@@ -18,6 +18,16 @@ export default defineConfig(({ mode }) => {
   return {
     build: {
       sourcemap: true, // Source map generation must be turned on
+      rollupOptions: {
+        // 파일명 끝의 -r2는 캐시 무효화용. 2026-10-11 배포/롤백 사이에 옛 청크 URL로 들어온 요청이 404를 받았고,
+        // vercel.json이 /assets/*.js에 붙이는 1년 immutable 헤더 때문에 그 404가 Cloudflare·기기 캐시에 그대로 박혔다.
+        // 같은 URL은 다시 못 쓰므로 접미사로 모든 JS/CSS URL을 새로 만든다. 같은 사고가 또 나면 숫자를 올린다.
+        output: {
+          entryFileNames: 'assets/[name]-[hash]-r2.js',
+          chunkFileNames: 'assets/[name]-[hash]-r2.js',
+          assetFileNames: 'assets/[name]-[hash]-r2[extname]',
+        },
+      },
     },
     server: {
       // 로컬 개발 전용 프록시. 브라우저는 same-origin(/backend)으로만 요청하니 CORS 검사를 타지 않고,
