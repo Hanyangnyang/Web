@@ -109,10 +109,14 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
               className="border-b border-slate-200"
               leading={<div className="w-7 h-4 rounded-full skeleton-shimmer flex-shrink-0" />}
               trailing={
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full skeleton-shimmer flex-shrink-0" />
-                  <div className="w-5 h-5 rounded-full skeleton-shimmer flex-shrink-0" />
-                  <div className="w-5 h-5 rounded-full skeleton-shimmer flex-shrink-0" />
+                // 실제 ChartSongRow의 듣기(w-12 -mx-1)·공유(w-9) 버튼 칸과 같은 폭에 아이콘 크기(18px/16px)만큼만 그림
+                <div className="flex items-center flex-shrink-0">
+                  <div className="w-12 h-12 -mx-1 flex items-center justify-center">
+                    <div className="w-[18px] h-[18px] rounded-full skeleton-shimmer" />
+                  </div>
+                  <div className="w-9 h-9 flex items-center justify-center">
+                    <div className="w-4 h-4 rounded-full skeleton-shimmer" />
+                  </div>
                 </div>
               }
             />

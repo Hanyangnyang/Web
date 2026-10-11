@@ -10,7 +10,7 @@ import { RecentSongRow } from '../shared/RecentSongRow';
 import { RecentSongsPreviewSection } from '../shared/RecentSongsPreviewSection';
 import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
-import { SongRowSkeleton } from '../shared/SongRowSkeleton';
+import { RecentSongRowSkeleton } from '../shared/RecentSongRowSkeleton';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { EmptyMessageCard } from './EmptyMessageCard';
@@ -151,8 +151,8 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
         >
         <div className="flex flex-col gap-1.5">
           {isSearchingPosts ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+            Array.from({ length: POST_PREVIEW_LIMIT }).map((_, i) => (
+              <RecentSongRowSkeleton key={i} />
             ))
           ) : activeQuery.trim().length < MIN_QUERY_LENGTH ? (
             <EmptyMessageCard message={`최소 ${MIN_QUERY_LENGTH}자 이상 입력해주세요!`} />

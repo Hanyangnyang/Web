@@ -5,7 +5,7 @@ import { ChartTopCard } from './ChartTopCard';
 import { MySongCard } from './MySongCard';
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
-import { SongRowSkeleton } from '../shared/SongRowSkeleton';
+import { RecentSongRowSkeleton } from '../shared/RecentSongRowSkeleton';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
@@ -237,7 +237,7 @@ export function PlaylistHomeView({
         {isRecentSongsLoading ? (
           <div className="flex flex-col gap-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+              <RecentSongRowSkeleton key={i} />
             ))}
           </div>
         ) : visibleSongs.length === 0 ? (

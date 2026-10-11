@@ -3,7 +3,7 @@ import { type Song, type TrackSummary } from '../playlistTypes';
 import { useSongSearchInfinite } from '../../../hooks/playlist/useSongSearchInfinite.js';
 import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSentinel.js';
 import { RecentSongRow } from '../shared/RecentSongRow';
-import { SongRowSkeleton } from '../shared/SongRowSkeleton';
+import { RecentSongRowSkeleton } from '../shared/RecentSongRowSkeleton';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { EmptyMessageCard } from './EmptyMessageCard';
@@ -37,7 +37,7 @@ export function SearchPostsView({ query, onBack, onSelectPost, onPlay, currentTr
         <div className="flex flex-col gap-1.5">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+              <RecentSongRowSkeleton key={i} />
             ))
           ) : isError ? (
             <EmptyMessageCard message="추천글을 불러오지 못했어요" action={{ label: '다시 시도', onClick: () => refetch() }} />
@@ -61,7 +61,7 @@ export function SearchPostsView({ query, onBack, onSelectPost, onPlay, currentTr
           <div ref={sentinelRef} className="mt-1.5 flex flex-col gap-1.5">
             {isFetchingNextPage &&
               Array.from({ length: 2 }).map((_, i) => (
-                <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+                <RecentSongRowSkeleton key={i} />
               ))}
           </div>
         )}

@@ -29,37 +29,56 @@ export function PostDetailCardSkeleton({ variant = 'card', className = '' }: Pos
     );
   }
 
+  // 실제 PostDetailCard와 같은 그림자·여백·줄 높이로 맞춰서, 로딩이 끝나 카드로 바뀔 때 높이가 튀지 않게 함
+  const shadow = 'shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)]';
+
   if (variant === 'grid') {
     return (
-      <div className={`h-full flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden ${className}`}>
+      <div className={`h-full flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden ${shadow} ${className}`}>
         <div className="w-full aspect-square skeleton-shimmer" />
-        <div className="px-4 pt-3 pb-4 flex-1 flex flex-col">
-          {/* PostDetailCard(2열)와 같은 구성: 이모지 반응 행 / 제목 / 본문 / 장르 */}
-          <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-6 h-6 rounded-full skeleton-shimmer flex-shrink-0" />
-            <div className="h-5 w-12 rounded-full skeleton-shimmer" />
+        {/* PostDetailCard(2열, narrow)와 같은 구성·여백(px-3 pt-2 pb-2): 이모지 반응 행(24px) / 제목(15px) / 본문(13px, 줄 높이 21px) / 구분선 / 장르(12px) */}
+        <div className="px-3 pt-2 pb-2 flex-1 flex flex-col">
+          <div className="flex items-start gap-1.5 mb-1">
+            <div className="h-[24px] w-9 rounded-full skeleton-shimmer flex-shrink-0" />
           </div>
-          <div className="h-4 w-3/4 rounded-full skeleton-shimmer mb-2" />
-          <div className="h-3.5 w-full rounded-full skeleton-shimmer mb-1.5" />
-          <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer mb-3" />
-          <div className="h-3 w-16 rounded-full skeleton-shimmer mt-auto" />
+          <div className="mb-1 h-[22px] flex items-center">
+            <div className="h-[15px] w-3/4 rounded-full skeleton-shimmer" />
+          </div>
+          <div className="mb-2">
+            <div className="h-[21px] flex items-center"><div className="h-[13px] w-full rounded-full skeleton-shimmer" /></div>
+            <div className="h-[21px] flex items-center"><div className="h-[13px] w-2/3 rounded-full skeleton-shimmer" /></div>
+          </div>
+          <div className="mt-auto">
+            <div className="border-t border-slate-100 mb-3" />
+            <div className="h-[18px] flex items-center">
+              <div className="h-3 w-16 rounded-full skeleton-shimmer" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden ${shadow} ${className}`}>
       <div className="w-full aspect-square skeleton-shimmer" />
+      {/* PostDetailCard(1열)와 같은 구성·여백(px-4 pt-3 pb-4): 이모지 반응 행(26px) / 제목(17px) / 본문(15px, 줄 높이 24px) / 구분선 / 장르(13px) + 시각 */}
       <div className="px-4 pt-3 pb-4">
         <div className="flex items-center gap-1.5 mb-2">
-          <div className="w-6 h-6 rounded-full skeleton-shimmer flex-shrink-0" />
-          <div className="h-5 w-14 rounded-full skeleton-shimmer" />
+          <div className="h-[26px] w-14 rounded-full skeleton-shimmer" />
         </div>
-        <div className="h-4 w-1/2 rounded-full skeleton-shimmer mb-2" />
-        <div className="h-3.5 w-full rounded-full skeleton-shimmer mb-1.5" />
-        <div className="h-3.5 w-2/3 rounded-full skeleton-shimmer mb-3" />
-        <div className="h-3 w-24 rounded-full skeleton-shimmer" />
+        <div className="mb-1 h-[26px] flex items-center">
+          <div className="h-[17px] w-1/2 rounded-full skeleton-shimmer" />
+        </div>
+        <div className="mb-2">
+          <div className="h-6 flex items-center"><div className="h-[15px] w-full rounded-full skeleton-shimmer" /></div>
+          <div className="h-6 flex items-center"><div className="h-[15px] w-2/3 rounded-full skeleton-shimmer" /></div>
+        </div>
+        <div className="border-t border-slate-100 mb-3" />
+        <div className="flex items-center justify-between gap-2 h-5">
+          <div className="h-[13px] w-24 rounded-full skeleton-shimmer" />
+          <div className="h-[13px] w-10 rounded-full skeleton-shimmer" />
+        </div>
       </div>
     </div>
   );

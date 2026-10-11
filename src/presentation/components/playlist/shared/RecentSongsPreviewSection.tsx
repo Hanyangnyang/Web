@@ -4,7 +4,7 @@ import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { EmptyMessageCard } from '../searchResults/EmptyMessageCard';
 import { PlaylistFallback } from './PlaylistFallback';
 import { RecentSongRow } from './RecentSongRow';
-import { SongRowSkeleton } from './SongRowSkeleton';
+import { RecentSongRowSkeleton } from './RecentSongRowSkeleton';
 
 // 최근 추가된 곡 섹션에서 보여줄 개수
 const RECENT_PREVIEW_LIMIT = 3;
@@ -31,7 +31,7 @@ export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading
       <div className="flex flex-col gap-1.5">
         {isLoading ? (
           Array.from({ length: RECENT_PREVIEW_LIMIT }).map((_, i) => (
-            <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+            <RecentSongRowSkeleton key={i} />
           ))
         ) : recentSongs.length === 0 ? (
           <EmptyMessageCard message="아직 추가된 곡이 없어요" />

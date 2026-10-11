@@ -6,7 +6,7 @@ import { type Song, type ReactionState, type TrackSummary, formatTimeAgo, toReac
 import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
 import { useTrackPosts, type TrackPostsSort } from '../../../hooks/playlist/useTrackPosts.js';
 import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSentinel.js';
-import { SongRowSkeleton } from '../shared/SongRowSkeleton';
+import { PostRowSkeleton } from './PostRowSkeleton';
 import { EmptyMessageCard } from '../searchResults/EmptyMessageCard';
 import { CHIP_ACTIVE, CHIP_BASE, CHIP_INACTIVE } from '../shared/GenreFilterChips';
 import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
@@ -150,13 +150,17 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       {isTrackInfoLoading ? (
         <div className="flex items-stretch gap-3 mb-4 bg-white rounded-card border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden">
           <div className="w-2/5 flex-shrink-0 aspect-square skeleton-shimmer" />
-          <div className="min-w-0 flex-1 flex flex-col justify-center gap-1.5 py-2 pr-3">
-            <div className="space-y-1.5">
-              <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
-              <div className="h-3 w-1/3 skeleton-shimmer rounded-full" />
+          {/* 실제 곡 정보와 같은 뼈대 — 위(곡명 19px·가수 15px, 아래 정렬) / 수평선 / 아래(추천글·재생수 줄 + 공유 안내 칩) */}
+          <div className="min-w-0 flex-1 flex flex-col pt-4 pb-2 pr-3">
+            <div className="flex-1 flex flex-col justify-end gap-1.5 pb-1.5">
+              <div className="h-[19px] w-2/3 skeleton-shimmer rounded-full" />
+              <div className="h-[15px] w-1/3 skeleton-shimmer rounded-full" />
             </div>
             <div className="border-t border-slate-300" />
-            <div className="h-5 w-full skeleton-shimmer rounded-full" />
+            <div className="flex-1 flex flex-col justify-start gap-1.5 pt-1.5">
+              <div className="h-[13px] w-4/5 skeleton-shimmer rounded-full" />
+              <div className="h-6 w-28 skeleton-shimmer rounded-md" />
+            </div>
           </div>
         </div>
       ) : (
@@ -246,11 +250,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
       {isLoading && (
         <div className="flex flex-col gap-1">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-1.5 px-3.5 py-3 bg-white rounded-card border border-slate-200">
-              <div className="h-4 w-full skeleton-shimmer rounded-full" />
-              <div className="h-4 w-2/3 skeleton-shimmer rounded-full" />
-              <div className="h-3 w-16 skeleton-shimmer rounded-full mt-1" />
-            </div>
+            <PostRowSkeleton key={i} />
           ))}
         </div>
       )}
@@ -330,7 +330,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         <div ref={sentinelRef} className="mt-1 flex flex-col gap-1">
           {isFetchingNextPage &&
             Array.from({ length: 2 }).map((_, i) => (
-              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+              <PostRowSkeleton key={i} />
             ))}
         </div>
       )}
