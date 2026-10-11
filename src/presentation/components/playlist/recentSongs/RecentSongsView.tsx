@@ -24,9 +24,8 @@ export function RecentSongsView({ onBack, onPlay, onShowAddSong, onShowSearch, o
 
   return (
     <SongListScreen
-      title="최근 추가된 곡"
+      title="최근 추천된 곡"
       emoji="🎵"
-      subtitle="에리카생들이 방금 추천한 곡을 확인해보세요!"
       songs={songs ?? []}
       isLoading={isLoading}
       onBack={onBack}

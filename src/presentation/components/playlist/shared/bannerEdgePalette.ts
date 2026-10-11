@@ -4,16 +4,11 @@ export interface EdgePalette {
   end: string;
 }
 
-// 글자(흰색)가 놓이는 구간의 배경 밝기 상한 — 이 값을 넘으면 흰 글씨가 묻힌다
-const MIDDLE_MAX_LUMINANCE = 85;
-const END_MAX_LUMINANCE = 55;
-
 function shade([red, green, blue]: number[], amount: number): string {
   return `rgb(${Math.round(red * amount)}, ${Math.round(green * amount)}, ${Math.round(blue * amount)})`;
 }
 
 // 앨범/아티스트 이미지 오른쪽 가장자리의 대표색으로 배너 배경 팔레트를 만든다.
-// 가장자리가 흰색에 가까워도 글자 영역은 충분히 어두워지도록 밝기에 맞춰 어둡게 깎는다.
 export function extractRightEdgePalette(image: HTMLImageElement): EdgePalette | null {
   try {
     const canvas = document.createElement('canvas');
@@ -40,12 +35,11 @@ export function extractRightEdgePalette(image: HTMLImageElement): EdgePalette | 
     const dominant = [...buckets.values()].sort((a, b) => b.count - a.count)[0];
     if (!dominant) return null;
     const color = [dominant.red / dominant.count, dominant.green / dominant.count, dominant.blue / dominant.count];
-    const luminance = 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
 
     return {
       edge: shade(color, 1),
-      middle: shade(color, Math.min(0.56, MIDDLE_MAX_LUMINANCE / Math.max(luminance, 1))),
-      end: shade(color, Math.min(0.38, END_MAX_LUMINANCE / Math.max(luminance, 1))),
+      middle: shade(color, 0.56),
+      end: shade(color, 0.38),
     };
   } catch {
     // CDN이 CORS 픽셀 읽기를 막는 경우에도 배너 자체는 정상 노출한다.
@@ -53,7 +47,6 @@ export function extractRightEdgePalette(image: HTMLImageElement): EdgePalette | 
   }
 }
 
-// 이미지 마스크가 사라지는 지점(약 25%)까지만 원색을 유지하고, 글자가 시작되는 지점(약 30%) 전에 어두워지게 한다
 export function edgePaletteGradient({ edge, middle, end }: EdgePalette): string {
-  return `linear-gradient(90deg, ${edge} 0%, ${edge} 24%, ${middle} 38%, ${end} 100%)`;
+  return `linear-gradient(90deg, ${edge} 0%, ${edge} 38%, ${middle} 78%, ${end} 100%)`;
 }

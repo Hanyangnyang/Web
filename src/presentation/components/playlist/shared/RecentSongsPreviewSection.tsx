@@ -25,10 +25,10 @@ export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading
     <>
     <hr className="-mx-3 my-4 border-slate-200" />
     <section>
-      <h3 className="mb-2 text-[17px] font-bold text-text-main">에리카생들은 어떤 다른 노래를 추천했을까요?</h3>
+      <h3 className="mb-2 text-[17px] font-bold text-text-main">에리카생들은 어떤 노래를 추천했을까요?</h3>
       <ErrorBoundary
         name="playlist-recent-preview"
-        fallback={<PlaylistFallback message="최근 추가된 곡을 표시할 수 없어요" />}
+        fallback={<PlaylistFallback message="최근 추천된 곡을 표시할 수 없어요" />}
       >
       <div className="flex flex-col gap-1.5">
         {isLoading ? (
@@ -36,7 +36,7 @@ export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading
             <RecentSongRowSkeleton key={i} />
           ))
         ) : recentSongs.length === 0 ? (
-          <EmptyMessageCard message="아직 추가된 곡이 없어요" />
+          <EmptyMessageCard message="아직 추천된 곡이 없어요" />
         ) : (
           recentSongs.slice(0, RECENT_PREVIEW_LIMIT).map((song) => (
             <RecentSongRow

@@ -301,9 +301,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
               ? '곡 추천이 일시적으로 제한되었어요'
               : creationStatus.canCreate
                 ? creationStatus.recentTrackIdsIn7Days.length === 0
-                  ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요!`
-                  : `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요! (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
-                : '오늘 추천 가능한 곡을 모두 채웠어요! 내일 다시 만나요 :)'
+                  ? `하루에 최대 ${creationStatus.dailyMaxLimit}곡까지 추천할 수 있어요`
+                  : `오늘 ${creationStatus.remainingCount}곡 더 추천할 수 있어요 (${creationStatus.dailyCount}/${creationStatus.dailyMaxLimit})`
+                : '오늘 추천 가능한 곡을 모두 채웠어요. 내일 다시 만나요 :)'
             : ''
         }
         subtitleLoading={!creationStatus && !isStatusError}
@@ -343,7 +343,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSearchClick();
                 }}
-                placeholder="곡 제목이나 아티스트를 검색해보세요"
+                placeholder="추천하고 싶은 곡 제목이나 아티스트를 검색해보세요"
                 className="flex-1 bg-transparent text-[15px] text-text-main placeholder-text-hint outline-none"
               />
               <button
@@ -402,11 +402,11 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                           isPlaying={track.trackId === currentTrackId}
                           onSelect={(selected, source) => {
                             setSelectedTrack(selected);
-                            // 앨범커버로 선택할 땐 선택과 동시에 재생하고 결과 패널은 열어둠 — 이미 재생 중인 곡이면 onPlay가 일시정지로 토글해버리므로 재생은 건너뜀.
+                            // 앨범커버(재생 아이콘 포함)로 선택할 땐 선택과 동시에 재생/일시정지 토글하고 결과 패널은 열어둠 — 커버 위 아이콘이 재생·일시정지 상태를 보여주므로 같은 터치로 토글.
                             // 하단 정보 영역으로 선택할 땐 선택만 하고(재생 안 함) 기존처럼 패널을 접음
                             setKeepResultsOpen(source === 'cover');
                             setResultsToggleOverride(null);
-                            if (source === 'cover' && selected.trackId !== currentTrackId) onPlay?.(selected);
+                            if (source === 'cover') onPlay?.(selected);
                           }}
                           albumArtSelects
                           selectLabel={alreadyRecommended ? `${track.title} 최근 7일 내 이미 추천한 곡` : `${track.title} 선택`}
@@ -467,9 +467,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
       {/* 2. 장르 */}
       <section className="mb-5">
-        <div className="flex items-center gap-1 mb-2">
+        <div className="flex items-baseline gap-1 mb-2">
           <h3 className="text-[19px] font-bold text-text-main">장르</h3>
-          <span className="text-[13px] font-semibold text-text-hint">({selectedGenres.length}/{MAX_GENRES})</span>
+          <span className="text-[13px] font-medium text-text-sub">필수 ({selectedGenres.length}/{MAX_GENRES})</span>
         </div>
         <div className="bg-white border border-slate-200 rounded-card p-2 shadow-[0_2px_4px_rgba(0,0,0,0.03)] flex flex-wrap justify-center gap-2">
           {GENRE_OPTIONS.map((genre) => {
@@ -482,7 +482,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
                 disabled={isDisabled}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-2xl text-[14px] font-medium border transition-all duration-200 active:scale-[0.96] ${
                   isSelected
-                    ? `${genre.light} ${genre.activeBorder} text-gray-600`
+                    ? `${genre.light} ${genre.activeBorder} text-gray-800 font-semibold`
                     : isDisabled
                       ? 'text-slate-300 border-slate-200'
                       : 'text-gray-500 border-gray-300'
@@ -498,9 +498,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
 
       {/* 3. 곡에 대한 한마디 */}
       <section className="mb-5">
-        <div className="flex items-center gap-1 mb-2">
+        <div className="flex items-baseline gap-1 mb-2">
           <h3 className="text-[19px] font-bold text-text-main">곡에 대한 한마디</h3>
-          <span className="text-[13px] font-semibold text-text-hint">(선택)</span>
+          <span className="text-[13px] font-medium text-text-hint">(선택)</span>
         </div>
         <div className="bg-white border border-slate-200 rounded-card px-3.5 py-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.03)] focus-within:border-playlist-primary focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] transition-all">
           <textarea
@@ -508,12 +508,12 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             maxLength={COMMENT_MAX_LENGTH}
             onChange={(e) => setComment(e.target.value)}
             onFocus={collapseResultsAfterPick}
-            placeholder={'이 곡에 대한 얘기를 자유롭게 남겨주세요!\n한마디가 생각나지 않는다면 건너뛰어도 돼요.'}
+            placeholder={'이 곡에 대한 얘기를 자유롭게 남겨주세요'}
             rows={5}
             className="w-full bg-transparent text-[15px] text-text-main placeholder-text-hint outline-none resize-none"
           />
         </div>
-        <div className="mt-1 text-right text-[12px] text-text-hint">
+        <div className="mt-1 text-right text-[13px] text-text-sub">
           {comment.length}/{COMMENT_MAX_LENGTH}
         </div>
       </section>
@@ -531,7 +531,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-4rem)] max-w-[360px] h-12 rounded-full text-[15px] font-bold border transition-all active:scale-[0.97] z-40 ${
           canSubmit
             ? 'bg-playlist-primary text-white border-transparent shadow-[0_6px_20px_rgba(15,23,42,0.35)]'
-            : 'bg-slate-100 text-slate-300 border-transparent'
+            : 'bg-slate-100 text-slate-400 border-transparent'
         }`}
         style={{
           bottom:

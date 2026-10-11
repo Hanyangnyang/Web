@@ -274,19 +274,36 @@ export function SongListScreen({
   const [reactionHintAnchor, setReactionHintAnchor] = useState<{ left: number; top: number; width: number; height: number; bottom: number } | null>(null);
   const reactionHintReady = !gridOnly && !isLoading && filteredSongs.length > 0 && viewToggleCoachmark.state === 'hidden';
   useLayoutEffect(() => {
-    if (!reactionHintReady) return;
-    const button = listContainerRef.current?.querySelector<HTMLElement>('button[aria-label="이모지 추가"]');
-    if (!button) return;
-    const rect = button.getBoundingClientRect();
-    const visible = rect.top > 120 && rect.bottom < window.innerHeight - 160;
-    setReactionHintAnchor(visible ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height, bottom: rect.bottom } : null);
-  }, [reactionHintReady, viewMode]);
+    const container = listContainerRef.current;
+    if (!reactionHintReady || !container) return;
+    const measure = () => {
+      const button = container.querySelector<HTMLElement>('button[aria-label="이모지 추가"]');
+      if (!button) return;
+      const rect = button.getBoundingClientRect();
+      const visible = rect.top > 120 && rect.bottom < window.innerHeight - 160;
+      const next = visible ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height, bottom: rect.bottom } : null;
+      // 값이 같으면 이전 객체를 그대로 둬서 불필요한 리렌더를 막는다
+      setReactionHintAnchor((prev) => (prev && next && prev.left === next.left && prev.top === next.top && prev.width === next.width && prev.height === next.height ? prev : next));
+    };
+    measure();
+    // 앨범 이미지가 늦게 로드되거나(특히 1열은 카드가 커서 버튼이 크게 밀림) 목록 높이가 바뀌면 버튼이 움직이는데,
+    // 처음 한 번만 재면 말풍선·스포트라이트가 엉뚱한 자리에 남는다 → 크기 변화·이미지 로드·창 크기 변화마다 다시 잼
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(container);
+    container.addEventListener('load', measure, true); // img load는 버블링되지 않아 캡처 단계로 받는다
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      container.removeEventListener('load', measure, true);
+      window.removeEventListener('resize', measure);
+    };
+  }, [reactionHintReady, viewMode, filteredSongs.length]);
   const reactionHintCoachmark = useCoachmark(REACTION_HOLD_HINT_SEEN_KEY, reactionHintReady && reactionHintAnchor !== null);
 
   return (
     <div className="-mx-4 px-4 pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">
       {/* 고정 헤더 */}
-      <div className="sticky -top-6 -mt-6 z-[100] bg-white/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+      <div className="sticky top-[calc(env(safe-area-inset-top,0px)-1.5rem)] -mt-6 z-[100] bg-white/90 backdrop-blur-xl pt-6 -mx-4 px-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
         <MiscSubViewHeader
           title={title}
           emoji={emoji}

@@ -1,6 +1,6 @@
 import { CollegeWheelPicker } from '../../ui/CollegeWheelPicker';
 import { GENRES } from '../playlistTypes';
-import { CHIP_ACTIVE, CHIP_INACTIVE, type GenreFilterState } from './GenreFilterChips';
+import { CHIP_INACTIVE, type GenreFilterState } from './GenreFilterChips';
 
 interface GenreFilterDropdownProps {
   value: GenreFilterState;
@@ -24,10 +24,8 @@ export function GenreFilterDropdown({ value, onChange, className = '' }: GenreFi
         panelWidthClassName="w-[96px]"
         liveChangeDelayMs={250}
         onChange={(key) => onChange({ ...value, selected: key === 'all' ? [] : [key] })}
-        // 왼쪽 기간 칩(ChartPeriodChips)과 같은 칩 모양 — 장르를 골랐을 때만 활성(파랑) 색
-        triggerClassName={`min-w-[64px] max-w-[96px] flex items-center justify-between gap-1 text-sm font-medium border rounded-lg pl-3 pr-2 py-1.5 transition-colors duration-200 ${
-          selectedKey === 'all' ? CHIP_INACTIVE : CHIP_ACTIVE
-        }`}
+        // 왼쪽 기간 칩(ChartPeriodChips)과 같은 칩 모양 — 장르를 골라도 파랑으로 바뀌지 않고 흰 칩 그대로(선택 여부는 칩 글자가 "장르" → 장르명으로 바뀌어 드러남)
+        triggerClassName={`min-w-[64px] max-w-[96px] flex items-center justify-between gap-1 text-sm font-medium border rounded-lg pl-3 pr-2 py-1.5 transition-colors duration-200 ${CHIP_INACTIVE}`}
       />
     </div>
   );

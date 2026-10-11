@@ -1,5 +1,6 @@
 import { ChevronRight, Heart } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useShareModal } from '../shared/useShareModal';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartTopCard } from './ChartTopCard';
 import { MySongCard } from './MySongCard';
@@ -100,6 +101,14 @@ export function PlaylistHomeView({
 }: PlaylistHomeViewProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // 공유 모달은 화면에 하나만 두고, 누른 카드의 곡을 담아서 염 (ChartView와 같은 방식)
+  const [shareTrack, setShareTrack] = useState<TrackSummary>({ trackId: '', title: '', artist: '', albumArtUrl: '' });
+  const share = useShareModal(shareTrack);
+  const handleShare = (t: ChartTrack) => {
+    setShareTrack({ trackId: t.trackId, title: t.title, artist: t.artist, albumArtUrl: t.albumArtUrl });
+    share.open();
+  };
+
   useEffect(() => {
     if (!autoFocusSearch) return;
     searchInputRef.current?.focus();
@@ -184,7 +193,7 @@ export function PlaylistHomeView({
           <div className="bg-white rounded-card border border-playlist-primary/20 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.03),0_8px_10px_-6px_rgba(0,0,0,0.03)] overflow-hidden h-[203px] flex items-center justify-center">
             <EmptyGenreState
               message={`아직 '${CHART_PERIOD_OPTIONS.find((option) => option.key === chartPeriod)?.label ?? ''}' 차트가 집계되지 않았어요`}
-              buttonLabel="최근 추가된 곡 보러가기"
+              buttonLabel="최근 추천된 곡 보러가기"
               onAction={onShowAllRecent}
             />
           </div>
@@ -198,7 +207,10 @@ export function PlaylistHomeView({
                   // 카드 어디를 눌러도 재생 없이 인기차트 화면으로 이동하면서 누른 곡 위치로 스크롤
                   onShowPosts={() => onShowAllChart(track.trackId)}
                   onPlay={() => onShowAllChart(track.trackId)}
+                  // 우상단 아이콘만 별도로 동작 — 재생 아이콘은 바로 재생, 공유 아이콘은 공유 팝업
+                  onPlayIcon={onPlayTrack}
                   showShareIcon
+                  onShare={handleShare}
                   currentTrackId={currentTrackId}
                 />
               ))}
@@ -222,10 +234,10 @@ export function PlaylistHomeView({
         <h3 className="mb-2">
           <button
             onClick={() => onShowAllRecent()}
-            aria-label="최근 추가된 곡 전체보기"
+            aria-label="최근 추천된 곡 전체보기"
             className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
           >
-            <span>최근 추가된 곡</span>
+            <span>최근 추천된 곡</span>
             <ChevronRight size={20} className="ml-0.5" />
           </button>
         </h3>
@@ -243,7 +255,7 @@ export function PlaylistHomeView({
         ) : visibleSongs.length === 0 ? (
           <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
             <EmptyGenreState
-              message={recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추가된 곡이 없어요'}
+              message={recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추천된 곡이 없어요'}
               buttonLabel="곡 추천하러 가기"
               onAction={onShowAddSong}
             />
@@ -325,6 +337,7 @@ export function PlaylistHomeView({
         )}
       </section>
 
+      {share.node}
     </div>
   );
 }

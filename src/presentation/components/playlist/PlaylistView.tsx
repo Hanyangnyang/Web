@@ -420,6 +420,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         '--playlist-player-height': `${playerHeight}px`,
       } as CSSProperties}
     >
+      {/* 상태바/노치(safe-area) 영역 가림막 — 스크롤한 콘텐츠가 sticky 헤더 위쪽으로 비쳐 보이는 것을 막음 (PWA·사파리) */}
+      <div
+        aria-hidden
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-app z-[200] bg-white pointer-events-none"
+        style={{ height: 'env(safe-area-inset-top, 0px)' }}
+      />
+
       {/* 당겨서 새로고침 인디케이터 — 당기는 만큼 내려오고, 기준 거리를 넘으면 회전 */}
       {(pull > 0 || isPullRefreshing) && (
         <div

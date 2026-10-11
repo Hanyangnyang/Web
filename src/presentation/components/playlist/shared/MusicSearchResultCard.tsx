@@ -36,34 +36,24 @@ export function MusicSearchResultCard({
     >
       {/* 앨범커버 */}
       {albumArtSelects ? (
-        <div className="relative w-full aspect-square">
-          <button
-            onClick={() => onSelect(track, 'cover')}
-            disabled={disabled}
-            aria-label={selectLabel}
-            className="block w-full h-full active:scale-95 transition-transform disabled:pointer-events-none"
-          >
-            <img src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
-          </button>
-          {/* 표지 전체는 곡 선택 버튼이고, 가운데 원형 아이콘만 별도 버튼으로 재생/일시정지(선택으로 전파되지 않게 막음) */}
+        // 표지 전체(재생 아이콘 포함)가 하나의 터치 영역 — 누르면 곡 선택. 재생 아이콘은 장식용 오버레이
+        <button
+          onClick={() => onSelect(track, 'cover')}
+          disabled={disabled}
+          aria-label={selectLabel}
+          className="relative block w-full aspect-square active:scale-95 transition-transform disabled:pointer-events-none"
+        >
+          <img src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
           {onPlay && !disabled && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onPlay(track);
-              }}
-              aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
-              // before 의사요소로 버튼 바깥 12px까지 터치 영역을 넓힘(원형 아이콘이 카드 폭의 22%라 손가락보다 작음)
-              className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center active:scale-95 transition-transform before:content-[''] before:absolute before:-inset-4"
-            >
+            <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
               {isPlaying ? (
                 <Pause className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
               ) : (
                 <Play className="w-1/2 h-1/2 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]" fill="white" stroke="white" strokeWidth={1} />
               )}
-            </button>
+            </span>
           )}
-        </div>
+        </button>
       ) : onPlay ? (
         <button
           onClick={() => onPlay(track)}
@@ -101,11 +91,11 @@ export function MusicSearchResultCard({
         <div className="min-w-0">
           <div className={`text-[13px] leading-4 text-text-sub truncate ${showChevron ? 'pr-5' : ''}`}>{track.artist}</div>
           {disabled && disabledMessage ? (
-            <div className="text-[11px] font-semibold text-red-400 truncate">{disabledMessage}</div>
+            <div className="text-[12px] font-semibold text-red-500 truncate">{disabledMessage}</div>
           ) : (
             // 이 곡에 등록된 추천글 수 — 백엔드 카탈로그 검색 응답의 recommendationCount.
             // "이 곡 추천하러 가기" 버튼이 있는 검색 결과 화면(onRecommend)은 회색, 곡 추천하기 화면은 파란색
-            <div className={`flex items-center gap-0.5 text-[11px] truncate ${onRecommend ? 'text-text-hint' : 'text-playlist-primary'}`}>
+            <div className={`flex items-center gap-0.5 text-[12px] truncate ${onRecommend ? 'text-text-hint' : 'text-playlist-primary'}`}>
               <MessageCircle size={10} className="flex-shrink-0" />
               <span>추천글 {track.recommendationCount}개</span>
             </div>
