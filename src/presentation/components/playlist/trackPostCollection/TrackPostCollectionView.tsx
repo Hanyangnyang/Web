@@ -113,9 +113,9 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         setLiked(isLiked);
         if (isLiked !== optimistic) likeToast.show(isLiked); // 서버 상태가 예상과 다르면 실제 결과로 안내를 바로잡음
       },
-      onError: () => {
+      onError: (error) => {
         setLiked(!optimistic);
-        likeToast.hide();
+        likeToast.fail(error);
       },
     });
   };

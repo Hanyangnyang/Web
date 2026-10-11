@@ -22,6 +22,17 @@ export function useLikeToast() {
     timerRef.current = setTimeout(() => setToast(null), LIKE_TOAST_MS);
   };
 
+  // 좋아요 요청이 실패했을 때 — 429(PL005 요청 제한/PL006 Spotify 한도 초과)는 조용히 되돌리면 "눌렀는데 안 됨"이라
+  // 이유를 안내하고, 그 외 실패는 기존처럼 낙관적 토스트만 거둠
+  const fail = (error: unknown) => {
+    const err = error as { statusCode?: number; code?: string; retryAfterSeconds?: number } | null;
+    if (err?.statusCode !== 429) return hide();
+    clearTimer();
+    const wait = err.retryAfterSeconds ? ` ${err.retryAfterSeconds}초 후 다시 시도해주세요.` : ' 잠시 후 다시 시도해주세요.';
+    setToast((prev) => ({ message: `요청이 많아 좋아요를 처리하지 못했어요.${wait}`, seq: (prev?.seq ?? 0) + 1 }));
+    timerRef.current = setTimeout(() => setToast(null), LIKE_TOAST_MS * 2);
+  };
+
   const hide = () => {
     clearTimer();
     setToast(null);
@@ -29,5 +40,5 @@ export function useLikeToast() {
 
   const node = toast ? <Toast key={toast.seq} message={toast.message} variant="light" alignWithFab /> : null;
 
-  return { show, hide, node };
+  return { show, hide, fail, node };
 }

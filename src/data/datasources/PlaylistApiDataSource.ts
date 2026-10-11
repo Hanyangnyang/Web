@@ -107,6 +107,10 @@ export interface TrackPostsDto {
   totalSongsCount: number;
   // 이 곡을 좋아요한 사람 수 (서버 필드명은 likeCount)
   likeCount: number;
+  // 요청 기기가 이 곡을 좋아요했는지 — 곡 단위 값이라 추천글이 0개여도 내려옴
+  isLiked?: boolean;
+  // 이 곡의 누적 재생수 — 추천글이 없어도 내려옴(재생 이력이 없으면 0). songs.content[].totalPlayCount는 호환용으로만 남음
+  totalPlayCount?: number;
   songs: PagedPlaylistSongsDto;
 }
 
@@ -168,8 +172,8 @@ export interface PlaylistApiDataSource {
   postReport: (songId: string, body: CreatePlaylistSongReportDto) => Promise<ApiResponse<PlaylistSongReportDto>>;
   // 곡(trackId) 단위 좋아요 토글 — 같은 곡의 모든 게시글에 공통 적용
   postTrackLike: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<ToggleLikeDto>>;
-  // 재생 버튼을 누를 때마다 호출 — 인기차트 집계용 일자별 재생수 +1. 성공 응답은 data=null(Swagger 예시의 {}는 자동 생성값)이라 성공 여부만 확인.
-  // DB에 없는 트랙(아직 추천 등록 안 된 검색 결과 곡 등)이면 404 C003
+  // 재생 시 호출 — 서버가 같은 기기·같은 곡을 KST 자정 기준 하루 1회만 집계하고, 중복 요청도 성공으로 응답하므로 성공했다고 화면 재생수를 +1하면 안 됨.
+  // 미등록 곡도 서버가 자동 등록 후 집계(Spotify 호출이 필요해 429 PL005/PL006이 날 수 있음). 성공 응답은 data=null이라 성공 여부만 확인
   postTrackPlay: (trackId: string, body: { deviceId: string }) => Promise<ApiResponse<null>>;
   postReaction: (songId: string, body: { deviceId: string; reactionType: string }) => Promise<ApiResponse<ToggleReactionDto>>;
   getTrackPosts: (params: GetTrackPostsDataSourceParams) => Promise<ApiResponse<TrackPostsDto>>;

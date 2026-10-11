@@ -28,8 +28,8 @@ function selectTrackPosts(data: InfiniteData<TrackPosts, number>) {
     totalSongsCount: first.totalSongsCount,
     likeCount: first.likeCount,
     totalPlayCount: first.totalPlayCount,
-    // 곡 단위 좋아요 상태 — 서버가 첫 게시글에 실어준 값(다음 페이지를 받아도 안 바뀜)
-    isLiked: first.posts[0]?.isLiked ?? false,
+    // 곡 단위 좋아요 상태 — 최상위 값이라 추천글이 0개여도 맞고, 다음 페이지를 받아도 안 바뀜
+    isLiked: first.isLiked,
     posts: data.pages.flatMap((page) => page.posts.map(mapPlaylistSongToSong)),
   };
 }

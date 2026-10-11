@@ -206,6 +206,7 @@ export const createPlaylistRepository = (
           totalSongsCount: 0,
           likeCount: 0,
           totalPlayCount: 0,
+          isLiked: false,
           posts: [],
           last: true,
         });
@@ -221,8 +222,9 @@ export const createPlaylistRepository = (
       albumArtUrl: data.albumArtUrl,
       totalSongsCount: data.totalSongsCount,
       likeCount: data.likeCount,
-      // 재생수는 게시글 단위가 아니라 트랙 단위라 모든 게시글에 같은 값이 실려있음 — 첫 게시글에서만 꺼내 씀
-      totalPlayCount: data.songs.content[0]?.totalPlayCount ?? 0,
+      // 재생수·좋아요 여부는 곡 단위라 최상위 필드를 씀 — 게시글이 0개여도 내려옴(구 응답 대비로 첫 게시글 값을 폴백)
+      totalPlayCount: data.totalPlayCount ?? data.songs.content[0]?.totalPlayCount ?? 0,
+      isLiked: data.isLiked ?? data.songs.content[0]?.isLiked ?? false,
       posts: data.songs.content.map((d) => toPlaylistSong(d, params.deviceId)),
       last: data.songs.last,
     });

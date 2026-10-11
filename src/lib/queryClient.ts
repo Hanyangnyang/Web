@@ -15,8 +15,8 @@ export const queryClient = new QueryClient({
       if (!import.meta.env.PROD) return; // 개발 중엔 어차피 Sentry가 비활성이라 SDK만 헛로드된다
       if (navigator.onLine === false) return; // 기기가 오프라인일 때 에러를 반환하지 않는다
       const err = error as (ApiValidationError & HttpError);
-      // 곡 검색 요청 제한(429 PL005)은 장애가 아니라 앱이 카운트다운 UX로 직접 처리하는 정상 응답이라 Sentry 노이즈만 됨
-      if (err.statusCode === 429 && err.code === 'PL005') return;
+      // 곡 검색 요청 제한(429 PL005)·Spotify 사용량 한도 초과(429 PL006)는 장애가 아니라 앱이 안내 UX로 직접 처리하는 정상 응답이라 Sentry 노이즈만 됨
+      if (err.statusCode === 429 && (err.code === 'PL005' || err.code === 'PL006')) return;
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
           tags: {
@@ -37,6 +37,7 @@ export const queryClient = new QueryClient({
       const err = error as (ApiValidationError & HttpError);
       // 재생수 기록의 404 C003(DB에 없는 트랙)은 장애가 아니라 정상 응답 — 아직 아무도 추천 등록하지 않은 검색 결과 곡을
       // 재생하면 항상 이렇게 내려옴. 다른 뮤테이션의 C003은 진짜 문제일 수 있어 mutationKey로 범위를 좁힘
+      if (err.statusCode === 429 && (err.code === 'PL005' || err.code === 'PL006')) return; // 미등록 곡 재생·좋아요의 Spotify 호출 제한
       if (mutation.options.mutationKey?.join('/') === 'playlist/record-track-play' && err.code === 'C003') return;
       initSentry().then(Sentry => {
         Sentry.captureException(error, {
