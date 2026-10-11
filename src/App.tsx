@@ -35,6 +35,9 @@ declare global {
   }
 }
 
+// PlaylistView 루트의 fadeIn(0.25s)이 끝날 때까지 떠나는 탭을 밑에 깔아두는 시간 — 애니메이션보다 살짝 길게 잡아 끝까지 겹쳐 보이게 함
+const PLAYLIST_FADE_MS = 300;
+
 interface CafeDeepLink {
   date: string | null;
   cafe: string | null;
@@ -174,12 +177,23 @@ function MainLayout() {
   const saveScrollPosition = useCallback(() => {
     scrollPositions.current[activeTabRef.current] = scrollContainerRef.current?.scrollTop ?? 0;
   }, []);
+  // 소식탭 배너 등에서 플레이리스트로 바로 넘어갈 때, 플레이리스트(fixed 오버레이)가 fade-in 되는 동안
+  // 떠나는 탭을 밑에 그대로 깔아둬서 빈 배경이 아니라 원래 화면 위로 겹쳐 나타나게(크로스페이드) 한다
+  const [tabUnderlay, setTabUnderlay] = useState<string | null>(null);
+  useEffect(() => {
+    if (!tabUnderlay) return;
+    const t = setTimeout(() => setTabUnderlay(null), PLAYLIST_FADE_MS);
+    return () => clearTimeout(t);
+  }, [tabUnderlay]);
+  // 패딩 클래스·스크롤 위치는 밑에 깔린 탭 기준으로 유지해야 크로스페이드 도중 원래 화면이 들썩이지 않는다
+  const layoutTab = tabUnderlay ?? activeTab;
+
   // 페인트 전에 복원해 이전 탭 위치가 한 프레임 보이는 깜빡임을 방지
   useLayoutEffect(() => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollPositions.current[activeTab] ?? 0;
+      scrollContainerRef.current.scrollTop = scrollPositions.current[layoutTab] ?? 0;
     }
-  }, [activeTab]);
+  }, [layoutTab]);
 
   // 2. 학식 데이터 - 학식탭이 활성 탭일 때만 요청(다른 탭 진입 시 불필요한 백엔드 호출 방지)
   const { menuDate, cafes, menuLoading, menuRevalidating, changeDate, refetchMenu } = useMenu(activeTab === 'cafe');
@@ -313,6 +327,8 @@ function MainLayout() {
 
     // 3. 스크롤 위치 저장 + 실제 전환
     saveScrollPosition();
+    // 플레이리스트는 화면 전체를 덮는 오버레이라 기타탭 자체는 높이가 0 — 떠나는 탭을 잠깐 같이 보여줘도 레이아웃이 안 겹친다
+    setTabUnderlay(tab === 'misc' && box === 'playlist' ? activeTab : null);
     setActiveTab(tab);
     localStorage.setItem('lastActiveTab', tab);
   }, [activeTab, posthog, saveScrollPosition, showMiscNew]);
@@ -349,8 +365,8 @@ function MainLayout() {
         }}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : activeTab === 'portal' ? 'pb-6' : 'py-6'}`}>
-          <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
+        <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(layoutTab === 'cafe' || layoutTab === 'shuttle') ? 'pb-6' : layoutTab === 'partner' ? '' : layoutTab === 'portal' ? 'pb-6' : 'py-6'}`}>
+          <div style={{ display: activeTab === 'cafe' || tabUnderlay === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}
               changeDate={changeDate}
@@ -362,10 +378,10 @@ function MainLayout() {
               onCafeDeepLinkHandled={() => setCafeDeepLink(null)}
             />
           </div>
-          <div style={{ display: activeTab === 'shuttle' ? 'block' : 'none' }}>
+          <div style={{ display: activeTab === 'shuttle' || tabUnderlay === 'shuttle' ? 'block' : 'none' }}>
             <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
-          <div style={{ display: activeTab === 'portal' ? 'block' : 'none' }}>
+          <div style={{ display: activeTab === 'portal' || tabUnderlay === 'portal' ? 'block' : 'none' }}>
             <PortalView isActive={activeTab === 'portal'} onNavigateToTab={handleTabChange} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
