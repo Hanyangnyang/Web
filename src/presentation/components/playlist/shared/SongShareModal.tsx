@@ -76,7 +76,14 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
       return;
     }
 
-    const link = { mobileWebUrl: shareUrl, webUrl: shareUrl };
+    // 학식 공유(ShareSheet)와 동일 — execution params가 있어야 카카오톡이 웹 대신 앱(kakao{key}://kakaolink?...)을 실행함
+    const execParams = (() => { try { return new URL(shareUrl).search.slice(1); } catch { return ''; } })();
+    const link = {
+      mobileWebUrl: shareUrl,
+      webUrl: shareUrl,
+      androidExecutionParams: execParams,
+      iosExecutionParams: execParams,
+    };
 
     try {
       window.Kakao!.Share.sendDefault({
