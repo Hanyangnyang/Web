@@ -1,0 +1,263 @@
+import { Play, X } from 'lucide-react';
+import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
+import { isIOSDevice } from '../../../../lib/platform.js';
+import { type TrackSummary } from '../playlistTypes';
+
+// play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
+// "탭해서 재생하기" 버튼을 띄운다. iOS Safari 자동재생 정책 때문에 필요 — Android/데스크톱은 이 정책이 없어서 해당 없음.
+const AUTOPLAY_CHECK_MS = 1500;
+const END_TOLERANCE_MS = 500; // 재생 위치가 전체 길이에서 이 안쪽이면 "끝까지 재생됨"으로 봄
+const END_GRACE_MS = 1500; // 끝 시각이 지나도 Spotify의 실제 이벤트가 없으면 이만큼 더 기다렸다가 멈춤으로 알림
+
+export type PlayableTrack = TrackSummary;
+
+// 상위(PlaylistView)가 현재 로드된 곡을 재생/일시정지 시키기 위해 ref로 노출하는 최소 인터페이스 —
+// controller가 이 컴포넌트 내부에서만 만들어지고 관리돼서, 재생 제어는 imperative handle로 열어줌
+export interface FloatingSpotifyPlayerHandle {
+  pause: () => void;
+  resume: () => void;
+}
+
+interface FloatingSpotifyPlayerProps {
+  song: PlayableTrack | null;
+  onClose: () => void;
+  // 실제 렌더링된 플레이어 카드 높이(safe-area 포함)를 전달 — 닫히면 0
+  onHeightChange?: (height: number) => void;
+  // Spotify iframe이 보고하는 실제 재생/일시정지 상태가 바뀔 때마다 상위로 올림 — 앨범커버 재생 버튼들이
+  // 재생 중엔 일시정지 아이콘으로 바뀌어야 해서, 이 상태를 알아야 함
+  onPlaybackStateChange?: (isPaused: boolean) => void;
+}
+
+const CLOSE_ANIMATION_MS = 250;
+
+export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, FloatingSpotifyPlayerProps>(
+  function FloatingSpotifyPlayer({ song, onClose, onHeightChange, onPlaybackStateChange }, ref) {
+  const [displaySong, setDisplaySong] = useState<PlayableTrack | null>(song);
+  const [closing, setClosing] = useState(false);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [showTapToPlay, setShowTapToPlay] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const controllerRef = useRef<SpotifyEmbedController | null>(null);
+  const isPausedRef = useRef(true);
+  const autoplayCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 미리듣기(30초)가 끝까지 재생된 상태 — Spotify embed는 끝에서 isPaused=true를 안 보내거나 늦게 보내서, 카드의 일시정지
+  // 아이콘이 재생 아이콘으로 돌아오지 않았음. position이 duration에 닿았거나 그 시각이 지나면 "끝남=멈춤"으로 직접 알림
+  const endedRef = useRef(false);
+  const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearEndTimer = () => {
+    if (endTimerRef.current) clearTimeout(endTimerRef.current);
+    endTimerRef.current = null;
+  };
+
+  // 카드들의 재생/일시정지 버튼이 이 컴포넌트 안에서만 존재하는 controller를 직접 조작할 수 있게 노출
+  useImperativeHandle(ref, () => ({
+    pause: () => controllerRef.current?.pause(),
+    // 끝까지 재생된 뒤라면 resume()이 먹지 않을 수 있어서 처음부터 다시 재생(play)함
+    resume: () => {
+      if (endedRef.current) {
+        endedRef.current = false;
+        controllerRef.current?.play();
+        return;
+      }
+      controllerRef.current?.resume();
+    },
+  }), []);
+
+  // 재생 시작 후 일정 시간 안에 실제로 재생이 시작되지 않으면 자동재생이 막힌 것으로 보고 "탭해서 재생하기" 버튼을 띄운다.
+  // 이 자동재생 차단은 iOS Safari 정책이라 iOS 기기가 아니면 애초에 검사할 필요가 없음
+  const schedulePlaybackCheck = () => {
+    if (!isIOSDevice()) return;
+    if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
+    autoplayCheckTimerRef.current = setTimeout(() => {
+      if (isPausedRef.current) setShowTapToPlay(true);
+    }, AUTOPLAY_CHECK_MS);
+  };
+
+  // "탭해서 재생하기" 버튼 클릭 시 controller.play()를 호출하여 재생을 시도한다.
+  const handleTapToPlay = () => {
+    controllerRef.current?.play();
+    setShowTapToPlay(false);
+  };
+
+  // song prop이 바뀌면 displaySong을 업데이트하고, song이 null이면 닫기 애니메이션 후 controller를 destroy한다.
+  useEffect(() => {
+    if (song) {
+      setDisplaySong(song);
+      setClosing(false);
+      return;
+    }
+    if (!displaySong) return;
+    controllerRef.current?.pause();
+    if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
+    setShowTapToPlay(false);
+    setClosing(true);
+    const timer = setTimeout(() => {
+      controllerRef.current?.destroy();
+      controllerRef.current = null;
+      setDisplaySong(null);
+      setClosing(false);
+    }, CLOSE_ANIMATION_MS);
+    return () => clearTimeout(timer);
+  }, [song]);
+
+  // 곡이 바뀔때마다 Spotify 컨트롤러를 새로 만들거나 재사용해서 실제 재생을 트리거함.
+  // displaySong이 바뀌면 Spotify IFrame API를 로드하고 controller를 생성하여 재생을 시작한다.
+  // controller가 이미 존재하면 loadUri() 후 play()를 호출한다.
+  useEffect(() => {
+    if (!displaySong) return;
+    const uri = `spotify:track:${displaySong.trackId}`;
+
+    setShowTapToPlay(false);
+    isPausedRef.current = true;
+    endedRef.current = false;
+    clearEndTimer();
+
+    if (controllerRef.current) {
+      controllerRef.current.loadUri(uri);
+      controllerRef.current.play();
+      schedulePlaybackCheck();
+      return;
+    }
+
+    let cancelled = false;
+    loadSpotifyIframeApi().then((IFrameAPI) => {
+      if (cancelled || !containerRef.current || controllerRef.current) return;
+      IFrameAPI.createController(
+        containerRef.current,
+        { uri, width: '100%', height: 80 },
+        (controller) => {
+          controllerRef.current = controller;
+          controller.addListener('ready', () => setIframeLoaded(true));
+          // position/duration은 ms. 끝에 닿았으면 isPaused가 false로 와도 멈춘 것으로 취급하고,
+          // 끝 직전 이벤트 이후로 소식이 없을 때를 대비해 남은 시간 뒤에 한 번 더 "멈춤"을 알림(새 이벤트가 오면 타이머를 다시 잡음)
+          controller.addListener('playback_update', (e: { data: { isPaused: boolean; position?: number; duration?: number } }) => {
+            const { isPaused, position = 0, duration = 0 } = e.data;
+            clearEndTimer();
+            const ended = duration > 0 && position >= duration - END_TOLERANCE_MS;
+            endedRef.current = ended;
+            const paused = isPaused || ended;
+            isPausedRef.current = paused;
+            onPlaybackStateChange?.(paused);
+            if (!paused) {
+              setShowTapToPlay(false);
+              if (duration > 0) {
+                endTimerRef.current = setTimeout(() => {
+                  endedRef.current = true;
+                  isPausedRef.current = true;
+                  onPlaybackStateChange?.(true);
+                }, duration - position + END_GRACE_MS);
+              }
+            }
+          });
+          controller.play();
+          schedulePlaybackCheck();
+        }
+      );
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [displaySong?.trackId]);
+
+  // 컴포넌트가 완전히 사라질때 컨트롤러/타이머를 정리하는 안전망.
+  // FloatingSpotifyPlayer가 언마운트될 때 controller가 존재하면 destroy()를 호출하고, autoplayCheckTimer를 clearTimeout한다.
+  // controller가 존재하면 destroy()를 호출하고, autoplayCheckTimer를 clearTimeout한다.
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.destroy();
+      controllerRef.current = null;
+      if (autoplayCheckTimerRef.current) clearTimeout(autoplayCheckTimerRef.current);
+      clearEndTimer();
+    };
+  }, []);
+
+  // 플레이어 카드의 실제 높이를 측정해 상위로 전달 — 하단 화면들의 여백/FAB 위치 계산에 쓰임.
+  // displaySong이 null이 되면(닫힘 애니메이션까지 끝난 뒤) 0을 보고해 여백도 함께 줄어들게 한다.
+  useLayoutEffect(() => {
+    if (!displaySong) {
+      onHeightChange?.(0);
+      return;
+    }
+    const el = sheetRef.current;
+    if (!el) return;
+    const report = () => onHeightChange?.(el.offsetHeight);
+    report();
+    const observer = new ResizeObserver(report);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [displaySong, onHeightChange]);
+
+  if (!displaySong) return null;
+
+  return (
+    // z-40이 아니라 z-[150]인 이유: 화면 상단 sticky 헤더가 z-[100]이라, 이 안에 있는
+    // 공유 팝업(z-[200])이 그보다 낮으면 fixed+z-index로 생기는 자체 stacking context에 갇혀서
+    // 팝업이 헤더 뒤로 깔려버림 — 바깥 래퍼 자체를 헤더보다 높여야 안쪽 z-index가 의미가 있음
+    <div className="fixed inset-x-0 bottom-0 z-[150] flex justify-center">
+      <div className="w-full max-w-app">
+        <div
+          ref={sheetRef}
+          className="bg-black shadow-2xl border-t border-slate-200 rounded-t-lg overflow-hidden"
+          style={{
+            animation: closing ? 'sheetDown 0.25s cubic-bezier(0.4, 0, 1, 1) forwards' : 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-white/10">
+            <div className="flex-1 min-w-0 truncate">
+              <span className="text-[15px] font-bold text-text-main">{displaySong.title}</span>
+              <span className="text-[15px] text-text-sub"> · {displaySong.artist}</span>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="닫기"
+              className="relative before:content-[''] before:absolute before:-inset-4 ml-1 flex-shrink-0 p-1 hover:bg-slate-100 rounded transition-colors active:scale-95"
+            >
+              <X size={18} className="text-black" />
+            </button>
+          </div>
+
+          {/* Spotify Embed — 압축(80px) 버전: 앨범아트+제목/가수명+재생버튼이 한 줄 */}
+          <div className="relative bg-white h-[80px]">
+            <div
+              className={`absolute inset-0 px-3 flex items-center gap-3 bg-white transition-opacity duration-200 ${
+                iframeLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              <div className="w-12 h-12 rounded skeleton-shimmer flex-shrink-0" />
+              <div className="flex-1 min-w-0 flex flex-col gap-2">
+                <div className="h-3 w-32 rounded-full skeleton-shimmer" />
+                <div className="h-3 w-20 rounded-full skeleton-shimmer" />
+              </div>
+              <div className="w-9 h-9 rounded-full skeleton-shimmer flex-shrink-0" />
+            </div>
+            <div
+              ref={containerRef}
+              className={`w-full h-full rounded transition-opacity duration-200 ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
+            />
+
+            {/* iOS Safari 등 자동재생이 막힌 경우에만 노출되는 수동 재생 버튼.
+                containerRef와 같은 부모의 형제 노드라 조건부 마운트/언마운트하면 안 되고(크래시 이슈),
+                항상 마운트해두고 opacity로만 보이고/숨김 처리한다. */}
+            <button
+              onClick={handleTapToPlay}
+              aria-label="탭해서 재생하기"
+              className={`absolute inset-0 z-20 flex items-center justify-center bg-black/50 transition-opacity duration-200 ${
+                showTapToPlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <span className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-black text-[15px] font-bold shadow-lg">
+                <Play size={18} fill="none" stroke="currentColor" strokeWidth={2} />
+                탭해서 재생하기
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  }
+);
