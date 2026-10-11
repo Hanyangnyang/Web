@@ -20,7 +20,7 @@ import { PlaylistHomeView } from './home/PlaylistHomeView';
 import { type Song, type ChartPeriod, type TrackSummary, filterSongsByGenre } from './playlistTypes';
 import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
-import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
+import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
@@ -228,8 +228,13 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   useBackHandler(handleBack);
 
   // 플레이리스트의 모든 API가 device_id를 요구해서, 화면 진입 시점에 무조건 익명 기기 식별자를 발급/재사용해둠
+  // 인증 서버 요청 한도에 걸렸으면 어떤 API도 못 쓰므로, 안내 팝업을 띄우고 확인을 누르면 플레이리스트를 나감
+  const [showRateLimitPopup, setShowRateLimitPopup] = useState(false);
   useEffect(() => {
-    getOrCreateAnonymousUserId().catch((err) => console.error('[PlaylistView] anonymous auth failed:', err));
+    getOrCreateAnonymousUserId().catch((err) => {
+      if (err instanceof AuthRateLimitError) setShowRateLimitPopup(true);
+      else console.error('[PlaylistView] anonymous auth failed:', err);
+    });
   }, []);
 
   // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원 + 홈/최근추가된곡
@@ -583,6 +588,29 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           <p className="text-[16px] font-bold text-text-main mb-1 text-center">플리를 종료하시겠습니까?</p>
           <p className="text-[13px] font-medium text-text-hint mb-3.5 text-center">
             {playingTrackId ? '종료하면 재생 중인 음악이 정지돼요.' : '하냥이들의 새로운 추천곡이 기다리고 있어요!'}
+          </p>
+        </ConfirmPopup>
+      )}
+
+      {/* 인증 요청 한도 초과 안내 — 확인하면 플레이리스트를 나감 */}
+      {showRateLimitPopup && (
+        <ConfirmPopup
+          compact
+          buttons={
+            <button
+              onClick={() => {
+                setShowRateLimitPopup(false);
+                onBack();
+              }}
+              className="w-full h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
+            >
+              확인
+            </button>
+          }
+        >
+          <p className="text-[16px] font-bold text-text-main mb-1 text-center">요청이 너무 많아요</p>
+          <p className="text-[13px] font-medium text-text-hint mb-3.5 text-center">
+            잠시 후에 다시 시도해주세요.
           </p>
         </ConfirmPopup>
       )}
