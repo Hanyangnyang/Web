@@ -25,7 +25,8 @@ import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
 import { useRecentSongsInfinite } from '../../hooks/playlist/useRecentSongsInfinite.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
-import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY, type SongPagesData } from '../../hooks/playlist/playlistQueryKeys.js';
+import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY, CHART_QUERY_KEY, keepOnlyFirstPage, type SongPagesData } from '../../hooks/playlist/playlistQueryKeys.js';
+import { runWithoutRetry } from '../../../lib/queryClient.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
@@ -109,18 +110,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const chartTracks = chartData?.tracks ?? [];
   // 인기차트 화면의 장르 필터 — 홈 미리보기에는 적용되지 않고(홈은 항상 전체 차트), 화면 안에서만 장르별 차트를 서버에서 받아옴
   const [chartGenreFilter, setChartGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
-  // 하단 플로팅 플레이어 상태 + 재생 버튼 동작(handlePlay) — usePlaylistPlayer 참고
-  const {
-    playerRef,
-    currentTrack,
-    playingTrackId,
-    playerHeight,
-    handlePlay,
-    handleClose: handlePlayerClose,
-    handlePlaybackStateChange,
-    handlePlayerHeightChange,
-  } = usePlaylistPlayer(recentSongsVariant);
-
   // 최근추가된곡/추천한곡 화면의 그리드·리스트 뷰 모드(사용자가 토글로 고른 값) — 어느 경로로 들어오든 이 선택대로 열린다. 이 화면들은 게시글 상세로 갔다가
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
@@ -136,6 +125,18 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     deepLinkSearchQuery ? [{ name: 'main' }, { name: 'search' }] : [{ name: 'main' }],
   );
   const screen = screenStack[screenStack.length - 1];
+  // 하단 플로팅 플레이어 상태 + 재생 버튼 동작(handlePlay) — usePlaylistPlayer 참고.
+  // screen.name은 전체 재생 이벤트(playlist_track_play)에 "어느 화면에서 재생했는지"로 실림
+  const {
+    playerRef,
+    currentTrack,
+    playingTrackId,
+    playerHeight,
+    handlePlay,
+    handleClose: handlePlayerClose,
+    handlePlaybackStateChange,
+    handlePlayerHeightChange,
+  } = usePlaylistPlayer(recentSongsVariant, screen.name);
   // 인기차트 화면용 차트 — 전체(장르 없음)이면 홈 미리보기와 같은 쿼리 키라 캐시를 공유하고, 장르를 고르면 그 장르 차트를 따로 받음
   const {
     data: screenChartData,
@@ -262,25 +263,40 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 홈/최근추가된곡/인기차트/저장한곡/내가추천한곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
   const { pull, isRefreshing: isPullRefreshing, threshold: pullThreshold } = usePullToRefresh({
     containerRef: scrollContainerRef,
-    onRefresh: () => {
+    // 스피너는 화면 위쪽에 보이는 데이터만 기다리고(return하는 Promise), 나머지는 백그라운드로 갱신(void) —
+    // 가장 느린 쿼리 하나가 스피너 전체를 붙잡지 않게 하기 위함. 직접 새로고침 중엔 재시도 없이 바로 실패 처리
+    onRefresh: () => runWithoutRetry(async () => {
+      // 무한 스크롤 목록은 첫 페이지만 남기고 다시 받음 — keepOnlyFirstPage 참고
+      const refetchFromFirstPage = (queryKey: readonly unknown[]) => {
+        keepOnlyFirstPage(queryClient, queryKey);
+        return queryClient.refetchQueries({ queryKey, type: 'active' });
+      };
       switch (screen.name) {
         case 'chart':
           return refetchScreenChart();
         // 최근추가된곡 화면은 전체 목록(무한 스크롤 캐시)과 홈 미리보기를 같이 새로고침
         case 'recent':
-          return queryClient.refetchQueries({ queryKey: RECENT_SONGS_INFINITE_QUERY_KEY, type: 'active' });
+          return refetchFromFirstPage(RECENT_SONGS_INFINITE_QUERY_KEY);
         case 'liked':
-          return queryClient.refetchQueries({ queryKey: LIKED_SONGS_QUERY_KEY, type: 'active' });
+          return refetchFromFirstPage(LIKED_SONGS_QUERY_KEY);
         case 'mySongs':
+          // 화면에 보이는 건 전체 목록(페이지 캐시)이고, 홈 미리보기용 배열 캐시는 백그라운드로
+          void queryClient.refetchQueries({ queryKey: MY_SONGS_QUERY_KEY, type: 'active' });
+          return refetchFromFirstPage(MY_SONGS_INFINITE_QUERY_KEY);
+        default: {
+          // 홈 — 위쪽에 보이는 곡 배너·인기차트·최근 추천된 곡(차트 + 최근 추가 캐시)만 기다리고,
+          // 나머지 마운트된 플레이리스트 쿼리(내가 추천/아티스트 추천 등)는 백그라운드로 새로고침
+          const isAboveFold = (queryKey: readonly unknown[]) =>
+            queryKey[1] === CHART_QUERY_KEY[1] || queryKey[1] === RECENT_SONGS_INFINITE_QUERY_KEY[1];
+          keepOnlyFirstPage(queryClient, ['playlist']);
+          void queryClient.refetchQueries({ queryKey: ['playlist'], type: 'active', predicate: (query) => !isAboveFold(query.queryKey) });
           return Promise.all([
-            queryClient.refetchQueries({ queryKey: MY_SONGS_QUERY_KEY, type: 'active' }),
-            queryClient.refetchQueries({ queryKey: MY_SONGS_INFINITE_QUERY_KEY, type: 'active' }),
+            queryClient.refetchQueries({ queryKey: CHART_QUERY_KEY, type: 'active' }),
+            queryClient.refetchQueries({ queryKey: RECENT_SONGS_INFINITE_QUERY_KEY, type: 'active' }),
           ]);
-        default:
-          // 홈 — 지금 마운트된 플레이리스트 쿼리(최근 추가/내가 추천/인기차트/아티스트 추천 미리보기)를 전부 새로고침
-          return queryClient.refetchQueries({ queryKey: ['playlist'], type: 'active' });
+        }
       }
-    },
+    }),
     enabled: screen.name === 'main' || screen.name === 'recent' || screen.name === 'chart' || screen.name === 'liked' || screen.name === 'mySongs',
   });
 

@@ -66,6 +66,31 @@ export async function withAreaTag<T>(area: string, fn: () => Promise<T>): Promis
   }
 }
 
+// fetch는 기본 타임아웃이 없어서 서버가 응답 없이 멈추면 로딩(당겨서 새로고침 스피너 등)이 끝나지 않는다.
+// 응답 헤더가 이 시간 안에 안 오면 요청을 끊고 TimeoutError로 던진다
+const REQUEST_TIMEOUT_MS = 15_000;
+
+// 타임아웃으로 끊긴 요청 — 이미 15초를 기다렸으므로 react-query 재시도 대상에서 뺀다(queryClient.ts)
+export const isTimeoutError = (error: unknown): boolean =>
+  error instanceof Error && error.name === 'TimeoutError';
+
+// AbortSignal.timeout()은 구형 WebView(iOS 16 미만 등)에 없어서 AbortController + setTimeout으로 직접 구현
+const fetchWithTimeout = async (url: string, init: RequestInit): Promise<Response> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (e) {
+    if (!controller.signal.aborted) throw e;
+    const err = new Error(`요청 시간 초과 (${REQUEST_TIMEOUT_MS / 1000}초)`) as HttpError;
+    err.name = 'TimeoutError';
+    err.endpoint = url;
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 export const createHttpClient = ({ baseUrl = '' }: { baseUrl?: string } = {}): HttpClient => {
   const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
   const buildUrl = (path: string) => {
@@ -76,10 +101,10 @@ export const createHttpClient = ({ baseUrl = '' }: { baseUrl?: string } = {}): H
 
   return {
     get: (path, headers = {}) =>
-      fetch(buildUrl(path), { headers }),
+      fetchWithTimeout(buildUrl(path), { headers }),
 
     post: (path, body, headers = {}) =>
-      fetch(buildUrl(path), {
+      fetchWithTimeout(buildUrl(path), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...headers },
         body: JSON.stringify(body),

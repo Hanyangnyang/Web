@@ -11,8 +11,9 @@ const TRACK_PLAY_THROTTLE_MS = 10 * 1000; // 같은 곡을 연타/실수로 여�
  * 플레이리스트 하단 플로팅 Spotify 플레이어의 상태(로드된 곡·재생/일시정지·높이)와
  * 재생 버튼 동작(handlePlay: 토글/새 곡 로드 + 재생수 기록 + A/B 테스트 지표 캡처)을 한곳에 모음.
  * recentSongsVariant는 A/B 테스트 지표에 실어 보낼 배정값 — PlaylistView도 쓰므로 밖에서 받음
+ * screen은 지금 보고 있는 플레이리스트 화면 이름 — 전체 재생 이벤트(playlist_track_play)에 재생 위치로 실림
  */
-export function usePlaylistPlayer(recentSongsVariant: RecentSongsTapAreaVariant) {
+export function usePlaylistPlayer(recentSongsVariant: RecentSongsTapAreaVariant, screen: string) {
   const posthog = usePostHog();
   const { mutate: recordTrackPlay } = useRecordTrackPlay();
 
@@ -55,15 +56,21 @@ export function usePlaylistPlayer(recentSongsVariant: RecentSongsTapAreaVariant)
       return;
     }
 
+    // 전체 재생 이벤트 — 화면과 무관하게 모든 새 곡 재생을 집계(플레이리스트 기능 전체의 재생량/재생 사용자 수용).
+    // A/B 테스트 이벤트(playlist_recent_song_*)는 실험 결과가 오염되지 않게 그대로 따로 둠
+    const playProps = { screen, surface: surface ?? null, track_id: track.trackId };
+    posthog?.capture('playlist_track_play', playProps);
     if (surface) {
       posthog?.capture('playlist_recent_song_play', { surface, variant: recentSongsVariant, track_id: track.trackId });
-      if (sustainedPlayTimeoutRef.current) clearTimeout(sustainedPlayTimeoutRef.current);
-      sustainedPlayTimeoutRef.current = setTimeout(() => {
-        if (currentTrackRef.current?.trackId === track.trackId && !isPausedRef.current) {
-          posthog?.capture('playlist_recent_song_play_sustained', { surface, variant: recentSongsVariant, track_id: track.trackId });
-        }
-      }, SUSTAINED_PLAY_THRESHOLD_MS);
     }
+    if (sustainedPlayTimeoutRef.current) clearTimeout(sustainedPlayTimeoutRef.current);
+    sustainedPlayTimeoutRef.current = setTimeout(() => {
+      if (currentTrackRef.current?.trackId !== track.trackId || isPausedRef.current) return;
+      posthog?.capture('playlist_track_play_sustained', playProps);
+      if (surface) {
+        posthog?.capture('playlist_recent_song_play_sustained', { surface, variant: recentSongsVariant, track_id: track.trackId });
+      }
+    }, SUSTAINED_PLAY_THRESHOLD_MS);
 
     setCurrentTrack(track);
     setIsPaused(false); // 새 곡은 바로 재생을 시도하므로 낙관적으로 반영 — 실제 상태는 playback_update가 뒤이어 보정함
@@ -74,7 +81,7 @@ export function usePlaylistPlayer(recentSongsVariant: RecentSongsTapAreaVariant)
 
     lastPlayRecordedAtRef.current.set(track.trackId, now);
     recordTrackPlay(track.trackId);
-  }, [currentTrack, isPaused, recordTrackPlay, posthog, recentSongsVariant]);
+  }, [currentTrack, isPaused, recordTrackPlay, posthog, recentSongsVariant, screen]);
 
   const handleClose = useCallback(() => {
     setCurrentTrack(null);

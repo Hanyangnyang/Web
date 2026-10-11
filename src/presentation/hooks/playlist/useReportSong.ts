@@ -1,5 +1,6 @@
 // 훅(ViewModel): 곡 신고하기 — 접수 성공 여부만 필요해서 결과값은 없음
 import { useMutation } from '@tanstack/react-query';
+import { usePostHog } from 'posthog-js/react';
 import { reportSongUseCase } from '../../../di.js';
 import { getOrCreateAnonymousUserId } from '../../../lib/supabase.js';
 
@@ -9,11 +10,17 @@ export interface ReportSongInput {
 }
 
 export function useReportSong() {
+  const posthog = usePostHog();
+
   return useMutation({
     mutationKey: ['playlist', 'report-song'],
     mutationFn: async ({ songId, reason }: ReportSongInput) => {
       const deviceId = await getOrCreateAnonymousUserId();
       await reportSongUseCase.execute({ songId, deviceId, reason });
+    },
+    // UGC 건전성 지표 — reason은 자유 입력이 아니라 고정 선택지(REPORT_REASONS)라 그대로 실어도 안전
+    onSuccess: (_, { songId, reason }) => {
+      posthog?.capture('playlist_song_reported', { song_id: songId, reason });
     },
   });
 }

@@ -3,7 +3,21 @@ import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { initSentry } from './sentry.js';
 import { subscribeToNetworkStatus } from '../infrastructure/network/NetworkStatus.js';
-import type { ApiValidationError, HttpError } from '../infrastructure/http/HttpClient.js';
+import { isTimeoutError, type ApiValidationError, type HttpError } from '../infrastructure/http/HttpClient.js';
+
+// 사용자가 직접 새로고침(당겨서 새로고침)하는 동안엔 재시도하지 않는다 — 기본 재시도는 실패할 때마다 1초·2초를 더
+// 기다려서 스피너가 3초 넘게 더 돈다. 사용자가 보고 있는 상황에선 빨리 실패를 보여주고 다시 당기게 하는 편이 낫다.
+// 판단이 실패 시점에 이뤄져서, 이 구간에 다른 화면의 쿼리가 실패해도 재시도하지 않는다(구간이 짧아 감수)
+let manualRefreshDepth = 0;
+
+export async function runWithoutRetry<T>(fn: () => Promise<T>): Promise<T> {
+  manualRefreshDepth += 1;
+  try {
+    return await fn();
+  } finally {
+    manualRefreshDepth -= 1;
+  }
+}
 
 // 앱 전역에서 하나만 쓰는 QueryClient
 export const queryClient = new QueryClient({
@@ -55,7 +69,8 @@ export const queryClient = new QueryClient({
       staleTime: 15 * 60 * 1000,   // 기본 15분
       gcTime: 24 * 60 * 60 * 1000, // 24시간
       refetchOnWindowFocus: false, // 모바일 웹뷰 특성상 불필요, 탭 재진입 갱신은 isVisible로 각 훅이 직접 제어
-      retry: 2, 
+      // 최대 2번 재시도 — 단, 직접 새로고침 중이거나 타임아웃(이미 15초 기다림)이면 바로 실패 처리
+      retry: (failureCount, error) => manualRefreshDepth === 0 && !isTimeoutError(error) && failureCount < 2,
     },
   },
 });

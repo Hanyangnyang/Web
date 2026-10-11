@@ -5,7 +5,7 @@ import { useMenu } from './presentation/hooks/useMenu.js';
 import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView.jsx';
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
-import { MiscView }      from './presentation/components/misc/MiscView.jsx';
+import { MiscView, type MiscBoxOpenSource } from './presentation/components/misc/MiscView.jsx';
 import { VALID_MISC_BOXES, VALID_MAP_CHIPS } from './presentation/components/portal/BannerCarousel.jsx';
 const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
 const UXWritingOverlay = import.meta.env.DEV
@@ -144,6 +144,8 @@ function MainLayout() {
     const box = dl.get('subView') || dl.get('box');
     return box && VALID_MISC_BOXES.includes(box) ? box : null;
   });
+  // pendingMiscBox가 어디서 왔는지(진입 경로 계측용) — 콜드 스타트 URL은 카카오 공유/웹 푸시를 구분할 수 없어 deeplink로 봄
+  const [pendingMiscBoxSource, setPendingMiscBoxSource] = useState<MiscBoxOpenSource>('deeplink');
   // 카카오 공유 등에서 플레이리스트의 특정 곡 게시글 모음까지 지정해 이동시킬 때 PlaylistView에 한 번만 전달.
   // 콜드 스타트로 tab=misc&box=playlist&trackId=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
   const [pendingPlaylistTrackId, setPendingPlaylistTrackId] = useState<string | null>(() => {
@@ -221,7 +223,7 @@ function MainLayout() {
   }, [showCafeDeepLinkLoader, splashDone, completeSplash]);
 
   // 3. 탭 라우팅 공통 함수 - Kakao 딥링크 / 푸시 알림 양쪽에서 재사용
-  const routeFromParams = useCallback((paramString: string) => {
+  const routeFromParams = useCallback((paramString: string, source: 'deeplink' | 'push' = 'deeplink') => {
     saveScrollPosition();
     const params = new URLSearchParams(paramString);
     const tab = params.get('tab');
@@ -239,7 +241,10 @@ function MainLayout() {
     if (tab === 'misc') {
       const box = params.get('subView') || params.get('box');
       const trackId = params.get('trackId');
-      if (box && VALID_MISC_BOXES.includes(box)) setPendingMiscBox(box);
+      if (box && VALID_MISC_BOXES.includes(box)) {
+        setPendingMiscBox(box);
+        setPendingMiscBoxSource(source);
+      }
       if (trackId && box === 'playlist') {
         setPendingPlaylistTrackId(trackId);
         setPendingPlaylistPostId(params.get('postId'));
@@ -286,7 +291,7 @@ function MainLayout() {
       if (!link) return;
       try {
         const url = new URL(link);
-        routeFromParams(url.searchParams.toString());
+        routeFromParams(url.searchParams.toString(), 'push');
       } catch (e) {
         console.error('Failed to parse notification deep link', e);
         initSentry().then(Sentry => {
@@ -302,7 +307,11 @@ function MainLayout() {
   // 이미 그 탭에 있는 상태에서 다시 눌러도 값은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
   const handleTabChange = useCallback((tab: string, chip?: string, box?: string, clubId?: string, playlistSearchQuery?: string) => {
     if (chip && tab === 'partner') setPendingMapChip(chip);
-    if (box && tab === 'misc') setPendingMiscBox(box);
+    if (box && tab === 'misc') {
+      setPendingMiscBox(box);
+      // box를 지정해 들어오는 건 소식탭뿐 — 검색어가 같이 오면 아티스트 추천, 아니면 배너(동아리 스포트라이트도 여기 포함되지만 플레이리스트와 무관)
+      setPendingMiscBoxSource(playlistSearchQuery ? 'portal_artist' : 'banner');
+    }
     if (clubId && tab === 'misc' && box === 'clubs') setPendingClubId(clubId);
     if (playlistSearchQuery && tab === 'misc' && box === 'playlist') setPendingPlaylistSearchQuery(playlistSearchQuery);
     if (tab === 'misc' && showMiscNew) {
@@ -389,6 +398,7 @@ function MainLayout() {
               resetSignal={miscResetSignal}
               isActive={activeTab === 'misc'}
               deepLinkBox={pendingMiscBox}
+              deepLinkBoxSource={pendingMiscBoxSource}
               onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
               deepLinkTrackId={pendingPlaylistTrackId}
               deepLinkPostId={pendingPlaylistPostId}

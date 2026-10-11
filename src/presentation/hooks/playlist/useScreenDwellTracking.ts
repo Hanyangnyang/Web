@@ -27,7 +27,7 @@ export function useScreenDwellTracking<TScreen extends string>({
   const prevScreenRef = useRef<TScreen>(screen);
   const screenEnteredAtRef = useRef<number>(Date.now());
   // 언마운트 클린업은 마운트 시점의 클로저를 그대로 쓰기 때문에, 나가는 순간의 최신 화면/dwellProps를
-  // 읽으려면 ref가 필요함(useLayoutEffect 쪽은 매 렌더 다시 실행되니 인자를 그대로 써도 최신값임)
+  // 읽으려면 ref가 필요함. 화면 전환 쪽(useLayoutEffect)도 dwellPropsRef를 씀 — 아래 주석 참고
   const currentScreenRef = useRef(screen);
   useEffect(() => { currentScreenRef.current = screen; }, [screen]);
   const dwellPropsRef = useRef(dwellProps);
@@ -40,10 +40,14 @@ export function useScreenDwellTracking<TScreen extends string>({
     if (prevScreen === screen) return;
 
     if (trackedScreens.includes(prevScreen)) {
+      // 여기서 보내는 건 "떠나는 화면(prevScreen)"의 체류시간이라, 속성도 그 화면을 보던 시점 값이어야 함.
+      // 인자 dwellProps는 이미 새 화면 기준으로 계산된 값(예: recent → main이면 view_mode가 빠지고, main → recent면
+      // main 이벤트에 view_mode가 잘못 붙음)이라 쓰면 안 됨. dwellPropsRef는 useEffect(이 layout effect보다 늦게 실행)가
+      // 갱신하므로 이 시점엔 아직 직전 렌더(= 떠나는 화면을 보던 마지막 렌더)의 값을 들고 있음
       posthog?.capture('playlist_screen_dwell', {
         screen: prevScreen,
         duration_ms: Date.now() - screenEnteredAtRef.current,
-        ...dwellProps,
+        ...dwellPropsRef.current,
       });
     }
     screenEnteredAtRef.current = Date.now();
