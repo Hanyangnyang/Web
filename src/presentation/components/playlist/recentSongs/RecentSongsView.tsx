@@ -19,8 +19,8 @@ interface RecentSongsViewProps extends SongListViewBaseProps {
 }
 
 export function RecentSongsView({ onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, highlightScrollTarget, currentTrackId, viewMode, onViewModeChange, playButtonVariant, genreFilter, onGenreFilterChange }: RecentSongsViewProps) {
-  // 홈 미리보기(앞 10개)와 달리 전체 목록 — 20개씩 이어 받는 무한 스크롤
-  const { songs, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentSongsInfinite();
+  // 홈 미리보기와 같은 캐시를 20개씩 이어 받는 무한 스크롤 — 장르 칩을 고르면 서버가 그 장르 곡만 페이징해서 줌
+  const { songs, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentSongsInfinite(genreFilter.selected[0]);
 
   return (
     <SongListScreen

@@ -7,6 +7,8 @@ import { mapPlaylistSongToSong } from '../../components/playlist/playlistTypes.j
 import type { SongPage, SongPagesData } from './playlistQueryKeys.js';
 
 export const SONG_LIST_PAGE_SIZE = 20;
+// 1분 안에 다시 들어오면 캐시를 그대로 보여주고 재요청하지 않음 — 홈 미리보기도 이 캐시의 앞부분을 쓰므로 홈↔전체보기 이동이 즉시 뜸
+export const SONG_LIST_STALE_TIME = 60 * 1000;
 
 // 모듈 레벨로 둬서 참조가 고정 — data가 같으면 react-query가 select 결과(이어 붙인 배열)를 재사용함
 const flattenSongs = (data: SongPagesData) => data.pages.flatMap((page) => page.songs);
@@ -27,7 +29,7 @@ export function useSongListInfinite({ queryKey, fetchPage }: UseSongListInfinite
     },
     getNextPageParam: (lastPage, allPages) => (lastPage.last ? undefined : allPages.length),
     select: flattenSongs,
-    staleTime: 0,
+    staleTime: SONG_LIST_STALE_TIME,
   });
 
   return {

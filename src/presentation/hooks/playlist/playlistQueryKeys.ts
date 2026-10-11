@@ -4,8 +4,7 @@ import type { InfiniteData, QueryClient } from '@tanstack/react-query';
 import type { Song } from '../../components/playlist/playlistTypes.js';
 import type { PopularityChart } from '../../../domain/entities/PopularityChart.js';
 
-// 홈 미리보기용(앞 10개만, 배열 캐시) — 전체 보기 화면은 아래 *_INFINITE_* 키(페이지 단위 캐시)를 따로 씀
-export const RECENT_SONGS_QUERY_KEY = ['playlist', 'recent-songs'];
+// 최근 추가된 곡은 홈 미리보기와 전체 보기가 *_INFINITE_* 키(페이지 단위 캐시)를 같이 씀 — 장르를 고르면 이 키 뒤에 장르 키가 붙은 캐시가 따로 생김
 export const MY_SONGS_QUERY_KEY = ['playlist', 'my-songs'];
 export const RECENT_SONGS_INFINITE_QUERY_KEY = ['playlist', 'recent-songs-pages'];
 export const MY_SONGS_INFINITE_QUERY_KEY = ['playlist', 'my-songs-pages'];
@@ -25,17 +24,17 @@ export interface SongPage {
 }
 export type SongPagesData = InfiniteData<SongPage, number>;
 
-const SONG_ARRAY_QUERY_KEYS = [RECENT_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY];
+const SONG_ARRAY_QUERY_KEYS = [MY_SONGS_QUERY_KEY];
 const SONG_PAGES_QUERY_KEYS = [RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY];
 
 // 배열 캐시(홈 미리보기)와 페이지 캐시(전체 보기)에 같은 변환을 적용
 function mapSongsInListCaches(queryClient: QueryClient, transform: (songs: Song[]) => Song[]) {
-  // 홈 미리보기는 장르별 캐시(['playlist','recent-songs','indie'] 등)가 같은 접두사로 따로 있어서 전부 패치
   for (const key of SONG_ARRAY_QUERY_KEYS) {
     queryClient.setQueriesData<Song[]>({ queryKey: key }, (prev) => prev && transform(prev));
   }
   for (const key of SONG_PAGES_QUERY_KEYS) {
-    queryClient.setQueryData<SongPagesData>(key, (prev) => prev && { ...prev, pages: prev.pages.map((page) => ({ ...page, songs: transform(page.songs) })) });
+    // 최근 추가된 곡은 장르별 캐시(['playlist','recent-songs-pages','indie'] 등)가 같은 접두사로 따로 있어서 전부 패치
+    queryClient.setQueriesData<SongPagesData>({ queryKey: key }, (prev) => prev && { ...prev, pages: prev.pages.map((page) => ({ ...page, songs: transform(page.songs) })) });
   }
 }
 

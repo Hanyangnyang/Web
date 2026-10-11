@@ -128,6 +128,8 @@ export function SongListScreen({
   // 오가도 같은 카드를 계속 다시 스크롤해서 보여주므로, 토글 버튼으로 1열↔2열을 바꿔도 그 카드가 보이던 위치 그대로 복원됨
   const [scrollTarget] = useState<string | null>(scrollToTrackId ?? null);
   const filteredSongs = filterSongsByGenre(songs, selectedGenres);
+  // 다음 페이지 로딩 스켈레톤 개수 — 2열이면 한 줄(2개) + 마지막 줄이 홀수일 때 비어 있는 칸 하나
+  const nextPageSkeletonCount = viewMode === 'grid' ? 2 + (filteredSongs.length % 2) : 1;
 
   const listContainerRef = useRef<HTMLDivElement>(null);
 
@@ -405,17 +407,15 @@ export function SongListScreen({
               </div>
               );
             })}
-          </div>
-        )}
-        {/* 다음 페이지가 있으면 목록 끝에 감시 요소 + 불러오는 중 표시. 장르 필터로 보이는 곡이 적어도(0개 포함) 이어서 불러옴 */}
-        {!isLoading && hasNextPage && (
-          <div ref={sentinelRef} className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
+            {/* 다음 페이지를 불러오는 중 — 같은 그리드 안에 이어 그려서, 마지막 줄이 한 칸만 차 있으면 그 빈 오른쪽 칸부터 채움 */}
             {isFetchingNextPage &&
-              Array.from({ length: viewMode === 'grid' ? 2 : 1 }).map((_, i) => (
-                <PostDetailCardSkeleton key={i} variant={skeletonVariant} />
+              Array.from({ length: nextPageSkeletonCount }).map((_, i) => (
+                <PostDetailCardSkeleton key={`next-${i}`} variant={skeletonVariant} />
               ))}
           </div>
         )}
+        {/* 다음 페이지가 있으면 목록 끝에 감시 요소. 장르 필터로 보이는 곡이 적어도(0개 포함) 이어서 불러옴 */}
+        {!isLoading && hasNextPage && <div ref={sentinelRef} className="h-1" />}
       </div>
       <ScrollToTopPill />
     </div>

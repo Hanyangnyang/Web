@@ -23,7 +23,7 @@ import { type Song, type ChartPeriod, type TrackSummary } from './playlistTypes'
 import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
-import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
+import { useRecentSongsInfinite } from '../../hooks/playlist/useRecentSongsInfinite.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
 import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY } from '../../hooks/playlist/playlistQueryKeys.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
@@ -83,14 +83,15 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const recentSongsVariant = useRecentSongsTapAreaVariant();
   // 소식탭 배너 딥링크로 마운트되면 첫 렌더부터 그 검색어/검색 화면으로 시작 — 마운트 후 effect로 옮기면 홈이 한 프레임 먼저 그려져 반짝임
   const [searchQuery, setSearchQuery] = useState(deepLinkSearchQuery ?? '');
-  const { data: fetchedSongs, isLoading: isAllRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
+  // 홈 미리보기·곡 배너는 최근추가된곡 화면과 같은 캐시(20개씩 페이지)의 앞부분을 씀 — 홈에서 받은 첫 페이지가 전체 보기에 그대로 이어짐
+  const { songs: fetchedSongs, isLoading: isAllRecentSongsLoading } = useRecentSongsInfinite();
   const songs = fetchedSongs ?? EMPTY_SONGS;
   // 홈 "최근 추가된 곡" 미리보기의 장르 필터
   // 최근 추가된 곡 화면과 상태(선택 + 칩 위치)를 공유해서, 홈에서 고른 장르가 그 화면에도 그대로 이어진다
   const [recentGenreFilter, setRecentGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
-  // 장르를 고르면 전체 첫 페이지를 걸러내지 않고 서버에서 그 장르의 앞 10개를 따로 받음(전체일 땐 위 쿼리와 같은 캐시)
-  const { data: genreSongs, isLoading: isGenreSongsLoading } = useRecentSongs(recentGenreFilter.selected[0]);
-  const filteredRecentSongs = genreSongs ?? EMPTY_SONGS;
+  // 장르를 고르면 전체 첫 페이지를 걸러내지 않고 서버에서 그 장르 곡만 받음 — 최근 추가된 곡 화면의 같은 장르 캐시와 공유(전체일 땐 위 쿼리와 같은 캐시)
+  const { songs: genreSongs, isLoading: isGenreSongsLoading } = useRecentSongsInfinite(recentGenreFilter.selected[0]);
+  const filteredRecentSongs = recentGenreFilter.selected.length > 0 ? (genreSongs ?? EMPTY_SONGS) : songs;
   const isRecentSongsLoading = recentGenreFilter.selected.length > 0 ? isGenreSongsLoading : isAllRecentSongsLoading;
   const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
@@ -140,15 +141,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // "어떤 곡을 추천해볼까요?" 클릭 시 검색 결과 화면(빈 검색어라 보여줄 게 없음) 대신
   // 홈으로 돌아가면서 검색바에 바로 포커스를 줌 — PlaylistHomeView가 마운트될 때 한 번 소비
   const [autoFocusSearch, setAutoFocusSearch] = useState(false);
-
-  // PlaylistView 자체는 최근추가된곡 화면을 드나들어도 마운트가 유지돼서, react-query의
-  // staleTime이 지나 있어도 "새로 마운트되는 시점" 트리거가 없어 자동으로 재조회되지 않았음.
-  // 그래서 이 화면에 들어오는 시점 자체를 트리거로 삼아 직접 refetch — 주의: refetch()는 staleTime과 무관하게
-  // 항상 요청을 보냄(실측 확인). useRecentSongs가 staleTime: 0이라 "화면 진입 때마다 최신으로 받기"와 같은 뜻이라 지금은 의도대로임.
-  // 나중에 staleTime을 늘리면 이 refetch가 그 값을 무시하게 되니, 그때는 인기차트처럼 enabled 토글 방식으로 바꿔야 함
-  useEffect(() => {
-    if (screen.name === 'recent') refetchRecentSongs();
-  }, [screen.name, refetchRecentSongs]);
 
   const pushScreen = useCallback((next: ScreenFrame) => {
     setScreenStack((prev) => [...prev, next]);
@@ -214,7 +206,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 곡추천하기 등록 성공 — 어느 화면에서 곡추천하기로 들어왔든, 자기 곡이 잘 올라갔는지 바로
   // 볼 수 있게 최근추가된곡으로 보냄. addSong 프레임을 그대로 recent로 바꿔치기해서(push가 아님)
   // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음.
+  // 곡을 추천하면 최근추가된곡 화면의 맨 위(방금 추천한 곡)를 1열로 보여줌 — 장르 필터가 걸려 있으면 새 곡이 안 보일 수 있어 전체로 되돌림
   const handleAddSongSuccess = useCallback(() => {
+    setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
+    setViewModes((prev) => ({ ...prev, recent: 'list' }));
     setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
 
@@ -268,7 +263,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           return refetchScreenChart();
         // 최근추가된곡 화면은 전체 목록(무한 스크롤 캐시)과 홈 미리보기를 같이 새로고침
         case 'recent':
-          return Promise.all([refetchRecentSongs(), queryClient.refetchQueries({ queryKey: RECENT_SONGS_INFINITE_QUERY_KEY, type: 'active' })]);
+          return queryClient.refetchQueries({ queryKey: RECENT_SONGS_INFINITE_QUERY_KEY, type: 'active' });
         case 'liked':
           return queryClient.refetchQueries({ queryKey: LIKED_SONGS_QUERY_KEY, type: 'active' });
         case 'mySongs':
