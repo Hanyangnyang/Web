@@ -16,6 +16,9 @@ import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSenti
 const VIEW_TOGGLE_COACHMARK_SEEN_KEY = 'viewToggleCoachmarkSeen';
 // 스마일(반응) 버튼을 꾹 눌러 슬라이드로 이모지를 고를 수 있다는 힌트 — 위 보기 전환 코치마크가 끝난 뒤에 한 번만 띄움
 const REACTION_HOLD_HINT_SEEN_KEY = 'reactionHoldHintSeen';
+// 반응 힌트 말풍선과 버튼 사이 간격, 그리고 말풍선 높이(2줄 글 + 패딩 + 꼬리)의 넉넉한 추정값 — 아래에 들어갈 자리가 있는지 가늠할 때 씀
+const HINT_GAP_PX = 14;
+const HINT_BUBBLE_HEIGHT_PX = 72;
 
 interface SongListScreenProps {
   title: string;
@@ -269,10 +272,11 @@ export function SongListScreen({
   }, [viewMode, isLoading, filteredSongs.length, songs]);
 
   // 꾹 누르기 힌트 — 첫 번째 카드의 스마일 버튼 아래에 띄움. 카드가 overflow-hidden이라 카드 안에 그리지 못하고,
-  // 버튼 위치를 재서 화면 기준(fixed) 좌표로 놓음. 버튼이 화면에 보이는 위치일 때만 띄우고(스크롤돼 있으면 건너뜀 — 아직 안 본 것으로 남음),
+  // 버튼 위치를 재서 화면 기준(fixed) 좌표로 놓음. 버튼이 화면에 보이는 위치일 때만 띄우고(화면 밖이면 건너뛰되 아직 안 본 것으로 남고, 스크롤로 들어오면 그때 띄움),
   // 앞선 보기 전환 코치마크가 사라진 뒤에 시작. 어둡게 덮는 효과는 다른 코치마크와 같음(z-110: 고정 헤더 z-100 위까지 덮음)
-  const [reactionHintAnchor, setReactionHintAnchor] = useState<{ left: number; top: number; width: number; height: number; bottom: number } | null>(null);
-  const reactionHintReady = !gridOnly && !isLoading && filteredSongs.length > 0 && viewToggleCoachmark.state === 'hidden';
+  // placement: 말풍선이 버튼 아래('below')에 들어갈 자리가 있으면 아래, 없으면(1열은 앨범커버가 커서 버튼이 화면 아래쪽에 놓임) 위('above')에 띄움
+  const [reactionHintAnchor, setReactionHintAnchor] = useState<{ left: number; top: number; width: number; height: number; bottom: number; placement: 'below' | 'above'; aboveBottom: number } | null>(null);
+  const reactionHintReady =!gridOnly && !isLoading && filteredSongs.length > 0 && viewToggleCoachmark.state === 'hidden';
   useLayoutEffect(() => {
     const container = listContainerRef.current;
     if (!reactionHintReady || !container) return;
@@ -280,10 +284,20 @@ export function SongListScreen({
       const button = container.querySelector<HTMLElement>('button[aria-label="이모지 추가"]');
       if (!button) return;
       const rect = button.getBoundingClientRect();
-      const visible = rect.top > 120 && rect.bottom < window.innerHeight - 160;
-      const next = visible ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height, bottom: rect.bottom } : null;
+      // 고정 헤더(위) 아래, 화면 아래쪽 끝 안에 버튼이 통째로 들어와 있을 때만 띄움
+      const visible = rect.top > 120 && rect.bottom < window.innerHeight - 8;
+      // 1열은 말풍선을 항상 버튼 위(꼬리가 아래)에 띄움 — 앨범커버가 커서 첫 카드의 버튼이 화면 아래쪽에 놓이기 때문.
+      // 2열은 버튼 아래에 자리가 있으면 아래, 없으면 위
+      const hasRoomBelow = rect.bottom + HINT_GAP_PX + HINT_BUBBLE_HEIGHT_PX < window.innerHeight - 8;
+      const placement = viewMode === 'list' ? ('above' as const) : hasRoomBelow ? ('below' as const) : ('above' as const);
+      // 위에 띄울 땐 말풍선이 고정 헤더 밑까지 들어갈 자리가 있어야 함
+      const fits = placement === 'above' ? rect.top - HINT_GAP_PX - HINT_BUBBLE_HEIGHT_PX > 120 : true;
+      const next = visible && fits
+        // aboveBottom: 위에 띄울 때 말풍선의 CSS bottom 값(화면 아래 끝에서 버튼 위쪽 간격까지의 거리)
+        ? { left: rect.left, top: rect.top, width: rect.width, height: rect.height, bottom: rect.bottom, placement, aboveBottom: window.innerHeight - rect.top + HINT_GAP_PX }
+        : null;
       // 값이 같으면 이전 객체를 그대로 둬서 불필요한 리렌더를 막는다
-      setReactionHintAnchor((prev) => (prev && next && prev.left === next.left && prev.top === next.top && prev.width === next.width && prev.height === next.height ? prev : next));
+      setReactionHintAnchor((prev) => (prev && next && prev.left === next.left && prev.top === next.top && prev.width === next.width && prev.height === next.height && prev.placement === next.placement && prev.aboveBottom === next.aboveBottom ? prev : next));
     };
     measure();
     // 앨범 이미지가 늦게 로드되거나(특히 1열은 카드가 커서 버튼이 크게 밀림) 목록 높이가 바뀌면 버튼이 움직이는데,
@@ -292,10 +306,23 @@ export function SongListScreen({
     observer?.observe(container);
     container.addEventListener('load', measure, true); // img load는 버블링되지 않아 캡처 단계로 받는다
     window.addEventListener('resize', measure);
+    // 처음엔 버튼이 화면 밖(예: 1열은 앨범커버가 커서 짧은 화면에선 버튼이 아래로 밀림)이라 건너뛰었어도, 스크롤해서 버튼이 보이는 위치에 오면 그때 띄움.
+    // scroll은 버블링되지 않고 스크롤 주체가 이 화면의 조상(PlaylistView 루트)이라 window에서 캡처 단계로 받고, 프레임당 한 번만 잼
+    let scrollFrame = 0;
+    const handleScroll = () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        measure();
+      });
+    };
+    window.addEventListener('scroll', handleScroll, true);
     return () => {
       observer?.disconnect();
       container.removeEventListener('load', measure, true);
       window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', handleScroll, true);
+      if (scrollFrame) cancelAnimationFrame(scrollFrame);
     };
   }, [reactionHintReady, viewMode, filteredSongs.length]);
   const reactionHintCoachmark = useCoachmark(REACTION_HOLD_HINT_SEEN_KEY, reactionHintReady && reactionHintAnchor !== null);
@@ -368,17 +395,22 @@ export function SongListScreen({
         {reactionHintAnchor && (
           <Coachmark
             {...reactionHintCoachmark}
-            tail="top"
+            tail={reactionHintAnchor.placement === 'below' ? 'top' : 'bottom'}
             tailClassName="left-4"
             zClassName="z-[110]"
             className="fixed"
-            // 말풍선은 버튼 아래에, 버튼 자리는 어둡게 덮이지 않도록 스포트라이트로 비워 둠(버튼보다 사방 3px 크게)
-            style={{ left: Math.max(8, reactionHintAnchor.left), top: reactionHintAnchor.bottom + 14 }}
+            // 말풍선은 버튼 아래(자리가 없으면 위)에, 버튼 자리는 어둡게 덮이지 않도록 스포트라이트로 비워 둠(버튼보다 사방 3px 크게)
+            // 위로 띄울 땐 transform 대신 bottom으로 위치를 잡음 — transform이 걸린 요소 안의 position:fixed(스포트라이트)는 화면이 아니라 그 요소를 기준으로 배치돼 어둡게 덮는 범위가 어긋남
+            style={
+              reactionHintAnchor.placement === 'below'
+                ? { left: Math.max(8, reactionHintAnchor.left), top: reactionHintAnchor.bottom + HINT_GAP_PX }
+                : { left: Math.max(8, reactionHintAnchor.left), bottom: reactionHintAnchor.aboveBottom }
+            }
             spotlight={{ left: reactionHintAnchor.left - 3, top: reactionHintAnchor.top - 3, width: reactionHintAnchor.width + 6, height: reactionHintAnchor.height + 6 }}
           >
             반응 버튼을 꾹 누른 채 옆으로 밀면,
             <br />
-            이모지를 편하게 고를 수 있어요!😊
+            이모지를 편하게 고를 수 있어요!
           </Coachmark>
         )}
         {isLoading ? (
