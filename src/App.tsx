@@ -6,6 +6,7 @@ import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
 import { MiscView }      from './presentation/components/misc/MiscView.jsx';
+import { VALID_MISC_BOXES, VALID_MAP_CHIPS } from './presentation/components/portal/BannerCarousel.jsx';
 const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
 const UXWritingOverlay = import.meta.env.DEV
   ? lazy(() => import('./devtools/ux-writing/UXWritingOverlay'))
@@ -38,6 +39,19 @@ interface CafeDeepLink {
   date: string | null;
   cafe: string | null;
   type: string | null;
+}
+
+// 콜드 스타트(앱이 꺼진 상태에서 tab=... 딥링크 URL로 새로 열리는 경우)에 tab/chip/box/trackId를 읽기 위한 헬퍼.
+// 학식 딥링크(date/cafe/type)와 동일하게 웹은 현재 페이지 쿼리스트링을, 네이티브는 OS가 넘겨준 초기
+// 딥링크 파라미터를 본다 — 이 둘 중 하나로 카카오 공유·배너 링크를 웹/앱 모두에서 cold start로 열 수 있게 함
+function resolveInitialDeepLinkParams(): URLSearchParams {
+  const webParams = new URLSearchParams(window.location.search);
+  if (webParams.has('tab')) return webParams;
+  try {
+    const native = window.__NativeDeepLink?.getParams?.();
+    if (native) return new URLSearchParams(native);
+  } catch {}
+  return webParams;
 }
 
 // 카카오 공유(date/cafe/type)·푸시 알림(tab=weather/partner) 딥링크가 가리키는 초기 탭을 계산.
@@ -79,6 +93,9 @@ function MainLayout() {
       const native = window.__NativeDeepLink?.getParams?.();
       if (native) { const fromNative = resolveInitialTab(`?${native}`); if (fromNative) return fromNative; }
     } catch {}
+    const dlTab = resolveInitialDeepLinkParams().get('tab');
+    if (dlTab === 'weather') return 'portal';
+    if (dlTab === 'partner' || dlTab === 'misc') return dlTab;
     let lastTab = localStorage.getItem('lastActiveTab') || 'cafe';
     if (lastTab === 'qr') lastTab = 'cafe';
     return lastTab;
@@ -103,24 +120,42 @@ function MainLayout() {
   // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
   const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
+  // 에리카 플레이리스트 신규 홍보용 — 기타탭에 한 번이라도 진입하면 하단 네비 NEW 뱃지를 영구히 숨김
+  const [showMiscNew, setShowMiscNew] = useState(() => { try { return localStorage.getItem('seenPlaylistFeature') !== '1'; } catch { return true; } });
   // 캠퍼스맵 탭을 다시 누르면 검색 화면 등을 닫고 지도로 돌아오게 하는 신호
   const [mapResetSignal, setMapResetSignal] = useState(0);
-  // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달
-  const [pendingMapChip, setPendingMapChip] = useState<string | null>(null);
-  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장, 중앙동아리)까지 지정해 이동시킬 때 MiscView에 한 번만 전달
-  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(() => {
-    const p = new URLSearchParams(window.location.search);
-    const box = p.get('subView') || p.get('box');
-    if (box) return box;
-    try {
-      const native = window.__NativeDeepLink?.getParams?.();
-      if (native) {
-        const np = new URLSearchParams(native);
-        return np.get('subView') || np.get('box');
-      }
-    } catch {}
-    return null;
+  // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달.
+  // 콜드 스타트로 tab=partner&chip=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
+  const [pendingMapChip, setPendingMapChip] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'partner') return null;
+    const chip = dl.get('chip');
+    return chip && VALID_MAP_CHIPS.includes(chip) ? chip : null;
   });
+  
+  // 배너 등에서 기타탭의 특정 서브뷰(예: 헬스장, 중앙동아리)까지 지정해 이동시킬 때 MiscView에 한 번만 전달.
+  // 콜드 스타트로 tab=misc&box=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
+  const [pendingMiscBox, setPendingMiscBox] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'misc') return null;
+    const box = dl.get('subView') || dl.get('box');
+    return box && VALID_MISC_BOXES.includes(box) ? box : null;
+  });
+  // 카카오 공유 등에서 플레이리스트의 특정 곡 게시글 모음까지 지정해 이동시킬 때 PlaylistView에 한 번만 전달.
+  // 콜드 스타트로 tab=misc&box=playlist&trackId=... 링크를 바로 열었을 때도(웹/네이티브 모두) 초기값으로 잡아줌
+  const [pendingPlaylistTrackId, setPendingPlaylistTrackId] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'misc' || dl.get('box') !== 'playlist') return null;
+    return dl.get('trackId');
+  });
+  // 추천글 카드에서 공유한 링크의 postId — trackId와 함께 한 번만 PlaylistView에 전달(위치에 따라 최근추가된곡/추천글 상세로 분기)
+  const [pendingPlaylistPostId, setPendingPlaylistPostId] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'misc' || dl.get('box') !== 'playlist') return null;
+    return dl.get('postId');
+  });
+  // 소식탭 플레이리스트 배너에서 아티스트를 눌렀을 때, 플레이리스트의 그 아티스트 검색 결과 화면으로 바로 보내기 위해 PlaylistView에 한 번만 전달
+  const [pendingPlaylistSearchQuery, setPendingPlaylistSearchQuery] = useState<string | null>(null);
   // 소식탭 오늘의 동아리 추천에서 "보러가기"를 눌렀을 때, 중앙동아리 목록에서 그 동아리 위치로
   // 자동 스크롤하기 위해 ClubView에 한 번만 전달
   const [pendingClubId, setPendingClubId] = useState<string | null>(null);
@@ -188,12 +223,15 @@ function MainLayout() {
       return;
     }
     if (tab === 'misc') {
+      const box = params.get('subView') || params.get('box');
+      const trackId = params.get('trackId');
+      if (box && VALID_MISC_BOXES.includes(box)) setPendingMiscBox(box);
+      if (trackId && box === 'playlist') {
+        setPendingPlaylistTrackId(trackId);
+        setPendingPlaylistPostId(params.get('postId'));
+      }
       setActiveTab('misc');
       localStorage.setItem('lastActiveTab', 'misc');
-      const box = params.get('subView') || params.get('box');
-      if (box) {
-        setPendingMiscBox(box);
-      }
       return;
     }
     if (tab === 'cafe' || params.has('date') || params.has('cafe') || params.has('type')) {
@@ -248,10 +286,15 @@ function MainLayout() {
   // 4. 탭 클릭 핸들러 — chip은 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지, box는 기타탭의
   // 특정 서브뷰(예: 헬스장)까지 지정하고 싶을 때만 넘어온다.
   // 이미 그 탭에 있는 상태에서 다시 눌러도 값은 바뀌어야 하므로 재클릭 얼리 리턴보다 먼저 처리한다
-  const handleTabChange = useCallback((tab: string, chip?: string, box?: string, clubId?: string) => {
+  const handleTabChange = useCallback((tab: string, chip?: string, box?: string, clubId?: string, playlistSearchQuery?: string) => {
     if (chip && tab === 'partner') setPendingMapChip(chip);
     if (box && tab === 'misc') setPendingMiscBox(box);
     if (clubId && tab === 'misc' && box === 'clubs') setPendingClubId(clubId);
+    if (playlistSearchQuery && tab === 'misc' && box === 'playlist') setPendingPlaylistSearchQuery(playlistSearchQuery);
+    if (tab === 'misc' && showMiscNew) {
+      setShowMiscNew(false);
+      try { localStorage.setItem('seenPlaylistFeature', '1'); } catch { /* 저장 실패해도 이번 세션에선 숨겨짐 */ }
+    }
 
     // 1. 같은 탭 재클릭 처리 — box로 특정 서브뷰를 지정한 딥링크라면 그리드로 리셋하지 않고 그 서브뷰로 바로 이동
     if (tab === activeTab) {
@@ -272,7 +315,7 @@ function MainLayout() {
     saveScrollPosition();
     setActiveTab(tab);
     localStorage.setItem('lastActiveTab', tab);
-  }, [activeTab, posthog, saveScrollPosition]);
+  }, [activeTab, posthog, saveScrollPosition, showMiscNew]);
 
   return (
     <>
@@ -298,13 +341,15 @@ function MainLayout() {
       {/* 메인 콘텐츠 화면 */}
       <div
         className="mx-auto w-full max-w-app h-[100dvh] flex flex-col overflow-hidden"
-        style={isApp ? {
-          paddingTop: platform === 'ios' ? 'env(safe-area-inset-top)' : 'env(safe-area-inset-top, 28px)',
+        style={{
+          // 안드로이드 네이티브만 env 미지원 대비 28px 폴백. 그 외(iOS 앱·PWA·Safari)는 env 값 그대로 —
+          // 노치/상태바가 없는 환경에선 0이라 일반 브라우저에 영향 없음
+          paddingTop: isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)',
           paddingBottom: 'env(safe-area-inset-bottom)',
-        } : {}}
+        }}
       >
         {/* key 제거: 탭 전환 시 컴포넌트 유지, display로 보이기/숨기기 */}
-        <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : 'py-6'}`}>
+        <div ref={scrollContainerRef} data-scroll-container className={`flex-1 overflow-y-auto overflow-x-hidden px-4 ${(activeTab === 'cafe' || activeTab === 'shuttle') ? 'pb-6' : activeTab === 'partner' ? '' : activeTab === 'portal' ? 'pb-6' : 'py-6'}`}>
           <div style={{ display: activeTab === 'cafe' ? 'block' : 'none' }}>
             <CafeteriaView
               date={menuDate}
@@ -329,6 +374,14 @@ function MainLayout() {
               isActive={activeTab === 'misc'}
               deepLinkBox={pendingMiscBox}
               onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
+              deepLinkTrackId={pendingPlaylistTrackId}
+              deepLinkPostId={pendingPlaylistPostId}
+              onDeepLinkTrackIdHandled={() => {
+                setPendingPlaylistTrackId(null);
+                setPendingPlaylistPostId(null);
+              }}
+              deepLinkSearchQuery={pendingPlaylistSearchQuery}
+              onDeepLinkSearchQueryHandled={() => setPendingPlaylistSearchQuery(null)}
               deepLinkClubId={pendingClubId}
               onDeepLinkClubIdHandled={() => setPendingClubId(null)}
             />
@@ -347,7 +400,7 @@ function MainLayout() {
             )}
           </div>
         </div>
-        <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
+        <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} showMiscNew={showMiscNew} />
       </div>
     </>
   );

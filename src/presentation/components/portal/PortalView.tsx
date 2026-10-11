@@ -1,16 +1,17 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { usePostHog } from 'posthog-js/react';
 
 import { Bell, ChevronRight } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather.js';
-import { useWeatherBriefing } from '../../hooks/useWeatherBriefing.js';
 import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
 import { useClubSpotlight, isClubBannerSeason } from '../../hooks/useClubSpotlight.js';
+import { useArtistRecommendations } from '../../hooks/playlist/useArtistRecommendations.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
 import { ClubSpotlightCard } from '../misc/ClubSpotlightCard.js';
+import { ArtistPromoCarousel } from '../playlist/shared/ArtistPromoCarousel.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
@@ -25,15 +26,21 @@ interface PortalViewProps {
   // 배너가 캠퍼스맵 등 앱 내부 탭으로 이동하는 링크일 때 새 창을 열지 않고 바로 탭을 전환하기 위해 씀.
   // chip은 캠퍼스맵 탭 안에서 특정 칩(예: 오픈스페이스)까지, box는 기타탭 안에서 특정 서브뷰(예: 헬스장)까지,
   // clubId는 기타탭 중앙동아리 안에서 특정 동아리 위치까지 미리 켜고 싶을 때만 넘어온다
-  onNavigateToTab?: (tab: string, chip?: string, box?: string, clubId?: string) => void;
+  // playlistSearchQuery는 box가 'playlist'일 때, 플레이리스트 검색 결과 화면을 그 검색어로 바로 열고 싶을 때만 넘어온다
+  onNavigateToTab?: (tab: string, chip?: string, box?: string, clubId?: string, playlistSearchQuery?: string) => void;
 }
 
 export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
   const posthog = usePostHog();
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
-  const { briefing } = useWeatherBriefing(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
+  const { data: recommendations, isLoading: recommendationsLoading } = useArtistRecommendations(isActive);
+  // 데이터가 같은 동안 배열 참조를 유지해야 캐러셀이 매 렌더마다 첫 장으로 되돌아가지 않음
+  const artistPromos = useMemo(
+    () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),
+    [recommendations],
+  );
   const spotlightClub = useClubSpotlight();
   const showClubBanner = isClubBannerSeason();
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
@@ -76,7 +83,17 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
       <div className="pb-32 relative space-y-3 [animation:slideUp_0.4s_ease-out]">
         {/* 1. 에리카 날씨 섹션 */}
         <ErrorBoundary name="portal-weather" fallback={<CardFallback message="날씨 정보를 표시할 수 없습니다" />}>
-          <WeatherCard weather={weather} loading={weatherLoading} isVisible={isActive} briefing={briefing} error={weatherError} onRetry={refetchWeather} />
+          <WeatherCard weather={weather} loading={weatherLoading} error={weatherError} onRetry={refetchWeather} />
+        </ErrorBoundary>
+
+        {/* 플레이리스트 홍보 캐러셀 — 백엔드가 기기별로 추천한 가수(0~5개). 없거나 실패하면 조용히 숨긴다 */}
+        <ErrorBoundary name="portal-artist-promo">
+          <ArtistPromoCarousel
+            artists={artistPromos}
+            isActive={isActive}
+            loading={recommendationsLoading}
+            onClick={(artist) => onNavigateToTab?.('misc', undefined, 'playlist', undefined, artist.artistName)}
+          />
         </ErrorBoundary>
 
         {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동. 3월·9월(모집 시즌)에만 노출 */}
