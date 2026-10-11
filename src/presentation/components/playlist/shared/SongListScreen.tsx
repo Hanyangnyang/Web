@@ -1,5 +1,5 @@
 import { LayoutGrid, Rows3 } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary, filterSongsByGenre } from '../playlistTypes';
 import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './PostDetailCard';
@@ -52,6 +52,8 @@ interface SongListScreenProps {
   // 빈 상태를 흰 카드 박스로 감쌀지 — 최근추가된곡의 카드 그리드와 톤을 맞추려는 화면(기본값)용.
   // 저장한 곡/내가 등록한 곡처럼 배경이 이미 흰 화면에서는 굳이 박스가 필요 없어 false로 끔
   emptyStateBoxed?: boolean;
+  // 빈 상태(목록 0개) 아래에 이어 붙일 내용 — 예: 구분선 + 최근 추가된 곡 미리보기
+  emptyStateFooter?: ReactNode;
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트에서 카드 재생 버튼 배정값 — RecentSongsView만 넘겨줌.
   // 안 넘기면 PostDetailCard가 기존(control) 동작으로 렌더링됨
   playButtonVariant?: RecentSongsTapAreaVariant;
@@ -60,6 +62,8 @@ interface SongListScreenProps {
   // 장르 필터를 상위(PlaylistView)에서 제어하고 싶을 때 넘김 — 홈 미리보기와 선택·칩 위치를 동기화. 안 넘기면 이 화면 내부 state로만 관리
   genreFilter?: GenreFilterState;
   onGenreFilterChange?: (next: GenreFilterState) => void;
+  // true면 헤더 아래 장르 칩을 그리지 않음 — 서버가 장르 필터를 지원하지 않는 화면용(저장한 곡)
+  hideGenreFilter?: boolean;
   // 무한 스크롤 — 다음 페이지가 있으면 목록 맨 아래에 감시 요소를 두고 화면 근처에 오면 onLoadMore를 부름.
   // 홈에서 누른 카드(scrollToTrackId)가 아직 안 불러온 페이지에 있으면 찾을 때까지 이어서 불러옴
   hasNextPage?: boolean;
@@ -86,12 +90,14 @@ export function SongListScreen({
   highlightScrollTarget = true,
   currentTrackId,
   emptyStateBoxed = true,
+  emptyStateFooter,
   viewMode: viewModeProp,
   onViewModeChange,
   playButtonVariant,
   hideMineBadge = false,
   genreFilter: genreFilterProp,
   onGenreFilterChange,
+  hideGenreFilter = false,
   hasNextPage = false,
   isFetchingNextPage = false,
   onLoadMore,
@@ -331,12 +337,14 @@ export function SongListScreen({
             ) : undefined
           }
         />
-        <GenreFilterChips
-          value={genreFilter}
-          onChange={setGenreFilter}
-          large
-          className="-mt-1.5 pb-2"
-        />
+        {!hideGenreFilter && (
+          <GenreFilterChips
+            value={genreFilter}
+            onChange={setGenreFilter}
+            large
+            className="-mt-1.5 pb-2"
+          />
+        )}
       </div>
       {/* 곡 리스트 — 인스타그램 피드처럼 2열 카드 그리드 또는 1열 리스트 */}
       <div ref={listContainerRef} className="-mx-4 px-2">
@@ -363,12 +371,15 @@ export function SongListScreen({
             ))}
           </div>
         ) : filteredSongs.length === 0 && !hasNextPage ? (
-          <EmptyGenreState
-            onAction={onEmptyStateAction ?? onShowAddSong}
-            message={emptyStateMessage}
-            buttonLabel={emptyStateButtonLabel}
-            boxed={emptyStateBoxed}
-          />
+          <>
+            <EmptyGenreState
+              onAction={onEmptyStateAction ?? onShowAddSong}
+              message={emptyStateMessage}
+              buttonLabel={emptyStateButtonLabel}
+              boxed={emptyStateBoxed}
+            />
+            {emptyStateFooter}
+          </>
         ) : (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
             {filteredSongs.map((song, index) => {

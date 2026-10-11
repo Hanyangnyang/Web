@@ -186,8 +186,6 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
         )}
       </section>
 
-      <hr className="-mx-3 mb-4 border-slate-200" />
-
       {/* 3. 최근 추가된 곡 */}
       <RecentSongsPreviewSection
         onShowRecent={onShowRecent}

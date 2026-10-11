@@ -19,11 +19,13 @@ interface RecentSongsPreviewSectionProps {
   variant?: RecentSongsTapAreaVariant; // 홈 미리보기와 같은 재생 인터랙션 A/B 배정
 }
 
-// 검색 결과·게시글 모음 화면 하단에 공통으로 붙는 "최근 추가된 곡" 섹션(제목은 "하냥이들이 어떤 곡들을 추천했을까요?") — 홈의 미리보기와 같은 행 UI, 3개만 보여주고 더보기로 전체보기 이동
+// 검색 결과·게시글 모음·저장한 곡(빈 상태) 등 화면 하단에 공통으로 붙는 "최근 추가된 곡" 섹션 — 위쪽 수평선과 제목("에리카생들은 어떤 다른 노래를 추천했을까요?")까지 한 묶음 — 홈의 미리보기와 같은 행 UI, 3개만 보여주고 더보기로 전체보기 이동
 export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading, onSelectRecentSong, onPlay, currentTrackId, variant = 'control' }: RecentSongsPreviewSectionProps) {
   return (
+    <>
+    <hr className="-mx-3 my-4 border-slate-200" />
     <section>
-      <h3 className="mb-2 text-[17px] font-bold text-text-main">하냥이들은 어떤 곡을 추천했을까요?</h3>
+      <h3 className="mb-2 text-[17px] font-bold text-text-main">에리카생들은 어떤 다른 노래를 추천했을까요?</h3>
       <ErrorBoundary
         name="playlist-recent-preview"
         fallback={<PlaylistFallback message="최근 추가된 곡을 표시할 수 없어요" />}
@@ -62,5 +64,6 @@ export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading
         </div>
       )}
     </section>
+    </>
   );
 }

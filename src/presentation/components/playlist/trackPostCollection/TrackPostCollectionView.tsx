@@ -335,8 +335,6 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
         </div>
       )}
 
-      <hr className="-mx-3 my-4 border-slate-200" />
-
       <RecentSongsPreviewSection
         onShowRecent={onShowRecent}
         recentSongs={recentSongs}

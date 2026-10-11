@@ -55,11 +55,13 @@ export function CollegeWheelPicker({ options, value, onChange, triggerClassName,
   }, [open]);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    // mousedown은 터치에선 "탭"이 끝난 뒤에야 합성되고 스크롤하려는 터치엔 아예 안 생겨서, 바깥을 스크롤하면 안 닫혔음 —
+    // 터치 시작 즉시 발생하는 pointerdown으로 감지
+    const handler = (e: PointerEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
   }, []);
 
   // 열릴 때 현재 선택값이 중앙에 오도록 스크롤 위치 초기화

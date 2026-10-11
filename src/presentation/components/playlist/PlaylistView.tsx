@@ -557,6 +557,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={handlePlay}
             onShowAddSong={() => pushAddSong()}
             onShowRecent={() => handleShowAllRecent()}
+            recentSongs={songs}
+            isRecentSongsLoading={isRecentSongsLoading}
+            onSelectRecentSong={handleSelectRecentSong}
+            recentSongsVariant={recentSongsVariant}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
           />

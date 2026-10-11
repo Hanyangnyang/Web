@@ -54,8 +54,6 @@ export function PostView({ postId, onBack, onPlay, onSelectTrack, currentTrackId
         />
       )}
 
-      <hr className="-mx-3 my-4 border-slate-200" />
-
       <RecentSongsPreviewSection
         onShowRecent={onShowRecent}
         recentSongs={recentSongs}
