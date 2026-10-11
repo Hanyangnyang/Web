@@ -181,7 +181,7 @@ export function PostDetailCard({
   const [liked, setLiked] = useState(post.isLiked ?? false);
   const report = useSongReport();
   const likeToast = useLikeToast();
-  const share = useShareModal({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl });
+  const share = useShareModal({ trackId: post.trackId, title: post.title, artist: post.artist, albumArtUrl: post.albumArtUrl, postId: post.id });
   const { toggleLike, toggleReactionMutation } = usePostInteractionMutations();
 
   const handleAlbumArtPlay = (e: { stopPropagation: () => void }) => {

@@ -148,6 +148,12 @@ function MainLayout() {
     if (dl.get('tab') !== 'misc' || dl.get('box') !== 'playlist') return null;
     return dl.get('trackId');
   });
+  // 추천글 카드에서 공유한 링크의 postId — trackId와 함께 한 번만 PlaylistView에 전달(위치에 따라 최근추가된곡/추천글 상세로 분기)
+  const [pendingPlaylistPostId, setPendingPlaylistPostId] = useState<string | null>(() => {
+    const dl = resolveInitialDeepLinkParams();
+    if (dl.get('tab') !== 'misc' || dl.get('box') !== 'playlist') return null;
+    return dl.get('postId');
+  });
   // 소식탭 플레이리스트 배너에서 아티스트를 눌렀을 때, 플레이리스트의 그 아티스트 검색 결과 화면으로 바로 보내기 위해 PlaylistView에 한 번만 전달
   const [pendingPlaylistSearchQuery, setPendingPlaylistSearchQuery] = useState<string | null>(null);
   // 소식탭 오늘의 동아리 추천에서 "보러가기"를 눌렀을 때, 중앙동아리 목록에서 그 동아리 위치로
@@ -220,7 +226,10 @@ function MainLayout() {
       const box = params.get('subView') || params.get('box');
       const trackId = params.get('trackId');
       if (box && VALID_MISC_BOXES.includes(box)) setPendingMiscBox(box);
-      if (trackId && box === 'playlist') setPendingPlaylistTrackId(trackId);
+      if (trackId && box === 'playlist') {
+        setPendingPlaylistTrackId(trackId);
+        setPendingPlaylistPostId(params.get('postId'));
+      }
       setActiveTab('misc');
       localStorage.setItem('lastActiveTab', 'misc');
       return;
@@ -366,7 +375,11 @@ function MainLayout() {
               deepLinkBox={pendingMiscBox}
               onDeepLinkBoxHandled={() => setPendingMiscBox(null)}
               deepLinkTrackId={pendingPlaylistTrackId}
-              onDeepLinkTrackIdHandled={() => setPendingPlaylistTrackId(null)}
+              deepLinkPostId={pendingPlaylistPostId}
+              onDeepLinkTrackIdHandled={() => {
+                setPendingPlaylistTrackId(null);
+                setPendingPlaylistPostId(null);
+              }}
               deepLinkSearchQuery={pendingPlaylistSearchQuery}
               onDeepLinkSearchQueryHandled={() => setPendingPlaylistSearchQuery(null)}
               deepLinkClubId={pendingClubId}

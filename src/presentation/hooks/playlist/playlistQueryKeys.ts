@@ -12,6 +12,8 @@ export const MY_SONGS_INFINITE_QUERY_KEY = ['playlist', 'my-songs-pages'];
 export const LIKED_SONGS_QUERY_KEY = ['playlist', 'liked-songs'];
 export const SONG_CREATION_STATUS_QUERY_KEY = ['playlist', 'creation-status'];
 export const ARTIST_RECOMMENDATIONS_QUERY_KEY = ['playlist', 'artist-recommendations'];
+// 추천글 단건 상세 — 키 뒤에 postId가 붙음. 목록 캐시와 달리 Song 하나가 통째로 들어 있음
+export const POST_DETAIL_QUERY_KEY = ['playlist', 'post-detail'];
 
 // 최근추가된곡/저장한곡/내가등록한곡 화면은 모두 이 세 캐시 중 하나에서 목록을 읽는데, 화면을 나갔다 들어오면
 // SongListScreen/PostDetailCard가 통째로 리마운트되면서 카드 안에서만 들고 있던 낙관적 업데이트(좋아요/반응)가
@@ -39,11 +41,13 @@ function mapSongsInListCaches(queryClient: QueryClient, transform: (songs: Song[
 }
 
 export function patchSongInListCaches(queryClient: QueryClient, songId: string, patch: (song: Song) => Song) {
+  queryClient.setQueryData<Song>([...POST_DETAIL_QUERY_KEY, songId], (prev) => prev && patch(prev));
   mapSongsInListCaches(queryClient, (songs) => songs.map((song) => (song.id === songId ? patch(song) : song)));
 }
 
 // 곡 단위 좋아요는 같은 곡(trackId)의 모든 게시글에 공통 적용되므로 trackId가 같은 게시글을 전부 패치
 export function patchTrackInListCaches(queryClient: QueryClient, trackId: string, patch: (song: Song) => Song) {
+  queryClient.setQueriesData<Song>({ queryKey: POST_DETAIL_QUERY_KEY }, (prev) => (prev && prev.trackId === trackId ? patch(prev) : prev));
   mapSongsInListCaches(queryClient, (songs) => songs.map((song) => (song.trackId === trackId ? patch(song) : song)));
 }
 

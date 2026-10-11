@@ -25,7 +25,8 @@ const KakaoIcon = () => (
   </svg>
 );
 
-export type SongShareModalSong = TrackSummary;
+// postId: 특정 추천글에서 공유할 때만 채움 — 링크에 실어서 열 때 그 추천글 위치로 바로 보냄(곡 단위 공유엔 없음)
+export type SongShareModalSong = TrackSummary & { postId?: string };
 
 interface SongShareModalProps {
   song: SongShareModalSong;
@@ -49,7 +50,8 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
   }, []);
 
   // 기타탭 > 플레이리스트로 진입시킨 뒤, trackId로 바로 그 곡의 게시글 모음(TrackPostCollectionView)까지 열게 함
-  const shareUrl = `${window.location.origin}/?tab=misc&box=playlist&trackId=${encodeURIComponent(song.trackId)}`;
+  // postId가 있어도 trackId는 같이 둠 — postId를 모르는 옛 버전 앱은 trackId만 읽어서 그 곡의 게시글 모음으로 열림
+  const shareUrl = `${window.location.origin}/?tab=misc&box=playlist&trackId=${encodeURIComponent(song.trackId)}${song.postId ? `&postId=${encodeURIComponent(song.postId)}` : ''}`;
   const shareTitle = `${song.title} · ${song.artist}`;
 
   const handleKakao = async () => {

@@ -25,7 +25,7 @@ import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
 import { useRecentSongsInfinite } from '../../hooks/playlist/useRecentSongsInfinite.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
-import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY } from '../../hooks/playlist/playlistQueryKeys.js';
+import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY, type SongPagesData } from '../../hooks/playlist/playlistQueryKeys.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
@@ -68,12 +68,17 @@ interface PlaylistViewProps {
   isActive?: boolean;
   deepLinkTrackId?: string | null;
   onDeepLinkTrackIdHandled?: () => void;
+  // 추천글 카드에서 공유한 링크의 게시글 id — 있으면 deepLinkTrackId의 게시글 모음 대신 이 글 위치(최근추가된곡/추천글 상세)로 보냄
+  deepLinkPostId?: string | null;
   // 소식탭 배너에서 아티스트를 눌러 들어올 때 — 이 검색어로 검색 결과 화면을 바로 연다
   deepLinkSearchQuery?: string | null;
   onDeepLinkSearchQueryHandled?: () => void;
 }
 
-export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkSearchQuery, onDeepLinkSearchQueryHandled }: PlaylistViewProps) {
+// 게시글을 눌렀을 때 최근추가된곡 화면으로 보내 스크롤할 최근 페이지 수(20곡씩) — 이보다 오래된 게시글은 단건 상세로 보냄
+const RECENT_SCROLL_PAGE_LIMIT = 2;
+
+export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled }: PlaylistViewProps) {
   const isApp = isNativeApp();
   const platform = getPlatform();
   const posthog = usePostHog();
@@ -84,7 +89,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 소식탭 배너 딥링크로 마운트되면 첫 렌더부터 그 검색어/검색 화면으로 시작 — 마운트 후 effect로 옮기면 홈이 한 프레임 먼저 그려져 반짝임
   const [searchQuery, setSearchQuery] = useState(deepLinkSearchQuery ?? '');
   // 홈 미리보기·곡 배너는 최근추가된곡 화면과 같은 캐시(20개씩 페이지)의 앞부분을 씀 — 홈에서 받은 첫 페이지가 전체 보기에 그대로 이어짐
-  const { songs: fetchedSongs, isLoading: isAllRecentSongsLoading } = useRecentSongsInfinite();
+  const { songs: fetchedSongs, isLoading: isAllRecentSongsLoading, hasNextPage: hasNextRecentPage, isFetchingNextPage: isFetchingNextRecentPage, fetchNextPage: fetchNextRecentPage } = useRecentSongsInfinite();
   const songs = fetchedSongs ?? EMPTY_SONGS;
   // 홈 "최근 추가된 곡" 미리보기의 장르 필터
   // 최근 추가된 곡 화면과 상태(선택 + 칩 위치)를 공유해서, 홈에서 고른 장르가 그 화면에도 그대로 이어진다
@@ -292,10 +297,30 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 부모(App.tsx)에 소비 완료를 알린다 (CampusMapView의 deepLinkChip과 동일한 방식). 아직 제목/가수명/
   // 앨범아트를 모르므로 빈 값으로 넘기고, TrackPostCollectionView가 useTrackPosts로 받아온 실제 값으로 채움
   useEffect(() => {
-    if (!deepLinkTrackId) return;
+    if (!deepLinkTrackId || deepLinkPostId) return; // postId가 있으면 아래 effect가 처리
     handleSelectSearchTrack({ trackId: deepLinkTrackId, title: '', artist: '', albumArtUrl: '' });
     onDeepLinkTrackIdHandled?.();
   }, [deepLinkTrackId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 추천글 공유 링크: 게시글 카드를 눌렀을 때(handleSelectPost)와 같은 기준으로 분기 — 최근 RECENT_SCROLL_PAGE_LIMIT 페이지 안이면
+  // 최근추가된곡에서 그 곡으로 스크롤, 더 오래됐으면 추천글 상세. 콜드 스타트면 최근추가된곡 캐시가 비어 있으니 첫 페이지 로딩이 끝나길 기다리고,
+  // 필요한 만큼 페이지가 안 받아졌으면 이어서 받은 뒤 판단(조회 실패 등으로 못 받아도 추천글 상세로 폴백)
+  useEffect(() => {
+    if (!deepLinkPostId || isAllRecentSongsLoading || isFetchingNextRecentPage) return;
+    const pages = queryClient.getQueryData<SongPagesData>(RECENT_SONGS_INFINITE_QUERY_KEY)?.pages.slice(0, RECENT_SCROLL_PAGE_LIMIT) ?? [];
+    const found = pages.flatMap((page) => page.songs).find((song) => song.id === deepLinkPostId);
+    if (!found && pages.length < RECENT_SCROLL_PAGE_LIMIT && hasNextRecentPage) {
+      void fetchNextRecentPage();
+      return;
+    }
+    if (found) {
+      setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
+      pushScreen({ name: 'recent', scrollTarget: found.trackId });
+    } else {
+      pushScreen({ name: 'postDetail', postId: deepLinkPostId });
+    }
+    onDeepLinkTrackIdHandled?.();
+  }, [deepLinkPostId, isAllRecentSongsLoading, isFetchingNextRecentPage, hasNextRecentPage, fetchedSongs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 소식탭 아티스트 배너 딥링크: 검색바에 그 이름을 채우고 검색 결과 화면을 연다. 이미 검색 결과 화면이면 쌓지 않고 검색어만 바꾼다
   useEffect(() => {
@@ -318,15 +343,23 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     });
   }, [pushScreen]);
 
-  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 기획 단계에서 게시글 상세(postDetail/PostView)를
-  // 쓰지 않기로 해서, 최근추가된곡 화면으로 이동하면서 그 곡 위치로 스크롤함(홈의 최근 추가된 곡 카드 클릭과 같은 방식).
-  // postDetail 화면/PostView 코드는 그대로 남겨둠 — 다시 쓰려면 아래를 pushScreen({ name: 'postDetail', postId: post.id })로 되돌리면 됨.
-  // 최근추가된곡 목록은 무한 스크롤이라, 아직 안 받은 페이지에 있는 게시글이면 SongListScreen이 찾을 때까지 이어서 불러온 뒤 스크롤함
-  // 장르 필터도 전체로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
+  // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭.
+  // - 최근 추가된 곡 앞쪽 RECENT_SCROLL_PAGE_LIMIT 페이지(page 0~1, 최근 40곡. 장르 필터 없는 전체 캐시)에 있는 게시글: 최근추가된곡 화면으로 이동해 그 곡으로 스크롤 —
+  //   목록 맨 위쪽이라 바로 찾을 수 있고, 주변 곡도 이어서 볼 수 있음.
+  // - 그보다 오래된 게시글: 단건 상세(PostView, GET /songs/{id}). 최근추가된곡으로 보내면 아래 페이지까지 이어 불러와야 하고(그 사이 화면이 비어 보임),
+  //   도착해도 목록 한참 아래라 위치 파악이 어려움.
+  // - id가 없는 게시글(로컬 임시 곡)은 단건 조회를 못 하니 최근추가된곡 스크롤로 처리.
+  // 최근추가된곡으로 갈 땐 장르 필터를 전체로 되돌림 — 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
   const handleSelectPost = useCallback((post: Song) => {
+    const nearbySongs = queryClient.getQueryData<SongPagesData>(RECENT_SONGS_INFINITE_QUERY_KEY)?.pages.slice(0, RECENT_SCROLL_PAGE_LIMIT).flatMap((page) => page.songs);
+    const isNearby = !!post.id && !!nearbySongs?.some((song) => song.id === post.id);
+    if (post.id && !isNearby) {
+      pushScreen({ name: 'postDetail', postId: post.id });
+      return;
+    }
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
     pushScreen({ name: 'recent', scrollTarget: post.trackId });
-  }, [pushScreen]);
+  }, [pushScreen, queryClient]);
 
   // 홈의 하단 "더보기"는 미리보기 마지막 곡 위치까지 부드럽게 내려간 뒤 이어서 목록을 보게 한다.
   // 헤더 화살표·빈 상태 등 다른 진입점은 기존처럼 목록 맨 위부터 보여준다.
@@ -488,6 +521,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onPlay={handlePlay}
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
+            playButtonVariant={recentSongsVariant}
+            onShowRecent={() => handleShowAllRecent()}
+            recentSongs={songs}
+            isRecentSongsLoading={isRecentSongsLoading}
+            onSelectRecentSong={handleSelectRecentSong}
           />
         ) : screen.name === 'chart' ? (
           <ChartView
