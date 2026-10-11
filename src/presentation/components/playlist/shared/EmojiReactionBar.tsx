@@ -156,7 +156,7 @@ export function EmojiReactionBar({
         >
           <Smile size={addButtonIconSize} className="text-text-sub" strokeWidth={2} />
           {/* 반응이 하나도 없으면 버튼 글씨가 안내 문구로 바뀜 */}
-          <span>{displayedReactions.length > 0 ? '반응' : '반응을 남겨주세요!'}</span>
+          <span>{displayedReactions.length > 0 ? '반응' : '반응을 남겨주세요'}</span>
         </button>
 
         {pickerOpen && (

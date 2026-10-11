@@ -263,9 +263,10 @@ export function PostDetailCard({
   ) : (
     <div className={`flex items-center gap-0.5 min-w-0 ${showTrackLink ? 'cursor-pointer' : ''}`} {...titleInteractiveProps}>
       <span className="truncate min-w-0">
-        {/* 폭이 좁은 2열(narrow)은 한 단계 작게 — 제목 sm / 가수 xs (1열은 base / sm) */}
+        {/* 글씨 위계: 곡명(bold) > 한마디(본문) > 가수명 > 장르·시간. 가수명은 본문보다 한 단계 작게 둬서 본문과 크기가 겹치지 않게 함.
+            폭이 좁은 2열(narrow)은 한 단계 작게 — 곡명 15 / 가수 13 (1열은 17 / 14) */}
         <span className={`${isNarrow ? 'text-[15px]' : 'text-[17px]'} font-bold text-text-main`}>{post.title}</span>
-        <span className={`${isNarrow ? 'text-[13px]' : 'text-[15px]'} font-medium text-text-sub`}> · {post.artist}</span>
+        <span className={`${isNarrow ? 'text-[13px]' : 'text-[14px]'} font-medium text-text-sub`}> · {post.artist}</span>
       </span>
       {showTrackLink && !useTrackLinkButton && <ChevronRight size={19} className="flex-shrink-0 text-text-sub" />}
     </div>
@@ -442,7 +443,7 @@ export function PostDetailCard({
 
         {/* 한마디가 비어 있으면 앱 안내 문구로 대체 */}
         {!compact && !post.body && (
-          <EmptyCommentNote className={`mb-2 ${isNarrow ? 'text-[13px]' : 'text-[15px]'} text-text-hint`} />
+          <EmptyCommentNote className={`mb-2 ${isNarrow ? 'text-[14px]' : 'text-[15px]'} text-text-hint`} />
         )}
 
         {/* 본문 */}
@@ -456,7 +457,7 @@ export function PostDetailCard({
                 style={bodyMaxHeight !== null ? { maxHeight: bodyMaxHeight } : undefined}
                 className={`${
                   isNarrow
-                    ? `text-[13px] overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
+                    ? `text-[14px] overflow-hidden transition-[max-height] duration-300 ease-out motion-reduce:transition-none ${isClampApplied ? 'line-clamp-3' : ''}`
                     : 'text-[15px]'
                 } ${moreInBody ? 'pr-7' : ''} text-text-main leading-relaxed whitespace-pre-line`}
               >
@@ -475,7 +476,7 @@ export function PostDetailCard({
                   toggleBody();
                 }}
                 aria-expanded={bodyExpanded}
-                className="relative before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 self-start mb-2 text-[13px] leading-relaxed font-semibold text-text-hint active:opacity-60"
+                className="relative before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 self-start mb-2 text-[13px] leading-relaxed font-semibold text-text-sub active:opacity-60"
               >
                 {bodyExpanded ? '접기' : '더보기'}
               </button>
@@ -514,7 +515,7 @@ export function PostDetailCard({
               })}
             </div>
             {!hideReactions && (
-              <span className={`flex-shrink-0 ${isNarrow ? 'text-[12px]' : 'text-[13px]'} text-text-hint`}>{formatTimeAgo(post.createdAt)}</span>
+              <span className={`flex-shrink-0 ${isNarrow ? 'text-[12px]' : 'text-[13px]'} text-slate-500`}>{formatTimeAgo(post.createdAt)}</span>
             )}
           </div>
         </div>
