@@ -109,18 +109,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const chartTracks = chartData?.tracks ?? [];
   // 인기차트 화면의 장르 필터 — 홈 미리보기에는 적용되지 않고(홈은 항상 전체 차트), 화면 안에서만 장르별 차트를 서버에서 받아옴
   const [chartGenreFilter, setChartGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
-  // 하단 플로팅 플레이어 상태 + 재생 버튼 동작(handlePlay) — usePlaylistPlayer 참고
-  const {
-    playerRef,
-    currentTrack,
-    playingTrackId,
-    playerHeight,
-    handlePlay,
-    handleClose: handlePlayerClose,
-    handlePlaybackStateChange,
-    handlePlayerHeightChange,
-  } = usePlaylistPlayer(recentSongsVariant);
-
   // 최근추가된곡/추천한곡 화면의 그리드·리스트 뷰 모드(사용자가 토글로 고른 값) — 어느 경로로 들어오든 이 선택대로 열린다. 이 화면들은 게시글 상세로 갔다가
   // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
@@ -136,6 +124,18 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     deepLinkSearchQuery ? [{ name: 'main' }, { name: 'search' }] : [{ name: 'main' }],
   );
   const screen = screenStack[screenStack.length - 1];
+  // 하단 플로팅 플레이어 상태 + 재생 버튼 동작(handlePlay) — usePlaylistPlayer 참고.
+  // screen.name은 전체 재생 이벤트(playlist_track_play)에 "어느 화면에서 재생했는지"로 실림
+  const {
+    playerRef,
+    currentTrack,
+    playingTrackId,
+    playerHeight,
+    handlePlay,
+    handleClose: handlePlayerClose,
+    handlePlaybackStateChange,
+    handlePlayerHeightChange,
+  } = usePlaylistPlayer(recentSongsVariant, screen.name);
   // 인기차트 화면용 차트 — 전체(장르 없음)이면 홈 미리보기와 같은 쿼리 키라 캐시를 공유하고, 장르를 고르면 그 장르 차트를 따로 받음
   const {
     data: screenChartData,
