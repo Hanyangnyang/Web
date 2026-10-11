@@ -5,6 +5,7 @@ import { GymView } from './GymView.jsx';
 import { ClubView } from './ClubView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
 import { MiscSubViewHeader } from './MiscSubViewHeader.jsx';
+import { PlaylistView } from '../playlist/PlaylistView';
 
 type SubViewComponent = ComponentType<{ onBack: () => void }>;
 
@@ -89,15 +90,18 @@ function FeedbackViewFallback({ onBack }: { onBack: () => void }) {
 interface MiscViewProps {
   resetSignal: number;
   isActive?: boolean;
-  // 배너 등에서 특정 서브뷰(예: 헬스장)까지 지정해 이동시킬 때 App.tsx가 한 번만 내려줌
-  deepLinkBox?: string | null;
-  onDeepLinkBoxHandled?: () => void;
-  // 소식탭 오늘의 동아리 추천에서 넘어왔을 때, 중앙동아리 목록의 그 동아리 위치로 자동 스크롤하기 위해 넘어옴
-  deepLinkClubId?: string | null;
+  deepLinkBox?: string | null;  // 소식탭 배너에서 넘어올때
+  onDeepLinkBoxHandled?: () => void; 
+  deepLinkTrackId?: string | null;   // 플레이리스트 카카오 공유를 위함
+  onDeepLinkTrackIdHandled?: () => void;
+  deepLinkPostId?: string | null;   // 추천글 카드에서 공유한 링크의 게시글 id (deepLinkTrackId와 함께 옴)
+  deepLinkSearchQuery?: string | null;   // 소식탭 플레이리스트 배너에서 아티스트를 눌렀을 때, 그 검색 결과 화면으로 바로 가기 위함
+  onDeepLinkSearchQueryHandled?: () => void;
+  deepLinkClubId?: string | null;   // 소식탭 배너에서 넘어올때, 해당하는 동아리 위치로 스크롤하기 위함
   onDeepLinkClubIdHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
@@ -130,6 +134,19 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
   };
 
   if (subView === 'gym') return <GymView onBack={() => setSubView('list')} />;
+  if (subView === 'playlist') {
+    return (
+      <PlaylistView
+        onBack={() => setSubView('list')}
+        isActive={isActive}
+        deepLinkTrackId={deepLinkTrackId}
+        onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
+        deepLinkPostId={deepLinkPostId}
+        deepLinkSearchQuery={deepLinkSearchQuery}
+        onDeepLinkSearchQueryHandled={onDeepLinkSearchQueryHandled}
+      />
+    );
+  }
   if (subView === 'insta') {
     const onBack = () => setSubView('list');
     if (InstagramViewComp) {

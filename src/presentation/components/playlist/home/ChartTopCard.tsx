@@ -1,0 +1,117 @@
+import { Pause, Play, Share2 } from 'lucide-react';
+import { type TrackSummary } from '../playlistTypes';
+
+// rank가 없으면(예: 홈의 "내가 추천한 곡") 순위 숫자만 생략하고 나머지 UI는 동일하게 그림
+type ChartCardTrack = TrackSummary & { rank?: number };
+
+interface ChartTopCardProps<T extends ChartCardTrack> {
+  track: T;
+  // 이 곡에 달린 추천 게시글 목록(캐러셀)을 보여달라는 요청
+  // 여러 게시글이 있을 수 있는 곡 하나에 바로 붙일 수 없어 상세 보기로 유도
+  onShowPosts: (track: T) => void;
+  // 앨범아트(흰 구분선 위쪽) 클릭 — 바로 재생
+  onPlay: (track: TrackSummary) => void;
+  // true면 우상단 재생 아이콘 옆에 공유 아이콘이 보임
+  showShareIcon?: boolean;
+  // 공유 아이콘을 누르면 호출 — 없으면 아이콘은 장식
+  onShare?: (track: T) => void;
+  // 재생/일시정지 아이콘만 눌렀을 때 호출 — 없으면 아이콘은 장식이라 onPlay로 통과
+  onPlayIcon?: (track: TrackSummary) => void;
+  // 지금 하단 플레이어에서 재생 중인 곡 — 같으면 재생 아이콘이 일시정지 아이콘으로 바뀜
+  currentTrackId?: string | null;
+  // 카드 너비 — 기본은 홈 미리보기의 가로 스크롤용 고정폭(152px). 소식탭 홍보 카드처럼 부모가 폭을
+  // 나눠줄 때는 예) "w-full flex-1"을 넘겨서 덮어쓴다 (Tailwind 클래스 병합 충돌을 피하려고 별도 prop으로 분리)
+  widthClassName?: string;
+  // 카드 높이 — 기본은 3:4 비율로 폭에 맞춰 자동 계산. 부모가 높이를 이미 정해준 상황(예: 소식탭
+  // 캐러셀에서 다른 슬라이드 높이에 맞춰야 할 때)에는 "h-full"을 넘겨서 비율 대신 그 높이를 그대로 채운다
+  heightClassName?: string;
+}
+
+// 인기차트 홈 미리보기 카드(최대 10위) — 배경은 앨범아트 하나로 카드 전체를 채우고, 그 위에 흰
+// 구분선으로 나눈 두 클릭 영역(위: 재생, 아래: 곡명·가수명 눌러 게시글 모음)만 얹음
+export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onPlay, showShareIcon, onShare, onPlayIcon, currentTrackId, widthClassName = 'w-[152px] flex-shrink-0', heightClassName = 'aspect-[3/4]' }: ChartTopCardProps<T>) {
+  const isPlaying = track.trackId === currentTrackId;
+
+  return (
+    <div className={`relative ${widthClassName} ${heightClassName} rounded-xl overflow-hidden shadow-lg`}>
+      {/* 앨범커버 전체 배경 — 카드 전체를 채우는 유일한 배경 */}
+      <img
+        src={track.albumArtUrl}
+        alt={track.title}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* 가독성용 그라데이션 오버레이 */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none" />
+
+      {/* 이미지 위에 얹는 두 클릭 영역 */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* 위쪽: 순위 + 재생 아이콘 — 누르면 바로 재생 */}
+        <div className="relative flex-1 min-h-0">
+          <button
+            onClick={() => onPlay(track)}
+            aria-label={`${track.rank != null ? `${track.rank}위 ` : ''}${track.title} ${isPlaying ? '일시정지' : '재생'}`}
+            className="absolute inset-0 w-full h-full active:scale-[0.98] transition-transform"
+          >
+            {track.rank != null && (
+              <span className="absolute bottom-1 left-3 text-4xl font-black italic leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+                {track.rank}
+              </span>
+            )}
+          </button>
+
+          {/* 우상단 아이콘 줄 — onShare/onPlayIcon을 넘긴 아이콘만 자기 버튼으로 눌리고(터치 영역을 사방으로 넓힘),
+              안 넘긴 아이콘은 장식이라 클릭이 아래 버튼(onPlay)으로 그대로 통과 */}
+          <div className="absolute top-2 right-2 flex items-center gap-2 pointer-events-none">
+            {showShareIcon && (
+              onShare ? (
+                <button
+                  onClick={() => onShare(track)}
+                  aria-label={`${track.title} 공유`}
+                  className="pointer-events-auto relative before:content-[''] before:absolute before:-inset-2 active:scale-90 transition-transform"
+                >
+                  <Share2 size={20} stroke="white" strokeWidth={2} aria-hidden="true" />
+                </button>
+              ) : (
+                <Share2 size={20} stroke="white" strokeWidth={2} aria-hidden="true" />
+              )
+            )}
+            {(() => {
+              const icon = isPlaying ? (
+                <Pause size={24} fill="white" stroke="white" strokeWidth={1} />
+              ) : (
+                <Play size={24} className="ml-0.5" fill="white" stroke="white" strokeWidth={1} />
+              );
+              return onPlayIcon ? (
+                <button
+                  onClick={() => onPlayIcon(track)}
+                  aria-label={`${track.title} ${isPlaying ? '일시정지' : '재생'}`}
+                  className="pointer-events-auto relative before:content-[''] before:absolute before:-inset-2 active:scale-90 transition-transform"
+                >
+                  {icon}
+                </button>
+              ) : (
+                icon
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* 흰색 구분선 — 위(재생)/아래(게시글 모음) 클릭 영역을 구분 */}
+        <div className="h-px mx-3 bg-white/40" aria-hidden="true" />
+
+        {/* 아래쪽: 곡명·가수명 — 누르면 이 곡의 게시글 모음으로 이동 */}
+        <button
+          onClick={() => onShowPosts(track)}
+          aria-label={`${track.title} 추천글 보기`}
+          className="flex items-center gap-1 px-3 pt-2 pb-3 text-left active:bg-black/10 transition-colors"
+        >
+          <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+            <div className="text-[15px] font-bold text-white truncate leading-tight">{track.title}</div>
+            <div className="text-[13px] font-medium text-white/90 truncate leading-tight">{track.artist}</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+}

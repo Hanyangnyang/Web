@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 import { WeatherCard } from './WeatherCard.jsx';
 import { Sun, Moon, Cloud, CloudSun, CloudMoon, CloudRain, Snowflake, CloudDrizzle, type LucideIcon } from 'lucide-react';
 import type { Weather, HourlyForecast, WeatherCondition, PmGrade } from '../../../domain/entities/Weather.js';
-import type { WeatherBriefing } from '../../../domain/entities/WeatherBriefing.js';
 
 // ── mock 데이터 생성기 ─────────────────────────────────────────────
 // 시간별 예보는 현재 시각 기준으로 생성한다 — 고정 epoch를 쓰면 시간이 지날수록
@@ -42,10 +41,6 @@ function makeWeather({ condition, temp, pmGrade = '보통' }: MakeWeatherArgs): 
     hourly: makeHourly(condition, temp),
   };
 }
-
-const BRIEFING: WeatherBriefing = {
-  content: '오늘도 좋은 하루 보내세요! 산책하기 좋은 날씨예요.',
-};
 
 // weatherTheme의 배경 분기와 1:1 대응하는 6종
 // (한파는 별도 배경/아이콘 없이 기온(-10°↓)에 따라 기존 카드 위에 "한파" 뱃지만 얹는 방식)
@@ -130,7 +125,6 @@ export const 전체매트릭스 = {
                 temp: col.coldSnapTemp !== undefined ? col.coldSnapTemp : bg.temp,
                 pmGrade: col.grade,
               })}
-              briefing={BRIEFING}
               loading={false}
             />
           )),
@@ -218,7 +212,7 @@ export const 아이콘모음 = {
 // ── 배경 6종 개별 스토리 (미세먼지: 보통) ──────────────────────────
 const story = (bg: (typeof BACKGROUNDS)[number]) => ({
   decorators: [mobileFrame],
-  args: { weather: makeWeather({ condition: bg.condition, temp: bg.temp }), briefing: BRIEFING, loading: false },
+  args: { weather: makeWeather({ condition: bg.condition, temp: bg.temp }), loading: false },
 });
 
 export const 폭염맑음 = story(BACKGROUNDS[0]);
@@ -228,18 +222,12 @@ export const 흐림 = story(BACKGROUNDS[3]);
 export const 눈 = story(BACKGROUNDS[4]);
 export const 비 = story(BACKGROUNDS[5]);
 
-// 브리핑이 아직 안 왔거나 없는 경우 — AI 문구 줄 자체가 빠진다
-export const 브리핑없음 = {
-  decorators: [mobileFrame],
-  args: { weather: makeWeather({ condition: 'SUNNY', temp: 24 }), briefing: null, loading: false },
-};
-
 // 서버가 모르는 날씨 상태를 준 경우 — "정보 없음" + 기본 아이콘/배경으로 버틴다
 export const 상태알수없음 = {
   decorators: [mobileFrame],
   args: {
     weather: { ...makeWeather({ condition: 'SUNNY', temp: 24 }), current: { ...makeWeather({ condition: 'SUNNY', temp: 24 }).current, condition: null } },
-    briefing: BRIEFING,
+   
     loading: false,
   },
 };
