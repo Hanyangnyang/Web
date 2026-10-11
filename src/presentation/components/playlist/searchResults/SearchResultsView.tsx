@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
@@ -44,6 +44,11 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
   const [activeQuery, setActiveQuery] = useState(query);
   const { data: postResults, isLoading: isSearchingPosts } = useSongSearch(activeQuery);
   const [localQuery, setLocalQuery] = useState(query);
+  // 검색어 없이(곡 검색하기 FAB) 들어온 경우엔 바로 입력할 수 있게 검색바에 포커스
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!query.trim()) searchInputRef.current?.focus();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { onActiveQueryChange?.(activeQuery); }, [activeQuery]); // eslint-disable-line react-hooks/exhaustive-deps
   const { data: trackResultsData, isFetching: isSearching, error: musicSearchError, refetch: refetchMusicSearch } = useMusicSearch(activeQuery);
   const trackResults: MusicSearchTrack[] = trackResultsData ?? [];
@@ -69,7 +74,7 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
         <MiscSubViewHeader
           title="검색 결과"
           emoji="🔍"
-          subtitle={`'${activeQuery}' 에 대한 검색 결과`}
+          subtitle={activeQuery.trim() ? `'${activeQuery}' 에 대한 검색 결과` : '곡 제목이나 아티스트를 검색해보세요'}
           onBack={onBack}
         />
       </div>
@@ -81,6 +86,7 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
         onSubmit={handleResearch}
         placeholder="곡 제목이나 아티스트로 검색해보세요"
         className="mt-2 mb-2"
+        ref={searchInputRef}
       />
 
       {/* 1. Spotify 곡 검색 결과 */}

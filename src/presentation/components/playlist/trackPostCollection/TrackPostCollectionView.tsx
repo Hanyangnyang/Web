@@ -206,7 +206,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
                 onClick={() => share.open()}
                 className="relative before:content-[''] before:absolute before:-inset-y-3.5 before:-inset-x-3 self-start max-w-full flex items-center gap-1 rounded-md bg-slate-50 border border-slate-200 px-1.5 py-[3.5px] text-left text-[11.5px] font-medium leading-tight text-text-sub active:bg-slate-100 transition-colors"
               >
-                <span>다른 하냥이에게 곡을 공유해봐요!</span>
+                <span>곡을 공유해보세요!</span>
                 <Share2 size={11} className="flex-shrink-0 text-text-hint" strokeWidth={2.2} />
               </button>
             </div>

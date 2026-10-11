@@ -7,6 +7,7 @@ import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
 import { RecommendSongView } from './recommendSong/RecommendSongView';
+import { SearchSongFab, SEARCH_FAB_STACK_PX } from './shared/SearchSongFab';
 import { EMPTY_GENRE_FILTER, type GenreFilterState } from './shared/GenreFilterChips';
 import { RecentSongsView } from './recentSongs/RecentSongsView';
 import { SearchResultsView } from './searchResults/SearchResultsView';
@@ -348,8 +349,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const isFabVisible = screen.name !== 'addSong';
   const bottomSpace = isFabVisible
     ? playerHeight > 0
-      ? playerHeight + PLAYER_GAP_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT // 플레이어 위에 뜬 FAB까지 감안
-      : FAB_CLOSED_BOTTOM_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT // FAB 기본 위치(플레이어 없을 때)까지 감안
+      ? playerHeight + PLAYER_GAP_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT + searchFabExtra // 플레이어 위에 뜬 FAB까지 감안
+      : FAB_CLOSED_BOTTOM_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT + searchFabExtra // FAB 기본 위치(플레이어 없을 때)까지 감안
     : playerHeight > 0 ? playerHeight + 4 : 4;
 
   return (
@@ -367,6 +368,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       } as CSSProperties}
     >
       {/* 당겨서 새로고침 인디케이터 — 당기는 만큼 내려오고, 기준 거리를 넘으면 회전 */}
+  const searchFabExtra = screen.name === 'recent' ? SEARCH_FAB_STACK_PX : 0; // 최근추가된곡 화면은 검색 FAB이 한 칸 더 쌓임
       {(pull > 0 || isPullRefreshing) && (
         <div
           className="fixed left-1/2 z-[1100] pointer-events-none"
@@ -580,6 +582,16 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
                 }}
                 className="flex-1 h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
+      {/* 곡 검색하기 FAB: 최근추가된곡 화면 전용 — 곡 추천하기 FAB 위에 쌓임. 누르면 검색어 없이 검색 화면(검색바에 포커스)으로 이동 */}
+      {screen.name === 'recent' && (
+        <SearchSongFab
+          playerHeight={playerHeight}
+          onClick={() => {
+            setSearchQuery('');
+            pushScreen({ name: 'search' });
+          }}
+        />
+      )}
                 나가기
               </button>
             </div>

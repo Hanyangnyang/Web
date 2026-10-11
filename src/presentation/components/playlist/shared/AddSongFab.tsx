@@ -22,7 +22,7 @@ const CLOSED_BOTTOM = `calc(${FAB_CLOSED_BOTTOM_PX}px + env(safe-area-inset-bott
 
 // 이 FAB은 앱 전역 스크롤 컨테이너(App.tsx)를 prop으로 전달받을 방법이 없어서,
 // DOM에서 가장 가까운 스크롤 가능한 조상을 직접 찾아 스크롤 여부를 감지한다.
-function findScrollParent(el: HTMLElement | null): HTMLElement | null {
+export function findScrollParent(el: HTMLElement | null): HTMLElement | null {
   let node = el?.parentElement ?? null;
   while (node) {
     if (/(auto|scroll)/.test(getComputedStyle(node).overflowY)) return node;
