@@ -98,8 +98,11 @@ onlineManager.setEventListener(subscribeToNetworkStatus);
  *
  * v4 (플레이리스트): Song/PlaylistSong 엔티티의 isBookmarked → isLiked 필드명 변경.
  *   이전 캐시를 그대로 읽으면 isLiked가 undefined라 저장한 곡·최근 추가된 곡의 하트가 전부 빈 상태로 복원된다.
+ *
+ * v5 (플레이리스트): 저장한 곡 캐시(['playlist','liked-songs'])가 Song[] 배열에서 무한 스크롤 페이지 구조
+ *   ({ pages: [{ songs, last }], pageParams })로 바뀜. 이전 캐시를 그대로 읽으면 data.pages가 없어 화면이 에러로 깨진다.
  */
-const CACHE_BUSTER = 'v4';
+const CACHE_BUSTER = 'v5';
 
 // buster 도입 전에는 키에 버전을 붙였다. 그 시절 항목은 아무도 읽지 않으므로 한 번 지워준다.
 const LEGACY_CACHE_KEYS = ['hyu_rq_cache_v1'];

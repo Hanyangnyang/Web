@@ -32,6 +32,8 @@ export interface PostDetailCardData {
   isMine?: boolean;
   // 서버가 내려주는 이모지별 반응 수 + 내 반응 여부 — 없으면 반응 0개로 시작
   reactions?: PlaylistReaction[];
+  // 곡을 좋아요한 사람 수 — 있으면 요약 카드(hideReactions)에 "n명이 좋아하는 노래에요."로 표시
+  likeCount?: number;
 }
 
 interface PostDetailCardProps {
@@ -88,6 +90,7 @@ export function songToPostDetailCardData(song: Song): PostDetailCardData {
     isLiked: song.isLiked,
     isMine: song.isMine,
     reactions: song.reactions,
+    likeCount: song.likeCount,
   };
 }
 
@@ -429,6 +432,13 @@ export function PostDetailCard({
           <div className={hideReactions ? 'flex-1 min-w-0' : ''}>{titleBlock}</div>
           {hideReactions && trailingButton}
         </div>
+
+        {/* 요약 카드(저장한 곡) — 곡명·가수명 아래에 수평선을 긋고 이 곡을 좋아하는 사람 수를 작은 회색 글씨로 */}
+        {hideReactions && post.likeCount != null && (
+          <div className="mt-1.5 pt-1.5 border-t border-slate-200 text-[11px] font-medium text-text-hint">
+            {post.likeCount.toLocaleString()}명이 좋아하는 노래에요
+          </div>
+        )}
 
         {/* 한마디가 비어 있으면 앱 안내 문구로 대체 */}
         {!compact && !post.body && (

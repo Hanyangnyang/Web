@@ -28,7 +28,9 @@ export interface PlaylistSongDto {
   // 이 게시글이 속한 곡(trackId) 전체의 누적 재생수 — 재생 기록 API가 게시글이 아니라
   // 트랙 단위(POST /tracks/{trackId}/play)라, 같은 곡의 모든 게시글에 동일한 값이 실려옴
   totalPlayCount: number;
-  // heartCount, updatedAt도 응답에 있지만 화면에 표기하지 않아 그대로 버림
+  // 곡(trackId)을 좋아요한 사람 수 — 저장한 곡 목록(/tracks/liked) 항목에만 내려옴(그 외 게시글 목록 응답엔 없음)
+  likeCount?: number;
+  // updatedAt도 응답에 있지만 화면에 표기하지 않아 그대로 버림
 }
 
 export interface PagedPlaylistSongsDto {
@@ -103,8 +105,8 @@ export interface TrackPostsDto {
   artist: string;
   albumArtUrl: string;
   totalSongsCount: number;
-  // 이 곡에 달린 모든 추천 게시글의 좋아요 수 합계
-  totalHeartCount: number;
+  // 이 곡을 좋아요한 사람 수 (서버 필드명은 likeCount)
+  likeCount: number;
   songs: PagedPlaylistSongsDto;
 }
 
@@ -177,7 +179,8 @@ export interface PlaylistApiDataSource {
 }
 
 const DEFAULT_PAGE = 0;
-const DEFAULT_SIZE = 50;
+// 서버 API 문서 기본값(size=20)과 동일 — 전체 보기는 무한 스크롤로 20개씩 이어 받음
+const DEFAULT_SIZE = 20;
 // 게시글 검색은 API 문서 기본값(size=20)을 그대로 따름 — 다른 목록보다 짧게
 const SEARCH_DEFAULT_SIZE = 20;
 // 내가 작성한 추천글 조회도 API 문서 기본값(size=20, 허용 범위 1~100)을 따름. page < 0 또는 size 범위 위반 시 서버가 400을 반환

@@ -1,5 +1,5 @@
 // 도메인 레포지토리 인터페이스: 플레이리스트 피드 곡 목록 조회/등록/신고/좋아요/재생기록/이모지반응/곡별게시글모아보기/인기차트 계약 (구현은 data 레이어의 PlaylistRepository)
-import type { PlaylistSong, PlaylistReaction } from '../entities/PlaylistSong.js';
+import type { PlaylistSong, PlaylistSongPage, PlaylistReaction } from '../entities/PlaylistSong.js';
 import type { TrackPosts } from '../entities/TrackPosts.js';
 import type { PopularityChart } from '../entities/PopularityChart.js';
 import type { SongCreationStatus } from '../entities/SongCreationStatus.js';
@@ -102,15 +102,15 @@ export interface GetArtistRecommendationsParams {
 }
 
 export interface PlaylistRepository {
-  getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSong[]>;
+  getRecentSongs: (params?: GetPlaylistSongsParams) => Promise<PlaylistSongPage>;
   // 게시글 단건 상세 조회 — 딥링크/SNS 공유/알림 연동, 그리고 게시글 목록에서 상세화면 진입 시 사용
   getSongById: (params: GetSongByIdParams) => Promise<PlaylistSong>;
   // 곡 등록 화면 진입 시 1일 3곡 제한/최근 7일 중복 추천 사전 확인용 기기 상태 조회
   getSongCreationStatus: (params: GetSongCreationStatusParams) => Promise<SongCreationStatus>;
   // 내가 좋아요 누른 곡 목록 조회 — 좋아요한 곡 화면용
-  getLikedSongs: (params: GetLikedSongsParams) => Promise<PlaylistSong[]>;
+  getLikedSongs: (params: GetLikedSongsParams) => Promise<PlaylistSongPage>;
   // 내가 등록(작성)한 게시글 목록 조회 — 내가 등록한 곡 화면용
-  getMySongs: (params: GetMySongsParams) => Promise<PlaylistSong[]>;
+  getMySongs: (params: GetMySongsParams) => Promise<PlaylistSongPage>;
   // 게시글 가중치 통합 검색(제목/가수/코멘트) — 검색 결과 화면의 "게시글" 섹션용
   searchSongs: (params: SearchSongsParams) => Promise<PlaylistSong[]>;
   submitSong: (params: SubmitSongParams) => Promise<PlaylistSong>;

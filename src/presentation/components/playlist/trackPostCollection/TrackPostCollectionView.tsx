@@ -5,6 +5,8 @@ import { type ReactionKey } from '../postReactions';
 import { type Song, type ReactionState, type TrackSummary, formatTimeAgo, toReactionState } from '../playlistTypes';
 import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
 import { useTrackPosts, type TrackPostsSort } from '../../../hooks/playlist/useTrackPosts.js';
+import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSentinel.js';
+import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { EmptyMessageCard } from '../searchResults/EmptyMessageCard';
 import { CHIP_ACTIVE, CHIP_BASE, CHIP_INACTIVE } from '../shared/GenreFilterChips';
 import { AlbumArtPlayButton } from '../shared/AlbumArtPlayButton';
@@ -48,7 +50,7 @@ const SORT_OPTIONS = [
 // 곡 단위 게시글 모음 화면 — 앨범커버 + 최신/인기 정렬 칩 + 게시글 리스트
 export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, isPlaying = false, onResolveTrack, onShowRecent, recentSongs, isRecentSongsLoading, onSelectRecentSong, onPlayTrack, currentTrackId, recentSongsVariant }: TrackPostCollectionViewProps) {
   const [sort, setSort] = useState<TrackPostsSort>('latest');
-  const { data, isLoading } = useTrackPosts(track.trackId, sort);
+  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useTrackPosts(track.trackId, sort);
   const posts = data?.posts ?? [];
   const totalCount = data?.totalSongsCount ?? posts.length;
   const totalPlayCount = data?.totalPlayCount ?? 0;
@@ -70,17 +72,29 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
   // 좋아요는 곡 단위라 이 화면의 모든 게시글이 같은 상태를 공유함 — 서버가 준 첫 게시글의 값으로 초기화
   const [liked, setLiked] = useState(false);
   const [reactionsByPost, setReactionsByPost] = useState<Record<string, ReactionState>>({});
-  // 게시글 목록을 새로 받아올 때마다(정렬 변경 포함) 서버가 준 초기 좋아요/반응 상태로 로컬 상태를 다시 맞춤
+  // 서버가 준 곡 좋아요 값이 바뀔 때(최초 로딩·정렬 변경·재조회)만 로컬 상태를 서버 값으로 맞춤 — 다음 페이지를 받을 땐 값이 그대로라
+  // 그 사이 사용자가 누른 좋아요가 옛 값으로 되돌아가지 않음
+  const serverIsLiked = data?.isLiked;
   useEffect(() => {
-    if (!data) return;
-    const reactions: Record<string, ReactionState> = {};
-    for (const post of data.posts) {
-      if (!post.id) continue;
-      reactions[post.id] = toReactionState(post.reactions);
-    }
-    setLiked(data.posts[0]?.isLiked ?? false);
-    setReactionsByPost(reactions);
-  }, [data]);
+    if (serverIsLiked === undefined) return;
+    setLiked(serverIsLiked);
+  }, [serverIsLiked]);
+  // 반응은 게시글 목록이 바뀔 때마다(정렬 변경·다음 페이지 포함) 새로 생긴 게시글만 서버 상태로 채우고, 이미 로컬에서 들고 있는 건 유지함 —
+  // 다음 페이지를 받는다고 앞에서 사용자가 누른 반응이 옛 값으로 덮어써지지 않게
+  const fetchedPosts = data?.posts;
+  useEffect(() => {
+    if (!fetchedPosts) return;
+    setReactionsByPost((prev) => {
+      const next: Record<string, ReactionState> = {};
+      for (const post of fetchedPosts) {
+        if (!post.id) continue;
+        next[post.id] = prev[post.id] ?? toReactionState(post.reactions);
+      }
+      return next;
+    });
+  }, [fetchedPosts]);
+
+  const sentinelRef = useInfiniteScrollSentinel({ hasNextPage, isFetchingNextPage, fetchNextPage, itemCount: posts.length });
 
   const [openPickerPostId, setOpenPickerPostId] = useState<string | null>(null);
   const report = useSongReport();
@@ -310,6 +324,16 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
           );
         })}
       </div>
+
+      {/* 다음 페이지가 있으면 목록 끝에 감시 요소 + 불러오는 중 표시 */}
+      {hasNextPage && (
+        <div ref={sentinelRef} className="mt-1 flex flex-col gap-1">
+          {isFetchingNextPage &&
+            Array.from({ length: 2 }).map((_, i) => (
+              <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
+            ))}
+        </div>
+      )}
 
       <hr className="-mx-3 my-4 border-slate-200" />
 

@@ -9,8 +9,8 @@ interface LikedSongsViewProps extends Omit<SongListViewBaseProps, 'viewMode' | '
 
 export function LikedSongsView({ onBack, onPlay, onShowAddSong, onShowRecent, onSelectTrack, currentTrackId }: LikedSongsViewProps) {
   // 최근추가된곡/인기차트와 동일하게 SWR로 통일 — 재방문 땐 캐시를 바로 보여주고 조용히
-  // 백그라운드에서 갱신함(isLoading은 캐시가 아예 없는 최초 진입에만 true)
-  const { data: songs, isLoading } = useLikedSongs();
+  // 백그라운드에서 갱신함(isLoading은 캐시가 아예 없는 최초 진입에만 true). 20개씩 이어 받는 무한 스크롤
+  const { songs, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useLikedSongs();
 
   return (
     <SongListScreen
@@ -30,6 +30,9 @@ export function LikedSongsView({ onBack, onPlay, onShowAddSong, onShowRecent, on
       currentTrackId={currentTrackId}
       emptyStateBoxed={false}
       hideMineBadge
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={fetchNextPage}
     />
   );
 }

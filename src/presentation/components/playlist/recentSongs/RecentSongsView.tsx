@@ -1,10 +1,10 @@
-import { type Song, type SongListViewBaseProps } from '../playlistTypes';
+import { type SongListViewBaseProps } from '../playlistTypes';
 import { SongListScreen } from '../shared/SongListScreen';
 import { type GenreFilterState } from '../shared/GenreFilterChips';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
+import { useRecentSongsInfinite } from '../../../hooks/playlist/useRecentSongsInfinite.js';
 
 interface RecentSongsViewProps extends SongListViewBaseProps {
-  songs: Song[];
   // 장르 필터 결과가 없을 때 "어떤 곡을 추천해볼까?" 버튼 클릭 시 검색 화면으로 이동
   onShowSearch: () => void;
   // 홈에서 누른 카드로 바로 스크롤하기 위한 대상 trackId
@@ -18,13 +18,17 @@ interface RecentSongsViewProps extends SongListViewBaseProps {
   onGenreFilterChange: (next: GenreFilterState) => void;
 }
 
-export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, highlightScrollTarget, currentTrackId, viewMode, onViewModeChange, playButtonVariant, genreFilter, onGenreFilterChange }: RecentSongsViewProps) {
+export function RecentSongsView({ onBack, onPlay, onShowAddSong, onShowSearch, onSelectTrack, scrollToTrackId, highlightScrollTarget, currentTrackId, viewMode, onViewModeChange, playButtonVariant, genreFilter, onGenreFilterChange }: RecentSongsViewProps) {
+  // 홈 미리보기(앞 10개)와 달리 전체 목록 — 20개씩 이어 받는 무한 스크롤
+  const { songs, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentSongsInfinite();
+
   return (
     <SongListScreen
       title="최근 추가된 곡"
       emoji="🎵"
       subtitle="에리카생들이 방금 추천한 곡을 확인해보세요!"
-      songs={songs}
+      songs={songs ?? []}
+      isLoading={isLoading}
       onBack={onBack}
       onPlay={onPlay}
       onShowAddSong={onShowAddSong}
@@ -40,6 +44,9 @@ export function RecentSongsView({ songs, onBack, onPlay, onShowAddSong, onShowSe
       playButtonVariant={playButtonVariant}
       genreFilter={genreFilter}
       onGenreFilterChange={onGenreFilterChange}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={fetchNextPage}
     />
   );
 }

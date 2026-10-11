@@ -10,6 +10,7 @@ import { Coachmark, useCoachmark } from './Coachmark';
 import { ScrollToTopPill } from './ScrollToTopPill';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { scrollNearestScrollableAncestorToTop } from '../../../../utils/scroll';
+import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSentinel';
 
 // 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다(Coachmark.tsx 참고)
 const VIEW_TOGGLE_COACHMARK_SEEN_KEY = 'viewToggleCoachmarkSeen';
@@ -59,6 +60,11 @@ interface SongListScreenProps {
   // 장르 필터를 상위(PlaylistView)에서 제어하고 싶을 때 넘김 — 홈 미리보기와 선택·칩 위치를 동기화. 안 넘기면 이 화면 내부 state로만 관리
   genreFilter?: GenreFilterState;
   onGenreFilterChange?: (next: GenreFilterState) => void;
+  // 무한 스크롤 — 다음 페이지가 있으면 목록 맨 아래에 감시 요소를 두고 화면 근처에 오면 onLoadMore를 부름.
+  // 홈에서 누른 카드(scrollToTrackId)가 아직 안 불러온 페이지에 있으면 찾을 때까지 이어서 불러옴
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
 }
 
 export function SongListScreen({
@@ -86,6 +92,9 @@ export function SongListScreen({
   hideMineBadge = false,
   genreFilter: genreFilterProp,
   onGenreFilterChange,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  onLoadMore,
 }: SongListScreenProps) {
   const [internalGenreFilter, setInternalGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
   const genreFilter = genreFilterProp ?? internalGenreFilter;
@@ -95,6 +104,8 @@ export function SongListScreen({
   const [openPickerKey, setOpenPickerKey] = useState<string | null>(null);
   const [internalViewMode, setInternalViewMode] = useState<'grid' | 'list'>('grid'); // 기본은 2열 — 1열은 토글로 전환
   const viewMode = gridOnly ? 'grid' : (viewModeProp ?? internalViewMode);
+  // 로딩 스켈레톤은 실제 카드 모양에 맞춤 — gridOnly(저장한 곡)는 반응·한마디 없는 요약 카드라 전용 변형을 씀
+  const skeletonVariant = gridOnly ? 'summary' : viewMode === 'grid' ? 'grid' : 'card';
   // 토글을 누르는 순간 화면 가운데에 가장 가까운 카드 — 열 수가 바뀌어 레이아웃이 달라져도 보던 곡으로 다시 스크롤하기 위해 기억해 둠
   const viewAnchorRef = useRef<string | null>(null);
   const setViewMode = (mode: 'grid' | 'list') => {
@@ -162,6 +173,8 @@ export function SongListScreen({
   // 대상이 있거나 뷰 모드가 바뀌어 목록 DOM이 다시 그려질 때마다 해당 카드로 부드럽게 스크롤
   // 처음 진입할 땐 홈에서 내려와 있던 스크롤 위치가 그대로 남아 있어 아래→위로 스크롤되므로, 맨 위로 먼저 옮긴 뒤 위→아래로 스크롤
   const didInitialScrollRef = useRef(false);
+  // 스크롤 대상 카드를 찾아 스크롤을 마쳤는지 — 이후 페이지가 더 붙어도 다시 스크롤하지 않음
+  const targetScrolledRef = useRef(false);
   // 찾아온 카드를 잠깐 강조 — 처음 스크롤할 때 대상 카드가 실제로 그려져 있을 때만 한 번 켬(토글로 1열↔2열을 바꿀 땐 다시 켜지 않음)
   const [highlightedTrackId, setHighlightedTrackId] = useState<string | null>(null);
   useLayoutEffect(() => {
@@ -180,8 +193,30 @@ export function SongListScreen({
     }
     const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
     target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (target) targetScrolledRef.current = true;
     if (isInitial && target && highlightScrollTarget) setHighlightedTrackId(scrollTarget);
   }, [viewMode, scrollTarget]);
+
+  // 위 effect는 화면에 들어올 때 카드가 이미 그려져 있을 때만 스크롤함 — 목록을 처음 불러오는 중이거나 대상 카드가 아직 안 받은 페이지에
+  // 있으면 못 찾으므로, 페이지가 붙을 때마다 다시 찾아보고 없으면 다음 페이지를 이어 불러옴(찾으면 스크롤+강조 후 멈춤)
+  useLayoutEffect(() => {
+    if (!scrollTarget || targetScrolledRef.current || isLoading) return;
+    const target = listContainerRef.current?.querySelector<HTMLElement>(`[data-track-id="${scrollTarget}"]`);
+    if (target) {
+      targetScrolledRef.current = true;
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      if (highlightScrollTarget) setHighlightedTrackId(scrollTarget);
+      return;
+    }
+    if (hasNextPage && !isFetchingNextPage) onLoadMore?.();
+  }, [scrollTarget, songs.length, isLoading, hasNextPage, isFetchingNextPage]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const sentinelRef = useInfiniteScrollSentinel({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage: () => onLoadMore?.(),
+    itemCount: songs.length,
+  });
   useEffect(() => {
     if (!highlightedTrackId) return;
     const timer = setTimeout(() => setHighlightedTrackId(null), 2400);
@@ -322,10 +357,10 @@ export function SongListScreen({
         {isLoading ? (
           <div className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
             {Array.from({ length: viewMode === 'grid' ? 4 : 3 }).map((_, i) => (
-              <PostDetailCardSkeleton key={i} variant={viewMode === 'grid' ? 'grid' : 'card'} />
+              <PostDetailCardSkeleton key={i} variant={skeletonVariant} />
             ))}
           </div>
-        ) : filteredSongs.length === 0 ? (
+        ) : filteredSongs.length === 0 && !hasNextPage ? (
           <EmptyGenreState
             onAction={onEmptyStateAction ?? onShowAddSong}
             message={emptyStateMessage}
@@ -370,6 +405,15 @@ export function SongListScreen({
               </div>
               );
             })}
+          </div>
+        )}
+        {/* 다음 페이지가 있으면 목록 끝에 감시 요소 + 불러오는 중 표시. 장르 필터로 보이는 곡이 적어도(0개 포함) 이어서 불러옴 */}
+        {!isLoading && hasNextPage && (
+          <div ref={sentinelRef} className={`grid gap-3 py-1 ${viewMode === 'grid' ? 'grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
+            {isFetchingNextPage &&
+              Array.from({ length: viewMode === 'grid' ? 2 : 1 }).map((_, i) => (
+                <PostDetailCardSkeleton key={i} variant={skeletonVariant} />
+              ))}
           </div>
         )}
       </div>

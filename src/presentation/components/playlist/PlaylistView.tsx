@@ -1,13 +1,14 @@
-import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo, type CSSProperties } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { isNativeApp, getPlatform } from '../../../lib/platform.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
-import { RecommendSongView } from './recommendSong/RecommendSongView';
 import { SearchSongFab, SEARCH_FAB_STACK_PX } from './shared/SearchSongFab';
+import { RecommendSongView } from './recommendSong/RecommendSongView';
 import { EMPTY_GENRE_FILTER, type GenreFilterState } from './shared/GenreFilterChips';
 import { RecentSongsView } from './recentSongs/RecentSongsView';
 import { SearchResultsView } from './searchResults/SearchResultsView';
@@ -18,12 +19,13 @@ import { MyPageView } from './myPage/MyPageView';
 import { LikedSongsView } from './likedSongs/LikedSongsView';
 import { MySongsView } from './mySongs/MySongsView';
 import { PlaylistHomeView } from './home/PlaylistHomeView';
-import { type Song, type ChartPeriod, type TrackSummary, filterSongsByGenre } from './playlistTypes';
+import { type Song, type ChartPeriod, type TrackSummary } from './playlistTypes';
 import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
 import { useRecentSongs } from '../../hooks/playlist/useRecentSongs.js';
 import { useMySongs } from '../../hooks/playlist/useMySongs.js';
+import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY } from '../../hooks/playlist/playlistQueryKeys.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
 import { usePopularityChart } from '../../hooks/playlist/usePopularityChart.js';
@@ -75,17 +77,21 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const isApp = isNativeApp();
   const platform = getPlatform();
   const posthog = usePostHog();
+  const queryClient = useQueryClient();
 
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고
   const recentSongsVariant = useRecentSongsTapAreaVariant();
   // 소식탭 배너 딥링크로 마운트되면 첫 렌더부터 그 검색어/검색 화면으로 시작 — 마운트 후 effect로 옮기면 홈이 한 프레임 먼저 그려져 반짝임
   const [searchQuery, setSearchQuery] = useState(deepLinkSearchQuery ?? '');
-  const { data: fetchedSongs, isLoading: isRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
+  const { data: fetchedSongs, isLoading: isAllRecentSongsLoading, refetch: refetchRecentSongs } = useRecentSongs();
   const songs = fetchedSongs ?? EMPTY_SONGS;
   // 홈 "최근 추가된 곡" 미리보기의 장르 필터
   // 최근 추가된 곡 화면과 상태(선택 + 칩 위치)를 공유해서, 홈에서 고른 장르가 그 화면에도 그대로 이어진다
   const [recentGenreFilter, setRecentGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
-  const filteredRecentSongs = useMemo(() => filterSongsByGenre(songs, recentGenreFilter.selected), [songs, recentGenreFilter.selected]);
+  // 장르를 고르면 전체 첫 페이지를 걸러내지 않고 서버에서 그 장르의 앞 10개를 따로 받음(전체일 땐 위 쿼리와 같은 캐시)
+  const { data: genreSongs, isLoading: isGenreSongsLoading } = useRecentSongs(recentGenreFilter.selected[0]);
+  const filteredRecentSongs = genreSongs ?? EMPTY_SONGS;
+  const isRecentSongsLoading = recentGenreFilter.selected.length > 0 ? isGenreSongsLoading : isAllRecentSongsLoading;
   const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
@@ -253,11 +259,29 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     skipScrollRestore: (screen.name === 'recent' || screen.name === 'mySongs' || screen.name === 'chart') && !!screen.scrollTarget,
   });
 
-  // 최근추가된곡/인기차트 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
+  // 홈/최근추가된곡/인기차트/저장한곡/내가추천한곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
   const { pull, isRefreshing: isPullRefreshing, threshold: pullThreshold } = usePullToRefresh({
     containerRef: scrollContainerRef,
-    onRefresh: () => (screen.name === 'chart' ? refetchScreenChart() : refetchRecentSongs()),
-    enabled: screen.name === 'recent' || screen.name === 'chart',
+    onRefresh: () => {
+      switch (screen.name) {
+        case 'chart':
+          return refetchScreenChart();
+        // 최근추가된곡 화면은 전체 목록(무한 스크롤 캐시)과 홈 미리보기를 같이 새로고침
+        case 'recent':
+          return Promise.all([refetchRecentSongs(), queryClient.refetchQueries({ queryKey: RECENT_SONGS_INFINITE_QUERY_KEY, type: 'active' })]);
+        case 'liked':
+          return queryClient.refetchQueries({ queryKey: LIKED_SONGS_QUERY_KEY, type: 'active' });
+        case 'mySongs':
+          return Promise.all([
+            queryClient.refetchQueries({ queryKey: MY_SONGS_QUERY_KEY, type: 'active' }),
+            queryClient.refetchQueries({ queryKey: MY_SONGS_INFINITE_QUERY_KEY, type: 'active' }),
+          ]);
+        default:
+          // 홈 — 지금 마운트된 플레이리스트 쿼리(최근 추가/내가 추천/인기차트/아티스트 추천 미리보기)를 전부 새로고침
+          return queryClient.refetchQueries({ queryKey: ['playlist'], type: 'active' });
+      }
+    },
+    enabled: screen.name === 'main' || screen.name === 'recent' || screen.name === 'chart' || screen.name === 'liked' || screen.name === 'mySongs',
   });
 
   const handleSearchSubmit = useCallback(() => {
@@ -302,7 +326,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 게시글 목록(TrackPostCollectionView/SearchResultsView) 항목 클릭 — 기획 단계에서 게시글 상세(postDetail/PostView)를
   // 쓰지 않기로 해서, 최근추가된곡 화면으로 이동하면서 그 곡 위치로 스크롤함(홈의 최근 추가된 곡 카드 클릭과 같은 방식).
   // postDetail 화면/PostView 코드는 그대로 남겨둠 — 다시 쓰려면 아래를 pushScreen({ name: 'postDetail', postId: post.id })로 되돌리면 됨.
-  // 주의: 최근추가된곡 목록은 최신 50개만 받아서, 그보다 오래된 게시글이면 해당 카드가 없어 스크롤 없이 목록 맨 위로 열림
+  // 최근추가된곡 목록은 무한 스크롤이라, 아직 안 받은 페이지에 있는 게시글이면 SongListScreen이 찾을 때까지 이어서 불러온 뒤 스크롤함
   // 장르 필터도 전체로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
   const handleSelectPost = useCallback((post: Song) => {
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
@@ -347,6 +371,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 목록 마지막 항목이 FAB에 가려지지 않는다
   const FAB_GAP_ABOVE_CONTENT = 12;
   const isFabVisible = screen.name !== 'addSong';
+  const searchFabExtra = screen.name === 'recent' ? SEARCH_FAB_STACK_PX : 0; // 최근추가된곡 화면은 검색 FAB이 한 칸 더 쌓임
   const bottomSpace = isFabVisible
     ? playerHeight > 0
       ? playerHeight + PLAYER_GAP_PX + FAB_HEIGHT_PX + FAB_GAP_ABOVE_CONTENT + searchFabExtra // 플레이어 위에 뜬 FAB까지 감안
@@ -368,7 +393,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       } as CSSProperties}
     >
       {/* 당겨서 새로고침 인디케이터 — 당기는 만큼 내려오고, 기준 거리를 넘으면 회전 */}
-  const searchFabExtra = screen.name === 'recent' ? SEARCH_FAB_STACK_PX : 0; // 최근추가된곡 화면은 검색 FAB이 한 칸 더 쌓임
       {(pull > 0 || isPullRefreshing) && (
         <div
           className="fixed left-1/2 z-[1100] pointer-events-none"
@@ -393,7 +417,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       <div key={screen.name} style={{ animation: 'fadeIn 0.25s ease-out' }}>
         {screen.name === 'recent' ? (
           <RecentSongsView
-            songs={songs}
             onBack={popScreen}
             onPlay={(song) => handlePlay(song, 'recent_full_list')}
             onShowAddSong={() => pushAddSong()}
@@ -562,6 +585,16 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       {screen.name !== 'addSong' && (
         <AddSongFab onClick={handleAddSongFabClick} playerHeight={playerHeight} showCoachmark={screen.name === 'main'} />
       )}
+      {/* 곡 검색하기 FAB: 최근추가된곡 화면 전용 — 곡 추천하기 FAB 위에 쌓임. 누르면 검색어 없이 검색 화면(검색바에 포커스)으로 이동 */}
+      {screen.name === 'recent' && (
+        <SearchSongFab
+          playerHeight={playerHeight}
+          onClick={() => {
+            setSearchQuery('');
+            pushScreen({ name: 'search' });
+          }}
+        />
+      )}
 
       {/* 플레이리스트를 나가려 할 때 확인 팝업(재생 중이면 음악이 멈춘다는 안내) */}
       {showExitConfirm && (
@@ -582,16 +615,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
                 }}
                 className="flex-1 h-11 rounded-full text-[15px] font-bold text-white bg-playlist-primary active:scale-[0.97] transition-transform"
               >
-      {/* 곡 검색하기 FAB: 최근추가된곡 화면 전용 — 곡 추천하기 FAB 위에 쌓임. 누르면 검색어 없이 검색 화면(검색바에 포커스)으로 이동 */}
-      {screen.name === 'recent' && (
-        <SearchSongFab
-          playerHeight={playerHeight}
-          onClick={() => {
-            setSearchQuery('');
-            pushScreen({ name: 'search' });
-          }}
-        />
-      )}
                 나가기
               </button>
             </div>

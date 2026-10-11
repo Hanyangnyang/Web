@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
 import { useSongSearchInfinite } from '../../../hooks/playlist/useSongSearchInfinite.js';
+import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSentinel.js';
 import { RecentSongRow } from '../shared/RecentSongRow';
 import { SongRowSkeleton } from '../shared/SongRowSkeleton';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
@@ -22,19 +22,7 @@ export function SearchPostsView({ query, onBack, onSelectPost, onPlay, currentTr
   const posts = data?.pages.flat() ?? [];
 
   // 목록 맨 아래 감시용 요소가 화면 근처에 오면 다음 페이지를 자동으로 불러옴(무한 스크롤)
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasNextPage) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && !isFetchingNextPage) fetchNextPage();
-      },
-      { rootMargin: '200px' },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, posts.length]);
+  const sentinelRef = useInfiniteScrollSentinel({ hasNextPage, isFetchingNextPage, fetchNextPage, itemCount: posts.length });
 
   return (
     <div className="pb-[calc(var(--playlist-bottom-space,204px)+env(safe-area-inset-bottom))] transition-[padding-bottom] duration-300 ease-out">

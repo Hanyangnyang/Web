@@ -43,6 +43,8 @@ export interface Song {
   // 지금 이 기기가 등록한 게시글인지 — 신고 아이콘을 숨길지 판단하는 데 씀
   isMine?: boolean;
   reactions?: PlaylistReaction[];
+  // 곡을 좋아요한 사람 수 — 저장한 곡 목록에서만 채워짐
+  likeCount?: number;
   // react-query 캐시에 그대로 들어가 localStorage에 직렬화되므로 Date 인스턴스가 아니라 ISO 문자열로 유지 —
   // Date로 저장하면 새로고침 후 복원 시 문자열로 풀리면서 formatTimeAgo가 크래시남 (Gym.ts 등 다른 엔티티와 동일한 이유)
   createdAt: string;
@@ -61,6 +63,7 @@ export function mapPlaylistSongToSong(song: PlaylistSong): Song {
     isLiked: song.isLiked,
     isMine: song.isMine,
     reactions: song.reactions,
+    likeCount: song.likeCount,
     createdAt: song.createdAt,
   };
 }

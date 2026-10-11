@@ -69,6 +69,7 @@ function toPlaylistSong(d: PlaylistSongDto, myDeviceId?: string): PlaylistSong {
     isLiked: d.isLiked,
     isMine: !!myDeviceId && d.deviceId === myDeviceId,
     reactions: toReactions(d.reactions),
+    likeCount: d.likeCount,
     // 곡 등록(POST) 직후 응답엔 createdAt이 null로 내려옴(DB 기록 시점과 응답 시점이 안 맞는 것으로 보임) —
     // 방금 등록한 게시글이니 "지금"으로 채워도 실제 값과 사실상 같음
     createdAt: d.createdAt ?? new Date().toISOString(),
@@ -79,11 +80,13 @@ export const createPlaylistRepository = (
   { playlistApiDataSource }: { playlistApiDataSource: PlaylistApiDataSource }
 ): PlaylistRepository => ({
   getRecentSongs: async (params) => {
-    const res = await playlistApiDataSource.getSongs(params);
+    // 화면에서 쓰는 장르 라벨(예: 'R&B')로 들어오면 백엔드 enum(R_AND_B)으로 바꿔서 보냄
+    const genre = params?.genre ? (GENRE_ENUM_BY_LABEL[params.genre] ?? params.genre) : undefined;
+    const res = await playlistApiDataSource.getSongs({ ...params, genre });
     const data = unwrap(res, 'playlist songs', (d) => !!d && Array.isArray(d.content));
 
     // 등록된 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
-    return data.content.map((d) => toPlaylistSong(d, params?.deviceId));
+    return { songs: data.content.map((d) => toPlaylistSong(d, params?.deviceId)), last: data.last };
   },
 
   getSongById: async (params) => {
@@ -98,7 +101,7 @@ export const createPlaylistRepository = (
     const data = unwrap(res, 'playlist liked songs', (d) => !!d && Array.isArray(d.content));
 
     // 좋아요한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
-    return data.content.map((d) => toPlaylistSong(d, params.deviceId));
+    return { songs: data.content.map((d) => toPlaylistSong(d, params.deviceId)), last: data.last };
   },
 
   getMySongs: async (params) => {
@@ -106,7 +109,7 @@ export const createPlaylistRepository = (
     const data = unwrap(res, 'playlist my-songs', (d) => !!d && Array.isArray(d.content));
 
     // 등록한 곡이 아직 없을 수 있는 정상 케이스라 빈 배열은 에러로 취급하지 않음
-    return data.content.map((d) => toPlaylistSong(d, params.deviceId));
+    return { songs: data.content.map((d) => toPlaylistSong(d, params.deviceId)), last: data.last };
   },
 
   searchSongs: async (params) => {
@@ -201,9 +204,10 @@ export const createPlaylistRepository = (
           artist: '',
           albumArtUrl: '',
           totalSongsCount: 0,
-          totalHeartCount: 0,
+          likeCount: 0,
           totalPlayCount: 0,
           posts: [],
+          last: true,
         });
       }
       throw e;
@@ -216,10 +220,11 @@ export const createPlaylistRepository = (
       artist: data.artist,
       albumArtUrl: data.albumArtUrl,
       totalSongsCount: data.totalSongsCount,
-      totalHeartCount: data.totalHeartCount,
+      likeCount: data.likeCount,
       // 재생수는 게시글 단위가 아니라 트랙 단위라 모든 게시글에 같은 값이 실려있음 — 첫 게시글에서만 꺼내 씀
       totalPlayCount: data.songs.content[0]?.totalPlayCount ?? 0,
       posts: data.songs.content.map((d) => toPlaylistSong(d, params.deviceId)),
+      last: data.songs.last,
     });
   },
 

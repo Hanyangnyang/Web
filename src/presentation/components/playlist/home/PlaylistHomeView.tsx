@@ -236,7 +236,7 @@ export function PlaylistHomeView({
         {/* 최근 추가된 곡 목록 */}
         {isRecentSongsLoading ? (
           <div className="flex flex-col gap-1.5">
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <SongRowSkeleton key={i} className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)]" />
             ))}
           </div>
