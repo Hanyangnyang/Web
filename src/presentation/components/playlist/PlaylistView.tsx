@@ -666,7 +666,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         >
           <p className="text-[16px] font-bold text-text-main mb-1 text-center">플리를 종료하시겠습니까?</p>
           <p className="text-[13px] font-medium text-text-hint mb-3.5 text-center">
-            {playingTrackId ? '종료하면 재생 중인 음악이 정지돼요.' : '하냥이들의 새로운 추천곡이 기다리고 있어요!'}
+            {playingTrackId ? '종료하면 재생 중인 음악이 정지돼요.' : '새로운 추천곡이 기다리고 있어요!'}
           </p>
         </ConfirmPopup>
       )}
