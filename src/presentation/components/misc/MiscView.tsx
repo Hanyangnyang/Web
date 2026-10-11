@@ -1,5 +1,5 @@
 // 컴포넌트: 기타탭 화면 오케스트레이터 (그리드 ↔ 하위 View 라우팅)
-import { useState, useEffect, lazy, Suspense, type ComponentType } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense, type ComponentType } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { GymView } from './GymView.jsx';
 import { ClubView } from './ClubView.jsx';
@@ -29,6 +29,10 @@ const LazyInstagramView = lazy(loadInstagramView);
 const LazyFeedbackView = lazy(loadFeedbackView);
 
 type SubView = 'list' | MiscBoxKey;
+
+// deepLinkBox가 어디서 왔는지 — 서브뷰 진입 경로 계측(playlist_opened의 source)에 씀.
+// deeplink: 카카오 공유 등 링크(콜드 스타트 URL 포함), push: 네이티브 푸시 탭, banner: 소식탭 배너, portal_artist: 소식탭 아티스트 추천
+export type MiscBoxOpenSource = 'deeplink' | 'push' | 'banner' | 'portal_artist';
 
 function AccordionGroupShimmer() {
   return (
@@ -91,7 +95,8 @@ interface MiscViewProps {
   resetSignal: number;
   isActive?: boolean;
   deepLinkBox?: string | null;  // 소식탭 배너에서 넘어올때
-  onDeepLinkBoxHandled?: () => void; 
+  deepLinkBoxSource?: MiscBoxOpenSource;  // deepLinkBox의 출처 — 진입 경로 계측용
+  onDeepLinkBoxHandled?: () => void;
   deepLinkTrackId?: string | null;   // 플레이리스트 카카오 공유를 위함
   onDeepLinkTrackIdHandled?: () => void;
   deepLinkPostId?: string | null;   // 추천글 카드에서 공유한 링크의 게시글 id (deepLinkTrackId와 함께 옴)
@@ -101,7 +106,7 @@ interface MiscViewProps {
   onDeepLinkClubIdHandled?: () => void;
 }
 
-export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
+export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkBoxSource = 'deeplink', onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
   const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
@@ -111,12 +116,24 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
     setSubView('list');
   }, [resetSignal]);
 
+  // 다음 서브뷰 전환이 어떤 경로로 일어났는지 — 전환을 일으키는 쪽(박스 클릭/딥링크)이 setSubView 직전에 채워둠
+  const openPropsRef = useRef<{ source: MiscBoxOpenSource | 'misc_box'; shared_track: boolean }>({ source: 'misc_box', shared_track: false });
+
   // 배너 등 딥링크로 넘어온 서브뷰를 한 번 적용하고 부모에 소비 완료를 알린다 (CampusMapView의 deepLinkChip과 동일한 방식)
   useEffect(() => {
     if (!deepLinkBox) return;
+    // shared_track: 카카오 공유처럼 특정 곡을 가리키는 링크로 들어왔는지(trackId는 box와 같은 렌더에 함께 세팅됨)
+    openPropsRef.current = { source: deepLinkBoxSource, shared_track: !!deepLinkTrackId };
     setSubView(deepLinkBox as SubView);
     onDeepLinkBoxHandled?.();
   }, [deepLinkBox]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 플레이리스트 진입 계측 — 리텐션/도달률의 기준 이벤트. 이미 플레이리스트에 있는 채로 딥링크가 또 와도
+  // subView가 안 바뀌니 다시 안 찍힘(새 진입이 아님). 다른 탭에 갔다 와도 MiscView는 마운트가 유지돼서 안 찍힘
+  useEffect(() => {
+    if (subView !== 'playlist') return;
+    posthog?.capture('playlist_opened', openPropsRef.current);
+  }, [subView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isActive) return;
@@ -129,6 +146,7 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, onDeepLin
     if (box === 'calendar') {
       window.open('https://www.hanyang.ac.kr/-93', '_blank', 'noopener,noreferrer');
     } else {
+      openPropsRef.current = { source: 'misc_box', shared_track: false };
       setSubView(box);
     }
   };
