@@ -413,10 +413,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       style={{
         backgroundColor: '#FFFFFF',
         animation: 'fadeIn 0.25s ease-out',
-        // 상태바/노치 높이만큼 루트 자체를 아래로 내림(학식·셔틀 탭과 같은 구조) — 스크롤 영역이 노치 아래에서 시작하므로
-        // sticky 헤더는 top 보정 없이 영역 맨 위(-top-6)에 붙는다
-        top: isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)',
-        paddingTop: '1.5rem',
+        paddingTop: `calc(1.5rem + ${isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)'})`,
         paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
         '--playlist-bottom-space': `${bottomSpace}px`,
         // 하단 플로팅 플레이어 실측 높이(닫힘이면 0) — 좋아요 토스트처럼 플레이어 위에 떠야 하는 요소가 읽음
