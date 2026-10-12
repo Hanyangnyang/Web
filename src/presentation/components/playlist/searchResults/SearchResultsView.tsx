@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { type Song, type TrackSummary } from '../playlistTypes';
@@ -54,6 +55,29 @@ export function SearchResultsView({ query, onBack, onShowMorePosts, onShowRecent
   const trackResults: MusicSearchTrack[] = trackResultsData ?? [];
   const { remainingSeconds: retryRemainingSeconds, isBlocked: isRetryBlocked } = useRetryCountdown(musicSearchError);
   const searchError = getSearchErrorMessage(musicSearchError, retryRemainingSeconds);
+
+  // 검색 지표 — 검색어 하나당 곡·추천글 결과가 둘 다 확정된 시점에 한 번만 캡처.
+  // 추천글 0건 = "아직 아무도 추천 안 한 곡"이라, 검색 결과의 곡 추천하기(→ playlist_recommend_entered의 prefilled_query)로
+  // 이어지는 비율이 콘텐츠 공급 지표가 됨. 검색어 원문은 결과가 비었을 때만 실어 "찾는데 없는 곡"을 파악(partner_map_search_no_result와 같은 방식)
+  const posthog = usePostHog();
+  const capturedQueryRef = useRef<string | null>(null);
+  useEffect(() => {
+    const trimmed = activeQuery.trim();
+    if (trimmed.length < MIN_QUERY_LENGTH || isSearching || isSearchingPosts) return;
+    if (capturedQueryRef.current === trimmed) return; // 같은 검색어 재조회(429 재시도 등)는 한 번으로 봄
+    const isResearch = capturedQueryRef.current !== null || trimmed !== query.trim();
+    capturedQueryRef.current = trimmed;
+    const trackResultCount = musicSearchError ? null : trackResults.length; // 검색 실패는 0건과 구분
+    const postResultCount = postResults?.length ?? 0;
+    posthog?.capture('playlist_search_submitted', {
+      query_length: trimmed.length,
+      track_result_count: trackResultCount,
+      post_result_count: postResultCount,
+      has_error: !!musicSearchError,
+      is_research: isResearch, // 검색 결과 화면 안에서 다시 검색했는지(첫 검색은 홈 검색바/아티스트 배너에서 들어옴)
+      ...(trackResultCount === 0 || postResultCount === 0 ? { query: trimmed } : {}),
+    });
+  }, [activeQuery, isSearching, isSearchingPosts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 검색바에서 Enter를 치거나 화살표 버튼을 누르면 재검색
   const handleResearch = () => {

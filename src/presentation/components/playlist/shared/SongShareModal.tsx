@@ -42,7 +42,12 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
   // 공유 지표 — 실제로 공유/복사가 끝난 시점에만 찍음(공유창을 열었다 취소한 경우 제외).
   // playlist_opened(source: deeplink, shared_track: true)와 짝지어 "공유 → 유입" 루프를 봄
   const captureShared = (method: 'kakao' | 'native' | 'clipboard') => {
-    posthog?.capture('playlist_shared', { method, track_id: song.trackId, is_post: !!song.postId });
+    posthog?.capture('playlist_shared', {
+      method,
+      track_id: song.trackId,
+      is_post: !!song.postId,
+      $set: { playlist_has_shared: true }, // 사용자 속성 — 공유해본 사람 코호트
+    });
   };
 
   useEffect(() => {
