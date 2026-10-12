@@ -59,8 +59,11 @@ type ScreenFrame =
 type PlaylistScreen = ScreenFrame['name'];
 type ViewMode = 'grid' | 'list';
 type ListScreen = 'recent' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들 (저장한 곡은 2열 고정이라 제외)
-// 홈/최근추가된곡 화면만 체류시간(A/B 테스트 지표)을 잰다 — useScreenDwellTracking 참고
-const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = ['main', 'recent'];
+// 모든 화면의 체류시간을 잰다(화면별 방문 수·체류시간 지표) — useScreenDwellTracking 참고.
+// 처음엔 A/B 테스트용으로 홈/최근추가된곡만 쟀는데, A/B 분석은 screen 필터로 이 둘만 골라 보므로 확장해도 영향 없음
+const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = [
+  'main', 'recent', 'addSong', 'search', 'searchPosts', 'trackPosts', 'postDetail', 'chart', 'myActivity', 'liked', 'mySongs',
+];
 
 interface PlaylistViewProps {
   onBack: () => void;
@@ -137,6 +140,21 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     handlePlaybackStateChange,
     handlePlayerHeightChange,
   } = usePlaylistPlayer(recentSongsVariant, screen.name);
+
+  // 필터 사용 지표 — 사용자가 칩을 직접 눌렀을 때만 캡처하도록 칩 콜백 자리에만 이 래퍼를 넘김.
+  // 곡 등록 후 장르를 전체로 되돌리는 것처럼 코드가 setter를 직접 부르는 경우는 집계에서 빠짐
+  const changeChartPeriod = (period: ChartPeriod) => {
+    if (period !== chartPeriod) posthog?.capture('playlist_chart_period_changed', { period, screen: screen.name });
+    setChartPeriod(period);
+  };
+  // target: 어떤 목록의 장르 필터인지(최근 추가된 곡 — 홈 미리보기와 공유 / 인기차트 화면)
+  const makeGenreFilterChange = (target: 'recent' | 'chart', current: GenreFilterState, setFilter: (next: GenreFilterState) => void) =>
+    (next: GenreFilterState) => {
+      if (next.selected[0] !== current.selected[0]) {
+        posthog?.capture('playlist_genre_filter_changed', { target, genre: next.selected[0] ?? 'all', screen: screen.name });
+      }
+      setFilter(next);
+    };
   // 인기차트 화면용 차트 — 전체(장르 없음)이면 홈 미리보기와 같은 쿼리 키라 캐시를 공유하고, 장르를 고르면 그 장르 차트를 따로 받음
   const {
     data: screenChartData,
@@ -245,8 +263,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     });
   }, []);
 
-  // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원 + 홈/최근추가된곡
-  // 체류시간(A/B 테스트 지표)을 PostHog로 캡처 — 로직 전체는 useScreenDwellTracking 참고
+  // 화면(홈/최근추가된곡/곡추천하기)마다 스크롤 위치를 독립적으로 기억했다가 복원 + 화면별
+  // 체류시간을 PostHog로 캡처 — 로직 전체는 useScreenDwellTracking 참고
   const { scrollContainerRef } = useScreenDwellTracking({
     screen: screen.name,
     trackedScreens: DWELL_TRACKED_SCREENS,
@@ -486,7 +504,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onViewModeChange={changeViewMode('recent')}
             playButtonVariant={recentSongsVariant}
             genreFilter={recentGenreFilter}
-            onGenreFilterChange={setRecentGenreFilter}
+            onGenreFilterChange={makeGenreFilterChange('recent', recentGenreFilter, setRecentGenreFilter)}
           />
         ) : screen.name === 'addSong' ? (
           <RecommendSongView
@@ -562,9 +580,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             scrollToTrackId={screen.scrollTarget}
             onScrollTargetConsumed={consumeChartScrollTarget}
             genreFilter={chartGenreFilter}
-            onGenreFilterChange={setChartGenreFilter}
+            onGenreFilterChange={makeGenreFilterChange('chart', chartGenreFilter, setChartGenreFilter)}
             chartPeriod={chartPeriod}
-            onChangePeriod={setChartPeriod}
+            onChangePeriod={changeChartPeriod}
             onBack={popScreen}
             onShowRecent={() => handleShowAllRecent()}
             onPlay={handlePlay}
@@ -608,12 +626,12 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             visibleSongs={visibleSongs}
             promoRecentSongs={songs.slice(0, 10)}
             recentGenreFilter={recentGenreFilter}
-            onChangeRecentGenreFilter={setRecentGenreFilter}
+            onChangeRecentGenreFilter={makeGenreFilterChange('recent', recentGenreFilter, setRecentGenreFilter)}
             isRecentSongsLoading={isRecentSongsLoading}
             visibleChart={visibleChart}
             isChartLoading={isChartLoading}
             chartPeriod={chartPeriod}
-            onChangeChartPeriod={setChartPeriod}
+            onChangeChartPeriod={changeChartPeriod}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSubmitSearch={handleSearchSubmit}
