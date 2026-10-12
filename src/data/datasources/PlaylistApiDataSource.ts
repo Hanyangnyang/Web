@@ -2,7 +2,7 @@
 import { parseOrThrow, type ApiResponse, type HttpClient } from '../../infrastructure/http/HttpClient.js';
 
 // 백엔드 genre enum
-export type PlaylistGenreDto = 'KPOP' | 'ROCK' | 'BAND' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OST' | 'OTHER';
+export type PlaylistGenreDto = 'KPOP' | 'ROCK' | 'BAND' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'EDM' | 'JPOP' | 'OST' | 'OTHER';
 
 export interface PlaylistReactionDto {
   type: string;
@@ -124,7 +124,7 @@ export interface GetTrackPostsDataSourceParams {
 
 // 백엔드 차트 유형 — RISING(실시간 급상승, 기본값), WEEKLY(주간), MONTHLY(월간)
 export type ChartTypeDto = 'RISING' | 'WEEKLY' | 'MONTHLY';
-export type ChartGenreDto = 'KPOP' | 'BAND' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OST' | 'OTHER';
+export type ChartGenreDto = 'KPOP' | 'BAND' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'EDM' | 'JPOP' | 'OST' | 'OTHER';
 
 // 인기차트 응답 shape 검증과 타입은 ChartSchema.ts(zod)가 담당하고 Repository가 파싱함 — 검증 전이라 unknown
 // (snapshotTime, startPeriod, endPeriod도 응답에 있지만 displayTitle이 이미 사람이 읽기 좋은 형태라 화면에선 안 씀)
