@@ -57,7 +57,7 @@ export interface GetTrackPostsParams {
 }
 
 export type ChartType = 'RISING' | 'WEEKLY' | 'MONTHLY';
-export type ChartGenre = 'KPOP' | 'BAND' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'JPOP' | 'OST' | 'OTHER';
+export type ChartGenre = 'KPOP' | 'BAND' | 'ROCK' | 'R_AND_B' | 'HIPHOP' | 'INDIE' | 'BALLAD' | 'POP' | 'EDM' | 'JPOP' | 'OST' | 'OTHER';
 
 export interface GetPopularityChartParams {
   type?: ChartType;

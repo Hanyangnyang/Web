@@ -78,6 +78,7 @@ export const GENRES = [
   { key: 'band', label: '밴드', emoji: '🥁', light: 'bg-[rgba(165,243,252,0.6)]', active: 'bg-[rgba(6,182,212,1)]', activeBorder: 'border-[rgba(6,182,212,0.5)]' },
   { key: 'ballad', label: '발라드', emoji: '🎻', light: 'bg-[rgba(187,247,208,0.6)]', active: 'bg-[rgba(34,197,94,1)]', activeBorder: 'border-[rgba(34,197,94,0.5)]' },
   { key: 'pop', label: 'POP', emoji: '🗽', light: 'bg-[rgba(153,246,228,0.6)]', active: 'bg-[rgba(20,184,166,1)]', activeBorder: 'border-[rgba(20,184,166,0.5)]' },
+  { key: 'edm', label: 'EDM', emoji: '🪩', light: 'bg-[rgba(221,214,254,0.6)]', active: 'bg-[rgba(124,58,237,1)]', activeBorder: 'border-[rgba(124,58,237,0.5)]' },
   { key: 'jpop', label: 'J-POP', emoji: '🎏', light: 'bg-[rgba(254,240,138,0.6)]', active: 'bg-[rgba(202,138,4,1)]', activeBorder: 'border-[rgba(202,138,4,0.5)]' },
   { key: 'ost', label: 'OST', emoji: '🎬', light: 'bg-[rgba(253,186,116,0.6)]', active: 'bg-[rgba(234,88,12,1)]', activeBorder: 'border-[rgba(234,88,12,0.5)]' },
   { key: 'other', label: '기타', emoji: '🎧', light: 'bg-[rgba(229,231,235,0.6)]', active: 'bg-[rgba(107,114,128,1)]', activeBorder: 'border-[rgba(107,114,128,0.5)]' },
