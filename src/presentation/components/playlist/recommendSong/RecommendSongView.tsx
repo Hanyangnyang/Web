@@ -262,6 +262,9 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
             genre_count: selectedGenres.length,
             comment_length: comment.trim().length,
             duration_ms: Date.now() - enteredAtRef.current,
+            // 사용자 속성 — "곡을 올려본 사람"(창작자 코호트). 듣기만 한 사람과 재방문율 등을 비교할 때 씀
+            $set: { playlist_has_recommended: true },
+            $set_once: { playlist_first_recommended_at: new Date().toISOString() },
           });
           onSubmitSuccess();
         },

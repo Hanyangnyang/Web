@@ -132,7 +132,11 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
   // subView가 안 바뀌니 다시 안 찍힘(새 진입이 아님). 다른 탭에 갔다 와도 MiscView는 마운트가 유지돼서 안 찍힘
   useEffect(() => {
     if (subView !== 'playlist') return;
-    posthog?.capture('playlist_opened', openPropsRef.current);
+    // $set_once: 사용자 속성 — 처음 들어온 날짜를 한 번만 기록해서 "언제부터 쓰기 시작했나" 코호트를 나눌 수 있게 함
+    posthog?.capture('playlist_opened', {
+      ...openPropsRef.current,
+      $set_once: { playlist_first_opened_at: new Date().toISOString() },
+    });
   }, [subView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
