@@ -23,6 +23,7 @@ const GENRE_KEY_TO_CHART_GENRE: Record<string, ChartGenre> = {
   indie: 'INDIE',
   ballad: 'BALLAD',
   pop: 'POP',
+  edm: 'EDM',
   jpop: 'JPOP',
   ost: 'OST',
   other: 'OTHER',

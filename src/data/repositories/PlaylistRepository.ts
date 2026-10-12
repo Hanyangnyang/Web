@@ -23,6 +23,7 @@ const GENRE_LABEL: Record<PlaylistGenreDto, string> = {
   INDIE: '인디',
   BALLAD: '발라드',
   POP: 'POP',
+  EDM: 'EDM',
   JPOP: 'J-POP',
   OST: 'OST',
   OTHER: '기타',
