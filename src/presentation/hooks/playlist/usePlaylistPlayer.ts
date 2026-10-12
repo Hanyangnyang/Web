@@ -66,7 +66,12 @@ export function usePlaylistPlayer(recentSongsVariant: RecentSongsTapAreaVariant,
     if (sustainedPlayTimeoutRef.current) clearTimeout(sustainedPlayTimeoutRef.current);
     sustainedPlayTimeoutRef.current = setTimeout(() => {
       if (currentTrackRef.current?.trackId !== track.trackId || isPausedRef.current) return;
-      posthog?.capture('playlist_track_play_sustained', playProps);
+      // 사용자 속성 — "실제로 들어본 사람"인지(듣는 사람 코호트)
+      posthog?.capture('playlist_track_play_sustained', {
+        ...playProps,
+        $set: { playlist_has_played: true },
+        $set_once: { playlist_first_played_at: new Date().toISOString() },
+      });
       if (surface) {
         posthog?.capture('playlist_recent_song_play_sustained', { surface, variant: recentSongsVariant, track_id: track.trackId });
       }
