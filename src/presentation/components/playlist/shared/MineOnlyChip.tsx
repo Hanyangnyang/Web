@@ -1,7 +1,8 @@
 import { CHIP_BASE, CHIP_INACTIVE, CHIP_LARGE } from './GenreFilterChips';
 
-// 켜졌을 때 — 장르 칩(파란 채움)과 성격이 다른 필터라는 게 보이도록 플리 포인트 보라색(playlist-accent)을 아주 연하게
-const CHIP_MINE_ACTIVE = 'bg-playlist-accent/10 text-playlist-accent border-playlist-accent/30';
+// 켜졌을 때 — 회색·흰색·검정 계열만: 장르 칩 선택 상태(색 채움 + 흰 글자)와 같은 모양을 회색으로.
+// 장르 칩(파란 채움)과 성격이 다른 필터라는 건 색 대신 구분선과 고정 위치로 구분됨
+const CHIP_MINE_ACTIVE = 'bg-slate-400 text-white border-transparent';
 
 interface MineOnlyChipProps {
   active: boolean;

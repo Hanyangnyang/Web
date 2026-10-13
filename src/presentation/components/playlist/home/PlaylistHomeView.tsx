@@ -11,6 +11,8 @@ import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { TrackPromoCarousel } from './TrackPromoCarousel';
+import { RefreshStamp } from './RefreshStamp';
+import { toChartBasisLabel } from '../shared/chartBasisLabel';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
@@ -27,8 +29,16 @@ interface PlaylistHomeViewProps {
   recentMineOnly: boolean;
   onChangeRecentMineOnly: (mineOnly: boolean) => void;
   isRecentSongsLoading: boolean;
+  // 최근 추천된 곡 제목행의 "N분 전 ↻" — 지금 보이는 목록(전체/장르/내 추천)의 마지막 수신 시각과 새로고침
+  recentUpdatedAt: number;
+  isRecentRefreshing: boolean;
+  recentRefreshCooldownMs: number;
+  onRefreshRecent: () => void;
+  onRefreshRecentThrottled: () => void;
   visibleChart: ChartTrack[];
   isChartLoading: boolean;
+  // 서버가 준 차트 제목(예: "10.08 19:00 기준 실시간 급상승", "10월 2주차 주간 차트") — 여기서 기준 시각·기간만 뽑아 제목 옆에 표시
+  chartDisplayTitle?: string;
   chartPeriod: ChartPeriod;
   onChangeChartPeriod: (period: ChartPeriod) => void;
   searchQuery: string;
@@ -69,8 +79,14 @@ export function PlaylistHomeView({
   recentMineOnly,
   onChangeRecentMineOnly,
   isRecentSongsLoading,
+  recentUpdatedAt,
+  isRecentRefreshing,
+  recentRefreshCooldownMs,
+  onRefreshRecent,
+  onRefreshRecentThrottled,
   visibleChart,
   isChartLoading,
+  chartDisplayTitle,
   chartPeriod,
   onChangeChartPeriod,
   searchQuery,
@@ -93,6 +109,7 @@ export function PlaylistHomeView({
   onSelectChartPromo,
 }: PlaylistHomeViewProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const chartBasisLabel = isChartLoading ? null : toChartBasisLabel(chartDisplayTitle, new Date());
 
   // 공유 모달은 화면에 하나만 두고, 누른 카드의 곡을 담아서 염 (ChartView와 같은 방식)
   const [shareTrack, setShareTrack] = useState<TrackSummary>({ trackId: '', title: '', artist: '', albumArtUrl: '' });
@@ -158,15 +175,21 @@ export function PlaylistHomeView({
 
       {/* 인기차트 섹션 */}
       <section className="mb-4">
-        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
+        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동.
+            "인기차트"와 > 사이에 차트 집계 기준 시각·기간 — 서버가 정해진 시각에 찍는 스냅샷이라 새로고침해도 결과가 같아서 버튼 없이 표시만 함 */}
         <h3 className="mb-2">
           <button
             onClick={() => onShowAllChart()}
             aria-label="인기차트 전체보기"
             className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
           >
-            <span>인기차트</span>
-            <ChevronRight size={20} className="ml-0.5" />
+            {/* items-baseline — 작은 기준 글자와 > 아이콘을 큰 "인기차트" 글자의 밑선에 맞춤.
+                아이콘은 글자 밑선이 없어서 아이콘 박스 아래 끝이 밑선에 놓이는데, > 모양은 24 박스 안 y=6~18에 그려져 아래 여백(20px 기준 약 4px)만큼 떠 보여서 그만큼 내림 */}
+            <span className="flex items-baseline gap-1">
+              <span>인기차트</span>
+              {chartBasisLabel && <span className="text-[14px] font-medium text-text-sub">{chartBasisLabel}</span>}
+              <ChevronRight size={20} className="translate-y-1" />
+            </span>
           </button>
         </h3>
 
@@ -223,17 +246,29 @@ export function PlaylistHomeView({
 
       {/* 최근 추가된 곡 섹션 */}
       <section>
-        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
-        <h3 className="mb-2">
-          <button
-            onClick={() => onShowAllRecent()}
-            aria-label="최근 추천된 곡 전체보기"
-            className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
-          >
-            <span>최근 추천된 곡</span>
-            <ChevronRight size={20} className="ml-0.5" />
-          </button>
-        </h3>
+        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동.
+            오른쪽 끝에는 "N분 전 ↻" — 마지막으로 받은 시각을 보여주고 눌러서 새로고침(쿨다운 안이면 요청 없이 아이콘만 돌림) */}
+        {/* items-baseline — "N분 전" 글자를 큰 제목 글자의 밑선에 맞춤(↻ 아이콘은 RefreshStamp 안에서 "N분 전" 글자 기준 가운데) */}
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <h3>
+            <button
+              onClick={() => onShowAllRecent()}
+              aria-label="최근 추천된 곡 전체보기"
+              className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
+            >
+              <span>최근 추천된 곡</span>
+              <ChevronRight size={20} className="ml-0.5" />
+            </button>
+          </h3>
+          <RefreshStamp
+            updatedAt={recentUpdatedAt}
+            isFetching={isRecentRefreshing}
+            cooldownMs={recentRefreshCooldownMs}
+            onRefresh={onRefreshRecent}
+            onThrottled={onRefreshRecentThrottled}
+            ariaLabel="최근 추천된 곡 새로고침"
+          />
+        </div>
 
         {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜.
             오른쪽 끝에 "내 추천" 칩을 고정 — 켜면 내가 추천한 곡만(장르와 함께 걸림), 최근 추가된 곡 화면과 상태를 공유 */}

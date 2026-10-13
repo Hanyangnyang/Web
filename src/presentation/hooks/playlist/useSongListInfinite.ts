@@ -37,6 +37,8 @@ export function useSongListInfinite({ queryKey, fetchPage, enabled = true }: Use
   return {
     songs: query.data,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    dataUpdatedAt: query.dataUpdatedAt, // 마지막으로 받은 시각(ms, 아직 없으면 0) — "N분 전" 표시와 새로고침 쿨다운 기준
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,
