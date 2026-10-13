@@ -6,6 +6,7 @@ import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './Post
 import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips, EMPTY_GENRE_FILTER, type GenreFilterState } from './GenreFilterChips';
+import { MineOnlyChip } from './MineOnlyChip';
 import { Coachmark, useCoachmark } from './Coachmark';
 import { ScrollToTopPill } from './ScrollToTopPill';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
@@ -67,6 +68,9 @@ interface SongListScreenProps {
   onGenreFilterChange?: (next: GenreFilterState) => void;
   // true면 헤더 아래 장르 칩을 그리지 않음 — 서버가 장르 필터를 지원하지 않는 화면용(저장한 곡)
   hideGenreFilter?: boolean;
+  // 넘겨주면 장르 칩 줄 맨 앞에 "내 추천" 토글 칩을 고정해서 보여줌(지금은 최근 추가된 곡만) — 켜고 끄는 동작·데이터 전환은 상위가 맡음
+  mineOnly?: boolean;
+  onMineOnlyChange?: (mineOnly: boolean) => void;
   // 무한 스크롤 — 다음 페이지가 있으면 목록 맨 아래에 감시 요소를 두고 화면 근처에 오면 onLoadMore를 부름.
   // 홈에서 누른 카드(scrollToTrackId)가 아직 안 불러온 페이지에 있으면 찾을 때까지 이어서 불러옴
   hasNextPage?: boolean;
@@ -101,6 +105,8 @@ export function SongListScreen({
   genreFilter: genreFilterProp,
   onGenreFilterChange,
   hideGenreFilter = false,
+  mineOnly = false,
+  onMineOnlyChange,
   hasNextPage = false,
   isFetchingNextPage = false,
   onLoadMore,
@@ -387,6 +393,7 @@ export function SongListScreen({
             onChange={setGenreFilter}
             large
             className="-mt-1.5 pb-2"
+            pinned={onMineOnlyChange && <MineOnlyChip active={mineOnly} onToggle={onMineOnlyChange} large />}
           />
         )}
       </div>

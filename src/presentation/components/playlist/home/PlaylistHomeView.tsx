@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useShareModal } from '../shared/useShareModal';
 import { MiscSubViewHeader } from '../../misc/MiscSubViewHeader';
 import { ChartTopCard } from './ChartTopCard';
-import { MySongCard } from './MySongCard';
 import { RecentSongRow } from '../shared/RecentSongRow';
+import { MineOnlyChip } from '../shared/MineOnlyChip';
 import { EmptyGenreState } from '../shared/EmptyGenreState';
 import { RecentSongRowSkeleton } from '../shared/RecentSongRowSkeleton';
 import { ChartPeriodChips } from '../shared/ChartPeriodChips';
@@ -15,8 +15,6 @@ import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } 
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 
-const MY_SONGS_PREVIEW_LIMIT = 10;
-
 interface PlaylistHomeViewProps {
   onBack: () => void;
   isActive?: boolean;
@@ -25,6 +23,9 @@ interface PlaylistHomeViewProps {
   // 최근 추가된 곡 미리보기의 장르 필터(비어 있으면 전체)
   recentGenreFilter: GenreFilterState;
   onChangeRecentGenreFilter: (next: GenreFilterState) => void;
+  // "내 추천" 칩 — 켜면 visibleSongs가 내가 추천한 곡으로 바뀌어 들어옴(최근 추가된 곡 화면과 공유하는 상태)
+  recentMineOnly: boolean;
+  onChangeRecentMineOnly: (mineOnly: boolean) => void;
   isRecentSongsLoading: boolean;
   visibleChart: ChartTrack[];
   isChartLoading: boolean;
@@ -46,12 +47,6 @@ interface PlaylistHomeViewProps {
   onShowAllChart: (trackId?: string) => void;
   onShowLiked: () => void;
   onShowAddSong: () => void;
-  // "내가 추천한 곡" 섹션 — 카드 UI는 인기차트(ChartTopCard)와 동일, 순위만 없음
-  mySongs: Song[];
-  isMySongsLoading: boolean;
-  onShowAllMySongs: () => void;
-  // 카드를 누르면 내가 추천한 곡 화면으로 이동하면서 그 곡 위치로 스크롤
-  onSelectMySong: (song: Song) => void;
   // true면 마운트 시 검색바에 자동으로 포커스 — "어떤 곡을 추천해볼까요?"로 홈에 돌아왔을 때 사용
   autoFocusSearch?: boolean;
   onAutoFocusSearchConsumed?: () => void;
@@ -71,6 +66,8 @@ export function PlaylistHomeView({
   promoRecentSongs,
   recentGenreFilter,
   onChangeRecentGenreFilter,
+  recentMineOnly,
+  onChangeRecentMineOnly,
   isRecentSongsLoading,
   visibleChart,
   isChartLoading,
@@ -87,10 +84,6 @@ export function PlaylistHomeView({
   onShowAllChart,
   onShowLiked,
   onShowAddSong,
-  mySongs,
-  isMySongsLoading,
-  onShowAllMySongs,
-  onSelectMySong,
   autoFocusSearch = false,
   onAutoFocusSearchConsumed,
   promoPopularTracks,
@@ -242,8 +235,14 @@ export function PlaylistHomeView({
           </button>
         </h3>
 
-        {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜 */}
-        <GenreFilterChips value={recentGenreFilter} onChange={onChangeRecentGenreFilter} className="mb-2" />
+        {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜.
+            오른쪽 끝에 "내 추천" 칩을 고정 — 켜면 내가 추천한 곡만(장르와 함께 걸림), 최근 추가된 곡 화면과 상태를 공유 */}
+        <GenreFilterChips
+          value={recentGenreFilter}
+          onChange={onChangeRecentGenreFilter}
+          className="mb-2"
+          pinned={<MineOnlyChip active={recentMineOnly} onToggle={onChangeRecentMineOnly} />}
+        />
 
         {/* 최근 추가된 곡 목록 */}
         {isRecentSongsLoading ? (
@@ -255,7 +254,11 @@ export function PlaylistHomeView({
         ) : visibleSongs.length === 0 ? (
           <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
             <EmptyGenreState
-              message={recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추천된 곡이 없어요'}
+              message={
+                recentMineOnly
+                  ? (recentGenreFilter.selected.length > 0 ? '아직 이 장르로 추천한 곡이 없어요' : '아직 추천한 곡이 없어요')
+                  : (recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추천된 곡이 없어요')
+              }
               buttonLabel="곡 추천하러 가기"
               onAction={onShowAddSong}
             />
@@ -284,55 +287,6 @@ export function PlaylistHomeView({
             >
               더보기
             </button>
-          </div>
-        )}
-      </section>
-
-      {/* 내가 추천한 곡 섹션 */}
-      <section className="mt-4">
-        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
-        <h3 className="mb-2">
-          <button
-            onClick={onShowAllMySongs}
-            aria-label="내가 추천한 곡 전체보기"
-            className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
-          >
-            <span>내가 추천한 곡</span>
-            <ChevronRight size={20} className="ml-0.5" />
-          </button>
-        </h3>
-
-        {isMySongsLoading ? (
-          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="flex gap-2 pb-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-[152px] aspect-[3/4] rounded-xl skeleton-shimmer" />
-              ))}
-            </div>
-          </div>
-        ) : mySongs.length === 0 ? (
-          <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
-            <EmptyGenreState
-              message="아직 추천한 곡이 없어요"
-              buttonLabel="곡 추천하러 가기"
-              onAction={onShowAddSong}
-            />
-          </div>
-        ) : (
-          <div className="overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="flex gap-2 pb-2">
-              {mySongs.slice(0, MY_SONGS_PREVIEW_LIMIT).map((song) => (
-                <MySongCard key={song.id ?? song.trackId} track={song} onSelect={() => onSelectMySong(song)} />
-              ))}
-              <button
-                onClick={onShowAllMySongs}
-                aria-label="내가 추천한 곡 전체보기"
-                className="relative before:content-[''] before:absolute before:-inset-2 flex-shrink-0 self-center px-4 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
-              >
-                더보기
-              </button>
-              <div className="w-1 flex-shrink-0" aria-hidden="true" />
-            </div>
           </div>
         )}
       </section>

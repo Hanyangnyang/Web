@@ -16,9 +16,10 @@ const flattenSongs = (data: SongPagesData) => data.pages.flatMap((page) => page.
 interface UseSongListInfiniteParams {
   queryKey: readonly unknown[];
   fetchPage: (params: { deviceId: string; page: number; size: number }) => Promise<PlaylistSongPage>;
+  enabled?: boolean; // false면 요청하지 않음 — 화면이 조건에 따라 이 목록을 쓸 때만 받게(기본 true)
 }
 
-export function useSongListInfinite({ queryKey, fetchPage }: UseSongListInfiniteParams) {
+export function useSongListInfinite({ queryKey, fetchPage, enabled = true }: UseSongListInfiniteParams) {
   const query = useInfiniteQuery({
     queryKey,
     initialPageParam: 0,
@@ -30,6 +31,7 @@ export function useSongListInfinite({ queryKey, fetchPage }: UseSongListInfinite
     getNextPageParam: (lastPage, allPages) => (lastPage.last ? undefined : allPages.length),
     select: flattenSongs,
     staleTime: SONG_LIST_STALE_TIME,
+    enabled,
   });
 
   return {

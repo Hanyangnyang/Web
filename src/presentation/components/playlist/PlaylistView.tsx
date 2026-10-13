@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useCallback, useRef, type CSSProperties } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef, type CSSProperties } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
@@ -17,15 +17,14 @@ import { TrackPostCollectionView } from './trackPostCollection/TrackPostCollecti
 import { PostView } from './post/PostView';
 import { MyPageView } from './myPage/MyPageView';
 import { LikedSongsView } from './likedSongs/LikedSongsView';
-import { MySongsView } from './mySongs/MySongsView';
 import { PlaylistHomeView } from './home/PlaylistHomeView';
-import { type Song, type ChartPeriod, type TrackSummary } from './playlistTypes';
+import { type Song, type ChartPeriod, type TrackSummary, filterSongsByGenre } from './playlistTypes';
 import { ChartView } from './chart/ChartView';
 import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
 import { useRecentSongsInfinite } from '../../hooks/playlist/useRecentSongsInfinite.js';
-import { useMySongs } from '../../hooks/playlist/useMySongs.js';
-import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY, CHART_QUERY_KEY, keepOnlyFirstPage, type SongPagesData } from '../../hooks/playlist/playlistQueryKeys.js';
+import { useMySongsInfinite } from '../../hooks/playlist/useMySongsInfinite.js';
+import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY, CHART_QUERY_KEY, keepOnlyFirstPage, type SongPagesData } from '../../hooks/playlist/playlistQueryKeys.js';
 import { runWithoutRetry } from '../../../lib/queryClient.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
 import { usePlaylistPlayer } from '../../hooks/playlist/usePlaylistPlayer';
@@ -41,7 +40,7 @@ const EMPTY_CHART: ChartTrack[] = []; // 인기차트 화면 데이터 도착 �
 // 화면 스택의 한 칸 = 화면 이름 + 그 화면이 쓰는 파라미터 
 type ScreenFrame =
   | { name: 'main' }
-  | { name: 'recent'; scrollTarget: string | null; highlight?: boolean } // highlight: false면 스크롤만 하고 카드 강조 생략(홈 "더보기"). // scrollTarget: 홈의 최근추가된곡 섹션의 곡 카드를 눌렀을때, 해당하는 곡으로 스크롤하기 위함 
+  | { name: 'recent'; scrollTarget: string | null; highlight?: boolean } // highlight: false면 스크롤만 하고 카드 강조 생략(홈 "더보기"). // scrollTarget: 홈의 최근추가된곡 섹션의 곡 카드를 눌렀을때, 해당하는 곡으로 스크롤하기 위함
   // prefillTrack: 게시글 모음에서 FAB을 누르는 등 특정 곡이 미리 채워진 채로 진입할 때의 곡
   // prefillQuery: 검색 결과 화면의 FAB에서 들어올 때 그 검색어로 곡 검색을 미리 해둠
   | { name: 'addSong'; prefillTrack: TrackSummary | null; prefillQuery: string | null }
@@ -54,15 +53,14 @@ type ScreenFrame =
   | { name: 'postDetail'; postId: string }
   | { name: 'chart'; scrollTarget: string | null } // scrollTarget: 홈의 인기차트 카드를 눌렀을 때 해당 곡으로 스크롤
   | { name: 'myActivity' }
-  | { name: 'liked' }
-  | { name: 'mySongs'; scrollTarget: string | null }; // scrollTarget: 홈의 내가추천한곡 카드를 눌렀을 때 해당 곡으로 스크롤
+  | { name: 'liked' };
 type PlaylistScreen = ScreenFrame['name'];
 type ViewMode = 'grid' | 'list';
-type ListScreen = 'recent' | 'mySongs'; // 그리드/리스트 토글이 있는 목록 화면들 (저장한 곡은 2열 고정이라 제외)
+type ListScreen = 'recent'; // 그리드/리스트 토글이 있는 목록 화면들 (저장한 곡은 2열 고정이라 제외)
 // 모든 화면의 체류시간을 잰다(화면별 방문 수·체류시간 지표) — useScreenDwellTracking 참고.
 // 처음엔 A/B 테스트용으로 홈/최근추가된곡만 쟀는데, A/B 분석은 screen 필터로 이 둘만 골라 보므로 확장해도 영향 없음
 const DWELL_TRACKED_SCREENS: readonly PlaylistScreen[] = [
-  'main', 'recent', 'addSong', 'search', 'searchPosts', 'trackPosts', 'postDetail', 'chart', 'myActivity', 'liked', 'mySongs',
+  'main', 'recent', 'addSong', 'search', 'searchPosts', 'trackPosts', 'postDetail', 'chart', 'myActivity', 'liked',
 ];
 
 interface PlaylistViewProps {
@@ -100,9 +98,20 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const [recentGenreFilter, setRecentGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
   // 장르를 고르면 전체 첫 페이지를 걸러내지 않고 서버에서 그 장르 곡만 받음 — 최근 추가된 곡 화면의 같은 장르 캐시와 공유(전체일 땐 위 쿼리와 같은 캐시)
   const { songs: genreSongs, isLoading: isGenreSongsLoading } = useRecentSongsInfinite(recentGenreFilter.selected[0]);
-  const filteredRecentSongs = recentGenreFilter.selected.length > 0 ? (genreSongs ?? EMPTY_SONGS) : songs;
   const isRecentSongsLoading = recentGenreFilter.selected.length > 0 ? isGenreSongsLoading : isAllRecentSongsLoading;
-  const { data: mySongs, isLoading: isMySongsLoading } = useMySongs();
+  // "내 추천" 칩 — 홈 미리보기와 최근 추가된 곡 화면이 장르 필터처럼 같은 값을 공유(홈에서 켜고 더보기로 들어가면 그대로 이어짐).
+  // 켜면 내가 추천한 곡 API로 바꿔 받음(최근 목록에서 내 글만 걸러내면 20개 페이지마다 몇 개 안 남음). 이 API는 장르 필터가 없어서 장르는 받은 곡에서 거름
+  const [recentMineOnly, setRecentMineOnly] = useState(false);
+  const { songs: fetchedMySongs, isLoading: isMySongsLoading } = useMySongsInfinite(recentMineOnly);
+  const myGenreSongs = useMemo(
+    () => filterSongsByGenre(fetchedMySongs ?? EMPTY_SONGS, recentGenreFilter.selected),
+    [fetchedMySongs, recentGenreFilter.selected],
+  );
+  // 홈 "최근 추천된 곡" 미리보기에 실제로 보이는 목록(장르 + 내 추천 반영)
+  const filteredRecentSongs = recentMineOnly
+    ? myGenreSongs
+    : recentGenreFilter.selected.length > 0 ? (genreSongs ?? EMPTY_SONGS) : songs;
+  const isHomeRecentLoading = recentMineOnly ? isMySongsLoading : isRecentSongsLoading;
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
   const { data: chartData, isLoading: isChartLoading, isError: isChartError, refetch: refetchChart } = usePopularityChart(chartPeriod, isActive);
@@ -113,12 +122,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const chartTracks = chartData?.tracks ?? [];
   // 인기차트 화면의 장르 필터 — 홈 미리보기에는 적용되지 않고(홈은 항상 전체 차트), 화면 안에서만 장르별 차트를 서버에서 받아옴
   const [chartGenreFilter, setChartGenreFilter] = useState<GenreFilterState>(EMPTY_GENRE_FILTER);
-  // 최근추가된곡/추천한곡 화면의 그리드·리스트 뷰 모드(사용자가 토글로 고른 값) — 어느 경로로 들어오든 이 선택대로 열린다. 이 화면들은 게시글 상세로 갔다가
-  // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면들을 드나들어도 유지됨)에 보관해뒀다가
+  // 최근추가된곡 화면의 그리드·리스트 뷰 모드(사용자가 토글로 고른 값) — 어느 경로로 들어오든 이 선택대로 열린다. 이 화면은 게시글 상세로 갔다가
+  // 뒤로가기로 돌아오면 통째로 리마운트돼서, PlaylistView(이 화면을 드나들어도 유지됨)에 보관해뒀다가
   // 마지막으로 보던 모드를 그대로 복원함
   const [viewModes, setViewModes] = useState<Record<ListScreen, ViewMode>>({
     recent: 'grid',
-    mySongs: 'grid',
   });
   const changeViewMode = (listScreen: ListScreen) => (mode: ViewMode) =>
     setViewModes((prev) => ({ ...prev, [listScreen]: mode }));
@@ -155,6 +163,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       }
       setFilter(next);
     };
+  // "내 추천" 칩을 직접 눌렀을 때 — 사용량은 없앤 "내가 추천한 곡" 화면을 이 칩이 잘 대체하는지 보는 근거로 캡처
+  const changeRecentMineOnly = (mineOnly: boolean) => {
+    posthog?.capture('playlist_mine_only_toggled', { enabled: mineOnly, screen: screen.name });
+    setRecentMineOnly(mineOnly);
+  };
   // 인기차트 화면용 차트 — 전체(장르 없음)이면 홈 미리보기와 같은 쿼리 키라 캐시를 공유하고, 장르를 고르면 그 장르 차트를 따로 받음
   const {
     data: screenChartData,
@@ -230,9 +243,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 곡추천하기 등록 성공 — 어느 화면에서 곡추천하기로 들어왔든, 자기 곡이 잘 올라갔는지 바로
   // 볼 수 있게 최근추가된곡으로 보냄. addSong 프레임을 그대로 recent로 바꿔치기해서(push가 아님)
   // 뒤로가기를 누르면 addSong 이전 화면으로 돌아가지, addSong 폼으로 돌아가지 않음.
-  // 곡을 추천하면 최근추가된곡 화면의 맨 위(방금 추천한 곡)를 1열로 보여줌 — 장르 필터가 걸려 있으면 새 곡이 안 보일 수 있어 전체로 되돌림
+  // 곡을 추천하면 최근추가된곡 화면의 맨 위(방금 추천한 곡)를 1열로 보여줌 — 장르·내 추천 필터가 걸려 있으면 새 곡이 안 보일 수 있어 전체로 되돌림
   const handleAddSongSuccess = useCallback(() => {
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
+    setRecentMineOnly(false);
     setViewModes((prev) => ({ ...prev, recent: 'list' }));
     setScreenStack((prev) => [...prev.slice(0, -1), { name: 'recent', scrollTarget: null }]);
   }, []);
@@ -275,10 +289,10 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     // 홈에서 특정 카드를 눌러 최근추가된곡 화면의 그 카드 위치로 스크롤하려는 목표가 있으면,
     // 스크롤 위치를 되돌리지 않고 SongListScreen의 자체 스크롤(scrollIntoView)에 맡김 —
     // 안 그러면 이 훅이 곧바로 scrollTop을 0으로 되돌려서 그 스크롤을 무효화시킴
-    skipScrollRestore: (screen.name === 'recent' || screen.name === 'mySongs' || screen.name === 'chart') && !!screen.scrollTarget,
+    skipScrollRestore: (screen.name === 'recent' || screen.name === 'chart') && !!screen.scrollTarget,
   });
 
-  // 홈/최근추가된곡/인기차트/저장한곡/내가추천한곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
+  // 홈/최근추가된곡/인기차트/저장한곡 화면에서 맨 위에서 아래로 당겨 새로고침 (인스타그램식). 같은 스크롤 컨테이너를 공유하므로 이 화면들에서만 켬
   const { pull, isRefreshing: isPullRefreshing, threshold: pullThreshold } = usePullToRefresh({
     containerRef: scrollContainerRef,
     // 스피너는 화면 위쪽에 보이는 데이터만 기다리고(return하는 Promise), 나머지는 백그라운드로 갱신(void) —
@@ -293,29 +307,29 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         case 'chart':
           return refetchScreenChart();
         // 최근추가된곡 화면은 전체 목록(무한 스크롤 캐시)과 홈 미리보기를 같이 새로고침
+        // "내 추천"을 켜 둔 상태면 화면에 보이는 내가 추천한 곡 목록을 새로고침
         case 'recent':
-          return refetchFromFirstPage(RECENT_SONGS_INFINITE_QUERY_KEY);
+          return refetchFromFirstPage(recentMineOnly ? MY_SONGS_INFINITE_QUERY_KEY : RECENT_SONGS_INFINITE_QUERY_KEY);
         case 'liked':
           return refetchFromFirstPage(LIKED_SONGS_QUERY_KEY);
-        case 'mySongs':
-          // 화면에 보이는 건 전체 목록(페이지 캐시)이고, 홈 미리보기용 배열 캐시는 백그라운드로
-          void queryClient.refetchQueries({ queryKey: MY_SONGS_QUERY_KEY, type: 'active' });
-          return refetchFromFirstPage(MY_SONGS_INFINITE_QUERY_KEY);
         default: {
-          // 홈 — 위쪽에 보이는 곡 배너·인기차트·최근 추천된 곡(차트 + 최근 추가 캐시)만 기다리고,
-          // 나머지 마운트된 플레이리스트 쿼리(내가 추천/아티스트 추천 등)는 백그라운드로 새로고침
+          // 홈 — 위쪽에 보이는 곡 배너·인기차트·최근 추천된 곡(차트 + 최근 추가 캐시, "내 추천"을 켰으면 내가 추천한 곡 캐시도)만 기다리고,
+          // 나머지 마운트된 플레이리스트 쿼리(아티스트 추천 등)는 백그라운드로 새로고침
           const isAboveFold = (queryKey: readonly unknown[]) =>
-            queryKey[1] === CHART_QUERY_KEY[1] || queryKey[1] === RECENT_SONGS_INFINITE_QUERY_KEY[1];
+            queryKey[1] === CHART_QUERY_KEY[1] ||
+            queryKey[1] === RECENT_SONGS_INFINITE_QUERY_KEY[1] ||
+            (recentMineOnly && queryKey[1] === MY_SONGS_INFINITE_QUERY_KEY[1]);
           keepOnlyFirstPage(queryClient, ['playlist']);
           void queryClient.refetchQueries({ queryKey: ['playlist'], type: 'active', predicate: (query) => !isAboveFold(query.queryKey) });
           return Promise.all([
             queryClient.refetchQueries({ queryKey: CHART_QUERY_KEY, type: 'active' }),
             queryClient.refetchQueries({ queryKey: RECENT_SONGS_INFINITE_QUERY_KEY, type: 'active' }),
+            ...(recentMineOnly ? [queryClient.refetchQueries({ queryKey: MY_SONGS_INFINITE_QUERY_KEY, type: 'active' })] : []),
           ]);
         }
       }
     }),
-    enabled: screen.name === 'main' || screen.name === 'recent' || screen.name === 'chart' || screen.name === 'liked' || screen.name === 'mySongs',
+    enabled: screen.name === 'main' || screen.name === 'recent' || screen.name === 'chart' || screen.name === 'liked',
   });
 
   const handleSearchSubmit = useCallback(() => {
@@ -349,6 +363,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     }
     if (found) {
       setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
+      setRecentMineOnly(false);
       pushScreen({ name: 'recent', scrollTarget: found.trackId });
     } else {
       pushScreen({ name: 'postDetail', postId: deepLinkPostId });
@@ -383,7 +398,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // - 그보다 오래된 게시글: 단건 상세(PostView, GET /songs/{id}). 최근추가된곡으로 보내면 아래 페이지까지 이어 불러와야 하고(그 사이 화면이 비어 보임),
   //   도착해도 목록 한참 아래라 위치 파악이 어려움.
   // - id가 없는 게시글(로컬 임시 곡)은 단건 조회를 못 하니 최근추가된곡 스크롤로 처리.
-  // 최근추가된곡으로 갈 땐 장르 필터를 전체로 되돌림 — 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
+  // 최근추가된곡으로 갈 땐 장르·내 추천 필터를 전체로 되돌림 — 걸어둔 필터에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문
   const handleSelectPost = useCallback((post: Song) => {
     const nearbySongs = queryClient.getQueryData<SongPagesData>(RECENT_SONGS_INFINITE_QUERY_KEY)?.pages.slice(0, RECENT_SCROLL_PAGE_LIMIT).flatMap((page) => page.songs);
     const isNearby = !!post.id && !!nearbySongs?.some((song) => song.id === post.id);
@@ -392,6 +407,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       return;
     }
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
+    setRecentMineOnly(false);
     pushScreen({ name: 'recent', scrollTarget: post.trackId });
   }, [pushScreen, queryClient]);
 
@@ -404,18 +420,21 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     const lastPreviewTrackId = previewSongs[previewSongs.length - 1]?.trackId ?? null;
     // 특정 곡을 누른 게 아니라 미리보기 끝 위치를 이어 보여주는 것이므로 카드 강조는 하지 않음
     pushScreen({ name: 'recent', scrollTarget: scrollToLastPreview ? lastPreviewTrackId : null, highlight: false });
-  }, [pushScreen, songs, posthog, recentSongsVariant]);
+  }, [pushScreen, filteredRecentSongs, posthog, recentSongsVariant]);
 
-  // 홈의 최근 추가된 곡 카드 클릭 — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤.
+  // 최근 추가된 곡 카드 클릭(홈 미리보기·다른 화면 하단 미리보기) — 전체보기 화면으로 이동하면서 누른 카드 위치로 바로 스크롤.
+  // 다른 화면 하단 미리보기는 "내 추천"과 무관한 전체 목록이라, 내 글이 아닌 곡을 누르면 내 추천을 꺼야 목록에서 그 카드를 찾을 수 있음
   const handleSelectRecentSong = useCallback((song: Song) => {
     posthog?.capture('playlist_recent_preview_navigate', { variant: recentSongsVariant, track_id: song.trackId });
+    if (!song.isMine) setRecentMineOnly(false);
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen, posthog, recentSongsVariant]);
 
   // 홈 곡 배너에서는 최근 곡 화면을 열고 해당 곡을 가운데로 이동한다.
-  // 장르 필터도 "전체"로 되돌림 — 사용자가 걸어둔 장르에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문(handleSelectPost와 같은 이유)
+  // 장르·내 추천 필터도 "전체"로 되돌림 — 사용자가 걸어둔 필터에 이 곡이 안 걸리면 목록에 카드가 없어 스크롤이 안 되기 때문(handleSelectPost와 같은 이유)
   const handleSelectRecentPromo = useCallback((song: Song) => {
     setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
+    setRecentMineOnly(false);
     pushScreen({ name: 'recent', scrollTarget: song.trackId });
   }, [pushScreen]);
 
@@ -505,6 +524,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             playButtonVariant={recentSongsVariant}
             genreFilter={recentGenreFilter}
             onGenreFilterChange={makeGenreFilterChange('recent', recentGenreFilter, setRecentGenreFilter)}
+            mineOnly={recentMineOnly}
+            onMineOnlyChange={changeRecentMineOnly}
           />
         ) : screen.name === 'addSong' ? (
           <RecommendSongView
@@ -593,7 +614,11 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
           <MyPageView
             onBack={popScreen}
             onShowLiked={() => pushScreen({ name: 'liked' })}
-            onShowMySongs={() => pushScreen({ name: 'mySongs', scrollTarget: null })}
+            // "내가 추천한 곡" 화면을 없애서, 내 추천을 켠 최근 추가된 곡 화면으로 보냄
+            onShowMySongs={() => {
+              setRecentMineOnly(true);
+              pushScreen({ name: 'recent', scrollTarget: null });
+            }}
           />
         ) : screen.name === 'liked' ? (
           <LikedSongsView
@@ -608,17 +633,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             onSelectTrack={handleSelectSearchTrack}
             currentTrackId={playingTrackId}
           />
-        ) : screen.name === 'mySongs' ? (
-          <MySongsView
-            onBack={popScreen}
-            onPlay={handlePlay}
-            onShowAddSong={() => pushAddSong()}
-            onSelectTrack={handleSelectSearchTrack}
-            scrollToTrackId={screen.scrollTarget}
-            currentTrackId={playingTrackId}
-            viewMode={viewModes.mySongs}
-            onViewModeChange={changeViewMode('mySongs')}
-          />
         ) : (
           <PlaylistHomeView
             onBack={requestExit}
@@ -627,7 +641,9 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             promoRecentSongs={songs.slice(0, 10)}
             recentGenreFilter={recentGenreFilter}
             onChangeRecentGenreFilter={makeGenreFilterChange('recent', recentGenreFilter, setRecentGenreFilter)}
-            isRecentSongsLoading={isRecentSongsLoading}
+            recentMineOnly={recentMineOnly}
+            onChangeRecentMineOnly={changeRecentMineOnly}
+            isRecentSongsLoading={isHomeRecentLoading}
             visibleChart={visibleChart}
             isChartLoading={isChartLoading}
             chartPeriod={chartPeriod}
@@ -647,10 +663,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             }}
             onShowLiked={() => pushScreen({ name: 'liked' })}
             onShowAddSong={() => pushAddSong()}
-            mySongs={mySongs ?? EMPTY_SONGS}
-            isMySongsLoading={isMySongsLoading}
-            onShowAllMySongs={() => pushScreen({ name: 'mySongs', scrollTarget: null })}
-            onSelectMySong={(song) => pushScreen({ name: 'mySongs', scrollTarget: song.trackId })}
             promoPopularTracks={(promoPopularChart?.tracks ?? EMPTY_CHART).slice(0, 10)}
             promoWeeklyTracks={(promoWeeklyChart?.tracks ?? EMPTY_CHART).slice(0, 10)}
             isTrackPromosLoading={isRecentSongsLoading || isPromoPopularLoading || isPromoWeeklyLoading}
