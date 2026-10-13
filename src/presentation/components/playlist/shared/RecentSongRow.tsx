@@ -2,6 +2,7 @@ import { ChevronRight, Pause, Play } from 'lucide-react';
 import { useState } from 'react';
 import { type Song, type ReactionState, toReactionState, formatTimeAgo } from '../playlistTypes';
 import { EmptyCommentNote } from './EmptyCommentNote';
+import { CoverImage } from './CoverImage';
 import { EmojiReactionBar } from './EmojiReactionBar';
 import { type ReactionKey } from '../postReactions';
 import { usePostInteractionMutations, nextOptimisticReaction } from '../../../hooks/playlist/usePostInteractions.js';
@@ -67,7 +68,7 @@ export function RecentSongRow({ song, onSelect, onPlay, currentTrackId, variant 
         aria-label={isPlaying ? `${song.title} 일시정지` : `${song.title} 재생`}
         className="relative w-1/5 flex-shrink-0 aspect-square overflow-hidden rounded-l-card active:opacity-80 transition-opacity"
       >
-        <img
+        <CoverImage
           src={song.albumArtUrl}
           alt={song.title}
           className="w-full h-full object-cover bg-slate-100"

@@ -1,5 +1,6 @@
 import { ChevronRight, MessageCircle, Pause, PenLine, Play } from 'lucide-react';
 import { type MusicSearchTrack } from '../../../../domain/entities/MusicSearchTrack.js';
+import { CoverImage } from './CoverImage';
 
 interface MusicSearchResultCardProps {
   track: MusicSearchTrack;
@@ -43,7 +44,7 @@ export function MusicSearchResultCard({
           aria-label={selectLabel}
           className="relative block w-full aspect-square active:scale-95 transition-transform disabled:pointer-events-none"
         >
-          <img src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
+          <CoverImage src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
           {onPlay && !disabled && (
             <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
               {isPlaying ? (
@@ -61,7 +62,7 @@ export function MusicSearchResultCard({
           aria-label={isPlaying ? `${track.title} 일시정지` : `${track.title} 재생`}
           className="relative block w-full aspect-square active:scale-95 transition-transform disabled:pointer-events-none"
         >
-          <img src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
+          <CoverImage src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
           {/* 재생/일시정지 아이콘 — 버튼이 이미 앨범커버 전체를 감싸고 있어 별도 버튼이 아니라 장식용 오버레이임 */}
           {!disabled && (
             <span className="absolute inset-0 m-auto w-[22%] aspect-square rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-md flex items-center justify-center">
@@ -75,7 +76,7 @@ export function MusicSearchResultCard({
         </button>
       ) : (
         <div className="w-full aspect-square">
-          <img src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
+          <CoverImage src={track.albumArtUrl} alt={track.title} className="w-full h-full object-cover bg-slate-100" />
         </div>
       )}
 

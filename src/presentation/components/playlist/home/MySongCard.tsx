@@ -1,5 +1,6 @@
 import { type TrackSummary, formatTimeAgo } from '../playlistTypes';
 import { EMPTY_COMMENT_NOTE } from '../shared/EmptyCommentNote';
+import { CoverImage } from '../shared/CoverImage';
 
 type MySongCardTrack = TrackSummary & { comment?: string; createdAt?: string };
 
@@ -18,7 +19,7 @@ export function MySongCard({ track, onSelect }: MySongCardProps) {
       aria-label={`${track.title} - ${track.artist}, 내가 추천한 곡 보기`}
       className="relative w-[152px] flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden shadow-lg text-left active:scale-[0.98] transition-transform"
     >
-      <img src={track.albumArtUrl} alt={track.title} className="absolute inset-0 w-full h-full object-cover" />
+      <CoverImage src={track.albumArtUrl} alt={track.title} className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col px-3 pb-3">
         <div className="text-[15px] font-bold text-white truncate leading-tight">{track.title}</div>

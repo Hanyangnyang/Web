@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from 'react';
 import { edgePaletteGradient, extractRightEdgePalette, type EdgePalette } from './bannerEdgePalette.js';
 import { getArtistNameSize, pickArtistPromoTemplate, type ArtistPromoTemplate } from './artistPromoTypography.js';
+import { COVER_FALLBACK_SRC } from './CoverImage';
 
 export interface ArtistPromoBannerProps {
   artistName: string;
@@ -130,8 +131,13 @@ export function ArtistPromoBanner({
               onError={() => setImageFailed(true)}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-white/10 text-[clamp(28px,12cqw,64px)] font-black text-white/80">
-              {Array.from(safeArtistName)[0]}
+            <div className="flex h-full w-full items-center justify-center bg-white">
+              <img
+                src={COVER_FALLBACK_SRC}
+                alt="하냥이"
+                className="h-[78%] w-[78%] object-contain select-none"
+                draggable={false}
+              />
             </div>
           )}
         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
-import { Music2 } from 'lucide-react';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
 import { edgePaletteGradient, extractRightEdgePalette, type EdgePalette } from '../shared/bannerEdgePalette.js';
+import { COVER_FALLBACK_SRC } from '../shared/CoverImage';
 import { type ChartPeriod, type Song, type TrackSummary } from '../playlistTypes.js';
 
 type PromoSource = 'recent' | 'popular' | 'weekly';
@@ -149,8 +149,8 @@ function TrackPromoBanner({ promo, onClick }: { promo: TrackPromo; onClick: () =
               onError={() => setImageFailed(true)}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-white/10">
-              <Music2 className="h-[34%] w-[34%] text-white/70" aria-hidden="true" />
+            <div className="flex h-full w-full items-center justify-center bg-white">
+              <img src={COVER_FALLBACK_SRC} alt="" className="h-[78%] w-[78%] object-contain" draggable={false} />
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { Pause, Play, Share2 } from 'lucide-react';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
+import { CoverImage } from '../shared/CoverImage';
 
 interface ChartSongRowProps {
   track: ChartTrack;
@@ -51,13 +52,11 @@ export function ChartSongRow({
       </span>
 
       {/* 앨범 커버 */}
-      {track.albumArtUrl && (
-        <img
-          src={track.albumArtUrl}
-          alt={track.title}
-          className={`${thumbnailClassName} object-cover rounded flex-shrink-0`}
-        />
-      )}
+      <CoverImage
+        src={track.albumArtUrl}
+        alt={track.title}
+        className={`${thumbnailClassName} object-cover rounded flex-shrink-0`}
+      />
 
       {/* 곡정보 */}
       <div className="flex-1 min-w-0">

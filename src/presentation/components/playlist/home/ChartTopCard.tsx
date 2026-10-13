@@ -1,5 +1,6 @@
 import { Pause, Play, Share2 } from 'lucide-react';
 import { type TrackSummary } from '../playlistTypes';
+import { CoverImage } from '../shared/CoverImage';
 
 // rank가 없으면(예: 홈의 "내가 추천한 곡") 순위 숫자만 생략하고 나머지 UI는 동일하게 그림
 type ChartCardTrack = TrackSummary & { rank?: number };
@@ -35,7 +36,7 @@ export function ChartTopCard<T extends ChartCardTrack>({ track, onShowPosts, onP
   return (
     <div className={`relative ${widthClassName} ${heightClassName} rounded-xl overflow-hidden shadow-lg`}>
       {/* 앨범커버 전체 배경 — 카드 전체를 채우는 유일한 배경 */}
-      <img
+      <CoverImage
         src={track.albumArtUrl}
         alt={track.title}
         className="absolute inset-0 w-full h-full object-cover"

@@ -10,6 +10,7 @@ import { useSongReport } from './useSongReport';
 import { ReportReasonPopup } from './ReportReasonPopup';
 import { PostMoreMenu } from './PostMoreMenu';
 import { EmptyCommentNote } from './EmptyCommentNote';
+import { CoverImage } from './CoverImage';
 import { useShareModal } from './useShareModal';
 import { Toast } from './Toast';
 import { useLikeToast } from './useLikeToast';
@@ -316,7 +317,7 @@ export function PostDetailCard({
     >
       {/* 앨범 커버 */}
       <div className="relative">
-        <img
+        <CoverImage
           src={post.albumArtUrl}
           alt={post.title}
           // rounded-t: 이모지 선택창이 열려 있는 동안엔 카드의 overflow-hidden을 풀어서(선택창이 카드 밖으로 나가도록) 커버 모서리를 직접 둥글게 유지

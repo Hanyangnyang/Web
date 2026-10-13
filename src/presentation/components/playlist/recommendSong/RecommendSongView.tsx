@@ -9,6 +9,7 @@ import { MusicSearchResultCard } from '../shared/MusicSearchResultCard';
 import { ConfirmPopup } from '../shared/ConfirmPopup';
 import { Toast } from '../shared/Toast';
 import { PlaylistFallback } from '../shared/PlaylistFallback';
+import { CoverImage } from '../shared/CoverImage';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { PLAYER_GAP_PX } from '../shared/AddSongFab';
 import { useFirstRecommendNotice } from './useFirstRecommendNotice';
@@ -446,7 +447,7 @@ export function RecommendSongView({ onBack, onSubmitSuccess, playerHeight = 0, o
         {/* 선택된 곡 */}
         {selectedTrack && (
           <div className="mt-2 flex items-center gap-3 bg-white border border-playlist-primary/30 shadow-[0_2px_4px_rgba(0,0,0,0.03)] rounded-card px-3 py-2.5">
-            <img
+            <CoverImage
               src={selectedTrack.albumArtUrl}
               alt={selectedTrack.title}
               className="w-10 h-10 rounded object-cover flex-shrink-0 bg-slate-100"
