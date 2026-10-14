@@ -1,3 +1,4 @@
+import { User } from 'lucide-react';
 import { CHIP_BASE, CHIP_INACTIVE, CHIP_LARGE } from './GenreFilterChips';
 
 // 켜졌을 때 — 회색·흰색·검정 계열만: 장르 칩 선택 상태(색 채움 + 흰 글자)와 같은 모양을 회색으로.
@@ -19,6 +20,8 @@ export function MineOnlyChip({ active, onToggle, large = false }: MineOnlyChipPr
       aria-pressed={active}
       className={`${CHIP_BASE} ${large ? CHIP_LARGE : ''} ${active ? CHIP_MINE_ACTIVE : CHIP_INACTIVE}`}
     >
+      {/* 사람 아이콘 — 장르 칩과 달리 "내 것만" 거르는 필터라는 걸 글자 앞에서 바로 알 수 있게. 글자 색을 그대로 따라감 */}
+      <User size={large ? 15 : 14} strokeWidth={2.2} aria-hidden="true" />
       <span>내 추천</span>
     </button>
   );

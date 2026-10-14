@@ -24,7 +24,6 @@ import { type ChartTrack } from '../../../domain/entities/PopularityChart.js';
 import { getOrCreateAnonymousUserId, AuthRateLimitError } from '../../../lib/supabase.js';
 import { useRecentSongsInfinite } from '../../hooks/playlist/useRecentSongsInfinite.js';
 import { useMySongsInfinite } from '../../hooks/playlist/useMySongsInfinite.js';
-import { SONG_LIST_STALE_TIME } from '../../hooks/playlist/useSongListInfinite.js';
 import { RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY, CHART_QUERY_KEY, keepOnlyFirstPage, type SongPagesData } from '../../hooks/playlist/playlistQueryKeys.js';
 import { runWithoutRetry } from '../../../lib/queryClient.js';
 import { ConfirmPopup } from './shared/ConfirmPopup';
@@ -116,10 +115,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     ? myGenreSongs
     : recentGenreFilter.selected.length > 0 ? (genreSongs ?? EMPTY_SONGS) : songs;
   const isHomeRecentLoading = recentMineOnly ? isMySongsLoading : isRecentSongsLoading;
-  // 홈 미리보기에 지금 보이는 목록의 쿼리 — 제목행 "N분 전 ↻"가 이 쿼리의 수신 시각을 보여주고 이 쿼리를 새로고침함
-  const homeRecentQuery = recentMineOnly
-    ? mySongsQuery
-    : recentGenreFilter.selected.length > 0 ? genreRecentSongsQuery : allRecentSongsQuery;
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
   const { data: chartData, isLoading: isChartLoading, isError: isChartError, refetch: refetchChart } = usePopularityChart(chartPeriod, isActive);
@@ -419,24 +414,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
     pushScreen({ name: 'recent', scrollTarget: post.trackId });
   }, [pushScreen, queryClient]);
 
-  // 홈 "최근 추천된 곡" 제목행의 새로고침 — 지금 보이는 목록(전체/장르/내 추천)만 첫 페이지부터 다시 받음(당겨서 새로고침과 같은 방식).
-  // 클릭은 쿨다운에 걸렸는지와 함께 캡처 — 쿨다운이 실제로 막은 요청 수를 보기 위함
-  const captureRecentRefresh = (throttled: boolean) => {
-    posthog?.capture('playlist_recent_refresh_clicked', {
-      throttled,
-      mine_only: recentMineOnly,
-      genre: recentGenreFilter.selected[0] ?? 'all',
-      seconds_since_update: Math.round((Date.now() - homeRecentQuery.dataUpdatedAt) / 1000),
-    });
-  };
-  const handleRefreshHomeRecent = () => {
-    captureRecentRefresh(false);
-    const genreKey = recentGenreFilter.selected[0];
-    const queryKey = recentMineOnly ? MY_SONGS_INFINITE_QUERY_KEY : genreKey ? [...RECENT_SONGS_INFINITE_QUERY_KEY, genreKey] : RECENT_SONGS_INFINITE_QUERY_KEY;
-    keepOnlyFirstPage(queryClient, queryKey);
-    void runWithoutRetry(() => homeRecentQuery.refetch());
-  };
-
   // 홈의 하단 "더보기"는 미리보기 마지막 곡 위치까지 부드럽게 내려간 뒤 이어서 목록을 보게 한다.
   // 헤더 화살표·빈 상태 등 다른 진입점은 기존처럼 목록 맨 위부터 보여준다.
   // A안/B안 사이 이견 없이 병합하는 개선이라 A/B 테스트 대상은 아니지만, "홈 → 최근추가된곡 진입" CTR 지표는 여기서 같이 캡처함
@@ -671,12 +648,6 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
             recentMineOnly={recentMineOnly}
             onChangeRecentMineOnly={changeRecentMineOnly}
             isRecentSongsLoading={isHomeRecentLoading}
-            recentUpdatedAt={homeRecentQuery.dataUpdatedAt}
-            isRecentRefreshing={homeRecentQuery.isFetching}
-            // 목록 staleTime과 같은 값 — 이 시간 안의 데이터는 앱이 이미 "최신"으로 보는 기준이라 그 안의 새로고침은 요청하지 않음
-            recentRefreshCooldownMs={SONG_LIST_STALE_TIME}
-            onRefreshRecent={handleRefreshHomeRecent}
-            onRefreshRecentThrottled={() => captureRecentRefresh(true)}
             visibleChart={visibleChart}
             isChartLoading={isChartLoading}
             chartDisplayTitle={chartData?.displayTitle}

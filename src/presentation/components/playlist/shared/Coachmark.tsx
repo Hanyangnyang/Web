@@ -7,6 +7,15 @@ const VISIBLE_MS = 3000;
 
 type CoachmarkState = 'hidden' | 'visible' | 'leaving';
 
+// 이 기기에서 그 말풍선을 이미 봤는지 — 다른 말풍선이 끝난 뒤에 이어서 띄울 때 순서 판단용. 접근 불가면 못 본 걸로(= 뒤 말풍선도 안 뜸)
+export function hasSeenCoachmark(storageKey: string) {
+  try {
+    return localStorage.getItem(storageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
 export function useCoachmark(storageKey: string, enabled = true) {
   const [state, setState] = useState<CoachmarkState>(() => {
     if (!enabled) return 'hidden';

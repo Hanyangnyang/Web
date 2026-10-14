@@ -11,7 +11,6 @@ import { ChartPeriodChips } from '../shared/ChartPeriodChips';
 import { GenreFilterChips, type GenreFilterState } from '../shared/GenreFilterChips';
 import { PlaylistSearchBar } from '../shared/PlaylistSearchBar';
 import { TrackPromoCarousel } from './TrackPromoCarousel';
-import { RefreshStamp } from './RefreshStamp';
 import { toChartBasisLabel } from '../shared/chartBasisLabel';
 import { type Song, type TrackSummary, type ChartPeriod, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
@@ -29,12 +28,6 @@ interface PlaylistHomeViewProps {
   recentMineOnly: boolean;
   onChangeRecentMineOnly: (mineOnly: boolean) => void;
   isRecentSongsLoading: boolean;
-  // 최근 추천된 곡 제목행의 "N분 전 ↻" — 지금 보이는 목록(전체/장르/내 추천)의 마지막 수신 시각과 새로고침
-  recentUpdatedAt: number;
-  isRecentRefreshing: boolean;
-  recentRefreshCooldownMs: number;
-  onRefreshRecent: () => void;
-  onRefreshRecentThrottled: () => void;
   visibleChart: ChartTrack[];
   isChartLoading: boolean;
   // 서버가 준 차트 제목(예: "10.08 19:00 기준 실시간 급상승", "10월 2주차 주간 차트") — 여기서 기준 시각·기간만 뽑아 제목 옆에 표시
@@ -67,7 +60,7 @@ interface PlaylistHomeViewProps {
   onSelectChartPromo: (track: ChartTrack, period: Extract<ChartPeriod, 'popular' | 'weekly'>) => void;
 }
 
-// 에리카 플레이리스트 홈 화면 — 검색바 + 인기차트 미리보기 + 최근 추가된 곡 미리보기.
+// 에리카 플레이리스트 홈 화면 — 검색바 + 최근 추가된 곡 미리보기 + 인기차트 미리보기.
 // PlaylistView(화면 전환을 관리하는 컨테이너)가 screenStack이 ['main']일 때 렌더링함
 export function PlaylistHomeView({
   onBack,
@@ -79,11 +72,6 @@ export function PlaylistHomeView({
   recentMineOnly,
   onChangeRecentMineOnly,
   isRecentSongsLoading,
-  recentUpdatedAt,
-  isRecentRefreshing,
-  recentRefreshCooldownMs,
-  onRefreshRecent,
-  onRefreshRecentThrottled,
   visibleChart,
   isChartLoading,
   chartDisplayTitle,
@@ -173,8 +161,78 @@ export function PlaylistHomeView({
         </div>
       ) : null}
 
-      {/* 인기차트 섹션 */}
+      {/* 최근 추가된 곡 섹션 */}
       <section className="mb-4">
+        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동 */}
+        <h3 className="mb-2">
+          <button
+            onClick={() => onShowAllRecent()}
+            aria-label="최근 추천된 곡 전체보기"
+            className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
+          >
+            <span>최근 추천된 곡</span>
+            <ChevronRight size={20} className="ml-0.5" />
+          </button>
+        </h3>
+
+        {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜.
+            오른쪽 끝에 "내 추천" 칩을 고정 — 켜면 내가 추천한 곡만(장르와 함께 걸림), 최근 추가된 곡 화면과 상태를 공유 */}
+        <GenreFilterChips
+          value={recentGenreFilter}
+          onChange={onChangeRecentGenreFilter}
+          className="mb-2"
+          pinned={<MineOnlyChip active={recentMineOnly} onToggle={onChangeRecentMineOnly} />}
+        />
+
+        {/* 최근 추가된 곡 목록 */}
+        {isRecentSongsLoading ? (
+          <div className="flex flex-col gap-1.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <RecentSongRowSkeleton key={i} />
+            ))}
+          </div>
+        ) : visibleSongs.length === 0 ? (
+          <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
+            <EmptyGenreState
+              message={
+                recentMineOnly
+                  ? (recentGenreFilter.selected.length > 0 ? '아직 이 장르로 추천한 곡이 없어요' : '아직 추천한 곡이 없어요')
+                  : (recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추천된 곡이 없어요')
+              }
+              buttonLabel="곡 추천하러 가기"
+              onAction={onShowAddSong}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            {visibleSongs.map((song) => (
+              <RecentSongRow
+                key={song.id ?? song.trackId}
+                song={song}
+                onSelect={onSelectRecentSong}
+                onPlay={onPlayTrack}
+                currentTrackId={currentTrackId}
+                variant={recentSongsVariant}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 더보기 — 최근 추가된 곡 전체보기로 이동 */}
+        {!isRecentSongsLoading && visibleSongs.length > 0 && (
+          <div className="flex justify-center mt-3">
+            <button
+              onClick={() => onShowAllRecent(true)}
+              className="relative before:content-[''] before:absolute before:-inset-2 px-5 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
+            >
+              더보기
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* 인기차트 섹션 */}
+      <section>
         {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동.
             "인기차트"와 > 사이에 차트 집계 기준 시각·기간 — 서버가 정해진 시각에 찍는 스냅샷이라 새로고침해도 결과가 같아서 버튼 없이 표시만 함 */}
         <h3 className="mb-2">
@@ -240,88 +298,6 @@ export function PlaylistHomeView({
               </button>
               <div className="w-1 flex-shrink-0" aria-hidden="true" />
             </div>
-          </div>
-        )}
-      </section>
-
-      {/* 최근 추가된 곡 섹션 */}
-      <section>
-        {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 어디를 눌러도 해당 화면으로 이동.
-            오른쪽 끝에는 "N분 전 ↻" — 마지막으로 받은 시각을 보여주고 눌러서 새로고침(쿨다운 안이면 요청 없이 아이콘만 돌림) */}
-        {/* items-baseline — "N분 전" 글자를 큰 제목 글자의 밑선에 맞춤(↻ 아이콘은 RefreshStamp 안에서 "N분 전" 글자 기준 가운데) */}
-        <div className="mb-2 flex items-baseline justify-between gap-2">
-          <h3>
-            <button
-              onClick={() => onShowAllRecent()}
-              aria-label="최근 추천된 곡 전체보기"
-              className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[19px] font-bold text-text-main active:scale-[0.98] transition-transform"
-            >
-              <span>최근 추천된 곡</span>
-              <ChevronRight size={20} className="ml-0.5" />
-            </button>
-          </h3>
-          <RefreshStamp
-            updatedAt={recentUpdatedAt}
-            isFetching={isRecentRefreshing}
-            cooldownMs={recentRefreshCooldownMs}
-            onRefresh={onRefreshRecent}
-            onThrottled={onRefreshRecentThrottled}
-            ariaLabel="최근 추천된 곡 새로고침"
-          />
-        </div>
-
-        {/* 장르 칩 — 인기차트의 실시간/주간/월간 칩처럼 제목 아래에 두고, 고르면 아래 미리보기가 그 장르로 바뀜.
-            오른쪽 끝에 "내 추천" 칩을 고정 — 켜면 내가 추천한 곡만(장르와 함께 걸림), 최근 추가된 곡 화면과 상태를 공유 */}
-        <GenreFilterChips
-          value={recentGenreFilter}
-          onChange={onChangeRecentGenreFilter}
-          className="mb-2"
-          pinned={<MineOnlyChip active={recentMineOnly} onToggle={onChangeRecentMineOnly} />}
-        />
-
-        {/* 최근 추가된 곡 목록 */}
-        {isRecentSongsLoading ? (
-          <div className="flex flex-col gap-1.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <RecentSongRowSkeleton key={i} />
-            ))}
-          </div>
-        ) : visibleSongs.length === 0 ? (
-          <div className="bg-white rounded-card border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] overflow-hidden">
-            <EmptyGenreState
-              message={
-                recentMineOnly
-                  ? (recentGenreFilter.selected.length > 0 ? '아직 이 장르로 추천한 곡이 없어요' : '아직 추천한 곡이 없어요')
-                  : (recentGenreFilter.selected.length > 0 ? '아직 이 장르엔 추천된 곡이 없어요' : '아직 추천된 곡이 없어요')
-              }
-              buttonLabel="곡 추천하러 가기"
-              onAction={onShowAddSong}
-            />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-1.5">
-            {visibleSongs.map((song) => (
-              <RecentSongRow
-                key={song.id ?? song.trackId}
-                song={song}
-                onSelect={onSelectRecentSong}
-                onPlay={onPlayTrack}
-                currentTrackId={currentTrackId}
-                variant={recentSongsVariant}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* 더보기 — 최근 추가된 곡 전체보기로 이동 */}
-        {!isRecentSongsLoading && visibleSongs.length > 0 && (
-          <div className="flex justify-center mt-3">
-            <button
-              onClick={() => onShowAllRecent(true)}
-              className="relative before:content-[''] before:absolute before:-inset-2 px-5 py-2.5 rounded-full text-[13px] font-bold text-text-sub bg-white border border-slate-200 shadow-[0_2px_4px_rgba(0,0,0,0.03)] hover:bg-slate-50 hover:text-text-main transition-colors active:scale-95"
-            >
-              더보기
-            </button>
           </div>
         )}
       </section>
