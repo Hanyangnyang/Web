@@ -11,6 +11,7 @@ import { ErrorBoundary } from '../../common/ErrorBoundary.js';
 import { useShareModal } from '../shared/useShareModal';
 import { type ChartPeriod, type TrackSummary, CHART_PERIOD_OPTIONS } from '../playlistTypes';
 import { type ChartTrack } from '../../../../domain/entities/PopularityChart.js';
+import { toChartBasisLabel } from '../shared/chartBasisLabel';
 
 interface ChartViewProps {
   chart: ChartTrack[];
@@ -33,10 +34,15 @@ interface ChartViewProps {
   onShowPosts: (track: ChartTrack) => void;
   // 지금 하단 플레이어에서 재생 중인 곡 — 해당 행의 재생 아이콘이 일시정지 아이콘으로 바뀜
   currentTrackId?: string | null;
+  // 서버가 준 차트 제목(예: "10월 2주차 주간 차트") — 기준 시각·기간만 뽑아 헤더 부제목으로 보여줌
+  displayTitle?: string;
 }
 
 // 인기차트 상세 화면 — 홈 미리보기(최대 10곡)와 달리 전체 차트를 보여줌
-export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, scrollToTrackId, onScrollTargetConsumed, genreFilter, onGenreFilterChange, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId }: ChartViewProps) {
+export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onChangePeriod, scrollToTrackId, onScrollTargetConsumed, genreFilter, onGenreFilterChange, onBack, onShowRecent, onPlay, onShowPosts, currentTrackId, displayTitle }: ChartViewProps) {
+  // 헤더 부제목 — "12:00 기준의 인기차트예요" / "10월 2주차의 인기차트예요" / "9월의 인기차트예요" (홈 인기차트 제목 옆 문구와 같은 함수)
+  const basisLabel = toChartBasisLabel(displayTitle, new Date());
+  const subtitle = basisLabel ? `'${basisLabel}' 인기차트입니다` : undefined;
   // 공유 모달은 화면에 하나만 두고, 누른 행의 곡을 담아서 염 — 행마다 모달 상태를 들고 있지 않게
   const [shareTrack, setShareTrack] = useState<TrackSummary>({ trackId: '', title: '', artist: '', albumArtUrl: '' });
   const share = useShareModal(shareTrack);
@@ -73,6 +79,8 @@ export function ChartView({ chart, isLoading, isError, onRetry, chartPeriod, onC
         <MiscSubViewHeader
           title="인기차트"
           emoji="🔥"
+          subtitle={subtitle}
+          subtitleLoading={isLoading}
           onBack={onBack}
         />
 

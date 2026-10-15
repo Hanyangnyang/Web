@@ -15,6 +15,7 @@ import { useSongReport } from '../shared/useSongReport';
 import { ReportReasonPopup } from '../shared/ReportReasonPopup';
 import { PostMoreMenu } from '../shared/PostMoreMenu';
 import { EmptyCommentNote } from '../shared/EmptyCommentNote';
+import { CoverImage } from '../shared/CoverImage';
 import { useShareModal } from '../shared/useShareModal';
 import { Toast } from '../shared/Toast';
 import { MarqueeText } from '../shared/MarqueeText';
@@ -169,7 +170,7 @@ export function TrackPostCollectionView({ track, onBack, onSelectPost, onPlay, i
               그 폭에서 높이를 역산(카드 전체 높이도 이 앨범커버 높이를 따라감). 카드 왼쪽/위/아래 테두리에
               여백 없이 꽉 차게(overflow-hidden으로 왼쪽 모서리만 카드 라운딩에 맞춰 클립) */}
           <div className="relative w-2/5 flex-shrink-0 aspect-square">
-            <img
+            <CoverImage
               src={displayTrack.albumArtUrl}
               alt={displayTrack.title}
               className="w-full h-full object-cover bg-slate-100"

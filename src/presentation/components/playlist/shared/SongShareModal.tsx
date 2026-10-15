@@ -4,6 +4,7 @@ import { usePostHog } from 'posthog-js/react';
 import { loadKakaoSdk } from '../../../../lib/kakaoShare.js';
 import { initSentry } from '../../../../lib/sentry.js';
 import { type TrackSummary } from '../playlistTypes';
+import { CoverImage } from './CoverImage';
 
 declare global {
   interface Window {
@@ -186,7 +187,7 @@ export function SongShareModal({ song, onClose, onCopied }: SongShareModalProps)
 
         {/* 공유 대상 곡 미리보기 — 앨범커버를 크게 가운데 배치 */}
         <div className="flex flex-col items-center px-3 pt-12 pb-8">
-          <img
+          <CoverImage
             src={song.albumArtUrl}
             alt={song.title}
             className="w-28 h-28 rounded-2xl object-cover shadow-md bg-slate-100"

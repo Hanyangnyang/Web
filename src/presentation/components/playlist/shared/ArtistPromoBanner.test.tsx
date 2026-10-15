@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ArtistPromoBanner } from './ArtistPromoBanner.js';
+import { COVER_FALLBACK_SRC } from './CoverImage';
 import { ARTIST_PROMO_TEMPLATES, getArtistNameSize, pickArtistPromoTemplate } from './artistPromoTypography.js';
 
 describe('ArtistPromoBanner', () => {
@@ -29,12 +30,12 @@ describe('ArtistPromoBanner', () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('이미지를 불러오지 못하면 가수명 첫 글자를 표시한다', () => {
+  it('이미지를 불러오지 못하면 스플래시 하냥이를 표시한다', () => {
     render(<ArtistPromoBanner artistName="백예린" artistImageUrl="https://example.com/broken.jpg" />);
 
     fireEvent.error(screen.getByAltText('백예린 아티스트 이미지'));
 
-    expect(screen.getByText('백')).toBeTruthy();
+    expect(screen.getByAltText('하냥이').getAttribute('src')).toBe(COVER_FALLBACK_SRC);
     expect(screen.queryByAltText('백예린 아티스트 이미지')).toBeNull();
   });
 

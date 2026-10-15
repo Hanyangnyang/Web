@@ -5,8 +5,8 @@ import type { Song } from '../../components/playlist/playlistTypes.js';
 import type { PopularityChart } from '../../../domain/entities/PopularityChart.js';
 
 // 최근 추가된 곡은 홈 미리보기와 전체 보기가 *_INFINITE_* 키(페이지 단위 캐시)를 같이 씀 — 장르를 고르면 이 키 뒤에 장르 키가 붙은 캐시가 따로 생김
-export const MY_SONGS_QUERY_KEY = ['playlist', 'my-songs'];
 export const RECENT_SONGS_INFINITE_QUERY_KEY = ['playlist', 'recent-songs-pages'];
+// 내가 추천한 곡 — 홈 미리보기·최근 추가된 곡 화면의 "내 추천" 칩을 켰을 때 둘 다 이 캐시를 씀
 export const MY_SONGS_INFINITE_QUERY_KEY = ['playlist', 'my-songs-pages'];
 // 저장한 곡은 미리보기 없이 전체 화면만 있어서 무한 스크롤 캐시 하나뿐
 export const LIKED_SONGS_QUERY_KEY = ['playlist', 'liked-songs'];
@@ -15,7 +15,7 @@ export const ARTIST_RECOMMENDATIONS_QUERY_KEY = ['playlist', 'artist-recommendat
 // 추천글 단건 상세 — 키 뒤에 postId가 붙음. 목록 캐시와 달리 Song 하나가 통째로 들어 있음
 export const POST_DETAIL_QUERY_KEY = ['playlist', 'post-detail'];
 
-// 최근추가된곡/저장한곡/내가등록한곡 화면은 모두 이 세 캐시 중 하나에서 목록을 읽는데, 화면을 나갔다 들어오면
+// 최근추가된곡(내 추천 포함)/저장한곡 화면은 모두 이 세 캐시 중 하나에서 목록을 읽는데, 화면을 나갔다 들어오면
 // SongListScreen/PostDetailCard가 통째로 리마운트되면서 카드 안에서만 들고 있던 낙관적 업데이트(좋아요/반응)가
 // 사라진다. 그 시점에 이 캐시들이 아직 옛날 값이면(백그라운드 refetch가 안 끝났으면) 방금 한 반응이 안 보였다가,
 // 다음번 재진입에야(그땐 refetch가 이미 끝나서) 보이는 것처럼 느껴짐 — 그래서 토글 성공 시 여기 캐시들도 같이 패치
@@ -26,14 +26,10 @@ export interface SongPage {
 }
 export type SongPagesData = InfiniteData<SongPage, number>;
 
-const SONG_ARRAY_QUERY_KEYS = [MY_SONGS_QUERY_KEY];
 const SONG_PAGES_QUERY_KEYS = [RECENT_SONGS_INFINITE_QUERY_KEY, LIKED_SONGS_QUERY_KEY, MY_SONGS_INFINITE_QUERY_KEY];
 
-// 배열 캐시(홈 미리보기)와 페이지 캐시(전체 보기)에 같은 변환을 적용
+// 목록 페이지 캐시 전부에 같은 변환을 적용
 function mapSongsInListCaches(queryClient: QueryClient, transform: (songs: Song[]) => Song[]) {
-  for (const key of SONG_ARRAY_QUERY_KEYS) {
-    queryClient.setQueriesData<Song[]>({ queryKey: key }, (prev) => prev && transform(prev));
-  }
   for (const key of SONG_PAGES_QUERY_KEYS) {
     // 최근 추가된 곡은 장르별 캐시(['playlist','recent-songs-pages','indie'] 등)가 같은 접두사로 따로 있어서 전부 패치
     queryClient.setQueriesData<SongPagesData>({ queryKey: key }, (prev) => prev && { ...prev, pages: prev.pages.map((page) => ({ ...page, songs: transform(page.songs) })) });

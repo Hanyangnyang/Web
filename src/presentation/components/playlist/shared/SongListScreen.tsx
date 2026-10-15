@@ -6,7 +6,8 @@ import { PostDetailCard, songToPostDetailCardData, BODY_TOGGLE_MS } from './Post
 import { PostDetailCardSkeleton } from './PostDetailCardSkeleton';
 import { EmptyGenreState } from './EmptyGenreState';
 import { GenreFilterChips, EMPTY_GENRE_FILTER, type GenreFilterState } from './GenreFilterChips';
-import { Coachmark, useCoachmark } from './Coachmark';
+import { MineOnlyChip } from './MineOnlyChip';
+import { Coachmark, useCoachmark, hasSeenCoachmark } from './Coachmark';
 import { ScrollToTopPill } from './ScrollToTopPill';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { scrollNearestScrollableAncestorToTop } from '../../../../utils/scroll';
@@ -14,6 +15,8 @@ import { useInfiniteScrollSentinel } from '../../../hooks/useInfiniteScrollSenti
 
 // 그리드/리스트 보기 전환 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다(Coachmark.tsx 참고)
 const VIEW_TOGGLE_COACHMARK_SEEN_KEY = 'viewToggleCoachmarkSeen';
+// "내 추천" 칩 코치마크를 한 번 봤는지 — 보기 전환 코치마크 다음, 반응 힌트 앞에 뜸
+const MINE_ONLY_COACHMARK_SEEN_KEY = 'mineOnlyChipCoachmarkSeen';
 // 스마일(반응) 버튼을 꾹 눌러 슬라이드로 이모지를 고를 수 있다는 힌트 — 위 보기 전환 코치마크가 끝난 뒤에 한 번만 띄움
 const REACTION_HOLD_HINT_SEEN_KEY = 'reactionHoldHintSeen';
 // 반응 힌트 말풍선과 버튼 사이 간격, 그리고 말풍선 높이(2줄 글 + 패딩 + 꼬리)의 넉넉한 추정값 — 아래에 들어갈 자리가 있는지 가늠할 때 씀
@@ -67,6 +70,9 @@ interface SongListScreenProps {
   onGenreFilterChange?: (next: GenreFilterState) => void;
   // true면 헤더 아래 장르 칩을 그리지 않음 — 서버가 장르 필터를 지원하지 않는 화면용(저장한 곡)
   hideGenreFilter?: boolean;
+  // 넘겨주면 장르 칩 줄 맨 앞에 "내 추천" 토글 칩을 고정해서 보여줌(지금은 최근 추가된 곡만) — 켜고 끄는 동작·데이터 전환은 상위가 맡음
+  mineOnly?: boolean;
+  onMineOnlyChange?: (mineOnly: boolean) => void;
   // 무한 스크롤 — 다음 페이지가 있으면 목록 맨 아래에 감시 요소를 두고 화면 근처에 오면 onLoadMore를 부름.
   // 홈에서 누른 카드(scrollToTrackId)가 아직 안 불러온 페이지에 있으면 찾을 때까지 이어서 불러옴
   hasNextPage?: boolean;
@@ -101,6 +107,8 @@ export function SongListScreen({
   genreFilter: genreFilterProp,
   onGenreFilterChange,
   hideGenreFilter = false,
+  mineOnly = false,
+  onMineOnlyChange,
   hasNextPage = false,
   isFetchingNextPage = false,
   onLoadMore,
@@ -239,6 +247,12 @@ export function SongListScreen({
   // 그리드 보기 전환 버튼 코치마크 — 처음 온 사람에게만, 잠깐 떴다 사라진다
   const viewToggleCoachmark = useCoachmark(VIEW_TOGGLE_COACHMARK_SEEN_KEY, enableViewToggle);
 
+  // "내 추천" 칩 코치마크 — 칩이 있는 화면(지금은 최근 추가된 곡)에 처음 들어왔을 때, 보기 전환 코치마크가 사라진 뒤에 한 번만 띄움
+  const hasMineOnlyChip = !hideGenreFilter && !!onMineOnlyChange;
+  const mineOnlyCoachmark = useCoachmark(MINE_ONLY_COACHMARK_SEEN_KEY, hasMineOnlyChip && viewToggleCoachmark.state === 'hidden');
+  // 뒤이어 뜨는 반응 힌트가 기다릴 조건 — state만 보면 "아직 켜지기 전이라 hidden"인 순간에 둘이 같이 켜질 수 있어서, 실제로 한 번 떴는지(저장된 키)까지 확인
+  const mineOnlyCoachmarkDone = !hasMineOnlyChip || (mineOnlyCoachmark.state === 'hidden' && hasSeenCoachmark(MINE_ONLY_COACHMARK_SEEN_KEY));
+
   // 2열에서 같은 줄 두 카드의 반응 행·한마디 영역 높이를 큰 쪽에 맞춤 — 한쪽만 칩이 두 줄로 늘어나면 곡명 위치가 좌우로 어긋나 읽기 불편해서.
   // 반응 바(data-reaction-bar)의 본래 높이를 재서 줄(2k, 2k+1) 단위로 최대값을 반응 행(data-reaction-row)의 min-height로 줌.
   // 반응을 달거나 취소해 높이가 바뀌어도 따라가도록 ResizeObserver로 지켜봄(min-height는 바 높이에 영향이 없어 되먹임 없음)
@@ -276,7 +290,7 @@ export function SongListScreen({
   // 앞선 보기 전환 코치마크가 사라진 뒤에 시작. 어둡게 덮는 효과는 다른 코치마크와 같음(z-110: 고정 헤더 z-100 위까지 덮음)
   // placement: 말풍선이 버튼 아래('below')에 들어갈 자리가 있으면 아래, 없으면(1열은 앨범커버가 커서 버튼이 화면 아래쪽에 놓임) 위('above')에 띄움
   const [reactionHintAnchor, setReactionHintAnchor] = useState<{ left: number; top: number; width: number; height: number; bottom: number; placement: 'below' | 'above'; aboveBottom: number } | null>(null);
-  const reactionHintReady =!gridOnly && !isLoading && filteredSongs.length > 0 && viewToggleCoachmark.state === 'hidden';
+  const reactionHintReady =!gridOnly && !isLoading && filteredSongs.length > 0 && viewToggleCoachmark.state === 'hidden' && mineOnlyCoachmarkDone;
   useLayoutEffect(() => {
     const container = listContainerRef.current;
     if (!reactionHintReady || !container) return;
@@ -387,6 +401,18 @@ export function SongListScreen({
             onChange={setGenreFilter}
             large
             className="-mt-1.5 pb-2"
+            pinned={onMineOnlyChange && (
+              <div className="relative">
+                {/* 말풍선이 떠 있는 동안 칩을 말풍선(z-40)의 어두운 그림자보다 위로 올려, 가리키는 칩만 밝게 보이게 함(보기 전환 버튼과 같은 방식) */}
+                <div className={mineOnlyCoachmark.state !== 'hidden' ? 'relative z-[45]' : ''}>
+                  <MineOnlyChip active={mineOnly} onToggle={onMineOnlyChange} large />
+                </div>
+                {/* 칩 바로 아래, 꼬리가 칩 가운데를 가리킴 */}
+                <Coachmark {...mineOnlyCoachmark} className="absolute right-0 top-full mt-2" tailClassName="right-[38px]">
+                  내가 추천한 곡을 모아볼 수 있어요!
+                </Coachmark>
+              </div>
+            )}
           />
         )}
       </div>
