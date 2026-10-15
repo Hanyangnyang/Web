@@ -13,7 +13,7 @@ export interface TrackSummary {
   albumArtUrl: string;
 }
 
-// RecentSongsView/LikedSongsView/MySongsView(전부 SongListScreen 위에 얇게 얹힌 화면들)가
+// RecentSongsView/LikedSongsView(둘 다 SongListScreen 위에 얇게 얹힌 화면들)가
 // 공통으로 받는 prop — 각 화면은 이걸 extends하고 자기만의 prop(데이터 소스, 빈 상태 문구 등)만 추가
 export interface SongListViewBaseProps {
   onBack: () => void;

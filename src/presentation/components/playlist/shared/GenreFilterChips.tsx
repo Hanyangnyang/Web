@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { GENRES } from '../playlistTypes';
 
 // 장르 필터의 상태 — 선택(비어 있으면 전체, 하나만 선택 가능해서 길이 0 또는 1)과 칩 순서(최근에 고른 순서)를 함께 들고 있다.
@@ -15,6 +15,8 @@ interface GenreFilterChipsProps {
   onChange: (next: GenreFilterState) => void;
   className?: string;
   large?: boolean; // 목록 화면처럼 모바일에서 누르기 편하도록 칩을 조금 키움(홈 미리보기는 기본 크기)
+  // 칩 줄 오른쪽 끝에 고정할 요소(가로 스크롤되지 않음) — 장르와 성격이 다른 필터(예: "내 추천")를 세로 구분선으로 장르 칩과 나눠 둠
+  pinned?: ReactNode;
 }
 
 // 선택 안 된 칩은 모두 기본 흰색, 선택된 칩은 플레이리스트 파란색 계열의 연한 톤
@@ -27,7 +29,7 @@ export const CHIP_BASE = 'flex items-center gap-1 px-3 py-1.5 rounded-2xl text-s
 const MOVE_MS = 300;
 const GENRE_KEYS = GENRES.map((genre) => genre.key);
 
-export function GenreFilterChips({ value, onChange, className = '', large = false }: GenreFilterChipsProps) {
+export function GenreFilterChips({ value, onChange, className = '', large = false, pinned }: GenreFilterChipsProps) {
   const { selected: selectedGenres, recent: recentKeys } = value;
   const containerRef = useRef<HTMLDivElement>(null);
   const chipRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -69,10 +71,15 @@ export function GenreFilterChips({ value, onChange, className = '', large = fals
     containerRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
   }, [orderSignature]);
 
-  return (
+  // 가로 스크롤되는 장르 칩 줄. pinned가 있으면 [이 줄 | 구분선 | 고정 요소]로 감싸서, 장르 칩은 화면 왼쪽 끝부터 구분선 앞까지만 스크롤됨
+  const scroller = (
     <div
       ref={containerRef}
-      className={`relative flex gap-1.5 overflow-x-auto px-4 ml-[-1rem] [&::-webkit-scrollbar]:hidden ${className}`}
+      className={
+        pinned
+          ? 'relative flex-1 min-w-0 flex gap-1.5 overflow-x-auto pl-4 ml-[-1rem] pr-1.5 [&::-webkit-scrollbar]:hidden'
+          : `relative flex gap-1.5 overflow-x-auto px-4 ml-[-1rem] [&::-webkit-scrollbar]:hidden ${className}`
+      }
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
       {order.map((key) => {
@@ -97,6 +104,18 @@ export function GenreFilterChips({ value, onChange, className = '', large = fals
           </button>
         );
       })}
+    </div>
+  );
+
+  if (!pinned) return scroller;
+
+  return (
+    <div className={`flex items-center ${className}`}>
+      {scroller}
+      <div className="flex-shrink-0 flex items-center gap-1.5 pl-1.5">
+        <span aria-hidden className="w-px h-5 bg-slate-200" />
+        {pinned}
+      </div>
     </div>
   );
 }

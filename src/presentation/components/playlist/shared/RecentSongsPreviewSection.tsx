@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import { type RecentSongsTapAreaVariant } from '../../../hooks/playlist/usePlaylistExperiment';
 import { type Song, type TrackSummary } from '../playlistTypes';
 import { ErrorBoundary } from '../../common/ErrorBoundary.js';
@@ -7,7 +8,7 @@ import { RecentSongRow } from './RecentSongRow';
 import { RecentSongRowSkeleton } from './RecentSongRowSkeleton';
 
 // 최근 추가된 곡 섹션에서 보여줄 개수
-const RECENT_PREVIEW_LIMIT = 3;
+const RECENT_PREVIEW_LIMIT = 5;
 
 interface RecentSongsPreviewSectionProps {
   onShowRecent: () => void; // 제목/"더보기" — 최근 추가된 곡 전체보기로 이동
@@ -19,13 +20,24 @@ interface RecentSongsPreviewSectionProps {
   variant?: RecentSongsTapAreaVariant; // 홈 미리보기와 같은 재생 인터랙션 A/B 배정
 }
 
-// 검색 결과·게시글 모음·저장한 곡(빈 상태) 등 화면 하단에 공통으로 붙는 "최근 추가된 곡" 섹션 — 위쪽 수평선과 제목("에리카생들은 어떤 다른 노래를 추천했을까요?")까지 한 묶음 — 홈의 미리보기와 같은 행 UI, 3개만 보여주고 더보기로 전체보기 이동
+// 검색 결과·게시글 모음·저장한 곡(빈 상태) 등 화면 하단에 공통으로 붙는 "최근 추가된 곡" 섹션 — 위쪽 수평선과 제목("다른 에리카생은 어떤 노래를 추천했을까?")까지 한 묶음 — 홈의 미리보기와 같은 행 UI, 5개만 보여주고 제목·더보기로 전체보기 이동
 export function RecentSongsPreviewSection({ onShowRecent, recentSongs, isLoading, onSelectRecentSong, onPlay, currentTrackId, variant = 'control' }: RecentSongsPreviewSectionProps) {
   return (
     <>
     <hr className="-mx-3 my-4 border-slate-200" />
     <section>
-      <h3 className="mb-2 text-[17px] font-bold text-text-main">에리카생들은 어떤 노래를 추천했을까요?</h3>
+      {/* 제목 글씨와 > 아이콘 전체가 하나의 버튼 — 홈 섹션 제목과 같은 방식으로, 눌러서 최근 추가된 곡 전체보기로 이동 */}
+      <h3 className="mb-2">
+        <button
+          type="button"
+          onClick={onShowRecent}
+          aria-label="최근 추천된 곡 전체보기"
+          className="relative before:content-[''] before:absolute before:-inset-y-3 before:-inset-x-2 flex items-center py-2 -my-2 text-[17px] font-bold text-text-main text-left active:scale-[0.98] transition-transform"
+        >
+          <span>다른 에리카생은 어떤 노래를 추천했을까?</span>
+          <ChevronRight size={18} className="ml-0.5 flex-shrink-0" />
+        </button>
+      </h3>
       <ErrorBoundary
         name="playlist-recent-preview"
         fallback={<PlaylistFallback message="최근 추천된 곡을 표시할 수 없어요" />}
