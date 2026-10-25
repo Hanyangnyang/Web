@@ -2,13 +2,28 @@
 import { useState, useEffect, useRef, lazy, Suspense, type ComponentType } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { GymView } from './GymView.jsx';
-import { ClubView } from './ClubView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
 import { MiscSubViewHeader } from './MiscSubViewHeader.jsx';
-import { PlaylistView } from '../playlist/PlaylistView';
 
 type SubViewComponent = ComponentType<{ onBack: () => void }>;
 
+// 플레이리스트 Lazy load 
+let playlistViewPromise: Promise<typeof import('../playlist/PlaylistView')> | null = null;
+const loadPlaylistView = () => {
+  if (!playlistViewPromise) playlistViewPromise = import('../playlist/PlaylistView');
+  return playlistViewPromise;
+};
+const LazyPlaylistView = lazy(() => loadPlaylistView().then(m => ({ default: m.PlaylistView })));
+
+// 중앙동아리 Lazy load — 동아리 데이터(Club.ts)는 소식탭 동아리 추천 카드도 쓰므로 엔트리에 남는다
+let clubViewPromise: Promise<typeof import('./ClubView.jsx')> | null = null;
+const loadClubView = () => {
+  if (!clubViewPromise) clubViewPromise = import('./ClubView.jsx');
+  return clubViewPromise;
+};
+const LazyClubView = lazy(() => loadClubView().then(m => ({ default: m.ClubView })));
+
+// 인스타그램 Lazy load
 let instagramViewPromise: Promise<{ default: SubViewComponent }> | null = null;
 const loadInstagramView = () => {
   if (!instagramViewPromise) {
@@ -17,6 +32,7 @@ const loadInstagramView = () => {
   return instagramViewPromise;
 };
 
+// 피드백 Lazy load
 let feedbackViewPromise: Promise<{ default: SubViewComponent }> | null = null;
 const loadFeedbackView = () => {
   if (!feedbackViewPromise) {
@@ -143,6 +159,8 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
     if (!isActive) return;
     loadInstagramView().then(m => setInstagramViewComp(() => m.default));
     loadFeedbackView().then(m => setFeedbackViewComp(() => m.default));
+    loadPlaylistView();
+    loadClubView();
   }, [isActive]);
 
   const handleBoxClick = (box: MiscBoxKey) => {
@@ -157,16 +175,19 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
 
   if (subView === 'gym') return <GymView onBack={() => setSubView('list')} />;
   if (subView === 'playlist') {
+    // 청크 도착 전엔 PlaylistView 루트와 같은 흰 오버레이를 깔아 기타탭 그리드가 비치지 않게 한다
     return (
-      <PlaylistView
-        onBack={() => setSubView('list')}
-        isActive={isActive}
-        deepLinkTrackId={deepLinkTrackId}
-        onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
-        deepLinkPostId={deepLinkPostId}
-        deepLinkSearchQuery={deepLinkSearchQuery}
-        onDeepLinkSearchQueryHandled={onDeepLinkSearchQueryHandled}
-      />
+      <Suspense fallback={<div className="fixed inset-0 z-[1001] mx-auto w-full max-w-app bg-white" style={{ animation: 'fadeIn 0.25s ease-out' }} />}>
+        <LazyPlaylistView
+          onBack={() => setSubView('list')}
+          isActive={isActive}
+          deepLinkTrackId={deepLinkTrackId}
+          onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
+          deepLinkPostId={deepLinkPostId}
+          deepLinkSearchQuery={deepLinkSearchQuery}
+          onDeepLinkSearchQueryHandled={onDeepLinkSearchQueryHandled}
+        />
+      </Suspense>
     );
   }
   if (subView === 'insta') {
@@ -195,7 +216,12 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
   }
   if (subView === 'clubs') {
     const onBack = () => setSubView('list');
-    return <ClubView onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />;
+    // 청크 도착 전엔 ClubView 루트와 같은 배경 오버레이를 깔아 기타탭 그리드가 비치지 않게 한다
+    return (
+      <Suspense fallback={<div className="fixed inset-0 z-[1001] bg-surface" />}>
+        <LazyClubView onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />
+      </Suspense>
+    );
   }
 
   return <MiscMenuGrid onBoxClick={handleBoxClick} />;
