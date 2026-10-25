@@ -45,6 +45,7 @@ export function CoverImage({ src, style, onLoad, onError, ...rest }: CoverImageP
 
   return (
     <img
+      crossOrigin="anonymous"
       {...rest}
       src={src}
       style={isLoading ? { ...style, ...LOADING_STYLE } : style}
