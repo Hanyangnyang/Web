@@ -2,9 +2,13 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <!-- 폰트는 항상 CORS 모드로 요청됨 → crossorigin 없으면 preload가 재사용이 안되고 이중 다운로드 함 -->
+    <!-- 브라우저 메모리 캐시는 URL + Request Mode(CORS 여부)를 한 세트로 묶어서 캐시 키를 만들기 때문-->
     <link rel="preload" href="/fonts/HakgyoansimDunggeunmiso-B.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/hanyang_splash.png" as="image" />
     <!-- 플레이리스트 곡 재생(Spotify embed iframe) 클릭 시 지연을 줄이기 위한 사전 연결 -->
+    <!-- CORS 요청과 일반 요청은 연결 풀이 분리됨 → crossorigin 유무를 실제 요청 방식과 맞춰야 함
+        (i.scdn.co는 앨범커버를 crossorigin="anonymous"로 요청하므로 crossorigin 필요) -->
     <link rel="preconnect" href="https://open.spotify.com" />
     <link rel="preconnect" href="https://open.spotifycdn.com" crossorigin />
     <link rel="preconnect" href="https://i.scdn.co" crossorigin />
@@ -12,12 +16,14 @@
     <link rel="preconnect" href="https://dapi.kakao.com" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.webp" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/assets/icons/icon-512.webp" />
-    <!-- iOS meta tags for native feel -->
+    <link rel="icon" type="image/webp" sizes="192x192" href="/assets/icons/icon-192.webp" />
+    <link rel="icon" type="image/webp" sizes="512x512" href="/assets/icons/icon-512.webp" />
+    <!-- iOS: 홈 화면에 추가 시 네이티브 앱처럼 보이게 하는 설정 -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="하냥냥" />
+    <!-- user-scalable=no·maximum-scale=1: 네이티브 앱 느낌 + iOS 입력창 포커스 시 자동 확대 방지 (접근성 감점은 감수한 트레이드오프)
+         viewport-fit=cover: 노치 영역까지 화면 사용 → CSS의 env(safe-area-inset-*)으로 여백 처리 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>하냥냥</title>
     <meta
@@ -81,7 +87,8 @@
     </script>
   </head>
   <body>
-    <!-- 색인·랭킹에는 영향이 없으며, 페이지가 여러 URL로 분리되면 반드시 제거할 것. -->
+    <!-- data-nosnippet: 구글 검색결과 미리보기에 앱 UI 텍스트 대신 meta description이 나오게 함.
+         색인·랭킹에는 영향이 없으며, 페이지가 여러 URL로 분리되면 반드시 제거할 것. -->
     <div id="root" data-nosnippet></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
