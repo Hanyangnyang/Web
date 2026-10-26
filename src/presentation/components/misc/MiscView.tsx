@@ -216,7 +216,6 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
   }
   if (subView === 'clubs') {
     const onBack = () => setSubView('list');
-    // 청크 도착 전엔 ClubView 루트와 같은 배경 오버레이를 깔아 기타탭 그리드가 비치지 않게 한다
     return (
       <Suspense fallback={<div className="fixed inset-0 z-[1001] bg-surface" />}>
         <LazyClubView onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />
