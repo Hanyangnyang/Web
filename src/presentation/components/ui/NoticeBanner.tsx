@@ -9,14 +9,14 @@ interface NoticeBannerProps {
   // 있으면 배너 오른쪽에 액션 버튼이 같이 뜬다 (예: 지하철 연결편 조회 실패 시 "다시 시도")
   actionLabel?: string;
   onAction?: () => void;
-  // info: 일반 공지(파랑, 기본값) — 셔틀 시간표 변경 예고, 헬스장 방학 단축 운영 안내
+  // info: 일반 공지(파랑, 기본값, 액션 버튼은 연한 파랑) — 셔틀 시간표 변경 예고, 헬스장 방학 단축 운영 안내, 학식 제보
   // error: 실패 안내(빨강/핑크) — 지하철 조회 실패 등
   variant?: 'info' | 'error';
 }
 
 const VARIANT_STYLE = {
-  info: { container: 'bg-primary/[0.04] border-primary/10', icon: 'text-primary', button: 'bg-primary/90 shadow-[0_4px_12px_rgba(14,74,132,0.2)]' },
-  error: { container: 'bg-error/[0.06] border-error/60', icon: 'text-error', button: 'bg-error/90 shadow-[0_4px_12px_rgba(239,68,68,0.2)]' },
+  info: { container: 'bg-primary/[0.04] border-primary/10', icon: 'text-primary', button: 'bg-primary/10 text-primary font-bold' },
+  error: { container: 'bg-error/[0.06] border-error/60', icon: 'text-error', button: 'bg-error/90 text-white shadow-[0_4px_12px_rgba(239,68,68,0.2)]' },
 };
 
 // 슬라이드-페이드 등장 공지 배너 (셔틀 시간표 변경 예고, 헬스장 방학 단축 운영 안내, 지하철 조회 실패 안내 등에서 공용으로 사용)
@@ -49,7 +49,7 @@ export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceS
         {actionLabel && onAction && (
           <button
             onClick={onAction}
-            className={`flex-shrink-0 text-white text-[11px] px-2 py-1 rounded-full active:scale-95 transition-transform ${style.button}`}
+            className={`flex-shrink-0 text-[11px] px-2 py-1 rounded-full active:scale-95 transition-transform ${style.button}`}
           >
             {actionLabel}
           </button>

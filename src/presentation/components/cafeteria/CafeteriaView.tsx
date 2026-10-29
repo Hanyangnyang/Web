@@ -1,5 +1,5 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense, Fragment } from 'react';
 import { Bell, UtensilsCrossed } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
@@ -10,6 +10,8 @@ import { ModalErrorFallback } from '../common/ModalErrorFallback.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
+import { MenuFeedbackModal } from './MenuFeedbackModal.js';
+import { NoticeBanner } from '../ui/NoticeBanner.js';
 import { getDateLabel, getFeaturedItem } from './cafeteriaFormat.js';
 import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
@@ -70,6 +72,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
   const [copiedToast, setCopiedToast] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
+  const [showMenuFeedback, setShowMenuFeedback] = useState(false);
 
   // 식당 자동 선택 및 메뉴 유무 확인
   useEffect(() => {
@@ -198,6 +201,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
           </ErrorBoundary>
         </Suspense>
       )}
+      {showMenuFeedback && <MenuFeedbackModal onClose={() => setShowMenuFeedback(false)} />}
       {shareTarget && (
         <Suspense fallback={null}>
           <ErrorBoundary name="cafeteria-share-sheet" fallback={<ModalErrorFallback message="공유 화면을 열 수 없어요" onClose={() => setShareTarget(null)} />}>
@@ -250,22 +254,36 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
             ) : cafes.length > 0 ? (
               Object.keys(groupedMenus).length > 0 ? (
                 // 4. 정상 — 그날 등록된 메뉴가 하나라도 있음
-                sortMealTypeEntries(Object.entries(groupedMenus))
-                  .map(([type, menus]) => (
-                    <MealTypeAccordion
-                      key={type}
-                      type={type}
-                      menus={menus}
-                      isAllMode={selectedCafeId === 'all'}
-                      isExpanded={!!expandedGroups[type]}
-                      onToggle={() => toggleGroup(type)}
-                      hours={selectedCafeHours}
-                      cafes={cafes}
-                      targetStr={toDateKey(date)}
-                      dateLabel={getDateLabel(date)}
-                      onShareRequest={setShareTarget}
-                    />
-                  ))
+                (() => {
+                  const entries = sortMealTypeEntries(Object.entries(groupedMenus));
+                  // 학식 제보 배너는 펼쳐진 식사(기본: 현재 시간대) 중 첫 번째 바로 아래, 다 접혀 있으면 목록 맨 아래에 둠
+                  const expandedIdx = entries.findIndex(([type]) => expandedGroups[type]);
+                  const bannerIdx = expandedIdx === -1 ? entries.length - 1 : expandedIdx;
+                  return entries.map(([type, menus], i) => (
+                    <Fragment key={type}>
+                      <MealTypeAccordion
+                        type={type}
+                        menus={menus}
+                        isAllMode={selectedCafeId === 'all'}
+                        isExpanded={!!expandedGroups[type]}
+                        onToggle={() => toggleGroup(type)}
+                        hours={selectedCafeHours}
+                        cafes={cafes}
+                        targetStr={toDateKey(date)}
+                        dateLabel={getDateLabel(date)}
+                        onShareRequest={setShareTarget}
+                      />
+                      {i === bannerIdx && (
+                        <NoticeBanner
+                          shouldShow
+                          message="학식 정보가 실제와 다른가요?"
+                          actionLabel="제보하기"
+                          onAction={() => setShowMenuFeedback(true)}
+                        />
+                      )}
+                    </Fragment>
+                  ));
+                })()
               ) : (
                 // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 그날 등록된 메뉴가 하나도 없음
                 <CardFallback
