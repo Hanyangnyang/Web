@@ -37,11 +37,19 @@ export function PeriodDayTypeSelector({ isFullMode, fullPeriod, setFullPeriod, f
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 바깥을 건드리기만 해도 닫힘 — mousedown은 모바일에서 "탭이 끝난 뒤"에만 오고 스크롤하려고 손가락을 댄 순간엔 안 와서,
+  // 손가락이 닿는 즉시 오는 pointerdown과 화면 스크롤(scroll, 캡처 단계)로 감지. 휠 컬럼 자체의 스크롤은 제외
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    if (!open) return;
+    const isOutside = (target: EventTarget | null) => !!ref.current && !ref.current.contains(target as Node);
+    const handler = (e: Event) => { if (isOutside(e.target)) setOpen(false); };
+    document.addEventListener('pointerdown', handler);
+    document.addEventListener('scroll', handler, { capture: true, passive: true });
+    return () => {
+      document.removeEventListener('pointerdown', handler);
+      document.removeEventListener('scroll', handler, { capture: true });
+    };
+  }, [open]);
 
   // 오픈 시 스크롤 위치 초기화
   useEffect(() => {

@@ -1,5 +1,5 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
-import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { Bus, ChevronDown } from 'lucide-react';
 import type { ScheduleItem, ShuttleAppConfig, ShuttleEmptyState } from '../../../domain/entities/Shuttle.js';
 import { SUBWAY_OPTS, isSubwayScheduleMissing, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
@@ -13,6 +13,7 @@ import { ScrollToTopPill } from '../playlist/shared/ScrollToTopPill.jsx';
 import { openKakaoSubway } from './kakaoSubway.js';
 import { findUpcomingSchedule, formatUpcomingScheduleMessage, type PeriodScheduleItem } from './upcomingSchedule.js';
 import { getKSTToday } from '../../../utils/kstTime.js';
+import { findScrollableAncestor } from '../../../utils/scroll.js';
 
 type SchoolShuttleAppConfig = ShuttleAppConfig & { period_schedule?: PeriodScheduleItem[] };
 
@@ -113,35 +114,55 @@ export function SchoolShuttleSection({
     };
   }, [subwayRedirecting]);
 
-  // 출발지 칩(stop) 이나 학기/요일 필터 변경 시 전체 시간표 스크롤을 맨 위(첫차)로 초기화
   const containerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (isFullMode && containerRef.current) {
-      const getScrollParent = (node: Node | null): Element | null => {
-        if (node == null || !(node instanceof HTMLElement)) return null;
-        if (node.scrollHeight > node.clientHeight) {
-          const style = window.getComputedStyle(node);
-          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-            return node;
-          }
-        }
-        return getScrollParent(node.parentNode) || document.documentElement || document.body;
-      };
+  const stopSelectorRef = useRef<HTMLDivElement>(null);
 
-      // 필터 변경 시엔 부드럽게 올림. 단, 전체 시간표를 막 켠 순간은 TimetableRow가 현재 시간대 행으로
-      // 자체 스크롤 애니메이션을 돌리므로 그것과 겹치지 않게 기존처럼 즉시 이동
-      const behavior: ScrollBehavior = justToggledFullMode ? 'auto' : 'smooth';
-      const scrollParent = getScrollParent(containerRef.current);
-      if (scrollParent) {
-        if (scrollParent === document.documentElement || scrollParent === document.body) {
-          window.scrollTo({ top: 0, behavior });
-        } else {
-          scrollParent.scrollTo({ top: 0, behavior });
-        }
-      }
+  // 전체 시간표를 켜는 순간엔 맨 위(첫차)로 즉시 이동 — 이후 TimetableRow가 현재 시간대 행으로 자체 스크롤 애니메이션을 돌림
+  useEffect(() => {
+    if (!isFullMode) return;
+    findScrollableAncestor(containerRef.current)?.scrollTo({ top: 0 });
+  }, [isFullMode]);
+
+  // 전체 시간표에서 출발지·학기·요일을 바꿔도 "보고 있던 시간대"를 그대로 보여주기 위한 기준점.
+  // 바꾸기 직전, 고정 헤더 바로 아래 걸친 행의 출발 시각과 헤더로부터의 거리를 기억해 둠
+  // (지하철 노선은 시간표 행이 그대로라 기준점 없이 위치만 유지됨)
+  const scrollAnchorRef = useRef<{ depMin: number; offset: number } | null>(null);
+  const captureScrollAnchor = () => {
+    const card = containerRef.current;
+    const header = stopSelectorRef.current;
+    if (!isFullMode || !card || !header || scrollAnchorRef.current) return;
+    const headerBottom = header.getBoundingClientRect().bottom;
+    const rows = Array.from(card.children) as HTMLElement[];
+    // 시간표 카드 윗부분이 아직 보이는 상태(목록 위쪽)면 기준점 없이 지금 위치 유지
+    if (!rows[0] || rows[0].getBoundingClientRect().top >= headerBottom) return;
+    const idx = rows.findIndex(r => r.getBoundingClientRect().bottom > headerBottom);
+    if (idx === -1 || !schedule[idx]) return;
+    scrollAnchorRef.current = { depMin: schedule[idx].depMin, offset: rows[idx].getBoundingClientRect().top - headerBottom };
+  };
+  // 값이 실제로 바뀔 때만 기준점을 잡고 setter 호출 (PeriodDayTypeSelector는 닫힐 때 같은 값으로도 setter를 부름)
+  const withScrollAnchor = <T,>(current: T, set: (value: T) => void) => (value: T) => {
+    if (value !== current) captureScrollAnchor();
+    set(value);
+  };
+
+  // 새 시간표가 그려진 직후(페인트 전) 기억해 둔 시각 이후 첫 행을 같은 높이에 맞춤 — 화면이 튀지 않고 내용만 바뀐 것처럼 보임
+  useLayoutEffect(() => {
+    const anchor = scrollAnchorRef.current;
+    scrollAnchorRef.current = null;
+    if (!anchor || !isFullMode) return;
+    const card = containerRef.current;
+    const header = stopSelectorRef.current;
+    const scroller = findScrollableAncestor(card);
+    if (!card || !header || !scroller) return;
+    if (schedule.length === 0) {
+      scroller.scrollTo({ top: 0 }); // 운행 정보가 없으면 맨 위의 안내 카드가 보이게
+      return;
     }
-    // lineId(지하철 노선)는 일부러 뺌 — 노선만 바꿀 땐 보던 위치 그대로 두고 지하철 도착 시간만 갈아끼움
-  }, [stop, fullDayType, fullPeriod, isFullMode]);
+    const found = schedule.findIndex(r => r.depMin >= anchor.depMin);
+    const row = card.children[found === -1 ? schedule.length - 1 : found] as HTMLElement | undefined;
+    if (!row) return;
+    scroller.scrollTop += row.getBoundingClientRect().top - header.getBoundingClientRect().bottom - anchor.offset;
+  }, [stop, fullDayType, fullPeriod]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleToggleFullMode = () => {
     if (!isFullMode) setJustToggledFullMode(true);
@@ -155,10 +176,11 @@ export function SchoolShuttleSection({
     <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 */}
       <StopSelector
+        ref={stopSelectorRef}
         viewMode={viewMode}
         setViewMode={setViewMode}
         stop={stop}
-        setStop={setStop}
+        setStop={withScrollAnchor(stop, setStop)}
         isActive={isActive}
         isGpsLoading={isGpsLoading}
       >
@@ -167,9 +189,9 @@ export function SchoolShuttleSection({
           className="mt-4"
           isFullMode={isFullMode}
           fullPeriod={fullPeriod}
-          setFullPeriod={setFullPeriod}
+          setFullPeriod={withScrollAnchor(fullPeriod, setFullPeriod)}
           fullDayType={fullDayType}
-          setFullDayType={setFullDayType}
+          setFullDayType={withScrollAnchor(fullDayType, setFullDayType)}
           appConfig={appConfig}
           isWeekend={isWeekend}
           needsSubway={needsSubway}
