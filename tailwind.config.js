@@ -21,7 +21,7 @@ export default {
           dark: '#9a6200',
         },
         error: '#ef4444',
-        surface: '#F8F9FA',
+        surface: '#FCFCFD',
         'text-main': '#212529',
         'text-sub': '#6C757D',
         'text-hint': '#94a3b8',

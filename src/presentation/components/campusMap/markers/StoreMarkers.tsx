@@ -1,5 +1,6 @@
 // 지도 위 매장 마커 렌더링 — 개수 뱃지로 묶지 않고 항상 모든 매장을 개별 표시한다.
 // 점/핀 전환은 MapMarkerPoint(공용)에 맡기고, 여기서는 매장 고유의 이름 라벨만 추가로 얹는다.
+import { Fragment } from 'react';
 import { CustomOverlayMap } from 'react-kakao-maps-sdk';
 import type { PartnerStore, PlottableStore } from '../../../../domain/entities/PartnerStore.js';
 import { MapMarkerPoint } from './MapMarkerPoint';
@@ -27,10 +28,11 @@ export function StoreMarkers({ stores, level, selectedId, onSelectStore }: Props
         const { latitude: lat, longitude: lng } = store.location.coordinates;
         const selected = store.id === selectedId;
 
+        // key는 목록 항목인 바깥 Fragment에 둬야 한다 — 빈 <>엔 key를 못 줘서 React가 순서(index)로만 매장을 구분했고,
+        // 목록이 바뀔 때마다 마커가 지워졌다 새로 만들어져 다음 렌더 전까지 점이 안 보이는 원인이 됐다
         return (
-          <>
+          <Fragment key={store.id}>
             <MapMarkerPoint
-              key={store.id}
               lat={lat}
               lng={lng}
               level={level}
@@ -45,7 +47,6 @@ export function StoreMarkers({ stores, level, selectedId, onSelectStore }: Props
                 마커가 점이든 핀이든 상관없이, 배율 기준(선택되었거나 충분히 확대됐을 때)으로만 표시한다. */}
             {(selected || level <= LABEL_VISIBLE_MAX_LEVEL) && (
               <CustomOverlayMap
-                key={`${store.id}-label`}
                 position={{ lat, lng }}
                 xAnchor={0.5}
                 yAnchor={0}
@@ -67,7 +68,7 @@ export function StoreMarkers({ stores, level, selectedId, onSelectStore }: Props
                 </div>
               </CustomOverlayMap>
             )}
-          </>
+          </Fragment>
         );
       })}
     </>

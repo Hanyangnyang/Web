@@ -1,5 +1,5 @@
 // 컴포넌트: 셔틀 출발지 칩 선택 (고정 상단 헤더) + 자동선택 안내 툴팁
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ReactNode, type Ref } from 'react';
 import { STOPS } from '../../../domain/entities/Shuttle.js';
 import { ViewModeToggle } from './ViewModeToggle.jsx';
 import styles from './StopSelector.module.css';
@@ -11,9 +11,12 @@ interface StopSelectorProps {
   setStop: (stop: string) => void;
   isActive: boolean;
   isGpsLoading: boolean;
+  // 출발지 칩 아래, 같은 고정 헤더 안에 함께 그릴 내용 (전체 시간표 모드의 시간표 필터 줄)
+  children?: ReactNode;
+  ref?: Ref<HTMLDivElement>;
 }
 
-export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, isGpsLoading }: StopSelectorProps) {
+export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, isGpsLoading, children, ref }: StopSelectorProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [isTooltipFadingOut, setIsTooltipFadingOut] = useState(false);
   const [tooltipStop, setTooltipStop] = useState(stop);
@@ -52,7 +55,7 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
   };
 
   return (
-    <div className="sticky top-0 bg-surface/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
+    <div ref={ref} className="sticky top-0 bg-surface/80 backdrop-blur-xl z-[100] -mx-4 px-4 py-4 rounded-b-xl border-b border-slate-200/50 shadow-[0_4px_12px_rgba(0,0,0,0.03)] mb-3">
       <div className="flex items-center justify-between mb-3">
         <div className="text-2xl font-extrabold text-text-main">출발지</div>
         <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
@@ -91,6 +94,7 @@ export function StopSelector({ viewMode, setViewMode, stop, setStop, isActive, i
           </div>
         ))}
       </div>
+      {children}
     </div>
   );
 }

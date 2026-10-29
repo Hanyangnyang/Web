@@ -1,6 +1,6 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { Bell, UtensilsCrossed } from 'lucide-react';
+import { useState, useEffect, useRef, lazy, Suspense, Fragment } from 'react';
+import { Bell, Megaphone, UtensilsCrossed } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
@@ -10,6 +10,8 @@ import { ModalErrorFallback } from '../common/ModalErrorFallback.js';
 import { DateNavigator } from './DateNavigator.js';
 import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
+import { MenuFeedbackModal } from './MenuFeedbackModal.js';
+import { NoticeBanner } from '../ui/NoticeBanner.js';
 import { getDateLabel, getFeaturedItem } from './cafeteriaFormat.js';
 import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
@@ -65,11 +67,14 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   };
 
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  // 처음(식당·날짜 진입 시) 기본으로 펼쳐 둔 식사 — 학식 제보 배너 위치 기준. 사용자가 다른 식사를 펼치고 접어도 바뀌지 않음
+  const [defaultExpandedGroups, setDefaultExpandedGroups] = useState<Record<string, boolean>>({});
   const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
   const [showAlarm, setShowAlarm] = useState(false);
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
   const [copiedToast, setCopiedToast] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
+  const [showMenuFeedback, setShowMenuFeedback] = useState(false);
 
   // 식당 자동 선택 및 메뉴 유무 확인
   useEffect(() => {
@@ -139,6 +144,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       });
 
       setExpandedGroups(initial);
+      setDefaultExpandedGroups(initial);
       urlTypeRef.current = null;
 
       if (foundExact) {
@@ -157,6 +163,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
 
     const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDateUnsafe());
     setExpandedGroups(initial);
+    setDefaultExpandedGroups(initial);
 
     if (scrollTargetType) {
       setTimeout(() => {
@@ -179,7 +186,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   return (
     <div ref={rootRef} className="pb-28 relative [animation:slideUp_0.4s_ease-out]">
       <button
-        className="fixed bottom-[calc(20px+64px+12px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 h-10 px-3 bg-[rgba(15,23,42,0.72)] backdrop-blur-[20px] text-surface border border-white/10 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-medium font-[inherit] transition-all duration-200 hover:scale-[1.04] hover:bg-[rgba(15,23,42,0.88)] hover:shadow-[0_6px_28px_rgba(0,0,0,0.45)] active:scale-[0.97]"
+        // 하단 내비게이션바와 같은 리퀴드 글래스(투명 유리 + 위쪽 반사광), 글자는 내비게이션바 비활성 탭 색.
+        // 위치: 내비게이션바(bottom 24px + h-16) 위 12px
+        className="fixed bottom-[calc(24px+64px+12px+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 h-10 px-3 bg-[linear-gradient(180deg,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_100%)] backdrop-blur-[10px] backdrop-saturate-[1.8] text-slate-600 border border-white/50 rounded-full flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_8px_32px_rgba(15,23,42,0.14),0_2px_6px_rgba(15,23,42,0.06),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_1px_rgba(255,255,255,0.35)] z-[999] whitespace-nowrap text-[0.78rem] font-semibold font-[inherit] transition-all duration-200 hover:scale-[1.04] active:scale-[0.97]"
         onClick={() => setShowAlarm(true)}
       >
         <Bell size={18} />
@@ -198,6 +207,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
           </ErrorBoundary>
         </Suspense>
       )}
+      {showMenuFeedback && <MenuFeedbackModal onClose={() => setShowMenuFeedback(false)} />}
       {shareTarget && (
         <Suspense fallback={null}>
           <ErrorBoundary name="cafeteria-share-sheet" fallback={<ModalErrorFallback message="공유 화면을 열 수 없어요" onClose={() => setShareTarget(null)} />}>
@@ -250,22 +260,39 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
             ) : cafes.length > 0 ? (
               Object.keys(groupedMenus).length > 0 ? (
                 // 4. 정상 — 그날 등록된 메뉴가 하나라도 있음
-                sortMealTypeEntries(Object.entries(groupedMenus))
-                  .map(([type, menus]) => (
-                    <MealTypeAccordion
-                      key={type}
-                      type={type}
-                      menus={menus}
-                      isAllMode={selectedCafeId === 'all'}
-                      isExpanded={!!expandedGroups[type]}
-                      onToggle={() => toggleGroup(type)}
-                      hours={selectedCafeHours}
-                      cafes={cafes}
-                      targetStr={toDateKey(date)}
-                      dateLabel={getDateLabel(date)}
-                      onShareRequest={setShareTarget}
-                    />
-                  ))
+                (() => {
+                  const entries = sortMealTypeEntries(Object.entries(groupedMenus));
+                  // 학식 제보 배너는 기본으로 펼쳐 둔 식사(현재 시간대) 아래에 고정 — 사용자가 다른 식사를 펼쳐도 따라가지 않음.
+                  // 기본 펼침이 여러 개면(다른 날짜는 전부 펼침, 중식 계열이 여럿) 그중 마지막 아래, 하나도 없으면 목록 맨 아래
+                  const defaultIdx = entries.reduce((last, [type], i) => (defaultExpandedGroups[type] ? i : last), -1);
+                  const bannerIdx = defaultIdx === -1 ? entries.length - 1 : defaultIdx;
+                  return entries.map(([type, menus], i) => (
+                    <Fragment key={type}>
+                      <MealTypeAccordion
+                        type={type}
+                        menus={menus}
+                        isAllMode={selectedCafeId === 'all'}
+                        isExpanded={!!expandedGroups[type]}
+                        onToggle={() => toggleGroup(type)}
+                        hours={selectedCafeHours}
+                        cafes={cafes}
+                        targetStr={toDateKey(date)}
+                        dateLabel={getDateLabel(date)}
+                        onShareRequest={setShareTarget}
+                      />
+                      {i === bannerIdx && (
+                        <NoticeBanner
+                          shouldShow
+                          variant="plain"
+                          message="학식 정보가 실제와 다른가요?"
+                          icon={<Megaphone size={15} strokeWidth={2.4} className="flex-shrink-0 text-primary" />}
+                          actionLabel="제보하기"
+                          onAction={() => setShowMenuFeedback(true)}
+                        />
+                      )}
+                    </Fragment>
+                  ));
+                })()
               ) : (
                 // 3. 조회는 됐지만 빈 데이터 — 실패는 아니고 그날 등록된 메뉴가 하나도 없음
                 <CardFallback
