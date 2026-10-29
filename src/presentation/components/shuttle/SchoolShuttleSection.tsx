@@ -7,8 +7,9 @@ import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { CardFallback } from '../common/CardFallback.js';
 import { StopSelector } from './StopSelector.jsx';
-import { TimetableHeader } from './TimetableHeader.jsx';
+import { TimetableHeader, TimetableFilterRow } from './TimetableHeader.jsx';
 import { SubwayRedirectOverlay } from './SubwayRedirectOverlay.jsx';
+import { ScrollToTopPill } from '../playlist/shared/ScrollToTopPill.jsx';
 import { openKakaoSubway } from './kakaoSubway.js';
 import { findUpcomingSchedule, formatUpcomingScheduleMessage, type PeriodScheduleItem } from './upcomingSchedule.js';
 import { getKSTToday } from '../../../utils/kstTime.js';
@@ -138,6 +139,12 @@ export function SchoolShuttleSection({
     }
   }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
 
+  // 시간표 제목·필터 줄 — 일반 모드에선 시간표 위, 전체 시간표 모드에선 출발지 고정 헤더 안에 그림
+  const filterRowProps = {
+    isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
+    appConfig, isWeekend, needsSubway, lineId, setLineId,
+  };
+
   const handleToggleFullMode = () => {
     if (!isFullMode) setJustToggledFullMode(true);
     setIsFullMode(!isFullMode);
@@ -153,7 +160,9 @@ export function SchoolShuttleSection({
         setStop={setStop}
         isActive={isActive}
         isGpsLoading={isGpsLoading}
-      />
+      >
+        {isFullMode && <TimetableFilterRow {...filterRowProps} className="mt-4" />}
+      </StopSelector>
 
       {/* 다가오는 시간표 변경 안내 배너 — 한번 뜨면 대상 기간이 될 때까지 계속 유지 */}
       <NoticeBanner shouldShow={isActive && !!upcomingSchedule} message={upcomingScheduleMessage ?? ''} persistOnceShown />
@@ -161,17 +170,9 @@ export function SchoolShuttleSection({
       {/* 시간표 */}
       <div className="mb-6">
         <TimetableHeader
-          isFullMode={isFullMode}
-          fullPeriod={fullPeriod}
-          setFullPeriod={setFullPeriod}
-          fullDayType={fullDayType}
-          setFullDayType={setFullDayType}
-          appConfig={appConfig}
-          isWeekend={isWeekend}
-          needsSubway={needsSubway}
+          {...filterRowProps}
+          showFilterRow={!isFullMode}
           hideSubwayCol={hideSubwayCol}
-          lineId={lineId}
-          setLineId={setLineId}
           onOpenSubway={() => openKakaoSubway(lineId, () => setSubwayRedirecting(true))}
           onToggleFullMode={handleToggleFullMode}
         />
@@ -253,6 +254,9 @@ export function SchoolShuttleSection({
       </div>
 
       <SubwayRedirectOverlay visible={subwayRedirecting} />
+
+      {/* 전체 시간표처럼 목록이 길어졌을 때 "맨 위로" — 하단 내비게이션바(bottom 24px + h-16) 위로 띄움 */}
+      <ScrollToTopPill size="compact" bottom="calc(100px + env(safe-area-inset-bottom))" />
     </div>
   );
 }

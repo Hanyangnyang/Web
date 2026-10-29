@@ -4,7 +4,7 @@ import type { ShuttleAppConfig } from '../../../domain/entities/Shuttle.js';
 import { PeriodDayTypeSelector } from './PeriodDayTypeSelector.jsx';
 import { SubwayDropdown } from './SubwayDropdown.jsx';
 
-interface TimetableHeaderProps {
+interface TimetableFilterRowProps {
   isFullMode: boolean;
   fullPeriod: string;
   setFullPeriod: (period: string) => void;
@@ -13,42 +13,59 @@ interface TimetableHeaderProps {
   appConfig: ShuttleAppConfig;
   isWeekend: boolean;
   needsSubway: boolean;
-  hideSubwayCol: boolean;
   lineId: string;
   setLineId: (lineId: string) => void;
+  className?: string;
+}
+
+// "시간표" 제목 + 기간/요일 선택기 + 지하철 노선 드롭다운 한 줄.
+// 전체 시간표 모드에선 출발지 고정 헤더 안으로 옮겨 그려서 스크롤해도 필터가 계속 보이게 함
+export function TimetableFilterRow({
+  isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
+  appConfig, isWeekend, needsSubway, lineId, setLineId, className = '',
+}: TimetableFilterRowProps) {
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
+
+      <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
+        <div className="shrink basis-[125px] min-w-0">
+          <PeriodDayTypeSelector
+            isFullMode={isFullMode}
+            fullPeriod={fullPeriod}
+            setFullPeriod={setFullPeriod}
+            fullDayType={fullDayType}
+            setFullDayType={setFullDayType}
+            appConfig={appConfig}
+            isWeekend={isWeekend}
+          />
+        </div>
+        {needsSubway && (
+          <div className="shrink-0 min-w-0">
+            <SubwayDropdown selected={lineId} onChange={setLineId} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface TimetableHeaderProps extends TimetableFilterRowProps {
+  // false면 제목·필터 줄을 여기서 그리지 않음 (전체 시간표 모드에서 출발지 헤더가 대신 그림)
+  showFilterRow: boolean;
+  hideSubwayCol: boolean;
   onOpenSubway: () => void;
   onToggleFullMode: () => void;
 }
 
 export function TimetableHeader({
-  isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
-  appConfig, isWeekend, needsSubway, hideSubwayCol,
-  lineId, setLineId, onOpenSubway, onToggleFullMode,
+  showFilterRow, hideSubwayCol, onOpenSubway, onToggleFullMode, ...filterRowProps
 }: TimetableHeaderProps) {
+  const { isFullMode, needsSubway } = filterRowProps;
+
   return (
     <>
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex-shrink-0 whitespace-nowrap flex items-center text-2xl font-extrabold text-text-main">시간표</div>
-
-        <div className="flex-1 flex items-center gap-2 min-w-0 justify-end">
-          <div className="shrink basis-[125px] min-w-0">
-            <PeriodDayTypeSelector
-              isFullMode={isFullMode}
-              fullPeriod={fullPeriod}
-              setFullPeriod={setFullPeriod}
-              fullDayType={fullDayType}
-              setFullDayType={setFullDayType}
-              appConfig={appConfig}
-              isWeekend={isWeekend}
-            />
-          </div>
-          {needsSubway && (
-            <div className="shrink-0 min-w-0">
-              <SubwayDropdown selected={lineId} onChange={setLineId} />
-            </div>
-          )}
-        </div>
-      </div>
+      {showFilterRow && <TimetableFilterRow {...filterRowProps} className="mb-3" />}
 
       <div className="flex items-center py-0 pb-1.5 border-b border-slate-100" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8 }}>
         {!hideSubwayCol && (
