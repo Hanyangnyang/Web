@@ -182,6 +182,15 @@ export function SchoolShuttleSection({
     />
   );
 
+  // 출발지 변경 — 전체 시간표에선 보던 시간대 유지, 일반 모드에선 새 출발지의 "다음 셔틀"이 바로 보이게 맨 위로.
+  // 일반 모드 목록은 현재 시각 기준이라 계속 바뀌고 출발지 변경 시 더 불러오기도 초기화되므로, 출발지별 위치는 기억하지 않음
+  const handleStopChange = (s: string) => {
+    if (!isFullMode && s !== stop) {
+      findScrollableAncestor(containerRef.current)?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    withScrollAnchor(stop, setStop)(s);
+  };
+
   const handleToggleFullMode = () => {
     if (!isFullMode) setJustToggledFullMode(true);
     setIsFullMode(!isFullMode);
@@ -198,7 +207,7 @@ export function SchoolShuttleSection({
         viewMode={viewMode}
         setViewMode={setViewMode}
         stop={stop}
-        setStop={withScrollAnchor(stop, setStop)}
+        setStop={handleStopChange}
         isActive={isActive}
         isGpsLoading={isGpsLoading}
       >
