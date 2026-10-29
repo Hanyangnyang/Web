@@ -19,7 +19,7 @@ interface TimetableFilterRowProps {
 }
 
 // "시간표" 제목 + 기간/요일 선택기 + 지하철 노선 드롭다운 한 줄.
-// 전체 시간표 모드에선 출발지 고정 헤더 안으로 옮겨 그려서 스크롤해도 필터가 계속 보이게 함
+// 출발지 고정 헤더 안에 그려서 스크롤해도 필터가 계속 보이게 함
 export function TimetableFilterRow({
   isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
   appConfig, isWeekend, needsSubway, lineId, setLineId, className = '',
@@ -50,22 +50,20 @@ export function TimetableFilterRow({
   );
 }
 
-interface TimetableHeaderProps extends TimetableFilterRowProps {
-  // false면 제목·필터 줄을 여기서 그리지 않음 (전체 시간표 모드에서 출발지 헤더가 대신 그림)
-  showFilterRow: boolean;
+// 제목·필터 줄(TimetableFilterRow)은 출발지 고정 헤더 안에서 그리고, 여기선 그 아래 카카오 지하철·전체 시간표 토글 줄만 그림
+interface TimetableHeaderProps {
+  isFullMode: boolean;
+  needsSubway: boolean;
   hideSubwayCol: boolean;
   onOpenSubway: () => void;
   onToggleFullMode: () => void;
 }
 
 export function TimetableHeader({
-  showFilterRow, hideSubwayCol, onOpenSubway, onToggleFullMode, ...filterRowProps
+  isFullMode, needsSubway, hideSubwayCol, onOpenSubway, onToggleFullMode,
 }: TimetableHeaderProps) {
-  const { isFullMode, needsSubway } = filterRowProps;
-
   return (
     <>
-      {showFilterRow && <TimetableFilterRow {...filterRowProps} className="mb-3" />}
 
       <div className="flex items-center py-0 pb-1.5 border-b border-slate-100" style={{ gap: 'clamp(6px, 3vw, 16px)', paddingRight: 8 }}>
         {!hideSubwayCol && (

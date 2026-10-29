@@ -128,22 +128,20 @@ export function SchoolShuttleSection({
         return getScrollParent(node.parentNode) || document.documentElement || document.body;
       };
 
+      // 필터 변경 시엔 부드럽게 올림. 단, 전체 시간표를 막 켠 순간은 TimetableRow가 현재 시간대 행으로
+      // 자체 스크롤 애니메이션을 돌리므로 그것과 겹치지 않게 기존처럼 즉시 이동
+      const behavior: ScrollBehavior = justToggledFullMode ? 'auto' : 'smooth';
       const scrollParent = getScrollParent(containerRef.current);
       if (scrollParent) {
         if (scrollParent === document.documentElement || scrollParent === document.body) {
-          window.scrollTo(0, 0);
+          window.scrollTo({ top: 0, behavior });
         } else {
-          scrollParent.scrollTop = 0;
+          scrollParent.scrollTo({ top: 0, behavior });
         }
       }
     }
-  }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
-
-  // 시간표 제목·필터 줄 — 일반 모드에선 시간표 위, 전체 시간표 모드에선 출발지 고정 헤더 안에 그림
-  const filterRowProps = {
-    isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
-    appConfig, isWeekend, needsSubway, lineId, setLineId,
-  };
+    // lineId(지하철 노선)는 일부러 뺌 — 노선만 바꿀 땐 보던 위치 그대로 두고 지하철 도착 시간만 갈아끼움
+  }, [stop, fullDayType, fullPeriod, isFullMode]);
 
   const handleToggleFullMode = () => {
     if (!isFullMode) setJustToggledFullMode(true);
@@ -151,7 +149,10 @@ export function SchoolShuttleSection({
   };
 
   return (
-    <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
+    // 하단 여백: 이 pb(96) + 시간표 mb-6(24) + 스크롤 컨테이너 pb-6(24) = 144px
+    // = 하단 내비게이션바 88px(bottom 24 + h-16) + 간격 12 + "맨 위로" 버튼 32 + 간격 12
+    //   → 맨 끝까지 내려도 "맨 위로" 버튼이 마지막 요소(더 불러오기 등)와 겹치지 않고 그 아래 빈칸에 들어감
+    <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 */}
       <StopSelector
         viewMode={viewMode}
@@ -161,7 +162,20 @@ export function SchoolShuttleSection({
         isActive={isActive}
         isGpsLoading={isGpsLoading}
       >
-        {isFullMode && <TimetableFilterRow {...filterRowProps} className="mt-4" />}
+        {/* 시간표 제목·필터 줄 — 출발지와 같은 고정 헤더 안에 그려서 스크롤해도 계속 보임 */}
+        <TimetableFilterRow
+          className="mt-4"
+          isFullMode={isFullMode}
+          fullPeriod={fullPeriod}
+          setFullPeriod={setFullPeriod}
+          fullDayType={fullDayType}
+          setFullDayType={setFullDayType}
+          appConfig={appConfig}
+          isWeekend={isWeekend}
+          needsSubway={needsSubway}
+          lineId={lineId}
+          setLineId={setLineId}
+        />
       </StopSelector>
 
       {/* 다가오는 시간표 변경 안내 배너 — 한번 뜨면 대상 기간이 될 때까지 계속 유지 */}
@@ -170,8 +184,8 @@ export function SchoolShuttleSection({
       {/* 시간표 */}
       <div className="mb-6">
         <TimetableHeader
-          {...filterRowProps}
-          showFilterRow={!isFullMode}
+          isFullMode={isFullMode}
+          needsSubway={needsSubway}
           hideSubwayCol={hideSubwayCol}
           onOpenSubway={() => openKakaoSubway(lineId, () => setSubwayRedirecting(true))}
           onToggleFullMode={handleToggleFullMode}
@@ -241,7 +255,7 @@ export function SchoolShuttleSection({
         </div>
 
         {!isFullMode && schedule.length > visibleCount && (
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center pt-3">
             <button
               className="bg-transparent border border-slate-300 text-text-sub rounded-full px-6 py-2 text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-surface"
               onClick={loadMore}
