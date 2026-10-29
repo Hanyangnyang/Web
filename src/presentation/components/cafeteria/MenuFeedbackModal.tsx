@@ -1,5 +1,6 @@
 // 학식 제보하기 팝업 — 메뉴·운영시간 등 학식 정보가 실제와 다를 때 자유 텍스트로 제보 (캠퍼스맵 제보 팝업과 같은 모양)
 import { useState } from 'react';
+import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
 
 interface MenuFeedbackModalProps {
   onClose: () => void;
@@ -10,13 +11,16 @@ const MAX_LENGTH = 300;
 export function MenuFeedbackModal({ onClose }: MenuFeedbackModalProps) {
   const [content, setContent] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const submitFeedback = useSubmitFeedbackApi();
 
-  const canSubmit = content.trim().length > 0;
+  const canSubmit = content.trim().length > 0 && !submitFeedback.isPending;
 
-  // TODO: 아직 UI 확인용 — 실제 전송(useSubmitFeedbackApi, category: 'MENU')은 연결 전이라 감사 화면만 보여줌
   const handleSubmit = () => {
     if (!canSubmit) return;
-    setSubmitted(true);
+    submitFeedback.mutate(
+      { category: 'MENU', feedbackType: 'INACCURACY', content: content.trim() },
+      { onSuccess: () => setSubmitted(true) }
+    );
   };
 
   return (
@@ -57,6 +61,9 @@ export function MenuFeedbackModal({ onClose }: MenuFeedbackModalProps) {
             <div className="text-right text-[11px] text-text-hint mt-1 mb-3">
               {content.length}/{MAX_LENGTH}
             </div>
+            {submitFeedback.isError && (
+              <p className="text-xs text-red-500 text-center mb-3">제보 접수에 실패했어요. 다시 시도해주세요.</p>
+            )}
             <div className="flex gap-2">
               <button
                 onClick={onClose}
@@ -71,7 +78,7 @@ export function MenuFeedbackModal({ onClose }: MenuFeedbackModalProps) {
                   canSubmit ? 'text-white bg-primary' : 'text-slate-300 bg-slate-100'
                 }`}
               >
-                제보하기
+                {submitFeedback.isPending ? '접수 중...' : '제보하기'}
               </button>
             </div>
           </>
