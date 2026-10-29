@@ -14,11 +14,19 @@ export function SubwayDropdown({ selected, onChange }: SubwayDropdownProps) {
   // selected가 SUBWAY_OPTS에 없을 수 있음(예: 노선 개편 후 남은 오래된 localStorage 값) — 못 찾으면 첫 옵션으로 대체
   const opt = SUBWAY_OPTS.find(o => o.id === selected) ?? SUBWAY_OPTS[0];
 
+  // 바깥을 건드리기만 해도 닫힘 — PeriodDayTypeSelector와 동일하게, 손가락이 닿는 즉시 오는 pointerdown과
+  // 화면 스크롤(scroll, 캡처 단계)로 감지. 드롭다운 목록 자체의 스크롤은 제외
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    if (!open) return;
+    const isOutside = (target: EventTarget | null) => !!ref.current && !ref.current.contains(target as Node);
+    const handler = (e: Event) => { if (isOutside(e.target)) setOpen(false); };
+    document.addEventListener('pointerdown', handler);
+    document.addEventListener('scroll', handler, { capture: true, passive: true });
+    return () => {
+      document.removeEventListener('pointerdown', handler);
+      document.removeEventListener('scroll', handler, { capture: true });
+    };
+  }, [open]);
 
   const line4 = SUBWAY_OPTS.filter(o => o.line === '4호선');
   const sb = SUBWAY_OPTS.filter(o => o.line === '수인분당선');

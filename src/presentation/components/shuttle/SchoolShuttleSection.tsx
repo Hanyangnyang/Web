@@ -1,5 +1,5 @@
 // 컴포넌트: "학교 셔틀" 화면 전체 (출발지 선택 + 시간표 + 지하철 연결)
-import { useState, useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { Bus, ChevronDown } from 'lucide-react';
 import type { ScheduleItem, ShuttleAppConfig, ShuttleEmptyState } from '../../../domain/entities/Shuttle.js';
 import { SUBWAY_OPTS, isSubwayScheduleMissing, type SubwayScheduleRow } from '../../../domain/entities/Subway.js';
@@ -7,11 +7,13 @@ import { TimetableRow, TimetableRowSkeleton } from './TimetableRow.jsx';
 import { NoticeBanner } from '../ui/NoticeBanner.jsx';
 import { CardFallback } from '../common/CardFallback.js';
 import { StopSelector } from './StopSelector.jsx';
-import { TimetableHeader } from './TimetableHeader.jsx';
+import { TimetableHeader, TimetableFilterRow } from './TimetableHeader.jsx';
 import { SubwayRedirectOverlay } from './SubwayRedirectOverlay.jsx';
+import { ScrollToTopPill } from '../playlist/shared/ScrollToTopPill.jsx';
 import { openKakaoSubway } from './kakaoSubway.js';
 import { findUpcomingSchedule, formatUpcomingScheduleMessage, type PeriodScheduleItem } from './upcomingSchedule.js';
 import { getKSTToday } from '../../../utils/kstTime.js';
+import { findScrollableAncestor } from '../../../utils/scroll.js';
 
 type SchoolShuttleAppConfig = ShuttleAppConfig & { period_schedule?: PeriodScheduleItem[] };
 
@@ -112,31 +114,82 @@ export function SchoolShuttleSection({
     };
   }, [subwayRedirecting]);
 
-  // 출발지 칩(stop) 이나 학기/요일 필터 변경 시 전체 시간표 스크롤을 맨 위(첫차)로 초기화
   const containerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (isFullMode && containerRef.current) {
-      const getScrollParent = (node: Node | null): Element | null => {
-        if (node == null || !(node instanceof HTMLElement)) return null;
-        if (node.scrollHeight > node.clientHeight) {
-          const style = window.getComputedStyle(node);
-          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-            return node;
-          }
-        }
-        return getScrollParent(node.parentNode) || document.documentElement || document.body;
-      };
+  const stopSelectorRef = useRef<HTMLDivElement>(null);
 
-      const scrollParent = getScrollParent(containerRef.current);
-      if (scrollParent) {
-        if (scrollParent === document.documentElement || scrollParent === document.body) {
-          window.scrollTo(0, 0);
-        } else {
-          scrollParent.scrollTop = 0;
-        }
-      }
+  // 전체 시간표를 켜는 순간엔 맨 위(첫차)로 즉시 이동 — 이후 TimetableRow가 현재 시간대 행으로 자체 스크롤 애니메이션을 돌림
+  useEffect(() => {
+    if (!isFullMode) return;
+    findScrollableAncestor(containerRef.current)?.scrollTo({ top: 0 });
+  }, [isFullMode]);
+
+  // 전체 시간표에서 출발지·학기·요일을 바꿔도 "보고 있던 시간대"를 그대로 보여주기 위한 기준점.
+  // 바꾸기 직전, 고정 헤더 바로 아래 걸친 행의 출발 시각과 헤더로부터의 거리를 기억해 둠
+  // (지하철 노선은 시간표 행이 그대로라 기준점 없이 위치만 유지됨)
+  const scrollAnchorRef = useRef<{ depMin: number; offset: number } | null>(null);
+  const captureScrollAnchor = () => {
+    const card = containerRef.current;
+    const header = stopSelectorRef.current;
+    if (!isFullMode || !card || !header || scrollAnchorRef.current) return;
+    const headerBottom = header.getBoundingClientRect().bottom;
+    const rows = Array.from(card.children) as HTMLElement[];
+    // 시간표 카드 윗부분이 아직 보이는 상태(목록 위쪽)면 기준점 없이 지금 위치 유지
+    if (!rows[0] || rows[0].getBoundingClientRect().top >= headerBottom) return;
+    const idx = rows.findIndex(r => r.getBoundingClientRect().bottom > headerBottom);
+    if (idx === -1 || !schedule[idx]) return;
+    scrollAnchorRef.current = { depMin: schedule[idx].depMin, offset: rows[idx].getBoundingClientRect().top - headerBottom };
+  };
+  // 값이 실제로 바뀔 때만 기준점을 잡고 setter 호출 (PeriodDayTypeSelector는 닫힐 때 같은 값으로도 setter를 부름)
+  const withScrollAnchor = <T,>(current: T, set: (value: T) => void) => (value: T) => {
+    if (value !== current) captureScrollAnchor();
+    set(value);
+  };
+
+  // 새 시간표가 그려진 직후(페인트 전) 기억해 둔 시각 이후 첫 행을 같은 높이에 맞춤 — 화면이 튀지 않고 내용만 바뀐 것처럼 보임
+  useLayoutEffect(() => {
+    const anchor = scrollAnchorRef.current;
+    scrollAnchorRef.current = null;
+    if (!anchor || !isFullMode) return;
+    const card = containerRef.current;
+    const header = stopSelectorRef.current;
+    const scroller = findScrollableAncestor(card);
+    if (!card || !header || !scroller) return;
+    if (schedule.length === 0) {
+      scroller.scrollTo({ top: 0 }); // 운행 정보가 없으면 맨 위의 안내 카드가 보이게
+      return;
     }
-  }, [stop, fullDayType, fullPeriod, lineId, isFullMode]);
+    const found = schedule.findIndex(r => r.depMin >= anchor.depMin);
+    const row = card.children[found === -1 ? schedule.length - 1 : found] as HTMLElement | undefined;
+    if (!row) return;
+    scroller.scrollTop += row.getBoundingClientRect().top - header.getBoundingClientRect().bottom - anchor.offset;
+  }, [stop, fullDayType, fullPeriod]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 시간표 제목·필터 줄 — 전체 시간표 모드에선 행이 많아 출발지 고정 헤더 안에 함께 그려 스크롤해도 계속 보이게 하고,
+  // 일반 모드에선 다음 셔틀 몇 행만 보여서 고정할 필요가 없으니 시간표 바로 위에 그림(고정 헤더가 화면을 덜 차지하게)
+  const renderFilterRow = (className: string) => (
+    <TimetableFilterRow
+      className={className}
+      isFullMode={isFullMode}
+      fullPeriod={fullPeriod}
+      setFullPeriod={withScrollAnchor(fullPeriod, setFullPeriod)}
+      fullDayType={fullDayType}
+      setFullDayType={withScrollAnchor(fullDayType, setFullDayType)}
+      appConfig={appConfig}
+      isWeekend={isWeekend}
+      needsSubway={needsSubway}
+      lineId={lineId}
+      setLineId={setLineId}
+    />
+  );
+
+  // 출발지 변경 — 전체 시간표에선 보던 시간대 유지, 일반 모드에선 새 출발지의 "다음 셔틀"이 바로 보이게 맨 위로.
+  // 일반 모드 목록은 현재 시각 기준이라 계속 바뀌고 출발지 변경 시 더 불러오기도 초기화되므로, 출발지별 위치는 기억하지 않음
+  const handleStopChange = (s: string) => {
+    if (!isFullMode && s !== stop) {
+      findScrollableAncestor(containerRef.current)?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    withScrollAnchor(stop, setStop)(s);
+  };
 
   const handleToggleFullMode = () => {
     if (!isFullMode) setJustToggledFullMode(true);
@@ -144,34 +197,33 @@ export function SchoolShuttleSection({
   };
 
   return (
-    <div className="pb-36 [animation:slideUp_0.4s_ease-out]">
+    // 하단 여백: 이 pb(96) + 시간표 mb-6(24) + 스크롤 컨테이너 pb-6(24) = 144px
+    // = 하단 내비게이션바 88px(bottom 24 + h-16) + 간격 12 + "맨 위로" 버튼 32 + 간격 12
+    //   → 맨 끝까지 내려도 "맨 위로" 버튼이 마지막 요소(더 불러오기 등)와 겹치지 않고 그 아래 빈칸에 들어감
+    <div className="pb-24 [animation:slideUp_0.4s_ease-out]">
       {/* 출발지 */}
       <StopSelector
+        ref={stopSelectorRef}
         viewMode={viewMode}
         setViewMode={setViewMode}
         stop={stop}
-        setStop={setStop}
+        setStop={handleStopChange}
         isActive={isActive}
         isGpsLoading={isGpsLoading}
-      />
+      >
+        {isFullMode && renderFilterRow('mt-4')}
+      </StopSelector>
 
       {/* 다가오는 시간표 변경 안내 배너 — 한번 뜨면 대상 기간이 될 때까지 계속 유지 */}
       <NoticeBanner shouldShow={isActive && !!upcomingSchedule} message={upcomingScheduleMessage ?? ''} persistOnceShown />
 
       {/* 시간표 */}
       <div className="mb-6">
+        {!isFullMode && renderFilterRow('mb-3')}
         <TimetableHeader
           isFullMode={isFullMode}
-          fullPeriod={fullPeriod}
-          setFullPeriod={setFullPeriod}
-          fullDayType={fullDayType}
-          setFullDayType={setFullDayType}
-          appConfig={appConfig}
-          isWeekend={isWeekend}
           needsSubway={needsSubway}
           hideSubwayCol={hideSubwayCol}
-          lineId={lineId}
-          setLineId={setLineId}
           onOpenSubway={() => openKakaoSubway(lineId, () => setSubwayRedirecting(true))}
           onToggleFullMode={handleToggleFullMode}
         />
@@ -240,7 +292,7 @@ export function SchoolShuttleSection({
         </div>
 
         {!isFullMode && schedule.length > visibleCount && (
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center pt-3">
             <button
               className="bg-transparent border border-slate-300 text-text-sub rounded-full px-6 py-2 text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-surface"
               onClick={loadMore}
@@ -253,6 +305,9 @@ export function SchoolShuttleSection({
       </div>
 
       <SubwayRedirectOverlay visible={subwayRedirecting} />
+
+      {/* 전체 시간표처럼 목록이 길어졌을 때 "맨 위로" — 하단 내비게이션바(bottom 24px + h-16) 위로 띄움 */}
+      <ScrollToTopPill size="compact" bottom="calc(100px + env(safe-area-inset-bottom))" />
     </div>
   );
 }
