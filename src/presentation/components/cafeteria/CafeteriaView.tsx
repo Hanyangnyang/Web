@@ -1,6 +1,6 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
 import { useState, useEffect, useRef, lazy, Suspense, Fragment } from 'react';
-import { Bell, UtensilsCrossed } from 'lucide-react';
+import { Bell, Megaphone, UtensilsCrossed } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
@@ -281,7 +281,9 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                       {i === bannerIdx && (
                         <NoticeBanner
                           shouldShow
+                          variant="plain"
                           message="학식 정보가 실제와 다른가요?"
+                          icon={<Megaphone size={15} strokeWidth={2.4} className="flex-shrink-0 text-primary" />}
                           actionLabel="제보하기"
                           onAction={() => setShowMenuFeedback(true)}
                         />
