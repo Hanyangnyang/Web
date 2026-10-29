@@ -19,7 +19,7 @@ interface TimetableFilterRowProps {
 }
 
 // "시간표" 제목 + 기간/요일 선택기 + 지하철 노선 드롭다운 한 줄.
-// 출발지 고정 헤더 안에 그려서 스크롤해도 필터가 계속 보이게 함
+// 전체 시간표 모드에선 출발지 고정 헤더 안에 그려서 스크롤해도 필터가 계속 보이게 함
 export function TimetableFilterRow({
   isFullMode, fullPeriod, setFullPeriod, fullDayType, setFullDayType,
   appConfig, isWeekend, needsSubway, lineId, setLineId, className = '',
@@ -50,7 +50,7 @@ export function TimetableFilterRow({
   );
 }
 
-// 제목·필터 줄(TimetableFilterRow)은 출발지 고정 헤더 안에서 그리고, 여기선 그 아래 카카오 지하철·전체 시간표 토글 줄만 그림
+// 제목·필터 줄(TimetableFilterRow)은 SchoolShuttleSection이 모드에 따라 위치를 정해 그리고, 여기선 그 아래 카카오 지하철·전체 시간표 토글 줄만 그림
 interface TimetableHeaderProps {
   isFullMode: boolean;
   needsSubway: boolean;

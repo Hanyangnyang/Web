@@ -164,6 +164,24 @@ export function SchoolShuttleSection({
     scroller.scrollTop += row.getBoundingClientRect().top - header.getBoundingClientRect().bottom - anchor.offset;
   }, [stop, fullDayType, fullPeriod]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 시간표 제목·필터 줄 — 전체 시간표 모드에선 행이 많아 출발지 고정 헤더 안에 함께 그려 스크롤해도 계속 보이게 하고,
+  // 일반 모드에선 다음 셔틀 몇 행만 보여서 고정할 필요가 없으니 시간표 바로 위에 그림(고정 헤더가 화면을 덜 차지하게)
+  const renderFilterRow = (className: string) => (
+    <TimetableFilterRow
+      className={className}
+      isFullMode={isFullMode}
+      fullPeriod={fullPeriod}
+      setFullPeriod={withScrollAnchor(fullPeriod, setFullPeriod)}
+      fullDayType={fullDayType}
+      setFullDayType={withScrollAnchor(fullDayType, setFullDayType)}
+      appConfig={appConfig}
+      isWeekend={isWeekend}
+      needsSubway={needsSubway}
+      lineId={lineId}
+      setLineId={setLineId}
+    />
+  );
+
   const handleToggleFullMode = () => {
     if (!isFullMode) setJustToggledFullMode(true);
     setIsFullMode(!isFullMode);
@@ -184,20 +202,7 @@ export function SchoolShuttleSection({
         isActive={isActive}
         isGpsLoading={isGpsLoading}
       >
-        {/* 시간표 제목·필터 줄 — 출발지와 같은 고정 헤더 안에 그려서 스크롤해도 계속 보임 */}
-        <TimetableFilterRow
-          className="mt-4"
-          isFullMode={isFullMode}
-          fullPeriod={fullPeriod}
-          setFullPeriod={withScrollAnchor(fullPeriod, setFullPeriod)}
-          fullDayType={fullDayType}
-          setFullDayType={withScrollAnchor(fullDayType, setFullDayType)}
-          appConfig={appConfig}
-          isWeekend={isWeekend}
-          needsSubway={needsSubway}
-          lineId={lineId}
-          setLineId={setLineId}
-        />
+        {isFullMode && renderFilterRow('mt-4')}
       </StopSelector>
 
       {/* 다가오는 시간표 변경 안내 배너 — 한번 뜨면 대상 기간이 될 때까지 계속 유지 */}
@@ -205,6 +210,7 @@ export function SchoolShuttleSection({
 
       {/* 시간표 */}
       <div className="mb-6">
+        {!isFullMode && renderFilterRow('mb-3')}
         <TimetableHeader
           isFullMode={isFullMode}
           needsSubway={needsSubway}
