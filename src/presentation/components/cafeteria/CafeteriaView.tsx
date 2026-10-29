@@ -67,6 +67,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
   };
 
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  // 처음(식당·날짜 진입 시) 기본으로 펼쳐 둔 식사 — 학식 제보 배너 위치 기준. 사용자가 다른 식사를 펼치고 접어도 바뀌지 않음
+  const [defaultExpandedGroups, setDefaultExpandedGroups] = useState<Record<string, boolean>>({});
   const [deepLinkTrigger, setDeepLinkTrigger] = useState(0);
   const [showAlarm, setShowAlarm] = useState(false);
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
@@ -142,6 +144,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
       });
 
       setExpandedGroups(initial);
+      setDefaultExpandedGroups(initial);
       urlTypeRef.current = null;
 
       if (foundExact) {
@@ -160,6 +163,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
 
     const { expandedGroups: initial, scrollTargetType } = getDefaultAccordionState(menusWithCafe, date, getKSTDateUnsafe());
     setExpandedGroups(initial);
+    setDefaultExpandedGroups(initial);
 
     if (scrollTargetType) {
       setTimeout(() => {
@@ -256,9 +260,10 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                 // 4. 정상 — 그날 등록된 메뉴가 하나라도 있음
                 (() => {
                   const entries = sortMealTypeEntries(Object.entries(groupedMenus));
-                  // 학식 제보 배너는 펼쳐진 식사(기본: 현재 시간대) 중 첫 번째 바로 아래, 다 접혀 있으면 목록 맨 아래에 둠
-                  const expandedIdx = entries.findIndex(([type]) => expandedGroups[type]);
-                  const bannerIdx = expandedIdx === -1 ? entries.length - 1 : expandedIdx;
+                  // 학식 제보 배너는 기본으로 펼쳐 둔 식사(현재 시간대) 아래에 고정 — 사용자가 다른 식사를 펼쳐도 따라가지 않음.
+                  // 기본 펼침이 여러 개면(다른 날짜는 전부 펼침, 중식 계열이 여럿) 그중 마지막 아래, 하나도 없으면 목록 맨 아래
+                  const defaultIdx = entries.reduce((last, [type], i) => (defaultExpandedGroups[type] ? i : last), -1);
+                  const bannerIdx = defaultIdx === -1 ? entries.length - 1 : defaultIdx;
                   return entries.map(([type, menus], i) => (
                     <Fragment key={type}>
                       <MealTypeAccordion
