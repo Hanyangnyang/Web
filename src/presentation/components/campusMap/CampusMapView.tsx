@@ -103,6 +103,20 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const getViewportHeight = useCallback(() => mapContainerRef.current?.clientHeight ?? window.innerHeight, []);
 
+  // 카카오맵은 생성 시점의 컨테이너 크기만큼만 타일을 그리고, 이후 크기 변화는 스스로 모른다.
+  // 탭이 숨겨진(display:none → 크기 0) 동안 생성됐거나, 창 크기·화면 회전·개발자도구 모바일 모드 전환으로
+  // 컨테이너가 바뀌면 지도 일부만 그려지고 나머지가 빈 채로 남으므로, 크기가 바뀔 때마다 relayout으로 다시 맞춘다.
+  // (탭이 다시 보일 때도 0 → 실제 크기로 바뀌므로 같은 경로로 처리된다)
+  useEffect(() => {
+    const el = mapContainerRef.current;
+    if (!map || !el) return;
+    const observer = new ResizeObserver(() => {
+      if (el.clientWidth > 0 && el.clientHeight > 0) map.relayout();
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [map]);
+
   // 시트가 보고한 높이를 컨테이너의 CSS 변수에 반영한다 — 플로팅 버튼이 이걸 딛고 선다.
   // 상태가 아닌 DOM에 직접 쓰는 이유: 높이 트랜지션 매 프레임마다 마커 수백 개가 리렌더되면 안 된다.
   const reportSheetHeight = useCallback<ReportSheetHeight>((heightPx) => {
