@@ -24,3 +24,12 @@ export const createLibraryRoom = ({ id, name, total, occupied, available }: Libr
 
   return { id, name, total, occupied, available, ratio, status };
 };
+
+// 소식탭 열람실 카드에 "오픈스페이스는 어때요?" 안내를 띄울 혼잡 기준.
+// 제1열람실·제2열람실·노상일 HOLMZ 중 한 곳이라도 '매우 혼잡'(점유율 67% 초과)이면 띄운다.
+// 집중열람실(QUIET_ROOM)은 좌석이 10여 석뿐이라 몇 명만 앉아도 등급이 크게 출렁여서 판정에서 뺀다.
+// 이름(roomName)은 백엔드가 바꿀 수 있어 id(백엔드 room enum)로 고른다
+const CROWDING_ROOM_IDS = ['FIRST_READING_ROOM', 'SECOND_READING_ROOM', 'HOLMZ'];
+
+export const isLibraryCrowded = (rooms: LibraryRoom[]): boolean =>
+  rooms.some((room) => CROWDING_ROOM_IDS.includes(room.id) && room.status === '매우 혼잡');
