@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ansan-printer-example-01",
+    "name": "학술정보관 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.29603000573167, "longitude": 126.83534960340357 },
+    "location": "1층 로비",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  },
+  {
+    "id": "ansan-printer-example-02",
+    "name": "본관 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.29870715871089, "longitude": 126.83258385968452 },
+    "location": "2층 복도",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  },
+  {
+    "id": "ansan-printer-example-03",
+    "name": "제1공학관 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.297515224529924, "longitude": 126.8381885645491 },
+    "location": "3층 학생 라운지",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  },
+  {
+    "id": "ansan-printer-example-04",
+    "name": "ERICA컨벤션센터 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.2982749355683, "longitude": 126.83928153291899 },
+    "location": "2층 로비",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  },
+  {
+    "id": "ansan-printer-example-05",
+    "name": "약학대학 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.2959582816104, "longitude": 126.83855337010921 },
+    "location": "1층 과사무실 앞",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  },
+  {
+    "id": "ansan-printer-example-06",
+    "name": "디자인대학 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.296695852240795, "longitude": 126.83117851205505 },
+    "location": "지하 1층 실습실 앞",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  },
+  {
+    "id": "ansan-printer-example-07",
+    "name": "창의관 (예시)",
+    "campus": "ANSAN",
+    "coordinates": { "latitude": 37.29191953181185, "longitude": 126.83701695165797 },
+    "location": "1층 편의시설",
+    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+  }
+]

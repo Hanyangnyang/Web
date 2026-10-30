@@ -15,9 +15,10 @@ import { PointMarkers } from './markers/PointMarkers';
 import { CampusBuildingSheet } from './sheets/CampusBuildingSheet';
 import { SmokingSpotSheet } from './sheets/SmokingSpotSheet';
 import { ParkingLotSheet } from './sheets/ParkingLotSheet';
+import { PrinterSheet, PrinterReportContent } from './sheets/PrinterSheet';
 import { CampusFeedbackModal } from './CampusFeedbackModal';
 import {
-  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
+  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, PRINTER_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
 } from './sheets/sheetMetrics';
 
 import {
@@ -28,6 +29,7 @@ import { openSpaceBuildings, type PlottableBuilding } from '../../../domain/enti
 import { collegeById } from '../../../domain/entities/College.js';
 import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { PARKING_LOTS, visibleParkingLots, type PlottableParkingLot } from '../../../domain/entities/ParkingLot.js';
+import { PRINTERS, visiblePrinters, type PlottablePrinter } from '../../../domain/entities/Printer.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useSmokingSpots } from '../../hooks/campusMap/useSmokingSpots.js';
@@ -99,7 +101,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     prevResetSignal.current = resetSignal;
     setSearchOpen(false);
   }, [resetSignal]);
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  // 제보 팝업을 어디서 열었는지 — 상단 📢 버튼(일반)과 프린터 목록 배너는 안내 문구·태그가 다르다
+  const [feedbackSource, setFeedbackSource] = useState<'general' | 'printer' | null>(null);
 
   // 지도가 실제로 그려지는 컨테이너의 픽셀 높이 — focusMap이 '시트 제외 영역 정중앙'을 계산할 때 쓴다
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -130,8 +133,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
 
   // 칩 하나에서 파생되는 화면 상태(어떤 레이어를 그릴지·어떤 시트를 띄울지)는 전부 이 훅이 계산한다
   const {
-    isOpenSpaceChip, isSmokingChip, isParkingChip, isBuildingLayerChip,
-    showsBuildingLayer, showsSmokingLayer, showsParkingLayer, storeCategory, sheetVisible,
+    isOpenSpaceChip, isSmokingChip, isParkingChip, isPrinterChip, isBuildingLayerChip,
+    showsBuildingLayer, showsSmokingLayer, showsParkingLayer, showsPrinterLayer, storeCategory, sheetVisible,
   } = useCampusMapLayers(chip);
 
   // 건물·흡연장은 각자의 칩이 켜졌을 때만 불러온다(RQ enabled).
@@ -141,6 +144,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const { spots: smokingSpots, loading: smokingLoading, loadErr: smokingError } = useSmokingSpots({ enabled: showsSmokingLayer });
   // 주차장은 아직 프로토타입 단계라 앱에 번들된 정적 데이터를 그대로 쓴다(백엔드/RQ 없음)
   const parkingLots = useMemo(() => visibleParkingLots(PARKING_LOTS), []);
+  // 프린터도 주차장과 같은 정적 데이터 (지금은 예시 1곳뿐)
+  const printers = useMemo(() => visiblePrinters(PRINTERS), []);
 
   // 오픈스페이스 칩이면 오픈스페이스가 있는 건물만 지도·목록에 올린다
   const layerBuildings = useMemo(
@@ -167,12 +172,15 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
       case 'parking':
         focusMap(sel.lot.coordinates.latitude, sel.lot.coordinates.longitude, PARKING_DETAIL_FRACTION, viewportHeight);
         break;
+      case 'printer':
+        focusMap(sel.printer.coordinates.latitude, sel.printer.coordinates.longitude, PRINTER_DETAIL_FRACTION, viewportHeight);
+        break;
     }
   }, [focusMap, getViewportHeight]);
 
   const {
     selection, sheetExpanded, setSheetExpanded,
-    selectStore, selectBuilding, selectSmokingSpot, selectParkingLot,
+    selectStore, selectBuilding, selectSmokingSpot, selectParkingLot, selectPrinter,
     closeDetail, clearSelection, browseCategory,
   } = useCampusMapSelection({
     onFocus: focusSelection,
@@ -187,6 +195,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const selectedBuilding = useMemo(() => selectedBy(selection, 'building', buildings), [selection, buildings]);
   const selectedSmokingSpot = useMemo(() => selectedBy(selection, 'smoking', smokingSpots), [selection, smokingSpots]);
   const selectedParkingLot = useMemo(() => selectedBy(selection, 'parking', parkingLots), [selection, parkingLots]);
+  const selectedPrinter = useMemo(() => selectedBy(selection, 'printer', printers), [selection, printers]);
 
   // 무엇을 선택하든 그에 해당하는 칩으로 전환한다.
   // '전체'에서 마커를 눌렀을 때 그 종류의 칩이 켜지게 하는 게 주 목적이고, 덕분에
@@ -211,6 +220,11 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   const pickParkingLot = (lot: PlottableParkingLot, source: SelectSource) => {
     if (!isParkingChip) setChip('parking');
     selectParkingLot(lot, source);
+  };
+
+  const pickPrinter = (printer: PlottablePrinter, source: SelectSource) => {
+    if (!isPrinterChip) setChip('printer');
+    selectPrinter(printer, source);
   };
 
   // 검색에서 건물을 고르면 교내시설 레이어로 확정한다 — 오픈스페이스 칩이 켜져 있어도
@@ -339,6 +353,12 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     posthog?.capture('partner_map_college_selected', { college_id: next, college_name: collegeName });
   };
 
+  // 프린터 제보 입구가 두 곳(시트 목록 3번째 칸 / 시트 위 플로팅)이라 어느 쪽이 더 눌리는지 같이 싣는다
+  const openPrinterReport = (placement: 'list' | 'floating') => {
+    setFeedbackSource('printer');
+    posthog?.capture('partner_map_printer_report_clicked', { placement });
+  };
+
   const openSearch = () => {
     setSearchOpen(true);
     posthog?.capture('partner_map_search_opened');
@@ -403,6 +423,15 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           />
         )}
 
+        {showsPrinterLayer && (
+          <PointMarkers
+            items={printers}
+            level={level}
+            selectedId={selectedPrinter?.id ?? null}
+            onSelect={(p) => pickPrinter(p, 'marker')}
+          />
+        )}
+
         {/* 현재 위치 파란 점 (+ 펄스) */}
         {userPos && (
           <CustomOverlayMap position={userPos} yAnchor={0.5} zIndex={30}>
@@ -460,7 +489,29 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         <LocateFixed size={19} className={locating ? 'text-text-hint animate-pulse' : 'text-[#334155]'} />
       </button>
 
-      {feedbackOpen && <CampusFeedbackModal onClose={() => setFeedbackOpen(false)} />}
+      {/* 프린터 제보 플로팅 배너 — 내 위치 버튼과 같은 줄, 그 왼쪽 빈자리(right = 버튼 12px + 폭 44px + 간격 8px).
+          높이도 버튼과 같은 44px로 맞춘다. 프린터 목록일 때만(상세에선 숨김).
+          색은 셔틀탭 공지 배너(NoticeBanner info: primary 4% 배경 + primary 10% 테두리)와 같게 하되, 지도 위라
+          반투명이면 지도가 비쳐 보이므로 흰색에 섞은 불투명 색으로 만든다 */}
+      {isPrinterChip && !selectedPrinter && (
+        <button
+          onClick={() => openPrinterReport('floating')}
+          style={{ bottom: `calc(${buttonBase} + 12px)` }}
+          className="absolute left-3 right-16 z-30 h-11 px-4 flex items-center justify-between gap-2.5 rounded-full bg-[color-mix(in_srgb,var(--color-primary)_4%,white)] border border-primary/10 shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
+        >
+          <PrinterReportContent />
+        </button>
+      )}
+
+      {feedbackSource === 'general' && <CampusFeedbackModal onClose={() => setFeedbackSource(null)} />}
+      {feedbackSource === 'printer' && (
+        <CampusFeedbackModal
+          onClose={() => setFeedbackSource(null)}
+          description="지도에 없는 프린터나 위치가 다른 프린터를 알려주세요!"
+          placeholder="OO관 2층 복도에 프린터가 있어요"
+          contentPrefix="[프린터]"
+        />
+      )}
 
       {/* 토스트 */}
       {toast && (
@@ -483,7 +534,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           </button>
           {/* 제보 📢 — 오픈스페이스·흡연장 등 지도 정보 오류/누락 제보. 폭이 좁아서(2/10) 안쪽 여백을 최소로 줘 내용이 경계에 거의 붙게 함 */}
           <button
-            onClick={() => setFeedbackOpen(true)}
+            onClick={() => setFeedbackSource('general')}
             aria-label="캠퍼스맵 제보하기"
             className="pointer-events-auto min-w-0 flex-[2] flex items-center justify-center gap-0.5 bg-white rounded-full px-1 py-2 shadow-[0_2px_10px_rgba(0,0,0,0.12)] [-webkit-tap-highlight-color:transparent] active:scale-[0.99] transition-transform"
           >
@@ -561,6 +612,17 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           selected={selectedParkingLot}
           onSelect={(p) => pickParkingLot(p, 'list')}
           onClose={closeDetail}
+        />
+      ) : isPrinterChip ? (
+        <PrinterSheet
+          printers={printers}
+          origin={distanceOrigin}
+          expanded={sheetExpanded}
+          onToggleExpand={setSheetExpanded}
+          selected={selectedPrinter}
+          onSelect={(p) => pickPrinter(p, 'list')}
+          onClose={closeDetail}
+          onReport={() => openPrinterReport('list')}
         />
       ) : null}
       </SheetHeightContext.Provider>
