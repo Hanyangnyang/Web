@@ -1,6 +1,6 @@
 // 지도 상단 필터 칩: 매장 카테고리와 교내시설/오픈스페이스/흡연장 레이어를 같은 레벨의 단일 선택으로 묶는다.
 import { useEffect, useRef } from 'react';
-import { CATEGORY_ORDER, CATEGORY_META } from '../../../domain/entities/PartnerStore.js';
+import { CATEGORY_META, type StoreCategory } from '../../../domain/entities/PartnerStore.js';
 import type { MapChip } from '../../hooks/campusMap/useCampusMapFilters.js';
 
 interface Props {
@@ -8,16 +8,21 @@ interface Props {
   onChange: (next: MapChip | null) => void;
 }
 
-const categoryChips = CATEGORY_ORDER.map((key) => ({ key, label: CATEGORY_META[key].label, emoji: CATEGORY_META[key].emoji }));
+const categoryChip = (key: StoreCategory) => ({ key, label: CATEGORY_META[key].label, emoji: CATEGORY_META[key].emoji });
 
+// 매장 카테고리와 시설 레이어가 섞인 순서라 CATEGORY_ORDER를 펼치지 않고 하나씩 나열한다
+// (CATEGORY_ORDER는 매장 목록 그룹핑 순서에도 쓰이므로 여기 맞춰 바꾸지 않는다)
 const CHIPS: { key: MapChip; label: string; emoji?: string }[] = [
   { key: 'all', label: '전체' },
+  categoryChip('food'),
+  categoryChip('cafe'),
   { key: 'openspace', label: '오픈스페이스', emoji: '📚' },
   { key: 'smoking', label: '흡연장', emoji: '🚬' },
-  { key: 'parking', label: '주차장', emoji: '🅿️' },
-  ...categoryChips,
-  // '교내시설'은 매장 카테고리 전부 다음, 맨 마지막 칩으로 둔다
   { key: 'building', label: '교내시설', emoji: '🏢' },
+  { key: 'parking', label: '주차장', emoji: '🅿️' },
+  categoryChip('pub'),
+  categoryChip('play'),
+  categoryChip('life'),
 ];
 
 export function MapFilterChips({ value, onChange }: Props) {
