@@ -14,6 +14,7 @@ const CHIPS: { key: MapChip; label: string; emoji?: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'openspace', label: '오픈스페이스', emoji: '📚' },
   { key: 'smoking', label: '흡연장', emoji: '🚬' },
+  { key: 'parking', label: '주차장', emoji: '🅿️' },
   ...categoryChips,
   // '교내시설'은 매장 카테고리 전부 다음, 맨 마지막 칩으로 둔다
   { key: 'building', label: '교내시설', emoji: '🏢' },

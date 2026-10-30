@@ -8,12 +8,14 @@ import { useCallback, useRef, useState } from 'react';
 import type { PartnerStore } from '../../../domain/entities/PartnerStore.js';
 import type { PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
 import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
+import type { PlottableParkingLot } from '../../../domain/entities/ParkingLot.js';
 
 // 선택한 '대상 자체' — 지도 포커스처럼 좌표가 당장 필요한 곳에 넘긴다
 export type MapSelection =
   | { kind: 'store'; store: PartnerStore }
   | { kind: 'building'; building: PlottableBuilding }
-  | { kind: 'smoking'; spot: PlottableSmokingSpot };
+  | { kind: 'smoking'; spot: PlottableSmokingSpot }
+  | { kind: 'parking'; lot: PlottableParkingLot };
 
 // 상태로 들고 있는 건 종류+id뿐이다. 객체를 통째로 담아두면 그 순간의 스냅샷이 되어,
 // 데이터가 갱신(RQ 재요청)돼도 열려 있는 상세 시트는 옛 내용을 계속 보여준다.
@@ -28,6 +30,7 @@ function toRef(selection: MapSelection): MapSelectionRef {
     case 'store': return { kind: 'store', id: selection.store.id };
     case 'building': return { kind: 'building', id: selection.building.id };
     case 'smoking': return { kind: 'smoking', id: selection.spot.id };
+    case 'parking': return { kind: 'parking', id: selection.lot.id };
   }
 }
 
@@ -86,6 +89,15 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
     onAfterSelect?.();
   }, [select, posthog, onAfterSelect]);
 
+  const selectParkingLot = useCallback((lot: PlottableParkingLot, source: SelectSource) => {
+    returnToList.current = source === 'list' || source === 'nearest';
+    select({ kind: 'parking', lot });
+    posthog?.capture('partner_map_parking_selected', {
+      lot_id: lot.id, lot_name: lot.name, source,
+    });
+    onAfterSelect?.();
+  }, [select, posthog, onAfterSelect]);
+
   // X로 상세 닫기: 목록에서 들어왔으면 펼쳐진 목록으로 복귀 (배율·센터는 그대로)
   const closeDetail = useCallback(() => {
     setSelection(null);
@@ -114,6 +126,7 @@ export function useCampusMapSelection({ onFocus, posthog, onAfterSelect }: Param
     selectStore,
     selectBuilding,
     selectSmokingSpot,
+    selectParkingLot,
     closeDetail,
     clearSelection,
     browseCategory,

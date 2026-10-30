@@ -5,7 +5,7 @@ import type { CategoryFilter, StoreCategory } from '../../../domain/entities/Par
 // 칩은 세 갈래다 — '전체'(모든 레이어) · 시설 종류 · 매장 카테고리.
 // 화면 곳곳에서 이 셋을 구분해야 해서 경계를 여기 한 곳에만 둔다.
 // FacilityKind ↔ StoreCategory로 접미사를 맞춰, 둘이 같은 층위의 '종류'임을 이름으로 드러낸다.
-const FACILITY_KINDS = ['building', 'openspace', 'smoking'] as const;
+const FACILITY_KINDS = ['building', 'openspace', 'smoking', 'parking'] as const;
 type FacilityKind = (typeof FACILITY_KINDS)[number];
 
 // 'all'은 union에 직접 쓴다. 예전엔 CategoryFilter('all' | StoreCategory)를 통째로 넣어
