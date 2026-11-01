@@ -1,5 +1,5 @@
 // 지도 하단 바텀시트: 프린터 — 프린터 리스트(+거리) / 개별 상세
-// 위치 목록을 아직 모으는 중이라, 목록 3번째 칸에 '빠진 프린터 제보' 행을 항상 끼운다
+// '빠진 프린터 제보' 입구는 시트 안이 아니라 시트 위 플로팅 배너(CampusMapView)에 있다
 import { useMemo } from 'react';
 import { X, Megaphone } from 'lucide-react';
 import type { PlottablePrinter } from '../../../../domain/entities/Printer.js';
@@ -16,7 +16,6 @@ interface Props {
   selected: PlottablePrinter | null;
   onSelect: (printer: PlottablePrinter) => void;
   onClose: () => void;                          // 상세 닫기 → 목록으로 복귀
-  onReport: () => void;                         // 제보 배너의 '제보하기'
 }
 
 // 흡연장·주차장 시트와 동일한 규격
@@ -28,9 +27,9 @@ function NearestBadge() {
   );
 }
 
-// '빠진 프린터 제보'의 안쪽 내용 — 시트 목록 3번째 칸과 시트 위 플로팅 배너가 같이 쓴다.
+// '빠진 프린터 제보'의 안쪽 내용 — 시트 위 플로팅 배너(CampusMapView)가 쓴다.
 // 아이콘·글씨·버튼은 학식탭 제보 배너(NoticeBanner plain)와 같은 규격으로, 둘이 같은 '제보' 기능임을 모양으로 맞춘다.
-// 바깥(여백·테두리·눌림 효과)은 놓이는 자리마다 달라서 쓰는 쪽이 감싼다.
+// 바깥(여백·테두리·그림자)은 지도 위에 뜨는 자리에 맞춰 쓰는 쪽이 감싼다.
 export function PrinterReportContent() {
   return (
     <>
@@ -45,7 +44,7 @@ export function PrinterReportContent() {
   );
 }
 
-export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selected, onSelect, onClose, onReport }: Props) {
+export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selected, onSelect, onClose }: Props) {
   const nearestId = useMemo(
     () => nearestTo(printers, origin, (p) => p.coordinates)?.id ?? null,
     [printers, origin]
@@ -106,18 +105,6 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
         </div>
       )}
       renderBadge={(p) => (p.id === nearestId ? <NearestBadge /> : null)}
-      // 가까운 2곳 바로 다음(3번째 칸) — 접힌/조금 펼친 상태에서도 스크롤 없이 보이게
-      bannerAfter={2}
-      banner={
-        // 여백·구분선은 목록의 다른 행과 같은 규격 — 행 하나의 내용만 바뀐 것처럼 보이게.
-        // 배경만 셔틀탭 공지 배너(NoticeBanner info)와 같은 연한 파랑으로 깔아 일반 항목과 구분한다
-        <button
-          onClick={onReport}
-          className="w-full flex items-center justify-between gap-2.5 px-4 py-3 text-left bg-primary/[0.04] active:bg-primary/[0.08] [-webkit-tap-highlight-color:transparent]"
-        >
-          <PrinterReportContent />
-        </button>
-      }
     />
   );
 }

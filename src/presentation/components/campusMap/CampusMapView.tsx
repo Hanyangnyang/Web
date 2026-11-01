@@ -353,10 +353,11 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     posthog?.capture('partner_map_college_selected', { college_id: next, college_name: collegeName });
   };
 
-  // 프린터 제보 입구가 두 곳(시트 목록 3번째 칸 / 시트 위 플로팅)이라 어느 쪽이 더 눌리는지 같이 싣는다
-  const openPrinterReport = (placement: 'list' | 'floating') => {
+  // 프린터 제보 입구는 이제 시트 위 플로팅 하나뿐이다. placement는 시트 목록 칸도 있던 때(f40884f)의
+  // 이벤트와 같은 기준으로 비교할 수 있게 그대로 싣는다
+  const openPrinterReport = () => {
     setFeedbackSource('printer');
-    posthog?.capture('partner_map_printer_report_clicked', { placement });
+    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating' });
   };
 
   const openSearch = () => {
@@ -491,13 +492,12 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
 
       {/* 프린터 제보 플로팅 배너 — 내 위치 버튼과 같은 줄, 그 왼쪽 빈자리(right = 버튼 12px + 폭 44px + 간격 8px).
           높이도 버튼과 같은 44px로 맞춘다. 프린터 목록일 때만(상세에선 숨김).
-          색은 셔틀탭 공지 배너(NoticeBanner info: primary 4% 배경 + primary 10% 테두리)와 같게 하되, 지도 위라
-          반투명이면 지도가 비쳐 보이므로 흰색에 섞은 불투명 색으로 만든다 */}
+          색은 학식탭 제보 배너(NoticeBanner plain: 흰 배경 + slate-200 테두리)와 같다 — 지도 위라 그림자만 더한다 */}
       {isPrinterChip && !selectedPrinter && (
         <button
-          onClick={() => openPrinterReport('floating')}
+          onClick={openPrinterReport}
           style={{ bottom: `calc(${buttonBase} + 12px)` }}
-          className="absolute left-3 right-16 z-30 h-11 px-4 flex items-center justify-between gap-2.5 rounded-full bg-[color-mix(in_srgb,var(--color-primary)_4%,white)] border border-primary/10 shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
+          className="absolute left-3 right-16 z-30 h-11 px-4 flex items-center justify-between gap-2.5 rounded-full bg-white border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
         >
           <PrinterReportContent />
         </button>
@@ -622,7 +622,6 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           selected={selectedPrinter}
           onSelect={(p) => pickPrinter(p, 'list')}
           onClose={closeDetail}
-          onReport={() => openPrinterReport('list')}
         />
       ) : null}
       </SheetHeightContext.Provider>

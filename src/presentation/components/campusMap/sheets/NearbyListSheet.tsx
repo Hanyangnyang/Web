@@ -1,5 +1,4 @@
 // 교내시설·흡연장 목록 시트의 공통 껍데기
-import { Fragment } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { NAV_CLEARANCE_CLASS, LIST_COLLAPSED_CSS } from './sheetMetrics';
@@ -26,21 +25,14 @@ export interface NearbyListSheetProps<T extends { id: string; coordinates: Coord
   renderLabel: (item: T) => React.ReactNode;  // 행의 이름/부제 영역
   renderBadge?: (item: T) => React.ReactNode;
   onSelect: (item: T) => void;
-  // 목록 중간에 끼울 행 (예: 프린터의 '빠진 곳 제보' 행) — bannerAfter개 행 다음에 들어간다.
-  // 행이 그보다 적으면(빈 목록 포함) 맨 끝에 붙어, 항목 수와 상관없이 항상 보인다.
-  // 구분선은 여기서 일반 행과 똑같이 그어주므로, 넘기는 쪽은 행 내용(여백 포함)만 그리면 된다
-  banner?: React.ReactNode;
-  bannerAfter?: number;
 }
 
 export function NearbyListSheet<T extends { id: string; coordinates: Coordinates }>({
   items, loading, error, origin, height, expanded, onToggleExpand,
   emoji, title, count, countColorClass, emptyText,
-  renderLabel, renderBadge, onSelect, banner, bannerAfter = Infinity,
+  renderLabel, renderBadge, onSelect,
 }: NearbyListSheetProps<T>) {
   const rows = sortByDistance(items, origin, (item) => item.coordinates);
-  const bannerIdx = Math.min(bannerAfter, rows.length);
-  const bannerNode = banner && <div className={bannerIdx > 0 ? 'border-t border-[#f1f5f9]' : ''}>{banner}</div>;
 
   return (
     <StandardBottomSheet height={expanded ? height : LIST_COLLAPSED_CSS}>
@@ -73,12 +65,11 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
         ) : null}
 
         {rows.map(({ item, distance }, idx) => (
-          <Fragment key={item.id}>
-          {idx === bannerIdx && bannerNode}
           <button
+            key={item.id}
             onClick={() => onSelect(item)}
             className={`w-full flex items-center gap-3 px-4 py-3 text-left active:bg-slate-50 [-webkit-tap-highlight-color:transparent] ${
-              idx > 0 || (banner && bannerIdx === 0) ? 'border-t border-[#f1f5f9]' : ''
+              idx > 0 ? 'border-t border-[#f1f5f9]' : ''
             }`}
           >
             <div className="flex-1 min-w-0">{renderLabel(item)}</div>
@@ -88,10 +79,7 @@ export function NearbyListSheet<T extends { id: string; coordinates: Coordinates
             )}
             <ChevronRight size={16} className="flex-shrink-0 text-text-hint" />
           </button>
-          </Fragment>
         ))}
-
-        {bannerIdx === rows.length && bannerNode}
       </div>
     </StandardBottomSheet>
   );
