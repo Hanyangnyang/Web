@@ -96,6 +96,8 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
     if (!deepLinkBox) return;
     // shared_track: 카카오 공유처럼 특정 곡을 가리키는 링크로 들어왔는지(trackId는 box와 같은 렌더에 함께 세팅됨)
     openPropsRef.current = { source: deepLinkBoxSource, shared_track: !!deepLinkTrackId };
+    // 부모가 한 번 내려준 딥링크 값을 적용하고 소비 완료를 알리는 패턴 — 콜백·ref 설정이 렌더 중엔 불가하고 딥링크 진입 시 한 번뿐이라 effect에 둠
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSubView(deepLinkBox as SubView);
     onDeepLinkBoxHandled?.();
   }, [deepLinkBox]); // eslint-disable-line react-hooks/exhaustive-deps
