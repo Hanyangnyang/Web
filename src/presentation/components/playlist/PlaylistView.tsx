@@ -6,6 +6,7 @@ import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
 import { useBackHandler } from '../../hooks/useBackHandler';
 import { getPlaylistRootTop } from './playlistLayout.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
+import { loadSpotifyIframeApi } from './shared/spotifyIframeApi';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
 import { SearchSongFab, SEARCH_FAB_STACK_PX } from './shared/SearchSongFab';
 import { RecommendSongView } from './recommendSong/RecommendSongView';
@@ -83,6 +84,12 @@ const RECENT_SCROLL_PAGE_LIMIT = 2;
 export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled }: PlaylistViewProps) {
   const posthog = usePostHog();
   const queryClient = useQueryClient();
+
+  // 첫 재생 때 IFrame API 스크립트(open.spotify.com)를 받느라 기다리지 않도록 플레이리스트 진입 시 미리 받아둔다.
+  // 연결만 여는 preconnect와 달리 스크립트를 실제로 받으므로 안 써서 닫히는 낭비가 없고, 모듈 싱글턴이라 재생 때 다시 불러도 중복 요청이 없다
+  useEffect(() => {
+    loadSpotifyIframeApi();
+  }, []);
 
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고
   const recentSongsVariant = useRecentSongsTapAreaVariant();

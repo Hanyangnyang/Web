@@ -6,12 +6,9 @@
     <!-- 브라우저 메모리 캐시는 URL + Request Mode(CORS 여부)를 한 세트로 묶어서 캐시 키를 만들기 때문-->
     <link rel="preload" href="/fonts/HakgyoansimDunggeunmiso-B.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/hanyang_splash.png" as="image" />
-    <!-- 플레이리스트 곡 재생(Spotify embed iframe) 클릭 시 지연을 줄이기 위한 사전 연결 -->
-    <!-- CORS 요청과 일반 요청은 연결 풀이 분리됨 → crossorigin 유무를 실제 요청 방식과 맞춰야 함
-        (i.scdn.co는 앨범커버를 crossorigin="anonymous"로 요청하므로 crossorigin 필요) -->
-    <link rel="preconnect" href="https://open.spotify.com" />
-    <link rel="preconnect" href="https://open.spotifycdn.com" crossorigin />
-    <link rel="preconnect" href="https://i.scdn.co" crossorigin />
+    <!-- Spotify 관련 사전 연결은 여기 두지 않음 — 앱 시작 직후 열어도 실제로 쓰기 전에 유휴 시간 초과로 닫혀서.
+         i.scdn.co(이미지)는 소식탭·기타탭 진입 시(src/lib/preconnect.ts), open.spotify.com(재생 스크립트)은
+         플레이리스트 진입 시 스크립트 자체를 미리 받는 방식(PlaylistView의 loadSpotifyIframeApi)으로 옮김 -->
     <!-- 캠퍼스맵 탭 진입 전 카카오맵 SDK 요청의 DNS/TCP/TLS를 미리 뚫어둠 (App.tsx의 splashDone prefetch와 짝) -->
     <link rel="preconnect" href="https://dapi.kakao.com" />
     <link rel="icon" type="image/png" href="/favicon.png" />

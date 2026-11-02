@@ -1,4 +1,4 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { usePostHog } from 'posthog-js/react';
 
 import { Bell, ChevronRight } from 'lucide-react';
@@ -15,6 +15,7 @@ import { ArtistPromoCarousel } from '../playlist/shared/ArtistPromoCarousel.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
+import { preconnectSpotifyImages } from '../../../lib/preconnect.js';
 
 const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').then(m => ({ default: m.WeatherAlarmSettings })));
 
@@ -36,6 +37,10 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
   const { data: recommendations, isLoading: recommendationsLoading } = useArtistRecommendations(isActive);
+  // 아티스트 이미지 URL은 추천 API 응답이 와야 알 수 있으므로, 응답을 기다리는 동안 이미지 서버 연결을 병렬로 열어둔다
+  useEffect(() => {
+    if (isActive) preconnectSpotifyImages();
+  }, [isActive]);
   // 데이터가 같은 동안 배열 참조를 유지해야 캐러셀이 매 렌더마다 첫 장으로 되돌아가지 않음
   const artistPromos = useMemo(
     () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),

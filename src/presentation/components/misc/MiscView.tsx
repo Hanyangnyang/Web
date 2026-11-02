@@ -8,6 +8,7 @@ import { ClubViewSkeleton } from './ClubViewSkeleton.jsx';
 import { InstagramViewSkeleton } from './InstagramViewSkeleton.jsx';
 import { FeedbackViewSkeleton } from './FeedbackViewSkeleton.jsx';
 import { prefetchGymSchedule } from '../../hooks/useGymSchedule.js';
+import { preconnectSpotifyImages } from '../../../lib/preconnect.js';
 
 // lazy 컴포넌트와 프리페치용 load를 한 쌍으로 만든다. 둘이 같은 Promise를 공유하도록 load 결과를 캐싱
 // factory는 호출부에서 import('리터럴 경로')로 직접 써야 Vite가 빌드 때 청크를 나눌 수 있다 (경로를 변수로 넘기면 안 됨)
@@ -76,8 +77,10 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
   }
 
   // 기타탭 진입(isActive) 시 하위 View 청크와 헬스장 시간표를 미리 받아둔다
+  // 플레이리스트에 들어가면 앨범커버가 바로 필요하므로 이미지 서버 연결도 같이 열어둔다
   useEffect(() => {
     if (!isActive) return;
+    preconnectSpotifyImages();
     prefetchGymSchedule();
     loadPlaylistView();
     loadClubView();
