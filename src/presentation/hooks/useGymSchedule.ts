@@ -10,6 +10,16 @@ const GYM_STALE_TIME = 60 * 60 * 1000; // 1시간 — 백엔드 gymPeriod 캐시
 const GYM_QUERY_KEY = ['gym', 'schedule'];
 const DAY_CHANGE_CHECK_INTERVAL = 60 * 1000; // 1분마다 KST 날짜(자정 기준)가 바뀌었는지 확인
 
+// 기타탭 진입 시 미리 받아둔다 — 헬스장 박스를 누르기 전에 응답이 와 있으면 스켈레톤 없이 바로 시간표가 뜬다
+// (캐시가 staleTime 안이면 요청을 보내지 않음)
+export function prefetchGymSchedule() {
+  return queryClient.prefetchQuery({
+    queryKey: GYM_QUERY_KEY,
+    queryFn: () => getGymScheduleUseCase.execute(),
+    staleTime: GYM_STALE_TIME,
+  });
+}
+
 export interface UseGymScheduleResult {
   gymData: GymSchedule | null;
   loading: boolean;

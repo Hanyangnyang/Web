@@ -66,7 +66,14 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icons.svg'],
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          // woff2: 첫 화면 폰트(둥근미소·Pretendard)까지 SW에서 응답해 콜드 스타트 네트워크 왕복을 없앰.
+          // public/fonts라 파일명에 buildId가 안 붙고 revision으로 관리돼서, 폰트가 안 바뀌면 배포해도 다시 안 받음.
+          // 대가: revision 항목은 Workbox가 cache:'reload'로 받아 HTTP 캐시를 건너뛰므로, 최초 방문엔 페이지가 받은
+          // 폰트(약 1.2MB)를 SW 설치 때 한 번 더 받는다. 매 콜드 스타트의 304 재검증을 없애는 쪽이 더 이득이라 감수
+          // otf(woff2 미지원 브라우저용 대체)와 webp(favicon·프로필 이미지)는 첫 화면과 무관해 일부러 뺌
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          // 주소창으로 연 sitemap·robots까지 SPA 폴백(index.html)으로 가로채 앱 화면이 뜨는 것을 막음 (구글봇은 SW를 안 써서 색인엔 원래 무관)
+          navigateFallbackDenylist: [/^\/sitemap\.xml$/, /^\/robots\.txt$/],
           maximumFileSizeToCacheInBytes: 3000000,
           clientsClaim: true,
           skipWaiting: true,

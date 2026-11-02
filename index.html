@@ -2,27 +2,30 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <!-- 폰트는 항상 CORS 모드로 요청됨 → crossorigin 없으면 preload가 재사용이 안되고 이중 다운로드 함 -->
+    <!-- 브라우저 메모리 캐시는 URL + Request Mode(CORS 여부)를 한 세트로 묶어서 캐시 키를 만들기 때문-->
     <link rel="preload" href="/fonts/HakgyoansimDunggeunmiso-B.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/hanyang_splash.png" as="image" />
-    <!-- 플레이리스트 곡 재생(Spotify embed iframe) 클릭 시 지연을 줄이기 위한 사전 연결 -->
-    <link rel="preconnect" href="https://open.spotify.com" />
-    <link rel="preconnect" href="https://open.spotifycdn.com" crossorigin />
-    <link rel="preconnect" href="https://i.scdn.co" crossorigin />
+    <!-- Spotify 관련 사전 연결은 여기 두지 않음 — 앱 시작 직후 열어도 실제로 쓰기 전에 유휴 시간 초과로 닫혀서.
+         i.scdn.co(이미지)는 소식탭·기타탭 진입 시(src/lib/preconnect.ts), open.spotify.com(재생 스크립트)은
+         플레이리스트 진입 시 스크립트 자체를 미리 받는 방식(PlaylistView의 loadSpotifyIframeApi)으로 옮김 -->
     <!-- 캠퍼스맵 탭 진입 전 카카오맵 SDK 요청의 DNS/TCP/TLS를 미리 뚫어둠 (App.tsx의 splashDone prefetch와 짝) -->
     <link rel="preconnect" href="https://dapi.kakao.com" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.webp" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/assets/icons/icon-512.webp" />
-    <!-- iOS meta tags for native feel -->
+    <link rel="icon" type="image/webp" sizes="192x192" href="/assets/icons/icon-192.webp" />
+    <link rel="icon" type="image/webp" sizes="512x512" href="/assets/icons/icon-512.webp" />
+    <!-- iOS: 홈 화면에 추가 시 네이티브 앱처럼 보이게 하는 설정 -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="하냥냥" />
+    <!-- user-scalable=no·maximum-scale=1: 네이티브 앱 느낌 + iOS 입력창 포커스 시 자동 확대 방지 (접근성 감점은 감수한 트레이드오프)
+         viewport-fit=cover: 노치 영역까지 화면 사용 → CSS의 env(safe-area-inset-*)으로 여백 처리 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>하냥냥</title>
     <meta
       name="description"
-      content="한양대학교 ERICA인을 위한 캠퍼스 필수 앱. 식당별 학식 메뉴, 셔틀버스·지하철 시간표, 단과대별 제휴정보, 날씨와 학정혼잡도, 헬스장 시간표까지 하냥냥에서 한번에 확인하세요!"
+      content="한양대학교 ERICA인을 위한 캠퍼스 필수 앱. 식당별 학식메뉴, 셔틀버스·지하철 시간표, 오픈스페이스·흡연장·제휴매장 한눈에 보는 캠퍼스맵, 학정혼잡도, 헬스장 시간표까지 하냥냥에서 한번에 확인하세요!"
     />
     <link rel="canonical" href="https://www.hanyang.life/" />
     <!-- Open Graph: 카카오톡 등 공유 카드용 -->
@@ -59,7 +62,7 @@
             "applicationCategory": "UtilitiesApplication",
             "operatingSystem": "Android, iOS",
             "inLanguage": "ko-KR",
-            "description": "식당별 학식 조회, 셔틀버스·지하철 시간표, 단과대별 제휴 정보, 날씨와 학정 혼잡도, 헬스장 시간표를 제공하는 한양대학교 ERICA 학생용 캠퍼스 앱",
+            "description": "식당별 학식 조회, 셔틀버스·지하철 시간표, 제휴매장·흡연장·오픈스페이스를 한눈에 보는 캠퍼스맵, 날씨와 학정 혼잡도, 헬스장 시간표를 제공하는 한양대학교 ERICA 학생용 캠퍼스 앱",
             "installUrl": [
               "https://play.google.com/store/apps/details?id=com.hanyangnyang.app",
               "https://apps.apple.com/kr/app/id6770033067"
@@ -71,7 +74,7 @@
             "featureList": [
               "식당별 학식 조회",
               "셔틀버스·지하철 시간표",
-              "단과대별 제휴 정보 모음",
+              "제휴매장·흡연장·오픈스페이스 한눈에 보는 캠퍼스맵",
               "날씨와 학정 혼잡도",
               "헬스장 시간표 확인"
             ]
@@ -81,7 +84,8 @@
     </script>
   </head>
   <body>
-    <!-- 색인·랭킹에는 영향이 없으며, 페이지가 여러 URL로 분리되면 반드시 제거할 것. -->
+    <!-- data-nosnippet: 구글 검색결과 미리보기에 앱 UI 텍스트 대신 meta description이 나오게 함.
+         색인·랭킹에는 영향이 없으며, 페이지가 여러 URL로 분리되면 반드시 제거할 것. -->
     <div id="root" data-nosnippet></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

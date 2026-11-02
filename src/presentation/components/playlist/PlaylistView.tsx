@@ -4,8 +4,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
 import { useBackHandler } from '../../hooks/useBackHandler';
-import { isNativeApp, getPlatform } from '../../../lib/platform.js';
+import { getPlaylistRootTop } from './playlistLayout.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
+import { loadSpotifyIframeApi } from './shared/spotifyIframeApi';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
 import { SearchSongFab, SEARCH_FAB_STACK_PX } from './shared/SearchSongFab';
 import { RecommendSongView } from './recommendSong/RecommendSongView';
@@ -81,10 +82,14 @@ interface PlaylistViewProps {
 const RECENT_SCROLL_PAGE_LIMIT = 2;
 
 export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled }: PlaylistViewProps) {
-  const isApp = isNativeApp();
-  const platform = getPlatform();
   const posthog = usePostHog();
   const queryClient = useQueryClient();
+
+  // 첫 재생 때 IFrame API 스크립트(open.spotify.com)를 받느라 기다리지 않도록 플레이리스트 진입 시 미리 받아둔다.
+  // 연결만 여는 preconnect와 달리 스크립트를 실제로 받으므로 안 써서 닫히는 낭비가 없고, 모듈 싱글턴이라 재생 때 다시 불러도 중복 요청이 없다
+  useEffect(() => {
+    loadSpotifyIframeApi();
+  }, []);
 
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고
   const recentSongsVariant = useRecentSongsTapAreaVariant();
@@ -117,7 +122,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   const isHomeRecentLoading = recentMineOnly ? isMySongsLoading : isRecentSongsLoading;
   // 홈 미리보기와 인기차트 전체보기 화면이 같은 기간 필터를 공유
   const [chartPeriod, setChartPeriod] = useState<ChartPeriod>('popular');
-  const { data: chartData, isLoading: isChartLoading, isError: isChartError, refetch: refetchChart } = usePopularityChart(chartPeriod, isActive);
+  const { data: chartData, isLoading: isChartLoading } = usePopularityChart(chartPeriod, isActive);
   // 홈 곡 배너는 현재 선택된 차트 칩과 무관하게 실시간·주간 전체 장르 TOP 10을 각각 사용한다.
   // 같은 queryKey가 겹치면 React Query가 요청과 캐시를 자동으로 공유한다.
   const { data: promoPopularChart, isLoading: isPromoPopularLoading } = usePopularityChart('popular', isActive);
@@ -349,6 +354,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 앨범아트를 모르므로 빈 값으로 넘기고, TrackPostCollectionView가 useTrackPosts로 받아온 실제 값으로 채움
   useEffect(() => {
     if (!deepLinkTrackId || deepLinkPostId) return; // postId가 있으면 아래 effect가 처리
+    // 부모가 한 번 내려준 딥링크 값을 적용하고 소비 완료를 알리는 패턴 — 콜백이 렌더 중엔 불가하고 딥링크 진입 시 한 번뿐이라 effect에 둠
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     handleSelectSearchTrack({ trackId: deepLinkTrackId, title: '', artist: '', albumArtUrl: '' });
     onDeepLinkTrackIdHandled?.();
   }, [deepLinkTrackId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -365,6 +372,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
       return;
     }
     if (found) {
+      // 최근추가된곡 페이지가 받아질 때까지 기다렸다가 판단해야 해서 렌더 중으로 옮길 수 없음 (비동기 데이터 대기는 effect의 몫)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecentGenreFilter((prev) => ({ ...prev, selected: [] }));
       setRecentMineOnly(false);
       pushScreen({ name: 'recent', scrollTarget: found.trackId });
@@ -377,6 +386,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 소식탭 아티스트 배너 딥링크: 검색바에 그 이름을 채우고 검색 결과 화면을 연다. 이미 검색 결과 화면이면 쌓지 않고 검색어만 바꾼다
   useEffect(() => {
     if (!deepLinkSearchQuery) return;
+    // 부모가 한 번 내려준 딥링크 값을 적용하고 소비 완료를 알리는 패턴 — 콜백이 렌더 중엔 불가하고 딥링크 진입 시 한 번뿐이라 effect에 둠
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery(deepLinkSearchQuery);
     setScreenStack((prev) => (prev[prev.length - 1].name === 'search' ? prev : [...prev, { name: 'search' }]));
     onDeepLinkSearchQueryHandled?.();
@@ -471,7 +482,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         animation: 'fadeIn 0.25s ease-out',
         // 상태바/노치 높이만큼 루트 자체를 아래로 내림(학식·셔틀 탭과 같은 구조) — 스크롤 영역이 노치 아래에서 시작하므로
         // sticky 헤더는 top 보정 없이 영역 맨 위(-top-6)에 붙는다
-        top: isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)',
+        top: getPlaylistRootTop(),
         paddingTop: '1.5rem',
         paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
         '--playlist-bottom-space': `${bottomSpace}px`,
