@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createLibraryRoom } from './LibraryRoom.js';
+import { createLibraryRoom, isLibraryCrowded } from './LibraryRoom.js';
 
 describe('createLibraryRoom', () => {
   it('점유율 33% 이하면 쾌적으로 분류한다', () => {
@@ -45,5 +45,27 @@ describe('createLibraryRoom', () => {
     expect(room.total).toBe(218);
     expect(room.occupied).toBe(100);
     expect(room.available).toBe(110);
+  });
+});
+
+describe('isLibraryCrowded', () => {
+  const room = (id: string, occupied: number) =>
+    createLibraryRoom({ id, name: id, total: 100, occupied, available: 100 - occupied });
+
+  it('제1·제2·HOLMZ 중 한 곳이라도 매우 혼잡이면 true', () => {
+    expect(isLibraryCrowded([room('FIRST_READING_ROOM', 20), room('SECOND_READING_ROOM', 20), room('HOLMZ', 80)])).toBe(true);
+    expect(isLibraryCrowded([room('FIRST_READING_ROOM', 80), room('SECOND_READING_ROOM', 20), room('HOLMZ', 20)])).toBe(true);
+  });
+
+  it('혼잡(매우 혼잡 아님)까지는 false', () => {
+    expect(isLibraryCrowded([room('FIRST_READING_ROOM', 67), room('SECOND_READING_ROOM', 60), room('HOLMZ', 60)])).toBe(false);
+  });
+
+  it('집중열람실은 매우 혼잡이어도 판정에서 뺀다', () => {
+    expect(isLibraryCrowded([room('FIRST_READING_ROOM', 20), room('QUIET_ROOM', 100)])).toBe(false);
+  });
+
+  it('열람실이 없으면 false', () => {
+    expect(isLibraryCrowded([])).toBe(false);
   });
 });

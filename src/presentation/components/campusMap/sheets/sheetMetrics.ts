@@ -11,6 +11,8 @@ export const BUILDING_DETAIL_FRACTION = 0.4;
 export const BUILDING_LIST_FRACTION = 0.45;
 export const SMOKING_DETAIL_FRACTION = 0.32;
 export const SMOKING_LIST_FRACTION = 0.45;
+export const PARKING_DETAIL_FRACTION = 0.32;
+export const PARKING_LIST_FRACTION = 0.45;
 
 // ── 하단 플로팅 BottomNav를 피하기 위한 여백 (88px = BottomNav.tsx의 bottom-24px + h-16) ──
 // 시트는 nav가 위로 지나가도록 화면 끝까지 연장하고, 콘텐츠만 이 여백만큼 비워 가려지지 않게 한다.

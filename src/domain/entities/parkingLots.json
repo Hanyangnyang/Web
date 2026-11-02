@@ -1,0 +1,236 @@
+[
+  {
+    "id": "ansan-parking-01",
+    "name": "제1주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29937450655232,
+      "longitude": 126.83785523939314
+    },
+    "capacity": 143,
+    "address": "경기 안산시 상록구 학사4길 1",
+    "description": "정문·셔틀콕·컨퍼런스홀·쪽문·제2과학기술관에서 접근이 용이한 주차장입니다.",
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-02",
+    "name": "제2주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.297515224529924,
+      "longitude": 126.8381885645491
+    },
+    "capacity": 260,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": "1·5공학관·ERICA컨벤션센터·약학관·학연산클러스터에서 접근이 용이한 주차장입니다.",
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-03",
+    "name": "제3주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29603000573167,
+      "longitude": 126.83534960340357
+    },
+    "capacity": 335,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": "학술정보관·4공학관·창업보육센터·예체능대학에서 접근이 용이한 주차장입니다.",
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-04-a",
+    "name": "제4주차장 A구역",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29954960609046,
+      "longitude": 126.8341689292235
+    },
+    "capacity": 85,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": "제4주차장은 두 구역으로 나뉘어 있어요(A/B구역 합산 85대).",
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-04-b",
+    "name": "제4주차장 B구역",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2964904973921,
+      "longitude": 126.83250418431304
+    },
+    "capacity": 85,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": "제4주차장은 두 구역으로 나뉘어 있어요(A/B구역 합산 85대).",
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-05",
+    "name": "제5주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.30098455557174,
+      "longitude": 126.8345267093677
+    },
+    "capacity": 278,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-dorm",
+    "name": "기숙사 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29322786344943,
+      "longitude": 126.83670906140453
+    },
+    "capacity": 146,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-design",
+    "name": "디자인 교육관 앞 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.296695852240795,
+      "longitude": 126.83117851205505
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-main-side",
+    "name": "본관 옆 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29870715871089,
+      "longitude": 126.83258385968452
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-main-back",
+    "name": "본관 뒷편 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29981631701796,
+      "longitude": 126.83321020041433
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-convention-2f-back",
+    "name": "에리카 컨벤션센터 2층 뒷편 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2982749355683,
+      "longitude": 126.83928153291899
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-lions-hall",
+    "name": "라이언스홀 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29626831324845,
+      "longitude": 126.84127361653749
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-open-theater-front",
+    "name": "노천극장 앞 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.297188991051335,
+      "longitude": 126.83913722268866
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-industry-back",
+    "name": "산학협력관 뒷편 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2964045492785,
+      "longitude": 126.84040207389678
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-pharmacy-convergence",
+    "name": "약학대학 · 융합교육관 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.2959582816104,
+      "longitude": 126.83855337010921
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-east-gate",
+    "name": "동문 게이트 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29508280176671,
+      "longitude": 126.83912479030761
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-business-incubator-back",
+    "name": "창업보육센터 뒷편 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.295621474261694,
+      "longitude": 126.8376969404393
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  },
+  {
+    "id": "ansan-parking-changui-side",
+    "name": "창의관 옆 주차장",
+    "campus": "ANSAN",
+    "coordinates": {
+      "latitude": 37.29191953181185,
+      "longitude": 126.83701695165797
+    },
+    "capacity": null,
+    "address": "경기 안산시 상록구 한양대학로 55",
+    "description": null,
+    "imageUrl": []
+  }
+]
