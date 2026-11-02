@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { usePullToRefresh } from '../../hooks/playlist/usePullToRefresh';
 import { useBackHandler } from '../../hooks/useBackHandler';
-import { isNativeApp, getPlatform } from '../../../lib/platform.js';
+import { getPlaylistRootTop } from './playlistLayout.js';
 import { FloatingSpotifyPlayer } from './shared/FloatingSpotifyPlayer';
 import { AddSongFab, FAB_HEIGHT_PX, FAB_CLOSED_BOTTOM_PX, PLAYER_GAP_PX } from './shared/AddSongFab';
 import { SearchSongFab, SEARCH_FAB_STACK_PX } from './shared/SearchSongFab';
@@ -81,8 +81,6 @@ interface PlaylistViewProps {
 const RECENT_SCROLL_PAGE_LIMIT = 2;
 
 export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled }: PlaylistViewProps) {
-  const isApp = isNativeApp();
-  const platform = getPlatform();
   const posthog = usePostHog();
   const queryClient = useQueryClient();
 
@@ -471,7 +469,7 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
         animation: 'fadeIn 0.25s ease-out',
         // 상태바/노치 높이만큼 루트 자체를 아래로 내림(학식·셔틀 탭과 같은 구조) — 스크롤 영역이 노치 아래에서 시작하므로
         // sticky 헤더는 top 보정 없이 영역 맨 위(-top-6)에 붙는다
-        top: isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)',
+        top: getPlaylistRootTop(),
         paddingTop: '1.5rem',
         paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
         '--playlist-bottom-space': `${bottomSpace}px`,
