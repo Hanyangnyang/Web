@@ -2,94 +2,60 @@
 import { useState, useEffect, useRef, lazy, Suspense, type ComponentType } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { GymView } from './GymView.jsx';
-import { ClubView } from './ClubView.jsx';
 import { MiscMenuGrid, type MiscBoxKey } from './MiscMenuGrid.jsx';
-import { MiscSubViewHeader } from './MiscSubViewHeader.jsx';
-import { PlaylistView } from '../playlist/PlaylistView';
+import { PlaylistViewSkeleton } from '../playlist/PlaylistViewSkeleton.jsx';
+import { ClubViewSkeleton } from './ClubViewSkeleton.jsx';
+import { InstagramViewSkeleton } from './InstagramViewSkeleton.jsx';
+import { FeedbackViewSkeleton } from './FeedbackViewSkeleton.jsx';
+import { prefetchGymSchedule } from '../../hooks/useGymSchedule.js';
+import { preconnectSpotifyImages } from '../../../lib/preconnect.js';
 
-type SubViewComponent = ComponentType<{ onBack: () => void }>;
+// lazy 컴포넌트와 프리페치용 load를 한 쌍으로 만든다. 둘이 같은 Promise를 공유하도록 load 결과를 캐싱
+// factory는 호출부에서 import('리터럴 경로')로 직접 써야 Vite가 빌드 때 청크를 나눌 수 있다 (경로를 변수로 넘기면 안 됨)
+function lazyWithPreload<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
+  let promise: Promise<{ default: T }> | null = null;
+  let loaded: { default: T } | null = null;
+  // 실패한 Promise를 캐시에 남기면 일시적 네트워크 실패 한 번으로 새로고침 전까지 재시도가 안 되고,
+  // 서브뷰 진입 시 그 rejection이 최상단 ErrorBoundary까지 올라가 앱 전체가 크래시 화면이 된다 → 실패하면 비워서 다음에 다시 받게 함
+  const load = () => (promise ??= factory().then(
+    m => (loaded = m),
+    e => { promise = null; throw e; },
+  ));
+  // Promise는 이미 fulfilled여도 then 콜백이 마이크로태스크로 밀려서, lazy가 첫 렌더에 한 번은 suspend해 fallback이 스치듯 보인다.
+  // 프리페치가 이미 끝났으면 then을 즉시 호출하는 thenable을 넘겨 lazy가 동기적으로 풀리게 한다 → fallback 없이 바로 렌더
+  const Lazy = lazy(() => {
+    if (!loaded) return load();
+    const m = loaded;
+    return { then: (resolve: (value: { default: T }) => void) => resolve(m) } as unknown as Promise<{ default: T }>;
+  });
+  return { load, Lazy };
+}
 
-let instagramViewPromise: Promise<{ default: SubViewComponent }> | null = null;
-const loadInstagramView = () => {
-  if (!instagramViewPromise) {
-    instagramViewPromise = import('./InstagramView.jsx').then(m => ({ default: m.InstagramView }));
-  }
-  return instagramViewPromise;
-};
+// 플레이리스트 Lazy load
+const { load: loadPlaylistView, Lazy: LazyPlaylistView } = lazyWithPreload(
+  () => import('../playlist/PlaylistView').then(m => ({ default: m.PlaylistView })),
+);
 
-let feedbackViewPromise: Promise<{ default: SubViewComponent }> | null = null;
-const loadFeedbackView = () => {
-  if (!feedbackViewPromise) {
-    feedbackViewPromise = import('./FeedbackView.jsx').then(m => ({ default: m.FeedbackView }));
-  }
-  return feedbackViewPromise;
-};
+// 중앙동아리 Lazy load — 동아리 데이터(Club.ts)는 소식탭 동아리 추천 카드도 쓰므로 엔트리에 남는다
+const { load: loadClubView, Lazy: LazyClubView } = lazyWithPreload(
+  () => import('./ClubView.jsx').then(m => ({ default: m.ClubView })),
+);
 
-const LazyInstagramView = lazy(loadInstagramView);
-const LazyFeedbackView = lazy(loadFeedbackView);
+// 인스타그램 Lazy load
+const { load: loadInstagramView, Lazy: LazyInstagramView } = lazyWithPreload(
+  () => import('./InstagramView.jsx').then(m => ({ default: m.InstagramView })),
+);
+
+// 피드백 Lazy load
+const { load: loadFeedbackView, Lazy: LazyFeedbackView } = lazyWithPreload(
+  () => import('./FeedbackView.jsx').then(m => ({ default: m.FeedbackView })),
+);
 
 type SubView = 'list' | MiscBoxKey;
 
 // deepLinkBox가 어디서 왔는지 — 서브뷰 진입 경로 계측(playlist_opened의 source)에 씀.
 // deeplink: 카카오 공유 등 링크(콜드 스타트 URL 포함), push: 네이티브 푸시 탭, banner: 소식탭 배너, portal_artist: 소식탭 아티스트 추천
 export type MiscBoxOpenSource = 'deeplink' | 'push' | 'banner' | 'portal_artist';
-
-function AccordionGroupShimmer() {
-  return (
-    <div className="bg-white border border-slate-200 rounded-card overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.02)] mb-3">
-      <div className="flex justify-between items-center px-4 py-2.5">
-        <div className="h-4 w-16 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-      </div>
-      <div className="border-t border-slate-100">
-        {[0, 1].map((i) => (
-          <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? 'border-t border-dashed border-slate-200' : ''}`}>
-            <div className="w-[54px] h-[54px] rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse flex-shrink-0" />
-            <div className="flex-1 flex flex-col gap-2">
-              <div className="h-3 rounded bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse w-2/5" />
-              <div className="h-3 rounded bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse w-[70%]" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function InstagramViewFallback({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="pb-20">
-      <MiscSubViewHeader title="학교 인스타그램" onBack={onBack} />
-      <AccordionGroupShimmer />
-      <AccordionGroupShimmer />
-    </div>
-  );
-}
-
-function FeedbackViewFallback({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="pb-20">
-      <MiscSubViewHeader title="피드백 보내기" onBack={onBack} />
-      <div className="bg-white border border-slate-200 rounded-card p-5 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.03)]">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-[18px] h-[18px] rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-          <div className="h-4 w-40 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-        </div>
-
-        <div className="flex flex-col gap-1.5 mb-3">
-          <div className="h-2.5 w-full rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-          <div className="h-2.5 w-4/5 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-        </div>
-
-        <div className="w-full min-h-[140px] rounded-xl bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse mb-3" />
-
-        <div className="flex justify-between items-center">
-          <div className="h-2.5 w-16 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-          <div className="h-8 w-20 rounded-full bg-gradient-to-br from-slate-100 to-slate-200/70 animate-pulse" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 interface MiscViewProps {
   resetSignal: number;
@@ -109,12 +75,24 @@ interface MiscViewProps {
 export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkBoxSource = 'deeplink', onDeepLinkBoxHandled, deepLinkTrackId, onDeepLinkTrackIdHandled, deepLinkPostId, deepLinkSearchQuery, onDeepLinkSearchQueryHandled, deepLinkClubId, onDeepLinkClubIdHandled }: MiscViewProps) {
   const posthog = usePostHog();
   const [subView, setSubView] = useState<SubView>('list');
-  const [InstagramViewComp, setInstagramViewComp] = useState<SubViewComponent | null>(null);
-  const [FeedbackViewComp, setFeedbackViewComp] = useState<SubViewComponent | null>(null);
-
-  useEffect(() => {
+  const [prevResetSignal, setPrevResetSignal] = useState(resetSignal);
+  if (resetSignal !== prevResetSignal) {
+    setPrevResetSignal(resetSignal);
     setSubView('list');
-  }, [resetSignal]);
+  }
+
+  // 기타탭 진입(isActive) 시 하위 View 청크와 헬스장 시간표를 미리 받아둔다
+  // 플레이리스트에 들어가면 앨범커버가 바로 필요하므로 이미지 서버 연결도 같이 열어둔다
+  useEffect(() => {
+    if (!isActive) return;
+    preconnectSpotifyImages();
+    prefetchGymSchedule();
+    // 프리페치 실패는 무시 — 실제 진입 시 lazy가 다시 받고, 그때도 실패하면 vite:preloadError 새로고침이 처리
+    loadPlaylistView().catch(() => {});
+    loadClubView().catch(() => {});
+    loadInstagramView().catch(() => {});
+    loadFeedbackView().catch(() => {});
+  }, [isActive]);
 
   // 다음 서브뷰 전환이 어떤 경로로 일어났는지 — 전환을 일으키는 쪽(박스 클릭/딥링크)이 setSubView 직전에 채워둠
   const openPropsRef = useRef<{ source: MiscBoxOpenSource | 'misc_box'; shared_track: boolean }>({ source: 'misc_box', shared_track: false });
@@ -124,6 +102,8 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
     if (!deepLinkBox) return;
     // shared_track: 카카오 공유처럼 특정 곡을 가리키는 링크로 들어왔는지(trackId는 box와 같은 렌더에 함께 세팅됨)
     openPropsRef.current = { source: deepLinkBoxSource, shared_track: !!deepLinkTrackId };
+    // 부모가 한 번 내려준 딥링크 값을 적용하고 소비 완료를 알리는 패턴 — 콜백·ref 설정이 렌더 중엔 불가하고 딥링크 진입 시 한 번뿐이라 effect에 둠
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSubView(deepLinkBox as SubView);
     onDeepLinkBoxHandled?.();
   }, [deepLinkBox]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -139,12 +119,6 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
     });
   }, [subView]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!isActive) return;
-    loadInstagramView().then(m => setInstagramViewComp(() => m.default));
-    loadFeedbackView().then(m => setFeedbackViewComp(() => m.default));
-  }, [isActive]);
-
   const handleBoxClick = (box: MiscBoxKey) => {
     posthog?.capture('misc_box_clicked', { box });
     if (box === 'calendar') {
@@ -157,45 +131,44 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
 
   if (subView === 'gym') return <GymView onBack={() => setSubView('list')} />;
   if (subView === 'playlist') {
+    const props = {
+      onBack: () => setSubView('list'),
+      isActive,
+      deepLinkTrackId,
+      onDeepLinkTrackIdHandled,
+      deepLinkPostId,
+      deepLinkSearchQuery,
+      onDeepLinkSearchQueryHandled,
+    };
     return (
-      <PlaylistView
-        onBack={() => setSubView('list')}
-        isActive={isActive}
-        deepLinkTrackId={deepLinkTrackId}
-        onDeepLinkTrackIdHandled={onDeepLinkTrackIdHandled}
-        deepLinkPostId={deepLinkPostId}
-        deepLinkSearchQuery={deepLinkSearchQuery}
-        onDeepLinkSearchQueryHandled={onDeepLinkSearchQueryHandled}
-      />
+      <Suspense fallback={<PlaylistViewSkeleton onBack={props.onBack} />}>
+        <LazyPlaylistView {...props} />
+      </Suspense>
     );
   }
   if (subView === 'insta') {
     const onBack = () => setSubView('list');
-    if (InstagramViewComp) {
-      const Comp = InstagramViewComp;
-      return <Comp onBack={onBack} />;
-    }
     return (
-      <Suspense fallback={<InstagramViewFallback onBack={onBack} />}>
+      <Suspense fallback={<InstagramViewSkeleton onBack={onBack} />}>
         <LazyInstagramView onBack={onBack} />
       </Suspense>
     );
   }
   if (subView === 'feedback') {
     const onBack = () => setSubView('list');
-    if (FeedbackViewComp) {
-      const Comp = FeedbackViewComp;
-      return <Comp onBack={onBack} />;
-    }
     return (
-      <Suspense fallback={<FeedbackViewFallback onBack={onBack} />}>
+      <Suspense fallback={<FeedbackViewSkeleton onBack={onBack} />}>
         <LazyFeedbackView onBack={onBack} />
       </Suspense>
     );
   }
   if (subView === 'clubs') {
-    const onBack = () => setSubView('list');
-    return <ClubView onBack={onBack} scrollToClubId={deepLinkClubId} onScrollToClubIdHandled={onDeepLinkClubIdHandled} />;
+    const props = { onBack: () => setSubView('list'), scrollToClubId: deepLinkClubId, onScrollToClubIdHandled: onDeepLinkClubIdHandled };
+    return (
+      <Suspense fallback={<ClubViewSkeleton onBack={props.onBack} />}>
+        <LazyClubView {...props} />
+      </Suspense>
+    );
   }
 
   return <MiscMenuGrid onBoxClick={handleBoxClick} />;

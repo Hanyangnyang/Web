@@ -4,7 +4,8 @@ import { Search, X } from 'lucide-react';
 import { CLUB_CATEGORIES, CLUBS, type ClubCategory, type ClubInfo } from '../../../domain/entities/Club.js';
 import { useBackHandler } from '../../hooks/useBackHandler.js';
 import { useClubSpotlight } from '../../hooks/useClubSpotlight.js';
-import { isNativeApp, getPlatform } from '../../../lib/platform.js';
+import { isNativeApp } from '../../../lib/platform.js';
+import { getClubScrollTopPadding } from './clubLayout.js';
 import { MiscSubViewHeader } from './MiscSubViewHeader.js';
 import { ClubSpotlightCard } from './ClubSpotlightCard.js';
 import { ClubFeedbackModal } from './ClubFeedbackModal.js';
@@ -88,7 +89,6 @@ interface ClubViewProps {
 export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: ClubViewProps) {
   useBackHandler(onBack);
   const isApp = isNativeApp();
-  const platform = getPlatform();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('전체');
   const [query, setQuery] = useState('');
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -142,7 +142,7 @@ export function ClubView({ onBack, scrollToClubId, onScrollToClubIdHandled }: Cl
   // 파고들어(top/margin-top을 이 값의 음수로) 세이프에리어(노치)까지 완전히 덮을 수 있다.
   // 이 값이 컨테이너 padding-top과 어긋나면 스크롤 시 노치 부분에 헤더 배경이 못 미쳐
   // 뒤 콘텐츠가 잠깐 비쳐 보인다 (중앙동아리 화면에서만 나던 현상의 원인).
-  const scrollTopPadding = `calc(1.5rem + ${isApp && platform === 'android' ? 'env(safe-area-inset-top, 28px)' : 'env(safe-area-inset-top)'})`;
+  const scrollTopPadding = getClubScrollTopPadding();
 
   return (
     <div className="fixed inset-0 z-[1001] bg-surface">

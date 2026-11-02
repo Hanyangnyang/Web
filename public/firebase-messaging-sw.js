@@ -21,7 +21,7 @@ messaging.onBackgroundMessage(function(payload) {
   const notificationTitle = payload.data?.title || '하냥냥 학식 알림';
   const notificationOptions = {
     body: payload.data?.body || '등록하신 키워드의 메뉴가 나왔어요!',
-    icon: '/icon-192x192.png',
+    icon: '/pwa-192x192.png',
     data: {
       url: payload.data?.link // 클릭 시 이동할 URL 저장
     }
@@ -41,9 +41,10 @@ self.addEventListener('notificationclick', function(event) {
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
         // 이미 앱이 열려있는 탭이 있다면 그 탭을 포커스하고 URL 이동
+        // scope(/firebase-cloud-messaging-push-scope)가 아니라 origin으로 비교 — 앱 탭 URL엔 scope 경로가 없어 항상 새 창이 열렸음
         for (let i = 0; i < windowClients.length; i++) {
           const client = windowClients[i];
-          if (client.url.includes(self.registration.scope) && 'focus' in client) {
+          if (client.url.startsWith(self.location.origin) && 'focus' in client) {
             return client.focus().then(() => client.navigate(urlToOpen));
           }
         }

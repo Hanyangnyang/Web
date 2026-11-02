@@ -13,12 +13,14 @@ export function useCampusMapLayers(chip: MapChip | null) {
   const isAllChip = chip === 'all';
   const isOpenSpaceChip = chip === 'openspace';
   const isSmokingChip = chip === 'smoking';
+  const isParkingChip = chip === 'parking';
   // 교내시설·오픈스페이스 둘 다 건물 데이터를 쓴다 (오픈스페이스는 그중 일부만 추린 것)
   const isBuildingLayerChip = chip === 'building' || isOpenSpaceChip;
 
   // 지도에 실제로 그릴 레이어 — 칩 '선택' 상태와는 별개다 ('전체'면 전부 그린다)
   const showsBuildingLayer = isAllChip || isBuildingLayerChip;
   const showsSmokingLayer = isAllChip || isSmokingChip;
+  const showsParkingLayer = isAllChip || isParkingChip;
 
   // 매장 카테고리 칩일 때만 매장 필터가 잡힌다 ('전체'는 'all'이 그대로 넘어와 전 카테고리)
   const storeCategory: CategoryFilter | null = toStoreCategory(chip);
@@ -30,9 +32,11 @@ export function useCampusMapLayers(chip: MapChip | null) {
     isAllChip,
     isOpenSpaceChip,
     isSmokingChip,
+    isParkingChip,
     isBuildingLayerChip,
     showsBuildingLayer,
     showsSmokingLayer,
+    showsParkingLayer,
     storeCategory,
     sheetVisible,
   };

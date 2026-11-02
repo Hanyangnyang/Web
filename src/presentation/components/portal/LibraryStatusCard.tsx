@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { BookOpen, Info } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { BookOpen, ChevronRight, Info } from 'lucide-react';
 import type { LibraryStatus } from '../../../domain/repositories/ILibraryRepository.js';
 import type { LibraryRoomStatus } from '../../../domain/entities/LibraryRoom.js';
 
@@ -15,6 +15,8 @@ interface LibraryStatusCardProps {
   loading: boolean;
   error?: Error | null;
   onRetry?: () => void;
+  showOpenSpaceHint?: boolean;
+  onFindOpenSpace?: () => void;
 }
 
 // 카드 자체가 이미 테두리·배경을 갖고 있어서, 실패/빈 상태도 CardFallback으로 한 번 더
@@ -36,7 +38,91 @@ function InlineNotice({ icon, message, onRetry }: { icon: ReactNode; message: st
   );
 }
 
-export function LibraryStatusCard({ library, loading, error, onRetry }: LibraryStatusCardProps) {
+
+const OPEN_SPACE_HINT = "학정 말고 📚오픈스페이스는 어때요?";
+// 한 글자씩 타이핑하기 위한 글자 배열. Array.from은 코드포인트 단위로 잘라서 이모지가 반쪽(서로게이트)으로 쪼개지지 않는다
+const HINT_CHARS = Array.from(OPEN_SPACE_HINT);
+// 강조할 구간 — 이모지는 문자열 길이로 2칸이라 indexOf 결과를 그대로 쓰면 어긋난다. 글자 배열 기준 인덱스로 바꿔 둔다
+const HINT_BOLD = '오픈스페이스';
+const HINT_BOLD_START = Array.from(OPEN_SPACE_HINT.slice(0, OPEN_SPACE_HINT.indexOf(HINT_BOLD))).length;
+const HINT_BOLD_END = HINT_BOLD_START + Array.from(HINT_BOLD).length;
+const HINT_OPEN_DELAY_MS = 600;   // 카드가 그려지고 잠깐 뒤에 펼친다 (처음부터 열려 있으면 "생겨나는" 느낌이 없다)
+const HINT_EXPAND_MS = 500;       // 펼침 애니메이션 길이 — 다 벌어진 뒤에 타이핑을 시작한다 (아래 duration-500과 같이 움직여야 한다)
+const HINT_TYPE_INTERVAL_MS = 80; // 글자 간격 (21자 ≈ 1.7초)
+
+// 좌석 그리드 아래가 벌어지며 안내 문구가 한 글자씩 타이핑된다. 다 쳐지면 '찾아보기'가 나타난다.
+// 높이는 grid-rows 0fr → 1fr 전환으로 애니메이션한다 — 내용 높이를 몰라도 height: auto까지 부드럽게 열린다.
+function OpenSpaceHint({ show, onClick }: { show: boolean; onClick?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [typed, setTyped] = useState(0);
+
+  useEffect(() => {
+    if (!show) {
+      setOpen(false);
+      setTyped(0);
+      return;
+    }
+    // 움직임 줄이기 설정이면 애니메이션 없이 문구 전체를 바로 보여준다
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setOpen(true);
+      setTyped(HINT_CHARS.length);
+      return; 
+    }
+    const t = setTimeout(() => setOpen(true), HINT_OPEN_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [show]);
+
+  useEffect(() => {
+    if (!open || typed >= HINT_CHARS.length) return;
+    const t = setTimeout(() => setTyped((n) => n + 1), typed === 0 ? HINT_EXPAND_MS : HINT_TYPE_INTERVAL_MS);
+    return () => clearTimeout(t);
+  }, [open, typed]);
+
+  const done = typed >= HINT_CHARS.length;
+
+  return (
+    <div className={`grid transition-[grid-template-rows] duration-500 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+      <div className="overflow-hidden">
+        <div className="pt-2.5">
+          <button
+            onClick={onClick}
+            disabled={!open}
+            aria-label={OPEN_SPACE_HINT}
+            // 배경·테두리 없이 내용만 — 좌우 여백도 빼서 헤더·좌석 그리드와 왼쪽 끝을 맞춘다.
+            // 위 구분선은 헤더·그리드 구분선과 같은 색으로 그어 좌석 그리드와 나눈다 (아래는 카드 안쪽 여백이 있어 조금만 준다)
+            className="w-full flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100 text-left active:opacity-60 transition-opacity [-webkit-tap-highlight-color:transparent]"
+          >
+            <span className="flex items-center min-w-0" aria-hidden>
+              {/* 좌석 정보가 주인공이라 문구는 한 단계 연하게 (헤더의 '실시간 좌석'과 좌석 이름 사이 톤) */}
+              <span className="text-[12.5px] font-semibold text-slate-500 leading-snug">
+                {/* 타이핑 중에도 강조 구간에 들어선 글자부터 굵게 나오도록, 지금까지 친 글자를 구간별로 나눠 그린다 */}
+                {HINT_CHARS.slice(0, Math.min(typed, HINT_BOLD_START)).join('')}
+                <strong className="font-extrabold text-slate-600">
+                  {HINT_CHARS.slice(HINT_BOLD_START, Math.min(typed, HINT_BOLD_END)).join('')}
+                </strong>
+                {HINT_CHARS.slice(HINT_BOLD_END, typed).join('')}
+                {/* 타이핑 중 커서 */}
+                {open && !done && <span className="inline-block w-px h-[1em] align-[-2px] ml-px bg-slate-400 animate-pulse" />}
+              </span>
+            </span>
+            <span
+              aria-hidden
+              className={`flex-shrink-0 flex items-center text-[11px] font-bold text-primary/70 transition-opacity duration-300 ${done ? 'opacity-100' : 'opacity-0'}`}
+            >
+              찾아보기
+              <ChevronRight size={13} strokeWidth={2.6} />
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function LibraryStatusCard({ library, loading, error, onRetry, showOpenSpaceHint = false, onFindOpenSpace }: LibraryStatusCardProps) {
+  // 좌석이 실제로 그려지는 정상 상태에서만 (로딩·실패·휴관 중엔 "혼잡"이 성립하지 않는다)
+  const hintVisible = showOpenSpaceHint && !!onFindOpenSpace && !loading && !!library?.list.length;
+
   return (
     <section className="mb-5 mt-3">
       <div className="bg-white/90 backdrop-blur-xl border border-slate-200/90 rounded-2xl p-4 shadow-[0_8px_30px_-4px_rgba(15,23,42,0.06),0_2px_8px_-2px_rgba(15,23,42,0.04),0_0_0_1px_rgba(15,23,42,0.03)] select-none">
@@ -133,6 +219,8 @@ export function LibraryStatusCard({ library, loading, error, onRetry }: LibraryS
             })}
           </div>
         )}
+
+        <OpenSpaceHint show={hintVisible} onClick={onFindOpenSpace} />
       </div>
     </section>
   );

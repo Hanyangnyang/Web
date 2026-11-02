@@ -1,0 +1,3 @@
+# scripts/generateFirebaseMessagingSw.js가 dev/build 때마다 LF로 다시 쓰는 자동 생성 파일.
+# Windows의 core.autocrlf=true와 부딪혀 내용 변화 없이도 계속 "수정됨"으로 뜨던 문제 방지.
+public/firebase-messaging-sw.js text eol=lf

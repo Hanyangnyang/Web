@@ -1,4 +1,4 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
 import { usePostHog } from 'posthog-js/react';
 
 import { Bell, ChevronRight } from 'lucide-react';
@@ -7,6 +7,7 @@ import { useLibraryStatus } from '../../hooks/useLibraryStatus.js';
 import { useBanners } from '../../hooks/useBanners.js';
 import { useClubSpotlight, isClubBannerSeason } from '../../hooks/useClubSpotlight.js';
 import { useArtistRecommendations } from '../../hooks/playlist/useArtistRecommendations.js';
+import { isLibraryCrowded } from '../../../domain/entities/LibraryRoom.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
@@ -15,6 +16,7 @@ import { ArtistPromoCarousel } from '../playlist/shared/ArtistPromoCarousel.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
 import { CardFallback } from '../common/CardFallback.jsx';
 import { ModalErrorFallback } from '../common/ModalErrorFallback.jsx';
+import { preconnectSpotifyImages } from '../../../lib/preconnect.js';
 
 const WeatherAlarmSettings = lazy(() => import('./WeatherAlarmSettings.jsx').then(m => ({ default: m.WeatherAlarmSettings })));
 
@@ -36,6 +38,10 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
   const { data: recommendations, isLoading: recommendationsLoading } = useArtistRecommendations(isActive);
+  // 아티스트 이미지 URL은 추천 API 응답이 와야 알 수 있으므로, 응답을 기다리는 동안 이미지 서버 연결을 병렬로 열어둔다
+  useEffect(() => {
+    if (isActive) preconnectSpotifyImages();
+  }, [isActive]);
   // 데이터가 같은 동안 배열 참조를 유지해야 캐러셀이 매 렌더마다 첫 장으로 되돌아가지 않음
   const artistPromos = useMemo(
     () => (recommendations ?? []).map((r) => ({ artistName: r.artist.name, artistImageUrl: r.artist.imageUrl })),
@@ -43,6 +49,15 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
   );
   const spotlightClub = useClubSpotlight();
   const showClubBanner = isClubBannerSeason();
+  // 주요 열람실이 매우 혼잡하면 오픈스페이스로 안내한다 (기준은 isLibraryCrowded). 클릭률을 보려면 노출 수도 있어야 해서,
+  // 소식탭이 보이는 동안 혼잡 상태가 된 순간에 한 번만 노출 이벤트를 남긴다 (폴링으로 매번 다시 찍히지 않게)
+  const libraryCrowded = !libraryLoading && !!library && isLibraryCrowded(library.list);
+  const hintShownLogged = useRef(false);
+  useEffect(() => {
+    if (!isActive || !libraryCrowded || hintShownLogged.current) return;
+    hintShownLogged.current = true;
+    posthog?.capture('library_openspace_hint_shown');
+  }, [isActive, libraryCrowded, posthog]);
   const [showWeatherAlarm, setShowWeatherAlarm] = useState(false);
   const [alarmPopup, setAlarmPopup] = useState('');
 
@@ -120,7 +135,17 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
 
         {/* 3. 열람실 혼잡도 섹션 */}
         <ErrorBoundary name="portal-library" fallback={<CardFallback message="혼잡도 정보를 표시할 수 없습니다" />}>
-          <LibraryStatusCard library={library} loading={libraryLoading} error={libraryError} onRetry={refetchLibrary} />
+          <LibraryStatusCard
+            library={library}
+            loading={libraryLoading}
+            error={libraryError}
+            onRetry={refetchLibrary}
+            showOpenSpaceHint={libraryCrowded}
+            onFindOpenSpace={() => {
+              posthog?.capture('library_openspace_hint_clicked');
+              onNavigateToTab?.('partner', 'openspace');
+            }}
+          />
         </ErrorBoundary>
       </div>
     </>

@@ -44,6 +44,19 @@ export const 정상데이터 = {
   args: { library: makeLibrary(혼합상태_열람실), loading: false },
 };
 
+// ── 혼잡 — 좌석 그리드 아래에 "오픈스페이스는 어때요?" 안내가 펼쳐진다 (판정 기준은 isLibraryCrowded: 여기선 제1열람실·HOLMZ가 매우 혼잡) ──
+const 전부혼잡_열람실: LibraryRoomInput[] = [
+  { id: 'FIRST_READING_ROOM', name: '제1열람실', total: 100, occupied: 88, available: 12 },
+  { id: 'SECOND_READING_ROOM', name: '제2열람실 (4F)', total: 218, occupied: 150, available: 68 },
+  { id: 'HOLMZ', name: '홀름즈 열람실 (2F)', total: 60, occupied: 55, available: 5 },
+  { id: 'QUIET_ROOM', name: '정숙 열람실 (2F)', total: 20, occupied: 12, available: 8 },
+];
+
+export const 전부혼잡_오픈스페이스안내 = {
+  decorators: [mobileFrame],
+  args: { library: makeLibrary(전부혼잡_열람실), loading: false, showOpenSpaceHint: true, onFindOpenSpace: () => {} },
+};
+
 // ── 빈 상태 분기 (library?.list && length > 0 이 false인 두 가지 경로) ─────
 export const 정보없음_빈목록 = {
   decorators: [mobileFrame],
