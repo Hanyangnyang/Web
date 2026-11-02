@@ -88,7 +88,8 @@ export function PlaylistView({ onBack, isActive = true, deepLinkTrackId, onDeepL
   // 첫 재생 때 IFrame API 스크립트(open.spotify.com)를 받느라 기다리지 않도록 플레이리스트 진입 시 미리 받아둔다.
   // 연결만 여는 preconnect와 달리 스크립트를 실제로 받으므로 안 써서 닫히는 낭비가 없고, 모듈 싱글턴이라 재생 때 다시 불러도 중복 요청이 없다
   useEffect(() => {
-    loadSpotifyIframeApi();
+    // 미리 받기 실패는 무시 — 재생 시 FloatingSpotifyPlayer가 다시 받는다
+    loadSpotifyIframeApi().catch(() => {});
   }, []);
 
   // "최근 추가된 곡" 재생 인터랙션 A/B 테스트 배정 — docs/playlist-recent-songs-ab-test.md 참고

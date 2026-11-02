@@ -32,7 +32,7 @@ let apiPromise: Promise<SpotifyIframeApi> | null = null;
 export function loadSpotifyIframeApi(): Promise<SpotifyIframeApi> {
   if (apiPromise) return apiPromise;
 
-  apiPromise = new Promise((resolve) => {
+  apiPromise = new Promise((resolve, reject) => {
     const previousCallback = window.onSpotifyIframeApiReady;
     window.onSpotifyIframeApiReady = (IFrameAPI) => {
       previousCallback?.(IFrameAPI);
@@ -43,6 +43,13 @@ export function loadSpotifyIframeApi(): Promise<SpotifyIframeApi> {
       const script = document.createElement('script');
       script.src = SCRIPT_SRC;
       script.async = true;
+      // 스크립트를 못 받으면 onSpotifyIframeApiReady가 영영 안 불려 Promise가 pending으로 남고, 싱글턴이라
+      // 새로고침 전까지 재생이 안 됐다 → 실패 시 reject하고 캐시·태그를 비워 다음 호출(다음 재생)에서 다시 받게 함
+      script.onerror = () => {
+        apiPromise = null;
+        script.remove();
+        reject(new Error('Spotify IFrame API 스크립트 로드 실패'));
+      };
       document.body.appendChild(script);
     }
   });
