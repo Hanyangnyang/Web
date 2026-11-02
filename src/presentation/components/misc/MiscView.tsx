@@ -15,7 +15,12 @@ import { preconnectSpotifyImages } from '../../../lib/preconnect.js';
 function lazyWithPreload<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   let promise: Promise<{ default: T }> | null = null;
   let loaded: { default: T } | null = null;
-  const load = () => (promise ??= factory().then(m => (loaded = m)));
+  // 실패한 Promise를 캐시에 남기면 일시적 네트워크 실패 한 번으로 새로고침 전까지 재시도가 안 되고,
+  // 서브뷰 진입 시 그 rejection이 최상단 ErrorBoundary까지 올라가 앱 전체가 크래시 화면이 된다 → 실패하면 비워서 다음에 다시 받게 함
+  const load = () => (promise ??= factory().then(
+    m => (loaded = m),
+    e => { promise = null; throw e; },
+  ));
   // Promise는 이미 fulfilled여도 then 콜백이 마이크로태스크로 밀려서, lazy가 첫 렌더에 한 번은 suspend해 fallback이 스치듯 보인다.
   // 프리페치가 이미 끝났으면 then을 즉시 호출하는 thenable을 넘겨 lazy가 동기적으로 풀리게 한다 → fallback 없이 바로 렌더
   const Lazy = lazy(() => {
@@ -82,10 +87,11 @@ export function MiscView({ resetSignal, isActive = false, deepLinkBox, deepLinkB
     if (!isActive) return;
     preconnectSpotifyImages();
     prefetchGymSchedule();
-    loadPlaylistView();
-    loadClubView();
-    loadInstagramView();
-    loadFeedbackView();
+    // 프리페치 실패는 무시 — 실제 진입 시 lazy가 다시 받고, 그때도 실패하면 vite:preloadError 새로고침이 처리
+    loadPlaylistView().catch(() => {});
+    loadClubView().catch(() => {});
+    loadInstagramView().catch(() => {});
+    loadFeedbackView().catch(() => {});
   }, [isActive]);
 
   // 다음 서브뷰 전환이 어떤 경로로 일어났는지 — 전환을 일으키는 쪽(박스 클릭/딥링크)이 setSubView 직전에 채워둠
