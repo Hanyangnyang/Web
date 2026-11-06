@@ -164,13 +164,19 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
           <PrinterDetailBody printer={selected} />
 
           {/* 이 프린터 정보 수정 제보 — 플로팅 배너와 같은 안쪽 내용이지만, 시트 안이라 테두리·그림자 없이 둔다.
-              테두리가 없으니 좌우 여백을 정보 줄(InfoRow px-0.5)과 같게 해 아이콘 세로선을 맞춘다.
+              문구는 '수정 제보' 버튼 바로 옆에 붙도록 오른쪽 정렬(justify-end) — 질문과 버튼을 한 덩어리로 읽히게.
               위쪽 옅은 선(헤더 구분선과 같은 색)으로 '정보'와 '제보 입구'를 나눈다 */}
           <button
             onClick={onReportEdit}
-            className="!mt-3 w-full h-12 px-0.5 border-t border-[#f1f5f9] flex items-center justify-between gap-2.5 [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
+            className="!mt-3 w-full h-12 px-0.5 border-t border-[#f1f5f9] flex items-center justify-end gap-2.5 [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
           >
-            <PrinterReportContent label="정보가 달라졌나요?" cta="수정 제보" />
+            {/* 질문 앞 이모지는 빼고, 대신 '수정 제보' 글자 앞에 같은 색·크기의 제보(확성기) 아이콘을 둔다 — 앱의 다른 제보 입구와 같은 아이콘
+                (플로팅 배너는 PrinterReportContent 그대로 — 이 버튼만 따로 그린다) */}
+            <span className="min-w-0 text-[13px] font-semibold text-text-main leading-snug truncate">틀린 정보가 있나요?</span>
+            <span className="flex-shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded-full bg-primary/[0.06] text-primary">
+              <Megaphone size={12} strokeWidth={2.4} className="flex-shrink-0" />
+              수정 제보
+            </span>
           </button>
         </div>
       </StandardBottomSheet>

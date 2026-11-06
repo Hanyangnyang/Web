@@ -555,7 +555,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           <span className="text-xl flex-shrink-0">🖨️</span>
           <span className="flex-1 min-w-0">
             <span className="flex items-center gap-1.5">
-              <span className="text-[13px] font-extrabold text-text-main leading-snug">프린터 칩이 생겼어요!</span>
+              <span className="text-[13px] font-extrabold text-text-main leading-snug">프린터 위치가 추가됐어요</span>
               <span className="flex-shrink-0 rounded-full bg-red-500 px-1.5 py-[3px] text-[9px] font-extrabold leading-none text-white">NEW</span>
             </span>
             <span className="block text-[11.5px] font-semibold text-text-hint leading-snug mt-0.5">프린터 정보를 제보해주세요!</span>

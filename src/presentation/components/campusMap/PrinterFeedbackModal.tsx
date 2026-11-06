@@ -74,8 +74,9 @@ function buildContent(target: PrinterFeedbackTarget, f: FormState, initial: Form
   return `[프린터-정보수정] ${target.printer.name}(${target.printer.id}) | ${parts.join(' / ')}`;
 }
 
-function hasAnyInput(f: FormState): boolean {
-  return FIELDS.some((x) => x.show(f) !== '');
+// 필수 칸(라벨에 * 표시) — 새 제보는 건물·세부위치, 수정 제보는 세부위치(건물 칸이 없다)
+function hasRequired(f: FormState, isEdit: boolean): boolean {
+  return f.detailLocation.trim() !== '' && (isEdit || f.building.trim() !== '');
 }
 
 function hasChanges(f: FormState, initial: FormState): boolean {
@@ -86,10 +87,24 @@ function hasChanges(f: FormState, initial: FormState): boolean {
 const INPUT_CLASS =
   'w-full h-10 bg-surface border border-[#e2e8f0] rounded-xl px-3 text-sm text-text-main placeholder-text-hint outline-none focus:border-primary';
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+// 칸 위 라벨 — 필수 칸은 빨간 *, 선택 칸은 흐린 '(선택)'을 라벨 옆에 붙인다
+type FieldMark = 'required' | 'optional';
+
+function FieldLabel({ label, mark }: { label: string; mark: FieldMark }) {
+  return (
+    <span className="block text-[12px] font-bold text-text-sub mb-1">
+      {label}
+      {mark === 'required'
+        ? <span className="text-red-500 ml-0.5" aria-label="필수">*</span>
+        : <span className="font-medium text-text-hint ml-1">(선택)</span>}
+    </span>
+  );
+}
+
+function Field({ label, mark, children }: { label: string; mark: FieldMark; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-[12px] font-bold text-text-sub mb-1">{label}</span>
+      <FieldLabel label={label} mark={mark} />
       {children}
     </label>
   );
@@ -99,7 +114,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 function PriceInput({ tag, value, onChange }: { tag: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="flex-1 min-w-0 flex items-center h-10 bg-surface border border-[#e2e8f0] rounded-xl px-3 gap-1.5 focus-within:border-primary">
-      <span className="flex-shrink-0 text-[12px] font-bold text-text-hint">{tag}</span>
+      <span className="flex-shrink-0 text-[12px] font-bold text-text-main">{tag}</span>
       <input
         value={value}
         // 숫자 키패드를 띄우고, 붙여넣기 등으로 섞여 들어온 숫자 외 문자는 걸러낸다
@@ -126,8 +141,8 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const isEdit = target.mode === 'edit';
-  // 새 제보는 하나라도 채우면, 수정 제보는 이미 채워진 채 시작하므로 하나라도 바꾸면 보낼 수 있다
-  const ready = isEdit ? hasChanges(form, initial) : hasAnyInput(form);
+  // 필수 칸(*)은 항상 채워져 있어야 한다. 수정 제보는 이미 채워진 채 시작하므로 거기에 더해 하나라도 바꿔야 보낼 수 있다
+  const ready = hasRequired(form, isEdit) && (!isEdit || hasChanges(form, initial));
   const canSubmit = ready && !submitFeedback.isPending;
 
   const handleSubmit = () => {
@@ -169,7 +184,7 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
               <div className="flex gap-2">
                 {!isEdit && (
                   <div className="flex-1 min-w-0">
-                    <Field label="건물">
+                    <Field label="건물" mark="required">
                       <BuildingAutocompleteInput
                         value={form.building}
                         onChange={(text, buildingId) => setForm((prev) => ({ ...prev, building: text, buildingId }))}
@@ -182,7 +197,7 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <Field label="세부위치">
+                  <Field label="세부위치" mark="required">
                     <input value={form.detailLocation} onChange={(e) => set('detailLocation', e.target.value)} maxLength={50} placeholder="3층 한자공" className={INPUT_CLASS} />
                   </Field>
                 </div>
@@ -190,18 +205,18 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
 
               {/* 가격 — label로 감싸면 칸 아무 데나 눌러도 첫 입력칸(흑백)에만 포커스가 가서 div로 둔다 */}
               <div>
-                <span className="block text-[12px] font-bold text-text-sub mb-1">가격 <span className="font-medium text-text-hint">(1장 기준)</span></span>
+                <FieldLabel label="가격" mark="optional" />
                 <div className="flex gap-2">
                   <PriceInput tag="흑백" value={form.priceMono} onChange={(v) => set('priceMono', v)} />
                   <PriceInput tag="컬러" value={form.priceColor} onChange={(v) => set('priceColor', v)} />
                 </div>
               </div>
 
-              <Field label="결제방식">
+              <Field label="결제방식" mark="optional">
                 <input value={form.payment} onChange={(e) => set('payment', e.target.value)} maxLength={50} placeholder="카드" className={INPUT_CLASS} />
               </Field>
 
-              <Field label="참고사항">
+              <Field label="참고사항" mark="optional">
                 {/* 다른 칸과 같은 한 줄 높이 — 길게 쓰면 칸 안에서 가로로 밀린다 */}
                 <input
                   value={form.note}
