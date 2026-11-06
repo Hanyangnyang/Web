@@ -15,9 +15,10 @@ import { PointMarkers } from './markers/PointMarkers';
 import { CampusBuildingSheet } from './sheets/CampusBuildingSheet';
 import { SmokingSpotSheet } from './sheets/SmokingSpotSheet';
 import { ParkingLotSheet } from './sheets/ParkingLotSheet';
-import { PrinterSheet, PrinterReportContent } from './sheets/PrinterSheet';
+import { PrinterSheet } from './sheets/PrinterSheet';
 import { CampusFeedbackModal } from './CampusFeedbackModal';
 import { PrinterFeedbackModal } from './PrinterFeedbackModal';
+import { PrinterReportFloatingButton } from './PrinterReportFloatingButton';
 import {
   STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, PRINTER_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
 } from './sheets/sheetMetrics';
@@ -30,7 +31,7 @@ import { openSpaceBuildings, type PlottableBuilding } from '../../../domain/enti
 import { collegeById } from '../../../domain/entities/College.js';
 import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { PARKING_LOTS, visibleParkingLots, type PlottableParkingLot } from '../../../domain/entities/ParkingLot.js';
-import { PRINTERS, visiblePrinters, type PlottablePrinter } from '../../../domain/entities/Printer.js';
+import { PRINTERS, printerDisplayName, type PlottablePrinter } from '../../../domain/entities/Printer.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useSmokingSpots } from '../../hooks/campusMap/useSmokingSpots.js';
@@ -149,7 +150,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   // 주차장은 아직 프로토타입 단계라 앱에 번들된 정적 데이터를 그대로 쓴다(백엔드/RQ 없음)
   const parkingLots = useMemo(() => visibleParkingLots(PARKING_LOTS), []);
   // 프린터도 주차장과 같은 정적 데이터 (지금은 예시 1곳뿐)
-  const printers = useMemo(() => visiblePrinters(PRINTERS), []);
+  // TODO(2단계): API(usePrinters) + 건물 좌표로 교체. 지금은 좌표가 들어 있는 예시 JSON 그대로
+  const printers = PRINTERS;
 
   // 오픈스페이스 칩이면 오픈스페이스가 있는 건물만 지도·목록에 올린다
   const layerBuildings = useMemo(
@@ -378,9 +380,13 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
 
   // 프린터 제보 입구는 둘 — 목록 위 플로팅 배너(새 프린터 제보)와 상세 시트 하단 버튼(이 프린터 정보 수정).
   // 같은 이벤트에 placement로 구분해 싣는다. 'floating'은 시트 목록 칸도 있던 때(f40884f)와 같은 기준값
+  // 바텀시트가 접힌 기본 상태에서만 긴 배너로 두고, 시트가 조금이라도 올라가면(목록 펼침 또는 상세 열림)
+  // 지도를 가리지 않게 동그라미 제보 버튼으로 접는다 (사라지지 않게)
+  const printerReportCompact = !!selectedPrinter || sheetExpanded;
   const openPrinterReport = () => {
     setFeedbackSource('printer');
-    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating', type: 'new' });
+    // compact: 동그라미 상태에서 눌렀는지 — 접힌 입구도 실제로 쓰이는지 보려고
+    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating', type: 'new', compact: printerReportCompact });
   };
   const openPrinterEditReport = () => {
     if (!selectedPrinter) return;
@@ -470,6 +476,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
             level={level}
             selectedId={selectedPrinter?.id ?? null}
             onSelect={(p) => pickPrinter(p, 'marker')}
+            labelOf={printerDisplayName}
           />
         )}
 
@@ -530,17 +537,17 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         <LocateFixed size={19} className={locating ? 'text-text-hint animate-pulse' : 'text-[#334155]'} />
       </button>
 
-      {/* 프린터 제보 플로팅 배너 — 내 위치 버튼과 같은 줄, 그 왼쪽 빈자리(right = 버튼 12px + 폭 44px + 간격 8px).
-          높이도 버튼과 같은 44px로 맞춘다. 프린터 목록일 때만(상세에선 숨김).
-          색은 학식탭 제보 배너(NoticeBanner plain: 흰 배경 + slate-200 테두리)와 같다 — 지도 위라 그림자만 더한다 */}
-      {isPrinterChip && !selectedPrinter && (
-        <button
+      {/* 프린터 제보 플로팅 버튼 — 내 위치 버튼과 같은 줄, 그 바로 왼쪽(right = 버튼 12px + 폭 44px + 간격 8px).
+          시트가 접혀 있으면 내용 폭에 맞춘 배너, 올라가면(목록 펼침·상세) 동그라미로 접힌다 (동작은 컴포넌트 주석 참고) */}
+      {isPrinterChip && (
+        <PrinterReportFloatingButton
+          compact={printerReportCompact}
+          // 시트 상태(선택된 프린터·목록 펼침)가 바뀌면 동그라미를 눌러 펼쳐 둔 배너를 다시 접는다
+          collapseKey={`${selectedPrinter?.id ?? ''}|${sheetExpanded}`}
+          bottom={`calc(${buttonBase} + 12px)`}
           onClick={openPrinterReport}
-          style={{ bottom: `calc(${buttonBase} + 12px)` }}
-          className="absolute left-3 right-16 z-30 h-11 px-4 flex items-center justify-between gap-2.5 rounded-full bg-white border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.18)] [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
-        >
-          <PrinterReportContent />
-        </button>
+          onExpand={() => posthog?.capture('partner_map_printer_report_expanded')}
+        />
       )}
 
       {/* 프린터 칩 신규 안내 배너 — 프린터 칩의 제보 배너와 같은 자리·같은 모양(흰 배경 + slate 테두리)이라

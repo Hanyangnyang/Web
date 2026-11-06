@@ -10,7 +10,7 @@ import { MapMarkerPoint } from './MapMarkerPoint';
 /** 점 마커로 찍히기 위해 필요한 최소 조건 — 건물·흡연장 엔티티가 모두 만족한다 */
 interface MarkerPoint {
   id: string;
-  name: string;
+  name: string | null; // 프린터처럼 이름이 없을 수 있는 항목은 labelOf로 라벨을 따로 만든다
   coordinates: Coordinates;
 }
 
@@ -19,10 +19,12 @@ interface Props<T extends MarkerPoint> {
   level: number;
   selectedId: string | null;
   onSelect: (item: T) => void;
+  // 마커 접근성 라벨 — 기본은 name. 이름이 비어 있을 수 있는 항목(프린터: 세부위치로 대신)만 넘긴다
+  labelOf?: (item: T) => string;
 }
 
 // 제네릭이라 onSelect가 넘겨받은 항목의 구체 타입(CampusBuilding·SmokingSpot)을 그대로 돌려준다
-export function PointMarkers<T extends MarkerPoint>({ items, level, selectedId, onSelect }: Props<T>) {
+export function PointMarkers<T extends MarkerPoint>({ items, level, selectedId, onSelect, labelOf }: Props<T>) {
   return (
     <>
       {items.map((item) => (
@@ -33,7 +35,7 @@ export function PointMarkers<T extends MarkerPoint>({ items, level, selectedId, 
           level={level}
           selected={item.id === selectedId}
           onClick={() => onSelect(item)}
-          ariaLabel={item.name}
+          ariaLabel={labelOf ? labelOf(item) : (item.name ?? '')}
           zIndexNormal={3}
           zIndexSelected={22}
         />

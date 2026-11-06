@@ -1,45 +1,39 @@
-// 도메인 엔티티: ERICA캠퍼스 프린터
-// 실제 데이터는 ./printers.json에서 관리 — 아직 위치 목록을 모으는 중이라 주차장(ParkingLot.ts)처럼
-// 데이터 레이어 없이 정적 import로 바로 쓴다. 백엔드 API가 생기면 그때 이 파일의 static import만 교체하면 된다.
-// 필드 구성은 백엔드에서 내려줄 응답 필드(이름·세부위치·가격·결제방식·참고사항·고장여부·최근수정일)에 맞춘다.
+// 도메인 엔티티: 캠퍼스 프린터 — 백엔드 /api/v1/campus-map/printers 응답(교내시설 하위 리소스)에 맞춘 모양.
+// 응답 검증·변환은 data 레이어의 PrinterRepository가 하고, 여기는 화면이 쓰는 모양과 순수 함수만 둔다.
 import printersData from './printers.json';
 import type { Coordinates } from './Coordinates.js';
 
 export interface Printer {
-  id: string;
-  // 목록·상세 시트 제목에 그대로 쓰는 이름 (예: '1공 한자공 프린터기')
-  name: string;
-  campus: string;
-  // 이 프린터가 있는 교내시설(CampusBuilding.id) — 백엔드에서 프린터는 교내시설 하위에 붙는다(오픈스페이스와 같은 구조).
-  // 교내시설 상세 시트가 이 값으로 '이 건물의 프린터' 목록을 만든다. 건물 밖(야외 등)이면 null
-  buildingId: string | null;
-  coordinates: Coordinates | null;
-  // 어느 건물 몇 층 어디에 있는지 (예: '제1공학관 2층 한자공 앞')
-  detailLocation: string | null;
-  // 가격 — 흑백/컬러/양면 등 조합이 프린터마다 달라 자유 문구로 받는다 (예: '흑백 50원 · 컬러 200원')
+  id: string;                    // 서버 UUID
+  // 이 프린터가 있는 교내시설(CampusBuilding.id) — 지도 좌표·교내시설 상세의 프린터 목록이 이 값으로 건물과 연결된다
+  buildingId: string;
+  buildingName: string | null;   // 서버가 같이 내려주는 건물 이름 (예: '학술정보관')
+  campus: string;                // 'ANSAN' | 'SEOUL'
+  detailLocation: string;        // 건물 안 위치 (예: '1층 로비 편의점 옆') — 서버 필수값
+  name: string | null;           // 없을 수 있다 → 화면 표시는 printerDisplayName으로
+  // 가격은 자유 문구 — 'A4 흑백 100원, 컬러 500원 / A3 흑백 200원' 형식도, 그 밖의 옛 자유 형식도 섞여 있어 그대로 보여준다
   price: string | null;
-  // 결제방식 — 카드·계정·현금 등 조합이 프린터마다 달라 자유 문구 하나로 받는다 (예: '카드, 프린터 계정 필요')
-  paymentMethod: string | null;
-  // 사용자에게 공지해야 할 내용 (예: '최근 고장이 잦다는 제보가 있어요')
-  notice: string | null;
-  // 고장 여부 — null은 '확인 안 됨'. 모르는 걸 '정상'으로 보여주지 않으려고 boolean과 구분한다
-  isBroken: boolean | null;
-  // 이 프린터 정보가 마지막으로 갱신된 날짜 (ISO 8601, 예: '2026-11-03')
-  updatedAt: string | null;
+  paymentMethod: string | null;  // 자유 문구 (예: '카드, 현금')
+  notes: string | null;          // 참고사항 (예: '주말 이용 가능')
+  // 고장으로 '등록된' 상태인지. false는 '고장 등록 없음'일 뿐 '정상 작동 확인'이 아니다 — 그렇게 표시하지 말 것
+  broken: boolean;
+  removed: boolean;              // 철거됨 — 목록엔 안 오고, 상세 조회로만 올 수 있다
+  updatedAt: string | null;      // ISO 8601 (예: '2026-11-06T06:00:00Z')
+  // 수정 제보의 expectedVersion으로 그대로 보낸다 — 사용자가 '이 버전을 보고' 고쳤다는 표시(서버가 충돌을 409로 알려준다)
+  version: number;
 }
 
-export const PRINTERS: Printer[] = printersData as Printer[];
+// 화면 제목용 이름 — 이름이 없으면 세부위치로 대신한다 (서버 정렬 규칙도 이름이 없으면 세부위치를 쓴다)
+export function printerDisplayName(printer: Pick<Printer, 'name' | 'detailLocation'>): string {
+  return printer.name?.trim() || printer.detailLocation;
+}
 
+// ── 지도 표시용 ──
+// API 응답엔 좌표가 없다(프린터는 건물 하위 리소스). 지도에 찍으려면 건물 좌표를 붙인 PlottablePrinter가 필요하다.
 export type PlottablePrinter = Printer & { coordinates: Coordinates };
 
-function hasCoords(printer: Printer): printer is PlottablePrinter {
-  return printer.coordinates !== null;
-}
-
-// 좌표가 있는 프린터만 반환
-export function visiblePrinters(printers: Printer[]): PlottablePrinter[] {
-  return printers.filter(hasCoords);
-}
+// TODO(2단계): API 연결 전까지 화면이 쓰는 예시 데이터. 좌표는 아직 JSON에 직접 들어 있다
+export const PRINTERS: PlottablePrinter[] = printersData as PlottablePrinter[];
 
 // 한 교내시설 안의 프린터 목록 (교내시설 상세 시트용)
 export function printersInBuilding<T extends Printer>(printers: T[], buildingId: string): T[] {

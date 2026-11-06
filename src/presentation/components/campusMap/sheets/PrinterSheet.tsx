@@ -1,8 +1,8 @@
 // 지도 하단 바텀시트: 프린터 — 프린터 리스트(+거리) / 개별 상세
 // '빠진 프린터 제보' 입구는 시트 안이 아니라 시트 위 플로팅 배너(CampusMapView)에 있다
 import { useMemo, type ReactNode } from 'react';
-import { X, Megaphone, MapPin, Coins, CreditCard, Info, Clock, type LucideIcon } from 'lucide-react';
-import type { Printer, PlottablePrinter } from '../../../../domain/entities/Printer.js';
+import { X, Megaphone, Clock, ChevronRight } from 'lucide-react';
+import { printerDisplayName, type Printer, type PlottablePrinter } from '../../../../domain/entities/Printer.js';
 import { nearestTo, type LatLng } from '../../../../lib/campusGeo.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { PRINTER_DETAIL_FRACTION, PRINTER_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
@@ -37,35 +37,25 @@ function BrokenTag() {
   );
 }
 
-// 상세 헤더에서 이름 바로 옆에 붙는 작동 상태 뱃지.
-// isBroken이 null(확인 안 됨)이면 '정상'으로 단정하지 않고 회색으로 따로 보여준다
-const STATUS_STYLE = {
-  broken: { box: 'bg-red-50 border-red-100 text-red-600', dot: 'bg-red-500', text: '고장' },
-  ok: { box: 'bg-emerald-50 border-emerald-100 text-emerald-700', dot: 'bg-emerald-500', text: '작동 중' },
-  unknown: { box: 'bg-surface border-[#e2e8f0] text-text-hint', dot: 'bg-slate-300', text: '확인 필요' },
-} as const;
-
-function StatusBadge({ isBroken }: { isBroken: Printer['isBroken'] }) {
-  const s = STATUS_STYLE[isBroken === true ? 'broken' : isBroken === false ? 'ok' : 'unknown'];
+// 상세 헤더에서 이름 바로 옆에 붙는 고장 뱃지 — 고장으로 '등록된' 프린터에만 붙인다.
+// broken:false는 '고장 등록 없음'일 뿐 '정상 작동 확인'이 아니라서(API 문서), 예전의 초록 '작동 중' 뱃지는 없앴다
+function BrokenBadge() {
   return (
-    <span className={`flex-shrink-0 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 ${s.box}`}>
-      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${s.dot}`} />
-      <span className="text-[10px] font-bold leading-none">{s.text}</span>
+    <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 bg-red-50 border-red-100 text-red-600">
+      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-red-500" />
+      <span className="text-[10px] font-bold leading-none">고장</span>
     </span>
   );
 }
 
-// 정보 카드의 한 줄 (아이콘 · 라벨 · 값). 값이 없으면 줄을 숨기지 않고 '정보 없음'으로 둬서
-// 프린터마다 카드 모양이 달라지지 않게 하고, 사용자가 '없는 정보'와 '빠뜨린 정보'를 헷갈리지 않게 한다
-function InfoRow({ icon: Icon, label, children }: { icon: LucideIcon; label: string; children: ReactNode }) {
+// 정보 카드의 한 줄 (라벨 · 값) — 아이콘 없이 글자만. 라벨 칸 폭이 고정이라 값들이 세로로 나란히 맞는다.
+// 값이 없으면 줄을 숨기지 않고 '정보 없음'으로 둬서 프린터마다 카드 모양이 달라지지 않게 하고,
+// 사용자가 '없는 정보'와 '빠뜨린 정보'를 헷갈리지 않게 한다
+function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     // first/last: 첫 줄 위·마지막 줄 아래 패딩만 줄여, 헤더·참고사항과의 간격이 줄 패딩만큼 두 번 벌어지지 않게
     <div className="flex items-start gap-2.5 px-0.5 py-1.5 first:pt-1 last:pb-1">
-      {/* 아이콘+라벨은 한 묶음이라 둘 사이만 좁게(gap-1), 묶음과 값 사이는 바깥 gap-2.5 */}
-      <span className="flex-shrink-0 flex items-start gap-1">
-        <Icon size={14} strokeWidth={2.2} className="flex-shrink-0 mt-[2px] text-text-hint" />
-        <span className="w-[52px] text-[11px] font-bold text-text-hint leading-[1.6]">{label}</span>
-      </span>
+      <span className="flex-shrink-0 w-[52px] text-[11px] font-bold text-text-hint leading-[1.6]">{label}</span>
       <div className="flex-1 min-w-0 text-[12px] font-semibold text-text-main leading-[1.6] break-keep">{children}</div>
     </div>
   );
@@ -93,12 +83,12 @@ function PrinterDetailBody({ printer }: { printer: Printer }) {
     <>
       {/* 배경·구분선 없이 촘촘한 라벨-값 목록으로 — 시트 위에서 가볍게 한눈에 읽힌다 */}
       <div>
-        <InfoRow icon={MapPin} label="세부위치">{printer.detailLocation ?? <Empty />}</InfoRow>
-        <InfoRow icon={Coins} label="가격">{printer.price ?? <Empty />}</InfoRow>
-        <InfoRow icon={CreditCard} label="결제방식">{printer.paymentMethod ?? <Empty />}</InfoRow>
+        <InfoRow label="세부위치">{printer.detailLocation ?? <Empty />}</InfoRow>
+        <InfoRow label="가격">{printer.price ?? <Empty />}</InfoRow>
+        <InfoRow label="결제방식">{printer.paymentMethod ?? <Empty />}</InfoRow>
         {/* 참고사항도 다른 정보와 같은 줄 형식 — 공지가 없는 프린터가 대부분이라 '정보 없음' 대신 줄 자체를 숨긴다 */}
-        {printer.notice && (
-          <InfoRow icon={Info} label="참고사항">{printer.notice}</InfoRow>
+        {printer.notes && (
+          <InfoRow label="참고사항">{printer.notes}</InfoRow>
         )}
       </div>
 
@@ -115,19 +105,19 @@ function PrinterDetailBody({ printer }: { printer: Printer }) {
   );
 }
 
-// 프린터 제보 입구의 안쪽 내용 — 목록 위 플로팅 배너('빠진 프린터가 있나요?')와 상세 하단 버튼('정보가 달라졌나요?')이 같이 쓴다.
-// 아이콘·글씨·버튼은 학식탭 제보 배너(NoticeBanner plain)와 같은 규격으로, 모두 같은 '제보' 기능임을 모양으로 맞춘다.
+// 프린터 제보 입구의 안쪽 내용 — 목록 위 플로팅 배너('프린터 정보를 제보해주세요!')가 쓴다
+// (상세 하단 '틀린 정보가 있나요?' 버튼은 모양이 달라 PrinterSheet 안에서 따로 그린다).
+// 아이콘·글씨는 학식탭 제보 배너(NoticeBanner plain)와 같은 규격. 끝에는 '제보하기' 버튼 대신
+// 목록 행과 같은 › 화살표를 둬서, 배너 전체가 눌러서 들어가는 버튼임을 보여준다.
 // 바깥(여백·테두리·그림자)은 놓이는 자리에 맞춰 쓰는 쪽이 감싼다.
-export function PrinterReportContent({ label = '빠진 프린터가 있나요?', cta = '제보하기' }: { label?: string; cta?: string }) {
+export function PrinterReportContent({ label = '프린터 정보를 제보해주세요!' }: { label?: string }) {
   return (
     <>
       <div className="flex items-center gap-2.5 min-w-0">
         <Megaphone size={15} strokeWidth={2.4} className="flex-shrink-0 text-primary" />
         <span className="text-[13px] font-semibold text-text-main leading-snug truncate">{label}</span>
       </div>
-      <span className="flex-shrink-0 text-[12px] font-semibold px-2.5 py-1 rounded-full bg-primary/[0.06] text-primary">
-        {cta}
-      </span>
+      <ChevronRight size={16} className="flex-shrink-0 text-text-hint" />
     </>
   );
 }
@@ -146,8 +136,8 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
           <span className="text-2xl flex-shrink-0">🖨️</span>
           {/* 이름이 길면 이름만 말줄임되고 상태 뱃지는 항상 이름 바로 뒤에 붙어 보인다 */}
           <div className="flex-1 min-w-0 flex items-center gap-1.5">
-            <span className="min-w-0 text-[16px] font-extrabold text-text-main truncate">{selected.name}</span>
-            <StatusBadge isBroken={selected.isBroken} />
+            <span className="min-w-0 text-[16px] font-extrabold text-text-main truncate">{printerDisplayName(selected)}</span>
+            {selected.broken && <BrokenBadge />}
           </div>
           {selected.id === nearestId && <NearestBadge />}
           <button
@@ -168,14 +158,13 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
               위쪽 옅은 선(헤더 구분선과 같은 색)으로 '정보'와 '제보 입구'를 나눈다 */}
           <button
             onClick={onReportEdit}
-            className="!mt-3 w-full h-12 px-0.5 border-t border-[#f1f5f9] flex items-center justify-end gap-2.5 [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
+            className="!mt-3 w-full h-12 px-0.5 border-t border-[#f1f5f9] flex items-center justify-end gap-1.5 [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform"
           >
-            {/* 질문 앞 이모지는 빼고, 대신 '수정 제보' 글자 앞에 같은 색·크기의 제보(확성기) 아이콘을 둔다 — 앱의 다른 제보 입구와 같은 아이콘
+            {/* 질문·버튼 모두 아이콘 없이 글자만 — 시트 안이라 정보 줄들 사이에서 튀지 않게
                 (플로팅 배너는 PrinterReportContent 그대로 — 이 버튼만 따로 그린다) */}
-            <span className="min-w-0 text-[13px] font-semibold text-text-main leading-snug truncate">틀린 정보가 있나요?</span>
-            <span className="flex-shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded-full bg-primary/[0.06] text-primary">
-              <Megaphone size={12} strokeWidth={2.4} className="flex-shrink-0" />
-              수정 제보
+            <span className="min-w-0 text-[12px] font-semibold text-text-main leading-snug truncate">틀린 정보가 있나요?</span>
+            <span className="flex-shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/[0.06] text-primary">
+              제보하기
             </span>
           </button>
         </div>
@@ -200,8 +189,8 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
       onSelect={onSelect}
       renderLabel={(p) => (
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-[14px] font-extrabold text-text-main truncate">{p.name}</span>
-          {p.isBroken === true && <BrokenTag />}
+          <span className="text-[14px] font-extrabold text-text-main truncate">{printerDisplayName(p)}</span>
+          {p.broken && <BrokenTag />}
         </div>
       )}
       renderBadge={(p) => (p.id === nearestId ? <NearestBadge /> : null)}
