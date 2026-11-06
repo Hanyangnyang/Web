@@ -1,3 +1,5 @@
+/* 800·900 파일은 일부러 두지 않음 — font-extrabold·font-black은 Bold(700)로 렌더링되며, 현재 디자인이 이 모습 기준.
+   ExtraBold·Black을 추가하면 이 클래스를 쓰는 곳(약 97곳)이 한꺼번에 두꺼워지니 주의 */
 @font-face {
   font-family: 'Pretendard';
   font-weight: 400;

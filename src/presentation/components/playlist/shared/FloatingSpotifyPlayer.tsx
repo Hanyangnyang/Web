@@ -2,6 +2,7 @@ import { Play, X } from 'lucide-react';
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { loadSpotifyIframeApi, type SpotifyEmbedController } from './spotifyIframeApi';
 import { isIOSDevice } from '../../../../lib/platform.js';
+import { initSentry } from '../../../../lib/sentry.js';
 import { type TrackSummary } from '../playlistTypes';
 
 // play() 호출 후 이 시간 안에 실제로 재생이 시작 안 되면 자동재생이 막힌 것으로 보고
@@ -155,6 +156,11 @@ export const FloatingSpotifyPlayer = forwardRef<FloatingSpotifyPlayerHandle, Flo
           schedulePlaybackCheck();
         }
       );
+    }).catch((e) => {
+      // 캐시가 비워졌으므로 다음 곡을 누르면 스크립트를 다시 받는다
+      initSentry().then(Sentry => {
+        Sentry.captureException(e, { tags: { source: 'spotify-iframe-api-load' } });
+      });
     });
 
     return () => {
