@@ -2,7 +2,7 @@
 import { X } from 'lucide-react';
 import { allOpenSpaces, type CampusBuilding, type PlottableBuilding } from '../../../../domain/entities/CampusBuilding.js';
 import { openSpaceLabel } from '../../../../domain/entities/OpenSpace.js';
-import { printerDisplayName, printersInBuilding, type Printer } from '../../../../domain/entities/Printer.js';
+import { printerShortName, printersInBuilding, type Printer } from '../../../../domain/entities/Printer.js';
 import type { LatLng } from '../../../../lib/campusGeo.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { collegeStyleByName } from '../../ui/collegeStyle.js';
@@ -135,8 +135,9 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
               <ul className="space-y-1">
                 {buildingPrinters.map((printer) => (
                   <li key={printer.id} className="text-[11px] text-text-main font-medium">
-                    · {printerDisplayName(printer)}
-                    {printer.detailLocation && <span className="text-text-hint font-normal"> — {printer.detailLocation}</span>}
+                    {/* 이미 이 건물 상세 안이라 건물 이름은 빼고 보여준다. 이름이 없으면 세부위치가 이름 자리에 오므로
+                        세부위치를 뒤에 따로 붙이지 않는다 (붙이면 '2층 휴게실 — 2층 휴게실'처럼 반복된다) */}
+                    · {printerShortName(printer)}
                     {/* 고장 난 프린터는 건물 목록에서도 바로 알 수 있게 — 프린터 목록의 '고장' 태그와 같은 모양 */}
                     {printer.broken && (
                       <span className="ml-1 align-[1px] text-[9px] font-bold px-1 py-px rounded bg-red-50 text-red-400 border border-red-100">고장</span>

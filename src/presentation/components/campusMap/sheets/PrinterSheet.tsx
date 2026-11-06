@@ -4,12 +4,16 @@ import { useMemo, type ReactNode } from 'react';
 import { X, Megaphone, Clock, ChevronRight } from 'lucide-react';
 import { printerDisplayName, type Printer, type PlottablePrinter } from '../../../../domain/entities/Printer.js';
 import { nearestTo, type LatLng } from '../../../../lib/campusGeo.js';
+import { getKSTDateKey, toEpoch } from '../../../../utils/kstTime.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { PRINTER_DETAIL_FRACTION, PRINTER_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
 import { NearbyListSheet } from './NearbyListSheet';
 
 interface Props {
-  printers: PlottablePrinter[];   // 좌표가 확정된 프린터만 (visiblePrinters로 걸러 넘긴다)
+  printers: PlottablePrinter[];   // 소속 건물 좌표를 붙인 프린터만 (toPlottablePrinters로 걸러 넘긴다)
+  // 프린터 API·건물 데이터의 로딩·실패 — 지도 전체를 막지 않고 이 시트 안에서만 알린다 (흡연장 시트와 같은 방식)
+  loading: boolean;
+  error: string | null;
   origin: LatLng | null;  // 거리 계산 기준점 (내 위치 또는 화면 중심)
   expanded: boolean;
   onToggleExpand: (expanded: boolean) => void;
@@ -48,6 +52,15 @@ function BrokenBadge() {
   );
 }
 
+// 철거된 프린터 — 목록엔 서버가 빼서 안 오고, 상세 조회로만 removed:true가 온다. API 문서대로 '철거된 프린터'로 표시
+function RemovedBadge() {
+  return (
+    <span className="flex-shrink-0 rounded-full border px-1.5 py-0.5 bg-slate-100 border-slate-200 text-slate-500 text-[10px] font-bold leading-none">
+      철거된 프린터
+    </span>
+  );
+}
+
 // 정보 카드의 한 줄 (라벨 · 값) — 아이콘 없이 글자만. 라벨 칸 폭이 고정이라 값들이 세로로 나란히 맞는다.
 // 값이 없으면 줄을 숨기지 않고 '정보 없음'으로 둬서 프린터마다 카드 모양이 달라지지 않게 하고,
 // 사용자가 '없는 정보'와 '빠뜨린 정보'를 헷갈리지 않게 한다
@@ -66,13 +79,18 @@ function Empty() {
 }
 
 // '2026-11-03' → { date: '2026.11.03', relative: '3일 전' }. 한 달이 넘으면 상대 표기는 생략한다
-function formatUpdatedAt(iso: string): { date: string; relative: string | null } {
-  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
-  const date = `${y}.${String(m).padStart(2, '0')}.${String(d).padStart(2, '0')}`;
-  const today = new Date();
-  const diffDays = Math.round(
-    (new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime() - new Date(y, m - 1, d).getTime()) / 86_400_000
-  );
+// updatedAt('2026-11-06T08:53:21Z' 같은 UTC 시각)을 한국 날짜로 바꿔 보여준다.
+// 날짜 부분만 잘라 쓰면 한국 시간 새벽 0~9시에 수정된 정보가 하루 전 날짜로 보여서, 시각으로 바꾼 뒤 KST로 옮긴다
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function formatUpdatedAt(iso: string): { date: string; relative: string | null } | null {
+  const epoch = toEpoch(iso);
+  if (Number.isNaN(epoch)) return null;
+  const kstKey = new Date(epoch + KST_OFFSET_MS).toISOString().slice(0, 10); // 'YYYY-MM-DD' (KST)
+  const date = kstKey.replace(/-/g, '.');
+  // 두 날짜 키 모두 같은 방식(UTC 자정)으로 읽어 하루 단위 차이만 본다
+  const diffDays = Math.round((Date.parse(getKSTDateKey()) - Date.parse(kstKey)) / DAY_MS);
   const relative = diffDays <= 0 ? '오늘' : diffDays === 1 ? '어제' : diffDays < 31 ? `${diffDays}일 전` : null;
   return { date, relative };
 }
@@ -83,13 +101,12 @@ function PrinterDetailBody({ printer }: { printer: Printer }) {
     <>
       {/* 배경·구분선 없이 촘촘한 라벨-값 목록으로 — 시트 위에서 가볍게 한눈에 읽힌다 */}
       <div>
-        <InfoRow label="세부위치">{printer.detailLocation ?? <Empty />}</InfoRow>
+        {/* 세부위치 줄엔 notes(예: '휴게실 가장 안쪽에 위치')를 보여준다 — detailLocation('5층 휴게실')은
+            제목(건물 이름 + detailLocation)에 이미 들어가 있어서 같은 글자를 또 보여주지 않는다.
+            그래서 notes를 쓰는 '참고사항' 줄은 따로 두지 않는다 */}
+        <InfoRow label="세부위치">{printer.notes ?? <Empty />}</InfoRow>
         <InfoRow label="가격">{printer.price ?? <Empty />}</InfoRow>
         <InfoRow label="결제방식">{printer.paymentMethod ?? <Empty />}</InfoRow>
-        {/* 참고사항도 다른 정보와 같은 줄 형식 — 공지가 없는 프린터가 대부분이라 '정보 없음' 대신 줄 자체를 숨긴다 */}
-        {printer.notes && (
-          <InfoRow label="참고사항">{printer.notes}</InfoRow>
-        )}
       </div>
 
       {/* 최근 수정일 — 정보가 얼마나 믿을 만한지 사용자가 스스로 판단할 수 있게 */}
@@ -106,7 +123,7 @@ function PrinterDetailBody({ printer }: { printer: Printer }) {
 }
 
 // 프린터 제보 입구의 안쪽 내용 — 목록 위 플로팅 배너('프린터 정보를 제보해주세요!')가 쓴다
-// (상세 하단 '틀린 정보가 있나요?' 버튼은 모양이 달라 PrinterSheet 안에서 따로 그린다).
+// (상세 하단 '틀린/추가할 정보가 있나요?' 버튼은 모양이 달라 PrinterSheet 안에서 따로 그린다).
 // 아이콘·글씨는 학식탭 제보 배너(NoticeBanner plain)와 같은 규격. 끝에는 '제보하기' 버튼 대신
 // 목록 행과 같은 › 화살표를 둬서, 배너 전체가 눌러서 들어가는 버튼임을 보여준다.
 // 바깥(여백·테두리·그림자)은 놓이는 자리에 맞춰 쓰는 쪽이 감싼다.
@@ -122,7 +139,7 @@ export function PrinterReportContent({ label = '프린터 정보를 제보해주
   );
 }
 
-export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selected, onSelect, onClose, onReportEdit }: Props) {
+export function PrinterSheet({ printers, loading, error, origin, expanded, onToggleExpand, selected, onSelect, onClose, onReportEdit }: Props) {
   const nearestId = useMemo(
     () => nearestTo(printers, origin, (p) => p.coordinates)?.id ?? null,
     [printers, origin]
@@ -137,7 +154,7 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
           {/* 이름이 길면 이름만 말줄임되고 상태 뱃지는 항상 이름 바로 뒤에 붙어 보인다 */}
           <div className="flex-1 min-w-0 flex items-center gap-1.5">
             <span className="min-w-0 text-[16px] font-extrabold text-text-main truncate">{printerDisplayName(selected)}</span>
-            {selected.broken && <BrokenBadge />}
+            {selected.removed ? <RemovedBadge /> : selected.broken && <BrokenBadge />}
           </div>
           {selected.id === nearestId && <NearestBadge />}
           <button
@@ -162,7 +179,11 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
           >
             {/* 질문·버튼 모두 아이콘 없이 글자만 — 시트 안이라 정보 줄들 사이에서 튀지 않게
                 (플로팅 배너는 PrinterReportContent 그대로 — 이 버튼만 따로 그린다) */}
-            <span className="min-w-0 text-[12px] font-semibold text-text-main leading-snug truncate">틀린 정보가 있나요?</span>
+            {/* 화면에 보이는 세 정보(세부위치=notes·가격·결제방식) 중 하나라도 비어 있으면 '채워 달라'는 쪽으로,
+                다 차 있으면 '고쳐 달라'는 쪽으로 묻는다 — 같은 제보 입구지만 지금 필요한 제보를 유도한다 */}
+            <span className="min-w-0 text-[12px] font-semibold text-text-main leading-snug truncate">
+              {selected.notes && selected.price && selected.paymentMethod ? '틀린 정보가 있나요?' : '추가할 정보가 있나요?'}
+            </span>
             <span className="flex-shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/[0.06] text-primary">
               제보하기
             </span>
@@ -176,8 +197,8 @@ export function PrinterSheet({ printers, origin, expanded, onToggleExpand, selec
   return (
     <NearbyListSheet
       items={printers}
-      loading={false}
-      error={null}
+      loading={loading}
+      error={error}
       origin={origin}
       height={toCssHeight(PRINTER_LIST_FRACTION)}
       expanded={expanded}

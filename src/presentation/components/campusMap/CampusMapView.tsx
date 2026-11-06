@@ -31,7 +31,8 @@ import { openSpaceBuildings, type PlottableBuilding } from '../../../domain/enti
 import { collegeById } from '../../../domain/entities/College.js';
 import type { PlottableSmokingSpot } from '../../../domain/entities/SmokingSpot.js';
 import { PARKING_LOTS, visibleParkingLots, type PlottableParkingLot } from '../../../domain/entities/ParkingLot.js';
-import { PRINTERS, printerDisplayName, type PlottablePrinter } from '../../../domain/entities/Printer.js';
+import { toPlottablePrinters, printerDisplayName, type PlottablePrinter } from '../../../domain/entities/Printer.js';
+import { usePrinters } from '../../hooks/campusMap/usePrinters.js';
 import { usePartnerStores } from '../../hooks/campusMap/usePartnerStores.js';
 import { useCampusBuildings } from '../../hooks/campusMap/useCampusBuildings.js';
 import { useSmokingSpots } from '../../hooks/campusMap/useSmokingSpots.js';
@@ -145,13 +146,17 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
   // 건물·흡연장은 각자의 칩이 켜졌을 때만 불러온다(RQ enabled).
   // 로딩·실패는 지도 전체를 막지 않고 해당 시트 안에서만 알린다 — 한 레이어가 실패해도
   // 지도와 나머지 레이어는 계속 쓸 수 있어야 하고, "실패"와 "원래 없음"이 구분돼야 한다.
-  const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: showsBuildingLayer });
+  // 프린터는 좌표가 없어 소속 건물 좌표로 찍으므로, 프린터 레이어가 보일 때도 건물을 불러온다
+  const { buildings, loading: buildingsLoading, loadErr: buildingsError } = useCampusBuildings({ enabled: showsBuildingLayer || showsPrinterLayer });
   const { spots: smokingSpots, loading: smokingLoading, loadErr: smokingError } = useSmokingSpots({ enabled: showsSmokingLayer });
   // 주차장은 아직 프로토타입 단계라 앱에 번들된 정적 데이터를 그대로 쓴다(백엔드/RQ 없음)
   const parkingLots = useMemo(() => visibleParkingLots(PARKING_LOTS), []);
-  // 프린터도 주차장과 같은 정적 데이터 (지금은 예시 1곳뿐)
-  // TODO(2단계): API(usePrinters) + 건물 좌표로 교체. 지금은 좌표가 들어 있는 예시 JSON 그대로
-  const printers = PRINTERS;
+  // 프린터는 백엔드(GET /campus-map/printers). 지도·프린터 시트는 건물 좌표를 붙인 것(printers)을,
+  // 교내시설 상세의 '이 건물 프린터' 목록은 좌표가 필요 없어 원본(allPrinters)을 쓴다
+  const { printers: allPrinters, loading: printersLoading, loadErr: printersError } = usePrinters({
+    enabled: showsPrinterLayer || showsBuildingLayer,
+  });
+  const printers = useMemo(() => toPlottablePrinters(allPrinters, buildings), [allPrinters, buildings]);
 
   // 오픈스페이스 칩이면 오픈스페이스가 있는 건물만 지도·목록에 올린다
   const layerBuildings = useMemo(
@@ -645,7 +650,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           selected={selectedBuilding}
           onSelect={(b) => pickBuilding(b, 'list')}
           onClose={closeDetail}
-          printers={printers}
+          printers={allPrinters}
         />
       ) : isSmokingChip ? (
         <SmokingSpotSheet
@@ -672,6 +677,9 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
       ) : isPrinterChip ? (
         <PrinterSheet
           printers={printers}
+          // 좌표가 건물 데이터에서 오므로 둘 중 하나라도 로딩·실패면 그 상태를 알린다
+          loading={printersLoading || buildingsLoading}
+          error={printersError ?? buildingsError}
           origin={distanceOrigin}
           expanded={sheetExpanded}
           onToggleExpand={setSheetExpanded}

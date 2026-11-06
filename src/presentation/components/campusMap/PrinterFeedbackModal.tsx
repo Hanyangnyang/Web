@@ -1,99 +1,24 @@
 // 프린터기 제보 팝업 — 입구가 둘이라 어떤 제보인지는 여는 쪽이 정해서 넘긴다
-//  - 'new' : 프린터 목록 위 플로팅 배너 → 지도에 없는 프린터 제보 (제목: '프린터기 제보하기', 빈 칸에서 시작)
-//  - 'edit': 프린터 상세 시트 하단 버튼 → 그 프린터 한 대의 정보 수정 제보
-//            (제목: 그 프린터 이름, 지금 값이 칸에 채워진 채 시작, 건물은 바꿀 일이 없어 칸을 숨긴다)
-// 항목을 칸별로 받되, 지금 백엔드 제보 API는 자유 텍스트(content) 하나만 받으므로
-// 보낼 때 한 줄로 합친다. 프린터 전용 API가 생기면 buildContent만 교체하면 된다
+//  - 'new' : 프린터 목록 위 플로팅 배너 → 지도에 없는 프린터 제보 (POST /campus-map/printer-reports)
+//  - 'edit': 프린터 상세 시트 하단 버튼 → 그 프린터의 정보 수정·고장 제보 (POST /campus-map/printers/{id}/reports)
+// 폼 값 ↔ 요청 변환 규칙은 printerReportForm.ts에 모아 두고(테스트 있음), 여기는 화면과 실패 처리만 맡는다.
+// 제보는 관리자 승인 후 반영되므로 접수돼도 화면의 공개 정보는 바꾸지 않는다.
 import { useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { printerDisplayName, type Printer } from '../../../domain/entities/Printer.js';
-import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
+import { PrinterReportError } from '../../../domain/repositories/IPrinterRepository.js';
+import {
+  fetchLatestPrinter, useSubmitNewPrinterReport, useSubmitPrinterChangeReport,
+} from '../../hooks/campusMap/useSubmitPrinterReport.js';
 import { BuildingAutocompleteInput } from './BuildingAutocompleteInput';
+import {
+  EMPTY_FORM, buildChanges, buildNewPrinter, changedLabels, formFromPrinter, hasRequired, mergeWithLatest,
+  type PrinterReportForm, type TriState,
+} from './printerReportForm';
 
 export type PrinterFeedbackTarget = { mode: 'new' } | { mode: 'edit'; printer: Printer };
 
 const NOTE_MAX_LENGTH = 200;
-
-interface FormState {
-  building: string;
-  // 자동완성 후보에서 고른 교내시설 id — 프린터는 백엔드에서 교내시설 하위에 붙으므로 고른 경우 함께 보낸다.
-  // 직접 친 이름(목록에 없는 건물)이면 null
-  buildingId: string | null;
-  detailLocation: string;
-  priceMono: string;   // 흑백 1장 가격 (숫자만)
-  priceColor: string;  // 컬러 1장 가격 (숫자만)
-  // 결제방식은 자유 텍스트 — 카드·계정·현금 등 조합이 프린터마다 달라 선택지로 묶지 않기로 했다
-  payment: string;
-  note: string;
-  // 고장 여부 — '모름'(unknown)과 명시적인 '예/아니오'를 구분한다 (API 문서: 모르면 false로 채우지 말고 생략).
-  // 수정 제보에서만 입력받는다 — 신규 제보에선 항상 '모름'이라 전송 내용에서 빠진다
-  broken: TriState;
-}
-
-// 세 갈래 선택: 'unknown' = 모름(서버로 안 보냄), 'yes'/'no' = 사용자가 직접 확인한 값.
-// 새 API(POST /printer-reports 등)에 연결할 때 unknown → 키 생략(undefined), yes → true, no → false로 바꾼다
-type TriState = 'unknown' | 'yes' | 'no';
-
-const EMPTY_FORM: FormState = {
-  building: '', buildingId: null, detailLocation: '', priceMono: '', priceColor: '', payment: '', note: '',
-  broken: 'unknown',
-};
-
-// 엔티티의 가격은 '흑백 50원 · 컬러 300원' 같은 자유 문구라 흑백/컬러 숫자만 뽑아 칸에 채운다
-function parsePrice(price: string | null, tag: '흑백' | '컬러'): string {
-  const m = price?.match(new RegExp(`${tag}\\s*([\\d,]+)\\s*원`));
-  return m ? m[1].replace(/,/g, '') : '';
-}
-
-function initialForm(target: PrinterFeedbackTarget): FormState {
-  if (target.mode === 'new') return EMPTY_FORM;
-  const p = target.printer;
-  return {
-    ...EMPTY_FORM,
-    detailLocation: p.detailLocation ?? '',
-    priceMono: parsePrice(p.price, '흑백'),
-    priceColor: parsePrice(p.price, '컬러'),
-    payment: p.paymentMethod ?? '',
-    note: p.notes ?? '',
-    // 서버 false는 '고장 등록 없음'일 뿐 '정상 확인'이 아니라서 '아니오'가 아니라 '모름'으로 시작한다
-    broken: p.broken ? 'yes' : 'unknown',
-  };
-}
-
-// 항목별 '보여줄 값' — 비교(무엇이 바뀌었나)와 전송 문구 조립에 같이 쓴다. 빈 값은 ''
-const FIELDS: { label: string; newOnly?: boolean; show: (f: FormState) => string }[] = [
-  { label: '건물', newOnly: true, show: (f) => (f.building.trim() ? `${f.building.trim()}${f.buildingId ? `(${f.buildingId})` : ''}` : '') },
-  { label: '세부위치', show: (f) => f.detailLocation.trim() },
-  {
-    label: '가격',
-    show: (f) => [f.priceMono && `흑백 ${f.priceMono}원`, f.priceColor && `컬러 ${f.priceColor}원`].filter(Boolean).join(', '),
-  },
-  { label: '결제방식', show: (f) => f.payment.trim() },
-  { label: '참고사항', show: (f) => f.note.trim() },
-  { label: '고장 여부', show: (f) => (f.broken === 'yes' ? '고장' : f.broken === 'no' ? '정상' : '') },
-];
-
-// 새 제보: 채워진 칸만 '항목: 값'
-// 수정 제보: 바뀐 칸만 '항목: 이전 → 새' — 관리자가 무엇을 어떻게 고치면 되는지 바로 보이게
-function buildContent(target: PrinterFeedbackTarget, f: FormState, initial: FormState): string {
-  if (target.mode === 'new') {
-    const parts = FIELDS.map((x) => x.show(f) && `${x.label}: ${x.show(f)}`).filter(Boolean);
-    return `[프린터-신규] | ${parts.join(' / ')}`;
-  }
-  const parts = FIELDS.filter((x) => !x.newOnly && x.show(f) !== x.show(initial))
-    .map((x) => `${x.label}: ${x.show(initial) || '없음'} → ${x.show(f) || '(비움)'}`);
-  // 이름은 관리자가 바로 알아보게, id는 데이터와 정확히 맞추게 함께 싣는다
-  return `[프린터-정보수정] ${printerDisplayName(target.printer)}(${target.printer.id}) | ${parts.join(' / ')}`;
-}
-
-// 필수 칸(라벨에 * 표시) — 새 제보는 건물·세부위치, 수정 제보는 세부위치(건물 칸이 없다)
-function hasRequired(f: FormState, isEdit: boolean): boolean {
-  return f.detailLocation.trim() !== '' && (isEdit || f.building.trim() !== '');
-}
-
-function hasChanges(f: FormState, initial: FormState): boolean {
-  return FIELDS.some((x) => !x.newOnly && x.show(f) !== x.show(initial));
-}
 
 // 입력칸 공통 규격 — 기존 캠퍼스맵 제보 textarea(CampusFeedbackModal)와 같은 배경·테두리·포커스색
 const INPUT_CLASS =
@@ -171,31 +96,96 @@ function TriStateSelect({
   );
 }
 
+// 제출 실패·충돌 안내 — warn(409: 최신 정보를 확인하고 다시 제출), error(그 밖의 실패·삭제된 프린터)
+type Notice = { tone: 'warn' | 'error'; text: string } | null;
+
 export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedbackTarget; onClose: () => void }) {
-  // 처음 값은 팝업이 열릴 때 한 번만 만들어 고정한다 — 수정 제보의 '무엇이 바뀌었나' 비교 기준.
-  // (target은 여는 쪽에서 매 렌더 새 객체로 만들어지므로 useMemo([target])로는 고정되지 않는다)
-  const [initial] = useState(() => initialForm(target));
-  const [form, setForm] = useState<FormState>(initial);
-  const [submitted, setSubmitted] = useState(false);
-  const submitFeedback = useSubmitFeedbackApi();
-
-  const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }));
-
-
   const isEdit = target.mode === 'edit';
-  // 필수 칸(*)은 항상 채워져 있어야 한다. 수정 제보는 이미 채워진 채 시작하므로 거기에 더해 하나라도 바꿔야 보낼 수 있다
-  const ready = hasRequired(form, isEdit) && (!isEdit || hasChanges(form, initial));
-  const canSubmit = ready && !submitFeedback.isPending;
+
+  // 수정 제보의 '비교 기준' — 어떤 서버 정보(printer·version)를 보고 고치는 중인지.
+  // 처음엔 연 순간의 정보, 409가 나면 최신 정보로 바뀐다. (target은 매 렌더 새 객체라 state로 고정한다)
+  const [base, setBase] = useState<{ printer: Printer | null; form: PrinterReportForm }>(() =>
+    target.mode === 'edit' ? { printer: target.printer, form: formFromPrinter(target.printer) } : { printer: null, form: EMPTY_FORM }
+  );
+  const [form, setForm] = useState<PrinterReportForm>(base.form);
+  const [submitted, setSubmitted] = useState(false);
+  const [notice, setNotice] = useState<Notice>(null);
+  const [blocked, setBlocked] = useState(false);       // 삭제된 프린터 — 더 보낼 수 없다
+  const [resolving, setResolving] = useState(false);   // 409 뒤 최신 정보 다시 불러오는 중
+
+  const newReport = useSubmitNewPrinterReport();
+  const changeReport = useSubmitPrinterChangeReport();
+  const pending = newReport.isPending || changeReport.isPending || resolving;
+
+  const set = <K extends keyof PrinterReportForm>(key: K, value: PrinterReportForm[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  // 수정 제보는 '바뀐 항목'이 하나라도 있어야 보낼 수 있다 (없으면 서버가 400)
+  const changes = isEdit && base.printer ? buildChanges(form, base.form, base.printer) : null;
+  const ready = hasRequired(form, isEdit) && (!isEdit || Object.keys(changes ?? {}).length > 0);
+  const canSubmit = ready && !pending && !blocked;
+
+  // 409: 버전만 바꿔 자동 재전송하지 않는다 — 최신 정보를 받아 폼에 합쳐 보여주고, 사용자가 확인 후 다시 제출한다
+  const resolveConflict = async (printerId: string) => {
+    setResolving(true);
+    try {
+      const latest = await fetchLatestPrinter(printerId);
+      if (!latest) {
+        setBlocked(true);
+        setNotice({ tone: 'error', text: '이 프린터는 삭제됐어요. 목록을 새로 불러올게요.' });
+        return;
+      }
+      const newBase = formFromPrinter(latest);
+      const labels = changedLabels(base.form, newBase);
+      setForm((prev) => mergeWithLatest(prev, base.form, newBase));
+      setBase({ printer: latest, form: newBase });
+      setNotice({
+        tone: 'warn',
+        text: `그사이 프린터 정보가 바뀌었어요${labels.length ? ` (${labels.join(', ')})` : ''}${
+          latest.removed ? ' · 철거된 프린터로 등록돼 있어요' : ''
+        }. 최신 정보를 확인하고 다시 제출해주세요.`,
+      });
+    } catch {
+      setNotice({ tone: 'error', text: '최신 프린터 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.' });
+    } finally {
+      setResolving(false);
+    }
+  };
+
+  const handleError = (error: unknown) => {
+    if (!(error instanceof PrinterReportError)) {
+      setNotice({ tone: 'error', text: '제보 접수에 실패했어요. 다시 시도해주세요.' });
+      return;
+    }
+    if (error.kind === 'conflict' && base.printer) {
+      void resolveConflict(base.printer.id);
+      return;
+    }
+    if (error.kind === 'notFound' && isEdit) {
+      setBlocked(true);
+      setNotice({ tone: 'error', text: '이 프린터는 삭제됐어요. 목록을 새로 불러올게요.' });
+      return;
+    }
+    // invalid(400)·notFound(신규: 건물 없음)·server·network — 서버 메시지 또는 종류별 기본 문구
+    setNotice({ tone: 'error', text: error.message });
+  };
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    submitFeedback.mutate(
-      { category: 'CAMPUS_MAP', feedbackType: 'INACCURACY', content: buildContent(target, form, initial) },
-      { onSuccess: () => setSubmitted(true) }
-    );
+    setNotice(null);
+    if (isEdit && base.printer && changes) {
+      changeReport.mutate(
+        { printerId: base.printer.id, expectedVersion: base.printer.version, changes },
+        { onSuccess: () => setSubmitted(true), onError: handleError }
+      );
+    } else {
+      newReport.mutate({ printer: buildNewPrinter(form) }, { onSuccess: () => setSubmitted(true), onError: handleError });
+    }
   };
 
-  const title = target.mode === 'edit' ? printerDisplayName(target.printer) : '프린터기 제보하기';
+  const title = isEdit && base.printer ? printerDisplayName(base.printer) : '프린터기 제보하기';
+  // 건물 이름만 치고 목록에서 고르지 않은 상태 — 신규 제보 API는 건물 id가 필수라 고르게 안내한다
+  const buildingNotPicked = !isEdit && form.building.trim() !== '' && form.buildingId === null;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 px-8" onClick={onClose}>
@@ -205,10 +195,11 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
         onClick={(e) => e.stopPropagation()}
       >
         {submitted ? (
+          // API 문서 안내 문구 그대로 — 관리자 승인 전이라 지도 정보는 아직 바뀌지 않는다
           <div className="text-center py-2">
             <p className="text-2xl mb-2">📢</p>
-            <p className="text-base font-bold text-text-main mb-1">제보 감사합니다!</p>
-            <p className="text-xs text-text-sub mb-4">확인 후 지도에 반영할게요.</p>
+            <p className="text-base font-bold text-text-main mb-1">제보가 접수되었습니다.</p>
+            <p className="text-xs text-text-sub mb-4">관리자 확인 후 반영됩니다.</p>
             <button
               onClick={onClose}
               className="w-full h-10 rounded-full text-sm font-bold text-white bg-primary active:scale-[0.97] transition-transform"
@@ -223,26 +214,31 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
             <div className="space-y-3 mb-4">
               {/* 건물 + 세부위치는 한 줄에 반반 — 둘이 합쳐 '어디'라는 하나의 정보라서.
                   건물은 새 프린터 제보에서만 있다(이미 있는 프린터는 건물이 바뀔 일이 없다) → 수정 제보에선 세부위치가 한 줄을 다 쓴다 */}
-              <div className="flex gap-2">
-                {!isEdit && (
+              <div>
+                <div className="flex gap-2">
+                  {!isEdit && (
+                    <div className="flex-1 min-w-0">
+                      <Field label="건물" mark="required">
+                        <BuildingAutocompleteInput
+                          value={form.building}
+                          onChange={(text, buildingId) => setForm((prev) => ({ ...prev, building: text, buildingId }))}
+                          placeholder="1공"
+                          className={INPUT_CLASS}
+                          // 칸이 반쪽이라 후보 이름이 잘리지 않게 목록은 두 칸을 합친 폭(자기 폭 x2 + gap-2)으로 편다
+                          listClassName="left-0 w-[calc(200%+0.5rem)]"
+                        />
+                      </Field>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
-                    <Field label="건물" mark="required">
-                      <BuildingAutocompleteInput
-                        value={form.building}
-                        onChange={(text, buildingId) => setForm((prev) => ({ ...prev, building: text, buildingId }))}
-                        placeholder="1공"
-                        className={INPUT_CLASS}
-                        // 칸이 반쪽이라 후보 이름이 잘리지 않게 목록은 두 칸을 합친 폭(자기 폭 x2 + gap-2)으로 편다
-                        listClassName="left-0 w-[calc(200%+0.5rem)]"
-                      />
+                    <Field label="세부위치" mark="required">
+                      <input value={form.detailLocation} onChange={(e) => set('detailLocation', e.target.value)} maxLength={50} placeholder="3층 한자공" className={INPUT_CLASS} />
                     </Field>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <Field label="세부위치" mark="required">
-                    <input value={form.detailLocation} onChange={(e) => set('detailLocation', e.target.value)} maxLength={50} placeholder="3층 한자공" className={INPUT_CLASS} />
-                  </Field>
                 </div>
+                {buildingNotPicked && (
+                  <p className="text-[11px] text-red-500 font-medium mt-1">목록에서 건물을 골라주세요</p>
+                )}
               </div>
 
               {/* 가격 — label로 감싸면 칸 아무 데나 눌러도 첫 입력칸(흑백)에만 포커스가 가서 div로 둔다 */}
@@ -281,8 +277,10 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
               </Field>
             </div>
 
-            {submitFeedback.isError && (
-              <p className="text-xs text-red-500 text-center mb-3">제보 접수에 실패했어요. 다시 시도해주세요.</p>
+            {notice && (
+              <p className={`text-xs text-center mb-3 break-keep ${notice.tone === 'warn' ? 'text-amber-600' : 'text-red-500'}`}>
+                {notice.text}
+              </p>
             )}
             <div className="flex gap-2">
               <button
@@ -298,7 +296,7 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
                   canSubmit ? 'text-white bg-primary' : 'text-slate-300 bg-slate-100'
                 }`}
               >
-                {submitFeedback.isPending ? '접수 중...' : '제보하기'}
+                {resolving ? '최신 정보 확인 중...' : pending ? '접수 중...' : '제보하기'}
               </button>
             </div>
           </>

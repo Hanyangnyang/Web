@@ -1,6 +1,5 @@
 // 도메인 엔티티: 캠퍼스 프린터 — 백엔드 /api/v1/campus-map/printers 응답(교내시설 하위 리소스)에 맞춘 모양.
 // 응답 검증·변환은 data 레이어의 PrinterRepository가 하고, 여기는 화면이 쓰는 모양과 순수 함수만 둔다.
-import printersData from './printers.json';
 import type { Coordinates } from './Coordinates.js';
 
 export interface Printer {
@@ -23,17 +22,38 @@ export interface Printer {
   version: number;
 }
 
-// 화면 제목용 이름 — 이름이 없으면 세부위치로 대신한다 (서버 정렬 규칙도 이름이 없으면 세부위치를 쓴다)
-export function printerDisplayName(printer: Pick<Printer, 'name' | 'detailLocation'>): string {
-  return printer.name?.trim() || printer.detailLocation;
+// 건물 안에서의 이름 — 세부위치(detailLocation, 예: '2층 휴게실').
+// 이미 건물 안이라는 걸 아는 자리(교내시설 상세의 '이 건물 프린터' 목록)에서 쓴다.
+// name 필드는 쓰지 않는다 — 화면 이름은 항상 '건물 + 세부위치'로 통일하기로 했다
+export function printerShortName(printer: Pick<Printer, 'detailLocation'>): string {
+  return printer.detailLocation;
+}
+
+// 화면 제목용 이름 — 건물 이름 + 세부위치 (예: '학술정보관 2층 휴게실').
+// 세부위치만으로는 어느 건물인지 알 수 없어서 붙인다. 세부위치가 이미 건물 이름으로 시작하면 두 번 붙이지 않는다
+export function printerDisplayName(printer: Pick<Printer, 'detailLocation' | 'buildingName'>): string {
+  const short = printerShortName(printer);
+  const building = printer.buildingName?.trim();
+  if (!building || short.startsWith(building)) return short;
+  return `${building} ${short}`;
 }
 
 // ── 지도 표시용 ──
 // API 응답엔 좌표가 없다(프린터는 건물 하위 리소스). 지도에 찍으려면 건물 좌표를 붙인 PlottablePrinter가 필요하다.
 export type PlottablePrinter = Printer & { coordinates: Coordinates };
 
-// TODO(2단계): API 연결 전까지 화면이 쓰는 예시 데이터. 좌표는 아직 JSON에 직접 들어 있다
-export const PRINTERS: PlottablePrinter[] = printersData as PlottablePrinter[];
+// 프린터마다 소속 건물(buildingId)의 좌표를 붙인다. 좌표를 모르는 건물(목록에 없거나 좌표 미확보)의 프린터는
+// 지도·거리순 목록에 둘 수 없어 뺀다 — 교내시설 상세의 프린터 목록은 좌표가 필요 없어 원본 목록을 따로 쓴다
+export function toPlottablePrinters(
+  printers: Printer[],
+  buildings: readonly { id: string; coordinates: Coordinates | null }[]
+): PlottablePrinter[] {
+  const coordsById = new Map(buildings.map((b) => [b.id, b.coordinates]));
+  return printers.flatMap((p) => {
+    const coordinates = coordsById.get(p.buildingId);
+    return coordinates ? [{ ...p, coordinates }] : [];
+  });
+}
 
 // 한 교내시설 안의 프린터 목록 (교내시설 상세 시트용)
 export function printersInBuilding<T extends Printer>(printers: T[], buildingId: string): T[] {
