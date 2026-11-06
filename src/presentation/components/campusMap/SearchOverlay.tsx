@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Search, X, MapPin, Send, Store } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import {
-  searchStores, groupByCategory, activePartnerships,
+  searchStores, matchedMenus, groupByCategory, activePartnerships,
   CATEGORY_META, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
 import { searchBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
@@ -117,7 +117,7 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
             <CardFallback
               icon={<Store size={26} className="text-text-hint mb-1" />}
               message="식당, 카페, 주점이나 교내시설을 검색해보세요"
-              subtext=""
+              subtext="'떡볶이'처럼 메뉴로도 찾을 수 있어요"
               className="!border-0 !shadow-none"
             />
           </div>
@@ -174,6 +174,8 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
             {stores.map((store) => {
               const colleges = activePartnerships(store);
               const closed = !store.isActive;
+              // 메뉴로 찾아온 매장이면 맞은 메뉴를 혜택 요약 대신 보여준다 — '왜 이 가게가 나왔지?'의 답
+              const menus = matchedMenus(store, query);
               return (
                 <button
                   key={store.id}
@@ -192,7 +194,11 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
                         <span className="text-[9px] font-bold px-1 py-px rounded bg-red-50 text-red-400 border border-red-100">폐업</span>
                       )}
                     </div>
-                    {(store.summaryBenefit || store.location.address) && (
+                    {menus.length > 0 ? (
+                      <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
+                        <span aria-hidden>🍽️ </span>{menus.join(' · ')}
+                      </p>
+                    ) : (store.summaryBenefit || store.location.address) && (
                       <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
                         {store.summaryBenefit ?? store.location.address}
                       </p>

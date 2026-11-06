@@ -38,6 +38,8 @@ export interface PartnerStore {
   emoji?: string;
   kakaoPlaceId?: string | null;
   partnerships: Partnership[];
+  // 메뉴 검색용 별칭 — '떡볶이'만 쳐도 떡볶이를 파는 매장이 검색되게 한다 (없으면 빈 배열)
+  representativeMenus: string[];
 }
 
 export const CATEGORY_ORDER: StoreCategory[] = ['food', 'cafe', 'pub', 'play', 'life'];
@@ -86,10 +88,27 @@ export function activePartnerships(store: PartnerStore): Partnership[] {
 }
 
 // 검색어에 맞는 매장만 반환 — 이름만 검색, 공백 제거·소문자화·한글 자모 분리
+// 매장 검색 — 이름 또는 대표 메뉴 중 하나라도 부분 일치하면 결과에 넣는다.
+// 이름으로 맞은 매장을 앞에 둔다: '엽기떡볶이'를 친 사람은 그 가게를 찾는 것이고,
+// 떡볶이를 파는 다른 가게는 그다음이다 (같은 그룹 안에서는 원래 순서 유지)
 export function searchStores(stores: PartnerStore[], query: string): PartnerStore[] {
   const q = normalizeForSearch(query.trim());
   if (!q) return [];
-  return stores.filter((s) => matchesQuery(s.name, q));
+  const byName: PartnerStore[] = [];
+  const byMenu: PartnerStore[] = [];
+  for (const s of stores) {
+    if (matchesQuery(s.name, q)) byName.push(s);
+    else if (s.representativeMenus.some((m) => matchesQuery(m, q))) byMenu.push(s);
+  }
+  return [...byName, ...byMenu];
+}
+
+// 검색어에 맞은 대표 메뉴 목록 — 이름이 아니라 메뉴로 찾아온 매장에 '왜 이 가게가 나왔는지'를 보여주는 용도.
+// 이름으로 이미 맞은 매장이면 빈 배열(굳이 메뉴를 덧붙일 이유가 없다)
+export function matchedMenus(store: PartnerStore, query: string): string[] {
+  const q = normalizeForSearch(query.trim());
+  if (!q || matchesQuery(store.name, q)) return [];
+  return store.representativeMenus.filter((m) => matchesQuery(m, q));
 }
 
 // 카테고리별로 그룹핑 — 카테고리 순서는 CATEGORY_ORDER에 따름, 비어 있는 카테고리는 제외

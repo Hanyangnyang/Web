@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  hasCoords, visibleStores, activePartnerships, searchStores, groupByCategory,
+  hasCoords, visibleStores, activePartnerships, searchStores, matchedMenus, groupByCategory,
   type PartnerStore, type Partnership,
 } from './PartnerStore.js';
 
@@ -25,6 +25,7 @@ function store(overrides: Partial<PartnerStore> = {}): PartnerStore {
     location: { coordinates: { latitude: 37.3, longitude: 126.83 }, address: null, fullAddress: null },
     kakaoPlaceId: null,
     partnerships: [partnership()],
+    representativeMenus: [],
     ...overrides,
   };
 }
@@ -98,6 +99,58 @@ describe('searchStores', () => {
 
   it('빈 검색어는 아무것도 반환하지 않는다', () => {
     expect(searchStores(stores, '  ')).toEqual([]);
+  });
+});
+
+describe('searchStores — 대표 메뉴 검색', () => {
+  // 백엔드 예시 응답(merchantId 250)의 대표 메뉴 그대로
+  const yupdduk = store({
+    id: '250',
+    name: '동대문엽기떡볶이 한양대에리카점',
+    representativeMenus: ['엽기떡볶이', '로제떡볶이', '마라떡볶이', '마라로제떡볶이', '떡볶이', '닭발', '닭볶음탕'],
+  });
+  const bunsik = store({ id: 'b', name: '떡볶이천국' });
+  const chicken = store({ id: 'c', name: '더 치킨', representativeMenus: ['후라이드', '양념치킨', '닭발'] });
+  const stores = [chicken, yupdduk, bunsik];
+
+  it("이름에 없어도 대표 메뉴로 찾는다 ('닭볶음탕' → 엽기떡볶이)", () => {
+    expect(searchStores(stores, '닭볶음탕').map((s) => s.id)).toEqual(['250']);
+  });
+
+  it('메뉴도 띄어쓰기를 무시하고 부분 일치로 찾는다', () => {
+    expect(searchStores(stores, '로제 떡').map((s) => s.id)).toEqual(['250']);
+  });
+
+  it('여러 매장이 같은 메뉴를 팔면 모두 찾는다', () => {
+    expect(searchStores(stores, '닭발').map((s) => s.id)).toEqual(['c', '250']);
+  });
+
+  it('이름으로 맞은 매장을 메뉴로 맞은 매장보다 앞에 둔다', () => {
+    // 엽기떡볶이는 이름에도 '떡볶이'가 있어 이름 매칭, 떡볶이천국도 이름 매칭 → 원래 순서대로 둘 다 앞
+    expect(searchStores(stores, '떡볶이').map((s) => s.id)).toEqual(['250', 'b']);
+    // '양념'은 치킨집 이름엔 없고 메뉴('양념치킨')에만 → 메뉴 매칭으로만 찾힌다
+    expect(searchStores([bunsik, chicken], '양념').map((s) => s.id)).toEqual(['c']);
+  });
+
+  it('메뉴로만 맞은 매장은 그 뒤에 온다', () => {
+    const tteok = store({ id: 't', name: '분식나라', representativeMenus: ['떡볶이', '순대'] });
+    expect(searchStores([tteok, bunsik], '떡볶이').map((s) => s.id)).toEqual(['b', 't']);
+  });
+});
+
+describe('matchedMenus', () => {
+  const s = store({ name: '분식나라', representativeMenus: ['떡볶이', '로제떡볶이', '순대'] });
+
+  it('검색어에 맞은 메뉴만 돌려준다', () => {
+    expect(matchedMenus(s, '떡볶이')).toEqual(['떡볶이', '로제떡볶이']);
+  });
+
+  it('이름으로 이미 맞은 매장이면 빈 배열', () => {
+    expect(matchedMenus(s, '분식')).toEqual([]);
+  });
+
+  it('빈 검색어면 빈 배열', () => {
+    expect(matchedMenus(s, ' ')).toEqual([]);
   });
 });
 
