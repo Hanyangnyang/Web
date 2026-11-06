@@ -4,11 +4,14 @@ import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
 
 interface MenuFeedbackModalProps {
   onClose: () => void;
+  // 제보 당시 화면 상태(날짜·식당 칩·펼친 식사) — 내용 앞에 붙여 보내, 관리자가 사용자가 무엇을 보고 제보했는지 알 수 있게 한다.
+  // 사용자에게는 보이지 않는다 (예: '[학식] 날짜: 2026-11-06 / 칩: 학생식당 / 펼친 식사: 중식')
+  contextPrefix?: string;
 }
 
 const MAX_LENGTH = 300;
 
-export function MenuFeedbackModal({ onClose }: MenuFeedbackModalProps) {
+export function MenuFeedbackModal({ onClose, contextPrefix }: MenuFeedbackModalProps) {
   const [content, setContent] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const submitFeedback = useSubmitFeedbackApi();
@@ -18,7 +21,7 @@ export function MenuFeedbackModal({ onClose }: MenuFeedbackModalProps) {
   const handleSubmit = () => {
     if (!canSubmit) return;
     submitFeedback.mutate(
-      { category: 'MENU', feedbackType: 'INACCURACY', content: content.trim() },
+      { category: 'MENU', feedbackType: 'INACCURACY', content: contextPrefix ? `${contextPrefix} | ${content.trim()}` : content.trim() },
       { onSuccess: () => setSubmitted(true) }
     );
   };
