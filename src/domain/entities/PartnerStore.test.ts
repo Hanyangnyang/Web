@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  hasCoords, visibleStores, activePartnerships, searchStores, matchedMenus, groupByCategory,
+  hasCoords, visibleStores, activePartnerships, searchStores, groupByCategory,
   type PartnerStore, type Partnership,
 } from './PartnerStore.js';
 
@@ -135,22 +135,6 @@ describe('searchStores — 대표 메뉴 검색', () => {
   it('메뉴로만 맞은 매장은 그 뒤에 온다', () => {
     const tteok = store({ id: 't', name: '분식나라', representativeMenus: ['떡볶이', '순대'] });
     expect(searchStores([tteok, bunsik], '떡볶이').map((s) => s.id)).toEqual(['b', 't']);
-  });
-});
-
-describe('matchedMenus', () => {
-  const s = store({ name: '분식나라', representativeMenus: ['떡볶이', '로제떡볶이', '순대'] });
-
-  it('검색어에 맞은 메뉴만 돌려준다', () => {
-    expect(matchedMenus(s, '떡볶이')).toEqual(['떡볶이', '로제떡볶이']);
-  });
-
-  it('이름으로 이미 맞은 매장이면 빈 배열', () => {
-    expect(matchedMenus(s, '분식')).toEqual([]);
-  });
-
-  it('빈 검색어면 빈 배열', () => {
-    expect(matchedMenus(s, ' ')).toEqual([]);
   });
 });
 

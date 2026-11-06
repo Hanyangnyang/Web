@@ -103,14 +103,6 @@ export function searchStores(stores: PartnerStore[], query: string): PartnerStor
   return [...byName, ...byMenu];
 }
 
-// 검색어에 맞은 대표 메뉴 목록 — 이름이 아니라 메뉴로 찾아온 매장에 '왜 이 가게가 나왔는지'를 보여주는 용도.
-// 이름으로 이미 맞은 매장이면 빈 배열(굳이 메뉴를 덧붙일 이유가 없다)
-export function matchedMenus(store: PartnerStore, query: string): string[] {
-  const q = normalizeForSearch(query.trim());
-  if (!q || matchesQuery(store.name, q)) return [];
-  return store.representativeMenus.filter((m) => matchesQuery(m, q));
-}
-
 // 카테고리별로 그룹핑 — 카테고리 순서는 CATEGORY_ORDER에 따름, 비어 있는 카테고리는 제외
 export function groupByCategory(stores: PartnerStore[]): { category: StoreCategory; stores: PartnerStore[] }[] {
   return CATEGORY_ORDER.map((category) => ({

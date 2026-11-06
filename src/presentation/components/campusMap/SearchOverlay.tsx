@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Search, X, MapPin, Send, Store } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import {
-  searchStores, matchedMenus, groupByCategory, activePartnerships,
+  searchStores, groupByCategory, activePartnerships,
   CATEGORY_META, type PartnerStore,
 } from '../../../domain/entities/PartnerStore.js';
 import { searchBuildings, type PlottableBuilding } from '../../../domain/entities/CampusBuilding.js';
@@ -174,8 +174,6 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
             {stores.map((store) => {
               const colleges = activePartnerships(store);
               const closed = !store.isActive;
-              // 메뉴로 찾아온 매장이면 맞은 메뉴를 혜택 요약 대신 보여준다 — '왜 이 가게가 나왔지?'의 답
-              const menus = matchedMenus(store, query);
               return (
                 <button
                   key={store.id}
@@ -188,17 +186,13 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
                   <span className="text-xl flex-shrink-0">{store.emoji || CATEGORY_META[store.category].emoji}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
+                      {/* 카테고리 이름은 섹션 제목(🍽️ 식당 등)과 왼쪽 이모지로 이미 보여서 줄마다 반복하지 않는다 */}
                       <span className="text-[14px] font-extrabold text-text-main truncate">{store.name}</span>
-                      <span className="text-[10px] font-bold text-text-hint">{CATEGORY_META[store.category].label}</span>
                       {closed && (
                         <span className="text-[9px] font-bold px-1 py-px rounded bg-red-50 text-red-400 border border-red-100">폐업</span>
                       )}
                     </div>
-                    {menus.length > 0 ? (
-                      <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
-                        <span aria-hidden>🍽️ </span>{menus.join(' · ')}
-                      </p>
-                    ) : (store.summaryBenefit || store.location.address) && (
+                    {(store.summaryBenefit || store.location.address) && (
                       <p className="text-[11px] text-text-hint font-medium truncate mt-0.5">
                         {store.summaryBenefit ?? store.location.address}
                       </p>
