@@ -178,6 +178,14 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
 
   const groupedMenus = groupMenusByType(menusWithCafe);
 
+  // 학식 제보에 붙일 '제보 당시 화면 상태' — 어느 날짜·어느 식당 칩에서 어떤 식사 드롭다운을 펼쳐 보고 있었는지.
+  // 펼친 식사는 화면에 보이는 순서(sortMealTypeEntries) 그대로 적는다. 팝업이 열려 있는 동안엔 뒤 화면을 조작할 수 없어
+  // 렌더 시점 값이 곧 제보 시점 값이다
+  const openedMealTypes = sortMealTypeEntries(Object.entries(groupedMenus))
+    .map(([type]) => type)
+    .filter((type) => expandedGroups[type]);
+  const feedbackContext = `[학식] 날짜: ${toDateKey(date)} / 칩: ${selectedCafeName} / 펼친 식사: ${openedMealTypes.length > 0 ? openedMealTypes.join(', ') : '없음'}`;
+
   const handleCopied = () => {
     setCopiedToast(true);
     setTimeout(() => setCopiedToast(false), 2000);
@@ -207,7 +215,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
           </ErrorBoundary>
         </Suspense>
       )}
-      {showMenuFeedback && <MenuFeedbackModal onClose={() => setShowMenuFeedback(false)} />}
+      {showMenuFeedback && <MenuFeedbackModal onClose={() => setShowMenuFeedback(false)} contextPrefix={feedbackContext} />}
       {shareTarget && (
         <Suspense fallback={null}>
           <ErrorBoundary name="cafeteria-share-sheet" fallback={<ModalErrorFallback message="공유 화면을 열 수 없어요" onClose={() => setShareTarget(null)} />}>

@@ -17,6 +17,7 @@ const CHIPS: { key: MapChip; label: string; emoji?: string }[] = [
   categoryChip('food'),
   categoryChip('cafe'),
   { key: 'openspace', label: '오픈스페이스', emoji: '📚' },
+  { key: 'printer', label: '프린터', emoji: '🖨️' },
   { key: 'smoking', label: '흡연장', emoji: '🚬' },
   { key: 'building', label: '교내시설', emoji: '🏢' },
   { key: 'parking', label: '주차장', emoji: '🅿️' },

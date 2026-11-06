@@ -117,7 +117,7 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
             <CardFallback
               icon={<Store size={26} className="text-text-hint mb-1" />}
               message="식당, 카페, 주점이나 교내시설을 검색해보세요"
-              subtext=""
+              subtext="'떡볶이'처럼 메뉴로도 찾을 수 있어요"
               className="!border-0 !shadow-none"
             />
           </div>
@@ -186,8 +186,8 @@ export function SearchOverlay({ onClose, onSelect, onSelectBuilding }: Props) {
                   <span className="text-xl flex-shrink-0">{store.emoji || CATEGORY_META[store.category].emoji}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
+                      {/* 카테고리 이름은 섹션 제목(🍽️ 식당 등)과 왼쪽 이모지로 이미 보여서 줄마다 반복하지 않는다 */}
                       <span className="text-[14px] font-extrabold text-text-main truncate">{store.name}</span>
-                      <span className="text-[10px] font-bold text-text-hint">{CATEGORY_META[store.category].label}</span>
                       {closed && (
                         <span className="text-[9px] font-bold px-1 py-px rounded bg-red-50 text-red-400 border border-red-100">폐업</span>
                       )}

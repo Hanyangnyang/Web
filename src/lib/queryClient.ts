@@ -117,8 +117,12 @@ onlineManager.setEventListener(subscribeToNetworkStatus);
  *
  * v5 (플레이리스트): 저장한 곡 캐시(['playlist','liked-songs'])가 Song[] 배열에서 무한 스크롤 페이지 구조
  *   ({ pages: [{ songs, last }], pageParams })로 바뀜. 이전 캐시를 그대로 읽으면 data.pages가 없어 화면이 에러로 깨진다.
+ *
+ * v6 (캠퍼스맵 메뉴 검색): PartnerStore에 필수 필드 representativeMenus(string[]) 추가.
+ *   이전 캐시를 그대로 읽으면 representativeMenus가 undefined라 검색어를 칠 때마다
+ *   searchStores의 representativeMenus.some()이 TypeError로 터져 검색 화면이 깨진다.
  */
-const CACHE_BUSTER = 'v5';
+const CACHE_BUSTER = 'v6';
 
 // buster 도입 전에는 키에 버전을 붙였다. 그 시절 항목은 아무도 읽지 않으므로 한 번 지워준다.
 const LEGACY_CACHE_KEYS = ['hyu_rq_cache_v1'];

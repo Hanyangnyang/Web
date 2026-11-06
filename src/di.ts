@@ -11,6 +11,7 @@ import { createGymApiDataSource } from './data/datasources/GymApiDataSource.js';
 import { createFeedbackApiDataSource } from './data/datasources/FeedbackApiDataSource.js';
 import { createPartnerStoreApiDataSource } from './data/datasources/PartnerStoreApiDataSource.js';
 import { createCampusBuildingApiDataSource } from './data/datasources/CampusBuildingApiDataSource.js';
+import { createPrinterApiDataSource } from './data/datasources/PrinterApiDataSource.js';
 import { createSmokingSpotApiDataSource } from './data/datasources/SmokingSpotApiDataSource.js';
 import { createAcademicStatusApiDataSource } from './data/datasources/AcademicStatusApiDataSource.js';
 import { createDateInfoApiDataSource } from './data/datasources/DateInfoApiDataSource.js';
@@ -25,6 +26,7 @@ import { createGymRepository } from './data/repositories/GymRepository.js';
 import { createFeedbackApiRepository } from './data/repositories/FeedbackApiRepository.js';
 import { createPartnerStoreRepository } from './data/repositories/PartnerStoreRepository.js';
 import { createCampusBuildingRepository } from './data/repositories/CampusBuildingRepository.js';
+import { createPrinterRepository } from './data/repositories/PrinterRepository.js';
 import { createSmokingSpotRepository } from './data/repositories/SmokingSpotRepository.js';
 import { createAcademicStatusRepository } from './data/repositories/AcademicStatusRepository.js';
 import { createDateInfoRepository } from './data/repositories/DateInfoRepository.js';
@@ -41,6 +43,11 @@ import { createGetGymScheduleUseCase } from './domain/usecases/GetGymScheduleUse
 import { createSubmitFeedbackApiUseCase } from './domain/usecases/SubmitFeedbackApiUseCase.js';
 import { createGetPartnerStoresUseCase } from './domain/usecases/GetPartnerStoresUseCase.js';
 import { createGetCampusBuildingsUseCase } from './domain/usecases/GetCampusBuildingsUseCase.js';
+import { createGetPrintersUseCase } from './domain/usecases/GetPrintersUseCase.js';
+import { createGetPrinterUseCase } from './domain/usecases/GetPrinterUseCase.js';
+import {
+  createSubmitNewPrinterReportUseCase, createSubmitPrinterChangeReportUseCase,
+} from './domain/usecases/SubmitPrinterReportUseCase.js';
 import { createGetSmokingSpotsUseCase } from './domain/usecases/GetSmokingSpotsUseCase.js';
 import { createGetAcademicStatusUseCase } from './domain/usecases/GetAcademicStatusUseCase.js';
 import { createGetDateInfoUseCase } from './domain/usecases/GetDateInfoUseCase.js';
@@ -92,6 +99,7 @@ const musicSearchApiDataSource = createMusicSearchApiDataSource({ httpClient: ap
 const feedbackApiDataSource = createFeedbackApiDataSource({ httpClient: apiHttpClient });
 const partnerStoreApiDataSource = createPartnerStoreApiDataSource({ httpClient: apiHttpClient });
 const campusBuildingApiDataSource = createCampusBuildingApiDataSource({ httpClient });
+const printerApiDataSource = createPrinterApiDataSource({ httpClient: apiHttpClient });
 const smokingSpotApiDataSource = createSmokingSpotApiDataSource({ httpClient });
 const academicStatusApiDataSource = createAcademicStatusApiDataSource({ httpClient: apiHttpClient });
 const dateInfoApiDataSource = createDateInfoApiDataSource({ httpClient: apiHttpClient });
@@ -111,6 +119,7 @@ export const musicSearchRepository = createMusicSearchRepository({ musicSearchAp
 export const feedbackApiRepository = createFeedbackApiRepository({ feedbackApiDataSource });
 export const partnerStoreRepository = createPartnerStoreRepository({ partnerStoreApiDataSource });
 export const campusBuildingRepository = createCampusBuildingRepository({ campusBuildingApiDataSource });
+export const printerRepository = createPrinterRepository({ printerApiDataSource });
 export const smokingSpotRepository = createSmokingSpotRepository({ smokingSpotApiDataSource });
 export const academicStatusRepository = createAcademicStatusRepository({ academicStatusApiDataSource });
 export const dateInfoRepository = createDateInfoRepository({ dateInfoApiDataSource });
@@ -143,6 +152,10 @@ export const searchMusicTracksUseCase = createSearchMusicTracksUseCase({ musicSe
 export const submitFeedbackApiUseCase = createSubmitFeedbackApiUseCase({ feedbackApiRepository });
 export const getPartnerStoresUseCase = createGetPartnerStoresUseCase({ partnerStoreRepository });
 export const getCampusBuildingsUseCase = createGetCampusBuildingsUseCase({ campusBuildingRepository });
+export const getPrintersUseCase = createGetPrintersUseCase({ printerRepository });
+export const getPrinterUseCase = createGetPrinterUseCase({ printerRepository });
+export const submitNewPrinterReportUseCase = createSubmitNewPrinterReportUseCase({ printerRepository });
+export const submitPrinterChangeReportUseCase = createSubmitPrinterChangeReportUseCase({ printerRepository });
 export const getSmokingSpotsUseCase = createGetSmokingSpotsUseCase({ smokingSpotRepository });
 export const getAcademicStatusUseCase = createGetAcademicStatusUseCase({ academicStatusRepository });
 export const getDateInfoUseCase = createGetDateInfoUseCase({ dateInfoRepository });

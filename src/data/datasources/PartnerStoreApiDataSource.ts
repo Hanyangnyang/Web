@@ -25,6 +25,8 @@ export interface PartnerStoreDto {
   fullAddress: string | null;
   kakaoPlaceId?: string | null;
   partnerships?: PartnershipDto[];
+  // 메뉴 검색용 별칭 (예: ['엽기떡볶이', '로제떡볶이', '떡볶이']) — 화면에 목록으로 보여주는 용도가 아니라 검색 매칭용
+  representativeMenus?: string[] | null;
 }
 
 export interface PartnerStoreApiDataSource {
