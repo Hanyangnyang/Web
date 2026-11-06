@@ -101,12 +101,11 @@ function PrinterDetailBody({ printer }: { printer: Printer }) {
     <>
       {/* 배경·구분선 없이 촘촘한 라벨-값 목록으로 — 시트 위에서 가볍게 한눈에 읽힌다 */}
       <div>
-        {/* 세부위치 줄엔 notes(예: '휴게실 가장 안쪽에 위치')를 보여준다 — detailLocation('5층 휴게실')은
-            제목(건물 이름 + detailLocation)에 이미 들어가 있어서 같은 글자를 또 보여주지 않는다.
-            그래서 notes를 쓰는 '참고사항' 줄은 따로 두지 않는다 */}
-        <InfoRow label="세부위치">{printer.notes ?? <Empty />}</InfoRow>
+        {/* 가격 → 결제방식 → 참고사항(notes, 예: '휴게실 가장 안쪽에 위치') 순서.
+            detailLocation('5층 휴게실')은 제목(건물 이름 + detailLocation)에 이미 들어가 있어서 줄로 따로 두지 않는다 */}
         <InfoRow label="가격">{printer.price ?? <Empty />}</InfoRow>
         <InfoRow label="결제방식">{printer.paymentMethod ?? <Empty />}</InfoRow>
+        <InfoRow label="참고사항">{printer.notes ?? <Empty />}</InfoRow>
       </div>
 
       {/* 최근 수정일 — 정보가 얼마나 믿을 만한지 사용자가 스스로 판단할 수 있게 */}
@@ -179,7 +178,7 @@ export function PrinterSheet({ printers, loading, error, origin, expanded, onTog
           >
             {/* 질문·버튼 모두 아이콘 없이 글자만 — 시트 안이라 정보 줄들 사이에서 튀지 않게
                 (플로팅 배너는 PrinterReportContent 그대로 — 이 버튼만 따로 그린다) */}
-            {/* 화면에 보이는 세 정보(세부위치=notes·가격·결제방식) 중 하나라도 비어 있으면 '채워 달라'는 쪽으로,
+            {/* 화면에 보이는 세 정보(가격·결제방식·참고사항=notes) 중 하나라도 비어 있으면 '채워 달라'는 쪽으로,
                 다 차 있으면 '고쳐 달라'는 쪽으로 묻는다 — 같은 제보 입구지만 지금 필요한 제보를 유도한다 */}
             <span className="min-w-0 text-[12px] font-semibold text-text-main leading-snug truncate">
               {selected.notes && selected.price && selected.paymentMethod ? '틀린 정보가 있나요?' : '추가할 정보가 있나요?'}

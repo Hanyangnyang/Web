@@ -213,10 +213,11 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
 
             <div className="space-y-3 mb-4">
               {/* 건물 + 세부위치는 한 줄에 반반 — 둘이 합쳐 '어디'라는 하나의 정보라서.
-                  건물은 새 프린터 제보에서만 있다(이미 있는 프린터는 건물이 바뀔 일이 없다) → 수정 제보에선 세부위치가 한 줄을 다 쓴다 */}
-              <div>
-                <div className="flex gap-2">
-                  {!isEdit && (
+                  새 프린터 제보에서만 받는다. 수정 제보는 '이미 이 위치에 있는 프린터'라 위치는 바꾸지 않고
+                  (제목이 곧 건물 + 세부위치), 세부위치 값은 서버 값 그대로라 changes에도 들어가지 않는다 */}
+              {!isEdit && (
+                <div>
+                  <div className="flex gap-2">
                     <div className="flex-1 min-w-0">
                       <Field label="건물" mark="required">
                         <BuildingAutocompleteInput
@@ -229,17 +230,17 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
                         />
                       </Field>
                     </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <Field label="세부위치" mark="required">
-                      <input value={form.detailLocation} onChange={(e) => set('detailLocation', e.target.value)} maxLength={50} placeholder="3층 한자공" className={INPUT_CLASS} />
-                    </Field>
+                    <div className="flex-1 min-w-0">
+                      <Field label="세부위치" mark="required">
+                        <input value={form.detailLocation} onChange={(e) => set('detailLocation', e.target.value)} maxLength={50} placeholder="3층 한자공" className={INPUT_CLASS} />
+                      </Field>
+                    </div>
                   </div>
+                  {buildingNotPicked && (
+                    <p className="text-[11px] text-red-500 font-medium mt-1">목록에서 건물을 골라주세요</p>
+                  )}
                 </div>
-                {buildingNotPicked && (
-                  <p className="text-[11px] text-red-500 font-medium mt-1">목록에서 건물을 골라주세요</p>
-                )}
-              </div>
+              )}
 
               {/* 가격 — label로 감싸면 칸 아무 데나 눌러도 첫 입력칸(흑백)에만 포커스가 가서 div로 둔다 */}
               <div>
