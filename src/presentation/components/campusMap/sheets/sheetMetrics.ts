@@ -13,7 +13,8 @@ export const SMOKING_DETAIL_FRACTION = 0.32;
 export const SMOKING_LIST_FRACTION = 0.45;
 export const PARKING_DETAIL_FRACTION = 0.32;
 export const PARKING_LIST_FRACTION = 0.45;
-export const PRINTER_DETAIL_FRACTION = 0.32;
+// 참고사항 + 정보 3줄 + 수정일까지 스크롤 없이 보이도록 흡연장·주차장(0.32)보다 높게 (교내시설 상세 최대치와 같은 값)
+export const PRINTER_DETAIL_FRACTION = 0.55;
 export const PRINTER_LIST_FRACTION = 0.45;
 
 // ── 하단 플로팅 BottomNav를 피하기 위한 여백 (88px = BottomNav.tsx의 bottom-24px + h-16) ──

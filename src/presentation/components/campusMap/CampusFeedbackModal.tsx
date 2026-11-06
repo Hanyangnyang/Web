@@ -4,6 +4,7 @@ import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
 
 interface CampusFeedbackModalProps {
   onClose: () => void;
+  title?: string;
   // 특정 레이어(예: 프린터 목록의 제보 배너)에서 열 때 문구를 그 맥락에 맞춘다. 없으면 상단 📢 버튼용 기본 문구
   description?: string;
   placeholder?: string;
@@ -15,6 +16,7 @@ const MAX_LENGTH = 300;
 
 export function CampusFeedbackModal({
   onClose,
+  title = '캠퍼스맵 제보하기',
   description = '오픈스페이스·흡연장 등 지도 정보가 다르거나 빠졌다면 알려주세요!',
   placeholder = 'OO관 앞에 흡연장이 있는데 지도엔 안 보여요',
   contentPrefix,
@@ -56,7 +58,7 @@ export function CampusFeedbackModal({
           </div>
         ) : (
           <>
-            <p className="text-base font-bold text-text-main mb-1 text-center">캠퍼스맵 제보하기</p>
+            <p className="text-base font-bold text-text-main mb-1 text-center">{title}</p>
             <p className="text-xs text-text-sub mb-3 text-center">
               {description}
             </p>

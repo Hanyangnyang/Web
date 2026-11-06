@@ -1,58 +1,86 @@
 [
   {
     "id": "ansan-printer-example-01",
-    "name": "학술정보관 (예시)",
+    "name": "학술정보관 1층 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.29603000573167, "longitude": 126.83534960340357 },
-    "location": "1층 로비",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "학술정보관 1층 로비 안내데스크 옆",
+    "price": "흑백 50원 · 컬러 200원",
+    "paymentMethod": "카드, 교통카드",
+    "notice": null,
+    "isBroken": false,
+    "updatedAt": "2026-11-03"
   },
   {
     "id": "ansan-printer-example-02",
-    "name": "본관 (예시)",
+    "name": "본관 2층 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.29870715871089, "longitude": 126.83258385968452 },
-    "location": "2층 복도",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "본관 2층 복도 끝 휴게공간",
+    "price": "흑백 100원",
+    "paymentMethod": "프린터 계정 필요",
+    "notice": null,
+    "isBroken": null,
+    "updatedAt": "2026-09-14"
   },
   {
     "id": "ansan-printer-example-03",
-    "name": "제1공학관 (예시)",
+    "name": "1공 한자공 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.297515224529924, "longitude": 126.8381885645491 },
-    "location": "3층 학생 라운지",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "제1공학관 3층 한양자동차공학과 학생 라운지",
+    "price": "흑백 50원 · 컬러 300원",
+    "paymentMethod": "카드, 프린터 계정 필요",
+    "notice": "최근 용지 걸림 고장이 잦다는 제보가 있어요. 급한 출력은 다른 프린터를 이용해 주세요.",
+    "isBroken": false,
+    "updatedAt": "2026-11-05"
   },
   {
     "id": "ansan-printer-example-04",
-    "name": "ERICA컨벤션센터 (예시)",
+    "name": "컨벤션센터 2층 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.2982749355683, "longitude": 126.83928153291899 },
-    "location": "2층 로비",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "ERICA컨벤션센터 2층 로비",
+    "price": "흑백 100원 · 컬러 300원",
+    "paymentMethod": "카드",
+    "notice": "수리 접수 완료 — 11월 둘째 주 중 복구 예정이에요.",
+    "isBroken": true,
+    "updatedAt": "2026-11-04"
   },
   {
     "id": "ansan-printer-example-05",
-    "name": "약학대학 (예시)",
+    "name": "약대 1층 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.2959582816104, "longitude": 126.83855337010921 },
-    "location": "1층 과사무실 앞",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "약학대학 1층 과사무실 앞",
+    "price": "흑백 50원",
+    "paymentMethod": "카드",
+    "notice": null,
+    "isBroken": false,
+    "updatedAt": "2026-10-20"
   },
   {
     "id": "ansan-printer-example-06",
-    "name": "디자인대학 (예시)",
+    "name": "디대 실습실 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.296695852240795, "longitude": 126.83117851205505 },
-    "location": "지하 1층 실습실 앞",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "디자인대학 지하 1층 실습실 앞",
+    "price": "흑백 100원 · 컬러 500원 (A3 가능)",
+    "paymentMethod": "프린터 계정 필요",
+    "notice": null,
+    "isBroken": false,
+    "updatedAt": "2026-10-28"
   },
   {
     "id": "ansan-printer-example-07",
-    "name": "창의관 (예시)",
+    "name": "창의관 1층 프린터기 (예시)",
     "campus": "ANSAN",
     "coordinates": { "latitude": 37.29191953181185, "longitude": 126.83701695165797 },
-    "location": "1층 편의시설",
-    "description": "예시 데이터예요. 실제 프린터 위치 목록이 모이면 교체됩니다."
+    "detailLocation": "창의관 1층 편의시설 옆",
+    "price": null,
+    "paymentMethod": null,
+    "notice": null,
+    "isBroken": null,
+    "updatedAt": null
   }
 ]

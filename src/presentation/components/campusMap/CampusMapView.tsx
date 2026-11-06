@@ -1,7 +1,7 @@
 // 제휴탭 지도 화면: 카카오맵 + 필터 칩(매장 카테고리·건물·흡연장) + 통합 검색 + 바텀시트
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomOverlayMap, Map as KakaoMap, useKakaoLoader } from 'react-kakao-maps-sdk';
-import { ArrowLeft, LocateFixed, Search } from 'lucide-react';
+import { ArrowLeft, ChevronRight, LocateFixed, Search } from 'lucide-react';
 import { ErrorBoundary } from '../common/ErrorBoundary.js';
 import { CardFallback } from '../common/CardFallback.js';
 import { usePostHog } from 'posthog-js/react';
@@ -17,6 +17,7 @@ import { SmokingSpotSheet } from './sheets/SmokingSpotSheet';
 import { ParkingLotSheet } from './sheets/ParkingLotSheet';
 import { PrinterSheet, PrinterReportContent } from './sheets/PrinterSheet';
 import { CampusFeedbackModal } from './CampusFeedbackModal';
+import { PrinterFeedbackModal } from './PrinterFeedbackModal';
 import {
   STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, PRINTER_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
 } from './sheets/sheetMetrics';
@@ -57,6 +58,8 @@ const SMOKING_FOCUS_LEVEL = 2;
 
 // 뭐먹지(랜덤 추천) 버튼 코치마크를 한 번 봤는지 — 다시 안 뜨게 기기에 남겨둔다
 const DICE_COACHMARK_SEEN_KEY = 'diceCoachmarkSeen';
+// 프린터 칩 신규 안내 배너 — 한 번 누른 사람에겐 다시 띄우지 않는다
+const PRINTER_INTRO_SEEN_KEY = 'printerChipIntroSeen';
 
 interface Props {
   // 탭이 숨겨져도 컴포넌트는 마운트된 채 남아서, 뒤로가기를 가로챌지 판단하려면 이 값이 필요하다
@@ -102,7 +105,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     setSearchOpen(false);
   }, [resetSignal]);
   // 제보 팝업을 어디서 열었는지 — 상단 📢 버튼(일반)과 프린터 목록 배너는 안내 문구·태그가 다르다
-  const [feedbackSource, setFeedbackSource] = useState<'general' | 'printer' | null>(null);
+  // 'printer-edit'은 상세 시트에서 연 '이 프린터 정보 수정' 제보 — 대상은 지금 선택된 프린터(selectedPrinter)
+  const [feedbackSource, setFeedbackSource] = useState<'general' | 'printer' | 'printer-edit' | null>(null);
 
   // 지도가 실제로 그려지는 컨테이너의 픽셀 높이 — focusMap이 '시트 제외 영역 정중앙'을 계산할 때 쓴다
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -257,6 +261,25 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     return () => clearTimeout(t);
   }, [diceCoachmark]);
 
+  // 프린터 칩 신규 안내 — 사용자가 한 번 누를 때까지 '전체' 칩 화면에 계속 띄운다.
+  // '봤음'은 누른 순간에만 저장한다 — 화면에 뜨기만 하고 지나친 사람에겐 다음 실행에도 다시 보여준다.
+  // 다른 칩이거나 시트가 열려 있을 땐 잠깐 숨겼다가 '전체'로 돌아오면 다시 보인다
+  const [printerIntroDismissed, setPrinterIntroDismissed] = useState(() => {
+    try {
+      return localStorage.getItem(PRINTER_INTRO_SEEN_KEY) !== null;
+    } catch {
+      return true;
+    }
+  });
+  const printerIntroShowing = !printerIntroDismissed && chip === 'all' && !sheetVisible;
+  // 노출 이벤트는 캠퍼스맵 진입 1회당 한 번만 — 칩을 오갈 때마다 다시 세면 클릭률이 왜곡된다
+  const printerIntroShownLogged = useRef(false);
+  useEffect(() => {
+    if (!printerIntroShowing || printerIntroShownLogged.current) return;
+    printerIntroShownLogged.current = true;
+    posthog?.capture('partner_map_printer_intro_shown');
+  }, [printerIntroShowing, posthog]);
+
   // 매장 로딩 실패는 StoreSheet 안에서 알리지만, '전체' 칩에서는 시트가 아예 안 뜬다.
   // 그때 마커만 조용히 사라지면 사용자는 원인을 알 수 없으므로 토스트로 한 번 알린다.
   useEffect(() => {
@@ -353,11 +376,28 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
     posthog?.capture('partner_map_college_selected', { college_id: next, college_name: collegeName });
   };
 
-  // 프린터 제보 입구는 이제 시트 위 플로팅 하나뿐이다. placement는 시트 목록 칸도 있던 때(f40884f)의
-  // 이벤트와 같은 기준으로 비교할 수 있게 그대로 싣는다
+  // 프린터 제보 입구는 둘 — 목록 위 플로팅 배너(새 프린터 제보)와 상세 시트 하단 버튼(이 프린터 정보 수정).
+  // 같은 이벤트에 placement로 구분해 싣는다. 'floating'은 시트 목록 칸도 있던 때(f40884f)와 같은 기준값
   const openPrinterReport = () => {
     setFeedbackSource('printer');
-    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating' });
+    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating', type: 'new' });
+  };
+  const openPrinterEditReport = () => {
+    if (!selectedPrinter) return;
+    setFeedbackSource('printer-edit');
+    posthog?.capture('partner_map_printer_report_clicked', { placement: 'detail', type: 'edit', printer_id: selectedPrinter.id });
+  };
+
+  // 신규 안내 배너 탭 → 프린터 칩으로 이동. 거기서 기존 '빠진 프린터 제보' 배너가 이어받는다
+  const openPrinterFromIntro = () => {
+    setPrinterIntroDismissed(true);
+    try {
+      localStorage.setItem(PRINTER_INTRO_SEEN_KEY, '1');
+    } catch {
+      // 저장 실패해도 이번 세션에선 다시 안 뜬다 (다음 실행엔 다시 보일 수 있음)
+    }
+    posthog?.capture('partner_map_printer_intro_clicked');
+    handleChipChange('printer');
   };
 
   const openSearch = () => {
@@ -503,14 +543,33 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         </button>
       )}
 
+      {/* 프린터 칩 신규 안내 배너 — 프린터 칩의 제보 배너와 같은 자리·같은 모양(흰 배경 + slate 테두리)이라
+          배너를 누르면 프린터 칩으로 가면서 이 배너가 같은 자리의 제보 배너로 자연스럽게 바뀌어 보인다.
+          문구가 두 줄이라 높이만 자유롭게 둔다 */}
+      {printerIntroShowing && (
+        <button
+          onClick={openPrinterFromIntro}
+          style={{ bottom: `calc(${buttonBase} + 12px)` }}
+          className="absolute left-3 right-16 z-30 min-h-11 px-4 py-2 flex items-center gap-2.5 rounded-2xl bg-white border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.18)] text-left [-webkit-tap-highlight-color:transparent] active:scale-[0.98] transition-transform [animation:fadeIn_0.3s_ease-out]"
+        >
+          <span className="text-xl flex-shrink-0">🖨️</span>
+          <span className="flex-1 min-w-0">
+            <span className="flex items-center gap-1.5">
+              <span className="text-[13px] font-extrabold text-text-main leading-snug">프린터 칩이 생겼어요!</span>
+              <span className="flex-shrink-0 rounded-full bg-red-500 px-1.5 py-[3px] text-[9px] font-extrabold leading-none text-white">NEW</span>
+            </span>
+            <span className="block text-[11.5px] font-semibold text-text-hint leading-snug mt-0.5">프린터 정보를 제보해주세요!</span>
+          </span>
+          <ChevronRight size={16} className="flex-shrink-0 text-text-hint" />
+        </button>
+      )}
+
       {feedbackSource === 'general' && <CampusFeedbackModal onClose={() => setFeedbackSource(null)} />}
       {feedbackSource === 'printer' && (
-        <CampusFeedbackModal
-          onClose={() => setFeedbackSource(null)}
-          description="지도에 없는 프린터나 위치가 다른 프린터를 알려주세요!"
-          placeholder="OO관 2층 복도에 프린터가 있어요"
-          contentPrefix="[프린터]"
-        />
+        <PrinterFeedbackModal target={{ mode: 'new' }} onClose={() => setFeedbackSource(null)} />
+      )}
+      {feedbackSource === 'printer-edit' && selectedPrinter && (
+        <PrinterFeedbackModal target={{ mode: 'edit', printer: selectedPrinter }} onClose={() => setFeedbackSource(null)} />
       )}
 
       {/* 토스트 */}
@@ -622,6 +681,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           selected={selectedPrinter}
           onSelect={(p) => pickPrinter(p, 'list')}
           onClose={closeDetail}
+          onReportEdit={openPrinterEditReport}
         />
       ) : null}
       </SheetHeightContext.Provider>
