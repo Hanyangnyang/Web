@@ -23,13 +23,12 @@ const TABS = [
 interface BottomNavProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  showMiscNew: boolean;
 }
 
 const LONG_PRESS_MS = 250;
 const DRAG_START_PX = 8;
 
-export function BottomNav({ activeTab, setActiveTab, showMiscNew }: BottomNavProps) {
+export function BottomNav({ activeTab, setActiveTab }: BottomNavProps) {
   const activeIndex = TABS.findIndex((tab) => tab.key === activeTab);
 
   // 꾹 누르거나 옆으로 밀면 캡슐을 손가락으로 끌고 다니다가, 손을 뗀 칸의 탭으로 전환
@@ -124,9 +123,6 @@ export function BottomNav({ activeTab, setActiveTab, showMiscNew }: BottomNavPro
               hoverIndex === index ? 'text-hyu-blue-light' : 'text-slate-600'
             }`}
           >
-            {key === 'misc' && showMiscNew && (
-              <span className="pointer-events-none absolute -top-3 right-0 whitespace-nowrap rounded-full bg-red-500 px-2.5 py-[5px] text-[10px] font-extrabold leading-none text-white shadow-sm">NEW</span>
-            )}
             {icon}
             <span className="text-[0.65rem] font-semibold whitespace-nowrap">{label}</span>
           </div>
