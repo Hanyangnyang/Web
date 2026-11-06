@@ -10,6 +10,9 @@ export interface Printer {
   // 목록·상세 시트 제목에 그대로 쓰는 이름 (예: '1공 한자공 프린터기')
   name: string;
   campus: string;
+  // 이 프린터가 있는 교내시설(CampusBuilding.id) — 백엔드에서 프린터는 교내시설 하위에 붙는다(오픈스페이스와 같은 구조).
+  // 교내시설 상세 시트가 이 값으로 '이 건물의 프린터' 목록을 만든다. 건물 밖(야외 등)이면 null
+  buildingId: string | null;
   coordinates: Coordinates | null;
   // 어느 건물 몇 층 어디에 있는지 (예: '제1공학관 2층 한자공 앞')
   detailLocation: string | null;
@@ -36,4 +39,9 @@ function hasCoords(printer: Printer): printer is PlottablePrinter {
 // 좌표가 있는 프린터만 반환
 export function visiblePrinters(printers: Printer[]): PlottablePrinter[] {
   return printers.filter(hasCoords);
+}
+
+// 한 교내시설 안의 프린터 목록 (교내시설 상세 시트용)
+export function printersInBuilding<T extends Printer>(printers: T[], buildingId: string): T[] {
+  return printers.filter((p) => p.buildingId === buildingId);
 }

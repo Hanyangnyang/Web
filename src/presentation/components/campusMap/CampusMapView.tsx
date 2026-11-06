@@ -649,6 +649,7 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
           selected={selectedBuilding}
           onSelect={(b) => pickBuilding(b, 'list')}
           onClose={closeDetail}
+          printers={printers}
         />
       ) : isSmokingChip ? (
         <SmokingSpotSheet

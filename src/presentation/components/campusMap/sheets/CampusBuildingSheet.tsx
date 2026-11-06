@@ -2,6 +2,7 @@
 import { X } from 'lucide-react';
 import { allOpenSpaces, type CampusBuilding, type PlottableBuilding } from '../../../../domain/entities/CampusBuilding.js';
 import { openSpaceLabel } from '../../../../domain/entities/OpenSpace.js';
+import { printersInBuilding, type Printer } from '../../../../domain/entities/Printer.js';
 import type { LatLng } from '../../../../lib/campusGeo.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
 import { collegeStyleByName } from '../../ui/collegeStyle.js';
@@ -22,6 +23,7 @@ interface Props {
   selected: CampusBuilding | null;
   onSelect: (building: PlottableBuilding) => void;
   onClose: () => void;                       // 상세 닫기 → 목록으로 복귀
+  printers: Printer[];                       // 전체 프린터 — 상세에서 이 건물(buildingId) 것만 골라 보여준다
 }
 
 
@@ -39,15 +41,17 @@ const VARIANT_META: Record<BuildingSheetVariant, { title: string; emoji: string;
   },
 };
 
-export function CampusBuildingSheet({ buildings, loading, error, origin, variant, expanded, onToggleExpand, selected, onSelect, onClose }: Props) {
+export function CampusBuildingSheet({ buildings, loading, error, origin, variant, expanded, onToggleExpand, selected, onSelect, onClose, printers }: Props) {
   const meta = VARIANT_META[variant];
 
   // ── 상세 모드 ──
   if (selected) {
+    const buildingPrinters = printersInBuilding(printers, selected.id);
     const hasDetails = !!selected.description
       || selected.primaryColleges.length > 0
       || selected.facilities.length > 0
-      || selected.openSpaces.length > 0;
+      || selected.openSpaces.length > 0
+      || buildingPrinters.length > 0;
 
     return (
       <StandardBottomSheet height="auto" maxHeight={toCssHeight(BUILDING_DETAIL_MAX_FRACTION)}>
@@ -118,6 +122,25 @@ export function CampusBuildingSheet({ buildings, loading, error, origin, variant
                     · {openSpaceLabel(space)}
                     {/* 찾아가는 요령은 이름과 무게를 달리해 한눈에 구분되게 (예전엔 한 문자열이라 전부 같은 굵기였다) */}
                     {space.hint && <span className="text-text-hint font-normal"> — {space.hint}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* 프린터 — 오픈스페이스와 같은 목록 모양. 프린터도 백엔드에서 교내시설 하위에 붙는다 */}
+          {buildingPrinters.length > 0 && (
+            <div>
+              <p className="text-[11px] font-bold text-text-hint mb-1.5">프린터</p>
+              <ul className="space-y-1">
+                {buildingPrinters.map((printer) => (
+                  <li key={printer.id} className="text-[11px] text-text-main font-medium">
+                    · {printer.name}
+                    {printer.detailLocation && <span className="text-text-hint font-normal"> — {printer.detailLocation}</span>}
+                    {/* 고장 난 프린터는 건물 목록에서도 바로 알 수 있게 — 프린터 목록의 '고장' 태그와 같은 모양 */}
+                    {printer.isBroken === true && (
+                      <span className="ml-1 align-[1px] text-[9px] font-bold px-1 py-px rounded bg-red-50 text-red-400 border border-red-100">고장</span>
+                    )}
                   </li>
                 ))}
               </ul>
