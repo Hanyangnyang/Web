@@ -5,11 +5,8 @@
 // 항목을 칸별로 받되, 지금 백엔드 제보 API는 자유 텍스트(content) 하나만 받으므로
 // 보낼 때 한 줄로 합친다. 프린터 전용 API가 생기면 buildContent만 교체하면 된다
 import { useState, type ReactNode } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { printerDisplayName, type Printer } from '../../../domain/entities/Printer.js';
-import {
-  PRINT_SERVICES, EMPTY_SERVICE_PRICES, composePrice, parsePrice,
-  type PrintService, type ServicePrices, type ColorPrices,
-} from '../../../domain/entities/PrinterPrice.js';
 import { useSubmitFeedbackApi } from '../../hooks/useSubmitFeedbackApi.js';
 import { BuildingAutocompleteInput } from './BuildingAutocompleteInput';
 
@@ -23,30 +20,43 @@ interface FormState {
   // 직접 친 이름(목록에 없는 건물)이면 null
   buildingId: string | null;
   detailLocation: string;
-  // 가격 — 칩으로 고른 서비스(복사·인쇄·스캔·팩스)마다 흑백/컬러 칸. 고르지 않은 서비스의 값은 남겨 두되 보내지 않는다
-  // (칩을 실수로 껐다 켜도 입력한 값이 사라지지 않게)
-  priceServices: PrintService[];
-  prices: ServicePrices;
+  priceMono: string;   // 흑백 1장 가격 (숫자만)
+  priceColor: string;  // 컬러 1장 가격 (숫자만)
   // 결제방식은 자유 텍스트 — 카드·계정·현금 등 조합이 프린터마다 달라 선택지로 묶지 않기로 했다
   payment: string;
   note: string;
+  // 고장 여부 — '모름'(unknown)과 명시적인 '예/아니오'를 구분한다 (API 문서: 모르면 false로 채우지 말고 생략).
+  // 수정 제보에서만 입력받는다 — 신규 제보에선 항상 '모름'이라 전송 내용에서 빠진다
+  broken: TriState;
 }
 
+// 세 갈래 선택: 'unknown' = 모름(서버로 안 보냄), 'yes'/'no' = 사용자가 직접 확인한 값.
+// 새 API(POST /printer-reports 등)에 연결할 때 unknown → 키 생략(undefined), yes → true, no → false로 바꾼다
+type TriState = 'unknown' | 'yes' | 'no';
+
 const EMPTY_FORM: FormState = {
-  building: '', buildingId: null, detailLocation: '', priceServices: [], prices: EMPTY_SERVICE_PRICES, payment: '', note: '',
+  building: '', buildingId: null, detailLocation: '', priceMono: '', priceColor: '', payment: '', note: '',
+  broken: 'unknown',
 };
+
+// 엔티티의 가격은 '흑백 50원 · 컬러 300원' 같은 자유 문구라 흑백/컬러 숫자만 뽑아 칸에 채운다
+function parsePrice(price: string | null, tag: '흑백' | '컬러'): string {
+  const m = price?.match(new RegExp(`${tag}\\s*([\\d,]+)\\s*원`));
+  return m ? m[1].replace(/,/g, '') : '';
+}
 
 function initialForm(target: PrinterFeedbackTarget): FormState {
   if (target.mode === 'new') return EMPTY_FORM;
   const p = target.printer;
-  const parsed = parsePrice(p.price);
   return {
     ...EMPTY_FORM,
     detailLocation: p.detailLocation ?? '',
-    priceServices: parsed.selected,
-    prices: parsed.prices,
+    priceMono: parsePrice(p.price, '흑백'),
+    priceColor: parsePrice(p.price, '컬러'),
     payment: p.paymentMethod ?? '',
     note: p.notes ?? '',
+    // 서버 false는 '고장 등록 없음'일 뿐 '정상 확인'이 아니라서 '아니오'가 아니라 '모름'으로 시작한다
+    broken: p.broken ? 'yes' : 'unknown',
   };
 }
 
@@ -54,9 +64,13 @@ function initialForm(target: PrinterFeedbackTarget): FormState {
 const FIELDS: { label: string; newOnly?: boolean; show: (f: FormState) => string }[] = [
   { label: '건물', newOnly: true, show: (f) => (f.building.trim() ? `${f.building.trim()}${f.buildingId ? `(${f.buildingId})` : ''}` : '') },
   { label: '세부위치', show: (f) => f.detailLocation.trim() },
-  { label: '가격', show: (f) => composePrice(f.priceServices, f.prices) },
+  {
+    label: '가격',
+    show: (f) => [f.priceMono && `흑백 ${f.priceMono}원`, f.priceColor && `컬러 ${f.priceColor}원`].filter(Boolean).join(', '),
+  },
   { label: '결제방식', show: (f) => f.payment.trim() },
   { label: '참고사항', show: (f) => f.note.trim() },
+  { label: '고장 여부', show: (f) => (f.broken === 'yes' ? '고장' : f.broken === 'no' ? '정상' : '') },
 ];
 
 // 새 제보: 채워진 칸만 '항목: 값'
@@ -109,9 +123,9 @@ function Field({ label, mark, children }: { label: string; mark: FieldMark; chil
 }
 
 // 가격 칸 하나 — 앞에 '흑백/컬러', 뒤에 '원'을 칸 안에 붙여 숫자만 치면 되게 한다
-function PriceInput({ tag, label, value, onChange }: { tag: string; label: string; value: string; onChange: (v: string) => void }) {
+function PriceInput({ tag, value, onChange }: { tag: string; value: string; onChange: (v: string) => void }) {
   return (
-    <div className="flex-1 min-w-0 flex items-center h-10 bg-surface border border-[#e2e8f0] rounded-xl px-2.5 gap-1 focus-within:border-primary">
+    <div className="flex-1 min-w-0 flex items-center h-10 bg-surface border border-[#e2e8f0] rounded-xl px-3 gap-1.5 focus-within:border-primary">
       <span className="flex-shrink-0 text-[12px] font-bold text-text-main">{tag}</span>
       <input
         value={value}
@@ -120,7 +134,7 @@ function PriceInput({ tag, label, value, onChange }: { tag: string; label: strin
         maxLength={5}
         onChange={(e) => onChange(e.target.value.replace(/\D/g, ''))}
         placeholder="0"
-        aria-label={label}
+        aria-label={`${tag} 가격`}
         className="flex-1 min-w-0 bg-transparent text-sm text-text-main text-right placeholder-text-hint outline-none"
       />
       <span className="flex-shrink-0 text-[12px] font-bold text-text-hint">원</span>
@@ -128,57 +142,32 @@ function PriceInput({ tag, label, value, onChange }: { tag: string; label: strin
   );
 }
 
-// 가격 입력 — 서비스 칩(복사·인쇄·스캔·팩스)을 눌러 켠 서비스만 '흑백 / 컬러' 줄이 생긴다.
-// 8칸을 다 펼치면 팝업이 길어지고 대부분 비어 있어서, 실제로 되는 서비스만 고르게 한다
-function PriceSection({
-  services, prices, currentPrice, onToggle, onChange,
+// 모름 / 예 / 아니오 드롭다운 — 결제방식과 한 줄에 반반으로 두기 위해 폭을 적게 차지하는 드롭다운으로 둔다.
+// 네이티브 select라 모바일에선 OS 기본 선택창이 뜬다. 기본값 '모름'은 회색 글씨로 보여 '미확인'과 '확인함'을 구분한다
+function TriStateSelect({
+  label, value, onChange, yesLabel, noLabel,
 }: {
-  services: PrintService[];
-  prices: ServicePrices;
-  currentPrice: string | null;   // 수정 제보에서, 칸에 다 못 옮긴 기존 가격 원문 (없으면 null)
-  onToggle: (s: PrintService) => void;
-  onChange: (s: PrintService, key: keyof ColorPrices, v: string) => void;
+  label: string;
+  value: TriState;
+  onChange: (v: TriState) => void;
+  yesLabel: string;
+  noLabel: string;
 }) {
   return (
-    <div>
-      <FieldLabel label="가격" mark="optional" />
-      {currentPrice && (
-        // 옛 자유 형식이라 칸으로 다 못 옮긴 정보(예: 'A3 가능')가 있을 때만 — 지워진 줄 알고 다시 적게 하지 않으려고
-        <p className="text-[11px] text-text-hint font-medium leading-snug mb-1.5 break-keep">현재 등록: {currentPrice}</p>
-      )}
-      <div className="flex gap-1.5 mb-2" role="group" aria-label="가격을 입력할 서비스">
-        {PRINT_SERVICES.map((s) => {
-          const on = services.includes(s);
-          return (
-            <button
-              key={s}
-              type="button"
-              onClick={() => onToggle(s)}
-              aria-pressed={on}
-              className={`flex-1 h-8 rounded-full text-[12px] font-bold border transition-colors [-webkit-tap-highlight-color:transparent] ${
-                on ? 'bg-primary text-white border-primary' : 'bg-white text-text-sub border-[#e2e8f0]'
-              }`}
-            >
-              {s}
-            </button>
-          );
-        })}
+    <Field label={label} mark="optional">
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value as TriState)}
+          className={`${INPUT_CLASS} appearance-none pr-9 ${value === 'unknown' ? 'text-text-hint' : ''}`}
+        >
+          <option value="unknown">모름</option>
+          <option value="yes">{yesLabel}</option>
+          <option value="no">{noLabel}</option>
+        </select>
+        <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-hint" />
       </div>
-      {services.length === 0 ? (
-        <p className="text-[11px] text-text-hint font-medium">되는 서비스를 눌러 가격을 입력해주세요</p>
-      ) : (
-        <div className="space-y-1.5">
-          {/* 칩을 누른 순서가 아니라 칩 순서대로 — 보낼 문자열(composePrice) 순서와 화면 순서를 같게 */}
-          {PRINT_SERVICES.filter((s) => services.includes(s)).map((s) => (
-            <div key={s} className="flex items-center gap-2">
-              <span className="flex-shrink-0 w-7 text-[12px] font-bold text-text-sub">{s}</span>
-              <PriceInput tag="흑백" label={`${s} 흑백 가격`} value={prices[s].mono} onChange={(v) => onChange(s, 'mono', v)} />
-              <PriceInput tag="컬러" label={`${s} 컬러 가격`} value={prices[s].color} onChange={(v) => onChange(s, 'color', v)} />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    </Field>
   );
 }
 
@@ -192,16 +181,6 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }));
 
-  const togglePriceService = (s: PrintService) =>
-    setForm((prev) => ({
-      ...prev,
-      priceServices: prev.priceServices.includes(s) ? prev.priceServices.filter((x) => x !== s) : [...prev.priceServices, s],
-    }));
-
-  // 수정 제보에서 기존 가격을 칸으로 다 옮기지 못했을 때만 원문을 같이 보여준다
-  const [currentPriceNote] = useState(() =>
-    target.mode === 'edit' && target.printer.price && !parsePrice(target.printer.price).complete ? target.printer.price : null
-  );
 
   const isEdit = target.mode === 'edit';
   // 필수 칸(*)은 항상 채워져 있어야 한다. 수정 제보는 이미 채워진 채 시작하므로 거기에 더해 하나라도 바꿔야 보낼 수 있다
@@ -266,18 +245,29 @@ export function PrinterFeedbackModal({ target, onClose }: { target: PrinterFeedb
                 </div>
               </div>
 
-              {/* 가격 — 칸이 여러 개라 label로 감싸지 않는다 (감싸면 아무 데나 눌러도 첫 칸에만 포커스가 간다) */}
-              <PriceSection
-                services={form.priceServices}
-                prices={form.prices}
-                currentPrice={currentPriceNote}
-                onToggle={togglePriceService}
-                onChange={(s, key, v) => setForm((prev) => ({ ...prev, prices: { ...prev.prices, [s]: { ...prev.prices[s], [key]: v } } }))}
-              />
+              {/* 가격 — label로 감싸면 칸 아무 데나 눌러도 첫 입력칸(흑백)에만 포커스가 가서 div로 둔다 */}
+              <div>
+                <FieldLabel label="가격" mark="optional" />
+                <div className="flex gap-2">
+                  <PriceInput tag="흑백" value={form.priceMono} onChange={(v) => set('priceMono', v)} />
+                  <PriceInput tag="컬러" value={form.priceColor} onChange={(v) => set('priceColor', v)} />
+                </div>
+              </div>
 
-              <Field label="결제방식" mark="optional">
-                <input value={form.payment} onChange={(e) => set('payment', e.target.value)} maxLength={50} placeholder="카드" className={INPUT_CLASS} />
-              </Field>
+              {/* 결제방식 + 고장 여부는 한 줄에 반반. 고장 여부는 이미 있는 프린터의 수정 제보에서만 —
+                  새로 알려주는 프린터는 '어디에 있다'가 핵심이라 상태까지 묻지 않고, 그땐 결제방식이 한 줄을 다 쓴다 */}
+              <div className="flex gap-2">
+                <div className="flex-1 min-w-0">
+                  <Field label="결제방식" mark="optional">
+                    <input value={form.payment} onChange={(e) => set('payment', e.target.value)} maxLength={50} placeholder="카드" className={INPUT_CLASS} />
+                  </Field>
+                </div>
+                {isEdit && (
+                  <div className="flex-1 min-w-0">
+                    <TriStateSelect label="고장 여부" value={form.broken} onChange={(v) => set('broken', v)} yesLabel="고장" noLabel="정상" />
+                  </div>
+                )}
+              </div>
 
               <Field label="참고사항" mark="optional">
                 {/* 다른 칸과 같은 한 줄 높이 — 길게 쓰면 칸 안에서 가로로 밀린다 */}

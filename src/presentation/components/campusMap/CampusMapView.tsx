@@ -380,13 +380,9 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
 
   // 프린터 제보 입구는 둘 — 목록 위 플로팅 배너(새 프린터 제보)와 상세 시트 하단 버튼(이 프린터 정보 수정).
   // 같은 이벤트에 placement로 구분해 싣는다. 'floating'은 시트 목록 칸도 있던 때(f40884f)와 같은 기준값
-  // 바텀시트가 접힌 기본 상태에서만 긴 배너로 두고, 시트가 조금이라도 올라가면(목록 펼침 또는 상세 열림)
-  // 지도를 가리지 않게 동그라미 제보 버튼으로 접는다 (사라지지 않게)
-  const printerReportCompact = !!selectedPrinter || sheetExpanded;
   const openPrinterReport = () => {
     setFeedbackSource('printer');
-    // compact: 동그라미 상태에서 눌렀는지 — 접힌 입구도 실제로 쓰이는지 보려고
-    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating', type: 'new', compact: printerReportCompact });
+    posthog?.capture('partner_map_printer_report_clicked', { placement: 'floating', type: 'new' });
   };
   const openPrinterEditReport = () => {
     if (!selectedPrinter) return;
@@ -538,16 +534,9 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
       </button>
 
       {/* 프린터 제보 플로팅 버튼 — 내 위치 버튼과 같은 줄, 그 바로 왼쪽(right = 버튼 12px + 폭 44px + 간격 8px).
-          시트가 접혀 있으면 내용 폭에 맞춘 배너, 올라가면(목록 펼침·상세) 동그라미로 접힌다 (동작은 컴포넌트 주석 참고) */}
+          내용 폭에 맞춘 배너로 프린터 칩에서 항상 펼쳐 둔다 (시트가 올라가면 위치만 따라 올라간다) */}
       {isPrinterChip && (
-        <PrinterReportFloatingButton
-          compact={printerReportCompact}
-          // 시트 상태(선택된 프린터·목록 펼침)가 바뀌면 동그라미를 눌러 펼쳐 둔 배너를 다시 접는다
-          collapseKey={`${selectedPrinter?.id ?? ''}|${sheetExpanded}`}
-          bottom={`calc(${buttonBase} + 12px)`}
-          onClick={openPrinterReport}
-          onExpand={() => posthog?.capture('partner_map_printer_report_expanded')}
-        />
+        <PrinterReportFloatingButton bottom={`calc(${buttonBase} + 12px)`} onClick={openPrinterReport} />
       )}
 
       {/* 프린터 칩 신규 안내 배너 — 프린터 칩의 제보 배너와 같은 자리·같은 모양(흰 배경 + slate 테두리)이라
