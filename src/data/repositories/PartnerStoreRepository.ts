@@ -47,6 +47,13 @@ function toPartnership(raw: PartnershipDto): Partnership | null {
   };
 }
 
+// 대표 메뉴는 검색 보조 정보라 형식이 이상해도 매장을 버리지 않고 빈 목록으로 둔다 —
+// 배열이 아니면 [], 배열 안의 문자열이 아니거나 빈 값은 하나씩 걸러낸다
+function toRepresentativeMenus(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((m): m is string => typeof m === 'string' && m.trim().length > 0).map((m) => m.trim());
+}
+
 // id·이름·카테고리 중 하나라도 신뢰할 수 없으면 매장 전체를 건너뛴다 —
 // 잘못된 카테고리로 잘못 표시하는 것보다, 그 매장 하나가 안 보이는 게 안전하다
 function toPartnerStore(raw: PartnerStoreDto): PartnerStore | null {
@@ -73,6 +80,7 @@ function toPartnerStore(raw: PartnerStoreDto): PartnerStore | null {
     },
     kakaoPlaceId: raw.kakaoPlaceId ?? null,
     partnerships,
+    representativeMenus: toRepresentativeMenus(raw.representativeMenus),
   };
 }
 
