@@ -13,9 +13,19 @@ export const SMOKING_DETAIL_FRACTION = 0.32;
 export const SMOKING_LIST_FRACTION = 0.45;
 export const PARKING_DETAIL_FRACTION = 0.32;
 export const PARKING_LIST_FRACTION = 0.45;
-// 참고사항 + 정보 3줄 + 수정일까지 스크롤 없이 보이도록 흡연장·주차장(0.32)보다 높게 (교내시설 상세 최대치와 같은 값)
-export const PRINTER_DETAIL_FRACTION = 0.55;
 export const PRINTER_LIST_FRACTION = 0.45;
+
+// 프린터 상세는 화면 비율이 아니라 '내용 5줄(가격·결제방식·참고사항·수정일·제보 버튼)이 각 한 줄일 때'의
+// 높이로 고정한다. 값이 길어져 줄이 늘어나도 시트는 이 높이를 유지하고 안쪽만 스크롤된다.
+// 244px = 헤더 61(pt-4 16 + 이모지 줄 32 + pb-3 12 + 구분선 1)
+//       + 본문 위 여백 8 + 정보 3줄 ≈90(InfoRow 31.2×3 − first/last 패딩 축소 4)
+//       + 간격 10 + 수정일 줄 15 + 간격 12 + 제보 버튼 48
+// PrinterSheet의 패딩·글자 크기를 바꾸면 이 값도 같이 고쳐야 한다.
+const PRINTER_DETAIL_CONTENT_PX = 244;
+/** 시트 실제 높이(px, safe-area 제외) — 지도 포커스 계산용 */
+export const PRINTER_DETAIL_PX = PRINTER_DETAIL_CONTENT_PX + 88;
+/** 시트 높이 CSS — nav 여백(88px)과 safe-area까지 포함 */
+export const PRINTER_DETAIL_CSS = `calc(${PRINTER_DETAIL_CONTENT_PX}px + 88px + env(safe-area-inset-bottom, 0px))`;
 
 // ── 하단 플로팅 BottomNav를 피하기 위한 여백 (88px = BottomNav.tsx의 bottom-24px + h-16) ──
 // 시트는 nav가 위로 지나가도록 화면 끝까지 연장하고, 콘텐츠만 이 여백만큼 비워 가려지지 않게 한다.
