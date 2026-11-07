@@ -152,4 +152,53 @@ describe('useMenu (React Query)', () => {
     expect(result.current.cafes.every(cafe => cafe.menus.length === 0)).toBe(true);
     expect(fetchMock.mock.calls.length).toBe(callsAfterInitialLoad);
   });
+
+  describe('앱 복귀(visibilitychange) 시 재검증', () => {
+    // 앱이 백그라운드에서 돌아온 상황을 흉내낸다
+    function returnToForeground() {
+      Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+      act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    }
+
+    // dataUpdatedAt을 과거로 돌려 '받은 지 n분 된 데이터'를 만든다
+    function seedMenuCache(minutesAgo: number) {
+      queryClient.setQueryData(['menu-period'], {}, { updatedAt: Date.now() - minutesAgo * 60 * 1000 });
+    }
+
+    it('데이터가 10분보다 오래됐으면 다시 불러온다', async () => {
+      seedMenuCache(11);
+      const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
+      renderHook(() => useMenu(true), { wrapper });
+      // 마운트 시 refetchOnMount로 한 번 불러올 수 있으니, 그 뒤 다시 오래된 상태로 만들고 세기 시작한다
+      await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+      seedMenuCache(11);
+      const before = fetchMock.mock.calls.length;
+
+      returnToForeground();
+
+      await waitFor(() => expect(fetchMock.mock.calls.length).toBe(before + 1));
+    });
+
+    it('데이터가 10분 안이면 다시 불러오지 않는다', async () => {
+      seedMenuCache(5);
+      const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
+      renderHook(() => useMenu(true), { wrapper });
+
+      returnToForeground();
+      await new Promise((r) => setTimeout(r, 20));
+
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('학식 탭이 아니면(isActive=false) 오래된 데이터여도 불러오지 않는다', async () => {
+      seedMenuCache(30);
+      const fetchMock = mockFetch(() => Promise.resolve(jsonResponse(true, menuApiResponse())));
+      renderHook(() => useMenu(false), { wrapper });
+
+      returnToForeground();
+      await new Promise((r) => setTimeout(r, 20));
+
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+  });
 });
