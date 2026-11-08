@@ -11,6 +11,7 @@ import { isLibraryCrowded } from '../../../domain/entities/LibraryRoom.js';
 import { WeatherCard } from './WeatherCard.jsx';
 import { BannerCarousel } from './BannerCarousel.jsx';
 import { LibraryStatusCard } from './LibraryStatusCard.jsx';
+import { PeperoPromoModal } from './PeperoPromoModal.js';
 import { ClubSpotlightCard } from '../misc/ClubSpotlightCard.js';
 import { ArtistPromoCarousel } from '../playlist/shared/ArtistPromoCarousel.js';
 import { ErrorBoundary } from '../common/ErrorBoundary.jsx';
@@ -30,13 +31,17 @@ interface PortalViewProps {
   // clubId는 기타탭 중앙동아리 안에서 특정 동아리 위치까지 미리 켜고 싶을 때만 넘어온다
   // playlistSearchQuery는 box가 'playlist'일 때, 플레이리스트 검색 결과 화면을 그 검색어로 바로 열고 싶을 때만 넘어온다
   onNavigateToTab?: (tab: string, chip?: string, box?: string, clubId?: string, playlistSearchQuery?: string) => void;
+  // 빼빼로데이 프로모션 팝업 열기 콜백 (App 전역 모달과 연동)
+  onOpenPeperoModal?: () => void;
 }
 
-export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps) {
+export function PortalView({ isActive = true, onNavigateToTab, onOpenPeperoModal }: PortalViewProps) {
   const posthog = usePostHog();
   const { weather, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeather(isActive);
   const { library, loading: libraryLoading, error: libraryError, refetch: refetchLibrary } = useLibraryStatus(isActive);
   const { banners, loading: bannersLoading, error: bannersError } = useBanners(isActive);
+  const [isPeperoModalOpen, setIsPeperoModalOpen] = useState(false);
+
   const { data: recommendations, isLoading: recommendationsLoading } = useArtistRecommendations(isActive);
   // 아티스트 이미지 URL은 추천 API 응답이 와야 알 수 있으므로, 응답을 기다리는 동안 이미지 서버 연결을 병렬로 열어둔다
   useEffect(() => {
@@ -101,14 +106,27 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           <WeatherCard weather={weather} loading={weatherLoading} error={weatherError} onRetry={refetchWeather} />
         </ErrorBoundary>
 
-        {/* 플레이리스트 홍보 캐러셀 — 백엔드가 기기별로 추천한 가수(0~5개). 없거나 실패하면 조용히 숨긴다 */}
-        <ErrorBoundary name="portal-artist-promo">
-          <ArtistPromoCarousel
-            artists={artistPromos}
-            isActive={isActive}
-            loading={recommendationsLoading}
-            onClick={(artist) => onNavigateToTab?.('misc', undefined, 'playlist', undefined, artist.artistName)}
-          />
+        {/* 플레이리스트 배너 위치를 빼빼로데이 프로모션 배너로 대체 — 터치 시 상세 팝업 오픈 */}
+        <ErrorBoundary name="portal-pepero-promo">
+          <button
+            type="button"
+            onClick={() => {
+              posthog?.capture('pepero_banner_clicked');
+              if (onOpenPeperoModal) {
+                onOpenPeperoModal();
+              } else {
+                setIsPeperoModalOpen(true);
+              }
+            }}
+            aria-label="빼빼로데이 꽃과 빼빼로 선물 세트 픽업 예약 안내"
+            className="relative block w-full aspect-[2/1] overflow-hidden rounded-2xl bg-[#FFF0F3] shadow-sm active:scale-[0.99] transition-transform text-left cursor-pointer"
+          >
+            <img
+              src="/assets/promo/pepero-playlist-banner.jpg"
+              alt="빼빼로데이엔 꽃으로 마음을 전해요"
+              className="w-full h-full object-cover"
+            />
+          </button>
         </ErrorBoundary>
 
         {/* 1.5. 오늘의 동아리 추천 배너 — 중앙동아리 화면 상단과 동일한 로테이션 카드, 눌렀을 때만 기타탭>중앙동아리로 내부 이동. 3월·9월(모집 시즌)에만 노출 */}
@@ -128,9 +146,18 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           </ErrorBoundary>
         )}
 
-        {/* 2. 배너 섹션 — 없어도 그만인 영역이라 조용히 숨긴다 */}
+        {/* 2. 배너 섹션 — 기존 배너 그대로 유지 */}
         <ErrorBoundary name="portal-banner">
-          <BannerCarousel banners={banners} loading={bannersLoading} error={bannersError} isActive={isActive} onNavigateToTab={onNavigateToTab} />
+          <BannerCarousel
+            banners={banners}
+            loading={bannersLoading}
+            error={bannersError}
+            isActive={isActive}
+            onNavigateToTab={onNavigateToTab}
+            onOpenModal={(modalType) => {
+              if (modalType === 'pepero') setIsPeperoModalOpen(true);
+            }}
+          />
         </ErrorBoundary>
 
         {/* 3. 열람실 혼잡도 섹션 */}
@@ -148,6 +175,15 @@ export function PortalView({ isActive = true, onNavigateToTab }: PortalViewProps
           />
         </ErrorBoundary>
       </div>
+
+      {/* 빼빼로데이 프로모션 상세 모달 (onOpenPeperoModal이 부모에서 전달되지 않았을 때의 fallback) */}
+      {!onOpenPeperoModal && (
+        <PeperoPromoModal
+          isOpen={isPeperoModalOpen}
+          onClose={() => setIsPeperoModalOpen(false)}
+          reservationUrl="https://open.kakao.com/o/s3Rr6aWi"
+        />
+      )}
     </>
   );
 }
