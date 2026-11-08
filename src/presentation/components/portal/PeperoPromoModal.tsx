@@ -24,35 +24,32 @@ export function PeperoPromoModal({
   const sheetRef = useRef<HTMLDivElement>(null);
   const autoCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 안드로이드 하드웨어 뒤로가기 키 지원
-  useBackHandler(() => {
-    handleClose();
-  }, isOpen);
+  // PostHog 체류 시간 및 터치 수 계측용 Ref
+  const openedAtRef = useRef<number>(Date.now());
+  const touchCountRef = useRef<number>(0);
+  const maxScrollPercentRef = useRef<number>(0);
+  const isConvertedRef = useRef<boolean>(false);
+  const closedEventSentRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      posthog?.capture('pepero_promo_modal_opened');
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  const captureClosedEvent = (closeMethod: string = 'unknown') => {
+    if (closedEventSentRef.current) return;
+    closedEventSentRef.current = true;
+    const dwellMs = Date.now() - openedAtRef.current;
+    const dwellSeconds = Math.round(dwellMs / 1000);
 
-  // 언마운트 시 자동 닫힘 타이머 정리
-  useEffect(() => {
-    return () => {
-      if (autoCloseTimeoutRef.current) {
-        clearTimeout(autoCloseTimeoutRef.current);
-      }
-    };
-  }, []);
+    posthog?.capture('pepero_promo_modal_closed', {
+      trigger: showDontShowAgain ? 'auto_popup' : 'manual_banner',
+      duration_ms: dwellMs,
+      duration_seconds: dwellSeconds,
+      touch_count: touchCountRef.current,
+      max_scroll_percent: maxScrollPercentRef.current,
+      converted: isConvertedRef.current,
+      close_method: closeMethod,
+    });
+  };
 
-  if (!isOpen) return null;
-
-  const handleClose = () => {
+  const handleClose = (method: string = 'x_button') => {
+    captureClosedEvent(method);
     if (dontShowAgain) {
       try {
         localStorage.setItem('hide_pepero_auto_popup', 'true');
@@ -65,21 +62,86 @@ export function PeperoPromoModal({
     }, 200);
   };
 
+  // 안드로이드 하드웨어 뒤로가기 키 지원
+  useBackHandler(() => {
+    handleClose('hardware_back');
+  }, isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      openedAtRef.current = Date.now();
+      touchCountRef.current = 0;
+      maxScrollPercentRef.current = 0;
+      isConvertedRef.current = false;
+      closedEventSentRef.current = false;
+
+      posthog?.capture('pepero_promo_modal_opened', {
+        trigger: showDontShowAgain ? 'auto_popup' : 'manual_banner',
+      });
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      if (isOpen) {
+        captureClosedEvent('unmount');
+      }
+    };
+  }, [isOpen, showDontShowAgain]);
+
+  // 언마운트 시 자동 닫힘 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimeoutRef.current) {
+        clearTimeout(autoCloseTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  if (!isOpen) return null;
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    const maxScroll = scrollHeight - clientHeight;
+    if (maxScroll > 0) {
+      const percent = Math.min(100, Math.round((scrollTop / maxScroll) * 100));
+      if (percent > maxScrollPercentRef.current) {
+        maxScrollPercentRef.current = percent;
+      }
+    }
+  };
+
   const handleCheckboxChange = (checked: boolean) => {
     setDontShowAgain(checked);
     if (checked) {
+      posthog?.capture('pepero_never_show_again_checked', {
+        duration_ms: Date.now() - openedAtRef.current,
+        touch_count: touchCountRef.current,
+      });
       try {
         localStorage.setItem('hide_pepero_auto_popup', 'true');
       } catch {}
       // 체크된 상태를 유저가 확인(250ms)한 뒤 바로 닫기
       autoCloseTimeoutRef.current = setTimeout(() => {
-        handleClose();
+        handleClose('never_show_again');
       }, 250);
     }
   };
 
   const handleReservationClick = () => {
-    posthog?.capture('pepero_reservation_clicked', { url: reservationUrl });
+    isConvertedRef.current = true;
+    const dwellMs = Date.now() - openedAtRef.current;
+    const dwellSeconds = Math.round(dwellMs / 1000);
+
+    posthog?.capture('pepero_reservation_clicked', {
+      url: reservationUrl,
+      trigger: showDontShowAgain ? 'auto_popup' : 'manual_banner',
+      duration_ms: dwellMs,
+      duration_seconds: dwellSeconds,
+      touch_count: touchCountRef.current,
+      max_scroll_percent: maxScrollPercentRef.current,
+    });
     if (reservationUrl) {
       window.open(reservationUrl, '_blank', 'noopener,noreferrer');
     }
@@ -92,12 +154,15 @@ export function PeperoPromoModal({
         className={`fixed inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity duration-200 ${
           closing ? 'opacity-0' : 'opacity-100 animate-[fadeIn_0.2s_ease-out]'
         }`}
-        onClick={handleClose}
+        onClick={() => handleClose('backdrop')}
       />
 
-      {/* 2. 중앙 팝업 모달 컨테이너 */}
+      {/* 2. 중앙 팝업 모달 컨테이너 (터치/클릭 횟수 캡처) */}
       <div
         ref={sheetRef}
+        onPointerDownCapture={() => {
+          touchCountRef.current += 1;
+        }}
         className={`relative z-10 w-full max-w-[420px] bg-white rounded-[28px] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden transition-all duration-200 ease-out ${
           closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
         }`}
@@ -106,7 +171,7 @@ export function PeperoPromoModal({
         <div className="pt-4 px-5 pb-1 flex justify-end bg-white shrink-0">
           <button
             type="button"
-            onClick={handleClose}
+            onClick={() => handleClose('x_button')}
             className="p-1 rounded-full text-slate-400 hover:text-slate-600 active:bg-slate-100 transition-colors"
             aria-label="닫기"
           >
@@ -114,8 +179,11 @@ export function PeperoPromoModal({
           </button>
         </div>
 
-        {/* 3. 스크롤러블 홍보글 본문 */}
-        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-6 pb-24 overscroll-contain text-slate-800 text-[15px] leading-relaxed">
+        {/* 3. 스크롤러블 홍보글 본문 (스크롤 깊이 계측) */}
+        <div
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto px-5 py-3 space-y-6 pb-24 overscroll-contain text-slate-800 text-[15px] leading-relaxed"
+        >
           
           {/* 큰 글씨 헤더 */}
           <div>

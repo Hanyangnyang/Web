@@ -2,8 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { PeperoPromoModal } from './PeperoPromoModal.js';
 
+const mockCapture = vi.fn();
 vi.mock('posthog-js/react', () => ({
-  usePostHog: () => ({ capture: vi.fn() }),
+  usePostHog: () => ({ capture: mockCapture }),
 }));
 
 describe('PeperoPromoModal', () => {
@@ -22,6 +23,7 @@ describe('PeperoPromoModal', () => {
   beforeEach(() => {
     storage.clear();
     setItemSpy.mockClear();
+    mockCapture.mockClear();
     vi.restoreAllMocks();
     vi.useFakeTimers();
   });
@@ -124,5 +126,40 @@ describe('PeperoPromoModal', () => {
   it('showDontShowAgain이 false(소식탭에서 직접 열었을 때)이면 다시 보지 않기 체크박스가 렌더링되지 않는다', () => {
     render(<PeperoPromoModal isOpen={true} onClose={vi.fn()} showDontShowAgain={false} />);
     expect(screen.queryByRole('checkbox', { name: /다시 보지 않기/ })).toBeNull();
+  });
+
+  it('열림, 터치 횟수, 머문 시간, 닫힘 이벤트가 PostHog에 정상 캡처된다', () => {
+    const { unmount } = render(
+      <PeperoPromoModal
+        isOpen={true}
+        onClose={vi.fn()}
+        showDontShowAgain={true}
+      />
+    );
+
+    // 열림 이벤트 확인
+    expect(mockCapture).toHaveBeenCalledWith('pepero_promo_modal_opened', {
+      trigger: 'auto_popup',
+    });
+
+    // 2초 경과 + 터치 2회 발생
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    const closeBtn = screen.getByRole('button', { name: '닫기' });
+    fireEvent.pointerDown(closeBtn);
+    fireEvent.click(closeBtn);
+
+    // 닫힘 이벤트 확인
+    expect(mockCapture).toHaveBeenCalledWith(
+      'pepero_promo_modal_closed',
+      expect.objectContaining({
+        trigger: 'auto_popup',
+        duration_seconds: 2,
+        touch_count: 1,
+        close_method: 'x_button',
+      })
+    );
   });
 });
