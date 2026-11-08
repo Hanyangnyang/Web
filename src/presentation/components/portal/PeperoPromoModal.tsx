@@ -132,9 +132,6 @@ export function PeperoPromoModal({
             </p>
           </div>
 
-          {/* 구분선 */}
-          <div className="border-t border-slate-100" />
-
           {/* 🩷 핑크 & ❤️ 레드 병렬 2열 사진 비교 배치 */}
           <div className="grid grid-cols-2 gap-3.5">
             {/* 핑크 */}
@@ -174,9 +171,6 @@ export function PeperoPromoModal({
             </div>
           </div>
 
-          {/* 구분선 */}
-          <div className="border-t border-slate-100" />
-
           {/* 하냥냥 픽업 예약 혜택 */}
           <div className="space-y-2">
             <h3 className="font-black text-slate-900 text-lg sm:text-[19px] flex items-center gap-1.5">
@@ -196,9 +190,6 @@ export function PeperoPromoModal({
               </div>
             </div>
           </div>
-
-          {/* 구분선 */}
-          <div className="border-t border-slate-100" />
 
           {/* 운영 시간 및 장소 안내 */}
           <div className="space-y-3">
