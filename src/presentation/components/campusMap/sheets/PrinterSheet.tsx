@@ -6,7 +6,7 @@ import { printerDisplayName, type Printer, type PlottablePrinter } from '../../.
 import { nearestTo, type LatLng } from '../../../../lib/campusGeo.js';
 import { getKSTDateKey, toEpoch } from '../../../../utils/kstTime.js';
 import { StandardBottomSheet } from '../../ui/StandardBottomSheet.js';
-import { PRINTER_DETAIL_FRACTION, PRINTER_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
+import { PRINTER_DETAIL_CSS, PRINTER_LIST_FRACTION, NAV_CLEARANCE_CLASS, toCssHeight } from './sheetMetrics';
 import { NearbyListSheet } from './NearbyListSheet';
 
 interface Props {
@@ -113,7 +113,7 @@ function PrinterDetailBody({ printer }: { printer: Printer }) {
         <Clock size={10} className="flex-shrink-0 text-text-hint" />
         <span className="text-[10px] font-medium text-text-hint">
           {updated
-            ? `최근 수정 ${updated.date}${updated.relative ? ` (${updated.relative})` : ''}`
+            ? `최근 수정일 : ${updated.date}${updated.relative ? ` - ${updated.relative}` : ''}`
             : '수정일 정보 없음'}
         </span>
       </div>
@@ -147,7 +147,7 @@ export function PrinterSheet({ printers, loading, error, origin, expanded, onTog
   // ── 상세 모드 ──
   if (selected) {
     return (
-      <StandardBottomSheet height={toCssHeight(PRINTER_DETAIL_FRACTION)}>
+      <StandardBottomSheet height={PRINTER_DETAIL_CSS}>
         <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-[#f1f5f9]">
           <span className="text-2xl flex-shrink-0">🖨️</span>
           {/* 이름이 길면 이름만 말줄임되고 상태 뱃지는 항상 이름 바로 뒤에 붙어 보인다 */}

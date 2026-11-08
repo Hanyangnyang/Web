@@ -20,7 +20,7 @@ import { CampusFeedbackModal } from './CampusFeedbackModal';
 import { PrinterFeedbackModal } from './PrinterFeedbackModal';
 import { PrinterReportFloatingButton } from './PrinterReportFloatingButton';
 import {
-  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, PRINTER_DETAIL_FRACTION, NAV_CLEARANCE_CSS,
+  STORE_DETAIL_FRACTION, BUILDING_DETAIL_FRACTION, SMOKING_DETAIL_FRACTION, PARKING_DETAIL_FRACTION, PRINTER_DETAIL_PX, NAV_CLEARANCE_CSS,
 } from './sheets/sheetMetrics';
 
 import {
@@ -184,7 +184,8 @@ export default function CampusMapView({ isActive, deepLinkChip, onDeepLinkChipHa
         focusMap(sel.lot.coordinates.latitude, sel.lot.coordinates.longitude, PARKING_DETAIL_FRACTION, viewportHeight);
         break;
       case 'printer':
-        focusMap(sel.printer.coordinates.latitude, sel.printer.coordinates.longitude, PRINTER_DETAIL_FRACTION, viewportHeight);
+        // 프린터 상세만 px 고정 높이라, 지금 화면 높이로 나눠 비율로 바꿔 넘긴다 (최대 0.55 — 이전 비율 높이와 같은 상한)
+        focusMap(sel.printer.coordinates.latitude, sel.printer.coordinates.longitude, Math.min(PRINTER_DETAIL_PX / viewportHeight, 0.55), viewportHeight);
         break;
     }
   }, [focusMap, getViewportHeight]);
