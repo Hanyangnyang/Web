@@ -135,29 +135,6 @@ export function PeperoPromoModal({
           {/* 구분선 */}
           <div className="border-t border-slate-100" />
 
-          {/* 하냥냥 픽업 예약 혜택 */}
-          <div className="space-y-2">
-            <h3 className="font-black text-slate-900 text-lg sm:text-[19px] flex items-center gap-1.5">
-              하냥냥 픽업 예약 혜택 🥰
-            </h3>
-            <p className="text-slate-600">
-              이 게시물을 통해 픽업 예약하면 할인해드려요!
-            </p>
-            <div className="space-y-1 pt-1 text-[15px]">
-              <div className="flex items-center gap-2 text-slate-600">
-                <span>현장 구매시</span>
-                <span className="font-semibold text-slate-400 line-through">11,111원</span>
-              </div>
-              <div className="flex items-baseline gap-2 text-slate-900">
-                <span className="font-extrabold text-[#FF477E]">픽업 예약시</span>
-                <span className="text-xl font-black text-[#FF477E]">10,000원</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 구분선 */}
-          <div className="border-t border-slate-100" />
-
           {/* 🩷 핑크 & ❤️ 레드 병렬 2열 사진 비교 배치 */}
           <div className="grid grid-cols-2 gap-3.5">
             {/* 핑크 */}
@@ -194,6 +171,29 @@ export function PeperoPromoModal({
               <p className="text-xs sm:text-[13px] font-semibold text-slate-700 leading-snug">
                 레드 거베라 + 오리지널 빼빼로
               </p>
+            </div>
+          </div>
+
+          {/* 구분선 */}
+          <div className="border-t border-slate-100" />
+
+          {/* 하냥냥 픽업 예약 혜택 */}
+          <div className="space-y-2">
+            <h3 className="font-black text-slate-900 text-lg sm:text-[19px] flex items-center gap-1.5">
+              하냥냥 픽업 예약 혜택 🥰
+            </h3>
+            <p className="text-slate-600">
+              이 게시물을 통해 픽업 예약하면 할인해드려요!
+            </p>
+            <div className="space-y-1 pt-1 text-[15px]">
+              <div className="flex items-center gap-2 text-slate-600">
+                <span>현장 구매시</span>
+                <span className="font-semibold text-slate-400 line-through">11,111원</span>
+              </div>
+              <div className="flex items-baseline gap-2 text-slate-900">
+                <span className="font-extrabold text-[#FF477E]">픽업 예약시</span>
+                <span className="text-xl font-black text-[#FF477E]">10,000원</span>
+              </div>
             </div>
           </div>
 
