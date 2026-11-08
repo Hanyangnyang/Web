@@ -18,5 +18,8 @@
 ## 배포 전 체크리스트
 - [ ] 
 <!-- TODO: versionCode 커밋 + 태그 규칙, release 빌드 검증 체크리스트 -->
-<!-- 브랜치 전략·revert 함정은 conventions.md, 환경변수는 env.md -->
+
+## develop → main 릴리스 흐름
+<!-- TODO: develop → main 릴리스 PR 흐름, revert 함정 -->
+<!-- 작업 브랜치 규칙은 conventions.md, 환경변수는 env.md -->
 
