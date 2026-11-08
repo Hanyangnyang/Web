@@ -120,4 +120,9 @@ describe('PeperoPromoModal', () => {
 
     expect(onCloseSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('showDontShowAgain이 false(소식탭에서 직접 열었을 때)이면 다시 보지 않기 체크박스가 렌더링되지 않는다', () => {
+    render(<PeperoPromoModal isOpen={true} onClose={vi.fn()} showDontShowAgain={false} />);
+    expect(screen.queryByRole('checkbox', { name: /다시 보지 않기/ })).toBeNull();
+  });
 });

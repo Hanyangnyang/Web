@@ -125,6 +125,7 @@ function MainLayout() {
   const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
   const [isPeperoModalOpen, setIsPeperoModalOpen] = useState(false);
+  const [isPeperoAutoPopup, setIsPeperoAutoPopup] = useState(false);
 
   // 11월 빼빼로데이 프로모션 첫 로딩 자동 팝업 ("다시 보지 않기" 체크 시 자동 팝업만 건너뜀)
   useEffect(() => {
@@ -132,6 +133,7 @@ function MainLayout() {
       const hideAutoPopup = localStorage.getItem('hide_pepero_auto_popup');
       if (!hideAutoPopup) {
         const timer = setTimeout(() => {
+          setIsPeperoAutoPopup(true);
           setIsPeperoModalOpen(true);
         }, 1800); // 스플래시 종료 직후 자연스럽게 오픈
         return () => clearTimeout(timer);
@@ -403,7 +405,10 @@ function MainLayout() {
             <PortalView
               isActive={activeTab === 'portal'}
               onNavigateToTab={handleTabChange}
-              onOpenPeperoModal={() => setIsPeperoModalOpen(true)}
+              onOpenPeperoModal={() => {
+                setIsPeperoAutoPopup(false);
+                setIsPeperoModalOpen(true);
+              }}
             />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
@@ -447,6 +452,7 @@ function MainLayout() {
         isOpen={isPeperoModalOpen}
         onClose={() => setIsPeperoModalOpen(false)}
         reservationUrl="https://open.kakao.com/o/s3Rr6aWi"
+        showDontShowAgain={isPeperoAutoPopup}
       />
     </>
   );

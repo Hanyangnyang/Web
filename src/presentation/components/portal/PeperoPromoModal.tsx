@@ -7,6 +7,7 @@ interface PeperoPromoModalProps {
   isOpen: boolean;
   onClose: () => void;
   reservationUrl?: string;
+  showDontShowAgain?: boolean;
 }
 
 const DEFAULT_RESERVATION_URL = 'https://open.kakao.com/o/s3Rr6aWi';
@@ -15,6 +16,7 @@ export function PeperoPromoModal({
   isOpen,
   onClose,
   reservationUrl = DEFAULT_RESERVATION_URL,
+  showDontShowAgain = true,
 }: PeperoPromoModalProps) {
   const posthog = usePostHog();
   const [closing, setClosing] = useState(false);
@@ -237,18 +239,20 @@ export function PeperoPromoModal({
             <span>픽업 예약하기</span>
           </button>
 
-          {/* 다시 보지 않기 체크박스 (체크 확인 후 팝업 닫힘) */}
-          <div className="flex items-center justify-end pt-1">
-            <label className="inline-flex items-center gap-2 cursor-pointer select-none text-[13.5px] sm:text-sm font-medium text-slate-500 hover:text-slate-700 active:text-slate-900 transition-colors py-1 px-1">
-              <input
-                type="checkbox"
-                checked={dontShowAgain}
-                onChange={(e) => handleCheckboxChange(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-300 text-[#FF477E] accent-[#FF477E] focus:ring-0 cursor-pointer"
-              />
-              <span>다시 보지 않기</span>
-            </label>
-          </div>
+          {/* 다시 보지 않기 체크박스 (자동 팝업 모드일 때만 표시, 체크 확인 후 팝업 닫힘) */}
+          {showDontShowAgain && (
+            <div className="flex items-center justify-end pt-1">
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none text-[13.5px] sm:text-sm font-medium text-slate-500 hover:text-slate-700 active:text-slate-900 transition-colors py-1 px-1">
+                <input
+                  type="checkbox"
+                  checked={dontShowAgain}
+                  onChange={(e) => handleCheckboxChange(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-[#FF477E] accent-[#FF477E] focus:ring-0 cursor-pointer"
+                />
+                <span>다시 보지 않기</span>
+              </label>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -182,6 +182,7 @@ export function PortalView({ isActive = true, onNavigateToTab, onOpenPeperoModal
           isOpen={isPeperoModalOpen}
           onClose={() => setIsPeperoModalOpen(false)}
           reservationUrl="https://open.kakao.com/o/s3Rr6aWi"
+          showDontShowAgain={false}
         />
       )}
     </>
