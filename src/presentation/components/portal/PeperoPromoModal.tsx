@@ -241,10 +241,10 @@ export function PeperoPromoModal({
             </div>
           </div>
 
-          {/* 하냥냥 픽업 예약 혜택 */}
+          {/* 사전 픽업 예약 혜택 */}
           <div className="space-y-2">
             <h3 className="font-black text-slate-900 text-lg sm:text-[19px] flex items-center gap-1.5">
-              하냥냥 픽업 예약 혜택 🥰
+              사전 픽업 예약 혜택 (화요일 마감) 🥰
             </h3>
             <p className="text-slate-600">
               이 게시물을 통해 픽업 예약하면 할인해드려요!

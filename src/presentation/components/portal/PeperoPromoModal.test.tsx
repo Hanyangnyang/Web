@@ -41,8 +41,9 @@ describe('PeperoPromoModal', () => {
     expect(screen.getByText('안녕하세요! 하냥냥 개발자입니다')).toBeTruthy();
     expect(screen.getByText(/학교 쪽문에서 선물 세트를 판매합니다!/)).toBeTruthy();
 
-    // 하냥냥 픽업 예약 혜택
-    expect(screen.getByText(/하냥냥 픽업 예약 혜택/)).toBeTruthy();
+    // 사전 픽업 예약 혜택
+    expect(screen.getByText(/사전 픽업 예약 혜택/)).toBeTruthy();
+    expect(screen.getByText(/화요일 마감/)).toBeTruthy();
     expect(screen.getByText(/이 게시물을 통해 픽업 예약하면 할인해드려요!/)).toBeTruthy();
     expect(screen.getByText(/현장 구매시/)).toBeTruthy();
     expect(screen.getByText('11,111원')).toBeTruthy();
