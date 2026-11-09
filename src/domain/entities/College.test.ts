@@ -27,6 +27,13 @@ describe('collegeByName', () => {
     expect(collegeByName('lions칼리지')?.id).toBe('1');
   });
 
+  it('제휴 부서(하냥냥, 학생회)를 정상 조회한다 (#119)', () => {
+    expect(collegeByName('하냥냥')?.id).toBe('11');
+    expect(collegeByName('학생회')?.id).toBe('12');
+    expect(collegeById('11')?.emoji).toBe('🐱');
+    expect(collegeById('12')?.emoji).toBe('🏛️');
+  });
+
   // 대학본부·사회교육원·학군단은 단과대가 아니라 못 찾는 게 정상 — 호출부가 중립색으로 떨어뜨린다
   it('단과대가 아닌 값은 undefined를 돌려준다', () => {
     expect(collegeByName('대학본부')).toBeUndefined();
