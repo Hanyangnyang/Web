@@ -5,6 +5,8 @@ import { ChevronRight } from 'lucide-react';
 import { getMenuIcon, filterRealMenuItems, parseBoldText, isCheonwonMarker } from './cafeteriaFormat.js';
 import { MenuEntry } from './MenuEntry.js';
 import { Accordion } from '../ui/Accordion.js';
+import { DormBreakfastPaymentReveal, DormBreakfastPaymentRow } from './DormBreakfastPayment.js';
+import { DORM_CAFE_ID } from './dormBreakfastPaymentConfig.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuWithCafe, ShareTarget } from './cafeteriaTypes.js';
 
@@ -55,6 +57,8 @@ export function MealTypeAccordion({
     `${window.location.origin}/?date=${targetStr}&cafe=${cafeId}&type=${encodeURIComponent(type)}`;
 
   const cafeGroups = isAllMode ? groupByCafe(menus) : null;
+  // 기숙사식당 칩의 조식: 펼친 뒤 메뉴 위에 결제 안내 띠가 붙으므로 헤더 아래 구분선은 뺀다
+  const showDormPayment = !isAllMode && mealKey === '조식' && menus.some(m => m.cafeId === DORM_CAFE_ID);
 
   return (
     <Accordion
@@ -62,11 +66,16 @@ export function MealTypeAccordion({
       onToggle={onToggle}
       dataType={type}
       style={{ scrollMarginTop: '140px' }}
+      showBodyDivider={!showDormPayment}
       header={
         <>
           <span className="text-xl flex-shrink-0">{getMenuIcon(type)}</span>
           <span className="font-bold text-[16px] tracking-tight text-text-main flex-shrink-0">{type}</span>
           {hoursText && <span className="text-[12px] text-text-hint truncate">{hoursText}</span>}
+          {/* 기숙사식당 칩 조식이 접혀 있을 때도 결제 방식이 보이도록 — 펼치면 메뉴 위 결제 띠가 대신 안내 */}
+          {showDormPayment && !isExpanded && (
+            <span className="text-[12px] text-text-hint flex-shrink-0 -ml-1">· 온라인 결제 필수</span>
+          )}
         </>
       }
       extra={
@@ -81,6 +90,7 @@ export function MealTypeAccordion({
                 const isCafeExpanded = !!expandedCafeIds[group.cafeId];
                 const groupCafe = cafes.find(c => c.id === group.cafeId);
                 const groupHoursText = mealKey ? groupCafe?.hours?.[mealKey] : null;
+                const isDormBreakfast = mealKey === '조식' && group.cafeId === DORM_CAFE_ID;
 
                 return (
                   <div
@@ -92,6 +102,10 @@ export function MealTypeAccordion({
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-[15px] font-black text-primary flex-shrink-0">{group.cafeName}</span>
                         {groupHoursText && <span className="text-[11px] text-text-hint truncate">{groupHoursText}</span>}
+                        {/* 접힌 상태에서도 결제 방식이 보이도록 — 펼치면 아래 결제 줄이 대신 안내 */}
+                        {isDormBreakfast && !isCafeExpanded && (
+                          <span className="text-[11px] text-text-hint flex-shrink-0 -ml-1">· 온라인 결제 필수</span>
+                        )}
                       </div>
                       <ChevronRight
                         size={16}
@@ -139,6 +153,8 @@ export function MealTypeAccordion({
                                 />
                               </React.Fragment>
                             ))}
+                            {/* 기숙사식당 조식은 온라인 결제만 받으므로 펼친 상세 맨 아래에 결제 바로가기를 붙인다 */}
+                            {isDormBreakfast && <DormBreakfastPaymentRow active={isCafeExpanded} />}
                           </div>
                         </div>
                       </div>
@@ -148,7 +164,12 @@ export function MealTypeAccordion({
               })}
             </div>
           ) : (
-            menus.map((m, i) => (
+            <>
+            {/* 기숙사식당 조식은 온라인 결제만 받으므로, 펼쳐지고 나서 메뉴 위에 결제 바로가기를 띄운다 */}
+            {showDormPayment && (
+              <DormBreakfastPaymentReveal active={isExpanded} />
+            )}
+            {menus.map((m, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <div className="mx-5 border-b border-dashed border-slate-200" />}
                 <div className="px-5 py-3.5 text-left relative">
@@ -161,7 +182,8 @@ export function MealTypeAccordion({
                   />
                 </div>
               </React.Fragment>
-            ))
+            ))}
+            </>
           )}
     </Accordion>
   );
