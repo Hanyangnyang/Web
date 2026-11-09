@@ -11,6 +11,7 @@ interface AccordionProps {
   className?: string;
   style?: CSSProperties;
   dataType?: string; // 딥링크 스크롤 앵커 등에 쓰는 data-type 속성
+  showBodyDivider?: boolean; // 헤더와 본문 사이 구분선 (기본 true) — 본문 첫 줄이 안내 띠처럼 붙을 때 끔
 }
 
 // 토글형 아코디언 껍데기 — 헤더 클릭 시 화살표 회전 + grid-template-rows 트랜지션으로 본문을 펼치고 접음
@@ -24,6 +25,7 @@ export function Accordion({
   className = '',
   style,
   dataType,
+  showBodyDivider = true,
 }: AccordionProps) {
   return (
     <div
@@ -53,7 +55,7 @@ export function Accordion({
         </div>
       </div>
       <div className={`accordion-content ${isExpanded ? 'expanded' : ''}`}>
-        <div className="accordion-inner border-t border-slate-100">
+        <div className={`accordion-inner ${showBodyDivider ? 'border-t border-slate-100' : ''}`}>
           {children}
         </div>
       </div>

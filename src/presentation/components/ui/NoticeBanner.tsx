@@ -17,8 +17,6 @@ interface NoticeBannerProps {
   icon?: ReactNode;
   // 표시 상태일 때의 바깥 여백 (기본 mb-4). 배너를 여러 개 붙여 쌓을 때 간격을 좁히는 용도 — 예: 학식 제보 + 기숙사 조식 결제 배너
   visibleSpacingClass?: string;
-  // 있으면 액션 버튼 라벨 오른쪽에 붙는 아이콘 (예: 외부 링크 ↗)
-  actionIcon?: ReactNode;
 }
 
 const VARIANT_STYLE = {
@@ -28,7 +26,7 @@ const VARIANT_STYLE = {
 };
 
 // 슬라이드-페이드 등장 공지 배너 (셔틀 시간표 변경 예고, 헬스장 방학 단축 운영 안내, 지하철 조회 실패 안내 등에서 공용으로 사용)
-export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceShown = false, actionLabel, onAction, variant = 'info', icon, visibleSpacingClass = 'mb-4', actionIcon }: NoticeBannerProps) {
+export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceShown = false, actionLabel, onAction, variant = 'info', icon, visibleSpacingClass = 'mb-4' }: NoticeBannerProps) {
   const [visible, setVisible] = useState(false);
   const style = VARIANT_STYLE[variant];
 
@@ -60,10 +58,9 @@ export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceS
         {actionLabel && onAction && (
           <button
             onClick={onAction}
-            className={`flex-shrink-0 inline-flex items-center gap-0.5 text-[12px] font-semibold px-2.5 py-1 rounded-full active:scale-95 transition-transform ${style.button}`}
+            className={`flex-shrink-0 text-[12px] font-semibold px-2.5 py-1 rounded-full active:scale-95 transition-transform ${style.button}`}
           >
             {actionLabel}
-            {actionIcon}
           </button>
         )}
       </div>

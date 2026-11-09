@@ -1,6 +1,6 @@
 // 컴포넌트: 날짜·식당 선택 및 아코디언 학식 목록 표시 (컨테이너 — state·effect·레이아웃만 담당)
 import { useState, useEffect, useRef, lazy, Suspense, Fragment } from 'react';
-import { Bell, CreditCard, ExternalLink, Megaphone, UtensilsCrossed } from 'lucide-react';
+import { Bell, Megaphone, UtensilsCrossed } from 'lucide-react';
 import { usePostHog } from 'posthog-js/react';
 import { getKSTDateUnsafe, toDateKey } from '../../../utils/kstTime.js';
 import { scrollNearestScrollableAncestorToTop } from '../../../utils/scroll.js';
@@ -12,15 +12,10 @@ import { CafeChipSelector } from './CafeChipSelector.js';
 import { MealTypeAccordion } from './MealTypeAccordion.js';
 import { MenuFeedbackModal } from './MenuFeedbackModal.js';
 import { NoticeBanner } from '../ui/NoticeBanner.js';
-import { openExternalUrl } from '../../../lib/openExternalUrl.js';
 import { getDateLabel, getFeaturedItem } from './cafeteriaFormat.js';
 import { groupMenusByType, sortMealTypeEntries, getDefaultAccordionState } from './cafeteriaSchedule.js';
 import type { Cafe, CafeHours } from '../../../domain/entities/Cafe.js';
 import type { MenuWithCafe, ShareTarget } from './cafeteriaTypes.js';
-
-const DORM_CAFE_ID = 're13';
-// 기숙사 천원의 아침밥(조식)은 현장 결제 없이 온라인 식권 구매만 받는다
-const DORM_BREAKFAST_PAYMENT_URL = 'https://life.hanyang.ac.kr/theme/pages/payment/ticket-shops.php';
 
 const CafeteriaAlarmSettings = lazy(() => import('./CafeteriaAlarmSettings.js').then(m => ({ default: m.CafeteriaAlarmSettings })));
 const ShareSheet = lazy(() => import('./ShareSheet.js').then(m => ({ default: m.ShareSheet })));
@@ -279,8 +274,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                   // 기본 펼침이 여러 개면(다른 날짜는 전부 펼침, 중식 계열이 여럿) 그중 마지막 아래, 하나도 없으면 목록 맨 아래
                   const defaultIdx = entries.reduce((last, [type], i) => (defaultExpandedGroups[type] ? i : last), -1);
                   const bannerIdx = defaultIdx === -1 ? entries.length - 1 : defaultIdx;
-                  // 기숙사 메뉴가 보이는 칩(전체·기숙사식당)에서만 조식 결제 안내 배너를 제보 배너 아래에 붙인다
-                  const showDormPaymentBanner = selectedCafeId === 'all' || selectedCafeId === DORM_CAFE_ID;
+                  // 기숙사식당 조식 결제 안내는 조식 아코디언 안에서 표시 — MealTypeAccordion·DormBreakfastPayment 참고
                   return entries.map(([type, menus], i) => (
                     <Fragment key={type}>
                       <MealTypeAccordion
@@ -303,20 +297,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                           icon={<Megaphone size={15} strokeWidth={2.4} className="flex-shrink-0 text-primary" />}
                           actionLabel="제보하기"
                           onAction={() => setShowMenuFeedback(true)}
-                          // 위 아코디언(mb-3=12px)과의 간격을 6px로 당기고(-mt-1.5), 결제 배너가 붙으면 그 사이도 6px로 맞춘다
-                          visibleSpacingClass={showDormPaymentBanner ? '-mt-1.5 mb-1.5' : '-mt-1.5 mb-4'}
-                        />
-                      )}
-                      {/* 기숙사 천원의 아침밥 온라인 결제 안내 — 학식 제보 배너 바로 아래 */}
-                      {i === bannerIdx && showDormPaymentBanner && (
-                        <NoticeBanner
-                          shouldShow
-                          variant="plain"
-                          message="기숙사식당 조식은 온라인 결제만 가능해요"
-                          icon={<CreditCard size={15} strokeWidth={2.4} className="flex-shrink-0 text-primary" />}
-                          actionLabel="결제하기"
-                          actionIcon={<ExternalLink size={12} strokeWidth={2.75} style={{ opacity: 0.8 }} />}
-                          onAction={() => { void openExternalUrl(DORM_BREAKFAST_PAYMENT_URL); }}
+                          // 위 아코디언(mb-3=12px)과의 간격을 6px로 당긴다(-mt-1.5)
+                          visibleSpacingClass="-mt-1.5 mb-4"
                         />
                       )}
                     </Fragment>
