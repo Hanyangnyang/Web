@@ -274,6 +274,7 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                   // 기본 펼침이 여러 개면(다른 날짜는 전부 펼침, 중식 계열이 여럿) 그중 마지막 아래, 하나도 없으면 목록 맨 아래
                   const defaultIdx = entries.reduce((last, [type], i) => (defaultExpandedGroups[type] ? i : last), -1);
                   const bannerIdx = defaultIdx === -1 ? entries.length - 1 : defaultIdx;
+                  // 기숙사식당 조식 결제 안내는 조식 아코디언 안에서 표시 — MealTypeAccordion·DormBreakfastPayment 참고
                   return entries.map(([type, menus], i) => (
                     <Fragment key={type}>
                       <MealTypeAccordion
@@ -296,6 +297,8 @@ export function CafeteriaView({ date, changeDate, cafes, loading, revalidating, 
                           icon={<Megaphone size={15} strokeWidth={2.4} className="flex-shrink-0 text-primary" />}
                           actionLabel="제보하기"
                           onAction={() => setShowMenuFeedback(true)}
+                          // 위 아코디언(mb-3=12px)과의 간격을 6px로 당긴다(-mt-1.5)
+                          visibleSpacingClass="-mt-1.5 mb-4"
                         />
                       )}
                     </Fragment>

@@ -15,6 +15,8 @@ interface NoticeBannerProps {
   variant?: 'info' | 'plain' | 'error';
   // 있으면 왼쪽 기본 ⓘ 아이콘 대신 표시 (예: 학식 제보 배너의 확성기 아이콘)
   icon?: ReactNode;
+  // 표시 상태일 때의 바깥 여백 (기본 mb-4). 배너를 여러 개 붙여 쌓을 때 간격을 좁히는 용도 — 예: 학식 제보 + 기숙사 조식 결제 배너
+  visibleSpacingClass?: string;
 }
 
 const VARIANT_STYLE = {
@@ -24,7 +26,7 @@ const VARIANT_STYLE = {
 };
 
 // 슬라이드-페이드 등장 공지 배너 (셔틀 시간표 변경 예고, 헬스장 방학 단축 운영 안내, 지하철 조회 실패 안내 등에서 공용으로 사용)
-export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceShown = false, actionLabel, onAction, variant = 'info', icon }: NoticeBannerProps) {
+export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceShown = false, actionLabel, onAction, variant = 'info', icon, visibleSpacingClass = 'mb-4' }: NoticeBannerProps) {
   const [visible, setVisible] = useState(false);
   const style = VARIANT_STYLE[variant];
 
@@ -39,7 +41,7 @@ export function NoticeBanner({ shouldShow, message, delayMs = 1000, persistOnceS
 
   return (
     <div
-      className={`overflow-hidden transition-all duration-500 ease-in-out ${visible ? 'max-h-16 mb-4 opacity-100' : 'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
+      className={`overflow-hidden transition-all duration-500 ease-in-out ${visible ? `max-h-16 ${visibleSpacingClass} opacity-100` :'max-h-0 opacity-0 mb-0 pointer-events-none'}`}
     >
       <div className={`flex items-center justify-between gap-2.5 px-4 py-2.5 border rounded-card ${style.container}`}>
         <div className="flex items-center gap-2.5 min-w-0">
