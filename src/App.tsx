@@ -5,7 +5,6 @@ import { useMenu } from './presentation/hooks/useMenu.js';
 import { CafeteriaView } from './presentation/components/cafeteria/CafeteriaView.jsx';
 import { ShuttleView }   from './presentation/components/shuttle/ShuttleView.jsx';
 import { PortalView }    from './presentation/components/portal/PortalView.jsx';
-import { PeperoPromoModal } from './presentation/components/portal/PeperoPromoModal.js';
 import { MiscView, type MiscBoxOpenSource } from './presentation/components/misc/MiscView.jsx';
 import { VALID_MISC_BOXES, VALID_MAP_CHIPS } from './presentation/components/portal/BannerCarousel.jsx';
 const CampusMapView = lazy(() => import('./presentation/components/campusMap/CampusMapView.jsx'));
@@ -124,22 +123,6 @@ function MainLayout() {
   // 제휴탭 최초 진입 후에만 지도 컴포넌트를 마운트 (SDK lazy load 트리거)
   const [partnerVisited, setPartnerVisited] = useState(() => activeTab === 'partner');
   const [miscResetSignal, setMiscResetSignal] = useState(0);
-  const [isPeperoModalOpen, setIsPeperoModalOpen] = useState(false);
-  const [isPeperoAutoPopup, setIsPeperoAutoPopup] = useState(false);
-
-  // 11월 빼빼로데이 프로모션 첫 로딩 자동 팝업 ("다시 보지 않기" 체크 시 자동 팝업만 건너뜀)
-  useEffect(() => {
-    try {
-      const hideAutoPopup = localStorage.getItem('hide_pepero_auto_popup');
-      if (!hideAutoPopup) {
-        const timer = setTimeout(() => {
-          setIsPeperoAutoPopup(true);
-          setIsPeperoModalOpen(true);
-        }, 1800); // 스플래시 종료 직후 자연스럽게 오픈
-        return () => clearTimeout(timer);
-      }
-    } catch {}
-  }, []);
   // 캠퍼스맵 탭을 다시 누르면 검색 화면 등을 닫고 지도로 돌아오게 하는 신호
   const [mapResetSignal, setMapResetSignal] = useState(0);
   // 배너 등에서 캠퍼스맵의 특정 칩(예: 오픈스페이스)까지 지정해 이동시킬 때 CampusMapView에 한 번만 전달.
@@ -402,14 +385,7 @@ function MainLayout() {
             <ShuttleView isActive={activeTab === 'shuttle'} />
           </div>
           <div style={{ display: activeTab === 'portal' || tabUnderlay === 'portal' ? 'block' : 'none' }}>
-            <PortalView
-              isActive={activeTab === 'portal'}
-              onNavigateToTab={handleTabChange}
-              onOpenPeperoModal={() => {
-                setIsPeperoAutoPopup(false);
-                setIsPeperoModalOpen(true);
-              }}
-            />
+            <PortalView isActive={activeTab === 'portal'} onNavigateToTab={handleTabChange} />
           </div>
           <div style={{ display: activeTab === 'misc' ? 'block' : 'none' }}>
             <MiscView
@@ -446,14 +422,6 @@ function MainLayout() {
         </div>
         <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
-
-      {/* 11월 빼빼로데이 프로모션 상세 모달 (초기 진입 자동 팝업 & 소식탭 배너 클릭 연동) */}
-      <PeperoPromoModal
-        isOpen={isPeperoModalOpen}
-        onClose={() => setIsPeperoModalOpen(false)}
-        reservationUrl="https://open.kakao.com/o/s3Rr6aWi"
-        showDontShowAgain={isPeperoAutoPopup}
-      />
     </>
   );
 }

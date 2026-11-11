@@ -48,28 +48,24 @@ export function SplashScreen({ ready, onDone, variant = 'default' }: SplashScree
     );
   }
 
-  // 배너 유무와 무관하게 로고 그룹(row-start-2)이 항상 정확히 같은 자리(화면 정중앙)에 오도록
-  // grid로 위/아래 여백을 1fr씩 대칭으로 둔다. 배너는 마스코트 바로 아래(row-start-3 self-start)에 붙어 표시
+  // 배너 유무와 무관하게 마스코트 그룹(row-start-2)이 항상 정확히 같은 자리(화면 정중앙)에 오도록
+  // grid로 위/아래 여백을 1fr씩 대칭으로 둔다. 배너가 없으면 3행이 그냥 빈 채로 아래 여백에 흡수되고,
+  // 있으면 마스코트 바로 아래(self-start)에 붙어 그 여백 공간을 위에서부터 채운다 — 마스코트 위치는 안 변함
   return (
     <div
       className={`fixed inset-0 z-[9999] bg-white grid grid-rows-[1fr_auto_1fr] justify-items-center transition-opacity duration-[450ms] ${fading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       onTransitionEnd={() => fading && onDone()}
     >
-      {/* 중앙 브랜드 로고 (하냥냥 글자 + 발바닥 순차 팝업 애니메이션) & 슬로건 */}
-      <div className="row-start-2 flex flex-col items-center gap-3">
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2">
-          <img
-            src="/hanyang_splash_text.png"
-            className="h-[52px] sm:h-16 w-auto object-contain splash-logo-anim-text"
-            alt="하냥냥"
-          />
-          <img
-            src="/hanyang_splash_paw.png"
-            className="h-[52px] sm:h-16 w-auto object-contain splash-logo-anim-paw"
-            alt="발바닥"
-          />
-        </div>
-        <p className="text-[0.8rem] font-medium text-text-hint splash-logo-anim-sub">
+      <div className="row-start-2 flex flex-col items-center gap-4">
+        <img
+          src="/hanyang_splash.png"
+          className="w-[200px] h-[200px] object-contain [animation:splash-pop_0.5s_cubic-bezier(0.16,1,0.3,1)_both]"
+          alt="하냥냥"
+        />
+        <p className="text-[1.4rem] text-primary tracking-[0.04em] [animation:splash-pop_0.5s_0.12s_cubic-bezier(0.16,1,0.3,1)_both]" style={{ fontFamily: "'HakgyoansimDunggeunmiso', sans-serif" }}>
+          하냥냥
+        </p>
+        <p className="text-[0.8rem] font-medium text-text-hint [animation:splash-pop_0.5s_0.22s_cubic-bezier(0.16,1,0.3,1)_both]">
           에리카 생활을 위한 꿀정보 모음
         </p>
       </div>
@@ -79,7 +75,7 @@ export function SplashScreen({ ready, onDone, variant = 'default' }: SplashScree
           <img
             src={splashBanner.imageUrl}
             alt={splashBanner.altText || '배너'}
-            className="w-full aspect-[2/1] object-cover rounded-2xl shadow-sm"
+            className="w-full aspect-[10/3] object-cover rounded-xl"
             onError={() => setBannerBroken(true)}
           />
         </div>

@@ -19,17 +19,19 @@ export function cacheBannersForSplash(banners: Banner[]) {
   }
 }
 
-// 이 브랜치(feat/pepero-flower-promo) 전용: 빼빼로데이 프로모션 배너 고정 노출
-const PEPERO_SPLASH_BANNER: Banner = {
-  id: -1111,
-  imageUrl: '/assets/promo/pepero-playlist-banner.jpg',
-  clickUrl: '',
-  altText: '빼빼로데이엔 꽃으로 마음을 전해요',
-  displayOrder: 0,
-  placement: 'BOTH',
-};
-
 export function useSplashBanner(): Banner | null {
-  // 이 브랜치에서는 빼빼로데이 프로모션 배너를 고정으로 노출
-  return PEPERO_SPLASH_BANNER;
+  // 선택은 스플래시가 뜬 시점(마운트)에 한 번만 — lazy init으로 고정
+  const [banner] = useState<Banner | null>(() => {
+    try {
+      const raw = localStorage.getItem(SPLASH_BANNER_CACHE_KEY);
+      if (!raw) return null;
+      const cached = JSON.parse(raw);
+      if (!Array.isArray(cached) || cached.length === 0) return null;
+      // cacheBannersForSplash에 저장되는 시점에 BannerRepository가 이미 displayOrder로 정렬해둔 배열이라 [0]이 항상 최상단 배너
+      return cached[0];
+    } catch {
+      return null;
+    }
+  });
+  return banner;
 }
