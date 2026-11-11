@@ -20,7 +20,7 @@
       ]
     },
     {
-      "source": "/(favicon.png|favicon.svg|apple-touch-icon.png|hanyang_splash.png|hanyang_splash_text.png|hanyang_splash_paw.png|hanyang_cafeteria.jpg|icons.svg|pwa-192x192.png|pwa-512x512.png|manifest.webmanifest)",
+      "source": "/(favicon.png|favicon.svg|apple-touch-icon.png|hanyang_splash.png|hanyang_cafeteria.jpg|icons.svg|pwa-192x192.png|pwa-512x512.png|manifest.webmanifest)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
       ]

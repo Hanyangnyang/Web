@@ -57,26 +57,4 @@ describe('BannerCarousel Instagram Deeplink Integration', () => {
     expect(openInstaSpy).not.toHaveBeenCalled();
     expect(windowOpenSpy).toHaveBeenCalledWith('https://hanyang.ac.kr', '_blank');
   });
-
-  it('내부 팝업/모달 링크 배너(?modal=pepero)를 클릭하면 onOpenModal 콜백이 호출된다', () => {
-    const onOpenModalSpy = vi.fn();
-    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-
-    const promoBanner: Banner = {
-      id: 3,
-      imageUrl: 'https://example.com/promo.png',
-      clickUrl: 'https://hanyang.life/?modal=pepero',
-      altText: '빼빼로데이 프로모션',
-      displayOrder: 1,
-      placement: 'BANNER',
-    };
-
-    render(<BannerCarousel banners={[promoBanner]} loading={false} onOpenModal={onOpenModalSpy} />);
-
-    const img = screen.getByAltText('빼빼로데이 프로모션');
-    fireEvent.click(img);
-
-    expect(onOpenModalSpy).toHaveBeenCalledWith('pepero');
-    expect(windowOpenSpy).not.toHaveBeenCalled();
-  });
 });

@@ -26,11 +26,9 @@ interface BannerCarouselProps {
   // clickUrl에 chip 파라미터(예: ?tab=partner&chip=openspace)가 있으면 캠퍼스맵의 특정 칩까지,
   // box 파라미터(예: ?tab=misc&box=gym)가 있으면 기타탭의 특정 서브뷰까지 지정한다
   onNavigateToTab?: (tab: string, chip?: string, box?: string) => void;
-  // 배너 클릭 시 내부 팝업/모달(예: ?modal=pepero 또는 popup:pepero)을 열기 위한 콜백
-  onOpenModal?: (modalType: string) => void;
 }
 
-export function BannerCarousel({ banners, loading, isActive = true, onNavigateToTab, onOpenModal }: BannerCarouselProps) {
+export function BannerCarousel({ banners, loading, isActive = true, onNavigateToTab }: BannerCarouselProps) {
   const posthog = usePostHog();
   const [current, setCurrent] = useState(0);
   // 마지막 배너 다음에 첫 배너로 "이어서 왼쪽으로" 넘어가는 것처럼 보이려고, 슬라이드 목록 끝에
@@ -163,27 +161,6 @@ export function BannerCarousel({ banners, loading, isActive = true, onNavigateTo
     if (!banner.clickUrl) return;
 
     posthog?.capture('banner_clicked', { banner_id: banner.id, banner_alt_text: banner.altText, click_url: banner.clickUrl });
-
-    // 0. 내부 모달 열기 링크 (예: popup:pepero 또는 ?modal=pepero)
-    if (onOpenModal) {
-      if (banner.clickUrl.startsWith('modal:') || banner.clickUrl.startsWith('popup:')) {
-        const modalType = banner.clickUrl.split(':')[1];
-        if (modalType) {
-          onOpenModal(modalType);
-          return;
-        }
-      }
-      try {
-        const parsedModalUrl = new URL(banner.clickUrl, window.location.origin);
-        const modalType = parsedModalUrl.searchParams.get('modal') || parsedModalUrl.searchParams.get('popup');
-        if (modalType) {
-          onOpenModal(modalType);
-          return;
-        }
-      } catch {
-        // clickUrl 파싱 실패 시 계속 진행
-      }
-    }
 
     // 우리 앱 자신을 가리키는 링크(예: https://hanyang.life/?tab=partner)면 새 창/브라우저를 열지 않고
     // 바로 그 탭으로 전환한다 — 네이티브에서는 window.open이 외부 브라우저로 튀어나가버리기 때문.
