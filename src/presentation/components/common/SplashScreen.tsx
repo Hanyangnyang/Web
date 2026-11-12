@@ -58,7 +58,7 @@ export function SplashScreen({ ready, onDone, variant = 'default' }: SplashScree
     >
       <div className="row-start-2 flex flex-col items-center gap-4">
         <img
-          src="/hanyang_splash.png"
+          src="/hanyang_splash_mascot.png"
           className="w-[200px] h-[200px] object-contain [animation:splash-pop_0.5s_cubic-bezier(0.16,1,0.3,1)_both]"
           alt="하냥냥"
         />

@@ -5,7 +5,7 @@
     <!-- 폰트는 항상 CORS 모드로 요청됨 → crossorigin 없으면 preload가 재사용이 안되고 이중 다운로드 함 -->
     <!-- 브라우저 메모리 캐시는 URL + Request Mode(CORS 여부)를 한 세트로 묶어서 캐시 키를 만들기 때문-->
     <link rel="preload" href="/fonts/HakgyoansimDunggeunmiso-B.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/hanyang_splash.png" as="image" />
+    <link rel="preload" href="/hanyang_splash_mascot.png" as="image" />
     <!-- Spotify 관련 사전 연결은 여기 두지 않음 — 앱 시작 직후 열어도 실제로 쓰기 전에 유휴 시간 초과로 닫혀서.
          i.scdn.co(이미지)는 소식탭·기타탭 진입 시(src/lib/preconnect.ts), open.spotify.com(재생 스크립트)은
          플레이리스트 진입 시 스크립트 자체를 미리 받는 방식(PlaylistView의 loadSpotifyIframeApi)으로 옮김 -->
