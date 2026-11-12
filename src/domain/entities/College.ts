@@ -26,6 +26,8 @@ export const COLLEGES: College[] = [
   { id: '8',  name: '소프트웨어융합대학',    emoji: '💻', displayName: '소프트웨어\n융합대학' },
   { id: '9',  name: '예체능대학',           emoji: '🎵', displayName: '예체능\n대학' },
   { id: '10', name: '첨단융합대학',         emoji: '🚀', displayName: '첨단융합\n대학' },
+  { id: '11', name: '하냥냥',               emoji: '🐱' },
+  { id: '12', name: '학생회',               emoji: '🏛️' },
 ];
 
 const BY_ID = new Map(COLLEGES.map((c) => [c.id, c]));
